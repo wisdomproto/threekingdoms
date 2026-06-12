@@ -16,6 +16,9 @@ importers:
       '@tk/engine':
         specifier: workspace:*
         version: link:../../packages/engine
+      '@tk/sim':
+        specifier: workspace:*
+        version: link:../../packages/sim
       next:
         specifier: ^15.0.0
         version: 15.5.19(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
