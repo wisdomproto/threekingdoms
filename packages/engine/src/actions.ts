@@ -42,6 +42,11 @@ function checkOutcome(ctx: BattleContext, state: BattleState): { state: BattleSt
   const retreated = (id: string) => getUnit(state, id).retreated;
 
   // 패배 체크 우선 — 군주 퇴각과 마지막 적 격파가 동시 발생하면 defeat (원작 룰)
+  // 턴 제한: turn은 maybeAdvancePhase의 적→아군 전환에서만 증가하므로,
+  // turn > turnLimit은 "turnLimit번째 라운드를 온전히 끝낸 직후"에만 참이 된다 (sim runner의 turn <= maxTurns 의미론과 일치)
+  if (state.turn > ctx.stage.turnLimit) {
+    return { state: { ...state, status: "defeat" }, events: [{ type: "battleEnded", result: "defeat" }] };
+  }
   if (d.kind === "lordRetreat" && retreated(d.unitId)) {
     return { state: { ...state, status: "defeat" }, events: [{ type: "battleEnded", result: "defeat" }] };
   }
@@ -150,6 +155,12 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
   const phase = maybeAdvancePhase(next);
   next = phase.state;
   events.push(...phase.events);
+
+  // 턴 증가 직후 재판정 — 턴 제한 패배가 "아군 페이즈 시작 시점"(phaseChanged 직후)에 잡히도록.
+  // 첫 checkOutcome에서 이미 종료됐다면 조기 반환되고, 유닛 상태는 그 사이 불변이라 이중 판정 위험 없음
+  const lateOutcome = checkOutcome(ctx, next);
+  next = lateOutcome.state;
+  events.push(...lateOutcome.events);
 
   return { state: next, events };
 }

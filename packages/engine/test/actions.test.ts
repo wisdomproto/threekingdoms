@@ -211,6 +211,58 @@ describe("페이즈 전환", () => {
   });
 });
 
+describe("턴 제한", () => {
+  /** turnLimit=2 컨텍스트 — 2라운드는 온전히 플레이 가능, 3턴 진입 순간 defeat */
+  const limitCtx: BattleContext = { ...testCtx, stage: { ...testCtx.stage, turnLimit: 2 } };
+
+  /** 한 라운드(아군 전원 wait → 적 전원 wait)를 진행하고 마지막 액션 결과를 반환 */
+  function playRound(ctx: BattleContext, s: BattleState): ReturnType<typeof applyAction> {
+    let last: ReturnType<typeof applyAction> | undefined;
+    for (const side of ["player", "enemy"] as const) {
+      for (const u of s.units.filter((u) => u.side === side && !u.retreated)) {
+        last = applyAction(ctx, s, { type: "wait", unitId: u.id });
+        s = last.state;
+        if (s.status !== "ongoing") return last;
+      }
+    }
+    return last!;
+  }
+
+  it("turnLimit 라운드까지는 ongoing — 마지막 라운드도 온전히 플레이 가능", () => {
+    // 1라운드 종료 → turn=2 (= turnLimit), 아직 ongoing
+    const r1 = playRound(limitCtx, createBattle(limitCtx, 42));
+    expect(r1.state.turn).toBe(2);
+    expect(r1.state.status).toBe("ongoing");
+    // 2라운드(= turnLimit번째 라운드) 중의 아군 행동도 정상 진행
+    const mid = applyAction(limitCtx, r1.state, { type: "wait", unitId: "유비" });
+    expect(mid.state.status).toBe("ongoing");
+  });
+
+  it("turnLimit 초과(턴 증가) 순간 defeat + battleEnded가 마지막 이벤트", () => {
+    const r1 = playRound(limitCtx, createBattle(limitCtx, 42));
+    const r2 = playRound(limitCtx, r1.state); // 2라운드 종료 → turn=3 > turnLimit=2
+    expect(r2.state.turn).toBe(3);
+    expect(r2.state.status).toBe("defeat");
+    expect(r2.events).toContainEqual({ type: "phaseChanged", phase: "player", turn: 3 });
+    expect(r2.events).toContainEqual({ type: "battleEnded", result: "defeat" });
+    // battleEnded는 항상 큐의 마지막 (렌더러 연출 계약)
+    expect(r2.events[r2.events.length - 1]).toEqual({ type: "battleEnded", result: "defeat" });
+    // 종료 후 추가 행동은 거부
+    expect(() => applyAction(limitCtx, r2.state, { type: "wait", unitId: "유비" })).toThrow();
+  });
+
+  it("기본 turnLimit(30) 내에서는 턴 제한이 발동하지 않는다", () => {
+    let s = createBattle(testCtx, 42);
+    for (let i = 0; i < 3; i++) {
+      const r = playRound(testCtx, s);
+      s = r.state;
+      if (s.status !== "ongoing") break;
+    }
+    expect(s.turn).toBe(4);
+    expect(s.status).toBe("ongoing");
+  });
+});
+
 describe("패배 조건", () => {
   it("유비(군주) 퇴각 시 defeat", () => {
     // 유비를 화웅(5,1) 인접 (4,1)에 배치, 병력 1로
