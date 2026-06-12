@@ -43,11 +43,11 @@ export type Commander = z.infer<typeof CommanderSchema>;
 
 /** 데미지 공식 계수 — 시뮬레이션 튜닝의 손잡이 (CLAUDE.md §11) */
 export const CombatConfigSchema = z.object({
-  defFactor: z.number(), // 방어력 반영 비율
-  levelCoef: z.number(), // 레벨 차 1당 데미지 증감률
+  defFactor: z.number().min(0).max(1), // 방어력 반영 비율
+  levelCoef: z.number().min(0).max(0.5), // 레벨 차 1당 데미지 증감률
   minDamage: z.number().int().min(0),
   varianceRatio: z.number().min(0).max(0.5), // 데미지 분산 ±비율
-  classAdvantage: z.record(z.record(z.number())), // attacker classId → defender classId → 배율
+  classAdvantage: z.record(z.record(z.number().positive())), // attacker classId → defender classId → 배율
 });
 export type CombatConfig = z.infer<typeof CombatConfigSchema>;
 
@@ -67,7 +67,10 @@ export const StageEventSchema = z.object({
     loserRetreats: z.boolean(),
   }),
   once: z.boolean(),
-});
+}).refine(
+  (e) => e.outcome.winnerId === e.trigger.attackerId || e.outcome.winnerId === e.trigger.defenderId,
+  { message: "winnerId must be attackerId or defenderId" },
+);
 export type StageEvent = z.infer<typeof StageEventSchema>;
 
 export const StageSchema = z

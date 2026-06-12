@@ -4,6 +4,7 @@ import {
   UnitClassSchema,
   CommanderSchema,
   CombatConfigSchema,
+  StageEventSchema,
   StageSchema,
 } from "../src/schemas";
 
@@ -83,5 +84,21 @@ describe("스키마 검증", () => {
         classAdvantage: { cavalry: { infantry: 1.3 } },
       })
     ).not.toThrow();
+  });
+
+  it("전투 계수: 음수 defFactor 거부", () => {
+    expect(() => CombatConfigSchema.parse({
+      defFactor: -0.5, levelCoef: 0.05, minDamage: 1, varianceRatio: 0.1,
+      classAdvantage: { cavalry: { infantry: 1.3 } },
+    })).toThrow();
+  });
+
+  it("일기토 이벤트: winnerId가 참가자가 아니면 거부", () => {
+    expect(() => StageEventSchema.parse({
+      id: "e", type: "duel",
+      trigger: { kind: "attack", attackerId: "guanyu", defenderId: "huaxiong" },
+      outcome: { winnerId: "zhangfei", loserRetreats: true },
+      once: true,
+    })).toThrow();
   });
 });
