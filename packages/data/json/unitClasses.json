@@ -1,0 +1,8 @@
+{
+  "lord":       { "id": "lord",       "name": "군주",   "move": 5, "rangeMin": 1, "rangeMax": 1 },
+  "cavalry":    { "id": "cavalry",    "name": "기병",   "move": 6, "rangeMin": 1, "rangeMax": 1 },
+  "infantry":   { "id": "infantry",   "name": "보병",   "move": 4, "rangeMin": 1, "rangeMax": 1 },
+  "archer":     { "id": "archer",     "name": "궁병",   "move": 4, "rangeMin": 2, "rangeMax": 2 },
+  "strategist": { "id": "strategist", "name": "책사",   "move": 4, "rangeMin": 1, "rangeMax": 1 },
+  "healer":     { "id": "healer",     "name": "풍수사", "move": 4, "rangeMin": 1, "rangeMax": 1 }
+}

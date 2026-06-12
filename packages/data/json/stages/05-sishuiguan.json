@@ -1,0 +1,47 @@
+{
+  "id": "05-sishuiguan",
+  "name": "사수관 전투",
+  "map": {
+    "width": 12,
+    "height": 12,
+    "tileLegend": { ".": "plain", "r": "road", "f": "forest", "m": "mountain", "#": "wall", "G": "gate" },
+    "tiles": [
+      "mm########mm",
+      "mm#....G.#mm",
+      "m.#....G.#.m",
+      "m..........m",
+      "f....r.r...f",
+      "f....r.r..ff",
+      ".....r.r....",
+      "..f..r.r..f.",
+      ".....r.r....",
+      "..f..r.r....",
+      ".....r.r..f.",
+      ".....r.r...."
+    ]
+  },
+  "units": [
+    { "commanderId": "liubei",    "side": "player", "x": 5, "y": 11 },
+    { "commanderId": "guanyu",    "side": "player", "x": 4, "y": 10 },
+    { "commanderId": "zhangfei",  "side": "player", "x": 7, "y": 10 },
+    { "commanderId": "jianyong",  "side": "player", "x": 5, "y": 10 },
+    { "commanderId": "mizhu",     "side": "player", "x": 6, "y": 11 },
+    { "commanderId": "huaxiong",  "side": "enemy",  "x": 6, "y": 2  },
+    { "commanderId": "dong_inf1", "side": "enemy",  "x": 4, "y": 4  },
+    { "commanderId": "dong_inf2", "side": "enemy",  "x": 8, "y": 4  },
+    { "commanderId": "dong_arc1", "side": "enemy",  "x": 5, "y": 3  },
+    { "commanderId": "dong_arc2", "side": "enemy",  "x": 7, "y": 3  },
+    { "commanderId": "dong_cav1", "side": "enemy",  "x": 6, "y": 6  }
+  ],
+  "victory": { "kind": "defeatUnit", "unitId": "huaxiong" },
+  "defeat":  { "kind": "lordRetreat", "unitId": "liubei" },
+  "events": [
+    {
+      "id": "duel_guanyu_huaxiong",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "guanyu", "defenderId": "huaxiong" },
+      "outcome": { "winnerId": "guanyu", "loserRetreats": true },
+      "once": true
+    }
+  ]
+}

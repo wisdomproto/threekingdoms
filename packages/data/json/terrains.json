@@ -1,0 +1,8 @@
+{
+  "plain":    { "id": "plain",    "name": "평지", "guard": 0,    "moveCost": { "default": 1 } },
+  "road":     { "id": "road",     "name": "가도", "guard": 0,    "moveCost": { "default": 1 } },
+  "forest":   { "id": "forest",   "name": "숲",   "guard": 0.15, "moveCost": { "default": 2, "infantry": 1, "bandit": 1 } },
+  "mountain": { "id": "mountain", "name": "산악", "guard": 0.3,  "moveCost": { "default": 3, "bandit": 1, "cavalry": 4 } },
+  "wall":     { "id": "wall",     "name": "성벽", "guard": 0,    "moveCost": { "default": 99 } },
+  "gate":     { "id": "gate",     "name": "관문", "guard": 0.2,  "moveCost": { "default": 1 } }
+}

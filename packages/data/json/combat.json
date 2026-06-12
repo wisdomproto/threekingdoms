@@ -1,0 +1,11 @@
+{
+  "defFactor": 0.6,
+  "levelCoef": 0.04,
+  "minDamage": 1,
+  "varianceRatio": 0.1,
+  "classAdvantage": {
+    "cavalry":  { "infantry": 1.3 },
+    "infantry": { "archer": 1.3 },
+    "archer":   { "cavalry": 1.3 }
+  }
+}
