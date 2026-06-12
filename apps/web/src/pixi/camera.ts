@@ -101,3 +101,130 @@ export function zoomAt(
   };
   return clampPan(next, viewport, worldSize);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Pixi 적용부 (설계 §2.2 CameraController) — 위 수학부의 유일한 소비자.
+// pixi.js를 직접 import하지 않고 구조적 타입(CameraTarget)으로 컨테이너를 받는다 —
+// camera.test.ts(node 환경, Pixi 무균 지대)가 이 파일을 계속 import할 수 있어야 하기 때문.
+// 트윈 진행은 BattleRenderer가 ticker에서 update(deltaMS)를 호출해 구동한다.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Pixi Container의 구조적 부분집합 — scale/position만 조작 */
+export interface CameraTarget {
+  scale: { set(value: number): void };
+  position: { set(x: number, y: number): void };
+}
+
+interface FocusTween {
+  fromOx: number;
+  fromOy: number;
+  toOx: number;
+  toOy: number;
+  elapsed: number;
+  duration: number;
+}
+
+function easeInOut(t: number): number {
+  return t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+}
+
+export class CameraController {
+  private state: CameraState;
+  private viewport: Size;
+  private readonly worldSize: Size;
+  private readonly target: CameraTarget;
+  private focusTween: FocusTween | null = null;
+
+  constructor(target: CameraTarget, worldSize: Size, viewport: Size) {
+    this.target = target;
+    this.worldSize = worldSize;
+    this.viewport = viewport;
+    this.state = clampPan({ scale: clampZoom(1), ox: 0, oy: 0 }, viewport, worldSize);
+    this.apply();
+  }
+
+  get current(): CameraState {
+    return this.state;
+  }
+
+  resize(viewport: Size): void {
+    this.viewport = viewport;
+    this.state = clampPan(this.state, viewport, this.worldSize);
+    this.apply();
+  }
+
+  panBy(dx: number, dy: number): void {
+    this.focusTween = null; // 수동 팬이 자동 포커스를 이긴다
+    this.state = panBy(this.state, dx, dy, this.viewport, this.worldSize);
+    this.apply();
+  }
+
+  zoomAt(anchor: Point, targetScale: number): void {
+    this.focusTween = null;
+    this.state = zoomAt(this.state, anchor, targetScale, this.viewport, this.worldSize);
+    this.apply();
+  }
+
+  screenToWorld(p: Point): Point {
+    return screenToWorld(this.state, p);
+  }
+
+  /** 컬링용 — 현재 뷰포트가 비추는 월드 좌표 rect */
+  viewWorldRect(): { x: number; y: number; width: number; height: number } {
+    const tl = screenToWorld(this.state, { x: 0, y: 0 });
+    return {
+      x: tl.x,
+      y: tl.y,
+      width: this.viewport.width / this.state.scale,
+      height: this.viewport.height / this.state.scale,
+    };
+  }
+
+  /** worldPoint(월드 px)를 화면 중앙으로 — ms=0이면 즉시 스냅 */
+  focusOn(worldPoint: Point, ms: number): void {
+    const desired = clampPan(
+      {
+        scale: this.state.scale,
+        ox: this.viewport.width / 2 - worldPoint.x * this.state.scale,
+        oy: this.viewport.height / 2 - worldPoint.y * this.state.scale,
+      },
+      this.viewport,
+      this.worldSize,
+    );
+    if (ms <= 0) {
+      this.focusTween = null;
+      this.state = desired;
+      this.apply();
+      return;
+    }
+    this.focusTween = {
+      fromOx: this.state.ox,
+      fromOy: this.state.oy,
+      toOx: desired.ox,
+      toOy: desired.oy,
+      elapsed: 0,
+      duration: ms,
+    };
+  }
+
+  /** ticker에서 호출 — 포커스 트윈 진행 */
+  update(deltaMS: number): void {
+    const tw = this.focusTween;
+    if (!tw) return;
+    tw.elapsed += deltaMS;
+    const t = Math.min(1, tw.elapsed / tw.duration);
+    const k = easeInOut(t);
+    this.state = {
+      scale: this.state.scale,
+      ox: tw.fromOx + (tw.toOx - tw.fromOx) * k,
+      oy: tw.fromOy + (tw.toOy - tw.fromOy) * k,
+    };
+    if (t >= 1) this.focusTween = null;
+    this.apply();
+  }
+
+  private apply(): void {
+    this.target.scale.set(this.state.scale);
+    this.target.position.set(this.state.ox, this.state.oy);
+  }
+}
