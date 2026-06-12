@@ -2783,17 +2783,17 @@
     "intelligence": 70,
     "faceId": 202
   },
-  "？？？": {
-    "id": "？？？",
-    "name": "？？？",
+  "unknown": {
+    "id": "unknown",
+    "name": "unknown",
     "leadership": 100,
     "war": 98,
     "intelligence": 80,
     "faceId": 238
   },
-  "？？？_2": {
-    "id": "？？？_2",
-    "name": "？？？",
+  "unknown_2": {
+    "id": "unknown_2",
+    "name": "unknown",
     "leadership": 83,
     "war": 99,
     "intelligence": 42,

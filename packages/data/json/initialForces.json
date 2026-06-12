@@ -2969,52 +2969,20 @@
     "level": 2,
     "items": []
   },
-  "？？？": {
-    "commanderId": "？？？",
+  "unknown": {
+    "commanderId": "unknown",
     "faction": 142,
     "troops": 950,
     "classId": "guardCavalry",
     "level": 45,
     "items": []
   },
-  "？？？_2": {
-    "commanderId": "？？？_2",
+  "unknown_2": {
+    "commanderId": "unknown_2",
     "faction": 142,
     "troops": 2450,
     "classId": "guardCavalry",
     "level": 40,
-    "items": []
-  },
-  "이명": {
-    "commanderId": "이명",
-    "faction": 142,
-    "troops": 0,
-    "classId": "beastUnit",
-    "level": 15,
-    "items": []
-  },
-  "축융": {
-    "commanderId": "축융",
-    "faction": 142,
-    "troops": 0,
-    "classId": "tribesman",
-    "level": 1,
-    "items": []
-  },
-  "장완": {
-    "commanderId": "장완",
-    "faction": 142,
-    "troops": 0,
-    "classId": "catapult",
-    "level": 30,
-    "items": []
-  },
-  "비위": {
-    "commanderId": "비위",
-    "faction": 142,
-    "troops": 0,
-    "classId": "catapult",
-    "level": 30,
     "items": []
   }
 }

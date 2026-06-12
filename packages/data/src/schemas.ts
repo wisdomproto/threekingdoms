@@ -133,9 +133,9 @@ export type Stage = z.infer<typeof StageSchema>;
 export const InitialForceSchema = z.object({
   commanderId: z.string(),
   faction: z.number().int().min(0).max(255), // 0x80=유비군 … (레퍼런스 §2 구획 D)
-  troops: z.number().int().min(0),
+  troops: z.number().int().min(1), // 0 병력 편성은 변환기에서 skip — 엔진 나눗셈 안전
   classId: z.string(),
-  level: z.number().int().min(0).max(99),
+  level: z.number().int().min(1).max(99),
   items: z.array(z.string()),
 });
 export type InitialForce = z.infer<typeof InitialForceSchema>;
