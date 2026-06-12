@@ -19,4 +19,12 @@ describe.skipIf(!have)("LS11 해제 (C:\\HERO 필요 — 없으면 skip)", () =>
       expect(c.length).toBe(w * h * 1.25 + 2);
     }
   });
+
+  it("해제 결과 해시 회귀 가드 (사수관 청크)", async () => {
+    const { createHash } = await import("node:crypto");
+    const chunks = ls11Extract(readFileSync(`${HERO}\\HEXZMAP.R3`));
+    const hash = createHash("sha256").update(chunks[0]!).digest("hex");
+    // Python ls11_extract.py 산출물과 바이트 일치가 확인된 출력의 지문 — 해시 상수는 저작물 아님
+    expect(hash).toBe("2a375275587b32bf50d7e8126b3dfbde9e68b9580a5357b6722ace97df77050d");
+  });
 });

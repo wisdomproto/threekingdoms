@@ -9,6 +9,7 @@ class BitReader {
     let ret = 0;
     for (let i = 0; i < n; i++) {
       if (this.bitLen === 0) {
+        if (this.bytePos >= this.d.length) throw new Error("LS11: unexpected end of input");
         this.bitQueue = this.d[this.bytePos]!;
         this.bytePos += 1;
         this.bitLen = 8;
@@ -42,6 +43,9 @@ function decompressChunk(data: Uint8Array, offset: number, origSize: number, dic
       out[len++] = dic[code]!;
     } else {
       const moveBack = code - 0x100;
+      if (moveBack === 0 || moveBack > len) {
+        throw new Error(`LS11: invalid back-reference ${moveBack} at output ${len}`);
+      }
       const copies = br.getCode() + 3;
       for (let i = 0; i < copies && len < origSize; i++) {
         out[len] = out[len - moveBack]!;
@@ -53,6 +57,7 @@ function decompressChunk(data: Uint8Array, offset: number, origSize: number, dic
 }
 
 export function ls11Extract(buf: Uint8Array): Uint8Array[] {
+  if (buf.length < 0x110) throw new Error(`LS11: buffer too small (${buf.length} bytes)`);
   const magic = String.fromCharCode(buf[0]!, buf[1]!, buf[2]!, buf[3]!);
   if (magic !== "LS11" && magic !== "Ls11") throw new Error(`not LS11: ${magic}`);
   const dic = buf.subarray(0x10, 0x110);
