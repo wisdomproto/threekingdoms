@@ -42,6 +42,20 @@ describe("computeDamage", () => {
     const r = computeDamage(ctx, state, weak, get("huaxiong"));
     expect(r.damage).toBeGreaterThanOrEqual(ctx.data.combat.minDamage);
   });
+
+  it("분산이 [1-vr, 1+vr) 범위 안이다", () => {
+    const { get } = unitsOf(createBattle(ctx.stage, ctx.data, 42));
+    const noVar: BattleContext = {
+      ...ctx, data: { ...ctx.data, combat: { ...ctx.data.combat, varianceRatio: 0 } },
+    };
+    for (const seed of [0, 1, 42, 12345]) {
+      const state = createBattle(ctx.stage, ctx.data, seed);
+      const base = computeDamage(noVar, state, get("guanyu"), get("dong_inf1")).damage;
+      const withVar = computeDamage(ctx, state, get("guanyu"), get("dong_inf1")).damage;
+      expect(withVar).toBeGreaterThanOrEqual(Math.floor(base * 0.9));
+      expect(withVar).toBeLessThanOrEqual(Math.ceil(base * 1.1));
+    }
+  });
 });
 
 describe("getAttackableTargets", () => {

@@ -6,7 +6,7 @@ import { terrainAt } from "./movement";
  * 데미지 공식 (계수는 전부 data/combat.json — CLAUDE.md §11 데이터-코드 분리):
  * base  = atk - def * defFactor
  * mult  = 상성 배율 × (1 - 방어측 지형 guard) × (1 + 레벨차 × levelCoef)
- * 분산  = ±varianceRatio (시드 RNG)
+ * 분산  = [1-varianceRatio, 1+varianceRatio) — rand ∈ [0,1)이라 상한 미포함 (시드 RNG)
  * 결과  = max(minDamage, floor(base × mult × variance))
  */
 export function computeDamage(
@@ -19,7 +19,7 @@ export function computeDamage(
   const base = Math.max(0, attacker.atk - defender.def * cfg.defFactor);
   const advantage = cfg.classAdvantage[attacker.classId]?.[defender.classId] ?? 1;
   const guard = terrainAt(ctx, defender.x, defender.y).guard;
-  const levelFactor = 1 + (attacker.level - defender.level) * cfg.levelCoef;
+  const levelFactor = Math.max(0, 1 + (attacker.level - defender.level) * cfg.levelCoef);
   const [rand, nextRngState] = nextRandom(state.rngState);
   const variance = 1 - cfg.varianceRatio + rand * cfg.varianceRatio * 2;
   const damage = Math.max(
@@ -46,7 +46,7 @@ export function getAttackableTargets(
   return state.units
     .filter((t) => t.side !== unit.side && !t.retreated)
     .filter((t) => {
-      const d = distance(pos, t);
+      const d = distance(pos, { x: t.x, y: t.y });
       return d >= unit.rangeMin && d <= unit.rangeMax;
     })
     .map((t) => t.id);
