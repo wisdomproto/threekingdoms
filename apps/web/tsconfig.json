@@ -20,6 +20,8 @@
   },
   "include": [
     "app",
+    "src",
+    "vitest.config.ts",
     "next-env.d.ts",
     ".next/types/**/*.ts"
   ],
