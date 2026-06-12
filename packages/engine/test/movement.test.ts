@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { gameData, stages } from "@tk/data";
 import { createBattle } from "../src/createBattle";
-import { getMovableTiles, terrainAt } from "../src/movement";
+import { getMovableTiles, terrainAt, moveCostFor } from "../src/movement";
 import type { BattleContext } from "../src/types";
 
 const ctx: BattleContext = { data: gameData, stage: stages["05-sishuiguan"]! };
@@ -14,7 +14,7 @@ describe("getMovableTiles", () => {
     expect(tiles).toContainEqual({ x: guanyu.x, y: guanyu.y });
     for (const t of tiles) {
       const manhattan = Math.abs(t.x - guanyu.x) + Math.abs(t.y - guanyu.y);
-      expect(manhattan).toBeLessThanOrEqual(guanyu.move); // 비용 1 미만 지형은 없으므로 상한
+      expect(manhattan).toBeLessThanOrEqual(guanyu.move); // 비용이 최소 1이므로 맨해튼 거리가 이동력을 초과하는 타일에는 도달 불가
     }
   });
 
@@ -41,5 +41,14 @@ describe("getMovableTiles", () => {
     const state = createBattle(ctx.stage, ctx.data, 42);
     const tiles = getMovableTiles(ctx, state, "liubei");
     expect(tiles.some((t) => t.y <= 7)).toBe(true); // 아군 라인 너머 북쪽으로 도달 가능
+  });
+
+  it("지형 비용은 병종 오버라이드를 적용한다 (기병 산악 4, 보병 숲 1)", () => {
+    const mountain = gameData.terrains["mountain"]!;
+    const forest = gameData.terrains["forest"]!;
+    expect(moveCostFor(mountain, "cavalry")).toBe(4);
+    expect(moveCostFor(mountain, "infantry")).toBe(3); // default
+    expect(moveCostFor(forest, "infantry")).toBe(1);
+    expect(moveCostFor(forest, "cavalry")).toBe(2); // default
   });
 });

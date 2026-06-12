@@ -7,8 +7,9 @@ export function terrainAt(ctx: BattleContext, x: number, y: number): Terrain {
   const ch = row[x];
   if (ch === undefined) throw new Error(`x out of range: ${x}`);
   const tid = ctx.stage.map.tileLegend[ch];
-  const terrain = tid ? ctx.data.terrains[tid] : undefined;
-  if (!terrain) throw new Error(`unknown tile '${ch}' at (${x},${y})`);
+  if (tid === undefined) throw new Error(`no legend entry for tile '${ch}' at (${x},${y})`);
+  const terrain = ctx.data.terrains[tid];
+  if (!terrain) throw new Error(`unknown terrain id '${tid}' for tile '${ch}' at (${x},${y})`);
   return terrain;
 }
 
@@ -22,7 +23,10 @@ export function unitAt(state: BattleState, x: number, y: number): UnitState | un
 
 const IMPASSABLE = 99;
 
-/** 다익스트라. 적 점유 타일은 통과 불가, 아군 점유 타일은 통과 가능·정지 불가 */
+/**
+ * 다익스트라. 적 점유 타일은 통과 불가, 아군 점유 타일은 통과 가능·정지 불가.
+ * moved/acted 가드는 호출자(applyAction)의 책임 — 이 함수는 위치·지형·이동력만 본다.
+ */
 export function getMovableTiles(ctx: BattleContext, state: BattleState, unitId: string): Coord[] {
   const unit = state.units.find((u) => u.id === unitId);
   if (!unit || unit.retreated) return [];
@@ -61,5 +65,7 @@ export function getMovableTiles(ctx: BattleContext, state: BattleState, unitId: 
     if (occupant && occupant.id !== unit.id) continue; // 점유 타일에 정지 불가
     result.push({ x, y });
   }
+  // 좌표 정렬로 반환 순서를 플랫폼/입력 무관하게 고정 — 시뮬 결정론의 전제
+  result.sort((a, b) => (a.y !== b.y ? a.y - b.y : a.x - b.x));
   return result;
 }
