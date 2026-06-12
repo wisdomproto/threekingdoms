@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { parseBakdata } from "./bakdata";
+import { parseBakdata } from "./bakdata.js";
+import { parseHexzmap, toBattleMap } from "./hexzmap.js";
 
 function arg(name: string, fallback: string): string {
   const i = process.argv.indexOf(`--${name}`);
@@ -18,4 +19,11 @@ write("commanders.json", bak.commanders);
 write("items.json", bak.items);
 write("initialForces.json", bak.initialForces);
 console.log(`장수 ${Object.keys(bak.commanders).length} / 아이템 ${Object.keys(bak.items).length} / 편성 ${Object.keys(bak.initialForces).length} → ${outDir}`);
-// 맵 변환은 Task 6에서 이 CLI에 추가
+
+// 맵 변환 (Task 6)
+const rawMaps = parseHexzmap(readFileSync(join(heroDir, "HEXZMAP.R3")));
+mkdirSync(join(outDir, "maps"), { recursive: true });
+const { map, unmapped } = toBattleMap(rawMaps[0]!, "sishuiguan");
+if (unmapped.length > 0) console.warn(`사수관 미매핑 타일: ${unmapped.join(", ")} → plain 폴백`);
+write("maps/sishuiguan.json", map);
+console.log(`맵: 사수관 ${map.width}×${map.height}`);

@@ -61,4 +61,11 @@ describe("게임 데이터 v2 무결성", () => {
       for (const it of f.items) expect(gameData.items[it], it).toBeDefined();
     }
   });
+
+  it("사수관 맵: 56×32, legend의 지형이 전부 실존", () => {
+    const m = gameData.maps["sishuiguan"]!;
+    expect(m.width).toBe(56);
+    expect(m.height).toBe(32);
+    for (const tid of Object.values(m.tileLegend)) expect(gameData.terrains[tid], tid).toBeDefined();
+  });
 });
