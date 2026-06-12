@@ -15,7 +15,7 @@ const BAR_STYLE: React.CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  padding: "10px 14px",
+  padding: "calc(10px + env(safe-area-inset-top)) 14px 10px", // 노치 기기 상단 안전 영역
   color: "#e8e6e3",
   fontSize: 15,
   background: "linear-gradient(rgba(10, 12, 15, 0.75), rgba(10, 12, 15, 0))",
