@@ -1,104 +1,70 @@
 import { describe, it, expect } from "vitest";
 import {
-  TerrainSchema,
-  UnitClassSchema,
-  CommanderSchema,
-  CombatConfigSchema,
-  StageEventSchema,
-  StageSchema,
+  CommanderSchema, UnitClassSchema, TerrainSchema, ItemSchema,
+  CombatConfigSchema, BattleMapSchema, StageSchema, StageEventSchema,
 } from "../src/schemas";
 
-describe("스키마 검증", () => {
-  it("지형: 정상 데이터 통과", () => {
-    expect(() =>
-      TerrainSchema.parse({
-        id: "plain",
-        name: "평지",
-        guard: 0,
-        moveCost: { default: 1 },
-      })
-    ).not.toThrow();
-  });
-
-  it("지형: guard 범위(0~0.9) 밖이면 거부", () => {
-    expect(() =>
-      TerrainSchema.parse({
-        id: "x",
-        name: "x",
-        guard: 1.5,
-        moveCost: { default: 1 },
-      })
-    ).toThrow();
-  });
-
-  it("병종: 사거리 min > max면 거부", () => {
-    expect(() =>
-      UnitClassSchema.parse({
-        id: "archer",
-        name: "궁병",
-        move: 4,
-        rangeMin: 2,
-        rangeMax: 1,
-      })
-    ).toThrow();
-  });
-
-  it("장수: 음수 스탯 거부", () => {
-    expect(() =>
-      CommanderSchema.parse({
-        id: "x",
-        name: "x",
-        classId: "infantry",
-        level: 1,
-        stats: { hp: -1, mp: 0, atk: 10, def: 10, int: 10 },
-      })
-    ).toThrow();
-  });
-
-  it("스테이지: 맵 타일 행 길이가 width와 다르면 거부", () => {
-    expect(() =>
-      StageSchema.parse({
-        id: "s",
-        name: "s",
-        map: {
-          width: 3,
-          height: 1,
-          tileLegend: { ".": "plain" },
-          tiles: [".."],
-        },
-        units: [],
-        victory: { kind: "defeatAll" },
-        defeat: { kind: "lordRetreat", unitId: "liubei" },
-        events: [],
-      })
-    ).toThrow();
-  });
-
-  it("전투 계수: 정상 데이터 통과", () => {
-    expect(() =>
-      CombatConfigSchema.parse({
-        defFactor: 0.5,
-        levelCoef: 0.05,
-        minDamage: 1,
-        varianceRatio: 0.1,
-        classAdvantage: { cavalry: { infantry: 1.3 } },
-      })
-    ).not.toThrow();
-  });
-
-  it("전투 계수: 음수 defFactor 거부", () => {
-    expect(() => CombatConfigSchema.parse({
-      defFactor: -0.5, levelCoef: 0.05, minDamage: 1, varianceRatio: 0.1,
-      classAdvantage: { cavalry: { infantry: 1.3 } },
+describe("스키마 v2 (원작 모델)", () => {
+  it("장수: 통솔/무력/지력 1~100", () => {
+    expect(() => CommanderSchema.parse({
+      id: "관우", name: "관우", leadership: 100, war: 98, intelligence: 80, faceId: 1,
+    })).not.toThrow();
+    expect(() => CommanderSchema.parse({
+      id: "x", name: "x", leadership: 101, war: 50, intelligence: 50, faceId: 0,
     })).toThrow();
   });
 
-  it("일기토 이벤트: winnerId가 참가자가 아니면 거부", () => {
+  it("병종: 승급 라인/티어/지형등급/사거리", () => {
+    expect(() => UnitClassSchema.parse({
+      id: "lightCavalry", name: "경기병", code: 6, baseAtk: 120, baseDef: 60,
+      move: 6, rangeMin: 1, rangeMax: 1, line: "cavalry", tier: 1, moveClass: "cavalry",
+    })).not.toThrow();
+    expect(() => UnitClassSchema.parse({
+      id: "x", name: "x", code: 0, baseAtk: 80, baseDef: 80,
+      move: 4, rangeMin: 2, rangeMax: 1, line: "infantry", tier: 1, moveClass: "foot",
+    })).toThrow(); // rangeMin > rangeMax
+  });
+
+  it("아이템: 분류/효과치/% 보정", () => {
+    expect(() => ItemSchema.parse({
+      id: "청룡언월도", name: "청룡언월도", category: "weapon", power: 255, bonusPercent: 12,
+    })).not.toThrow();
+    expect(() => ItemSchema.parse({
+      id: "x", name: "x", category: "snack", power: 0, bonusPercent: 0,
+    })).toThrow(); // 잘못된 분류
+  });
+
+  it("전투 설정: 원작 상수 형태", () => {
+    expect(() => CombatConfigSchema.parse({
+      advantageDefFactor: 0.75, disadvantageDefFactor: 1.25,
+      counterRatio: 0.5, minDamage: 1, maxTurns: 30,
+      lineAdvantage: { cavalry: "infantry", infantry: "archer", archer: "cavalry" },
+    })).not.toThrow();
+  });
+
+  it("맵: tiles 행 길이 검증 (v0 메커니즘 계승)", () => {
+    expect(() => BattleMapSchema.parse({
+      id: "m", name: "m", width: 3, height: 1,
+      tileLegend: { ".": "plain" }, tiles: [".."],
+    })).toThrow();
+  });
+
+  it("스테이지: 배치에 병종/레벨/병력 포함, 맵은 id 참조", () => {
+    expect(() => StageSchema.parse({
+      id: "s", name: "s", mapId: "sishuiguan", turnLimit: 30,
+      units: [{ commanderId: "관우", classId: "lightCavalry", level: 1, troops: 1120,
+                items: ["청룡언월도"], side: "player", x: 0, y: 0 }],
+      victory: { kind: "defeatUnit", unitId: "화웅" },
+      defeat: { kind: "lordRetreat", unitId: "유비" },
+      events: [],
+    })).not.toThrow();
+  });
+
+  it("일기토 이벤트: winnerId 교차 검증 유지", () => {
     expect(() => StageEventSchema.parse({
       id: "e", type: "duel",
-      trigger: { kind: "attack", attackerId: "guanyu", defenderId: "huaxiong" },
-      outcome: { winnerId: "zhangfei", loserRetreats: true },
-      once: true,
+      trigger: { kind: "attack", attackerId: "관우", defenderId: "화웅" },
+      outcome: { winnerId: "장비", loserRetreats: true }, once: true,
     })).toThrow();
   });
 });
