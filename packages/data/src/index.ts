@@ -26,14 +26,26 @@ export interface GameData {
   combat: CombatConfig;
 }
 
+function loadJson<T>(
+  schema: { safeParse: (d: unknown) => { success: true; data: T } | { success: false; error: { message: string } } },
+  data: unknown,
+  filename: string
+): T {
+  const result = schema.safeParse(data);
+  if (!result.success) {
+    throw new Error(`[${filename}] 스키마 검증 실패:\n${result.error.message}`);
+  }
+  return result.data;
+}
+
 /** import 시점에 전부 검증 — 잘못된 JSON은 여기서 즉시 터진다 */
 export const gameData: GameData = {
-  terrains: z.record(TerrainSchema).parse(terrainsJson),
-  unitClasses: z.record(UnitClassSchema).parse(unitClassesJson),
-  commanders: z.record(CommanderSchema).parse(commandersJson),
-  combat: CombatConfigSchema.parse(combatJson),
+  terrains: loadJson(z.record(TerrainSchema), terrainsJson, "terrains.json"),
+  unitClasses: loadJson(z.record(UnitClassSchema), unitClassesJson, "unitClasses.json"),
+  commanders: loadJson(z.record(CommanderSchema), commandersJson, "commanders.json"),
+  combat: loadJson(CombatConfigSchema, combatJson, "combat.json"),
 };
 
 export const stages: Record<string, Stage> = {
-  "05-sishuiguan": StageSchema.parse(sishuiguanJson),
+  "05-sishuiguan": loadJson(StageSchema, sishuiguanJson, "stages/05-sishuiguan.json"),
 };

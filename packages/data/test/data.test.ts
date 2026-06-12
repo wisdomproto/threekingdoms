@@ -41,4 +41,26 @@ describe("게임 데이터 무결성", () => {
       expect(placed.has(e.trigger.defenderId)).toBe(true);
     }
   });
+
+  it("사수관: victory/defeat의 unitId가 배치되어 있다", () => {
+    const stage = stages["05-sishuiguan"]!;
+    const placed = new Set(stage.units.map((u) => u.commanderId));
+    if ("unitId" in stage.victory) expect(placed.has(stage.victory.unitId)).toBe(true);
+    expect(placed.has(stage.defeat.unitId)).toBe(true);
+  });
+
+  it("전투 계수: classAdvantage의 classId가 전부 병종 테이블에 존재한다", () => {
+    for (const [atkId, defs] of Object.entries(gameData.combat.classAdvantage)) {
+      expect(gameData.unitClasses[atkId], `attacker ${atkId}`).toBeDefined();
+      for (const defId of Object.keys(defs)) {
+        expect(gameData.unitClasses[defId], `defender ${defId}`).toBeDefined();
+      }
+    }
+  });
+
+  it("레코드 키와 id 필드가 일치한다", () => {
+    for (const [k, v] of Object.entries(gameData.terrains)) expect(v.id).toBe(k);
+    for (const [k, v] of Object.entries(gameData.unitClasses)) expect(v.id).toBe(k);
+    for (const [k, v] of Object.entries(gameData.commanders)) expect(v.id).toBe(k);
+  });
 });
