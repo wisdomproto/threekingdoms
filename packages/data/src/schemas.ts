@@ -129,3 +129,13 @@ export const StageSchema = z.object({
   events: z.array(StageEventSchema),
 });
 export type Stage = z.infer<typeof StageSchema>;
+
+export const InitialForceSchema = z.object({
+  commanderId: z.string(),
+  faction: z.number().int().min(0).max(255), // 0x80=유비군 … (레퍼런스 §2 구획 D)
+  troops: z.number().int().min(0),
+  classId: z.string(),
+  level: z.number().int().min(0).max(99),
+  items: z.array(z.string()),
+});
+export type InitialForce = z.infer<typeof InitialForceSchema>;

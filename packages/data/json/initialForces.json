@@ -1,0 +1,3020 @@
+{
+  "유비": {
+    "commanderId": "유비",
+    "faction": 128,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "관우": {
+    "commanderId": "관우",
+    "faction": 128,
+    "troops": 1120,
+    "classId": "lightCavalry",
+    "level": 1,
+    "items": [
+      "청룡언월도"
+    ]
+  },
+  "장비": {
+    "commanderId": "장비",
+    "faction": 128,
+    "troops": 1120,
+    "classId": "lightCavalry",
+    "level": 1,
+    "items": [
+      "사모"
+    ]
+  },
+  "동탁": {
+    "commanderId": "동탁",
+    "faction": 133,
+    "troops": 2080,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "여포": {
+    "commanderId": "여포",
+    "faction": 135,
+    "troops": 2720,
+    "classId": "lightCavalry",
+    "level": 6,
+    "items": [
+      "적토마",
+      "방천화극"
+    ]
+  },
+  "화웅": {
+    "commanderId": "화웅",
+    "faction": 133,
+    "troops": 1760,
+    "classId": "lightCavalry",
+    "level": 3,
+    "items": []
+  },
+  "이유": {
+    "commanderId": "이유",
+    "faction": 133,
+    "troops": 1760,
+    "classId": "archer",
+    "level": 3,
+    "items": []
+  },
+  "공융": {
+    "commanderId": "공융",
+    "faction": 141,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 8,
+    "items": []
+  },
+  "조조": {
+    "commanderId": "조조",
+    "faction": 129,
+    "troops": 2720,
+    "classId": "lightCavalry",
+    "level": 18,
+    "items": [
+      "청강검",
+      "오자의병법서",
+      "옥새"
+    ]
+  },
+  "원소": {
+    "commanderId": "원소",
+    "faction": 132,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "손견": {
+    "commanderId": "손견",
+    "faction": 130,
+    "troops": 2080,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": []
+  },
+  "원술": {
+    "commanderId": "원술",
+    "faction": 134,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "공손찬": {
+    "commanderId": "공손찬",
+    "faction": 131,
+    "troops": 1760,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": []
+  },
+  "정보": {
+    "commanderId": "정보",
+    "faction": 130,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "황개": {
+    "commanderId": "황개",
+    "faction": 130,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "도겸": {
+    "commanderId": "도겸",
+    "faction": 136,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "하후돈": {
+    "commanderId": "하후돈",
+    "faction": 129,
+    "troops": 2720,
+    "classId": "lightCavalry",
+    "level": 15,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "하후연": {
+    "commanderId": "하후연",
+    "faction": 129,
+    "troops": 2720,
+    "classId": "lightCavalry",
+    "level": 15,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "조인": {
+    "commanderId": "조인",
+    "faction": 129,
+    "troops": 2720,
+    "classId": "footman",
+    "level": 15,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "조홍": {
+    "commanderId": "조홍",
+    "faction": 129,
+    "troops": 2720,
+    "classId": "footman",
+    "level": 15,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "이숙": {
+    "commanderId": "이숙",
+    "faction": 133,
+    "troops": 1760,
+    "classId": "archer",
+    "level": 3,
+    "items": []
+  },
+  "호진": {
+    "commanderId": "호진",
+    "faction": 133,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": []
+  },
+  "양앙": {
+    "commanderId": "양앙",
+    "faction": 139,
+    "troops": 1760,
+    "classId": "archer",
+    "level": 3,
+    "items": []
+  },
+  "황권": {
+    "commanderId": "황권",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "염포": {
+    "commanderId": "염포",
+    "faction": 139,
+    "troops": 1120,
+    "classId": "bandit",
+    "level": 1,
+    "items": []
+  },
+  "공손월": {
+    "commanderId": "공손월",
+    "faction": 131,
+    "troops": 1760,
+    "classId": "archer",
+    "level": 7,
+    "items": []
+  },
+  "조표": {
+    "commanderId": "조표",
+    "faction": 136,
+    "troops": 1120,
+    "classId": "band",
+    "level": 3,
+    "items": []
+  },
+  "조잠": {
+    "commanderId": "조잠",
+    "faction": 133,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": []
+  },
+  "여건": {
+    "commanderId": "여건",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "관훙": {
+    "commanderId": "관훙",
+    "faction": 142,
+    "troops": 3360,
+    "classId": "guardCavalry",
+    "level": 41,
+    "items": []
+  },
+  "마속": {
+    "commanderId": "마속",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "band",
+    "level": 30,
+    "items": []
+  },
+  "이풍": {
+    "commanderId": "이풍",
+    "faction": 134,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "서상": {
+    "commanderId": "서상",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "요화": {
+    "commanderId": "요화",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "chariot",
+    "level": 40,
+    "items": []
+  },
+  "사마가": {
+    "commanderId": "사마가",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "tribesman",
+    "level": 4,
+    "items": []
+  },
+  "순상": {
+    "commanderId": "순상",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "두습": {
+    "commanderId": "두습",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "bandit",
+    "level": 1,
+    "items": []
+  },
+  "왕보": {
+    "commanderId": "왕보",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "chariot",
+    "level": 40,
+    "items": []
+  },
+  "조루": {
+    "commanderId": "조루",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "catapult",
+    "level": 40,
+    "items": []
+  },
+  "유대": {
+    "commanderId": "유대",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "장막": {
+    "commanderId": "장막",
+    "faction": 135,
+    "troops": 2080,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "손환": {
+    "commanderId": "손환",
+    "faction": 130,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "원윤": {
+    "commanderId": "원윤",
+    "faction": 134,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "장포": {
+    "commanderId": "장포",
+    "faction": 142,
+    "troops": 3360,
+    "classId": "guardCavalry",
+    "level": 41,
+    "items": []
+  },
+  "한당": {
+    "commanderId": "한당",
+    "faction": 130,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "주연": {
+    "commanderId": "주연",
+    "faction": 130,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "이각": {
+    "commanderId": "이각",
+    "faction": 133,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": []
+  },
+  "곽사": {
+    "commanderId": "곽사",
+    "faction": 133,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": []
+  },
+  "서영": {
+    "commanderId": "서영",
+    "faction": 133,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": []
+  },
+  "전풍": {
+    "commanderId": "전풍",
+    "faction": 132,
+    "troops": 2400,
+    "classId": "archer",
+    "level": 5,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "저수": {
+    "commanderId": "저수",
+    "faction": 132,
+    "troops": 2080,
+    "classId": "archer",
+    "level": 4,
+    "items": []
+  },
+  "안량": {
+    "commanderId": "안량",
+    "faction": 132,
+    "troops": 1900,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "문추": {
+    "commanderId": "문추",
+    "faction": 132,
+    "troops": 1900,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "조운": {
+    "commanderId": "조운",
+    "faction": 131,
+    "troops": 2080,
+    "classId": "lightCavalry",
+    "level": 11,
+    "items": []
+  },
+  "봉기": {
+    "commanderId": "봉기",
+    "faction": 132,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "허유": {
+    "commanderId": "허유",
+    "faction": 132,
+    "troops": 1800,
+    "classId": "band",
+    "level": 4,
+    "items": []
+  },
+  "진진": {
+    "commanderId": "진진",
+    "faction": 132,
+    "troops": 1800,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "경무": {
+    "commanderId": "경무",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "관순": {
+    "commanderId": "관순",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 4,
+    "items": []
+  },
+  "엄강": {
+    "commanderId": "엄강",
+    "faction": 131,
+    "troops": 1760,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": []
+  },
+  "국의": {
+    "commanderId": "국의",
+    "faction": 132,
+    "troops": 2080,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": []
+  },
+  "곽가": {
+    "commanderId": "곽가",
+    "faction": 129,
+    "troops": 2400,
+    "classId": "archer",
+    "level": 15,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "우금": {
+    "commanderId": "우금",
+    "faction": 129,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 12,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "손건": {
+    "commanderId": "손건",
+    "faction": 136,
+    "troops": 1440,
+    "classId": "transport",
+    "level": 9,
+    "items": []
+  },
+  "미축": {
+    "commanderId": "미축",
+    "faction": 136,
+    "troops": 1440,
+    "classId": "band",
+    "level": 10,
+    "items": []
+  },
+  "진등": {
+    "commanderId": "진등",
+    "faction": 136,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 10,
+    "items": []
+  },
+  "악취": {
+    "commanderId": "악취",
+    "faction": 134,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "허저": {
+    "commanderId": "허저",
+    "faction": 129,
+    "troops": 2400,
+    "classId": "lightCavalry",
+    "level": 5,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "순욱": {
+    "commanderId": "순욱",
+    "faction": 129,
+    "troops": 2400,
+    "classId": "band",
+    "level": 15,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "기영": {
+    "commanderId": "기영",
+    "faction": 134,
+    "troops": 2400,
+    "classId": "lightCavalry",
+    "level": 5,
+    "items": [
+      "삼첨도",
+      "오자의병법서"
+    ]
+  },
+  "동소": {
+    "commanderId": "동소",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "진기": {
+    "commanderId": "진기",
+    "faction": 134,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "고순": {
+    "commanderId": "고순",
+    "faction": 135,
+    "troops": 2080,
+    "classId": "beastUnit",
+    "level": 3,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "위속": {
+    "commanderId": "위속",
+    "faction": 135,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": []
+  },
+  "송겸": {
+    "commanderId": "송겸",
+    "faction": 135,
+    "troops": 1760,
+    "classId": "archer",
+    "level": 3,
+    "items": []
+  },
+  "진궁": {
+    "commanderId": "진궁",
+    "faction": 135,
+    "troops": 2080,
+    "classId": "archer",
+    "level": 4,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "순유": {
+    "commanderId": "순유",
+    "faction": 129,
+    "troops": 2400,
+    "classId": "band",
+    "level": 5,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "정욱": {
+    "commanderId": "정욱",
+    "faction": 129,
+    "troops": 2080,
+    "classId": "archer",
+    "level": 4,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "서황": {
+    "commanderId": "서황",
+    "faction": 129,
+    "troops": 2080,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "장요": {
+    "commanderId": "장요",
+    "faction": 135,
+    "troops": 2080,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "후성": {
+    "commanderId": "후성",
+    "faction": 135,
+    "troops": 2080,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": []
+  },
+  "미방": {
+    "commanderId": "미방",
+    "faction": 136,
+    "troops": 1440,
+    "classId": "footman",
+    "level": 9,
+    "items": []
+  },
+  "간옹": {
+    "commanderId": "간옹",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "archer",
+    "level": 3,
+    "items": []
+  },
+  "만총": {
+    "commanderId": "만총",
+    "faction": 129,
+    "troops": 1760,
+    "classId": "archer",
+    "level": 3,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "허사": {
+    "commanderId": "허사",
+    "faction": 135,
+    "troops": 2080,
+    "classId": "brawler",
+    "level": 4,
+    "items": []
+  },
+  "왕개": {
+    "commanderId": "왕개",
+    "faction": 135,
+    "troops": 1440,
+    "classId": "transport",
+    "level": 2,
+    "items": []
+  },
+  "학맹": {
+    "commanderId": "학맹",
+    "faction": 135,
+    "troops": 1440,
+    "classId": "band",
+    "level": 2,
+    "items": []
+  },
+  "조성": {
+    "commanderId": "조성",
+    "faction": 135,
+    "troops": 1440,
+    "classId": "brawler",
+    "level": 2,
+    "items": []
+  },
+  "손관": {
+    "commanderId": "손관",
+    "faction": 135,
+    "troops": 1440,
+    "classId": "archer",
+    "level": 2,
+    "items": []
+  },
+  "차주": {
+    "commanderId": "차주",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "오반": {
+    "commanderId": "오반",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "archer",
+    "level": 5,
+    "items": []
+  },
+  "심배": {
+    "commanderId": "심배",
+    "faction": 132,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "곽도": {
+    "commanderId": "곽도",
+    "faction": 132,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "가후": {
+    "commanderId": "가후",
+    "faction": 129,
+    "troops": 2080,
+    "classId": "transport",
+    "level": 4,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "유표": {
+    "commanderId": "유표",
+    "faction": 137,
+    "troops": 1760,
+    "classId": "lightCavalry",
+    "level": 3,
+    "items": []
+  },
+  "주영": {
+    "commanderId": "주영",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "노소": {
+    "commanderId": "노소",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "마등": {
+    "commanderId": "마등",
+    "faction": 140,
+    "troops": 3040,
+    "classId": "lightCavalry",
+    "level": 7,
+    "items": []
+  },
+  "진림": {
+    "commanderId": "진림",
+    "faction": 132,
+    "troops": 1760,
+    "classId": "transport",
+    "level": 3,
+    "items": []
+  },
+  "왕충": {
+    "commanderId": "왕충",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "유엽": {
+    "commanderId": "유엽",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "장수": {
+    "commanderId": "장수",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "장합": {
+    "commanderId": "장합",
+    "faction": 132,
+    "troops": 2080,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "고람": {
+    "commanderId": "고람",
+    "faction": 132,
+    "troops": 1800,
+    "classId": "archer",
+    "level": 4,
+    "items": []
+  },
+  "한맹": {
+    "commanderId": "한맹",
+    "faction": 132,
+    "troops": 1800,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "순우경": {
+    "commanderId": "순우경",
+    "faction": 132,
+    "troops": 2080,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": []
+  },
+  "장기": {
+    "commanderId": "장기",
+    "faction": 132,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "마충": {
+    "commanderId": "마충",
+    "faction": 130,
+    "troops": 2080,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "이이": {
+    "commanderId": "이이",
+    "faction": 130,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "사정": {
+    "commanderId": "사정",
+    "faction": 130,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "신명": {
+    "commanderId": "신명",
+    "faction": 132,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": []
+  },
+  "서서": {
+    "commanderId": "서서",
+    "faction": 142,
+    "troops": 2720,
+    "classId": "sorcerer",
+    "level": 26,
+    "items": []
+  },
+  "채모": {
+    "commanderId": "채모",
+    "faction": 137,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "이적": {
+    "commanderId": "이적",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "pikeman",
+    "level": 23,
+    "items": []
+  },
+  "유기": {
+    "commanderId": "유기",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "pikeman",
+    "level": 24,
+    "items": []
+  },
+  "이전": {
+    "commanderId": "이전",
+    "faction": 129,
+    "troops": 2080,
+    "classId": "footman",
+    "level": 4,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "유봉": {
+    "commanderId": "유봉",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "pikeman",
+    "level": 23,
+    "items": []
+  },
+  "장무": {
+    "commanderId": "장무",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "bandit",
+    "level": 5,
+    "items": [
+      "적로",
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "진손": {
+    "commanderId": "진손",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "bandit",
+    "level": 5,
+    "items": []
+  },
+  "괴월": {
+    "commanderId": "괴월",
+    "faction": 137,
+    "troops": 1440,
+    "classId": "archer",
+    "level": 2,
+    "items": []
+  },
+  "유종": {
+    "commanderId": "유종",
+    "faction": 137,
+    "troops": 1440,
+    "classId": "footman",
+    "level": 2,
+    "items": []
+  },
+  "문빙": {
+    "commanderId": "문빙",
+    "faction": 137,
+    "troops": 1440,
+    "classId": "lightCavalry",
+    "level": 2,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "왕위": {
+    "commanderId": "왕위",
+    "faction": 137,
+    "troops": 1440,
+    "classId": "lightCavalry",
+    "level": 2,
+    "items": []
+  },
+  "여광": {
+    "commanderId": "여광",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "brigand",
+    "level": 1,
+    "items": []
+  },
+  "여상": {
+    "commanderId": "여상",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "brigand",
+    "level": 1,
+    "items": []
+  },
+  "제갈량": {
+    "commanderId": "제갈량",
+    "faction": 142,
+    "troops": 2720,
+    "classId": "sorcerer",
+    "level": 30,
+    "items": []
+  },
+  "위연": {
+    "commanderId": "위연",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "lightCavalry",
+    "level": 5,
+    "items": []
+  },
+  "관평": {
+    "commanderId": "관평",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "heavyCavalry",
+    "level": 22,
+    "items": []
+  },
+  "하후란": {
+    "commanderId": "하후란",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "brawler",
+    "level": 1,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "한조": {
+    "commanderId": "한조",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "장윤": {
+    "commanderId": "장윤",
+    "faction": 137,
+    "troops": 1440,
+    "classId": "footman",
+    "level": 2,
+    "items": []
+  },
+  "이규": {
+    "commanderId": "이규",
+    "faction": 137,
+    "troops": 1440,
+    "classId": "footman",
+    "level": 2,
+    "items": []
+  },
+  "방통": {
+    "commanderId": "방통",
+    "faction": 142,
+    "troops": 2720,
+    "classId": "sorcerer",
+    "level": 34,
+    "items": []
+  },
+  "왕찬": {
+    "commanderId": "왕찬",
+    "faction": 137,
+    "troops": 1440,
+    "classId": "band",
+    "level": 2,
+    "items": []
+  },
+  "송충": {
+    "commanderId": "송충",
+    "faction": 137,
+    "troops": 1440,
+    "classId": "footman",
+    "level": 2,
+    "items": []
+  },
+  "하후은": {
+    "commanderId": "하후은",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "brigand",
+    "level": 1,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "안명": {
+    "commanderId": "안명",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "마연": {
+    "commanderId": "마연",
+    "faction": 132,
+    "troops": 1120,
+    "classId": "brigand",
+    "level": 1,
+    "items": []
+  },
+  "초촉": {
+    "commanderId": "초촉",
+    "faction": 132,
+    "troops": 1760,
+    "classId": "archer",
+    "level": 3,
+    "items": []
+  },
+  "장남": {
+    "commanderId": "장남",
+    "faction": 132,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "하후걸": {
+    "commanderId": "하후걸",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "brawler",
+    "level": 1,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "손권": {
+    "commanderId": "손권",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "주유": {
+    "commanderId": "주유",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "sorcerer",
+    "level": 5,
+    "items": [
+      "손자의병법서",
+      "영걸검"
+    ]
+  },
+  "노숙": {
+    "commanderId": "노숙",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "archer",
+    "level": 5,
+    "items": []
+  },
+  "장소": {
+    "commanderId": "장소",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "archer",
+    "level": 5,
+    "items": []
+  },
+  "제갈근": {
+    "commanderId": "제갈근",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "감택": {
+    "commanderId": "감택",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "감녕": {
+    "commanderId": "감녕",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "beastUnit",
+    "level": 5,
+    "items": []
+  },
+  "여몽": {
+    "commanderId": "여몽",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": [
+      "손자의병법서",
+      "영걸검"
+    ]
+  },
+  "태사자": {
+    "commanderId": "태사자",
+    "faction": 141,
+    "troops": 2400,
+    "classId": "lightCavalry",
+    "level": 9,
+    "items": []
+  },
+  "육손": {
+    "commanderId": "육손",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "sorcerer",
+    "level": 5,
+    "items": [
+      "손자의병법서",
+      "영걸검"
+    ]
+  },
+  "포용": {
+    "commanderId": "포용",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "채양": {
+    "commanderId": "채양",
+    "faction": 129,
+    "troops": 2080,
+    "classId": "footman",
+    "level": 4,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "채중": {
+    "commanderId": "채중",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "주창": {
+    "commanderId": "주창",
+    "faction": 142,
+    "troops": 2720,
+    "classId": "brigand",
+    "level": 22,
+    "items": []
+  },
+  "고옹": {
+    "commanderId": "고옹",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "transport",
+    "level": 5,
+    "items": []
+  },
+  "우번": {
+    "commanderId": "우번",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "band",
+    "level": 5,
+    "items": []
+  },
+  "보즐": {
+    "commanderId": "보즐",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "archer",
+    "level": 5,
+    "items": []
+  },
+  "설종": {
+    "commanderId": "설종",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "archer",
+    "level": 5,
+    "items": []
+  },
+  "육적": {
+    "commanderId": "육적",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "archer",
+    "level": 5,
+    "items": []
+  },
+  "엄준": {
+    "commanderId": "엄준",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "장흥": {
+    "commanderId": "장흥",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "주태": {
+    "commanderId": "주태",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "lightCavalry",
+    "level": 5,
+    "items": [
+      "손자의병법서",
+      "영걸검"
+    ]
+  },
+  "채훈": {
+    "commanderId": "채훈",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "정봉": {
+    "commanderId": "정봉",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "서성": {
+    "commanderId": "서성",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "능통": {
+    "commanderId": "능통",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "lightCavalry",
+    "level": 5,
+    "items": []
+  },
+  "진무": {
+    "commanderId": "진무",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "모개": {
+    "commanderId": "모개",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "황충": {
+    "commanderId": "황충",
+    "faction": 142,
+    "troops": 3040,
+    "classId": "footman",
+    "level": 7,
+    "items": []
+  },
+  "우금_2": {
+    "commanderId": "우금_2",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "beastUnit",
+    "level": 1,
+    "items": []
+  },
+  "진교": {
+    "commanderId": "진교",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "조순": {
+    "commanderId": "조순",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "반장": {
+    "commanderId": "반장",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": [
+      "손자의병법서",
+      "영걸검"
+    ]
+  },
+  "마량": {
+    "commanderId": "마량",
+    "faction": 142,
+    "troops": 2720,
+    "classId": "transport",
+    "level": 30,
+    "items": []
+  },
+  "유도": {
+    "commanderId": "유도",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "유현": {
+    "commanderId": "유현",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "lightCavalry",
+    "level": 1,
+    "items": []
+  },
+  "형도영": {
+    "commanderId": "형도영",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "brigand",
+    "level": 1,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "조범": {
+    "commanderId": "조범",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 6,
+    "items": []
+  },
+  "진응": {
+    "commanderId": "진응",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "lightCavalry",
+    "level": 1,
+    "items": []
+  },
+  "금선": {
+    "commanderId": "금선",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "공지": {
+    "commanderId": "공지",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "한현": {
+    "commanderId": "한현",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "양령": {
+    "commanderId": "양령",
+    "faction": 129,
+    "troops": 3040,
+    "classId": "lightCavalry",
+    "level": 7,
+    "items": []
+  },
+  "손유": {
+    "commanderId": "손유",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "archer",
+    "level": 5,
+    "items": [
+      "손자의병법서",
+      "영걸검"
+    ]
+  },
+  "여범": {
+    "commanderId": "여범",
+    "faction": 130,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "장송": {
+    "commanderId": "장송",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "archer",
+    "level": 3,
+    "items": []
+  },
+  "법정": {
+    "commanderId": "법정",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "chariot",
+    "level": 34,
+    "items": []
+  },
+  "유장": {
+    "commanderId": "유장",
+    "faction": 138,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "마초": {
+    "commanderId": "마초",
+    "faction": 142,
+    "troops": 3040,
+    "classId": "lightCavalry",
+    "level": 7,
+    "items": []
+  },
+  "맹달": {
+    "commanderId": "맹달",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "왕누": {
+    "commanderId": "왕누",
+    "faction": 138,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "이회": {
+    "commanderId": "이회",
+    "faction": 138,
+    "troops": 1760,
+    "classId": "archer",
+    "level": 3,
+    "items": []
+  },
+  "유괴": {
+    "commanderId": "유괴",
+    "faction": 138,
+    "troops": 2400,
+    "classId": "lightCavalry",
+    "level": 5,
+    "items": []
+  },
+  "냉포": {
+    "commanderId": "냉포",
+    "faction": 138,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "장임": {
+    "commanderId": "장임",
+    "faction": 138,
+    "troops": 2720,
+    "classId": "archer",
+    "level": 6,
+    "items": []
+  },
+  "등현": {
+    "commanderId": "등현",
+    "faction": 138,
+    "troops": 2080,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "양회": {
+    "commanderId": "양회",
+    "faction": 138,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "고패": {
+    "commanderId": "고패",
+    "faction": 138,
+    "troops": 2080,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": []
+  },
+  "오의": {
+    "commanderId": "오의",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "archer",
+    "level": 5,
+    "items": []
+  },
+  "오란": {
+    "commanderId": "오란",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": []
+  },
+  "뇌동": {
+    "commanderId": "뇌동",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": []
+  },
+  "엄안": {
+    "commanderId": "엄안",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "chariot",
+    "level": 34,
+    "items": []
+  },
+  "마대": {
+    "commanderId": "마대",
+    "faction": 142,
+    "troops": 3040,
+    "classId": "lightCavalry",
+    "level": 7,
+    "items": []
+  },
+  "장노": {
+    "commanderId": "장노",
+    "faction": 139,
+    "troops": 1760,
+    "classId": "brigand",
+    "level": 3,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "장위": {
+    "commanderId": "장위",
+    "faction": 139,
+    "troops": 1760,
+    "classId": "brigand",
+    "level": 3,
+    "items": []
+  },
+  "양임": {
+    "commanderId": "양임",
+    "faction": 139,
+    "troops": 1760,
+    "classId": "brigand",
+    "level": 3,
+    "items": []
+  },
+  "곽준": {
+    "commanderId": "곽준",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "beastUnit",
+    "level": 5,
+    "items": []
+  },
+  "진식": {
+    "commanderId": "진식",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "brawler",
+    "level": 5,
+    "items": []
+  },
+  "하후상": {
+    "commanderId": "하후상",
+    "faction": 129,
+    "troops": 3040,
+    "classId": "archer",
+    "level": 7,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "하후덕": {
+    "commanderId": "하후덕",
+    "faction": 129,
+    "troops": 3040,
+    "classId": "footman",
+    "level": 7,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "조창": {
+    "commanderId": "조창",
+    "faction": 129,
+    "troops": 3040,
+    "classId": "footman",
+    "level": 7,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "조비": {
+    "commanderId": "조비",
+    "faction": 129,
+    "troops": 4000,
+    "classId": "footman",
+    "level": 10,
+    "items": [
+      "청강검",
+      "오자의병법서",
+      "옥새"
+    ]
+  },
+  "사마의": {
+    "commanderId": "사마의",
+    "faction": 129,
+    "troops": 3680,
+    "classId": "sorcerer",
+    "level": 9,
+    "items": [
+      "손자의병법서",
+      "패자검"
+    ]
+  },
+  "조휴": {
+    "commanderId": "조휴",
+    "faction": 129,
+    "troops": 2720,
+    "classId": "guardCavalry",
+    "level": 6,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "방덕": {
+    "commanderId": "방덕",
+    "faction": 129,
+    "troops": 3040,
+    "classId": "lightCavalry",
+    "level": 7,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "관해": {
+    "commanderId": "관해",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "bandit",
+    "level": 5,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "악진": {
+    "commanderId": "악진",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "왕철": {
+    "commanderId": "왕철",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "lightCavalry",
+    "level": 1,
+    "items": []
+  },
+  "장연": {
+    "commanderId": "장연",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "lightCavalry",
+    "level": 1,
+    "items": []
+  },
+  "번궁": {
+    "commanderId": "번궁",
+    "faction": 131,
+    "troops": 1120,
+    "classId": "brawler",
+    "level": 4,
+    "items": []
+  },
+  "우칙": {
+    "commanderId": "우칙",
+    "faction": 131,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "주비": {
+    "commanderId": "주비",
+    "faction": 131,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 7,
+    "items": []
+  },
+  "조하": {
+    "commanderId": "조하",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "양안": {
+    "commanderId": "양안",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "양망": {
+    "commanderId": "양망",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "후루": {
+    "commanderId": "후루",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "tribesman",
+    "level": 1,
+    "items": []
+  },
+  "진장": {
+    "commanderId": "진장",
+    "faction": 131,
+    "troops": 1120,
+    "classId": "lightCavalry",
+    "level": 7,
+    "items": []
+  },
+  "동량": {
+    "commanderId": "동량",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "lightCavalry",
+    "level": 1,
+    "items": []
+  },
+  "이웅": {
+    "commanderId": "이웅",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "lightCavalry",
+    "level": 1,
+    "items": []
+  },
+  "엄쌍": {
+    "commanderId": "엄쌍",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "brigand",
+    "level": 22,
+    "items": []
+  },
+  "주강": {
+    "commanderId": "주강",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "brigand",
+    "level": 22,
+    "items": []
+  },
+  "오조": {
+    "commanderId": "오조",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "bandit",
+    "level": 1,
+    "items": []
+  },
+  "맹숙": {
+    "commanderId": "맹숙",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "bandit",
+    "level": 1,
+    "items": []
+  },
+  "정덕": {
+    "commanderId": "정덕",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "tribesman",
+    "level": 1,
+    "items": []
+  },
+  "장획": {
+    "commanderId": "장획",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "tribesman",
+    "level": 1,
+    "items": []
+  },
+  "고창": {
+    "commanderId": "고창",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "tribesman",
+    "level": 1,
+    "items": []
+  },
+  "송비": {
+    "commanderId": "송비",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "tribesman",
+    "level": 1,
+    "items": []
+  },
+  "조식": {
+    "commanderId": "조식",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "band",
+    "level": 1,
+    "items": [
+      "의천검",
+      "맹덕신서"
+    ]
+  },
+  "사마사": {
+    "commanderId": "사마사",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "sorcerer",
+    "level": 1,
+    "items": [
+      "손자의병법서",
+      "패자검"
+    ]
+  },
+  "사마소": {
+    "commanderId": "사마소",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "sorcerer",
+    "level": 1,
+    "items": [
+      "손자의병법서",
+      "패자검"
+    ]
+  },
+  "조진": {
+    "commanderId": "조진",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "chariot",
+    "level": 24,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "학소": {
+    "commanderId": "학소",
+    "faction": 129,
+    "troops": 1120,
+    "classId": "chariot",
+    "level": 24,
+    "items": [
+      "청강검",
+      "오자의병법서"
+    ]
+  },
+  "강유": {
+    "commanderId": "강유",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "guardCavalry",
+    "level": 40,
+    "items": []
+  },
+  "한영": {
+    "commanderId": "한영",
+    "faction": 131,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "곽적": {
+    "commanderId": "곽적",
+    "faction": 131,
+    "troops": 1120,
+    "classId": "bandit",
+    "level": 4,
+    "items": []
+  },
+  "양현": {
+    "commanderId": "양현",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "bandit",
+    "level": 1,
+    "items": []
+  },
+  "유벽": {
+    "commanderId": "유벽",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "brigand",
+    "level": 23,
+    "items": []
+  },
+  "유순": {
+    "commanderId": "유순",
+    "faction": 138,
+    "troops": 2080,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "양송": {
+    "commanderId": "양송",
+    "faction": 139,
+    "troops": 2080,
+    "classId": "band",
+    "level": 4,
+    "items": []
+  },
+  "양수": {
+    "commanderId": "양수",
+    "faction": 129,
+    "troops": 2080,
+    "classId": "transport",
+    "level": 4,
+    "items": [
+      "맹덕신서"
+    ]
+  },
+  "왕평": {
+    "commanderId": "왕평",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "유선": {
+    "commanderId": "유선",
+    "faction": 142,
+    "troops": 2720,
+    "classId": "chariot",
+    "level": 41,
+    "items": []
+  },
+  "이엄": {
+    "commanderId": "이엄",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "archer",
+    "level": 4,
+    "items": []
+  },
+  "비관": {
+    "commanderId": "비관",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "한섬": {
+    "commanderId": "한섬",
+    "faction": 135,
+    "troops": 1760,
+    "classId": "lightCavalry",
+    "level": 3,
+    "items": []
+  },
+  "보병대": {
+    "commanderId": "보병대",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "보병대_2": {
+    "commanderId": "보병대_2",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "보병대_3": {
+    "commanderId": "보병대_3",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "보병대_4": {
+    "commanderId": "보병대_4",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "footman",
+    "level": 1,
+    "items": []
+  },
+  "보병대_5": {
+    "commanderId": "보병대_5",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "footman",
+    "level": 2,
+    "items": []
+  },
+  "보병대_6": {
+    "commanderId": "보병대_6",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "footman",
+    "level": 2,
+    "items": []
+  },
+  "보병대_7": {
+    "commanderId": "보병대_7",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "footman",
+    "level": 2,
+    "items": []
+  },
+  "보병대_8": {
+    "commanderId": "보병대_8",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "footman",
+    "level": 2,
+    "items": []
+  },
+  "보병대_9": {
+    "commanderId": "보병대_9",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": []
+  },
+  "보병대_10": {
+    "commanderId": "보병대_10",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": []
+  },
+  "보병대_11": {
+    "commanderId": "보병대_11",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "footman",
+    "level": 3,
+    "items": []
+  },
+  "보병대_12": {
+    "commanderId": "보병대_12",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "보병대_13": {
+    "commanderId": "보병대_13",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "보병대_14": {
+    "commanderId": "보병대_14",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "footman",
+    "level": 4,
+    "items": []
+  },
+  "보병대_15": {
+    "commanderId": "보병대_15",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "보병대_16": {
+    "commanderId": "보병대_16",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "footman",
+    "level": 5,
+    "items": []
+  },
+  "보병대_17": {
+    "commanderId": "보병대_17",
+    "faction": 142,
+    "troops": 2720,
+    "classId": "footman",
+    "level": 6,
+    "items": []
+  },
+  "보병대_18": {
+    "commanderId": "보병대_18",
+    "faction": 142,
+    "troops": 2720,
+    "classId": "footman",
+    "level": 6,
+    "items": []
+  },
+  "궁병대": {
+    "commanderId": "궁병대",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "궁병대_2": {
+    "commanderId": "궁병대_2",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "궁병대_3": {
+    "commanderId": "궁병대_3",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "궁병대_4": {
+    "commanderId": "궁병대_4",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "archer",
+    "level": 1,
+    "items": []
+  },
+  "궁병대_5": {
+    "commanderId": "궁병대_5",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "archer",
+    "level": 2,
+    "items": []
+  },
+  "궁병대_6": {
+    "commanderId": "궁병대_6",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "archer",
+    "level": 2,
+    "items": []
+  },
+  "궁병대_7": {
+    "commanderId": "궁병대_7",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "archer",
+    "level": 2,
+    "items": []
+  },
+  "궁병대_8": {
+    "commanderId": "궁병대_8",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "archer",
+    "level": 2,
+    "items": []
+  },
+  "궁병대_9": {
+    "commanderId": "궁병대_9",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "archer",
+    "level": 3,
+    "items": []
+  },
+  "궁병대_10": {
+    "commanderId": "궁병대_10",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "archer",
+    "level": 3,
+    "items": []
+  },
+  "궁병대_11": {
+    "commanderId": "궁병대_11",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "archer",
+    "level": 3,
+    "items": []
+  },
+  "궁병대_12": {
+    "commanderId": "궁병대_12",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "archer",
+    "level": 4,
+    "items": []
+  },
+  "궁병대_13": {
+    "commanderId": "궁병대_13",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "archer",
+    "level": 4,
+    "items": []
+  },
+  "궁병대_14": {
+    "commanderId": "궁병대_14",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "archer",
+    "level": 4,
+    "items": []
+  },
+  "궁병대_15": {
+    "commanderId": "궁병대_15",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "archer",
+    "level": 5,
+    "items": []
+  },
+  "궁병대_16": {
+    "commanderId": "궁병대_16",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "archer",
+    "level": 5,
+    "items": []
+  },
+  "궁병대_17": {
+    "commanderId": "궁병대_17",
+    "faction": 142,
+    "troops": 2720,
+    "classId": "archer",
+    "level": 6,
+    "items": []
+  },
+  "궁병대_18": {
+    "commanderId": "궁병대_18",
+    "faction": 142,
+    "troops": 2720,
+    "classId": "archer",
+    "level": 6,
+    "items": []
+  },
+  "기병대": {
+    "commanderId": "기병대",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "lightCavalry",
+    "level": 1,
+    "items": []
+  },
+  "기병대_2": {
+    "commanderId": "기병대_2",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "lightCavalry",
+    "level": 1,
+    "items": []
+  },
+  "기병대_3": {
+    "commanderId": "기병대_3",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "lightCavalry",
+    "level": 1,
+    "items": []
+  },
+  "기병대_4": {
+    "commanderId": "기병대_4",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "lightCavalry",
+    "level": 1,
+    "items": []
+  },
+  "기병대_5": {
+    "commanderId": "기병대_5",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "lightCavalry",
+    "level": 2,
+    "items": []
+  },
+  "기병대_6": {
+    "commanderId": "기병대_6",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "lightCavalry",
+    "level": 2,
+    "items": []
+  },
+  "기병대_7": {
+    "commanderId": "기병대_7",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "lightCavalry",
+    "level": 2,
+    "items": []
+  },
+  "기병대_8": {
+    "commanderId": "기병대_8",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "lightCavalry",
+    "level": 2,
+    "items": []
+  },
+  "기병대_9": {
+    "commanderId": "기병대_9",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "lightCavalry",
+    "level": 3,
+    "items": []
+  },
+  "기병대_10": {
+    "commanderId": "기병대_10",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "lightCavalry",
+    "level": 3,
+    "items": []
+  },
+  "기병대_11": {
+    "commanderId": "기병대_11",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "lightCavalry",
+    "level": 3,
+    "items": []
+  },
+  "기병대_12": {
+    "commanderId": "기병대_12",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": []
+  },
+  "기병대_13": {
+    "commanderId": "기병대_13",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": []
+  },
+  "기병대_14": {
+    "commanderId": "기병대_14",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "lightCavalry",
+    "level": 4,
+    "items": []
+  },
+  "기병대_15": {
+    "commanderId": "기병대_15",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "lightCavalry",
+    "level": 5,
+    "items": []
+  },
+  "기병대_16": {
+    "commanderId": "기병대_16",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "lightCavalry",
+    "level": 5,
+    "items": []
+  },
+  "기병대_17": {
+    "commanderId": "기병대_17",
+    "faction": 142,
+    "troops": 2720,
+    "classId": "lightCavalry",
+    "level": 6,
+    "items": []
+  },
+  "기병대_18": {
+    "commanderId": "기병대_18",
+    "faction": 142,
+    "troops": 2720,
+    "classId": "lightCavalry",
+    "level": 6,
+    "items": []
+  },
+  "적병": {
+    "commanderId": "적병",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "bandit",
+    "level": 1,
+    "items": []
+  },
+  "적병_2": {
+    "commanderId": "적병_2",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "bandit",
+    "level": 1,
+    "items": []
+  },
+  "적병_3": {
+    "commanderId": "적병_3",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "bandit",
+    "level": 1,
+    "items": []
+  },
+  "적병_4": {
+    "commanderId": "적병_4",
+    "faction": 142,
+    "troops": 1120,
+    "classId": "bandit",
+    "level": 1,
+    "items": []
+  },
+  "적병_5": {
+    "commanderId": "적병_5",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "bandit",
+    "level": 2,
+    "items": []
+  },
+  "적병_6": {
+    "commanderId": "적병_6",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "bandit",
+    "level": 2,
+    "items": []
+  },
+  "적병_7": {
+    "commanderId": "적병_7",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "bandit",
+    "level": 2,
+    "items": []
+  },
+  "적병_8": {
+    "commanderId": "적병_8",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "bandit",
+    "level": 2,
+    "items": []
+  },
+  "적병_9": {
+    "commanderId": "적병_9",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "bandit",
+    "level": 3,
+    "items": []
+  },
+  "적병_10": {
+    "commanderId": "적병_10",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "bandit",
+    "level": 3,
+    "items": []
+  },
+  "적병_11": {
+    "commanderId": "적병_11",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "bandit",
+    "level": 3,
+    "items": []
+  },
+  "적병_12": {
+    "commanderId": "적병_12",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "bandit",
+    "level": 4,
+    "items": []
+  },
+  "적병_13": {
+    "commanderId": "적병_13",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "bandit",
+    "level": 4,
+    "items": []
+  },
+  "적병_14": {
+    "commanderId": "적병_14",
+    "faction": 142,
+    "troops": 2080,
+    "classId": "bandit",
+    "level": 4,
+    "items": []
+  },
+  "적병_15": {
+    "commanderId": "적병_15",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "bandit",
+    "level": 5,
+    "items": []
+  },
+  "적병_16": {
+    "commanderId": "적병_16",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "bandit",
+    "level": 5,
+    "items": []
+  },
+  "적병_17": {
+    "commanderId": "적병_17",
+    "faction": 142,
+    "troops": 2720,
+    "classId": "bandit",
+    "level": 6,
+    "items": []
+  },
+  "적병_18": {
+    "commanderId": "적병_18",
+    "faction": 142,
+    "troops": 2720,
+    "classId": "bandit",
+    "level": 6,
+    "items": []
+  },
+  "군악대": {
+    "commanderId": "군악대",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "band",
+    "level": 2,
+    "items": []
+  },
+  "군악대_2": {
+    "commanderId": "군악대_2",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "band",
+    "level": 2,
+    "items": []
+  },
+  "군악대_3": {
+    "commanderId": "군악대_3",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "band",
+    "level": 2,
+    "items": []
+  },
+  "군악대_4": {
+    "commanderId": "군악대_4",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "band",
+    "level": 2,
+    "items": []
+  },
+  "맹수사": {
+    "commanderId": "맹수사",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "beastUnit",
+    "level": 5,
+    "items": []
+  },
+  "맹수사_2": {
+    "commanderId": "맹수사_2",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "beastUnit",
+    "level": 5,
+    "items": []
+  },
+  "요술사": {
+    "commanderId": "요술사",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "sorcerer",
+    "level": 5,
+    "items": []
+  },
+  "요술사_2": {
+    "commanderId": "요술사_2",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "sorcerer",
+    "level": 5,
+    "items": []
+  },
+  "무도가": {
+    "commanderId": "무도가",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "brawler",
+    "level": 3,
+    "items": []
+  },
+  "무도가_2": {
+    "commanderId": "무도가_2",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "brawler",
+    "level": 3,
+    "items": []
+  },
+  "무도가_3": {
+    "commanderId": "무도가_3",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "brawler",
+    "level": 3,
+    "items": []
+  },
+  "무도가_4": {
+    "commanderId": "무도가_4",
+    "faction": 142,
+    "troops": 1760,
+    "classId": "brawler",
+    "level": 3,
+    "items": []
+  },
+  "이민족": {
+    "commanderId": "이민족",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "tribesman",
+    "level": 5,
+    "items": []
+  },
+  "이민족_2": {
+    "commanderId": "이민족_2",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "tribesman",
+    "level": 5,
+    "items": []
+  },
+  "이민족_3": {
+    "commanderId": "이민족_3",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "tribesman",
+    "level": 5,
+    "items": []
+  },
+  "이민족_4": {
+    "commanderId": "이민족_4",
+    "faction": 142,
+    "troops": 2400,
+    "classId": "tribesman",
+    "level": 5,
+    "items": []
+  },
+  "수송대": {
+    "commanderId": "수송대",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "transport",
+    "level": 2,
+    "items": []
+  },
+  "수송대_2": {
+    "commanderId": "수송대_2",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "transport",
+    "level": 2,
+    "items": []
+  },
+  "수송대_3": {
+    "commanderId": "수송대_3",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "transport",
+    "level": 2,
+    "items": []
+  },
+  "수송대_4": {
+    "commanderId": "수송대_4",
+    "faction": 142,
+    "troops": 1440,
+    "classId": "transport",
+    "level": 2,
+    "items": []
+  },
+  "？？？": {
+    "commanderId": "？？？",
+    "faction": 142,
+    "troops": 950,
+    "classId": "guardCavalry",
+    "level": 45,
+    "items": []
+  },
+  "？？？_2": {
+    "commanderId": "？？？_2",
+    "faction": 142,
+    "troops": 2450,
+    "classId": "guardCavalry",
+    "level": 40,
+    "items": []
+  },
+  "이명": {
+    "commanderId": "이명",
+    "faction": 142,
+    "troops": 0,
+    "classId": "beastUnit",
+    "level": 15,
+    "items": []
+  },
+  "축융": {
+    "commanderId": "축융",
+    "faction": 142,
+    "troops": 0,
+    "classId": "tribesman",
+    "level": 1,
+    "items": []
+  },
+  "장완": {
+    "commanderId": "장완",
+    "faction": 142,
+    "troops": 0,
+    "classId": "catapult",
+    "level": 30,
+    "items": []
+  },
+  "비위": {
+    "commanderId": "비위",
+    "faction": 142,
+    "troops": 0,
+    "classId": "catapult",
+    "level": 30,
+    "items": []
+  }
+}

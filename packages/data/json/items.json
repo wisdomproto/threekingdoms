@@ -1,0 +1,443 @@
+{
+  "둔갑천서": {
+    "id": "둔갑천서",
+    "name": "둔갑천서",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0
+  },
+  "청랑서": {
+    "id": "청랑서",
+    "name": "청랑서",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0
+  },
+  "고취구": {
+    "id": "고취구",
+    "name": "고취구",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0
+  },
+  "손자의병법서": {
+    "id": "손자의병법서",
+    "name": "손자의병법서",
+    "category": "book",
+    "power": 255,
+    "bonusPercent": 22
+  },
+  "맹덕신서": {
+    "id": "맹덕신서",
+    "name": "맹덕신서",
+    "category": "book",
+    "power": 255,
+    "bonusPercent": 15
+  },
+  "조황비전": {
+    "id": "조황비전",
+    "name": "조황비전",
+    "category": "horse",
+    "power": 255,
+    "bonusPercent": 1
+  },
+  "적로": {
+    "id": "적로",
+    "name": "적로",
+    "category": "horse",
+    "power": 255,
+    "bonusPercent": 2
+  },
+  "적토마": {
+    "id": "적토마",
+    "name": "적토마",
+    "category": "horse",
+    "power": 255,
+    "bonusPercent": 3
+  },
+  "옥새": {
+    "id": "옥새",
+    "name": "옥새",
+    "category": "supplyItem",
+    "power": 255,
+    "bonusPercent": 0
+  },
+  "의천검": {
+    "id": "의천검",
+    "name": "의천검",
+    "category": "weapon",
+    "power": 255,
+    "bonusPercent": 14
+  },
+  "청강검": {
+    "id": "청강검",
+    "name": "청강검",
+    "category": "weapon",
+    "power": 255,
+    "bonusPercent": 20
+  },
+  "칠성검": {
+    "id": "칠성검",
+    "name": "칠성검",
+    "category": "weapon",
+    "power": 255,
+    "bonusPercent": 10
+  },
+  "청룡언월도": {
+    "id": "청룡언월도",
+    "name": "청룡언월도",
+    "category": "weapon",
+    "power": 255,
+    "bonusPercent": 12
+  },
+  "삼첨도": {
+    "id": "삼첨도",
+    "name": "삼첨도",
+    "category": "weapon",
+    "power": 255,
+    "bonusPercent": 10
+  },
+  "방천화극": {
+    "id": "방천화극",
+    "name": "방천화극",
+    "category": "weapon",
+    "power": 255,
+    "bonusPercent": 18
+  },
+  "사모": {
+    "id": "사모",
+    "name": "사모",
+    "category": "weapon",
+    "power": 255,
+    "bonusPercent": 10
+  },
+  "궁술지침서": {
+    "id": "궁술지침서",
+    "name": "궁술지침서",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0
+  },
+  "마술지침서": {
+    "id": "마술지침서",
+    "name": "마술지침서",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0
+  },
+  "검술지침서": {
+    "id": "검술지침서",
+    "name": "검술지침서",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0
+  },
+  "장창": {
+    "id": "장창",
+    "name": "장창",
+    "category": "treasure",
+    "power": 30,
+    "bonusPercent": 0
+  },
+  "보병차": {
+    "id": "보병차",
+    "name": "보병차",
+    "category": "treasure",
+    "power": 60,
+    "bonusPercent": 0
+  },
+  "연노": {
+    "id": "연노",
+    "name": "연노",
+    "category": "treasure",
+    "power": 35,
+    "bonusPercent": 0
+  },
+  "투석기": {
+    "id": "투석기",
+    "name": "투석기",
+    "category": "treasure",
+    "power": 70,
+    "bonusPercent": 0
+  },
+  "마개": {
+    "id": "마개",
+    "name": "마개",
+    "category": "treasure",
+    "power": 40,
+    "bonusPercent": 0
+  },
+  "근위개": {
+    "id": "근위개",
+    "name": "근위개",
+    "category": "treasure",
+    "power": 80,
+    "bonusPercent": 0
+  },
+  "무술교본": {
+    "id": "무술교본",
+    "name": "무술교본",
+    "category": "treasure",
+    "power": 20,
+    "bonusPercent": 0
+  },
+  "의협교본": {
+    "id": "의협교본",
+    "name": "의협교본",
+    "category": "treasure",
+    "power": 40,
+    "bonusPercent": 0
+  },
+  "술": {
+    "id": "술",
+    "name": "술",
+    "category": "supplyItem",
+    "power": 5,
+    "bonusPercent": 0
+  },
+  "특급주": {
+    "id": "특급주",
+    "name": "특급주",
+    "category": "supplyItem",
+    "power": 10,
+    "bonusPercent": 0
+  },
+  "빼갈": {
+    "id": "빼갈",
+    "name": "빼갈",
+    "category": "supplyItem",
+    "power": 20,
+    "bonusPercent": 0
+  },
+  "콩": {
+    "id": "콩",
+    "name": "콩",
+    "category": "supplyItem",
+    "power": 10,
+    "bonusPercent": 0
+  },
+  "보리": {
+    "id": "보리",
+    "name": "보리",
+    "category": "supplyItem",
+    "power": 20,
+    "bonusPercent": 0
+  },
+  "쌀": {
+    "id": "쌀",
+    "name": "쌀",
+    "category": "supplyItem",
+    "power": 40,
+    "bonusPercent": 0
+  },
+  "폭탄": {
+    "id": "폭탄",
+    "name": "폭탄",
+    "category": "attackItem",
+    "power": 50,
+    "bonusPercent": 0
+  },
+  "낙석서": {
+    "id": "낙석서",
+    "name": "낙석서",
+    "category": "attackItem",
+    "power": 10,
+    "bonusPercent": 0
+  },
+  "설붕서": {
+    "id": "설붕서",
+    "name": "설붕서",
+    "category": "attackItem",
+    "power": 20,
+    "bonusPercent": 0
+  },
+  "산사태서": {
+    "id": "산사태서",
+    "name": "산사태서",
+    "category": "attackItem",
+    "power": 40,
+    "bonusPercent": 0
+  },
+  "소용돌이서": {
+    "id": "소용돌이서",
+    "name": "소용돌이서",
+    "category": "attackItem",
+    "power": 8,
+    "bonusPercent": 0
+  },
+  "탁류서": {
+    "id": "탁류서",
+    "name": "탁류서",
+    "category": "attackItem",
+    "power": 16,
+    "bonusPercent": 0
+  },
+  "해일서": {
+    "id": "해일서",
+    "name": "해일서",
+    "category": "attackItem",
+    "power": 32,
+    "bonusPercent": 0
+  },
+  "초열서": {
+    "id": "초열서",
+    "name": "초열서",
+    "category": "attackItem",
+    "power": 5,
+    "bonusPercent": 0
+  },
+  "화룡서": {
+    "id": "화룡서",
+    "name": "화룡서",
+    "category": "attackItem",
+    "power": 10,
+    "bonusPercent": 0
+  },
+  "업화서": {
+    "id": "업화서",
+    "name": "업화서",
+    "category": "attackItem",
+    "power": 20,
+    "bonusPercent": 0
+  },
+  "농무서": {
+    "id": "농무서",
+    "name": "농무서",
+    "category": "attackItem",
+    "power": 5,
+    "bonusPercent": 0
+  },
+  "기상서": {
+    "id": "기상서",
+    "name": "기상서",
+    "category": "attackItem",
+    "power": 10,
+    "bonusPercent": 0
+  },
+  "호우서": {
+    "id": "호우서",
+    "name": "호우서",
+    "category": "attackItem",
+    "power": 20,
+    "bonusPercent": 0
+  },
+  "원대서": {
+    "id": "원대서",
+    "name": "원대서",
+    "category": "supplyItem",
+    "power": 50,
+    "bonusPercent": 0
+  },
+  "원부서": {
+    "id": "원부서",
+    "name": "원부서",
+    "category": "supplyItem",
+    "power": 100,
+    "bonusPercent": 0
+  },
+  "원군서": {
+    "id": "원군서",
+    "name": "원군서",
+    "category": "supplyItem",
+    "power": 200,
+    "bonusPercent": 0
+  },
+  "평기서": {
+    "id": "평기서",
+    "name": "평기서",
+    "category": "supplyItem",
+    "power": 25,
+    "bonusPercent": 0
+  },
+  "활기서": {
+    "id": "활기서",
+    "name": "활기서",
+    "category": "supplyItem",
+    "power": 50,
+    "bonusPercent": 0
+  },
+  "용기서": {
+    "id": "용기서",
+    "name": "용기서",
+    "category": "supplyItem",
+    "power": 100,
+    "bonusPercent": 0
+  },
+  "상약": {
+    "id": "상약",
+    "name": "상약",
+    "category": "supplyItem",
+    "power": 30,
+    "bonusPercent": 0
+  },
+  "한방약": {
+    "id": "한방약",
+    "name": "한방약",
+    "category": "supplyItem",
+    "power": 60,
+    "bonusPercent": 0
+  },
+  "차": {
+    "id": "차",
+    "name": "차",
+    "category": "supplyItem",
+    "power": 120,
+    "bonusPercent": 0
+  },
+  "칙명서": {
+    "id": "칙명서",
+    "name": "칙명서",
+    "category": "supplyItem",
+    "power": 255,
+    "bonusPercent": 0
+  },
+  "원군보고": {
+    "id": "원군보고",
+    "name": "원군보고",
+    "category": "supplyItem",
+    "power": 255,
+    "bonusPercent": 0
+  },
+  "자웅일대검": {
+    "id": "자웅일대검",
+    "name": "자웅일대검",
+    "category": "weapon",
+    "power": 255,
+    "bonusPercent": 16
+  },
+  "영걸검": {
+    "id": "영걸검",
+    "name": "영걸검",
+    "category": "weapon",
+    "power": 255,
+    "bonusPercent": 22
+  },
+  "패자검": {
+    "id": "패자검",
+    "name": "패자검",
+    "category": "weapon",
+    "power": 255,
+    "bonusPercent": 24
+  },
+  "육도": {
+    "id": "육도",
+    "name": "육도",
+    "category": "book",
+    "power": 255,
+    "bonusPercent": 15
+  },
+  "삼략": {
+    "id": "삼략",
+    "name": "삼략",
+    "category": "book",
+    "power": 255,
+    "bonusPercent": 15
+  },
+  "오자의병법서": {
+    "id": "오자의병법서",
+    "name": "오자의병법서",
+    "category": "book",
+    "power": 255,
+    "bonusPercent": 20
+  }
+}

@@ -1,11 +1,16 @@
 import { z } from "zod";
 import {
   TerrainSchema, UnitClassSchema, CombatConfigSchema,
+  CommanderSchema, ItemSchema, InitialForceSchema,
   type Terrain, type UnitClass, type CombatConfig,
+  type Commander, type Item, type InitialForce,
 } from "./schemas";
 import terrainsJson from "../json/terrains.json";
 import unitClassesJson from "../json/unitClasses.json";
 import combatJson from "../json/combat.json";
+import commandersJson from "../json/commanders.json";
+import itemsJson from "../json/items.json";
+import initialForcesJson from "../json/initialForces.json";
 
 export * from "./schemas";
 
@@ -19,12 +24,18 @@ export interface GameData {
   terrains: Record<string, Terrain>;
   unitClasses: Record<string, UnitClass>;
   combat: CombatConfig;
+  commanders: Record<string, Commander>;
+  items: Record<string, Item>;
+  initialForces: Record<string, InitialForce>;
 }
 
 /** import 시점에 전부 검증 — 잘못된 JSON은 여기서 즉시 터진다.
- *  commanders/items/initialForces/maps/stages는 Port 5/6/9에서 추가된다. */
+ *  maps/stages는 Port 6/9에서 추가된다. */
 export const gameData: GameData = {
   terrains: loadJson(z.record(TerrainSchema), terrainsJson, "terrains.json"),
   unitClasses: loadJson(z.record(UnitClassSchema), unitClassesJson, "unitClasses.json"),
   combat: loadJson(CombatConfigSchema, combatJson, "combat.json"),
+  commanders: loadJson(z.record(CommanderSchema), commandersJson, "commanders.json"),
+  items: loadJson(z.record(ItemSchema), itemsJson, "items.json"),
+  initialForces: loadJson(z.record(InitialForceSchema), initialForcesJson, "initialForces.json"),
 };

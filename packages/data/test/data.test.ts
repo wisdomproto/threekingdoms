@@ -47,4 +47,18 @@ describe("게임 데이터 v2 무결성", () => {
     for (const [k, v] of Object.entries(gameData.terrains)) expect(v.id).toBe(k);
     for (const [k, v] of Object.entries(gameData.unitClasses)) expect(v.id).toBe(k);
   });
+
+  it("생성된 장수 데이터가 레퍼런스와 일치 (관우/여포)", () => {
+    expect(gameData.commanders["관우"]).toMatchObject({ leadership: 100, war: 98, intelligence: 80 });
+    expect(gameData.commanders["여포"]!.war).toBe(100);
+    expect(Object.keys(gameData.commanders).length).toBeGreaterThan(300);
+  });
+
+  it("초기 편성의 classId·아이템이 전부 실존 참조", () => {
+    for (const f of Object.values(gameData.initialForces)) {
+      expect(gameData.unitClasses[f.classId], f.commanderId).toBeDefined();
+      expect(gameData.commanders[f.commanderId]).toBeDefined();
+      for (const it of f.items) expect(gameData.items[it], it).toBeDefined();
+    }
+  });
 });

@@ -1,0 +1,2834 @@
+{
+  "유비": {
+    "id": "유비",
+    "name": "유비",
+    "leadership": 91,
+    "war": 75,
+    "intelligence": 64,
+    "faceId": 0
+  },
+  "관우": {
+    "id": "관우",
+    "name": "관우",
+    "leadership": 100,
+    "war": 98,
+    "intelligence": 80,
+    "faceId": 1
+  },
+  "장비": {
+    "id": "장비",
+    "name": "장비",
+    "leadership": 83,
+    "war": 99,
+    "intelligence": 42,
+    "faceId": 2
+  },
+  "동탁": {
+    "id": "동탁",
+    "name": "동탁",
+    "leadership": 78,
+    "war": 89,
+    "intelligence": 54,
+    "faceId": 136
+  },
+  "여포": {
+    "id": "여포",
+    "name": "여포",
+    "leadership": 80,
+    "war": 100,
+    "intelligence": 21,
+    "faceId": 148
+  },
+  "화웅": {
+    "id": "화웅",
+    "name": "화웅",
+    "leadership": 88,
+    "war": 90,
+    "intelligence": 29,
+    "faceId": 138
+  },
+  "이유": {
+    "id": "이유",
+    "name": "이유",
+    "leadership": 77,
+    "war": 25,
+    "intelligence": 90,
+    "faceId": 137
+  },
+  "공융": {
+    "id": "공융",
+    "name": "공융",
+    "leadership": 67,
+    "war": 58,
+    "intelligence": 83,
+    "faceId": 195
+  },
+  "조조": {
+    "id": "조조",
+    "name": "조조",
+    "leadership": 98,
+    "war": 75,
+    "intelligence": 94,
+    "faceId": 27
+  },
+  "원소": {
+    "id": "원소",
+    "name": "원소",
+    "leadership": 71,
+    "war": 58,
+    "intelligence": 47,
+    "faceId": 110
+  },
+  "손견": {
+    "id": "손견",
+    "name": "손견",
+    "leadership": 81,
+    "war": 90,
+    "intelligence": 62,
+    "faceId": 77
+  },
+  "원술": {
+    "id": "원술",
+    "name": "원술",
+    "leadership": 71,
+    "war": 79,
+    "intelligence": 43,
+    "faceId": 144
+  },
+  "공손찬": {
+    "id": "공손찬",
+    "name": "공손찬",
+    "leadership": 67,
+    "war": 71,
+    "intelligence": 55,
+    "faceId": 107
+  },
+  "정보": {
+    "id": "정보",
+    "name": "정보",
+    "leadership": 73,
+    "war": 69,
+    "intelligence": 81,
+    "faceId": 78
+  },
+  "황개": {
+    "id": "황개",
+    "name": "황개",
+    "leadership": 74,
+    "war": 86,
+    "intelligence": 66,
+    "faceId": 170
+  },
+  "도겸": {
+    "id": "도겸",
+    "name": "도겸",
+    "leadership": 42,
+    "war": 53,
+    "intelligence": 61,
+    "faceId": 189
+  },
+  "하후돈": {
+    "id": "하후돈",
+    "name": "하후돈",
+    "leadership": 87,
+    "war": 95,
+    "intelligence": 60,
+    "faceId": 28
+  },
+  "하후연": {
+    "id": "하후연",
+    "name": "하후연",
+    "leadership": 86,
+    "war": 90,
+    "intelligence": 52,
+    "faceId": 29
+  },
+  "조인": {
+    "id": "조인",
+    "name": "조인",
+    "leadership": 79,
+    "war": 80,
+    "intelligence": 62,
+    "faceId": 30
+  },
+  "조홍": {
+    "id": "조홍",
+    "name": "조홍",
+    "leadership": 74,
+    "war": 74,
+    "intelligence": 47,
+    "faceId": 31
+  },
+  "이숙": {
+    "id": "이숙",
+    "name": "이숙",
+    "leadership": 50,
+    "war": 54,
+    "intelligence": 68,
+    "faceId": 139
+  },
+  "호진": {
+    "id": "호진",
+    "name": "호진",
+    "leadership": 37,
+    "war": 58,
+    "intelligence": 30,
+    "faceId": 140
+  },
+  "양앙": {
+    "id": "양앙",
+    "name": "양앙",
+    "leadership": 60,
+    "war": 72,
+    "intelligence": 46,
+    "faceId": 56
+  },
+  "황권": {
+    "id": "황권",
+    "name": "황권",
+    "leadership": 72,
+    "war": 45,
+    "intelligence": 84,
+    "faceId": 161
+  },
+  "염포": {
+    "id": "염포",
+    "name": "염포",
+    "leadership": 27,
+    "war": 36,
+    "intelligence": 80,
+    "faceId": 200
+  },
+  "공손월": {
+    "id": "공손월",
+    "name": "공손월",
+    "leadership": 58,
+    "war": 60,
+    "intelligence": 47,
+    "faceId": 108
+  },
+  "조표": {
+    "id": "조표",
+    "name": "조표",
+    "leadership": 52,
+    "war": 52,
+    "intelligence": 24,
+    "faceId": 190
+  },
+  "조잠": {
+    "id": "조잠",
+    "name": "조잠",
+    "leadership": 57,
+    "war": 63,
+    "intelligence": 25,
+    "faceId": 200
+  },
+  "여건": {
+    "id": "여건",
+    "name": "여건",
+    "leadership": 47,
+    "war": 51,
+    "intelligence": 40,
+    "faceId": 184
+  },
+  "관훙": {
+    "id": "관훙",
+    "name": "관훙",
+    "leadership": 85,
+    "war": 88,
+    "intelligence": 70,
+    "faceId": 64
+  },
+  "마속": {
+    "id": "마속",
+    "name": "마속",
+    "leadership": 54,
+    "war": 65,
+    "intelligence": 84,
+    "faceId": 26
+  },
+  "이풍": {
+    "id": "이풍",
+    "name": "이풍",
+    "leadership": 62,
+    "war": 68,
+    "intelligence": 35,
+    "faceId": 183
+  },
+  "서상": {
+    "id": "서상",
+    "name": "서상",
+    "leadership": 75,
+    "war": 82,
+    "intelligence": 30,
+    "faceId": 182
+  },
+  "요화": {
+    "id": "요화",
+    "name": "요화",
+    "leadership": 41,
+    "war": 78,
+    "intelligence": 60,
+    "faceId": 16
+  },
+  "사마가": {
+    "id": "사마가",
+    "name": "사마가",
+    "leadership": 74,
+    "war": 91,
+    "intelligence": 18,
+    "faceId": 216
+  },
+  "순상": {
+    "id": "순상",
+    "name": "순상",
+    "leadership": 39,
+    "war": 45,
+    "intelligence": 70,
+    "faceId": 181
+  },
+  "두습": {
+    "id": "두습",
+    "name": "두습",
+    "leadership": 50,
+    "war": 57,
+    "intelligence": 52,
+    "faceId": 180
+  },
+  "왕보": {
+    "id": "왕보",
+    "name": "왕보",
+    "leadership": 74,
+    "war": 52,
+    "intelligence": 73,
+    "faceId": 63
+  },
+  "조루": {
+    "id": "조루",
+    "name": "조루",
+    "leadership": 51,
+    "war": 60,
+    "intelligence": 70,
+    "faceId": 147
+  },
+  "유대": {
+    "id": "유대",
+    "name": "유대",
+    "leadership": 59,
+    "war": 64,
+    "intelligence": 43,
+    "faceId": 55
+  },
+  "장막": {
+    "id": "장막",
+    "name": "장막",
+    "leadership": 48,
+    "war": 57,
+    "intelligence": 26,
+    "faceId": 194
+  },
+  "손환": {
+    "id": "손환",
+    "name": "손환",
+    "leadership": 70,
+    "war": 65,
+    "intelligence": 72,
+    "faceId": 121
+  },
+  "원윤": {
+    "id": "원윤",
+    "name": "원윤",
+    "leadership": 23,
+    "war": 25,
+    "intelligence": 59,
+    "faceId": 145
+  },
+  "장포": {
+    "id": "장포",
+    "name": "장포",
+    "leadership": 83,
+    "war": 92,
+    "intelligence": 37,
+    "faceId": 211
+  },
+  "한당": {
+    "id": "한당",
+    "name": "한당",
+    "leadership": 59,
+    "war": 60,
+    "intelligence": 42,
+    "faceId": 88
+  },
+  "주연": {
+    "id": "주연",
+    "name": "주연",
+    "leadership": 70,
+    "war": 70,
+    "intelligence": 62,
+    "faceId": 179
+  },
+  "이각": {
+    "id": "이각",
+    "name": "이각",
+    "leadership": 49,
+    "war": 63,
+    "intelligence": 42,
+    "faceId": 141
+  },
+  "곽사": {
+    "id": "곽사",
+    "name": "곽사",
+    "leadership": 59,
+    "war": 61,
+    "intelligence": 33,
+    "faceId": 142
+  },
+  "서영": {
+    "id": "서영",
+    "name": "서영",
+    "leadership": 38,
+    "war": 54,
+    "intelligence": 38,
+    "faceId": 143
+  },
+  "전풍": {
+    "id": "전풍",
+    "name": "전풍",
+    "leadership": 88,
+    "war": 45,
+    "intelligence": 90,
+    "faceId": 113
+  },
+  "저수": {
+    "id": "저수",
+    "name": "저수",
+    "leadership": 71,
+    "war": 60,
+    "intelligence": 85,
+    "faceId": 114
+  },
+  "안량": {
+    "id": "안량",
+    "name": "안량",
+    "leadership": 84,
+    "war": 87,
+    "intelligence": 32,
+    "faceId": 111
+  },
+  "문추": {
+    "id": "문추",
+    "name": "문추",
+    "leadership": 86,
+    "war": 91,
+    "intelligence": 19,
+    "faceId": 112
+  },
+  "조운": {
+    "id": "조운",
+    "name": "조운",
+    "leadership": 87,
+    "war": 98,
+    "intelligence": 84,
+    "faceId": 3
+  },
+  "봉기": {
+    "id": "봉기",
+    "name": "봉기",
+    "leadership": 66,
+    "war": 54,
+    "intelligence": 82,
+    "faceId": 122
+  },
+  "허유": {
+    "id": "허유",
+    "name": "허유",
+    "leadership": 40,
+    "war": 45,
+    "intelligence": 61,
+    "faceId": 123
+  },
+  "진진": {
+    "id": "진진",
+    "name": "진진",
+    "leadership": 32,
+    "war": 35,
+    "intelligence": 65,
+    "faceId": 118
+  },
+  "경무": {
+    "id": "경무",
+    "name": "경무",
+    "leadership": 32,
+    "war": 44,
+    "intelligence": 53,
+    "faceId": 120
+  },
+  "관순": {
+    "id": "관순",
+    "name": "관순",
+    "leadership": 32,
+    "war": 42,
+    "intelligence": 61,
+    "faceId": 60
+  },
+  "엄강": {
+    "id": "엄강",
+    "name": "엄강",
+    "leadership": 60,
+    "war": 66,
+    "intelligence": 45,
+    "faceId": 109
+  },
+  "국의": {
+    "id": "국의",
+    "name": "국의",
+    "leadership": 65,
+    "war": 73,
+    "intelligence": 39,
+    "faceId": 128
+  },
+  "곽가": {
+    "id": "곽가",
+    "name": "곽가",
+    "leadership": 32,
+    "war": 36,
+    "intelligence": 97,
+    "faceId": 34
+  },
+  "우금": {
+    "id": "우금",
+    "name": "우금",
+    "leadership": 62,
+    "war": 60,
+    "intelligence": 52,
+    "faceId": 39
+  },
+  "손건": {
+    "id": "손건",
+    "name": "손건",
+    "leadership": 34,
+    "war": 38,
+    "intelligence": 74,
+    "faceId": 12
+  },
+  "미축": {
+    "id": "미축",
+    "name": "미축",
+    "leadership": 36,
+    "war": 40,
+    "intelligence": 64,
+    "faceId": 13
+  },
+  "진등": {
+    "id": "진등",
+    "name": "진등",
+    "leadership": 25,
+    "war": 36,
+    "intelligence": 70,
+    "faceId": 17
+  },
+  "악취": {
+    "id": "악취",
+    "name": "악취",
+    "leadership": 67,
+    "war": 70,
+    "intelligence": 51,
+    "faceId": 165
+  },
+  "허저": {
+    "id": "허저",
+    "name": "허저",
+    "leadership": 94,
+    "war": 97,
+    "intelligence": 25,
+    "faceId": 37
+  },
+  "순욱": {
+    "id": "순욱",
+    "name": "순욱",
+    "leadership": 62,
+    "war": 37,
+    "intelligence": 96,
+    "faceId": 32
+  },
+  "기영": {
+    "id": "기영",
+    "name": "기영",
+    "leadership": 70,
+    "war": 70,
+    "intelligence": 35,
+    "faceId": 146
+  },
+  "동소": {
+    "id": "동소",
+    "name": "동소",
+    "leadership": 48,
+    "war": 52,
+    "intelligence": 62,
+    "faceId": 157
+  },
+  "진기": {
+    "id": "진기",
+    "name": "진기",
+    "leadership": 62,
+    "war": 68,
+    "intelligence": 42,
+    "faceId": 156
+  },
+  "고순": {
+    "id": "고순",
+    "name": "고순",
+    "leadership": 63,
+    "war": 56,
+    "intelligence": 60,
+    "faceId": 150
+  },
+  "위속": {
+    "id": "위속",
+    "name": "위속",
+    "leadership": 68,
+    "war": 72,
+    "intelligence": 46,
+    "faceId": 151
+  },
+  "송겸": {
+    "id": "송겸",
+    "name": "송겸",
+    "leadership": 50,
+    "war": 59,
+    "intelligence": 45,
+    "faceId": 152
+  },
+  "진궁": {
+    "id": "진궁",
+    "name": "진궁",
+    "leadership": 85,
+    "war": 54,
+    "intelligence": 80,
+    "faceId": 149
+  },
+  "순유": {
+    "id": "순유",
+    "name": "순유",
+    "leadership": 60,
+    "war": 40,
+    "intelligence": 94,
+    "faceId": 33
+  },
+  "정욱": {
+    "id": "정욱",
+    "name": "정욱",
+    "leadership": 85,
+    "war": 25,
+    "intelligence": 90,
+    "faceId": 35
+  },
+  "서황": {
+    "id": "서황",
+    "name": "서황",
+    "leadership": 83,
+    "war": 91,
+    "intelligence": 49,
+    "faceId": 38
+  },
+  "장요": {
+    "id": "장요",
+    "name": "장요",
+    "leadership": 87,
+    "war": 90,
+    "intelligence": 80,
+    "faceId": 36
+  },
+  "후성": {
+    "id": "후성",
+    "name": "후성",
+    "leadership": 65,
+    "war": 67,
+    "intelligence": 42,
+    "faceId": 153
+  },
+  "미방": {
+    "id": "미방",
+    "name": "미방",
+    "leadership": 59,
+    "war": 63,
+    "intelligence": 25,
+    "faceId": 14
+  },
+  "간옹": {
+    "id": "간옹",
+    "name": "간옹",
+    "leadership": 36,
+    "war": 42,
+    "intelligence": 74,
+    "faceId": 15
+  },
+  "만총": {
+    "id": "만총",
+    "name": "만총",
+    "leadership": 30,
+    "war": 27,
+    "intelligence": 68,
+    "faceId": 100
+  },
+  "허사": {
+    "id": "허사",
+    "name": "허사",
+    "leadership": 20,
+    "war": 23,
+    "intelligence": 78,
+    "faceId": 154
+  },
+  "왕개": {
+    "id": "왕개",
+    "name": "왕개",
+    "leadership": 29,
+    "war": 32,
+    "intelligence": 54,
+    "faceId": 155
+  },
+  "학맹": {
+    "id": "학맹",
+    "name": "학맹",
+    "leadership": 46,
+    "war": 60,
+    "intelligence": 51,
+    "faceId": 156
+  },
+  "조성": {
+    "id": "조성",
+    "name": "조성",
+    "leadership": 66,
+    "war": 70,
+    "intelligence": 57,
+    "faceId": 157
+  },
+  "손관": {
+    "id": "손관",
+    "name": "손관",
+    "leadership": 62,
+    "war": 67,
+    "intelligence": 49,
+    "faceId": 158
+  },
+  "차주": {
+    "id": "차주",
+    "name": "차주",
+    "leadership": 70,
+    "war": 72,
+    "intelligence": 60,
+    "faceId": 54
+  },
+  "오반": {
+    "id": "오반",
+    "name": "오반",
+    "leadership": 64,
+    "war": 65,
+    "intelligence": 47,
+    "faceId": 89
+  },
+  "심배": {
+    "id": "심배",
+    "name": "심배",
+    "leadership": 73,
+    "war": 71,
+    "intelligence": 67,
+    "faceId": 116
+  },
+  "곽도": {
+    "id": "곽도",
+    "name": "곽도",
+    "leadership": 31,
+    "war": 34,
+    "intelligence": 76,
+    "faceId": 115
+  },
+  "가후": {
+    "id": "가후",
+    "name": "가후",
+    "leadership": 81,
+    "war": 40,
+    "intelligence": 96,
+    "faceId": 42
+  },
+  "유표": {
+    "id": "유표",
+    "name": "유표",
+    "leadership": 70,
+    "war": 70,
+    "intelligence": 65,
+    "faceId": 174
+  },
+  "주영": {
+    "id": "주영",
+    "name": "주영",
+    "leadership": 69,
+    "war": 74,
+    "intelligence": 35,
+    "faceId": 43
+  },
+  "노소": {
+    "id": "노소",
+    "name": "노소",
+    "leadership": 61,
+    "war": 65,
+    "intelligence": 42,
+    "faceId": 44
+  },
+  "마등": {
+    "id": "마등",
+    "name": "마등",
+    "leadership": 89,
+    "war": 94,
+    "intelligence": 53,
+    "faceId": 185
+  },
+  "진림": {
+    "id": "진림",
+    "name": "진림",
+    "leadership": 55,
+    "war": 23,
+    "intelligence": 80,
+    "faceId": 124
+  },
+  "왕충": {
+    "id": "왕충",
+    "name": "왕충",
+    "leadership": 53,
+    "war": 55,
+    "intelligence": 37,
+    "faceId": 56
+  },
+  "유엽": {
+    "id": "유엽",
+    "name": "유엽",
+    "leadership": 73,
+    "war": 35,
+    "intelligence": 85,
+    "faceId": 57
+  },
+  "장수": {
+    "id": "장수",
+    "name": "장수",
+    "leadership": 68,
+    "war": 74,
+    "intelligence": 53,
+    "faceId": 155
+  },
+  "장합": {
+    "id": "장합",
+    "name": "장합",
+    "leadership": 88,
+    "war": 90,
+    "intelligence": 62,
+    "faceId": 117
+  },
+  "고람": {
+    "id": "고람",
+    "name": "고람",
+    "leadership": 72,
+    "war": 75,
+    "intelligence": 50,
+    "faceId": 125
+  },
+  "한맹": {
+    "id": "한맹",
+    "name": "한맹",
+    "leadership": 61,
+    "war": 65,
+    "intelligence": 43,
+    "faceId": 126
+  },
+  "순우경": {
+    "id": "순우경",
+    "name": "순우경",
+    "leadership": 68,
+    "war": 73,
+    "intelligence": 62,
+    "faceId": 127
+  },
+  "장기": {
+    "id": "장기",
+    "name": "장기",
+    "leadership": 60,
+    "war": 72,
+    "intelligence": 41,
+    "faceId": 128
+  },
+  "마충": {
+    "id": "마충",
+    "name": "마충",
+    "leadership": 56,
+    "war": 58,
+    "intelligence": 54,
+    "faceId": 154
+  },
+  "이이": {
+    "id": "이이",
+    "name": "이이",
+    "leadership": 57,
+    "war": 79,
+    "intelligence": 63,
+    "faceId": 139
+  },
+  "사정": {
+    "id": "사정",
+    "name": "사정",
+    "leadership": 74,
+    "war": 69,
+    "intelligence": 63,
+    "faceId": 140
+  },
+  "신명": {
+    "id": "신명",
+    "name": "신명",
+    "leadership": 54,
+    "war": 59,
+    "intelligence": 48,
+    "faceId": 131
+  },
+  "서서": {
+    "id": "서서",
+    "name": "서서",
+    "leadership": 85,
+    "war": 44,
+    "intelligence": 97,
+    "faceId": 5
+  },
+  "채모": {
+    "id": "채모",
+    "name": "채모",
+    "leadership": 67,
+    "war": 70,
+    "intelligence": 68,
+    "faceId": 176
+  },
+  "이적": {
+    "id": "이적",
+    "name": "이적",
+    "leadership": 72,
+    "war": 21,
+    "intelligence": 84,
+    "faceId": 11
+  },
+  "유기": {
+    "id": "유기",
+    "name": "유기",
+    "leadership": 50,
+    "war": 30,
+    "intelligence": 63,
+    "faceId": 177
+  },
+  "이전": {
+    "id": "이전",
+    "name": "이전",
+    "leadership": 73,
+    "war": 72,
+    "intelligence": 47,
+    "faceId": 41
+  },
+  "유봉": {
+    "id": "유봉",
+    "name": "유봉",
+    "leadership": 59,
+    "war": 63,
+    "intelligence": 57,
+    "faceId": 18
+  },
+  "장무": {
+    "id": "장무",
+    "name": "장무",
+    "leadership": 52,
+    "war": 64,
+    "intelligence": 18,
+    "faceId": 198
+  },
+  "진손": {
+    "id": "진손",
+    "name": "진손",
+    "leadership": 51,
+    "war": 65,
+    "intelligence": 14,
+    "faceId": 199
+  },
+  "괴월": {
+    "id": "괴월",
+    "name": "괴월",
+    "leadership": 26,
+    "war": 29,
+    "intelligence": 74,
+    "faceId": 175
+  },
+  "유종": {
+    "id": "유종",
+    "name": "유종",
+    "leadership": 52,
+    "war": 59,
+    "intelligence": 52,
+    "faceId": 178
+  },
+  "문빙": {
+    "id": "문빙",
+    "name": "문빙",
+    "leadership": 78,
+    "war": 84,
+    "intelligence": 24,
+    "faceId": 179
+  },
+  "왕위": {
+    "id": "왕위",
+    "name": "왕위",
+    "leadership": 36,
+    "war": 40,
+    "intelligence": 58,
+    "faceId": 180
+  },
+  "여광": {
+    "id": "여광",
+    "name": "여광",
+    "leadership": 68,
+    "war": 73,
+    "intelligence": 25,
+    "faceId": 131
+  },
+  "여상": {
+    "id": "여상",
+    "name": "여상",
+    "leadership": 70,
+    "war": 57,
+    "intelligence": 23,
+    "faceId": 132
+  },
+  "제갈량": {
+    "id": "제갈량",
+    "name": "제갈량",
+    "leadership": 94,
+    "war": 44,
+    "intelligence": 100,
+    "faceId": 4
+  },
+  "위연": {
+    "id": "위연",
+    "name": "위연",
+    "leadership": 80,
+    "war": 92,
+    "intelligence": 51,
+    "faceId": 7
+  },
+  "관평": {
+    "id": "관평",
+    "name": "관평",
+    "leadership": 78,
+    "war": 80,
+    "intelligence": 74,
+    "faceId": 19
+  },
+  "하후란": {
+    "id": "하후란",
+    "name": "하후란",
+    "leadership": 70,
+    "war": 72,
+    "intelligence": 53,
+    "faceId": 62
+  },
+  "한조": {
+    "id": "한조",
+    "name": "한조",
+    "leadership": 59,
+    "war": 62,
+    "intelligence": 45,
+    "faceId": 51
+  },
+  "장윤": {
+    "id": "장윤",
+    "name": "장윤",
+    "leadership": 50,
+    "war": 59,
+    "intelligence": 60,
+    "faceId": 181
+  },
+  "이규": {
+    "id": "이규",
+    "name": "이규",
+    "leadership": 24,
+    "war": 28,
+    "intelligence": 58,
+    "faceId": 184
+  },
+  "방통": {
+    "id": "방통",
+    "name": "방통",
+    "leadership": 88,
+    "war": 51,
+    "intelligence": 98,
+    "faceId": 8
+  },
+  "왕찬": {
+    "id": "왕찬",
+    "name": "왕찬",
+    "leadership": 28,
+    "war": 30,
+    "intelligence": 70,
+    "faceId": 182
+  },
+  "송충": {
+    "id": "송충",
+    "name": "송충",
+    "leadership": 29,
+    "war": 33,
+    "intelligence": 41,
+    "faceId": 183
+  },
+  "하후은": {
+    "id": "하후은",
+    "name": "하후은",
+    "leadership": 58,
+    "war": 60,
+    "intelligence": 62,
+    "faceId": 58
+  },
+  "안명": {
+    "id": "안명",
+    "name": "안명",
+    "leadership": 59,
+    "war": 62,
+    "intelligence": 34,
+    "faceId": 65
+  },
+  "마연": {
+    "id": "마연",
+    "name": "마연",
+    "leadership": 61,
+    "war": 65,
+    "intelligence": 43,
+    "faceId": 133
+  },
+  "초촉": {
+    "id": "초촉",
+    "name": "초촉",
+    "leadership": 61,
+    "war": 65,
+    "intelligence": 34,
+    "faceId": 134
+  },
+  "장남": {
+    "id": "장남",
+    "name": "장남",
+    "leadership": 47,
+    "war": 56,
+    "intelligence": 46,
+    "faceId": 135
+  },
+  "하후걸": {
+    "id": "하후걸",
+    "name": "하후걸",
+    "leadership": 55,
+    "war": 72,
+    "intelligence": 31,
+    "faceId": 59
+  },
+  "손권": {
+    "id": "손권",
+    "name": "손권",
+    "leadership": 80,
+    "war": 86,
+    "intelligence": 87,
+    "faceId": 79
+  },
+  "주유": {
+    "id": "주유",
+    "name": "주유",
+    "leadership": 88,
+    "war": 75,
+    "intelligence": 95,
+    "faceId": 80
+  },
+  "노숙": {
+    "id": "노숙",
+    "name": "노숙",
+    "leadership": 78,
+    "war": 61,
+    "intelligence": 95,
+    "faceId": 86
+  },
+  "장소": {
+    "id": "장소",
+    "name": "장소",
+    "leadership": 29,
+    "war": 32,
+    "intelligence": 92,
+    "faceId": 81
+  },
+  "제갈근": {
+    "id": "제갈근",
+    "name": "제갈근",
+    "leadership": 46,
+    "war": 55,
+    "intelligence": 91,
+    "faceId": 82
+  },
+  "감택": {
+    "id": "감택",
+    "name": "감택",
+    "leadership": 52,
+    "war": 45,
+    "intelligence": 78,
+    "faceId": 57
+  },
+  "감녕": {
+    "id": "감녕",
+    "name": "감녕",
+    "leadership": 84,
+    "war": 91,
+    "intelligence": 54,
+    "faceId": 84
+  },
+  "여몽": {
+    "id": "여몽",
+    "name": "여몽",
+    "leadership": 80,
+    "war": 84,
+    "intelligence": 91,
+    "faceId": 83
+  },
+  "태사자": {
+    "id": "태사자",
+    "name": "태사자",
+    "leadership": 81,
+    "war": 94,
+    "intelligence": 67,
+    "faceId": 85
+  },
+  "육손": {
+    "id": "육손",
+    "name": "육손",
+    "leadership": 85,
+    "war": 80,
+    "intelligence": 95,
+    "faceId": 87
+  },
+  "포용": {
+    "id": "포용",
+    "name": "포용",
+    "leadership": 30,
+    "war": 34,
+    "intelligence": 62,
+    "faceId": 65
+  },
+  "채양": {
+    "id": "채양",
+    "name": "채양",
+    "leadership": 40,
+    "war": 53,
+    "intelligence": 39,
+    "faceId": 45
+  },
+  "채중": {
+    "id": "채중",
+    "name": "채중",
+    "leadership": 30,
+    "war": 51,
+    "intelligence": 36,
+    "faceId": 46
+  },
+  "주창": {
+    "id": "주창",
+    "name": "주창",
+    "leadership": 82,
+    "war": 85,
+    "intelligence": 40,
+    "faceId": 20
+  },
+  "고옹": {
+    "id": "고옹",
+    "name": "고옹",
+    "leadership": 17,
+    "war": 18,
+    "intelligence": 72,
+    "faceId": 95
+  },
+  "우번": {
+    "id": "우번",
+    "name": "우번",
+    "leadership": 32,
+    "war": 40,
+    "intelligence": 78,
+    "faceId": 96
+  },
+  "보즐": {
+    "id": "보즐",
+    "name": "보즐",
+    "leadership": 20,
+    "war": 25,
+    "intelligence": 65,
+    "faceId": 97
+  },
+  "설종": {
+    "id": "설종",
+    "name": "설종",
+    "leadership": 31,
+    "war": 35,
+    "intelligence": 62,
+    "faceId": 98
+  },
+  "육적": {
+    "id": "육적",
+    "name": "육적",
+    "leadership": 27,
+    "war": 32,
+    "intelligence": 68,
+    "faceId": 99
+  },
+  "엄준": {
+    "id": "엄준",
+    "name": "엄준",
+    "leadership": 24,
+    "war": 25,
+    "intelligence": 71,
+    "faceId": 100
+  },
+  "장흥": {
+    "id": "장흥",
+    "name": "장흥",
+    "leadership": 62,
+    "war": 67,
+    "intelligence": 64,
+    "faceId": 101
+  },
+  "주태": {
+    "id": "주태",
+    "name": "주태",
+    "leadership": 78,
+    "war": 87,
+    "intelligence": 53,
+    "faceId": 102
+  },
+  "채훈": {
+    "id": "채훈",
+    "name": "채훈",
+    "leadership": 63,
+    "war": 65,
+    "intelligence": 56,
+    "faceId": 237
+  },
+  "정봉": {
+    "id": "정봉",
+    "name": "정봉",
+    "leadership": 70,
+    "war": 75,
+    "intelligence": 65,
+    "faceId": 90
+  },
+  "서성": {
+    "id": "서성",
+    "name": "서성",
+    "leadership": 59,
+    "war": 72,
+    "intelligence": 70,
+    "faceId": 91
+  },
+  "능통": {
+    "id": "능통",
+    "name": "능통",
+    "leadership": 71,
+    "war": 81,
+    "intelligence": 65,
+    "faceId": 92
+  },
+  "진무": {
+    "id": "진무",
+    "name": "진무",
+    "leadership": 58,
+    "war": 69,
+    "intelligence": 55,
+    "faceId": 93
+  },
+  "모개": {
+    "id": "모개",
+    "name": "모개",
+    "leadership": 48,
+    "war": 57,
+    "intelligence": 49,
+    "faceId": 47
+  },
+  "황충": {
+    "id": "황충",
+    "name": "황충",
+    "leadership": 90,
+    "war": 95,
+    "intelligence": 67,
+    "faceId": 6
+  },
+  "우금_2": {
+    "id": "우금_2",
+    "name": "우금",
+    "leadership": 73,
+    "war": 82,
+    "intelligence": 35,
+    "faceId": 49
+  },
+  "진교": {
+    "id": "진교",
+    "name": "진교",
+    "leadership": 18,
+    "war": 20,
+    "intelligence": 74,
+    "faceId": 48
+  },
+  "조순": {
+    "id": "조순",
+    "name": "조순",
+    "leadership": 54,
+    "war": 60,
+    "intelligence": 51,
+    "faceId": 61
+  },
+  "반장": {
+    "id": "반장",
+    "name": "반장",
+    "leadership": 72,
+    "war": 75,
+    "intelligence": 39,
+    "faceId": 94
+  },
+  "마량": {
+    "id": "마량",
+    "name": "마량",
+    "leadership": 73,
+    "war": 45,
+    "intelligence": 90,
+    "faceId": 25
+  },
+  "유도": {
+    "id": "유도",
+    "name": "유도",
+    "leadership": 48,
+    "war": 53,
+    "intelligence": 55,
+    "faceId": 68
+  },
+  "유현": {
+    "id": "유현",
+    "name": "유현",
+    "leadership": 49,
+    "war": 58,
+    "intelligence": 58,
+    "faceId": 69
+  },
+  "형도영": {
+    "id": "형도영",
+    "name": "형도영",
+    "leadership": 70,
+    "war": 78,
+    "intelligence": 30,
+    "faceId": 70
+  },
+  "조범": {
+    "id": "조범",
+    "name": "조범",
+    "leadership": 49,
+    "war": 52,
+    "intelligence": 54,
+    "faceId": 71
+  },
+  "진응": {
+    "id": "진응",
+    "name": "진응",
+    "leadership": 53,
+    "war": 63,
+    "intelligence": 20,
+    "faceId": 72
+  },
+  "금선": {
+    "id": "금선",
+    "name": "금선",
+    "leadership": 40,
+    "war": 52,
+    "intelligence": 27,
+    "faceId": 73
+  },
+  "공지": {
+    "id": "공지",
+    "name": "공지",
+    "leadership": 40,
+    "war": 44,
+    "intelligence": 63,
+    "faceId": 74
+  },
+  "한현": {
+    "id": "한현",
+    "name": "한현",
+    "leadership": 46,
+    "war": 57,
+    "intelligence": 35,
+    "faceId": 75
+  },
+  "양령": {
+    "id": "양령",
+    "name": "양령",
+    "leadership": 47,
+    "war": 48,
+    "intelligence": 51,
+    "faceId": 76
+  },
+  "손유": {
+    "id": "손유",
+    "name": "손유",
+    "leadership": 60,
+    "war": 64,
+    "intelligence": 52,
+    "faceId": 103
+  },
+  "여범": {
+    "id": "여범",
+    "name": "여범",
+    "leadership": 25,
+    "war": 30,
+    "intelligence": 72,
+    "faceId": 104
+  },
+  "장송": {
+    "id": "장송",
+    "name": "장송",
+    "leadership": 30,
+    "war": 34,
+    "intelligence": 86,
+    "faceId": 10
+  },
+  "법정": {
+    "id": "법정",
+    "name": "법정",
+    "leadership": 66,
+    "war": 52,
+    "intelligence": 87,
+    "faceId": 9
+  },
+  "유장": {
+    "id": "유장",
+    "name": "유장",
+    "leadership": 47,
+    "war": 52,
+    "intelligence": 51,
+    "faceId": 159
+  },
+  "마초": {
+    "id": "마초",
+    "name": "마초",
+    "leadership": 88,
+    "war": 97,
+    "intelligence": 44,
+    "faceId": 186
+  },
+  "맹달": {
+    "id": "맹달",
+    "name": "맹달",
+    "leadership": 71,
+    "war": 73,
+    "intelligence": 70,
+    "faceId": 61
+  },
+  "왕누": {
+    "id": "왕누",
+    "name": "왕누",
+    "leadership": 21,
+    "war": 23,
+    "intelligence": 80,
+    "faceId": 162
+  },
+  "이회": {
+    "id": "이회",
+    "name": "이회",
+    "leadership": 72,
+    "war": 70,
+    "intelligence": 88,
+    "faceId": 163
+  },
+  "유괴": {
+    "id": "유괴",
+    "name": "유괴",
+    "leadership": 47,
+    "war": 51,
+    "intelligence": 60,
+    "faceId": 164
+  },
+  "냉포": {
+    "id": "냉포",
+    "name": "냉포",
+    "leadership": 64,
+    "war": 66,
+    "intelligence": 23,
+    "faceId": 165
+  },
+  "장임": {
+    "id": "장임",
+    "name": "장임",
+    "leadership": 84,
+    "war": 87,
+    "intelligence": 69,
+    "faceId": 166
+  },
+  "등현": {
+    "id": "등현",
+    "name": "등현",
+    "leadership": 66,
+    "war": 69,
+    "intelligence": 65,
+    "faceId": 167
+  },
+  "양회": {
+    "id": "양회",
+    "name": "양회",
+    "leadership": 71,
+    "war": 75,
+    "intelligence": 44,
+    "faceId": 168
+  },
+  "고패": {
+    "id": "고패",
+    "name": "고패",
+    "leadership": 56,
+    "war": 59,
+    "intelligence": 43,
+    "faceId": 169
+  },
+  "오의": {
+    "id": "오의",
+    "name": "오의",
+    "leadership": 70,
+    "war": 71,
+    "intelligence": 69,
+    "faceId": 171
+  },
+  "오란": {
+    "id": "오란",
+    "name": "오란",
+    "leadership": 85,
+    "war": 88,
+    "intelligence": 43,
+    "faceId": 172
+  },
+  "뇌동": {
+    "id": "뇌동",
+    "name": "뇌동",
+    "leadership": 81,
+    "war": 86,
+    "intelligence": 43,
+    "faceId": 173
+  },
+  "엄안": {
+    "id": "엄안",
+    "name": "엄안",
+    "leadership": 87,
+    "war": 86,
+    "intelligence": 71,
+    "faceId": 23
+  },
+  "마대": {
+    "id": "마대",
+    "name": "마대",
+    "leadership": 74,
+    "war": 84,
+    "intelligence": 47,
+    "faceId": 187
+  },
+  "장노": {
+    "id": "장노",
+    "name": "장노",
+    "leadership": 73,
+    "war": 72,
+    "intelligence": 80,
+    "faceId": 191
+  },
+  "장위": {
+    "id": "장위",
+    "name": "장위",
+    "leadership": 62,
+    "war": 72,
+    "intelligence": 35,
+    "faceId": 192
+  },
+  "양임": {
+    "id": "양임",
+    "name": "양임",
+    "leadership": 24,
+    "war": 45,
+    "intelligence": 57,
+    "faceId": 55
+  },
+  "곽준": {
+    "id": "곽준",
+    "name": "곽준",
+    "leadership": 62,
+    "war": 67,
+    "intelligence": 65,
+    "faceId": 22
+  },
+  "진식": {
+    "id": "진식",
+    "name": "진식",
+    "leadership": 60,
+    "war": 67,
+    "intelligence": 28,
+    "faceId": 24
+  },
+  "하후상": {
+    "id": "하후상",
+    "name": "하후상",
+    "leadership": 68,
+    "war": 70,
+    "intelligence": 60,
+    "faceId": 50
+  },
+  "하후덕": {
+    "id": "하후덕",
+    "name": "하후덕",
+    "leadership": 67,
+    "war": 69,
+    "intelligence": 59,
+    "faceId": 52
+  },
+  "조창": {
+    "id": "조창",
+    "name": "조창",
+    "leadership": 93,
+    "war": 81,
+    "intelligence": 42,
+    "faceId": 53
+  },
+  "조비": {
+    "id": "조비",
+    "name": "조비",
+    "leadership": 65,
+    "war": 68,
+    "intelligence": 65,
+    "faceId": 67
+  },
+  "사마의": {
+    "id": "사마의",
+    "name": "사마의",
+    "leadership": 95,
+    "war": 48,
+    "intelligence": 99,
+    "faceId": 66
+  },
+  "조휴": {
+    "id": "조휴",
+    "name": "조휴",
+    "leadership": 72,
+    "war": 72,
+    "intelligence": 65,
+    "faceId": 205
+  },
+  "방덕": {
+    "id": "방덕",
+    "name": "방덕",
+    "leadership": 81,
+    "war": 94,
+    "intelligence": 65,
+    "faceId": 188
+  },
+  "관해": {
+    "id": "관해",
+    "name": "관해",
+    "leadership": 52,
+    "war": 68,
+    "intelligence": 14,
+    "faceId": 197
+  },
+  "악진": {
+    "id": "악진",
+    "name": "악진",
+    "leadership": 74,
+    "war": 74,
+    "intelligence": 39,
+    "faceId": 40
+  },
+  "왕철": {
+    "id": "왕철",
+    "name": "왕철",
+    "leadership": 45,
+    "war": 60,
+    "intelligence": 22,
+    "faceId": 212
+  },
+  "장연": {
+    "id": "장연",
+    "name": "장연",
+    "leadership": 60,
+    "war": 64,
+    "intelligence": 40,
+    "faceId": 212
+  },
+  "번궁": {
+    "id": "번궁",
+    "name": "번궁",
+    "leadership": 71,
+    "war": 62,
+    "intelligence": 52,
+    "faceId": 46
+  },
+  "우칙": {
+    "id": "우칙",
+    "name": "우칙",
+    "leadership": 30,
+    "war": 23,
+    "intelligence": 46,
+    "faceId": 77
+  },
+  "주비": {
+    "id": "주비",
+    "name": "주비",
+    "leadership": 61,
+    "war": 66,
+    "intelligence": 53,
+    "faceId": 158
+  },
+  "조하": {
+    "id": "조하",
+    "name": "조하",
+    "leadership": 41,
+    "war": 55,
+    "intelligence": 47,
+    "faceId": 170
+  },
+  "양안": {
+    "id": "양안",
+    "name": "양안",
+    "leadership": 76,
+    "war": 67,
+    "intelligence": 28,
+    "faceId": 156
+  },
+  "양망": {
+    "id": "양망",
+    "name": "양망",
+    "leadership": 76,
+    "war": 28,
+    "intelligence": 67,
+    "faceId": 155
+  },
+  "후루": {
+    "id": "후루",
+    "name": "후루",
+    "leadership": 59,
+    "war": 65,
+    "intelligence": 44,
+    "faceId": 218
+  },
+  "진장": {
+    "id": "진장",
+    "name": "진장",
+    "leadership": 53,
+    "war": 58,
+    "intelligence": 54,
+    "faceId": 143
+  },
+  "동량": {
+    "id": "동량",
+    "name": "동량",
+    "leadership": 60,
+    "war": 69,
+    "intelligence": 32,
+    "faceId": 133
+  },
+  "이웅": {
+    "id": "이웅",
+    "name": "이웅",
+    "leadership": 38,
+    "war": 73,
+    "intelligence": 11,
+    "faceId": 208
+  },
+  "엄쌍": {
+    "id": "엄쌍",
+    "name": "엄쌍",
+    "leadership": 50,
+    "war": 70,
+    "intelligence": 48,
+    "faceId": 208
+  },
+  "주강": {
+    "id": "주강",
+    "name": "주강",
+    "leadership": 32,
+    "war": 51,
+    "intelligence": 68,
+    "faceId": 208
+  },
+  "오조": {
+    "id": "오조",
+    "name": "오조",
+    "leadership": 45,
+    "war": 42,
+    "intelligence": 60,
+    "faceId": 155
+  },
+  "맹숙": {
+    "id": "맹숙",
+    "name": "맹숙",
+    "leadership": 52,
+    "war": 69,
+    "intelligence": 31,
+    "faceId": 208
+  },
+  "정덕": {
+    "id": "정덕",
+    "name": "정덕",
+    "leadership": 51,
+    "war": 70,
+    "intelligence": 56,
+    "faceId": 162
+  },
+  "장획": {
+    "id": "장획",
+    "name": "장획",
+    "leadership": 63,
+    "war": 78,
+    "intelligence": 61,
+    "faceId": 194
+  },
+  "고창": {
+    "id": "고창",
+    "name": "고창",
+    "leadership": 48,
+    "war": 72,
+    "intelligence": 56,
+    "faceId": 62
+  },
+  "송비": {
+    "id": "송비",
+    "name": "송비",
+    "leadership": 58,
+    "war": 64,
+    "intelligence": 30,
+    "faceId": 208
+  },
+  "조식": {
+    "id": "조식",
+    "name": "조식",
+    "leadership": 13,
+    "war": 15,
+    "intelligence": 78,
+    "faceId": 204
+  },
+  "사마사": {
+    "id": "사마사",
+    "name": "사마사",
+    "leadership": 79,
+    "war": 65,
+    "intelligence": 87,
+    "faceId": 201
+  },
+  "사마소": {
+    "id": "사마소",
+    "name": "사마소",
+    "leadership": 75,
+    "war": 66,
+    "intelligence": 85,
+    "faceId": 163
+  },
+  "조진": {
+    "id": "조진",
+    "name": "조진",
+    "leadership": 88,
+    "war": 74,
+    "intelligence": 66,
+    "faceId": 77
+  },
+  "학소": {
+    "id": "학소",
+    "name": "학소",
+    "leadership": 91,
+    "war": 68,
+    "intelligence": 88,
+    "faceId": 95
+  },
+  "강유": {
+    "id": "강유",
+    "name": "강유",
+    "leadership": 80,
+    "war": 90,
+    "intelligence": 94,
+    "faceId": 21
+  },
+  "한영": {
+    "id": "한영",
+    "name": "한영",
+    "leadership": 55,
+    "war": 61,
+    "intelligence": 44,
+    "faceId": 142
+  },
+  "곽적": {
+    "id": "곽적",
+    "name": "곽적",
+    "leadership": 50,
+    "war": 35,
+    "intelligence": 63,
+    "faceId": 141
+  },
+  "양현": {
+    "id": "양현",
+    "name": "양현",
+    "leadership": 55,
+    "war": 58,
+    "intelligence": 66,
+    "faceId": 130
+  },
+  "유벽": {
+    "id": "유벽",
+    "name": "유벽",
+    "leadership": 65,
+    "war": 67,
+    "intelligence": 59,
+    "faceId": 129
+  },
+  "유순": {
+    "id": "유순",
+    "name": "유순",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 44,
+    "faceId": 160
+  },
+  "양송": {
+    "id": "양송",
+    "name": "양송",
+    "leadership": 26,
+    "war": 45,
+    "intelligence": 57,
+    "faceId": 193
+  },
+  "양수": {
+    "id": "양수",
+    "name": "양수",
+    "leadership": 28,
+    "war": 29,
+    "intelligence": 85,
+    "faceId": 43
+  },
+  "왕평": {
+    "id": "왕평",
+    "name": "왕평",
+    "leadership": 72,
+    "war": 72,
+    "intelligence": 67,
+    "faceId": 119
+  },
+  "유선": {
+    "id": "유선",
+    "name": "유선",
+    "leadership": 18,
+    "war": 22,
+    "intelligence": 20,
+    "faceId": 196
+  },
+  "이엄": {
+    "id": "이엄",
+    "name": "이엄",
+    "leadership": 72,
+    "war": 75,
+    "intelligence": 74,
+    "faceId": 106
+  },
+  "비관": {
+    "id": "비관",
+    "name": "비관",
+    "leadership": 58,
+    "war": 49,
+    "intelligence": 45,
+    "faceId": 105
+  },
+  "한섬": {
+    "id": "한섬",
+    "name": "한섬",
+    "leadership": 45,
+    "war": 56,
+    "intelligence": 38,
+    "faceId": 179
+  },
+  "보병대": {
+    "id": "보병대",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_2": {
+    "id": "보병대_2",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_3": {
+    "id": "보병대_3",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_4": {
+    "id": "보병대_4",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_5": {
+    "id": "보병대_5",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_6": {
+    "id": "보병대_6",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_7": {
+    "id": "보병대_7",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_8": {
+    "id": "보병대_8",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_9": {
+    "id": "보병대_9",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_10": {
+    "id": "보병대_10",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_11": {
+    "id": "보병대_11",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_12": {
+    "id": "보병대_12",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_13": {
+    "id": "보병대_13",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_14": {
+    "id": "보병대_14",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_15": {
+    "id": "보병대_15",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_16": {
+    "id": "보병대_16",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_17": {
+    "id": "보병대_17",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "보병대_18": {
+    "id": "보병대_18",
+    "name": "보병대",
+    "leadership": 50,
+    "war": 40,
+    "intelligence": 30,
+    "faceId": 215
+  },
+  "궁병대": {
+    "id": "궁병대",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_2": {
+    "id": "궁병대_2",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_3": {
+    "id": "궁병대_3",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_4": {
+    "id": "궁병대_4",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_5": {
+    "id": "궁병대_5",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_6": {
+    "id": "궁병대_6",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_7": {
+    "id": "궁병대_7",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_8": {
+    "id": "궁병대_8",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_9": {
+    "id": "궁병대_9",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_10": {
+    "id": "궁병대_10",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_11": {
+    "id": "궁병대_11",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_12": {
+    "id": "궁병대_12",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_13": {
+    "id": "궁병대_13",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_14": {
+    "id": "궁병대_14",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_15": {
+    "id": "궁병대_15",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_16": {
+    "id": "궁병대_16",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_17": {
+    "id": "궁병대_17",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "궁병대_18": {
+    "id": "궁병대_18",
+    "name": "궁병대",
+    "leadership": 30,
+    "war": 40,
+    "intelligence": 50,
+    "faceId": 210
+  },
+  "기병대": {
+    "id": "기병대",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_2": {
+    "id": "기병대_2",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_3": {
+    "id": "기병대_3",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_4": {
+    "id": "기병대_4",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_5": {
+    "id": "기병대_5",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_6": {
+    "id": "기병대_6",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_7": {
+    "id": "기병대_7",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_8": {
+    "id": "기병대_8",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_9": {
+    "id": "기병대_9",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_10": {
+    "id": "기병대_10",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_11": {
+    "id": "기병대_11",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_12": {
+    "id": "기병대_12",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_13": {
+    "id": "기병대_13",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_14": {
+    "id": "기병대_14",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_15": {
+    "id": "기병대_15",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_16": {
+    "id": "기병대_16",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_17": {
+    "id": "기병대_17",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "기병대_18": {
+    "id": "기병대_18",
+    "name": "기병대",
+    "leadership": 40,
+    "war": 50,
+    "intelligence": 30,
+    "faceId": 212
+  },
+  "적병": {
+    "id": "적병",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_2": {
+    "id": "적병_2",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_3": {
+    "id": "적병_3",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_4": {
+    "id": "적병_4",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_5": {
+    "id": "적병_5",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_6": {
+    "id": "적병_6",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_7": {
+    "id": "적병_7",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_8": {
+    "id": "적병_8",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_9": {
+    "id": "적병_9",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_10": {
+    "id": "적병_10",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_11": {
+    "id": "적병_11",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_12": {
+    "id": "적병_12",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_13": {
+    "id": "적병_13",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_14": {
+    "id": "적병_14",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_15": {
+    "id": "적병_15",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_16": {
+    "id": "적병_16",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_17": {
+    "id": "적병_17",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "적병_18": {
+    "id": "적병_18",
+    "name": "적병",
+    "leadership": 30,
+    "war": 50,
+    "intelligence": 40,
+    "faceId": 219
+  },
+  "군악대": {
+    "id": "군악대",
+    "name": "군악대",
+    "leadership": 10,
+    "war": 10,
+    "intelligence": 70,
+    "faceId": 202
+  },
+  "군악대_2": {
+    "id": "군악대_2",
+    "name": "군악대",
+    "leadership": 10,
+    "war": 10,
+    "intelligence": 70,
+    "faceId": 202
+  },
+  "군악대_3": {
+    "id": "군악대_3",
+    "name": "군악대",
+    "leadership": 10,
+    "war": 10,
+    "intelligence": 70,
+    "faceId": 202
+  },
+  "군악대_4": {
+    "id": "군악대_4",
+    "name": "군악대",
+    "leadership": 10,
+    "war": 10,
+    "intelligence": 70,
+    "faceId": 202
+  },
+  "맹수사": {
+    "id": "맹수사",
+    "name": "맹수사",
+    "leadership": 40,
+    "war": 70,
+    "intelligence": 10,
+    "faceId": 217
+  },
+  "맹수사_2": {
+    "id": "맹수사_2",
+    "name": "맹수사",
+    "leadership": 40,
+    "war": 70,
+    "intelligence": 10,
+    "faceId": 217
+  },
+  "요술사": {
+    "id": "요술사",
+    "name": "요술사",
+    "leadership": 50,
+    "war": 5,
+    "intelligence": 80,
+    "faceId": 236
+  },
+  "요술사_2": {
+    "id": "요술사_2",
+    "name": "요술사",
+    "leadership": 50,
+    "war": 5,
+    "intelligence": 80,
+    "faceId": 236
+  },
+  "무도가": {
+    "id": "무도가",
+    "name": "무도가",
+    "leadership": 60,
+    "war": 50,
+    "intelligence": 10,
+    "faceId": 209
+  },
+  "무도가_2": {
+    "id": "무도가_2",
+    "name": "무도가",
+    "leadership": 60,
+    "war": 50,
+    "intelligence": 10,
+    "faceId": 209
+  },
+  "무도가_3": {
+    "id": "무도가_3",
+    "name": "무도가",
+    "leadership": 60,
+    "war": 50,
+    "intelligence": 10,
+    "faceId": 209
+  },
+  "무도가_4": {
+    "id": "무도가_4",
+    "name": "무도가",
+    "leadership": 60,
+    "war": 50,
+    "intelligence": 10,
+    "faceId": 209
+  },
+  "이민족": {
+    "id": "이민족",
+    "name": "이민족",
+    "leadership": 50,
+    "war": 60,
+    "intelligence": 10,
+    "faceId": 218
+  },
+  "이민족_2": {
+    "id": "이민족_2",
+    "name": "이민족",
+    "leadership": 50,
+    "war": 60,
+    "intelligence": 10,
+    "faceId": 218
+  },
+  "이민족_3": {
+    "id": "이민족_3",
+    "name": "이민족",
+    "leadership": 50,
+    "war": 60,
+    "intelligence": 10,
+    "faceId": 218
+  },
+  "이민족_4": {
+    "id": "이민족_4",
+    "name": "이민족",
+    "leadership": 50,
+    "war": 60,
+    "intelligence": 10,
+    "faceId": 218
+  },
+  "수송대": {
+    "id": "수송대",
+    "name": "수송대",
+    "leadership": 10,
+    "war": 10,
+    "intelligence": 70,
+    "faceId": 202
+  },
+  "수송대_2": {
+    "id": "수송대_2",
+    "name": "수송대",
+    "leadership": 10,
+    "war": 10,
+    "intelligence": 70,
+    "faceId": 202
+  },
+  "수송대_3": {
+    "id": "수송대_3",
+    "name": "수송대",
+    "leadership": 10,
+    "war": 10,
+    "intelligence": 70,
+    "faceId": 202
+  },
+  "수송대_4": {
+    "id": "수송대_4",
+    "name": "수송대",
+    "leadership": 10,
+    "war": 10,
+    "intelligence": 70,
+    "faceId": 202
+  },
+  "？？？": {
+    "id": "？？？",
+    "name": "？？？",
+    "leadership": 100,
+    "war": 98,
+    "intelligence": 80,
+    "faceId": 238
+  },
+  "？？？_2": {
+    "id": "？？？_2",
+    "name": "？？？",
+    "leadership": 83,
+    "war": 99,
+    "intelligence": 42,
+    "faceId": 239
+  },
+  "이명": {
+    "id": "이명",
+    "name": "이명",
+    "leadership": 72,
+    "war": 70,
+    "intelligence": 48,
+    "faceId": 230
+  },
+  "축융": {
+    "id": "축융",
+    "name": "축융",
+    "leadership": 66,
+    "war": 82,
+    "intelligence": 32,
+    "faceId": 231
+  },
+  "장완": {
+    "id": "장완",
+    "name": "장완",
+    "leadership": 73,
+    "war": 60,
+    "intelligence": 85,
+    "faceId": 207
+  },
+  "비위": {
+    "id": "비위",
+    "name": "비위",
+    "leadership": 25,
+    "war": 23,
+    "intelligence": 80,
+    "faceId": 203
+  }
+}
