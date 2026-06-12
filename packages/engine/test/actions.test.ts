@@ -31,6 +31,15 @@ describe("applyAction: move", () => {
     const s = patchUnit(fresh(), "guanyu", { acted: true });
     expect(() => applyAction(ctx, s, { type: "move", unitId: "guanyu", to: { x: 4, y: 9 } })).toThrow();
   });
+
+  it("같은 턴에 이동 후 공격이 가능하고 이동한 위치 기준으로 사거리 판정한다", () => {
+    let s = fresh();
+    // 관우(4,10) → (4,5)로 이동 (dong_inf1 (4,4) 인접). 이동력 6, plain 경로 비용 5
+    s = applyAction(ctx, s, { type: "move", unitId: "guanyu", to: { x: 4, y: 5 } }).state;
+    const { state } = applyAction(ctx, s, { type: "attack", unitId: "guanyu", targetId: "dong_inf1" });
+    expect(get(state, "guanyu").acted).toBe(true);
+    expect(get(state, "dong_inf1").hp).toBeLessThan(50);
+  });
 });
 
 describe("applyAction: attack", () => {
@@ -87,6 +96,47 @@ describe("applyAction: 일기토", () => {
     const { state, events } = applyAction(ctx, s, { type: "attack", unitId: "guanyu", targetId: "huaxiong" });
     expect(state.status).toBe("victory");
     expect(events).toContainEqual({ type: "battleEnded", result: "victory" });
+  });
+
+  it("일기토에서 공격자가 패자: 공격자 퇴각, 방어자 생존", () => {
+    const loseCtx: BattleContext = {
+      ...ctx,
+      stage: {
+        ...ctx.stage,
+        events: [{
+          id: "duel_guanyu_huaxiong", type: "duel" as const,
+          trigger: { kind: "attack" as const, attackerId: "guanyu", defenderId: "huaxiong" },
+          outcome: { winnerId: "huaxiong", loserRetreats: true },
+          once: true,
+        }],
+      },
+    };
+    const s = patchUnit(fresh(), "guanyu", { x: 6, y: 3 });
+    const { state } = applyAction(loseCtx, s, { type: "attack", unitId: "guanyu", targetId: "huaxiong" });
+    expect(get(state, "guanyu").retreated).toBe(true);
+    expect(get(state, "huaxiong").retreated).toBe(false);
+    expect(state.status).toBe("ongoing"); // 관우는 군주가 아니므로 패배 아님
+  });
+
+  it("loserRetreats=false면 일기토 후 양측 모두 생존", () => {
+    const noRetreatCtx: BattleContext = {
+      ...ctx,
+      stage: {
+        ...ctx.stage,
+        events: [{
+          id: "duel_guanyu_huaxiong", type: "duel" as const,
+          trigger: { kind: "attack" as const, attackerId: "guanyu", defenderId: "huaxiong" },
+          outcome: { winnerId: "guanyu", loserRetreats: false },
+          once: true,
+        }],
+      },
+    };
+    const s = patchUnit(fresh(), "guanyu", { x: 6, y: 3 });
+    const { state, events } = applyAction(noRetreatCtx, s, { type: "attack", unitId: "guanyu", targetId: "huaxiong" });
+    expect(get(state, "huaxiong").retreated).toBe(false);
+    expect(get(state, "guanyu").retreated).toBe(false);
+    expect(events.filter((e) => e.type === "unitRetreated")).toHaveLength(0);
+    expect(state.firedEvents).toContain("duel_guanyu_huaxiong");
   });
 });
 

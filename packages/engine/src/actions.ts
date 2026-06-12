@@ -41,6 +41,7 @@ function checkOutcome(ctx: BattleContext, state: BattleState): { state: BattleSt
   const d = ctx.stage.defeat;
   const retreated = (id: string) => getUnit(state, id).retreated;
 
+  // 패배 체크 우선 — 군주 퇴각과 마지막 적 격파가 동시 발생하면 defeat (원작 룰)
   if (d.kind === "lordRetreat" && retreated(d.unitId)) {
     return { state: { ...state, status: "defeat" }, events: [{ type: "battleEnded", result: "defeat" }] };
   }
@@ -132,6 +133,7 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
           events.push(...ctr.events);
         }
       }
+      // 반격으로 공격자가 퇴각했어도 acted=true로 통일 — maybeAdvancePhase의 retreated 필터가 가드
       next = replaceUnit(next, { ...getUnit(next, unit.id), acted: true });
       break;
     }
