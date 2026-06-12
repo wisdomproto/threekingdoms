@@ -104,6 +104,13 @@ SHEETS: list[dict] = [
         "pose_order": NAMED_POSE_ORDER,
         "type": "named",
     },
+    {
+        "spriteId": "zhangliao",
+        "source":   "B-5e_ink_01.png",   # SD 2.5등신 — 관우/장비와 등신 통일
+        "cols": 3, "rows": 2,
+        "pose_order": NAMED_POSE_ORDER,
+        "type": "named",
+    },
     # ── 병종 템플릿 — 아군(player) ───────────────────────────────────────
     {
         "spriteId": "_multi_player",   # 내부 태그 — 아래서 3종 spriteId로 분해

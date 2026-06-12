@@ -59,6 +59,18 @@
     "source": "B-5d_ink_01.png",
     "method": "blob"
   },
+  "zhangliao": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack",
+      "back_idle",
+      "back_move",
+      "back_attack"
+    ],
+    "source": "B-5e_ink_01.png",
+    "method": "blob"
+  },
   "footman_player": {
     "poses": [
       "front_idle",

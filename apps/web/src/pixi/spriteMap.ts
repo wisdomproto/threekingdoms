@@ -17,6 +17,7 @@ export const COMMANDER_SPRITE_MAP: Record<string, string> = {
   장비:   "zhangfei",
   여포:   "lvbu",
   화웅:   "huaxiong",
+  장료:   "zhangliao",
   // 미생성분: 이숙, 호진, 조잠, 간옹, 조운, 제갈량 등 → 폴백(색 사각형)
 };
 
