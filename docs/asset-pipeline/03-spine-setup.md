@@ -67,6 +67,8 @@ Essential은 할인 없이 $69 수준의 영구 라이선스이며, Professional
 
 ## 3. 병종 골격 규격화 방침
 
+> ⚠️ **법적 제약**: Spine 파츠·스킨 제작에 쓰는 모든 이미지는 코에이(KOEI) 게임 그래픽 스타일 모방 금지 (CLAUDE.md §1 법적 라인). 파츠 소스 이미지를 생성할 때도 01 가이드와 동일하게 프롬프트에 "do NOT imitate any specific game or publisher's art style"을 포함한다.
+
 CLAUDE.md §4의 원칙: **같은 병종은 같은 골격을 공유하고, 무기는 슬롯 교체로 처리한다.**
 
 ### 3-1. 명명 규칙
