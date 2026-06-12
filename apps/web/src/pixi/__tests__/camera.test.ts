@@ -114,3 +114,28 @@ describe("worldToScreen / screenToWorld", () => {
     expect(round.y).toBeCloseTo(p.y, 9);
   });
 });
+
+describe("리사이즈 후 clampPan (ResizeObserver 시나리오)", () => {
+  it("뷰포트 확장 후 경계 밖 pivot은 새 뷰포트 기준으로 클램프된다", () => {
+    // 상황: 초기 뷰포트 23×895(DevTools 열린 상태)로 마운트 → pivot (-500, -300) 저장
+    // → 뷰포트가 1280×800으로 확장(ResizeObserver 발화) → clampPan 재적용
+    const prevState: CameraState = { scale: 1, ox: -500, oy: -300 };
+    const newView: Size = { width: 1280, height: 800 };
+    const result = clampPan(prevState, newView, WORLD); // WORLD = 2688×1536
+    // 맵(2688)이 뷰(1280)보다 크므로 빈 가장자리 금지: ox ≤ 0
+    expect(result.ox).toBeLessThanOrEqual(0);
+    // 음수 한계: viewport - world*scale = 1280 - 2688 = -1408
+    expect(result.ox).toBeGreaterThanOrEqual(newView.width - WORLD.width);
+    expect(result.oy).toBeLessThanOrEqual(0);
+    expect(result.oy).toBeGreaterThanOrEqual(newView.height - WORLD.height);
+  });
+
+  it("뷰포트가 맵보다 커지면(극단적 줌아웃) 맵이 중앙 정렬된다", () => {
+    // 맵보다 훨씬 큰 뷰포트 — scale 0.25에서 가로 672px < 1280px
+    const state: CameraState = { scale: 0.25, ox: -999, oy: 999 };
+    const bigView: Size = { width: 1280, height: 800 };
+    const result = clampPan(state, bigView, WORLD);
+    expect(result.ox).toBeCloseTo((bigView.width - WORLD.width * 0.25) / 2, 6);
+    expect(result.oy).toBeCloseTo((bigView.height - WORLD.height * 0.25) / 2, 6);
+  });
+});

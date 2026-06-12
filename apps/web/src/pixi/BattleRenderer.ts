@@ -56,6 +56,7 @@ interface Scene {
   unsubscribe: () => void;
   onWheel: (e: WheelEvent) => void;
   tick: () => void;
+  resizeObserver: ResizeObserver;
 }
 
 export class BattleRenderer implements Presenter {
@@ -83,8 +84,14 @@ export class BattleRenderer implements Presenter {
     this.mounting = true;
 
     const app = new Application();
+    // resizeTo 대신 mount 시점 크기로 초기화 + ResizeObserver 사용.
+    // ResizePlugin의 resizeTo는 globalThis 'resize' 이벤트에 의존해
+    // iframe 기반 프리뷰나 CSS-only 레이아웃 변화에선 발화하지 않는다.
+    const initW = parent.clientWidth || 300;
+    const initH = parent.clientHeight || 150;
     await app.init({
-      resizeTo: parent,
+      width: initW,
+      height: initH,
       background: 0x1b1f24,
       antialias: true,
       resolution: typeof window !== "undefined" ? Math.min(window.devicePixelRatio, 2) : 1,
@@ -128,6 +135,20 @@ export class BattleRenderer implements Presenter {
     });
     fx.resize(app.screen.width, app.screen.height);
 
+    // ResizeObserver: 컨테이너 크기 변화를 Pixi renderer에 직접 전파.
+    // globalThis 'resize' 이벤트(ResizePlugin)와 달리 iframe·CSS 리플로우에도 발화하며,
+    // 마운트 해제 시 disconnect()로 정확히 정리된다 (StrictMode 가드).
+    const resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const { width, height } = entry.contentRect;
+      if (width > 0 && height > 0) {
+        app.renderer.resize(width, height);
+        // app.renderer.on("resize") 핸들러가 camera.resize + fx.resize를 호출한다.
+      }
+    });
+    resizeObserver.observe(parent);
+
     const input = new InputAdapter({
       stage: app.stage,
       screen: app.screen,
@@ -166,7 +187,7 @@ export class BattleRenderer implements Presenter {
 
     this.scene = {
       app, world, tweens, textures, terrain, highlights, units, fx, camera, input,
-      unsubscribe, onWheel, tick,
+      unsubscribe, onWheel, tick, resizeObserver,
     };
 
     // 초기 상태 반영 + 군주(첫 아군 유닛)로 카메라 스냅
@@ -182,6 +203,7 @@ export class BattleRenderer implements Presenter {
     if (!s) return; // init 진행 중이면 mount()의 가드가 마무리한다
     this.scene = null;
     s.unsubscribe();
+    s.resizeObserver.disconnect();
     s.input.detach();
     s.app.canvas.removeEventListener("wheel", s.onWheel);
     s.app.ticker.remove(s.tick);
