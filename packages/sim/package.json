@@ -1,0 +1,17 @@
+{
+  "name": "@tk/sim",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/cli.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tk/data": "workspace:*",
+    "@tk/engine": "workspace:*",
+    "tsx": "^4.19.0"
+  },
+  "devDependencies": { "typescript": "^5.6.0", "vitest": "^2.1.0" }
+}
