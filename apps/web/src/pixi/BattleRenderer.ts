@@ -223,6 +223,10 @@ export class BattleRenderer implements Presenter {
     const store = this.store;
     if (!s || !store) return;
     const view = s.units.view(e.unitId);
+    // 멱등 규칙 (수정명세-3): 프리뷰 워크로 이미 목적지에 도착한 유닛에 대해
+    // 커밋된 unitMoved가 재생되면 같은 경로를 다시 걷게 된다.
+    // 유닛의 현재 시각 위치가 이벤트 목적지와 같으면 즉시 resolve — 이중 워크 방지.
+    if (view.gridX === e.to.x && view.gridY === e.to.y) return;
     // committed는 이미 이동(+후속 피해) 적용 후 — 유닛을 from으로 되돌린 가상 상태로 경로 재계산.
     // 반격 퇴각으로 retreated가 됐어도 경로 계산은 가능해야 하므로 함께 해제한다.
     const committed = store.committedState;
@@ -235,6 +239,40 @@ export class BattleRenderer implements Presenter {
     const path = findPath(this.ctx, patched, e.unitId, e.to) ?? [e.from, e.to];
     s.camera.focusOn(gridToWorld(e.to), Math.max(FOCUS_MS, path.length * 150 * 0.6));
     await view.moveAlong(path); // 타일당 150ms — 직선 금지 (벽/성문 관통 방지)
+  }
+
+  /**
+   * 프리뷰 워크 (원작 UX §수정명세-1) — postMoveMenu(preview≠from) 진입 시 store가 호출.
+   * 유닛 스프라이트를 BFS 경로를 따라 목적지까지 워크 트윈. 타일당 ~100ms (확정 이동보다 약간 빠름).
+   * 반환 Promise 완료 → store.setPreviewWalking(false).
+   */
+  async previewWalk(unitId: string, from: Coord, to: Coord): Promise<void> {
+    const s = this.scene;
+    const store = this.store;
+    if (!s || !store) return;
+    const view = s.units.view(unitId);
+    // 경로 재계산: 현재 committed 기준, unitId를 from에 배치한 가상 상태
+    const committed = store.committedState;
+    const patched: BattleState = {
+      ...committed,
+      units: committed.units.map((u) =>
+        u.id === unitId ? { ...u, x: from.x, y: from.y, retreated: false } : u,
+      ),
+    };
+    const path = findPath(this.ctx, patched, unitId, to) ?? [from, to];
+    s.camera.focusOn(gridToWorld(to), Math.max(FOCUS_MS, path.length * 100 * 0.6));
+    await view.moveAlong(path, 100); // 타일당 100ms — 확정 이동(150ms)보다 약간 빠르게
+  }
+
+  /**
+   * 프리뷰 취소 (원작 UX §수정명세-2) — menuCancel 시 store가 호출.
+   * 유닛 스프라이트를 원위치(from)로 즉시 스냅 (원작은 즉시 복귀에 가까움).
+   */
+  previewCancel(unitId: string, to: Coord): void {
+    const s = this.scene;
+    if (!s) return;
+    const view = s.units.view(unitId);
+    view.snapTo(to.x, to.y);
   }
 
   async damageDealt(e: Ev<"damageDealt">): Promise<void> {

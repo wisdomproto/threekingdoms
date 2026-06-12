@@ -64,10 +64,16 @@ function Btn({
 export function ActionMenu({
   ui,
   dispatch,
+  previewWalking = false,
 }: {
   ui: InputState;
   dispatch: (e: UiEvent) => void;
+  /** 프리뷰 워크 진행 중 — true면 메뉴 숨김 (워크 완료 후 표시, 원작 UX §수정명세-1) */
+  previewWalking?: boolean;
 }): React.ReactElement | null {
+  // 프리뷰 워크 중에는 메뉴를 숨긴다 — 유닛이 목적지에 도착한 뒤 표시
+  if (previewWalking) return null;
+
   if (ui.kind === "postMoveMenu") {
     return (
       <div style={ZONE_STYLE}>

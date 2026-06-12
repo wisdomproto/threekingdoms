@@ -16,6 +16,8 @@ const ATTACK_ALPHA = 0.45;
 const CURSOR_TINT = 0xf2d35e;
 const CURSOR_ALPHA = 0.4;
 const GHOST_ALPHA = 0.55;
+const ORIGIN_TINT = 0xaaaaaa; // 출발지 마커 — 원작: 유닛이 걸어간 뒤 출발지에 잔상
+const ORIGIN_ALPHA = 0.4;
 
 export class HighlightLayer extends Container {
   private readonly textures: TextureResolver;
@@ -72,12 +74,16 @@ export class HighlightLayer extends Container {
         break;
       }
       case "postMoveMenu": {
-        // 고스트: 이동 예정지(프리뷰)를 아군색 반투명으로
-        this.place(ui.preview, SIDE_COLORS.player, GHOST_ALPHA);
+        // 출발지 마커: 유닛이 걸어간 뒤 원위치에 잔상을 남긴다 (원작 문법).
+        // preview=from(제자리)인 경우 마커는 불필요 — 유닛이 이동하지 않았으므로.
+        const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
+        if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
         break;
       }
       case "targetSelect": {
-        this.place(ui.preview, SIDE_COLORS.player, GHOST_ALPHA);
+        // targetSelect에서도 출발지 마커 유지 + 공격 범위 하이라이트
+        const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
+        if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
         for (const t of this.targetCoords(battle, ui.attackable)) {
           this.place(t, ATTACK_TINT, ATTACK_ALPHA);
         }

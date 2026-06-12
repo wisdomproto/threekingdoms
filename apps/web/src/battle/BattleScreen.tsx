@@ -33,6 +33,8 @@ type Ev<T extends BattleEvent["type"]> = Extract<BattleEvent, { type: T }>;
  * 현재 마운트된 렌더러로 연출을 위임하는 Presenter.
  * 렌더러가 없으면(마운트 전/StrictMode 정리 후) 모든 연출이 즉시 완료되어
  * EventPlayer 큐가 교착 없이 드레인된다.
+ *
+ * previewWalk/previewCancel도 여기서 위임 — store 생성 시 onPreviewWalk/onPreviewCancel에 연결.
  */
 class PresenterDelegate implements Presenter {
   target: BattleRenderer | null = null;
@@ -64,6 +66,14 @@ class PresenterDelegate implements Presenter {
   focus(coord: Coord): void {
     this.target?.focusOn(coord);
   }
+  /** 프리뷰 워크 (원작 UX §수정명세-1): 렌더러가 없으면 즉시 완료 */
+  previewWalk(unitId: string, from: Coord, to: Coord): Promise<void> {
+    return this.target?.previewWalk(unitId, from, to) ?? Promise.resolve();
+  }
+  /** 프리뷰 취소 스냅 (원작 UX §수정명세-2) */
+  previewCancel(unitId: string, to: Coord): void {
+    this.target?.previewCancel(unitId, to);
+  }
 }
 
 function makeCtx(): BattleContext {
@@ -87,6 +97,9 @@ function createSession(): Session {
     dev: process.env.NODE_ENV !== "production",
     onDevViolation: (m) => console.error(`[battle dev 단언] ${m}`),
     onFocus: (c) => delegate.focus(c),
+    // 원작 UX §수정명세: 프리뷰 워크·취소를 현재 렌더러에 위임
+    onPreviewWalk: (unitId, from, to) => delegate.previewWalk(unitId, from, to),
+    onPreviewCancel: (unitId, to) => delegate.previewCancel(unitId, to),
   });
   return { ctx, store, delegate };
 }
@@ -121,7 +134,7 @@ export default function BattleScreen(): React.ReactElement {
       <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
       <TurnBanner ui={snap.ui} vm={snap.vm} dispatch={dispatch} />
       <UnitPanel ui={snap.ui} vm={snap.vm} />
-      <ActionMenu ui={snap.ui} dispatch={dispatch} />
+      <ActionMenu ui={snap.ui} dispatch={dispatch} previewWalking={snap.previewWalking} />
       <ResultOverlay ui={snap.ui} vm={snap.vm} />
     </div>
   );

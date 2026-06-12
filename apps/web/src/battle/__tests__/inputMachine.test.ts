@@ -323,3 +323,67 @@ describe("movePreview 취소 = 엔진 무호출 (store 통합)", () => {
     expect(store.settledState).toBe(before);
   });
 });
+
+describe("previewWalking 플래그 (원작 UX §수정명세)", () => {
+  it("preview≠from 이동 탭 → previewWalking=true, 워크 완료 후 false", async () => {
+    let walkResolve!: () => void;
+    const walkPromise = new Promise<void>((r) => { walkResolve = r; });
+    let walkCalled = false;
+    const store = new BattleStore(ctx, SEED, {
+      onPreviewWalk: () => { walkCalled = true; return walkPromise; },
+    });
+    store.dispatchUi({ type: "tapTile", coord: guanyuPos }); // idle → selected
+    expect(store.previewWalking).toBe(false);
+    store.dispatchUi({ type: "tapTile", coord: { x: 49, y: 15 } }); // → postMoveMenu (이동)
+    expect(store.uiState.kind).toBe("postMoveMenu");
+    expect(walkCalled).toBe(true);
+    expect(store.previewWalking).toBe(true); // 워크 중
+    walkResolve();
+    await walkPromise;
+    // Promise.then이 마이크로태스크 큐에서 실행되므로 한 틱 기다린다
+    await Promise.resolve();
+    expect(store.previewWalking).toBe(false); // 워크 완료
+  });
+
+  it("preview=from(제자리) → previewWalking 발동 안 함", () => {
+    let walkCalled = false;
+    const store = new BattleStore(ctx, SEED, {
+      onPreviewWalk: () => { walkCalled = true; return Promise.resolve(); },
+    });
+    store.dispatchUi({ type: "tapTile", coord: guanyuPos }); // idle → selected
+    store.dispatchUi({ type: "tapTile", coord: guanyuPos }); // 제자리 → postMoveMenu(from=preview)
+    expect(store.uiState.kind).toBe("postMoveMenu");
+    expect(walkCalled).toBe(false);
+    expect(store.previewWalking).toBe(false);
+  });
+
+  it("previewWalking 중 menuCancel → previewWalking=false + onPreviewCancel 호출", () => {
+    let cancelCalled = false;
+    const store = new BattleStore(ctx, SEED, {
+      onPreviewWalk: () => new Promise(() => {}), // 절대 resolve 안 함 — 워크 중 상태 유지
+      onPreviewCancel: () => { cancelCalled = true; },
+    });
+    store.dispatchUi({ type: "tapTile", coord: guanyuPos });
+    store.dispatchUi({ type: "tapTile", coord: { x: 49, y: 15 } }); // postMoveMenu
+    expect(store.previewWalking).toBe(true);
+    store.dispatchUi({ type: "menuCancel" }); // → selected
+    expect(store.uiState.kind).toBe("selected");
+    expect(store.previewWalking).toBe(false); // 취소로 플래그 리셋
+    expect(cancelCalled).toBe(true);
+  });
+
+  it("previewWalking은 getSnapshot에 반영된다", async () => {
+    let walkResolve!: () => void;
+    const walkPromise = new Promise<void>((r) => { walkResolve = r; });
+    const store = new BattleStore(ctx, SEED, {
+      onPreviewWalk: () => walkPromise,
+    });
+    store.dispatchUi({ type: "tapTile", coord: guanyuPos });
+    store.dispatchUi({ type: "tapTile", coord: { x: 49, y: 15 } });
+    expect(store.getSnapshot().previewWalking).toBe(true);
+    walkResolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(store.getSnapshot().previewWalking).toBe(false);
+  });
+});

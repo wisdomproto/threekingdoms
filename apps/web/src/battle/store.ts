@@ -12,7 +12,12 @@
  * enemyTurn 진입 시 EnemyTurnDriver를 비동기로 기동한다.
  *
  * useSyncExternalStore 어댑터: subscribe/getSnapshot. 스냅샷은 직렬화 가능 슬라이스
- * { ui, vm }이며 참조 캐시로 불필요한 React 리렌더를 막는다.
+ * { ui, vm, previewWalking }이며 참조 캐시로 불필요한 React 리렌더를 막는다.
+ *
+ * previewWalking 플래그 (원작 UX §수정명세):
+ *   postMoveMenu(preview≠from) 진입 시 true, 워크 완료/취소 시 false.
+ *   순수 데이터 — Pixi import 없음. 렌더러(onPreviewWalk/onPreviewCancel 콜백)가 실제 트윈을 실행.
+ *   ActionMenu/타깃 하이라이트는 previewWalking=false일 때만 표시.
  */
 import { applyAction, createBattle } from "@tk/engine";
 import type { Action, BattleContext, BattleEvent, BattleState, Coord } from "@tk/engine";
@@ -27,11 +32,25 @@ export interface BattleStoreOptions {
   dev?: boolean;
   onDevViolation?: (message: string) => void;
   onFocus?: (coord: Coord) => void;
+  /**
+   * 프리뷰 워크 콜백 (원작 UX §수정명세-1).
+   * postMoveMenu(preview≠from) 진입 시 렌더러가 등록. 완료되면 store.setPreviewWalking(false)를 호출해야 함.
+   * 미등록(헤드리스/테스트)이면 즉시 완료로 간주.
+   */
+  onPreviewWalk?: (unitId: string, from: Coord, to: Coord) => Promise<void>;
+  /**
+   * 프리뷰 취소 콜백 (원작 UX §수정명세-2).
+   * menuCancel 시 렌더러가 유닛을 원위치(from)로 스냅/트윈 복귀.
+   * 미등록이면 무시.
+   */
+  onPreviewCancel?: (unitId: string, to: Coord) => void;
 }
 
 export interface StoreSnapshot {
   ui: InputState;
   vm: BattleVM;
+  /** 프리뷰 워크 진행 중 — ActionMenu·타깃 하이라이트 숨김 조건 */
+  previewWalking: boolean;
 }
 
 /** 헤드리스 기본 Presenter — 모든 연출을 즉시 완료 (테스트·시뮬레이션용) */
@@ -58,6 +77,8 @@ export class BattleStore {
   private readonly log: Action[] = [];
   private readonly player: EventPlayer;
   private readonly opts: BattleStoreOptions;
+  /** 프리뷰 워크 진행 중 플래그 — 순수 데이터, Pixi 무관 */
+  private _previewWalking = false;
 
   private listeners = new Set<() => void>();
   private snapshotCache: StoreSnapshot | null = null;
@@ -95,7 +116,22 @@ export class BattleStore {
     return this.log;
   }
 
+  get previewWalking(): boolean {
+    return this._previewWalking;
+  }
+
+  /**
+   * 렌더러 워크 완료 시 호출 — previewWalking을 false로 전환하고 HUD를 갱신한다.
+   * inputMachine 전이는 일어나지 않는다.
+   */
+  setPreviewWalking(value: boolean): void {
+    if (this._previewWalking === value) return;
+    this._previewWalking = value;
+    this.notify();
+  }
+
   dispatchUi(event: UiEvent): void {
+    const prevUi = this.ui;
     const prevKind = this.ui.kind;
     const { next, effects } = reduceInput(this.ui, event, this.ctx, this.committed);
     this.ui = next;
@@ -114,6 +150,41 @@ export class BattleStore {
     // 커밋이 있었다면 events가 비어도(중간 wait는 이벤트 0개) 반드시 큐를 돌린다 —
     // 드레인 → drained 디스패치가 animating을 풀어주는 유일한 경로이므로 생략 시 교착
     if (didCommit) void this.player.enqueue(batch);
+
+    // ── 프리뷰 워크 연출 트리거 (원작 UX §수정명세-1) ───────────────────────
+    // selected→postMoveMenu(preview≠from)일 때만 발동 — targetSelect→postMoveMenu 복귀는 제외
+    if (
+      next.kind === "postMoveMenu" &&
+      prevUi.kind === "selected" &&
+      (next.preview.x !== next.from.x || next.preview.y !== next.from.y)
+    ) {
+      this._previewWalking = true;
+      const unitId = next.unitId;
+      const from = next.from;
+      const to = next.preview;
+      const walk = this.opts.onPreviewWalk
+        ? this.opts.onPreviewWalk(unitId, from, to)
+        : Promise.resolve();
+      void walk.then(() => {
+        this.setPreviewWalking(false);
+      });
+    }
+
+    // ── 프리뷰 취소: 유닛 원위치 복귀 (원작 UX §수정명세-2) ─────────────────
+    if (
+      (event.type === "menuCancel" || event.type === "cancel") &&
+      prevUi.kind === "postMoveMenu" &&
+      next.kind === "selected"
+    ) {
+      // previewWalking 중이었을 수도 있으므로 플래그 초기화
+      this._previewWalking = false;
+      const prevPreview = prevUi.preview;
+      const prevFrom = prevUi.from;
+      const movedAway = prevPreview.x !== prevFrom.x || prevPreview.y !== prevFrom.y;
+      if (movedAway) {
+        this.opts.onPreviewCancel?.(prevUi.unitId, prevFrom);
+      }
+    }
 
     if (this.ui.kind === "enemyTurn" && prevKind !== "enemyTurn") this.startEnemyPhase();
     if (this.ui.kind === "idle" || this.ui.kind === "battleOver") this.flushIdleWaiters();
@@ -137,7 +208,11 @@ export class BattleStore {
 
   getSnapshot = (): StoreSnapshot => {
     if (!this.snapshotCache) {
-      this.snapshotCache = { ui: this.ui, vm: battleVM(this.ctx, this.settled) };
+      this.snapshotCache = {
+        ui: this.ui,
+        vm: battleVM(this.ctx, this.settled),
+        previewWalking: this._previewWalking,
+      };
     }
     return this.snapshotCache;
   };
