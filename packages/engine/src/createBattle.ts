@@ -1,18 +1,27 @@
-import type { GameData, Stage } from "@tk/data";
-import type { BattleState, UnitState } from "./types";
+import type { BattleContext, BattleState, UnitState } from "./types";
 
-export function createBattle(stage: Stage, data: GameData, seed: number): BattleState {
+export function createBattle(ctx: BattleContext, seed: number): BattleState {
+  const { data, stage } = ctx;
   const units: UnitState[] = stage.units.map((p) => {
     const cmd = data.commanders[p.commanderId];
     if (!cmd) throw new Error(`unknown commander: ${p.commanderId}`);
-    const cls = data.unitClasses[cmd.classId];
-    if (!cls) throw new Error(`unknown class: ${cmd.classId}`);
+    const cls = data.unitClasses[p.classId];
+    if (!cls) throw new Error(`unknown class: ${p.classId}`);
+    // 원작 룰: 소지품 중 최고 무기 1개만 공격력 % 보정
+    let weaponBonus = 1.0;
+    for (const itemId of p.items) {
+      const item = data.items[itemId];
+      if (!item) throw new Error(`unknown item: ${itemId}`);
+      if (item.category === "weapon") weaponBonus = Math.max(weaponBonus, 1 + item.bonusPercent / 100);
+    }
+    const maxMp = Math.floor((p.level + 10) * cmd.intelligence / 40);
     return {
-      id: cmd.id, classId: cls.id, side: p.side,
-      x: p.x, y: p.y, level: cmd.level,
-      hp: cmd.stats.hp, maxHp: cmd.stats.hp,
-      mp: cmd.stats.mp, maxMp: cmd.stats.mp,
-      atk: cmd.stats.atk, def: cmd.stats.def, int: cmd.stats.int,
+      id: cmd.id, classId: cls.id, line: cls.line, moveClass: cls.moveClass,
+      side: p.side, x: p.x, y: p.y, level: p.level,
+      troops: p.troops, maxTroops: p.troops, morale: 100,
+      mp: maxMp, maxMp,
+      war: cmd.war, leadership: cmd.leadership, intelligence: cmd.intelligence,
+      baseAtk: cls.baseAtk, baseDef: cls.baseDef, weaponBonus,
       move: cls.move, rangeMin: cls.rangeMin, rangeMax: cls.rangeMax,
       moved: false, acted: false, retreated: false,
     };

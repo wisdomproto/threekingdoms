@@ -1,30 +1,38 @@
 import { describe, it, expect } from "vitest";
-import { gameData, stages } from "@tk/data";
+import { gameData } from "@tk/data";
 import { createBattle } from "../src/createBattle";
+import { testCtx, testStage, testMap } from "./fixtures";
 
-const stage = stages["05-sishuiguan"]!;
+describe("createBattle v2 (원작 모델)", () => {
+  const state = createBattle(testCtx, 42);
 
-describe("createBattle", () => {
-  it("스테이지의 모든 유닛이 스탯 해석되어 배치된다", () => {
-    const state = createBattle(stage, gameData, 42);
-    expect(state.units).toHaveLength(stage.units.length);
-    const guanyu = state.units.find((u) => u.id === "guanyu")!;
-    expect(guanyu.hp).toBe(64);
-    expect(guanyu.move).toBe(6);       // cavalry
-    expect(guanyu.side).toBe("player");
+  it("병력/사기/레벨이 스테이지 배치대로 해석된다", () => {
+    const guanyu = state.units.find((u) => u.id === "관우")!;
+    expect(guanyu).toMatchObject({ troops: 1120, maxTroops: 1120, morale: 100, level: 1, side: "player" });
   });
-  it("턴 1, 아군 페이즈, ongoing으로 시작한다", () => {
-    const state = createBattle(stage, gameData, 42);
-    expect(state.turn).toBe(1);
-    expect(state.phase).toBe("player");
-    expect(state.status).toBe("ongoing");
-    expect(state.rngState).toBe(42);
+
+  it("장수 3능력치 + 병종 기초치가 유닛에 들어간다", () => {
+    const guanyu = state.units.find((u) => u.id === "관우")!;
+    expect(guanyu).toMatchObject({ war: 98, leadership: 100, intelligence: 80 }); // 관우 원작 수치
+    expect(guanyu).toMatchObject({ baseAtk: 120, baseDef: 60, move: 6, line: "cavalry", moveClass: "cavalry" }); // 경기병
   });
-  it("존재하지 않는 commanderId는 에러를 던진다", () => {
-    const badStage = {
-      ...stage,
-      units: [{ commanderId: "ghost", side: "player" as const, x: 0, y: 0 }],
-    };
-    expect(() => createBattle(badStage, gameData, 42)).toThrow("unknown commander: ghost");
+
+  it("무기 보정: 청룡언월도 +12% → weaponBonus 1.12, 무기 없으면 1.0", () => {
+    expect(state.units.find((u) => u.id === "관우")!.weaponBonus).toBeCloseTo(1.12, 5);
+    expect(state.units.find((u) => u.id === "유비")!.weaponBonus).toBe(1.0);
+  });
+
+  it("책략치 MP = (레벨+10)×지력÷40 내림 (레퍼런스 §6)", () => {
+    // 관우 Lv1 지력 80 → 11×80/40 = 22
+    expect(state.units.find((u) => u.id === "관우")!.mp).toBe(22);
+  });
+
+  it("턴 1, 아군 페이즈, ongoing, rngState=seed", () => {
+    expect(state).toMatchObject({ turn: 1, phase: "player", status: "ongoing", rngState: 42 });
+  });
+
+  it("미지의 commanderId/classId/mapId는 에러", () => {
+    const bad = { ...testStage, units: [{ ...testStage.units[0]!, commanderId: "없는장수" }] };
+    expect(() => createBattle({ data: gameData, stage: bad, map: testMap }, 1)).toThrow("없는장수");
   });
 });

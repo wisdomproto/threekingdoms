@@ -1,21 +1,24 @@
-import type { GameData, Stage, Side } from "@tk/data";
+import type { GameData, Stage, BattleMap, Side, Line, MoveClass } from "@tk/data";
 
 export interface Coord { x: number; y: number }
 
 export interface UnitState {
-  id: string;          // commanderId 재사용 (스테이지 내 유일)
+  id: string;            // commanderId
   classId: string;
+  line: Line;            // 상성 판정
+  moveClass: MoveClass;  // 지형 비용 판정
   side: Side;
   x: number; y: number;
   level: number;
-  hp: number; maxHp: number;
-  mp: number; maxMp: number;
-  atk: number; def: number; int: number;
+  troops: number; maxTroops: number;  // 병력 = 원작 HP (병력 0 = 퇴각, 사망 없음)
+  morale: number;                     // 사기 — 공/방 직접 가산. 변동 규칙 미해독으로 당분간 고정 100
+  mp: number; maxMp: number;          // 책략치 = (레벨+10)×지력÷40
+  war: number; leadership: number; intelligence: number;
+  baseAtk: number; baseDef: number;
+  weaponBonus: number;                // 1 + 최고 무기 bonusPercent/100 (소지품 중 최고 1개 — 원작 룰)
   move: number;
   rangeMin: number; rangeMax: number;
-  moved: boolean;      // 이번 페이즈에 이동했는가
-  acted: boolean;      // 이번 페이즈 행동(공격/대기) 완료했는가
-  retreated: boolean;  // HP 0 = 퇴각 (사망 없음 — CLAUDE.md §10)
+  moved: boolean; acted: boolean; retreated: boolean;
 }
 
 export interface BattleState {
@@ -41,7 +44,7 @@ export type BattleEvent =
   | { type: "phaseChanged"; phase: Side; turn: number }
   | { type: "battleEnded"; result: "victory" | "defeat" };
 
-/** 정적 컨텍스트 — 상태와 분리해 BattleState를 직렬화 가능하게 유지 */
-export interface BattleContext { data: GameData; stage: Stage }
+/** 정적 컨텍스트 — map은 stage.mapId로 해석된 BattleMap */
+export interface BattleContext { data: GameData; stage: Stage; map: BattleMap }
 
 export interface ActionResult { state: BattleState; events: BattleEvent[] }
