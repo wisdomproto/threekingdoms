@@ -21,4 +21,4 @@ console.log(`승률: ${((wins / runs) * 100).toFixed(1)}% (승 ${wins} / 패 ${r
 console.log(`평균 턴: ${avg(results.map((r) => r.turns))}`);
 console.log(`평균 아군 퇴각: ${avg(results.map((r) => r.playerRetreats))}`);
 console.log(`일기토 발동률: ${((results.filter((r) => r.duelsFired.length > 0).length / runs) * 100).toFixed(1)}%`);
-console.log(`(참고: 그리디 정책은 HP 최저 우선이라 일기토 발동률·승률은 실제 플레이보다 보수적)`);
+console.log(`(참고: 원작 공식은 분산 없음 — 시드는 현재 결과에 영향 없음. 그리디 정책은 보수적)`);

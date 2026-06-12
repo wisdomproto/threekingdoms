@@ -48,3 +48,6 @@ export const gameData: GameData = {
     "05-sishuiguan": loadJson(StageSchema, stage05Json, "stages/05-sishuiguan.json"),
   },
 };
+
+/** Convenience shorthand — same object as gameData.stages */
+export const stages: Record<string, Stage> = gameData.stages;

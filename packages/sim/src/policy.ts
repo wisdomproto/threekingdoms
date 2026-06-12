@@ -19,7 +19,7 @@ export function chooseAction(ctx: BattleContext, state: BattleState): Action | u
   if (targets.length > 0) {
     const weakest = targets
       .map((id) => state.units.find((u) => u.id === id)!)
-      .sort((a, b) => a.hp - b.hp)[0]!;
+      .sort((a, b) => a.troops - b.troops)[0]!;
     return { type: "attack", unitId: unit.id, targetId: weakest.id };
   }
 

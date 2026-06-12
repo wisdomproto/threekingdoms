@@ -6,7 +6,7 @@
 
 | 패키지 | 역할 |
 |---|---|
-| `packages/data` | zod 스키마 + 게임 데이터 JSON (의존성 제로) |
+| `packages/data` | zod 스키마 + 게임 데이터 JSON — 원작(영걸전) 수치 기반 — docs/reference 참조 |
 | `packages/engine` | 헤드리스 전투 엔진 — 순수 함수, 시드 RNG 결정론 |
 | `packages/sim` | 자동 플레이 시뮬레이션 CLI (밸런스 튜닝 루프) |
 | `apps/web` | Next.js 클라이언트 (렌더링은 차기 작업) |
@@ -19,6 +19,7 @@ pnpm install        # 의존성 설치
 pnpm test           # 전체 테스트
 pnpm sim            # 사수관 200판 시뮬레이션 리포트
 pnpm sim -- --stage 05-sishuiguan --runs 500 --seed 1
+pnpm import-hero  # C:\HERO 원본에서 데이터 JSON 재생성
 ```
 
 ## 개발 규칙
