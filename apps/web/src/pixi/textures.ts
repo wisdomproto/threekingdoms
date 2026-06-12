@@ -4,9 +4,12 @@
  * RenderTexture로 1회 베이크 → 전 스프라이트가 공유(풀 배칭).
  * v0.1(에셋 통합): loadSprites()로 manifest.json을 읽어 스프라이트 텍스처를 비동기 로드.
  *   getSprite(spriteId, pose) → Texture | null (null = 폴백 색 사각형 유지 필수)
+ * v0.2(지형 타일): loadTiles()로 tiles-manifest.json을 읽어 지형 이미지 타일을 비동기 로드.
+ *   getTerrain(terrainId, variant) → 이미지+1px 외곽선 합성 Texture.
+ *   미보유 지형/로드 전엔 기존 단색 베이크 반환 (폴백 유지 필수).
  * 향후 atlas frame 반환 구현으로 교체해도 소비측 호출은 불변 — placeholder→에셋 교체 경로의 핵심.
  */
-import { Assets, Graphics, Texture, type Renderer } from "pixi.js";
+import { Assets, Container, Graphics, Sprite, Texture, type Renderer } from "pixi.js";
 import { TILE_SIZE } from "./projection";
 
 /** 지형 14종 베이스 색 (terrains.json의 id와 1:1) */
@@ -48,6 +51,7 @@ type Manifest = Record<string, ManifestEntry>;
 export type SpritePose = "front_idle" | "front_move" | "front_attack" | "back_idle" | "back_move" | "back_attack";
 
 const SPRITE_BASE = "/assets/sprites";
+const TILE_BASE = "/assets/tiles";
 
 function darken(color: number, factor: number): number {
   const r = Math.floor(((color >> 16) & 0xff) * factor);
@@ -63,8 +67,16 @@ export class TextureResolver {
   private readonly baked = new Map<string, Texture>();
   /** spriteId → pose → Texture. loadSprites() 완료 후에만 채워진다 */
   private readonly sprites = new Map<string, Map<string, Texture>>();
+  /**
+   * terrainId → variant[] → Texture (이미지+외곽선 합성).
+   * loadTiles() 완료 후에만 채워진다.
+   */
+  private readonly tiles = new Map<string, Texture[]>();
+  /** Pixi Renderer 참조 — 타일 텍스처 베이크에 필요 */
+  private readonly renderer: Renderer;
 
   constructor(renderer: Renderer) {
+    this.renderer = renderer;
     // 지형 14종: 베이스 색 + 살짝 어두운 외곽선(그리드 가독성)
     for (const [id, color] of Object.entries(TERRAIN_COLORS)) {
       const g = new Graphics();
@@ -165,6 +177,108 @@ export class TextureResolver {
   }
 
   /**
+   * tiles-manifest.json { terrainId: variantCount } 를 로드하고
+   * {terrainId}_{n}.png 를 비동기 로드 → 이미지+1px 외곽선 합성 RenderTexture로 베이크.
+   * 실패 시 조용히 폴백(단색 베이크) 유지 — mount는 계속 진행.
+   */
+  async loadTiles(): Promise<void> {
+    let manifest: Record<string, number>;
+    try {
+      const res = await fetch(`${TILE_BASE}/tiles-manifest.json`);
+      if (!res.ok) {
+        console.warn(`[TextureResolver] tiles-manifest.json 로드 실패 (${res.status}) — 단색 폴백 유지`);
+        return;
+      }
+      manifest = (await res.json()) as Record<string, number>;
+    } catch (e) {
+      console.warn("[TextureResolver] tiles-manifest.json fetch 오류 — 단색 폴백 유지", e);
+      return;
+    }
+
+    // 모든 타일 URL 수집
+    const loadQueue: Array<{ terrainId: string; variant: number; url: string }> = [];
+    for (const [terrainId, count] of Object.entries(manifest)) {
+      for (let n = 0; n < count; n++) {
+        const url = `${TILE_BASE}/${terrainId}_${n}.png`;
+        loadQueue.push({ terrainId, variant: n, url });
+      }
+    }
+
+    const urls = loadQueue.map((q) => q.url);
+    let loaded: Record<string, Texture> = {};
+    try {
+      loaded = await Assets.load<Texture>(urls);
+    } catch (e) {
+      console.warn("[TextureResolver] 지형 타일 텍스처 로드 오류 — 부분 폴백", e);
+    }
+
+    // 지형별 variants 배열 구성 + 외곽선 합성 베이크
+    const grouped = new Map<string, Array<{ variant: number; url: string }>>();
+    for (const q of loadQueue) {
+      if (!grouped.has(q.terrainId)) grouped.set(q.terrainId, []);
+      grouped.get(q.terrainId)!.push(q);
+    }
+
+    for (const [terrainId, entries] of grouped) {
+      const variants: Texture[] = [];
+      // 항상 원래 순서(variant 번호) 보장
+      entries.sort((a, b) => a.variant - b.variant);
+      for (const { url } of entries) {
+        const rawTex = loaded[url];
+        if (!rawTex) continue;
+        // 이미지 스프라이트 + 1px 외곽선 합성 → RenderTexture (그리드 가독성 유지)
+        const baked = this.bakeImageTile(rawTex, terrainId);
+        variants.push(baked);
+      }
+      if (variants.length > 0) {
+        this.tiles.set(terrainId, variants);
+      }
+    }
+
+    const totalVariants = [...this.tiles.values()].reduce((s, v) => s + v.length, 0);
+    console.info(`[TextureResolver] 지형 타일 로드 완료: ${this.tiles.size}종 ${totalVariants}변형`);
+  }
+
+  /**
+   * 이미지 Texture + 1px 외곽선을 RenderTexture로 합성 베이크.
+   * 그리드 가독성을 위해 기존 단색 타일과 동일하게 어두운 외곽선을 씌운다.
+   */
+  private bakeImageTile(imageTex: Texture, terrainId: string): Texture {
+    // 이미지를 TILE_SIZE×TILE_SIZE 스프라이트로, 외곽선을 Graphics로 겹쳐 베이크
+    const container = new Container();
+    const sprite = new Sprite(imageTex);
+    sprite.width = TILE_SIZE;
+    sprite.height = TILE_SIZE;
+
+    // 외곽선 색: 해당 지형 단색 베이스의 어두운 버전. 없으면 기본 어두운 회색
+    const baseColor = TERRAIN_COLORS[terrainId] ?? 0x333333;
+    const outlineColor = darken(baseColor, 0.75);
+
+    const outline = new Graphics();
+    outline.rect(0, 0, TILE_SIZE, TILE_SIZE).stroke({ width: 1, color: outlineColor, alpha: 0.85 });
+
+    container.addChild(sprite, outline);
+    const tex = this.renderer.generateTexture(container);
+    container.destroy({ children: true });
+    return tex;
+  }
+
+  /**
+   * 지형 이미지 타일 텍스처 조회.
+   * @param terrainId  지형 ID (TERRAIN_COLORS 키와 동일)
+   * @param variant    변형 인덱스 — (x*7 + y*13) % variantCount 패턴으로 호출
+   * @returns 이미지+외곽선 합성 Texture. 미보유(로드 전 또는 해당 지형 없음) 시 단색 베이크 폴백.
+   */
+  getTerrain(terrainId: string, variant: number): Texture {
+    const variants = this.tiles.get(terrainId);
+    if (variants && variants.length > 0) {
+      return variants[variant % variants.length]!;
+    }
+    // 폴백: 기존 단색 베이크 (로드 전 또는 미지원 지형)
+    return this.get("terrain", terrainId);
+  }
+
+  /**
    * 스프라이트 텍스처 조회. 미보유 시 null (폴백: 색 사각형 — 설계 §필수).
    * view: "front"|"back", pose: "idle"|"move"|"attack"
    */
@@ -182,5 +296,10 @@ export class TextureResolver {
     this.baked.clear();
     // sprites는 Assets 전역 캐시가 관리 — 여기서 개별 destroy 안 함 (공유 참조 보호)
     this.sprites.clear();
+    // tiles는 bakeImageTile()이 생성한 RenderTexture — TextureResolver가 소유
+    for (const variants of this.tiles.values()) {
+      for (const tex of variants) tex.destroy(true);
+    }
+    this.tiles.clear();
   }
 }

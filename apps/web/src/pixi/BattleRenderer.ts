@@ -113,6 +113,9 @@ export class BattleRenderer implements Presenter {
     // 스프라이트 비동기 로드 — 실패 시 폴백(색 사각형) 유지, mount는 계속 진행.
     // 완료 시 이미 생성된 UnitView들을 갱신해야 한다 (아래 .then — 없으면 대기 유닛이 영원히 폴백).
     const spritesReady = textures.loadSprites();
+    // 지형 타일 비동기 로드 — 실패 시 폴백(단색 베이크) 유지, mount는 계속 진행.
+    // 완료 후 TerrainLayer.rebake()로 이미지 텍스처로 교체 + 청크 캐시 재생성.
+    const tilesReady = textures.loadTiles();
     const fx = new FxLayer(tweens);
 
     // 씬그래프: stage → world(카메라 변환) → terrain/highlight/unit/fx.world, stage → fx.screen
@@ -128,6 +131,11 @@ export class BattleRenderer implements Presenter {
     spritesReady
       .then(() => units.refreshSprites())
       .catch((e) => console.warn("[BattleRenderer] loadSprites 예외 (폴백 유지):", e));
+    // 지형 타일 로드 완료 → TerrainLayer 이미지 텍스처로 교체 + 청크 캐시 재생성
+    // (terrain은 아래에서 선언되므로, Promise 콜백은 terrain 참조 가능 — JS 클로저)
+    tilesReady
+      .then(() => terrain.rebake())
+      .catch((e) => console.warn("[BattleRenderer] loadTiles 예외 (단색 폴백 유지):", e));
     fx.world.zIndex = 3;
     world.addChild(terrain, highlights, units, fx.world);
     app.stage.addChild(world, fx.screen);
