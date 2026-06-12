@@ -1,8 +1,16 @@
 {
-  "plain":    { "id": "plain",    "name": "평지", "guard": 0,    "moveCost": { "default": 1 } },
-  "road":     { "id": "road",     "name": "가도", "guard": 0,    "moveCost": { "default": 1 } },
-  "forest":   { "id": "forest",   "name": "숲",   "guard": 0.15, "moveCost": { "default": 2, "infantry": 1, "bandit": 1 } },
-  "mountain": { "id": "mountain", "name": "산악", "guard": 0.3,  "moveCost": { "default": 3, "bandit": 1, "cavalry": 4 } },
-  "wall":     { "id": "wall",     "name": "성벽", "guard": 0,    "moveCost": { "default": 99 } },
-  "gate":     { "id": "gate",     "name": "관문", "guard": 0.2,  "moveCost": { "default": 1 } }
+  "plain":     { "id": "plain",     "name": "평지",     "guard": 0,    "moveCost": { "default": 1 } },
+  "grass":     { "id": "grass",     "name": "초원",     "guard": 0.05, "moveCost": { "default": 1 } },
+  "bridge":    { "id": "bridge",    "name": "다리",     "guard": 0,    "moveCost": { "default": 1 } },
+  "waste":     { "id": "waste",     "name": "황무지",   "guard": 0,    "moveCost": { "default": 1 } },
+  "village":   { "id": "village",   "name": "촌락",     "guard": 0.05, "moveCost": { "default": 1 }, "healTroopsRatio": 0.1, "healMp": true },
+  "barracks":  { "id": "barracks",  "name": "병영",     "guard": 0.1,  "moveCost": { "default": 1 }, "healTroopsRatio": 0.1 },
+  "depot":     { "id": "depot",     "name": "보물창고", "guard": 0,    "moveCost": { "default": 1 } },
+  "forest":    { "id": "forest",    "name": "삼림",     "guard": 0.2,  "moveCost": { "default": 2, "archerFoot": 3, "bandit": 1 } },
+  "mountain":  { "id": "mountain",  "name": "산지",     "guard": 0.3,  "moveCost": { "default": 2, "cavalry": 3, "bandit": 1 } },
+  "fort":      { "id": "fort",      "name": "요새",     "guard": 0.3,  "moveCost": { "default": 2, "cavalry": 3, "bandit": 1 } },
+  "gate":      { "id": "gate",      "name": "성문",     "guard": 0.2,  "moveCost": { "default": 1 } },
+  "river":     { "id": "river",     "name": "하천",     "guard": 0,    "moveCost": { "default": 99 } },
+  "wall":      { "id": "wall",      "name": "성벽",     "guard": 0,    "moveCost": { "default": 99 } },
+  "cliff":     { "id": "cliff",     "name": "절벽",     "guard": 0,    "moveCost": { "default": 99, "bandit": 1 } }
 }

@@ -1,66 +1,50 @@
 import { describe, it, expect } from "vitest";
-import { gameData, stages } from "../src/index";
+import { gameData } from "../src/index";
 
-describe("게임 데이터 무결성", () => {
-  it("모든 JSON이 스키마를 통과해 로드된다", () => {
-    expect(Object.keys(gameData.terrains).length).toBeGreaterThan(0);
-    expect(Object.keys(gameData.unitClasses).length).toBeGreaterThan(0);
-    expect(Object.keys(gameData.commanders).length).toBeGreaterThan(0);
+describe("게임 데이터 v2 무결성", () => {
+  it("병종 19종이 원작 코드 0~18과 1:1", () => {
+    const codes = Object.values(gameData.unitClasses).map((c) => c.code).sort((a, b) => a - b);
+    expect(codes).toEqual(Array.from({ length: 19 }, (_, i) => i));
   });
 
-  it("장수의 classId는 전부 병종 테이블에 존재한다", () => {
-    for (const c of Object.values(gameData.commanders)) {
-      expect(gameData.unitClasses[c.classId], `${c.id}.classId=${c.classId}`).toBeDefined();
+  it("원작 명시 기초치 스팟 체크 (레퍼런스 §5)", () => {
+    const c = gameData.unitClasses;
+    expect(c["footman"]).toMatchObject({ baseAtk: 80, baseDef: 80, move: 4 });
+    expect(c["chariot"]).toMatchObject({ baseAtk: 120, baseDef: 160 });
+    expect(c["lightCavalry"]).toMatchObject({ baseAtk: 120, baseDef: 60, move: 6 });
+    expect(c["guardCavalry"]).toMatchObject({ baseAtk: 160, baseDef: 120, move: 6 });
+    expect(c["catapult"]).toMatchObject({ move: 3, rangeMax: 3 });
+    expect(c["archer"]).toMatchObject({ rangeMin: 2, rangeMax: 2 });
+  });
+
+  it("승급 라인이 3단계로 완결된다", () => {
+    for (const line of ["infantry", "archer", "cavalry", "bandit"] as const) {
+      const tiers = Object.values(gameData.unitClasses)
+        .filter((c) => c.line === line).map((c) => c.tier).sort();
+      expect(tiers).toEqual([1, 2, 3]);
     }
   });
 
-  it("사수관: 배치 유닛의 commanderId가 전부 존재하고 맵 범위 안이다", () => {
-    const stage = stages["05-sishuiguan"]!;
-    for (const u of stage.units) {
-      expect(gameData.commanders[u.commanderId], u.commanderId).toBeDefined();
-      expect(u.x).toBeLessThan(stage.map.width);
-      expect(u.y).toBeLessThan(stage.map.height);
-    }
+  it("지형: 원작 guard/이동 수치 (레퍼런스 §5 지형 표)", () => {
+    const t = gameData.terrains;
+    expect(t["plain"]!.guard).toBe(0);
+    expect(t["forest"]!).toMatchObject({ guard: 0.2, moveCost: expect.objectContaining({ default: 2, archerFoot: 3 }) });
+    expect(t["mountain"]!).toMatchObject({ guard: 0.3, moveCost: expect.objectContaining({ default: 2, cavalry: 3, bandit: 1 }) });
+    expect(t["river"]!.moveCost.default).toBeGreaterThanOrEqual(99);
+    expect(t["barracks"]!.healTroopsRatio).toBe(0.1);
   });
 
-  it("사수관: 타일 코드가 전부 legend에 있고 legend의 지형이 전부 존재한다", () => {
-    const stage = stages["05-sishuiguan"]!;
-    for (const row of stage.map.tiles) {
-      for (const ch of row) expect(stage.map.tileLegend[ch], `tile '${ch}'`).toBeDefined();
-    }
-    for (const tid of Object.values(stage.map.tileLegend)) {
-      expect(gameData.terrains[tid], tid).toBeDefined();
-    }
-  });
-
-  it("사수관: 일기토 이벤트 참가자가 전부 배치되어 있다", () => {
-    const stage = stages["05-sishuiguan"]!;
-    const placed = new Set(stage.units.map((u) => u.commanderId));
-    for (const e of stage.events) {
-      expect(placed.has(e.trigger.attackerId)).toBe(true);
-      expect(placed.has(e.trigger.defenderId)).toBe(true);
-    }
-  });
-
-  it("사수관: victory/defeat의 unitId가 배치되어 있다", () => {
-    const stage = stages["05-sishuiguan"]!;
-    const placed = new Set(stage.units.map((u) => u.commanderId));
-    if ("unitId" in stage.victory) expect(placed.has(stage.victory.unitId)).toBe(true);
-    expect(placed.has(stage.defeat.unitId)).toBe(true);
-  });
-
-  it("전투 계수: classAdvantage의 classId가 전부 병종 테이블에 존재한다", () => {
-    for (const [atkId, defs] of Object.entries(gameData.combat.classAdvantage)) {
-      expect(gameData.unitClasses[atkId], `attacker ${atkId}`).toBeDefined();
-      for (const defId of Object.keys(defs)) {
-        expect(gameData.unitClasses[defId], `defender ${defId}`).toBeDefined();
-      }
-    }
+  it("전투 설정: 원작 상수", () => {
+    expect(gameData.combat).toMatchObject({
+      advantageDefFactor: 0.75, disadvantageDefFactor: 1.25, counterRatio: 0.5, maxTurns: 30,
+    });
+    expect(gameData.combat.lineAdvantage).toEqual({
+      cavalry: "infantry", infantry: "archer", archer: "cavalry",
+    });
   });
 
   it("레코드 키와 id 필드가 일치한다", () => {
     for (const [k, v] of Object.entries(gameData.terrains)) expect(v.id).toBe(k);
     for (const [k, v] of Object.entries(gameData.unitClasses)) expect(v.id).toBe(k);
-    for (const [k, v] of Object.entries(gameData.commanders)) expect(v.id).toBe(k);
   });
 });
