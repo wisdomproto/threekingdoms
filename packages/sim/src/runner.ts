@@ -16,6 +16,7 @@ export function runBattle(stageId: string, seed: number, maxTurns = 30): RunResu
   let state = createBattle(stage, gameData, seed);
 
   let guard = 0;
+  // turn은 아군 페이즈 시작 시 증가 — <= 경계로 maxTurns번째 라운드까지 온전히 실행
   while (state.status === "ongoing" && state.turn <= maxTurns) {
     if (++guard > 10_000) throw new Error("simulation runaway"); // 무한 루프 안전장치
     const action = chooseAction(ctx, state);

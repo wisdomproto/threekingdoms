@@ -18,6 +18,6 @@ describe("runBattle", () => {
   it("maxTurns에 걸리면 timeout", () => {
     const r = runBattle("05-sishuiguan", 42, 1); // 1턴 제한
     expect(["victory", "defeat", "timeout"]).toContain(r.result);
-    expect(r.turns).toBeLessThanOrEqual(2);
+    expect(r.turns).toBeLessThanOrEqual(1);
   });
 });

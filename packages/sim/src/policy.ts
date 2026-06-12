@@ -29,7 +29,7 @@ export function chooseAction(ctx: BattleContext, state: BattleState): Action | u
       const tiles = getMovableTiles(ctx, state, unit.id);
       const score = (t: { x: number; y: number }) =>
         Math.min(...enemies.map((e) => distance(t, { x: e.x, y: e.y })));
-      const best = tiles.sort((a, b) => score(a) - score(b))[0];
+      const best = [...tiles].sort((a, b) => score(a) - score(b))[0];
       if (best && !(best.x === unit.x && best.y === unit.y)) {
         return { type: "move", unitId: unit.id, to: best };
       }
