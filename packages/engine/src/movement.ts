@@ -1,20 +1,20 @@
-import type { Terrain } from "@tk/data";
+import type { MoveClass, Terrain } from "@tk/data";
 import type { BattleContext, BattleState, Coord, UnitState } from "./types";
 
 export function terrainAt(ctx: BattleContext, x: number, y: number): Terrain {
-  const row = ctx.stage.map.tiles[y];
+  const row = ctx.map.tiles[y];
   if (row === undefined) throw new Error(`y out of range: ${y}`);
   const ch = row[x];
   if (ch === undefined) throw new Error(`x out of range: ${x}`);
-  const tid = ctx.stage.map.tileLegend[ch];
+  const tid = ctx.map.tileLegend[ch];
   if (tid === undefined) throw new Error(`no legend entry for tile '${ch}' at (${x},${y})`);
   const terrain = ctx.data.terrains[tid];
   if (!terrain) throw new Error(`unknown terrain id '${tid}' for tile '${ch}' at (${x},${y})`);
   return terrain;
 }
 
-export function moveCostFor(terrain: Terrain, classId: string): number {
-  return terrain.moveCost[classId] ?? terrain.moveCost.default;
+export function moveCostFor(terrain: Terrain, moveClass: MoveClass | string): number {
+  return terrain.moveCost[moveClass] ?? terrain.moveCost.default;
 }
 
 export function unitAt(state: BattleState, x: number, y: number): UnitState | undefined {
@@ -30,12 +30,12 @@ const IMPASSABLE = 99;
 export function getMovableTiles(ctx: BattleContext, state: BattleState, unitId: string): Coord[] {
   const unit = state.units.find((u) => u.id === unitId);
   if (!unit || unit.retreated) return [];
-  const { width, height } = ctx.stage.map;
+  const { width, height } = ctx.map;
 
   const dist = new Map<string, number>();
   const key = (x: number, y: number) => `${x},${y}`;
   dist.set(key(unit.x, unit.y), 0);
-  // 이동력이 한 자릿수라 우선순위 큐 없이 단순 배열로 충분 (맵 12×12)
+  // 이동력이 한 자릿수라 우선순위 큐 없이 단순 배열로 충분
   const frontier: Array<{ x: number; y: number; cost: number }> = [{ x: unit.x, y: unit.y, cost: 0 }];
 
   while (frontier.length > 0) {
@@ -47,7 +47,7 @@ export function getMovableTiles(ctx: BattleContext, state: BattleState, unitId: 
       if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
       const occupant = unitAt(state, nx, ny);
       if (occupant && occupant.side !== unit.side) continue; // 적은 통과 불가
-      const cost = moveCostFor(terrainAt(ctx, nx, ny), unit.classId);
+      const cost = moveCostFor(terrainAt(ctx, nx, ny), unit.moveClass);
       if (cost >= IMPASSABLE) continue;
       const next = cur.cost + cost;
       if (next > unit.move) continue;

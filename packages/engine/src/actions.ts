@@ -21,17 +21,17 @@ function assertCanAct(state: BattleState, unit: UnitState, forMove: boolean): vo
   if (forMove && unit.moved) throw new Error(`${unit.id} already moved`);
 }
 
-/** HP 차감 → 0이면 퇴각. 새 상태와 이벤트를 반환 */
+/** 병력 차감 → 0이면 퇴각. 새 상태와 이벤트를 반환 */
 function dealDamage(
   state: BattleState, attacker: UnitState, defender: UnitState, damage: number, counter: boolean,
 ): { state: BattleState; events: BattleEvent[] } {
-  const hp = Math.max(0, defender.hp - damage);
-  const retreated = hp === 0;
+  const troops = Math.max(0, defender.troops - damage);
+  const retreated = troops === 0;
   const events: BattleEvent[] = [
     { type: "damageDealt", attackerId: attacker.id, defenderId: defender.id, damage, counter },
   ];
   if (retreated) events.push({ type: "unitRetreated", unitId: defender.id });
-  return { state: replaceUnit(state, { ...defender, hp, retreated }), events };
+  return { state: replaceUnit(state, { ...defender, troops, retreated }), events };
 }
 
 /** 승패 판정. 충족 시 status 변경 + battleEnded 이벤트 */
@@ -107,28 +107,26 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
         next = { ...state, firedEvents: [...state.firedEvents, duel.id] };
         if (duel.outcome.loserRetreats) {
           const loser = getUnit(next, loserId);
-          next = replaceUnit(next, { ...loser, hp: 0, retreated: true });
+          next = replaceUnit(next, { ...loser, troops: 0, retreated: true });
           events.push({ type: "unitRetreated", unitId: loserId });
         }
         next = replaceUnit(next, { ...getUnit(next, unit.id), acted: true });
         break;
       }
 
-      // 일반 공격 — computeDamage가 소비한 rngState를 즉시 반영
-      const atkResult = computeDamage(ctx, state, unit, target);
-      next = { ...state, rngState: atkResult.nextRngState };
-      const hit = dealDamage(next, unit, getUnit(next, target.id), atkResult.damage, false);
+      // 일반 공격 — 원작 룰: 명중 100%, 분산 없음
+      const dmg = computeDamage(ctx, unit, target);
+      const hit = dealDamage(next, unit, getUnit(next, target.id), dmg, false);
       next = hit.state;
       events.push(...hit.events);
 
-      // 반격: 방어측 생존 + 공격측이 방어측 사거리 안 — 갱신된 rngState로 별도 분산
+      // 반격: 방어측 생존 + 공격측이 방어측 사거리 안
       const defender = getUnit(next, target.id);
       if (!defender.retreated) {
         const d = distance({ x: unit.x, y: unit.y }, { x: defender.x, y: defender.y });
         if (d >= defender.rangeMin && d <= defender.rangeMax) {
-          const ctrResult = computeDamage(ctx, next, defender, getUnit(next, unit.id));
-          next = { ...next, rngState: ctrResult.nextRngState };
-          const ctr = dealDamage(next, defender, getUnit(next, unit.id), ctrResult.damage, true);
+          const ctrDmg = computeDamage(ctx, defender, getUnit(next, unit.id), ctx.data.combat.counterRatio);
+          const ctr = dealDamage(next, defender, getUnit(next, unit.id), ctrDmg, true);
           next = ctr.state;
           events.push(...ctr.events);
         }

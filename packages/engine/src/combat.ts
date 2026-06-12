@@ -1,32 +1,37 @@
 import type { BattleContext, BattleState, Coord, UnitState } from "./types";
-import { nextRandom } from "./rng";
 import { terrainAt } from "./movement";
 
+/** 보정능력치 — 80 이상에서 가치가 비선형 급증하는 원작 커브 (레퍼런스 §6) */
+export function adjustedStat(x: number): number {
+  return Math.round(4000 / (140 - x));
+}
+
+export function attackPower(u: UnitState): number {
+  return (u.baseAtk + u.morale + adjustedStat(u.war)) * (10 + u.level) / 10 * u.weaponBonus;
+}
+
+export function defensePower(u: UnitState): number {
+  return (u.baseDef + u.morale + adjustedStat(u.leadership)) * (10 + u.level) / 10;
+}
+
+/** 공격측 line 기준 방어력 배율: 유리 0.75 / 불리 1.25 / 그 외 1.0 */
+function defFactor(ctx: BattleContext, attacker: UnitState, defender: UnitState): number {
+  const cfg = ctx.data.combat;
+  if (cfg.lineAdvantage[attacker.line] === defender.line) return cfg.advantageDefFactor;
+  if (cfg.lineAdvantage[defender.line] === attacker.line) return cfg.disadvantageDefFactor;
+  return 1.0;
+}
+
 /**
- * 데미지 공식 (계수는 전부 data/combat.json — CLAUDE.md §11 데이터-코드 분리):
- * base  = atk - def * defFactor
- * mult  = 상성 배율 × (1 - 방어측 지형 guard) × (1 + 레벨차 × levelCoef)
- * 분산  = [1-varianceRatio, 1+varianceRatio) — rand ∈ [0,1)이라 상한 미포함 (시드 RNG)
- * 결과  = max(minDamage, floor(base × mult × variance))
+ * 원작 데미지 공식 — 명중 100%, 분산 없음 (퍼즐성 = 계산 가능성).
+ * 데미지 = (공격력 − 방어력 × 상성계수 ÷ 2) × (1 − 방어측 지형 guard), ratio는 반격 0.5용
  */
 export function computeDamage(
-  ctx: BattleContext,
-  state: BattleState,
-  attacker: UnitState,
-  defender: UnitState,
-): { damage: number; nextRngState: number } {
-  const cfg = ctx.data.combat;
-  const base = Math.max(0, attacker.atk - defender.def * cfg.defFactor);
-  const advantage = cfg.classAdvantage[attacker.classId]?.[defender.classId] ?? 1;
+  ctx: BattleContext, attacker: UnitState, defender: UnitState, ratio = 1,
+): number {
   const guard = terrainAt(ctx, defender.x, defender.y).guard;
-  const levelFactor = Math.max(0, 1 + (attacker.level - defender.level) * cfg.levelCoef);
-  const [rand, nextRngState] = nextRandom(state.rngState);
-  const variance = 1 - cfg.varianceRatio + rand * cfg.varianceRatio * 2;
-  const damage = Math.max(
-    cfg.minDamage,
-    Math.floor(base * advantage * (1 - guard) * levelFactor * variance),
-  );
-  return { damage, nextRngState };
+  const raw = attackPower(attacker) - defensePower(defender) * defFactor(ctx, attacker, defender) / 2;
+  return Math.max(ctx.data.combat.minDamage, Math.floor(Math.max(0, raw) * (1 - guard) * ratio));
 }
 
 export function distance(a: Coord, b: Coord): number {
