@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 /** 능력치 1~100 (원작 범위) */
-const Stat = z.number().int().min(1).max(100);
+export const Stat = z.number().int().min(1).max(100);
 
 export const CommanderSchema = z.object({
   id: z.string(),            // 한글 이름 기반 (동명이인은 _2 접미)
@@ -27,7 +27,7 @@ export const UnitClassSchema = z.object({
   code: z.number().int().min(0).max(18),     // 원작 병종 코드 0x00~0x12
   baseAtk: z.number().int().min(0).max(200), // 병종 공격력 기초치
   baseDef: z.number().int().min(0).max(200),
-  move: z.number().int().min(0).max(10),
+  move: z.number().int().min(0).max(10), // 0 = 비전투(백성 등) — 엔진에서 이동 불가 처리
   rangeMin: z.number().int().min(1),
   rangeMax: z.number().int().min(1),
   line: LineSchema,
@@ -62,8 +62,12 @@ export const CombatConfigSchema = z.object({
   counterRatio: z.number().min(0).max(1),        // 0.5
   minDamage: z.number().int().min(0),
   maxTurns: z.number().int().min(1),
-  lineAdvantage: z.record(LineSchema),           // attacker line → 유리한 defender line
-});
+  // attacker line → 유리한 defender line. 키도 Line으로 검증, 자기참조 금지
+  lineAdvantage: z.record(LineSchema, LineSchema),
+}).refine(
+  (c) => Object.entries(c.lineAdvantage).every(([k, v]) => k !== v),
+  { message: "lineAdvantage must not be self-referential" },
+);
 export type CombatConfig = z.infer<typeof CombatConfigSchema>;
 
 export const SideSchema = z.enum(["player", "enemy"]);
@@ -74,7 +78,7 @@ export const BattleMapSchema = z.object({
   name: z.string(),
   width: z.number().int().min(1),
   height: z.number().int().min(1),
-  tileLegend: z.record(z.string()),
+  tileLegend: z.record(z.string().length(1), z.string()), // 키 = 타일 1글자 코드
   tiles: z.array(z.string()),
 }).refine(
   (m) => m.tiles.length === m.height && m.tiles.every((r) => r.length === m.width),

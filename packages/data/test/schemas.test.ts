@@ -67,4 +67,55 @@ describe("스키마 v2 (원작 모델)", () => {
       outcome: { winnerId: "장비", loserRetreats: true }, once: true,
     })).toThrow();
   });
+
+  it("lineAdvantage: 키와 값 모두 Line enum 검증", () => {
+    // 유효: 모든 키·값이 Line enum 범위
+    expect(() => CombatConfigSchema.parse({
+      advantageDefFactor: 0.75, disadvantageDefFactor: 1.25,
+      counterRatio: 0.5, minDamage: 0, maxTurns: 50,
+      lineAdvantage: { cavalry: "infantry", infantry: "archer" },
+    })).not.toThrow();
+
+    // 키가 invalid Line → throw
+    expect(() => CombatConfigSchema.parse({
+      advantageDefFactor: 0.75, disadvantageDefFactor: 1.25,
+      counterRatio: 0.5, minDamage: 0, maxTurns: 50,
+      lineAdvantage: { notALine: "infantry" },
+    })).toThrow();
+
+    // 값이 invalid Line → throw
+    expect(() => CombatConfigSchema.parse({
+      advantageDefFactor: 0.75, disadvantageDefFactor: 1.25,
+      counterRatio: 0.5, minDamage: 0, maxTurns: 50,
+      lineAdvantage: { cavalry: "notALine" },
+    })).toThrow();
+  });
+
+  it("lineAdvantage: 자기참조 금지 (k !== v)", () => {
+    expect(() => CombatConfigSchema.parse({
+      advantageDefFactor: 0.75, disadvantageDefFactor: 1.25,
+      counterRatio: 0.5, minDamage: 0, maxTurns: 50,
+      lineAdvantage: { cavalry: "cavalry" },
+    })).toThrow("lineAdvantage must not be self-referential");
+  });
+
+  it("tileLegend: 키 길이 정확히 1글자", () => {
+    // 유효: 1글자
+    expect(() => BattleMapSchema.parse({
+      id: "m", name: "m", width: 2, height: 2,
+      tileLegend: { ".": "plain", "*": "wall" }, tiles: [".*", "*."],
+    })).not.toThrow();
+
+    // 2글자 키 → throw
+    expect(() => BattleMapSchema.parse({
+      id: "m", name: "m", width: 2, height: 2,
+      tileLegend: { ".": "plain", "**": "wall" }, tiles: [".*", "*."],
+    })).toThrow();
+
+    // 0글자 키 → throw
+    expect(() => BattleMapSchema.parse({
+      id: "m", name: "m", width: 1, height: 1,
+      tileLegend: { "": "plain" }, tiles: ["."],
+    })).toThrow();
+  });
 });
