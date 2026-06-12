@@ -1,0 +1,89 @@
+{
+  "id": "05-sishuiguan",
+  "name": "사수관 전투",
+  "mapId": "sishuiguan",
+  "turnLimit": 30,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "footman",
+      "level": 1,
+      "troops": 1120,
+      "items": [],
+      "side": "player",
+      "x": 50,
+      "y": 14
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 1,
+      "troops": 1120,
+      "items": ["청룡언월도"],
+      "side": "player",
+      "x": 50,
+      "y": 15
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 1,
+      "troops": 1120,
+      "items": ["사모"],
+      "side": "player",
+      "x": 50,
+      "y": 16
+    },
+    {
+      "commanderId": "화웅",
+      "classId": "lightCavalry",
+      "level": 3,
+      "troops": 1760,
+      "items": [],
+      "side": "enemy",
+      "x": 2,
+      "y": 14
+    },
+    {
+      "commanderId": "조잠",
+      "classId": "footman",
+      "level": 3,
+      "troops": 1760,
+      "items": [],
+      "side": "enemy",
+      "x": 2,
+      "y": 12
+    },
+    {
+      "commanderId": "이숙",
+      "classId": "archer",
+      "level": 3,
+      "troops": 1760,
+      "items": [],
+      "side": "enemy",
+      "x": 2,
+      "y": 15
+    },
+    {
+      "commanderId": "호진",
+      "classId": "footman",
+      "level": 3,
+      "troops": 1760,
+      "items": [],
+      "side": "enemy",
+      "x": 1,
+      "y": 14
+    }
+  ],
+  "victory": { "kind": "defeatUnit", "unitId": "화웅" },
+  "defeat": { "kind": "lordRetreat", "unitId": "유비" },
+  "events": [
+    {
+      "id": "duel_guanyu_huaxiong",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "관우", "defenderId": "화웅" },
+      "outcome": { "winnerId": "관우", "loserRetreats": true },
+      "once": true
+    }
+  ]
+}

@@ -1,9 +1,9 @@
 import { z } from "zod";
 import {
   TerrainSchema, UnitClassSchema, CombatConfigSchema,
-  CommanderSchema, ItemSchema, InitialForceSchema, BattleMapSchema,
+  CommanderSchema, ItemSchema, InitialForceSchema, BattleMapSchema, StageSchema,
   type Terrain, type UnitClass, type CombatConfig,
-  type Commander, type Item, type InitialForce, type BattleMap,
+  type Commander, type Item, type InitialForce, type BattleMap, type Stage,
 } from "./schemas";
 import terrainsJson from "../json/terrains.json";
 import unitClassesJson from "../json/unitClasses.json";
@@ -12,6 +12,7 @@ import commandersJson from "../json/commanders.json";
 import itemsJson from "../json/items.json";
 import initialForcesJson from "../json/initialForces.json";
 import sishuiguanJson from "../json/maps/sishuiguan.json";
+import stage05Json from "../json/stages/05-sishuiguan.json";
 
 export * from "./schemas";
 
@@ -29,6 +30,7 @@ export interface GameData {
   items: Record<string, Item>;
   initialForces: Record<string, InitialForce>;
   maps: Record<string, BattleMap>;
+  stages: Record<string, Stage>;
 }
 
 /** import 시점에 전부 검증 — 잘못된 JSON은 여기서 즉시 터진다. */
@@ -41,5 +43,8 @@ export const gameData: GameData = {
   initialForces: loadJson(z.record(InitialForceSchema), initialForcesJson, "initialForces.json"),
   maps: {
     sishuiguan: loadJson(BattleMapSchema, sishuiguanJson, "maps/sishuiguan.json"),
+  },
+  stages: {
+    "05-sishuiguan": loadJson(StageSchema, stage05Json, "stages/05-sishuiguan.json"),
   },
 };

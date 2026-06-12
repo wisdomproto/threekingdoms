@@ -68,4 +68,37 @@ describe("게임 데이터 v2 무결성", () => {
     expect(m.height).toBe(32);
     for (const tid of Object.values(m.tileLegend)) expect(gameData.terrains[tid], tid).toBeDefined();
   });
+
+  it("사수관 스테이지: 참조 무결성 (장수/병종/아이템/맵/이벤트)", () => {
+    const s = gameData.stages["05-sishuiguan"]!;
+    const m = gameData.maps[s.mapId]!;
+    expect(m).toBeDefined();
+    const placed = new Set(s.units.map((u) => u.commanderId));
+    for (const u of s.units) {
+      expect(gameData.commanders[u.commanderId], u.commanderId).toBeDefined();
+      expect(gameData.unitClasses[u.classId], u.classId).toBeDefined();
+      for (const it of u.items) expect(gameData.items[it], it).toBeDefined();
+      expect(u.x).toBeLessThan(m.width);
+      expect(u.y).toBeLessThan(m.height);
+      // 배치 타일이 통행 가능해야 한다 (성벽/하천 위 배치 금지)
+      const terrainId = m.tileLegend[m.tiles[u.y]![u.x]!]!;
+      expect(gameData.terrains[terrainId]!.moveCost.default).toBeLessThan(99);
+    }
+    if ("unitId" in s.victory) expect(placed.has(s.victory.unitId)).toBe(true);
+    expect(placed.has(s.defeat.unitId)).toBe(true);
+    for (const e of s.events) {
+      expect(placed.has(e.trigger.attackerId)).toBe(true);
+      expect(placed.has(e.trigger.defenderId)).toBe(true);
+    }
+  });
+
+  it("사수관: 아군 초기값이 원작 초기 편성과 일치 (유비/관우/장비)", () => {
+    const s = gameData.stages["05-sishuiguan"]!;
+    for (const name of ["유비", "관우", "장비"]) {
+      const u = s.units.find((x) => x.commanderId === name)!;
+      const f = gameData.initialForces[name]!;
+      expect(u.classId).toBe(f.classId);
+      expect(u.troops).toBe(f.troops);
+    }
+  });
 });
