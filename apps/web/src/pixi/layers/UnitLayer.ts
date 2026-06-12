@@ -50,6 +50,11 @@ export class UnitLayer extends Container {
     return v;
   }
 
+  /** loadSprites() 완료 후 호출 — 폴백으로 생성된 뷰에 스프라이트 텍스처 적용 */
+  refreshSprites(): void {
+    for (const v of this.views.values()) v.refreshSprite();
+  }
+
   /** committed로 강제 정합 — 연출 결과가 어긋났어도 진실로 덮는다 */
   sync(state: BattleState): void {
     for (const u of state.units) {

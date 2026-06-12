@@ -133,6 +133,12 @@ export class UnitView extends Container {
 
   // ── 스프라이트 텍스처 적용 ────────────────────────────────────────────────
 
+  /** 에셋 로드 완료 후 외부(UnitLayer)에서 호출 — 현재 뷰의 idle 텍스처로 갱신, facing 보존 */
+  refreshSprite(): void {
+    this.applySpriteTexture(this.view, "idle");
+    this.applyFacing();
+  }
+
   /**
    * 지정된 뷰+포즈 텍스처를 spriteBase에 적용.
    * 텍스처가 없으면 폴백(fallbackBase)을 표시.

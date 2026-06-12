@@ -110,10 +110,9 @@ export class BattleRenderer implements Presenter {
 
     const tweens = new TweenRunner(app.ticker);
     const textures = new TextureResolver(app.renderer);
-    // 스프라이트 비동기 로드 — 실패 시 폴백(색 사각형) 유지, mount는 계속 진행
-    textures.loadSprites().catch((e) =>
-      console.warn("[BattleRenderer] loadSprites 예외 (폴백 유지):", e),
-    );
+    // 스프라이트 비동기 로드 — 실패 시 폴백(색 사각형) 유지, mount는 계속 진행.
+    // 완료 시 이미 생성된 UnitView들을 갱신해야 한다 (아래 .then — 없으면 대기 유닛이 영원히 폴백).
+    const spritesReady = textures.loadSprites();
     const fx = new FxLayer(tweens);
 
     // 씬그래프: stage → world(카메라 변환) → terrain/highlight/unit/fx.world, stage → fx.screen
@@ -125,6 +124,10 @@ export class BattleRenderer implements Presenter {
     highlights.zIndex = 1;
     const units = new UnitLayer(this.ctx, store.settledState, textures, tweens);
     units.zIndex = 2;
+    // 에셋 로드 완료 → 폴백으로 생성된 기존 UnitView에 스프라이트 적용
+    spritesReady
+      .then(() => units.refreshSprites())
+      .catch((e) => console.warn("[BattleRenderer] loadSprites 예외 (폴백 유지):", e));
     fx.world.zIndex = 3;
     world.addChild(terrain, highlights, units, fx.world);
     app.stage.addChild(world, fx.screen);
