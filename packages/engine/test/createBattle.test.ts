@@ -20,4 +20,11 @@ describe("createBattle", () => {
     expect(state.status).toBe("ongoing");
     expect(state.rngState).toBe(42);
   });
+  it("존재하지 않는 commanderId는 에러를 던진다", () => {
+    const badStage = {
+      ...stage,
+      units: [{ commanderId: "ghost", side: "player" as const, x: 0, y: 0 }],
+    };
+    expect(() => createBattle(badStage, gameData, 42)).toThrow("unknown commander: ghost");
+  });
 });

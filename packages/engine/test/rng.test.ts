@@ -14,4 +14,12 @@ describe("시드 RNG", () => {
     expect(v).toBeLessThan(1);
     expect(s).not.toBe(42);
   });
+  it("연속 호출 시 값이 진행된다 (시퀀스 결정론)", () => {
+    const [v1, s1] = nextRandom(42);
+    const [v2] = nextRandom(s1);
+    expect(v2).not.toBe(v1);
+    // 고정값 회귀 가드 — 구현이 바뀌면 리플레이 호환성이 깨진다
+    expect(v1).toBeCloseTo(0.6011037519201636, 10);
+    expect(v2).toBeCloseTo(0.4482905589975416, 10);
+  });
 });

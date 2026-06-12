@@ -23,6 +23,7 @@ export interface BattleState {
   phase: Side;
   status: "ongoing" | "victory" | "defeat";
   units: UnitState[];
+  /** mulberry32 내부 상태. signed int32라 음수 가능. nextRandom()에 그대로 전달 */
   rngState: number;
   firedEvents: string[]; // once 이벤트 중복 발동 방지
 }
