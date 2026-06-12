@@ -1,0 +1,10 @@
+{
+  "plain": 3,
+  "forest": 3,
+  "mountain": 3,
+  "river": 3,
+  "wall": 3,
+  "bridge": 2,
+  "waste": 2,
+  "grass": 2
+}
