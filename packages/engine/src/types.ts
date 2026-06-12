@@ -26,7 +26,7 @@ export interface BattleState {
   phase: Side;
   status: "ongoing" | "victory" | "defeat";
   units: UnitState[];
-  /** mulberry32 내부 상태. signed int32라 음수 가능. nextRandom()에 그대로 전달 */
+  /** mulberry32 내부 상태. signed int32라 음수 가능. 원작 공식은 분산이 없어 전투 중 갱신되지 않음 — 기연/일반 일기토 확률 등 미래 RNG 용도로 보존 */
   rngState: number;
   firedEvents: string[]; // once 이벤트 중복 발동 방지
 }
