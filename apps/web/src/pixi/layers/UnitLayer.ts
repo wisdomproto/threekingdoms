@@ -26,6 +26,8 @@ export class UnitLayer extends Container {
       const view = new UnitView(
         {
           id: u.id,
+          commanderId: u.id,        // 스테이지 JSON의 commanderId = unit.id
+          classId: u.classId,
           name: ctx.data.commanders[u.id]?.name ?? u.id,
           side: u.side,
           x: u.x,

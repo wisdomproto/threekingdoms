@@ -110,6 +110,10 @@ export class BattleRenderer implements Presenter {
 
     const tweens = new TweenRunner(app.ticker);
     const textures = new TextureResolver(app.renderer);
+    // 스프라이트 비동기 로드 — 실패 시 폴백(색 사각형) 유지, mount는 계속 진행
+    textures.loadSprites().catch((e) =>
+      console.warn("[BattleRenderer] loadSprites 예외 (폴백 유지):", e),
+    );
     const fx = new FxLayer(tweens);
 
     // 씬그래프: stage → world(카메라 변환) → terrain/highlight/unit/fx.world, stage → fx.screen

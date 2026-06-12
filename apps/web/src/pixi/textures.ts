@@ -2,9 +2,11 @@
  * TextureResolver (설계 §2.2) — `(kind, id) => Texture`.
  * v0: 부팅 시 Graphics로 지형 14종 + 진영 2색 베이스 + 하이라이트용 백색 타일을
  * RenderTexture로 1회 베이크 → 전 스프라이트가 공유(풀 배칭).
+ * v0.1(에셋 통합): loadSprites()로 manifest.json을 읽어 스프라이트 텍스처를 비동기 로드.
+ *   getSprite(spriteId, pose) → Texture | null (null = 폴백 색 사각형 유지 필수)
  * 향후 atlas frame 반환 구현으로 교체해도 소비측 호출은 불변 — placeholder→에셋 교체 경로의 핵심.
  */
-import { Graphics, Texture, type Renderer } from "pixi.js";
+import { Assets, Graphics, Texture, type Renderer } from "pixi.js";
 import { TILE_SIZE } from "./projection";
 
 /** 지형 14종 베이스 색 (terrains.json의 id와 1:1) */
@@ -33,6 +35,20 @@ export const SIDE_COLORS: Record<"player" | "enemy", number> = {
 
 export type TextureKind = "terrain" | "side" | "white";
 
+/** manifest.json 형식 (slice_sheets.py 출력) */
+interface ManifestEntry {
+  poses: string[];
+  source: string;
+  method: string;
+  note?: string;
+}
+type Manifest = Record<string, ManifestEntry>;
+
+/** 스프라이트 포즈 키: "{view}_{pose}" */
+export type SpritePose = "front_idle" | "front_move" | "front_attack" | "back_idle" | "back_move" | "back_attack";
+
+const SPRITE_BASE = "/assets/sprites";
+
 function darken(color: number, factor: number): number {
   const r = Math.floor(((color >> 16) & 0xff) * factor);
   const g = Math.floor(((color >> 8) & 0xff) * factor);
@@ -45,6 +61,8 @@ export const UNIT_BASE_SIZE = TILE_SIZE - 10;
 
 export class TextureResolver {
   private readonly baked = new Map<string, Texture>();
+  /** spriteId → pose → Texture. loadSprites() 완료 후에만 채워진다 */
+  private readonly sprites = new Map<string, Map<string, Texture>>();
 
   constructor(renderer: Renderer) {
     // 지형 14종: 베이스 색 + 살짝 어두운 외곽선(그리드 가독성)
@@ -98,8 +116,71 @@ export class TextureResolver {
     return tex;
   }
 
+  /**
+   * manifest.json을 로드하고 등록된 스프라이트 텍스처를 비동기 로드.
+   * BattleRenderer.mount() 내에서 await — 실패해도 폴백(색 사각형)이 유지되므로 throw하지 않음.
+   */
+  async loadSprites(): Promise<void> {
+    let manifest: Manifest;
+    try {
+      const res = await fetch(`${SPRITE_BASE}/manifest.json`);
+      if (!res.ok) {
+        console.warn(`[TextureResolver] manifest.json 로드 실패 (${res.status}) — 색 사각형 폴백 유지`);
+        return;
+      }
+      manifest = (await res.json()) as Manifest;
+    } catch (e) {
+      console.warn("[TextureResolver] manifest.json fetch 오류 — 색 사각형 폴백 유지", e);
+      return;
+    }
+
+    const loadQueue: Array<{ spriteId: string; pose: string; url: string }> = [];
+    for (const [spriteId, entry] of Object.entries(manifest)) {
+      for (const pose of entry.poses) {
+        const url = `${SPRITE_BASE}/${spriteId}/${pose}.png`;
+        loadQueue.push({ spriteId, pose, url });
+      }
+    }
+
+    // Assets.load는 URL 배열을 한 번에 처리 (내부적으로 병렬)
+    const urls = loadQueue.map((q) => q.url);
+    let loaded: Record<string, Texture> = {};
+    try {
+      loaded = await Assets.load<Texture>(urls);
+    } catch (e) {
+      console.warn("[TextureResolver] 스프라이트 텍스처 로드 오류 — 부분 폴백", e);
+    }
+
+    for (const { spriteId, pose, url } of loadQueue) {
+      const tex = loaded[url];
+      if (!tex) continue;
+      if (!this.sprites.has(spriteId)) {
+        this.sprites.set(spriteId, new Map());
+      }
+      this.sprites.get(spriteId)!.set(pose, tex);
+    }
+
+    const loadedCount = [...this.sprites.values()].reduce((s, m) => s + m.size, 0);
+    console.info(`[TextureResolver] 스프라이트 로드 완료: ${this.sprites.size}종 ${loadedCount}컷`);
+  }
+
+  /**
+   * 스프라이트 텍스처 조회. 미보유 시 null (폴백: 색 사각형 — 설계 §필수).
+   * view: "front"|"back", pose: "idle"|"move"|"attack"
+   */
+  getSprite(spriteId: string, view: "front" | "back", pose: "idle" | "move" | "attack"): Texture | null {
+    const poseKey = `${view}_${pose}`;
+    const poseMap = this.sprites.get(spriteId);
+    if (!poseMap) return null;
+
+    // 정확한 포즈 키 우선, 없으면 같은 뷰의 idle로 그레이스풀 폴백
+    return poseMap.get(poseKey) ?? poseMap.get(`${view}_idle`) ?? null;
+  }
+
   destroy(): void {
     for (const tex of this.baked.values()) tex.destroy(true);
     this.baked.clear();
+    // sprites는 Assets 전역 캐시가 관리 — 여기서 개별 destroy 안 함 (공유 참조 보호)
+    this.sprites.clear();
   }
 }

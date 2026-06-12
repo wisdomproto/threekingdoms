@@ -1,15 +1,25 @@
 /**
  * UnitView (설계 §2.2) — "애니메이션 시퀀스 재생기" 파사드.
  * play('idle'|'move'|'attack'|'hit'|'retreat') => Promise + setFacing/setGridPosition.
- * v0 구현은 색 사각형 + 장수명 Text + 병력 바. 인터페이스가 시퀀스 기반이라
- * Spine/스프라이트 에셋 도착 시 이 파일 내부만 교체된다 (CLAUDE.md §4 프레임 정책).
+ *
+ * v0.1(에셋 통합): 스프라이트 에셋이 있으면 수묵 SD 스프라이트 표시, 없으면 색 사각형 폴백(필수).
+ * 방향(facing):
+ *   - 좌우: scale.x = +1(우향) | -1(좌향) 미러링 — 코드에서만 처리, 에셋은 한 방향만
+ *   - 앞뒤: 이동/공격 상대 방향이 뒤쪽(y가 현재보다 작아지는 방향)이면 "back" 뷰, 아니면 "front" 뷰.
+ *          템플릿 유닛(front 뷰만 보유)은 항상 front 뷰 사용.
+ * 스프라이트 anchor: (0.5, 1.0) — 발 위치 기준 타일 중앙 정렬.
+ * 높이: 타일(48px) × 1.6 ≈ 77px — SD 비율 살리기, 인접 타일 살짝 겹침 허용 (zIndex 정렬로 해결).
+ * 병력 바 / 이름 라벨은 스프라이트 위 배치 (스프라이트 사용 시 y오프셋 조정).
+ *
+ * CLAUDE.md §4: 에셋(Spine/스프라이트)이 교체돼도 인터페이스는 불변.
  * zIndex = depthOf(y) 선확보 — 아이소 전환 시 깊이 정렬 공짜.
  */
-import { Container, Graphics, Sprite, Text } from "pixi.js";
+import { Container, Graphics, Sprite, Text, Texture } from "pixi.js";
 import type { Coord } from "@tk/engine";
 import { depthOf, gridToWorld, TILE_SIZE } from "../projection";
 import { UNIT_BASE_SIZE, type TextureResolver } from "../textures";
 import { easeInOut, type TweenRunner } from "../tweens";
+import { resolveSpriteId } from "../spriteMap";
 
 export type UnitSequence = "idle" | "move" | "attack" | "hit" | "retreat";
 
@@ -21,8 +31,16 @@ const HIT_MS = 180;
 const RETREAT_MS = 350;
 const LUNGE_PX = 10;
 
+/**
+ * 스프라이트 표시 높이: 타일의 ~1.6배 (SD 비율 살리기).
+ * 타일(48px) × 1.6 = 76.8 → 77px. 인접 타일 살짝 겹침 허용 (zIndex 정렬로 해결).
+ */
+const SPRITE_DISPLAY_H = Math.round(TILE_SIZE * 1.6);
+
 export interface UnitViewInit {
   id: string;
+  commanderId: string;
+  classId: string;
   name: string;
   side: "player" | "enemy";
   x: number;
@@ -40,10 +58,26 @@ export class UnitView extends Container {
   readonly maxTroops: number;
   retreatedFlag: boolean;
 
-  private readonly base: Sprite;
+  /** 폴백 색 사각형 (스프라이트 없을 때 표시) */
+  private readonly fallbackBase: Sprite;
+  /** 수묵 스프라이트 (에셋 로드 시 교체. null = 미보유 → 폴백 유지) */
+  private readonly spriteBase: Sprite;
+  /** 현재 실제로 화면에 보이는 베이스 (fallbackBase or spriteBase) */
+  private get activeBase(): Sprite {
+    return this.spriteBase.visible ? this.spriteBase : this.fallbackBase;
+  }
+
   private readonly barFill: Graphics;
+  private readonly barBg: Graphics;
+  private readonly nameLabel: Text;
   private readonly tweens: TweenRunner;
-  private facing = 1; // 1=우, -1=좌
+  private readonly textures: TextureResolver;
+  private readonly spriteId: string | null;
+
+  /** "front" | "back" — 현재 뷰 방향 */
+  private view: "front" | "back" = "front";
+  /** +1=우 | -1=좌 */
+  private facing = 1;
 
   constructor(init: UnitViewInit, textures: TextureResolver, tweens: TweenRunner) {
     super();
@@ -54,23 +88,32 @@ export class UnitView extends Container {
     this.maxTroops = init.maxTroops;
     this.retreatedFlag = init.retreated;
     this.tweens = tweens;
+    this.textures = textures;
+    this.spriteId = resolveSpriteId(init.commanderId, init.classId, init.side);
 
-    // 베이스 (진영색 라운드 사각) — 컨테이너 중심 기준
-    this.base = new Sprite(textures.get("side", init.side));
-    this.base.anchor.set(0.5);
-    this.addChild(this.base);
+    // ── 폴백 색 사각형 (진영색 라운드 사각) ──
+    this.fallbackBase = new Sprite(textures.get("side", init.side));
+    this.fallbackBase.anchor.set(0.5);
+    this.addChild(this.fallbackBase);
 
-    // 병력 바 (배경 + 채움)
-    const barBg = new Graphics();
-    barBg.rect(0, 0, BAR_WIDTH, BAR_HEIGHT).fill(0x222222);
-    barBg.position.set(-BAR_WIDTH / 2, UNIT_BASE_SIZE / 2 + 2);
-    this.addChild(barBg);
+    // ── 스프라이트 슬롯 (초기에는 hidden, 에셋 로드 시 교체) ──
+    this.spriteBase = new Sprite(Texture.EMPTY);
+    this.spriteBase.anchor.set(0.5, 1.0); // 발 기준 정렬
+    this.spriteBase.visible = false;
+    this.addChild(this.spriteBase);
+
+    // 스프라이트가 있으면 즉시 초기 포즈 적용 (loadSprites 완료 후 호출된 경우)
+    this.applySpriteTexture("front", "idle");
+
+    // ── 병력 바 (배경 + 채움) ──
+    this.barBg = new Graphics();
+    this.barBg.rect(0, 0, BAR_WIDTH, BAR_HEIGHT).fill(0x222222);
+    this.addChild(this.barBg);
     this.barFill = new Graphics();
-    this.barFill.position.set(-BAR_WIDTH / 2, UNIT_BASE_SIZE / 2 + 2);
     this.addChild(this.barFill);
 
-    // 장수명 — 유닛 ~7기라 Pixi Text 캐시로 충분 (설계 리스크 §7)
-    const label = new Text({
+    // ── 장수명 라벨 ──
+    this.nameLabel = new Text({
       text: init.name,
       style: {
         fontFamily: "sans-serif",
@@ -79,16 +122,66 @@ export class UnitView extends Container {
         stroke: { color: 0x000000, width: 3 },
       },
     });
-    label.anchor.set(0.5, 1);
-    label.position.set(0, -UNIT_BASE_SIZE / 2 - 2);
-    this.addChild(label);
+    this.nameLabel.anchor.set(0.5, 1);
+    this.addChild(this.nameLabel);
 
     this.redrawBar();
+    this.repositionUI();
     this.snapTo(init.x, init.y);
     this.setRetreated(init.retreated);
   }
 
+  // ── 스프라이트 텍스처 적용 ────────────────────────────────────────────────
+
+  /**
+   * 지정된 뷰+포즈 텍스처를 spriteBase에 적용.
+   * 텍스처가 없으면 폴백(fallbackBase)을 표시.
+   */
+  private applySpriteTexture(view: "front" | "back", pose: "idle" | "move" | "attack"): void {
+    if (!this.spriteId) return; // 매핑 없음 → 항상 폴백
+
+    const tex = this.textures.getSprite(this.spriteId, view, pose);
+    if (!tex) return; // 에셋 미로드 → 폴백 유지
+
+    // 텍스처 높이를 SPRITE_DISPLAY_H에 맞게 스케일
+    const src = tex.source;
+    const srcH = src ? src.height : tex.height;
+    const scale = srcH > 0 ? SPRITE_DISPLAY_H / srcH : 1;
+
+    this.spriteBase.texture = tex;
+    this.spriteBase.scale.set(Math.abs(this.spriteBase.scale.x > 0 ? scale : -scale), scale);
+    this.spriteBase.visible = true;
+    this.fallbackBase.visible = false;
+    this.repositionUI();
+  }
+
+  /**
+   * 현재 뷰+포즈를 유지한 채 방향(facing)만 변경.
+   * scale.x 부호로 좌우 미러링.
+   */
+  private applyFacing(): void {
+    const s = this.spriteBase.visible ? this.spriteBase : this.fallbackBase;
+    s.scale.x = Math.abs(s.scale.x) * this.facing;
+  }
+
+  /** 병력 바 / 라벨을 현재 활성 베이스 위에 배치 */
+  private repositionUI(): void {
+    if (this.spriteBase.visible) {
+      // 스프라이트: anchor=(0.5, 1.0) → 발=0, 머리=-SPRITE_DISPLAY_H
+      const topY = -SPRITE_DISPLAY_H;
+      this.barBg.position.set(-BAR_WIDTH / 2, 2);             // 발 아래 2px
+      this.barFill.position.set(-BAR_WIDTH / 2, 2);
+      this.nameLabel.position.set(0, topY - 2);                    // 머리 위 2px
+    } else {
+      // 폴백 색 사각형: anchor=(0.5, 0.5) → 중앙=0
+      this.barBg.position.set(-BAR_WIDTH / 2, UNIT_BASE_SIZE / 2 + 2);
+      this.barFill.position.set(-BAR_WIDTH / 2, UNIT_BASE_SIZE / 2 + 2);
+      this.nameLabel.position.set(0, -UNIT_BASE_SIZE / 2 - 2);
+    }
+  }
+
   // ── 상태 적용 (sync/연출 공용) ──────────────────────────────────────────
+
   snapTo(gx: number, gy: number): void {
     this.gridX = gx;
     this.gridY = gy;
@@ -110,11 +203,23 @@ export class UnitView extends Container {
 
   setFacing(dir: 1 | -1): void {
     this.facing = dir;
-    this.base.scale.x = Math.abs(this.base.scale.x) * dir;
+    this.applyFacing();
   }
 
   faceToward(target: Coord): void {
     if (target.x !== this.gridX) this.setFacing(target.x > this.gridX ? 1 : -1);
+  }
+
+  /**
+   * 뷰 방향 업데이트: 이동 벡터 dy < 0(위쪽)이면 back, 아니면 front.
+   * 템플릿 유닛(back 뷰 미보유)은 front 유지.
+   */
+  private setView(fromY: number, toY: number): void {
+    const newView: "front" | "back" = toY < fromY ? "back" : "front";
+    if (newView !== this.view) {
+      this.view = newView;
+      this.applySpriteTexture(this.view, "idle");
+    }
   }
 
   private redrawBar(): void {
@@ -127,9 +232,12 @@ export class UnitView extends Container {
   }
 
   // ── 시퀀스 재생기 ────────────────────────────────────────────────────────
+
   play(seq: UnitSequence): Promise<void> {
     switch (seq) {
       case "idle":
+        this.applySpriteTexture(this.view, "idle");
+        return Promise.resolve();
       case "move": // 이동 본체는 moveAlong이 담당 — 단독 호출은 즉시 완료
         return Promise.resolve();
       case "attack":
@@ -143,11 +251,13 @@ export class UnitView extends Container {
 
   /** 경로(시작 타일 포함)를 따라 타일당 msPerTile 트윈. zIndex/facing을 타일마다 갱신 */
   async moveAlong(path: readonly Coord[], msPerTile: number = MOVE_MS_PER_TILE): Promise<void> {
+    this.applySpriteTexture(this.view, "move");
     for (let i = 1; i < path.length; i++) {
       const from = path[i - 1];
       const to = path[i];
       if (!from || !to) continue;
       if (to.x !== from.x) this.setFacing(to.x > from.x ? 1 : -1);
+      this.setView(from.y, to.y);
       const wf = gridToWorld(from);
       const wt = gridToWorld(to);
       await this.tweens.run(msPerTile, (t) => {
@@ -157,27 +267,34 @@ export class UnitView extends Container {
       this.gridY = to.y;
       this.zIndex = depthOf(to.y);
     }
+    this.applySpriteTexture(this.view, "idle");
   }
 
   private playAttack(): Promise<void> {
+    this.applySpriteTexture(this.view, "attack");
     const ox = this.position.x;
     const dir = this.facing;
-    return this.tweens.run(ATTACK_MS, (t) => {
-      // 전진 후 복귀 (0→1→0 왕복)
-      const swing = t < 0.5 ? t * 2 : (1 - t) * 2;
-      this.position.x = ox + dir * LUNGE_PX * easeInOut(swing);
-    });
+    return this.tweens
+      .run(ATTACK_MS, (t) => {
+        // 전진 후 복귀 (0→1→0 왕복)
+        const swing = t < 0.5 ? t * 2 : (1 - t) * 2;
+        this.position.x = ox + dir * LUNGE_PX * easeInOut(swing);
+      })
+      .then(() => {
+        this.applySpriteTexture(this.view, "idle");
+      });
   }
 
   private playHit(): Promise<void> {
     const ox = this.position.x;
-    this.base.tint = 0xff8080;
+    // 피격: 스프라이트 틴트 적용 (색 사각형과 동일한 방식)
+    this.activeBase.tint = 0xff8080;
     return this.tweens
       .run(HIT_MS, (t) => {
         this.position.x = ox + Math.sin(t * Math.PI * 4) * 3 * (1 - t);
       })
       .then(() => {
-        this.base.tint = 0xffffff;
+        this.activeBase.tint = 0xffffff;
         this.position.x = ox;
       });
   }
