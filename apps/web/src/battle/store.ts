@@ -63,6 +63,7 @@ export function createInstantPresenter(): Presenter {
   return {
     unitMoved: done,
     damageDealt: done,
+    strategyCast: done,
     unitRetreated: done,
     duelTriggered: done,
     phaseChanged: done,

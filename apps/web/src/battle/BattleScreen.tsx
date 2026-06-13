@@ -48,6 +48,9 @@ class PresenterDelegate implements Presenter {
   damageDealt(e: Ev<"damageDealt">): Promise<void> {
     return this.target?.damageDealt(e) ?? Promise.resolve();
   }
+  strategyCast(e: Ev<"strategyCast">): Promise<void> {
+    return this.target?.strategyCast(e) ?? Promise.resolve();
+  }
   unitRetreated(e: Ev<"unitRetreated">): Promise<void> {
     return this.target?.unitRetreated(e) ?? Promise.resolve();
   }
@@ -87,6 +90,8 @@ function activeUnitId(ui: InputState): string | null {
     case "selected":
     case "postMoveMenu":
     case "targetSelect":
+    case "strategyMenu":
+    case "strategyTarget":
       return ui.unitId;
     default:
       return null;

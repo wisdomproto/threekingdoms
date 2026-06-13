@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>맵 청크 보드 — 스테이지별 배경 생성</title>
+<style>
+  :root { --bg:#14161c; --panel:#1d212b; --panel2:#242936; --line:#333a4a; --txt:#e8e6df; --dim:#9aa1b0; --acc:#d4a843; --acc2:#6fae6f; --red:#c75450; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt); font-family:'Malgun Gothic','Segoe UI',sans-serif; line-height:1.5; }
+  header { position:sticky; top:0; z-index:50; background:rgba(20,22,28,.96); border-bottom:1px solid var(--line); padding:10px 22px; display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+  header h1 { font-size:16px; margin:0; color:var(--acc); }
+  header .sub { color:var(--dim); font-size:12px; }
+  #dirbtn { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:6px 12px; cursor:pointer; font-size:12.5px; }
+  #progress { margin-left:auto; font-size:12px; color:var(--dim); }
+  #tabs { position:sticky; top:49px; z-index:49; background:rgba(20,22,28,.96); border-bottom:1px solid var(--line); padding:6px 22px; display:flex; gap:6px; flex-wrap:wrap; }
+  .tab { background:var(--panel); color:var(--dim); border:1px solid var(--line); border-radius:8px 8px 0 0; padding:6px 14px; cursor:pointer; font-size:13px; }
+  .tab.active { background:var(--panel2); color:var(--acc); border-color:var(--acc); }
+  .tab .cnt { font-size:11px; color:var(--acc2); margin-left:6px; }
+  main { max-width:1280px; margin:0 auto; padding:18px 22px 80px; }
+  .info { background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--acc); border-radius:8px; padding:12px 16px; font-size:13px; color:var(--dim); margin:14px 0; }
+  .info b { color:var(--txt); }
+  .promptbox { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin:14px 0; }
+  .promptbox h3 { margin:0 0 8px; font-size:14px; color:var(--acc); display:flex; align-items:center; gap:10px; }
+  pre.prompt { background:#11141a; border:1px solid var(--line); border-radius:8px; padding:10px; font-size:11.5px; line-height:1.45; white-space:pre-wrap; word-break:break-word; color:#c9d4e3; max-height:160px; overflow:auto; margin:0; font-family:Consolas,'Malgun Gothic',monospace; }
+  .stitchhint { font-size:12px; color:var(--acc2); margin-top:8px; }
+  .stitchhint code { background:#11141a; border:1px solid var(--line); border-radius:4px; padding:1px 6px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(380px, 1fr)); gap:14px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:8px; }
+  .card.done { border-color:var(--acc2); }
+  .card h3 { margin:0; font-size:13.5px; display:flex; align-items:center; gap:8px; }
+  .card h3 .pid { color:var(--acc); font-family:Consolas,monospace; }
+  .card h3 .rng { color:var(--dim); font-size:11px; font-weight:normal; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .lbl { font-size:11px; color:var(--dim); margin-bottom:4px; }
+  .blockimg { width:100%; border-radius:6px; border:1px solid var(--line); display:block; cursor:zoom-in; image-rendering:pixelated; background:#11141a; }
+  .btn { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:5px 10px; cursor:pointer; font-size:12px; }
+  .btn:hover { border-color:var(--acc); }
+  .btn.primary { background:var(--acc); color:#1a1407; border-color:var(--acc); font-weight:bold; }
+  .minirow { display:flex; gap:6px; margin-top:4px; }
+  .drop { border:1.5px dashed var(--line); border-radius:8px; min-height:120px; padding:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:border-color .15s, background .15s; position:relative; overflow:hidden; }
+  .drop:focus, .drop.armed { border-color:var(--acc); background:rgba(212,168,67,.05); outline:none; }
+  .drop.dragover { border-color:var(--acc2); background:rgba(111,174,111,.08); }
+  .drop .hint { color:#5a6172; font-size:11px; text-align:center; pointer-events:none; }
+  .drop img { width:100%; border-radius:6px; display:block; cursor:zoom-in; }
+  .drop .ops { position:absolute; top:4px; right:4px; display:flex; gap:3px; }
+  .drop .ops button { background:rgba(20,22,28,.85); border:1px solid var(--line); color:var(--dim); border-radius:4px; font-size:11px; padding:2px 6px; cursor:pointer; }
+  .drop .ops button:hover { color:var(--txt); border-color:var(--acc); }
+  #lightbox { position:fixed; inset:0; background:rgba(0,0,0,.92); display:none; align-items:center; justify-content:center; z-index:100; cursor:zoom-out; }
+  #lightbox img { max-width:94vw; max-height:92vh; image-rendering:auto; }
+  #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--acc); color:#1a1407; font-weight:bold; padding:8px 20px; border-radius:20px; font-size:13px; display:none; z-index:110; }
+</style>
+</head>
+<body>
+<header>
+  <h1>맵 청크 보드</h1>
+  <span class="sub">스테이지별 배경 = 블록아웃 조각 → img2img → painted 채우기 → Claude가 stitch</span>
+  <button id="dirbtn" title="painted 저장 폴더 — docs\art\chunks 선택 권장">저장 폴더: 미연결</button>
+  <div id="progress"></div>
+</header>
+<div id="tabs"></div>
+<main>
+  <div class="info">
+    <b>사용법</b> ① 각 카드의 <b>블록아웃</b>을 Gemini에 <b>img2img 입력</b>으로 넣고 아래 공통 프롬프트로 생성
+    ② 결과를 카드 우측 <b>점선 영역에 Ctrl+V</b>(드래그&드롭/파일선택) — 한 조각당 1장
+    ③ 한 스테이지 조각을 다 채우면 하단 <b>stitch 명령</b>을 Claude에게 주면 합쳐서 배경 교체.
+    <br>저장 폴더를 <code>docs\art\chunks</code>로 연결하면 붙여넣는 즉시 <b>painted_{stage}_r#_c#</b> 파일로 자동 저장돼 바로 stitch 가능.
+  </div>
+  <div class="promptbox">
+    <h3>img2img 공통 프롬프트 <button class="btn primary" id="copyprompt">복사</button> <span class="sub" style="color:var(--dim);font-weight:normal">6장 모두 동일 — 첫 조각 잘 나오면 나머지 생성에 스타일 참조로 첨부</span></h3>
+    <pre class="prompt" id="promptpre"></pre>
+  </div>
+  <div id="board"></div>
+</main>
+<div id="lightbox"><img alt=""></div>
+<div id="toast"></div>
+
+<script src="chunks/index.js" onerror="window.__noindex=1"></script>
+<script>
+'use strict';
+
+const CHUNK_PROMPT =
+`Top-down orthographic battlefield map, traditional East Asian ink-wash painting (수묵 담채), muted earth tones, soft brush texture and paper grain, LOW contrast so game units read on top.
+Repaint this color-block layout EXACTLY — keep every region's position, shape and size:
+pale tan = open dry-dirt plain, sage/dark green = dense forest canopy seen from above, light khaki = dry cracked wasteland, grey = stone fortress wall, dark brown = wooden fortress gate, orange-tan = army camp tents, tan = supply depot, dusty blue = river/water, brown plank = wooden bridge.
+Painterly continuous terrain, blend region edges naturally, NO grid lines, NO hard outlines around regions, NO text, NO characters, NO UI.
+The painting must continue all the way to the image edges (for seamless tiling with neighboring map sections).`;
+
+const STAGES = window.CHUNK_STAGES || {};
+let activeStage = localStorage.getItem('mcb_stage') || Object.keys(STAGES)[0] || null;
+
+/* ───── IndexedDB (조각당 1장, key=cardId) ───── */
+let db = null;
+function openDB() {
+  return new Promise((res, rej) => {
+    const rq = indexedDB.open('chunkBoard', 1);
+    rq.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('imgs')) d.createObjectStore('imgs', { keyPath: 'card' });
+      if (!d.objectStoreNames.contains('settings')) d.createObjectStore('settings');
+    };
+    rq.onsuccess = e => res(e.target.result);
+    rq.onerror = () => rej(rq.error);
+  });
+}
+const tx = (store, mode) => db.transaction(store, mode).objectStore(store);
+function dbGet(card) { return new Promise((res, rej) => { const r = tx('imgs','readonly').get(card); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+function dbPut(rec) { return new Promise((res, rej) => { const r = tx('imgs','readwrite').put(rec); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); }
+function dbDel(card) { return new Promise((res, rej) => { const r = tx('imgs','readwrite').delete(card); r.onsuccess=()=>res(); r.onerror=()=>rej(r.error); }); }
+function dbAll() { return new Promise((res, rej) => { const r = tx('imgs','readonly').getAll(); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+function sGet(k){ return new Promise((res,rej)=>{ const r=tx('settings','readonly').get(k); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+function sPut(k,v){ return new Promise((res,rej)=>{ const t=db.transaction('settings','readwrite'); t.objectStore('settings').put(v,k); t.oncomplete=()=>res(); t.onerror=()=>rej(t.error); }); }
+
+/* ───── 저장 폴더 (File System Access) ───── */
+let dirHandle = null;
+function updateDirUI() {
+  const b = document.getElementById('dirbtn');
+  if (dirHandle) { b.textContent = '저장 폴더: ' + dirHandle.name; b.style.borderColor='var(--acc2)'; b.style.color='var(--acc2)'; }
+  else { b.textContent='저장 폴더: 미연결'; b.style.borderColor=''; b.style.color=''; }
+}
+async function restoreDir() {
+  try { const s = await sGet('dir'); if (s && await s.queryPermission({mode:'readwrite'})==='granted') dirHandle=s; updateDirUI(); } catch(e){}
+}
+async function ensureDir(interactive) {
+  if (dirHandle && await dirHandle.queryPermission({mode:'readwrite'})==='granted') return dirHandle;
+  try { const s = await sGet('dir'); if (s && await s.requestPermission({mode:'readwrite'})==='granted') { dirHandle=s; updateDirUI(); return dirHandle; } } catch(e){}
+  if (!interactive || !window.showDirectoryPicker) return null;
+  try { dirHandle = await showDirectoryPicker({ id:'chunkArt', mode:'readwrite' }); await sPut('dir', dirHandle); updateDirUI(); toast('연결됨 — 붙여넣는 즉시 ' + dirHandle.name + ' 에 저장'); return dirHandle; }
+  catch(e){ return null; }
+}
+async function writeToDir(name, blob) {
+  const dh = await ensureDir(false);
+  if (!dh) return false;
+  try { const fh = await dh.getFileHandle(name, {create:true}); const w = await fh.createWritable(); await w.write(blob); await w.close(); return true; }
+  catch(e){ return false; }
+}
+
+/* ───── 렌더 ───── */
+function extOf(blob){ return (blob.type.split('/')[1]||'png').replace('jpeg','jpg'); }
+const blobUrls = new Map();
+function urlFor(card, blob){ if(blobUrls.has(card)) URL.revokeObjectURL(blobUrls.get(card)); const u=URL.createObjectURL(blob); blobUrls.set(card,u); return u; }
+
+function renderTabs() {
+  const keys = Object.keys(STAGES);
+  document.getElementById('tabs').innerHTML = keys.map(k =>
+    `<button class="tab ${k===activeStage?'active':''}" data-tab="${k}">${STAGES[k].name||k} <span class="cnt" id="cnt-${k}"></span></button>`
+  ).join('') || '<span class="sub" style="color:var(--red)">chunks/index.js 없음 — export_chunks.py 먼저 실행</span>';
+}
+
+function render() {
+  document.getElementById('promptpre').textContent = CHUNK_PROMPT;
+  renderTabs();
+  const st = STAGES[activeStage];
+  const board = document.getElementById('board');
+  if (!st) { board.innerHTML = ''; return; }
+  const tile = st.tilePx;
+  let html = `<div class="grid">`;
+  for (const ch of st.chunks) {
+    const card = `${st.mapId}_r${ch.row}_c${ch.col}`;
+    html += `<div class="card" id="card-${card}">
+      <h3><span class="pid">r${ch.row}_c${ch.col}</span> <span class="rng">타일 [${ch.x0}:${ch.x1}]×[${ch.y0}:${ch.y1}] · ${ch.size[0]}×${ch.size[1]}px</span></h3>
+      <div class="cols">
+        <div>
+          <div class="lbl">블록아웃 (Gemini 입력 — 클릭 확대)</div>
+          <img class="blockimg" src="chunks/${ch.name}" alt="blockout">
+          <div class="minirow"><button class="btn" data-dlblock="chunks/${ch.name}">블록아웃 다운로드</button></div>
+        </div>
+        <div>
+          <div class="lbl">painted 결과 (Ctrl+V / 드롭)</div>
+          <div class="drop" tabindex="0" data-drop="${card}"><span class="hint">클릭 후 Ctrl+V<br>또는 드래그&드롭</span></div>
+        </div>
+      </div>
+    </div>`;
+  }
+  html += `</div>`;
+  const total = st.chunks.length;
+  html += `<div class="stitchhint" id="stitchhint"></div>`;
+  board.innerHTML = html;
+  loadStageImages();
+}
+
+async function loadStageImages() {
+  const st = STAGES[activeStage]; if (!st) return;
+  const all = await dbAll();
+  const byCard = new Map(all.map(r => [r.card, r]));
+  for (const ch of st.chunks) {
+    const card = `${st.mapId}_r${ch.row}_c${ch.col}`;
+    const rec = byCard.get(card);
+    if (rec) setDropImage(card, rec.blob);
+  }
+  updateProgress();
+}
+
+function setDropImage(card, blob) {
+  const drop = document.querySelector(`.drop[data-drop="${CSS.escape(card)}"]`);
+  if (!drop) return;
+  const u = urlFor(card, blob);
+  drop.innerHTML = `<img src="${u}"><div class="ops"><button class="dl" title="폴더에 저장">⬇</button><button class="rm" title="삭제">✕</button></div>`;
+  drop.closest('.card').classList.add('done');
+}
+function clearDrop(card) {
+  const drop = document.querySelector(`.drop[data-drop="${CSS.escape(card)}"]`);
+  if (!drop) return;
+  drop.innerHTML = `<span class="hint">클릭 후 Ctrl+V<br>또는 드래그&드롭</span>`;
+  drop.closest('.card').classList.remove('done');
+}
+
+async function saveChunk(card, blob) {
+  const name = `painted_${card}.${extOf(blob)}`;
+  await dbPut({ card, blob, name, at: Date.now() });
+  setDropImage(card, blob);
+  const wrote = await writeToDir(name, blob);
+  updateProgress();
+  toast(wrote ? `${name} → 폴더 저장됨` : `${name} 저장됨 (폴더 미연결 — ⬇로 저장)`);
+}
+
+function updateProgress() {
+  for (const k of Object.keys(STAGES)) {
+    dbAll().then(all => {
+      const set = new Set(all.map(r => r.card));
+      const have = STAGES[k].chunks.filter(ch => set.has(`${k}_r${ch.row}_c${ch.col}`)).length;
+      const total = STAGES[k].chunks.length;
+      const cnt = document.getElementById('cnt-' + k);
+      if (cnt) cnt.textContent = `${have}/${total}`;
+      if (k === activeStage) {
+        document.getElementById('progress').textContent = `${STAGES[k].name}: painted ${have}/${total}`;
+        const hint = document.getElementById('stitchhint');
+        if (hint) hint.innerHTML = (have === total)
+          ? `✅ 전부 채움 — Claude에게: <code>python tools/sprite-pipeline/stitch_chunks.py ${k}</code> 돌려달라고 하세요`
+          : `남은 조각 ${total - have}개 — 다 채우면 stitch 명령이 여기 뜹니다`;
+      }
+    });
+  }
+}
+
+/* ───── 이벤트 ───── */
+document.getElementById('tabs').addEventListener('click', e => {
+  const t = e.target.closest('.tab'); if (!t) return;
+  activeStage = t.dataset.tab; localStorage.setItem('mcb_stage', activeStage); render();
+});
+document.getElementById('copyprompt').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(CHUNK_PROMPT); } catch { const ta=document.createElement('textarea'); ta.value=CHUNK_PROMPT; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+  toast('프롬프트 복사됨');
+});
+document.getElementById('board').addEventListener('click', async e => {
+  const dlb = e.target.closest('[data-dlblock]');
+  if (dlb) { const a=document.createElement('a'); a.href=dlb.dataset.dlblock; a.download=dlb.dataset.dlblock.split('/').pop(); a.click(); return; }
+  const img = e.target.closest('.blockimg') || (e.target.closest('.drop') && e.target.tagName==='IMG' ? e.target : null);
+  if (img && e.target.tagName==='IMG' && !e.target.closest('.ops')) {
+    const lb=document.getElementById('lightbox'); lb.querySelector('img').src=e.target.src; lb.style.display='flex'; return;
+  }
+  const drop = e.target.closest('.drop');
+  if (drop) {
+    const card = drop.dataset.drop;
+    if (e.target.closest('.rm')) { await dbDel(card); clearDrop(card); updateProgress(); return; }
+    if (e.target.closest('.dl')) { const rec=await dbGet(card); if(rec){ const ok=await writeToDir(rec.name, rec.blob) || (()=>{const a=document.createElement('a');a.href=urlFor(card,rec.blob);a.download=rec.name;a.click();return true;})(); toast(rec.name+' 저장'); } return; }
+    document.querySelectorAll('.drop.armed').forEach(d=>d.classList.remove('armed'));
+    drop.classList.add('armed'); drop.focus();
+  }
+});
+document.getElementById('lightbox').addEventListener('click', e => e.currentTarget.style.display='none');
+document.addEventListener('paste', e => {
+  const dz = document.activeElement.closest?.('.drop') || document.querySelector('.drop.armed');
+  if (!dz) return;
+  for (const it of (e.clipboardData?.items||[])) if (it.type.startsWith('image/')) { saveChunk(dz.dataset.drop, it.getAsFile()); e.preventDefault(); return; }
+  toast('클립보드에 이미지가 없습니다');
+});
+document.getElementById('board').addEventListener('dragover', e => { const d=e.target.closest('.drop'); if(d){ e.preventDefault(); d.classList.add('dragover'); } });
+document.getElementById('board').addEventListener('dragleave', e => { const d=e.target.closest('.drop'); if(d) d.classList.remove('dragover'); });
+document.getElementById('board').addEventListener('drop', e => {
+  const d=e.target.closest('.drop'); if(!d) return; e.preventDefault(); d.classList.remove('dragover');
+  for (const f of e.dataTransfer.files) if (f.type.startsWith('image/')) { saveChunk(d.dataset.drop, f); return; }
+});
+document.getElementById('dirbtn').addEventListener('click', async () => { dirHandle=null; await ensureDir(true); });
+
+let toastTimer=null;
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.style.display='none', 2200); }
+
+/* ───── 시작 ───── */
+(async () => {
+  render();
+  try { db = await openDB(); await restoreDir(); await loadStageImages(); updateProgress(); }
+  catch (err) { document.querySelector('.info').insertAdjacentHTML('beforeend', '<br><b style="color:var(--red)">⚠ IndexedDB 열기 실패 — 저장 비활성 (' + err + ')</b>'); }
+  if (window.__noindex) document.querySelector('.info').insertAdjacentHTML('beforeend', '<br><b style="color:var(--red)">⚠ chunks/index.js 로드 실패 — 같은 폴더에서 열거나 export_chunks.py 실행</b>');
+  if (!window.showDirectoryPicker) document.getElementById('dirbtn').title='이 브라우저는 폴더 직접 저장 미지원 (Chrome/Edge 권장) — ⬇는 일반 다운로드';
+})();
+</script>
+</body>
+</html>

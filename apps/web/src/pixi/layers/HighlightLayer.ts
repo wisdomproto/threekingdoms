@@ -15,6 +15,8 @@ const ATTACK_TINT = 0xd54a3a;
 const ATTACK_ALPHA = 0.45;
 const CURSOR_TINT = 0xf2d35e;
 const CURSOR_ALPHA = 0.4;
+const STRATEGY_TINT = 0xb890ff; // 책략 시전 가능 칸 (보라)
+const STRATEGY_ALPHA = 0.4;
 const GHOST_ALPHA = 0.55;
 const ORIGIN_TINT = 0xaaaaaa; // 출발지 마커 — 원작: 유닛이 걸어간 뒤 출발지에 잔상
 const ORIGIN_ALPHA = 0.4;
@@ -87,6 +89,18 @@ export class HighlightLayer extends Container {
         for (const t of this.targetCoords(battle, ui.attackable)) {
           this.place(t, ATTACK_TINT, ATTACK_ALPHA);
         }
+        break;
+      }
+      case "strategyMenu": {
+        const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
+        if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
+        break;
+      }
+      case "strategyTarget": {
+        // 출발지 마커 + 시전 가능 칸(보라) 하이라이트
+        const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
+        if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
+        for (const t of ui.castTiles) this.place(t, STRATEGY_TINT, STRATEGY_ALPHA);
         break;
       }
       default:

@@ -52,6 +52,9 @@ export class FakePresenter implements Presenter {
   damageDealt(e: Ev<"damageDealt">): Promise<void> {
     return this.handle(e);
   }
+  strategyCast(e: Ev<"strategyCast">): Promise<void> {
+    return this.handle(e);
+  }
   unitRetreated(e: Ev<"unitRetreated">): Promise<void> {
     return this.handle(e);
   }
@@ -121,6 +124,7 @@ export class TrackingPresenter extends FakePresenter {
       case "phaseChanged":
         this.phase = e.phase;
         break;
+      case "strategyCast": // 시전 알림만 — 실제 피해는 후속 damageDealt가 투영 반영
       case "duelTriggered":
       case "battleEnded":
         break;

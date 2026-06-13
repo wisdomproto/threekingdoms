@@ -41,6 +41,8 @@ function activeUnitId(ui: InputState): string | null {
     case "selected":
     case "postMoveMenu":
     case "targetSelect":
+    case "strategyMenu":
+    case "strategyTarget":
       return ui.unitId;
     default:
       return null;
@@ -94,15 +96,29 @@ function TroopsBar({ unit }: { unit: UnitVM }): React.ReactElement {
  * 능력치 막대 (조조전 장수 정보 패널 §1: 공격력/방어력/정신력 등) — 1~100 스케일.
  * 순발(민첩)·사기 막대는 엔진 미보유/고정값이라 생략 (sosoden-battle-ux-analysis §1).
  */
-function StatBar({ label, value, color }: { label: string; value: number; color: string }): React.ReactElement {
-  const ratio = Math.max(0, Math.min(1, value / 100));
+function StatBar({
+  label,
+  value,
+  sub,
+  color,
+}: {
+  label: string;
+  value: number;
+  sub?: number; // 장수 원값(무력/통솔/지력) — 괄호 표시 + 바 기준
+  color: string;
+}): React.ReactElement {
+  // 바는 장수 원값(0~100)을 보여주고(강함 직관), 숫자는 실제 부대 능력치
+  const ratio = Math.max(0, Math.min(1, (sub ?? value) / 100));
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginTop: 3 }}>
       <span style={{ width: 40, color: "#9aa3ad", flexShrink: 0 }}>{label}</span>
       <div style={{ flex: 1, height: 5, borderRadius: 3, background: "#2a2f36" }}>
         <div style={{ width: `${Math.round(ratio * 100)}%`, height: "100%", borderRadius: 3, background: color }} />
       </div>
-      <span style={{ width: 22, textAlign: "right", flexShrink: 0 }}>{value}</span>
+      <span style={{ minWidth: 44, textAlign: "right", flexShrink: 0 }}>
+        {value}
+        {sub !== undefined ? <span style={{ color: "#6b727c", fontSize: 11 }}> ({sub})</span> : null}
+      </span>
     </div>
   );
 }
@@ -137,9 +153,10 @@ export function UnitPanel({ ui, vm }: { ui: InputState; vm: BattleVM }): React.R
         </span>
       </div>
       <div style={{ marginTop: 6, borderTop: "1px solid #2a2f36", paddingTop: 6 }}>
-        <StatBar label="공격력" value={unit.war} color="#ff8a5c" />
-        <StatBar label="방어력" value={unit.leadership} color="#7aa7ff" />
-        <StatBar label="정신력" value={unit.intelligence} color="#b890ff" />
+        {/* 부대 능력치(전투 실값) — 괄호는 장수 원값 */}
+        <StatBar label="공격력" value={unit.atk} sub={unit.warStat} color="#ff8a5c" />
+        <StatBar label="방어력" value={unit.def} sub={unit.leadershipStat} color="#7aa7ff" />
+        <StatBar label="정신력" value={unit.spirit} sub={unit.intelligenceStat} color="#b890ff" />
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginTop: 6, color: "#c7cdd4" }}>
         <span>

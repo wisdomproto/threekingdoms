@@ -1,17 +1,31 @@
 import type { BattleContext, BattleState, Coord, UnitState } from "./types";
-import { terrainAt } from "./movement";
+import { terrainAt, unitAt } from "./movement";
 
-/** 보정능력치 — 80 이상에서 가치가 비선형 급증하는 원작 커브 (레퍼런스 §6) */
+/**
+ * 조조전 전투 공식 (docs/reference/sosoden-combat-formula.md).
+ * 부대 능력 = floor(장수능력 / 2) + 성장(레벨). commanders.json 무력/통솔/지력 = 장수 원값.
+ * 병력(troops)도 조조전 스케일(~100~150) — 영걸전 천 단위가 아님.
+ * ⚠️ 등급계수(병과·스탯별 S~D 성장)는 원작 표 미확보 — 잠정 LV_GROWTH 상수. 플레이테스트로 튜닝.
+ */
+const LV_GROWTH = 3; // 레벨당 부대 능력 성장 (잠정 — 병과별 등급계수 확보 시 교체)
+const DMG_BASE = 25; // 데미지 상수항 (조조전 + 25)
+
+/** 부대 공격력 = floor(무력/2) + 성장 (← 무력) */
+export function attackPower(u: UnitState): number {
+  return Math.floor(u.war / 2) + LV_GROWTH * u.level;
+}
+/** 부대 방어력 = floor(통솔/2) + 성장 (← 통솔) */
+export function defensePower(u: UnitState): number {
+  return Math.floor(u.leadership / 2) + LV_GROWTH * u.level;
+}
+/** 부대 정신력 = floor(지력/2) + 성장 (← 지력. 책략 위력/피해감소 — 현재 통상전 미사용) */
+export function spiritPower(u: UnitState): number {
+  return Math.floor(u.intelligence / 2) + LV_GROWTH * u.level;
+}
+
+/** 영걸전 레거시 보정 커브 — 미사용(호환 위해 보존). */
 export function adjustedStat(x: number): number {
   return Math.round(4000 / (140 - x));
-}
-
-export function attackPower(u: UnitState): number {
-  return (u.baseAtk + u.morale + adjustedStat(u.war)) * (10 + u.level) / 10 * u.weaponBonus;
-}
-
-export function defensePower(u: UnitState): number {
-  return (u.baseDef + u.morale + adjustedStat(u.leadership)) * (10 + u.level) / 10;
 }
 
 /** 공격측 line 기준 방어력 배율: 유리 0.75 / 불리 1.25 / 그 외 1.0 */
@@ -23,19 +37,78 @@ function defFactor(ctx: BattleContext, attacker: UnitState, defender: UnitState)
 }
 
 /**
- * 원작 데미지 공식 — 명중 100%, 분산 없음 (퍼즐성 = 계산 가능성).
- * 데미지 = (공격력 − 방어력 × 상성계수 ÷ 2) × (1 − 방어측 지형 guard), ratio는 반격 0.5용
+ * 조조전 데미지 공식 — 명중 100%, 분산 없음 (퍼즐성 = 계산 가능성).
+ * 데미지 = ((부대공격력 − 부대방어력 × 상성계수) ÷ 2 + 공격자레벨 + 25) × (1 − 지형 guard)
+ *   - 상성계수: 유리 0.75 / 불리 1.25 (방어력에 곱)
+ *   - +Lv +25 상수항이 조조전 특유의 "압축된 저(低)데미지 공방전" 페이싱을 만든다
+ *   - ratio: 반격 0.5용. guard: 지형 방어보정(영걸전 잔존 — 조조전 점유 ×1.2는 후속)
  */
 export function computeDamage(
   ctx: BattleContext, attacker: UnitState, defender: UnitState, ratio = 1,
 ): number {
   const guard = terrainAt(ctx, defender.x, defender.y).guard;
-  const raw = attackPower(attacker) - defensePower(defender) * defFactor(ctx, attacker, defender) / 2;
+  const atk = attackPower(attacker);
+  const def = defensePower(defender) * defFactor(ctx, attacker, defender);
+  const raw = (atk - def) / 2 + attacker.level + DMG_BASE;
   return Math.max(ctx.data.combat.minDamage, Math.floor(Math.max(0, raw) * (1 - guard) * ratio));
 }
 
 export function distance(a: Coord, b: Coord): number {
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+}
+
+// ── 책략 (§8 스킬 1층) ────────────────────────────────────────────────────────
+
+/**
+ * 책략 데미지 (docs/reference/sosoden-combat-formula.md §3 책략):
+ *   ((시전 정신력 − 대상 정신력)/3 + 시전Lv + 25) × power/10, 최소 1.
+ * power/10 정규화 — 초열(6)≈0.6배 … 화룡(20)≈2.0배. (원작 "× 기본치"의 잠정 스케일)
+ */
+export function strategyDamage(caster: UnitState, target: UnitState, power: number): number {
+  const raw = (spiritPower(caster) - spiritPower(target)) / 3 + caster.level + DMG_BASE;
+  return Math.max(1, Math.floor((Math.max(0, raw) * power) / 10));
+}
+
+/** 책략 영향 칸 = 대상 칸 + AoE 모양 (cross = 상하좌우 십자) */
+export function strategyAoeCells(target: Coord, aoe: "single" | "cross"): Coord[] {
+  if (aoe === "single") return [target];
+  return [
+    target,
+    { x: target.x - 1, y: target.y }, { x: target.x + 1, y: target.y },
+    { x: target.x, y: target.y - 1 }, { x: target.x, y: target.y + 1 },
+  ];
+}
+
+/**
+ * 시전 가능한 대상 칸 목록 — 시전자에서 castRange 이내(맨해튼) + AoE 안에 유효 표적(적/아군)이 1명 이상.
+ * 입력 UI(하이라이트)와 검증에 공용.
+ */
+export function getStrategyTargets(
+  ctx: BattleContext, state: BattleState, unitId: string, strategyId: string, from?: Coord,
+): Coord[] {
+  const u = state.units.find((x) => x.id === unitId);
+  const strat = ctx.data.strategies[strategyId];
+  if (!u || u.retreated || !strat) return [];
+  if (!(u.classId in ctx.data.unitClasses) ||
+      !ctx.data.unitClasses[u.classId]!.strategies.includes(strategyId)) return [];
+  if (u.mp < strat.mp) return [];
+  const origin = from ?? { x: u.x, y: u.y }; // 프리뷰 이동 후 위치에서 시전 가능 판정
+  const W = ctx.map.width, H = ctx.map.height;
+  const out: Coord[] = [];
+  for (let dy = -strat.castRange; dy <= strat.castRange; dy++) {
+    const rem = strat.castRange - Math.abs(dy);
+    for (let dx = -rem; dx <= rem; dx++) {
+      const tile = { x: origin.x + dx, y: origin.y + dy };
+      if (tile.x < 0 || tile.y < 0 || tile.x >= W || tile.y >= H) continue;
+      const hit = strategyAoeCells(tile, strat.aoe).some((c) => {
+        const t = unitAt(state, c.x, c.y);
+        if (!t || t.retreated) return false;
+        return strat.target === "enemy" ? t.side !== u.side : t.side === u.side;
+      });
+      if (hit) out.push(tile);
+    }
+  }
+  return out;
 }
 
 /** from 위치 기준 사거리 내 적 id 목록. from 생략 시 현재 위치 */

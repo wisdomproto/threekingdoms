@@ -1,15 +1,16 @@
 import { z } from "zod";
 import {
   TerrainSchema, UnitClassSchema, CombatConfigSchema,
-  CommanderSchema, ItemSchema, InitialForceSchema, BattleMapSchema, StageSchema,
+  CommanderSchema, ItemSchema, InitialForceSchema, BattleMapSchema, StageSchema, StrategySchema,
   type Terrain, type UnitClass, type CombatConfig,
-  type Commander, type Item, type InitialForce, type BattleMap, type Stage,
+  type Commander, type Item, type InitialForce, type BattleMap, type Stage, type Strategy,
 } from "./schemas";
 import terrainsJson from "../json/terrains.json";
 import unitClassesJson from "../json/unitClasses.json";
 import combatJson from "../json/combat.json";
 import commandersJson from "../json/commanders.json";
 import itemsJson from "../json/items.json";
+import strategiesJson from "../json/strategies.json";
 import initialForcesJson from "../json/initialForces.json";
 import sishuiguanJson from "../json/maps/sishuiguan.json";
 import stage05Json from "../json/stages/05-sishuiguan.json";
@@ -28,6 +29,7 @@ export interface GameData {
   combat: CombatConfig;
   commanders: Record<string, Commander>;
   items: Record<string, Item>;
+  strategies: Record<string, Strategy>;
   initialForces: Record<string, InitialForce>;
   maps: Record<string, BattleMap>;
   stages: Record<string, Stage>;
@@ -40,6 +42,7 @@ export const gameData: GameData = {
   combat: loadJson(CombatConfigSchema, combatJson, "combat.json"),
   commanders: loadJson(z.record(CommanderSchema), commandersJson, "commanders.json"),
   items: loadJson(z.record(ItemSchema), itemsJson, "items.json"),
+  strategies: loadJson(z.record(StrategySchema), strategiesJson, "strategies.json"),
   initialForces: loadJson(z.record(InitialForceSchema), initialForcesJson, "initialForces.json"),
   maps: {
     sishuiguan: loadJson(BattleMapSchema, sishuiguanJson, "maps/sishuiguan.json"),

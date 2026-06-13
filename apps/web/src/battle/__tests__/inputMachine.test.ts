@@ -83,6 +83,7 @@ describe("idle", () => {
         actions: [
           { type: "wait", unitId: "유비" },
           { type: "wait", unitId: "장비" },
+          { type: "wait", unitId: "간옹" },
         ],
       },
     ]);
@@ -262,21 +263,30 @@ describe("전이 전수 — 모든 (상태, 이벤트) 조합이 던지지 않�
   const sel = select(nearState, GUANYU);
   const menu = reduceInput(sel, { type: "tapTile", coord: { x: 49, y: 15 } }, ctx, nearState).next;
   const ts = reduceInput(menu, { type: "menuAttack" }, ctx, nearState).next;
+  // 계략 상태는 합성 — 픽스처 유닛(관우)은 책략이 없어 전이는 대부분 noop(시전 불가).
+  // strategyTarget의 castTiles에 빈 평지 탭 좌표를 넣어 commit→animating 경로만 활성화.
+  const C = { x: 50, y: 15 };
+  const stratMenu: InputState = { kind: "strategyMenu", unitId: GUANYU, from: C, preview: C, movable: [], attackable: [], strategies: ["업화"] };
+  const stratTarget: InputState = { kind: "strategyTarget", unitId: GUANYU, from: C, preview: C, movable: [], attackable: [], strategies: ["업화"], strategyId: "업화", castTiles: [{ x: 45, y: 20 }] };
 
   const states: InputState[] = [
     { kind: "idle" },
     sel,
     menu,
     ts,
+    stratMenu,
+    stratTarget,
     { kind: "animating" },
     { kind: "enemyTurn" },
     { kind: "autoTurn" },
     { kind: "battleOver", result: "victory" },
   ];
   const events: UiEvent[] = [
-    { type: "tapTile", coord: { x: 45, y: 20 } }, // 빈 평지 — 어떤 하이라이트에도 안 걸림
+    { type: "tapTile", coord: { x: 45, y: 20 } }, // 빈 평지 — 어떤 하이라이트에도 안 걸림 (단 stratTarget.castTiles엔 포함)
     { type: "cancel" },
     { type: "menuAttack" },
+    { type: "menuStrategy" },
+    { type: "selectStrategy", strategyId: "업화" },
     { type: "menuWait" },
     { type: "menuCancel" },
     { type: "endTurnPressed" },
@@ -286,18 +296,20 @@ describe("전이 전수 — 모든 (상태, 이벤트) 조합이 던지지 않�
 
   /**
    * 허용 전이표: 상태 kind → 이벤트 type → 기대 kind.
-   * nearState는 아군 페이즈·진행 중이므로 auto=false(기본) drained는 idle로,
-   * idle×autoStart는 autoTurn으로 전이한다.
+   * nearState는 아군 페이즈·진행 중이므로 auto=false(기본) drained는 idle로, idle×autoStart는 autoTurn.
+   * 관우는 책략 미보유 → menuStrategy(postMoveMenu.strategies=[])·selectStrategy는 시전 불가라 noop.
    */
   const table: Record<InputState["kind"], Record<UiEvent["type"], InputState["kind"]>> = {
-    idle: { tapTile: "idle", cancel: "idle", menuAttack: "idle", menuWait: "idle", menuCancel: "idle", endTurnPressed: "animating", autoStart: "autoTurn", drained: "idle" },
-    selected: { tapTile: "idle", cancel: "idle", menuAttack: "selected", menuWait: "selected", menuCancel: "selected", endTurnPressed: "selected", autoStart: "selected", drained: "selected" },
-    postMoveMenu: { tapTile: "postMoveMenu", cancel: "selected", menuAttack: "targetSelect", menuWait: "animating", menuCancel: "selected", endTurnPressed: "postMoveMenu", autoStart: "postMoveMenu", drained: "postMoveMenu" },
-    targetSelect: { tapTile: "targetSelect", cancel: "postMoveMenu", menuAttack: "targetSelect", menuWait: "targetSelect", menuCancel: "postMoveMenu", endTurnPressed: "targetSelect", autoStart: "targetSelect", drained: "targetSelect" },
-    animating: { tapTile: "animating", cancel: "animating", menuAttack: "animating", menuWait: "animating", menuCancel: "animating", endTurnPressed: "animating", autoStart: "animating", drained: "idle" },
-    enemyTurn: { tapTile: "enemyTurn", cancel: "enemyTurn", menuAttack: "enemyTurn", menuWait: "enemyTurn", menuCancel: "enemyTurn", endTurnPressed: "enemyTurn", autoStart: "enemyTurn", drained: "idle" },
-    autoTurn: { tapTile: "autoTurn", cancel: "autoTurn", menuAttack: "autoTurn", menuWait: "autoTurn", menuCancel: "autoTurn", endTurnPressed: "autoTurn", autoStart: "autoTurn", drained: "idle" },
-    battleOver: { tapTile: "battleOver", cancel: "battleOver", menuAttack: "battleOver", menuWait: "battleOver", menuCancel: "battleOver", endTurnPressed: "battleOver", autoStart: "battleOver", drained: "battleOver" },
+    idle: { tapTile: "idle", cancel: "idle", menuAttack: "idle", menuStrategy: "idle", selectStrategy: "idle", menuWait: "idle", menuCancel: "idle", endTurnPressed: "animating", autoStart: "autoTurn", drained: "idle" },
+    selected: { tapTile: "idle", cancel: "idle", menuAttack: "selected", menuStrategy: "selected", selectStrategy: "selected", menuWait: "selected", menuCancel: "selected", endTurnPressed: "selected", autoStart: "selected", drained: "selected" },
+    postMoveMenu: { tapTile: "postMoveMenu", cancel: "selected", menuAttack: "targetSelect", menuStrategy: "postMoveMenu", selectStrategy: "postMoveMenu", menuWait: "animating", menuCancel: "selected", endTurnPressed: "postMoveMenu", autoStart: "postMoveMenu", drained: "postMoveMenu" },
+    targetSelect: { tapTile: "targetSelect", cancel: "postMoveMenu", menuAttack: "targetSelect", menuStrategy: "targetSelect", selectStrategy: "targetSelect", menuWait: "targetSelect", menuCancel: "postMoveMenu", endTurnPressed: "targetSelect", autoStart: "targetSelect", drained: "targetSelect" },
+    strategyMenu: { tapTile: "strategyMenu", cancel: "postMoveMenu", menuAttack: "strategyMenu", menuStrategy: "strategyMenu", selectStrategy: "strategyMenu", menuWait: "strategyMenu", menuCancel: "postMoveMenu", endTurnPressed: "strategyMenu", autoStart: "strategyMenu", drained: "strategyMenu" },
+    strategyTarget: { tapTile: "animating", cancel: "strategyMenu", menuAttack: "strategyTarget", menuStrategy: "strategyTarget", selectStrategy: "strategyTarget", menuWait: "strategyTarget", menuCancel: "strategyMenu", endTurnPressed: "strategyTarget", autoStart: "strategyTarget", drained: "strategyTarget" },
+    animating: { tapTile: "animating", cancel: "animating", menuAttack: "animating", menuStrategy: "animating", selectStrategy: "animating", menuWait: "animating", menuCancel: "animating", endTurnPressed: "animating", autoStart: "animating", drained: "idle" },
+    enemyTurn: { tapTile: "enemyTurn", cancel: "enemyTurn", menuAttack: "enemyTurn", menuStrategy: "enemyTurn", selectStrategy: "enemyTurn", menuWait: "enemyTurn", menuCancel: "enemyTurn", endTurnPressed: "enemyTurn", autoStart: "enemyTurn", drained: "idle" },
+    autoTurn: { tapTile: "autoTurn", cancel: "autoTurn", menuAttack: "autoTurn", menuStrategy: "autoTurn", selectStrategy: "autoTurn", menuWait: "autoTurn", menuCancel: "autoTurn", endTurnPressed: "autoTurn", autoStart: "autoTurn", drained: "idle" },
+    battleOver: { tapTile: "battleOver", cancel: "battleOver", menuAttack: "battleOver", menuStrategy: "battleOver", selectStrategy: "battleOver", menuWait: "battleOver", menuCancel: "battleOver", endTurnPressed: "battleOver", autoStart: "battleOver", drained: "battleOver" },
   };
 
   for (const st of states) {

@@ -32,6 +32,7 @@ export interface PresentedSnapshot {
 export interface Presenter {
   unitMoved(e: Ev<"unitMoved">): Promise<void>;
   damageDealt(e: Ev<"damageDealt">): Promise<void>;
+  strategyCast(e: Ev<"strategyCast">): Promise<void>;
   unitRetreated(e: Ev<"unitRetreated">): Promise<void>;
   duelTriggered(e: Ev<"duelTriggered">): Promise<void>;
   phaseChanged(e: Ev<"phaseChanged">): Promise<void>;
@@ -133,6 +134,8 @@ export class EventPlayer {
         return p.unitMoved(e);
       case "damageDealt":
         return p.damageDealt(e);
+      case "strategyCast":
+        return p.strategyCast(e);
       case "unitRetreated":
         return p.unitRetreated(e);
       case "duelTriggered":

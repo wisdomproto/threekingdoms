@@ -9,6 +9,8 @@ test-output.txt
 # 생성 에셋 원본 시트(대용량, 재생성 가능) — 게임은 public/assets의 슬라이스만 사용.
 # board.html/.md(레시피)는 추적. 블록아웃 layout_*.png는 export_layout.py로 재생성.
 docs/art/*.png
+# 청크 분할 중간물(블록아웃·painted·manifest·index.js) — export/stitch로 재생성. board.html은 추적.
+docs/art/chunks/
 # 폐기된 아이소메트릭 렌더러 에셋
 apps/web/public/assets/iso/
 

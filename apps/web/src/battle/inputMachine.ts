@@ -7,8 +7,18 @@
  * 들고 즉시 postMoveMenu로 진입한다(§5 표의 "movePreview → 즉시 postMoveMenu"를 한 전이로 구현).
  * 취소(menuCancel)는 커밋이 없었으므로 무손실로 selected에 복귀한다.
  */
-import { getAttackableTargets, getMovableTiles, unitAt } from "@tk/engine";
+import { getAttackableTargets, getMovableTiles, getStrategyTargets, unitAt } from "@tk/engine";
 import type { Action, BattleContext, BattleState, Coord } from "@tk/engine";
+
+/** preview(또는 현위치)에서 시전 가능한 책략 id 목록 — MP 충분 + 사정거리 내 표적 존재 */
+function castableStrategies(
+  ctx: BattleContext, battle: BattleState, unitId: string, from: Coord,
+): string[] {
+  const u = battle.units.find((x) => x.id === unitId);
+  const cls = u ? ctx.data.unitClasses[u.classId] : undefined;
+  if (!u || !cls) return [];
+  return cls.strategies.filter((id) => getStrategyTargets(ctx, battle, unitId, id, from).length > 0);
+}
 
 export type InputState =
   | { kind: "idle"; inspectedId?: string }
@@ -24,6 +34,8 @@ export type InputState =
       movable: Coord[];
       /** preview 좌표 기준 공격 가능 대상 */
       attackable: string[];
+      /** preview 기준 시전 가능 책략 id (계략 버튼 표시 조건) */
+      strategies: string[];
     }
   | {
       kind: "targetSelect";
@@ -32,6 +44,30 @@ export type InputState =
       preview: Coord;
       movable: Coord[];
       attackable: string[];
+      strategies: string[];
+    }
+  /** 계략: 책략 목록에서 선택 */
+  | {
+      kind: "strategyMenu";
+      unitId: string;
+      from: Coord;
+      preview: Coord;
+      movable: Coord[];
+      attackable: string[];
+      strategies: string[];
+    }
+  /** 계략: 선택한 책략의 대상 칸 조준 */
+  | {
+      kind: "strategyTarget";
+      unitId: string;
+      from: Coord;
+      preview: Coord;
+      movable: Coord[];
+      attackable: string[];
+      strategies: string[];
+      strategyId: string;
+      /** 시전 가능 대상 칸 (하이라이트) */
+      castTiles: Coord[];
     }
   | { kind: "animating" }
   | { kind: "enemyTurn" }
@@ -43,6 +79,8 @@ export type UiEvent =
   | { type: "tapTile"; coord: Coord }
   | { type: "cancel" }
   | { type: "menuAttack" }
+  | { type: "menuStrategy" }
+  | { type: "selectStrategy"; strategyId: string }
   | { type: "menuWait" }
   | { type: "menuCancel" }
   | { type: "endTurnPressed" }
@@ -157,6 +195,7 @@ export function reduceInput(
             preview: pos,
             movable: state.movable,
             attackable: state.attackable,
+            strategies: castableStrategies(ctx, battle, state.unitId, pos),
           },
           effects: [],
         };
@@ -186,6 +225,7 @@ export function reduceInput(
             preview: event.coord,
             movable: state.movable,
             attackable: getAttackableTargets(ctx, battle, state.unitId, event.coord),
+            strategies: castableStrategies(ctx, battle, state.unitId, event.coord),
           },
           effects: [{ type: "focus", coord: event.coord }],
         };
@@ -199,6 +239,10 @@ export function reduceInput(
       if (event.type === "menuAttack") {
         if (state.attackable.length === 0) return noop(state); // 대상 없음 — 버튼 비활성과 동일
         return { next: { ...state, kind: "targetSelect" }, effects: [] };
+      }
+      if (event.type === "menuStrategy") {
+        if (state.strategies.length === 0) return noop(state); // 시전 가능 책략 없음
+        return { next: { ...state, kind: "strategyMenu" }, effects: [] };
       }
       if (event.type === "menuWait") {
         return {
@@ -245,6 +289,43 @@ export function reduceInput(
                 type: "attack",
                 unitId: state.unitId,
                 targetId: target.id,
+              }),
+            },
+          ],
+        };
+      }
+      return noop(state);
+    }
+
+    case "strategyMenu": {
+      if (event.type === "selectStrategy") {
+        if (!state.strategies.includes(event.strategyId)) return noop(state);
+        const castTiles = getStrategyTargets(ctx, battle, state.unitId, event.strategyId, state.preview);
+        if (castTiles.length === 0) return noop(state);
+        return { next: { ...state, kind: "strategyTarget", strategyId: event.strategyId, castTiles }, effects: [] };
+      }
+      if (event.type === "cancel" || event.type === "menuCancel") {
+        return { next: { ...state, kind: "postMoveMenu" }, effects: [] };
+      }
+      return noop(state); // tapTile 등 무시 — 모달
+    }
+
+    case "strategyTarget": {
+      if (event.type === "cancel" || event.type === "menuCancel") {
+        return { next: { ...state, kind: "strategyMenu" }, effects: [] };
+      }
+      if (event.type === "tapTile") {
+        if (!state.castTiles.some((t) => sameCoord(t, event.coord))) return noop(state);
+        return {
+          next: { kind: "animating" },
+          effects: [
+            {
+              type: "commit",
+              actions: chainActions(state.unitId, state.from, state.preview, {
+                type: "strategy",
+                unitId: state.unitId,
+                strategyId: state.strategyId,
+                target: event.coord,
               }),
             },
           ],

@@ -4,7 +4,7 @@
  * 반환값은 전부 직렬화 가능한 평면 객체 (useSyncExternalStore 스냅샷에 그대로 실린다).
  */
 import type { Side } from "@tk/data";
-import { terrainAt } from "@tk/engine";
+import { terrainAt, attackPower, defensePower, spiritPower } from "@tk/engine";
 import type { BattleContext, BattleState, UnitState } from "@tk/engine";
 
 export interface UnitVM {
@@ -23,9 +23,13 @@ export interface UnitVM {
   acted: boolean;
   retreated: boolean;
   // 조조전 장수 정보 패널 대응 (sosoden-battle-ux-analysis §1·§6)
-  war: number;          // 무력 → 공격력
-  leadership: number;   // 통솔 → 방어력
-  intelligence: number; // 지력 → 정신력
+  // 부대 능력치(전투에 실제로 쓰이는 값) = floor(장수능력/2) + 성장. 장수 원값은 *Stat에 보존.
+  atk: number;          // 부대 공격력 (← 무력)
+  def: number;          // 부대 방어력 (← 통솔)
+  spirit: number;       // 부대 정신력 (← 지력)
+  warStat: number;      // 장수 무력 (원값)
+  leadershipStat: number;
+  intelligenceStat: number;
   move: number;         // 이동력
   rangeMin: number;
   rangeMax: number;
@@ -62,9 +66,12 @@ export function unitVM(ctx: BattleContext, u: UnitState): UnitVM {
     moved: u.moved,
     acted: u.acted,
     retreated: u.retreated,
-    war: u.war,
-    leadership: u.leadership,
-    intelligence: u.intelligence,
+    atk: attackPower(u),
+    def: defensePower(u),
+    spirit: spiritPower(u),
+    warStat: u.war,
+    leadershipStat: u.leadership,
+    intelligenceStat: u.intelligence,
     move: u.move,
     rangeMin: u.rangeMin,
     rangeMax: u.rangeMax,

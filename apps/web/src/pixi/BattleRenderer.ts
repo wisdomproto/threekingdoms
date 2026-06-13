@@ -288,7 +288,10 @@ export class BattleRenderer implements Presenter {
     // 하이라이트 = InputMachine 상태의 수동적 뷰 (좌표 해석은 committed 기준)
     // 선택 연동: uiState에서 선택된 unitId를 뽑아 UnitLayer.setSelected() 호출
     const getSelectedUnitId = (ui: InputState): string | null => {
-      if (ui.kind === "selected" || ui.kind === "postMoveMenu" || ui.kind === "targetSelect") {
+      if (
+        ui.kind === "selected" || ui.kind === "postMoveMenu" || ui.kind === "targetSelect" ||
+        ui.kind === "strategyMenu" || ui.kind === "strategyTarget"
+      ) {
         return ui.unitId;
       }
       return null;
@@ -431,6 +434,16 @@ export class BattleRenderer implements Presenter {
       s.fx.damagePopup(popupAt, e.damage, e.counter),
     ]);
     defender.setTroops(defender.troops - e.damage);
+  }
+
+  async strategyCast(e: Ev<"strategyCast">): Promise<void> {
+    const s = this.scene;
+    if (!s) return;
+    // 시전자 방향 + 대상 포커스 + 책략명 배너. 개별 피해 팝업은 후속 damageDealt가 처리.
+    s.units.view(e.casterId).faceToward(e.target);
+    this.autoFocus(gridToWorld(e.target), FOCUS_MS);
+    const name = this.ctx.data.strategies[e.strategyId]?.name ?? e.strategyId;
+    await s.fx.banner(`책략 · ${name}!`, DUEL_BANNER_MS);
   }
 
   async unitRetreated(e: Ev<"unitRetreated">): Promise<void> {

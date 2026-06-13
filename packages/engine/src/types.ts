@@ -34,11 +34,13 @@ export interface BattleState {
 export type Action =
   | { type: "move"; unitId: string; to: Coord }
   | { type: "attack"; unitId: string; targetId: string }
+  | { type: "strategy"; unitId: string; strategyId: string; target: Coord }
   | { type: "wait"; unitId: string };
 
 export type BattleEvent =
   | { type: "unitMoved"; unitId: string; from: Coord; to: Coord }
   | { type: "damageDealt"; attackerId: string; defenderId: string; damage: number; counter: boolean }
+  | { type: "strategyCast"; casterId: string; strategyId: string; target: Coord }
   | { type: "unitRetreated"; unitId: string }
   | { type: "duelTriggered"; eventId: string; attackerId: string; defenderId: string; winnerId: string }
   | { type: "phaseChanged"; phase: Side; turn: number }

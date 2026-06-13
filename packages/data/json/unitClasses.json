@@ -17,5 +17,6 @@
   "sorcerer":      { "id": "sorcerer",      "name": "주술사",   "code": 15, "baseAtk": 40,  "baseDef": 40,  "move": 4, "rangeMin": 1, "rangeMax": 1, "line": "support",  "tier": 1, "moveClass": "foot" },
   "tribesman":     { "id": "tribesman",     "name": "이민족",   "code": 16, "baseAtk": 140, "baseDef": 160, "move": 6, "rangeMin": 1, "rangeMax": 1, "line": "support",  "tier": 1, "moveClass": "bandit" },
   "civilian":      { "id": "civilian",      "name": "백성",     "code": 17, "baseAtk": 40,  "baseDef": 40,  "move": 4, "rangeMin": 1, "rangeMax": 1, "line": "support",  "tier": 1, "moveClass": "foot" },
-  "transport":     { "id": "transport",     "name": "수송대",   "code": 18, "baseAtk": 40,  "baseDef": 40,  "move": 4, "rangeMin": 1, "rangeMax": 1, "line": "support",  "tier": 1, "moveClass": "foot" }
+  "transport":     { "id": "transport",     "name": "수송대",   "code": 18, "baseAtk": 40,  "baseDef": 40,  "move": 4, "rangeMin": 1, "rangeMax": 1, "line": "support",  "tier": 1, "moveClass": "foot" },
+  "strategist":    { "id": "strategist",    "name": "책사",     "code": 19, "baseAtk": 40,  "baseDef": 40,  "move": 5, "rangeMin": 1, "rangeMax": 1, "line": "support",  "tier": 1, "moveClass": "foot", "strategies": ["초열", "업화"] }
 }

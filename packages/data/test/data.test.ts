@@ -2,9 +2,23 @@ import { describe, it, expect } from "vitest";
 import { gameData } from "../src/index";
 
 describe("게임 데이터 v2 무결성", () => {
-  it("병종 19종이 원작 코드 0~18과 1:1", () => {
+  it("영걸전 병종 19종(코드 0~18) + 조조전 추가 병종(19+, 책사 등)", () => {
     const codes = Object.values(gameData.unitClasses).map((c) => c.code).sort((a, b) => a - b);
-    expect(codes).toEqual(Array.from({ length: 19 }, (_, i) => i));
+    // 코드 0~18 = 영걸전 19종 전부 존재
+    for (let i = 0; i < 19; i++) expect(codes).toContain(i);
+    // 책사(조조전 caster, code 19) = 책략 보유 병종
+    expect(gameData.unitClasses["strategist"]!.code).toBe(19);
+    expect(gameData.unitClasses["strategist"]!.strategies.length).toBeGreaterThan(0);
+    // 코드 중복 없음
+    expect(new Set(codes).size).toBe(codes.length);
+  });
+
+  it("병종의 책략은 strategies.json에 존재 (참조 무결성)", () => {
+    for (const cls of Object.values(gameData.unitClasses)) {
+      for (const sid of cls.strategies) {
+        expect(gameData.strategies[sid], `${cls.id} → ${sid}`).toBeDefined();
+      }
+    }
   });
 
   it("원작 명시 기초치 스팟 체크 (레퍼런스 §5)", () => {
@@ -93,13 +107,16 @@ describe("게임 데이터 v2 무결성", () => {
     }
   });
 
-  it("사수관: 아군 초기값이 원작 초기 편성과 일치 (유비/관우/장비)", () => {
+  it("사수관: 아군 병종은 원작 편성과 일치, 병력은 조조전 스케일(~100)", () => {
+    // 병종(classId)은 원작 초기 편성 유지. 병력(troops)은 조조전 hp 스케일(~100~150)로
+    // 재조정됨 — 영걸전 천 단위가 아님 (combat.ts 조조전 공식과 짝). docs/reference/sosoden-combat-formula.md
     const s = gameData.stages["05-sishuiguan"]!;
     for (const name of ["유비", "관우", "장비"]) {
       const u = s.units.find((x) => x.commanderId === name)!;
       const f = gameData.initialForces[name]!;
       expect(u.classId).toBe(f.classId);
-      expect(u.troops).toBe(f.troops);
+      expect(u.troops).toBeGreaterThan(0);
+      expect(u.troops).toBeLessThanOrEqual(300); // 조조전 스케일
     }
   });
 });

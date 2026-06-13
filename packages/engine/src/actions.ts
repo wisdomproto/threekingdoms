@@ -1,6 +1,9 @@
 import type { Action, ActionResult, BattleContext, BattleEvent, BattleState, UnitState } from "./types";
-import { getMovableTiles } from "./movement";
-import { computeDamage, distance, getAttackableTargets } from "./combat";
+import { getMovableTiles, unitAt } from "./movement";
+import {
+  computeDamage, distance, getAttackableTargets,
+  strategyDamage, strategyAoeCells, getStrategyTargets,
+} from "./combat";
 import { findDuelTrigger } from "./events";
 
 function getUnit(state: BattleState, id: string): UnitState {
@@ -137,6 +140,39 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
         }
       }
       // 반격으로 공격자가 퇴각했어도 acted=true로 통일 — maybeAdvancePhase의 retreated 필터가 가드
+      next = replaceUnit(next, { ...getUnit(next, unit.id), acted: true });
+      break;
+    }
+
+    case "strategy": {
+      assertCanAct(state, unit, false);
+      const strat = ctx.data.strategies[action.strategyId];
+      if (!strat) throw new Error(`unknown strategy: ${action.strategyId}`);
+      const cls = ctx.data.unitClasses[unit.classId];
+      if (!cls || !cls.strategies.includes(action.strategyId)) {
+        throw new Error(`${unit.id} cannot use ${action.strategyId}`);
+      }
+      if (unit.mp < strat.mp) throw new Error(`${unit.id} not enough MP for ${action.strategyId}`);
+      const castable = getStrategyTargets(ctx, state, unit.id, action.strategyId);
+      if (!castable.some((t) => t.x === action.target.x && t.y === action.target.y)) {
+        throw new Error(`(${action.target.x},${action.target.y}) not a valid cast target`);
+      }
+      // MP 소비 → 시전 이벤트(연출/VFX) → AoE 데미지(간접=무반격)
+      next = replaceUnit(state, { ...unit, mp: unit.mp - strat.mp });
+      events.push({
+        type: "strategyCast", casterId: unit.id, strategyId: action.strategyId, target: action.target,
+      });
+      for (const c of strategyAoeCells(action.target, strat.aoe)) {
+        const t = unitAt(next, c.x, c.y);
+        if (!t || t.retreated) continue;
+        const isTarget = strat.target === "enemy" ? t.side !== unit.side : t.side === unit.side;
+        if (!isTarget) continue;
+        const caster = getUnit(next, unit.id);
+        const dmg = strategyDamage(caster, t, strat.power);
+        const hit = dealDamage(next, caster, getUnit(next, t.id), dmg, false);
+        next = hit.state;
+        events.push(...hit.events);
+      }
       next = replaceUnit(next, { ...getUnit(next, unit.id), acted: true });
       break;
     }

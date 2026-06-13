@@ -24,7 +24,7 @@ export type MoveClass = z.infer<typeof MoveClassSchema>;
 export const UnitClassSchema = z.object({
   id: z.string(),
   name: z.string(),
-  code: z.number().int().min(0).max(18),     // 원작 병종 코드 0x00~0x12
+  code: z.number().int().min(0).max(63),     // 0x00~0x12=영걸전 병종, 19+=조조전 추가 병종(책사 등)
   baseAtk: z.number().int().min(0).max(200), // 병종 공격력 기초치
   baseDef: z.number().int().min(0).max(200),
   move: z.number().int().min(0).max(10), // 0 = 비전투(백성 등) — 엔진에서 이동 불가 처리
@@ -33,8 +33,25 @@ export const UnitClassSchema = z.object({
   line: LineSchema,
   tier: z.number().int().min(1).max(3),      // 승급 단계
   moveClass: MoveClassSchema,
+  strategies: z.array(z.string()).default([]), // 이 병종이 쓰는 책략 id 목록 (§8 병종별 리스트)
 }).refine((c) => c.rangeMin <= c.rangeMax, { message: "rangeMin must be <= rangeMax" });
 export type UnitClass = z.infer<typeof UnitClassSchema>;
+
+/**
+ * 책략 (§8 스킬 1층, 액티브·MP). 효과 정의는 조조전 원작(strategies.json 73종) 기반.
+ * "어느 병종이 무슨 책략"의 할당은 원작 데이터 미추출 → §8대로 우리가 설계(UnitClass.strategies).
+ */
+export const StrategySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  category: z.enum(["fire", "water", "earth", "wind", "heal", "debuff"]),
+  mp: z.number().int().min(0),
+  power: z.number().int().min(0),       // 위력 — 데미지 배수(×power/10)
+  castRange: z.number().int().min(1),   // 시전 거리 (시전자→대상 칸)
+  aoe: z.enum(["single", "cross"]),     // 대상 칸만 / 십자(대상+상하좌우)
+  target: z.enum(["enemy", "ally"]),
+});
+export type Strategy = z.infer<typeof StrategySchema>;
 
 export const TerrainSchema = z.object({
   id: z.string(),

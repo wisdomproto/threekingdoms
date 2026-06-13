@@ -5,6 +5,7 @@
  * targetSelect에서는 취소 버튼만 노출 — 기계상 무효 타일 탭이 noop이므로
  * 모바일에서 취소 버튼 없이는 targetSelect를 빠져나갈 수 없다.
  */
+import { gameData } from "@tk/data";
 import type { InputState, UiEvent } from "../inputMachine";
 import { BUTTON_FRAME } from "./frames";
 
@@ -88,24 +89,46 @@ export function ActionMenu({
           disabled={ui.attackable.length === 0}
           onPress={() => dispatch({ type: "menuAttack" })}
         />
+        {ui.strategies.length > 0 ? (
+          <Btn label="계략" accent="#b890ff" onPress={() => dispatch({ type: "menuStrategy" })} />
+        ) : null}
         <Btn label="대기" accent="#4da3ff" onPress={() => dispatch({ type: "menuWait" })} />
         <Btn label="취소" onPress={() => dispatch({ type: "menuCancel" })} />
       </div>
     );
   }
-  if (ui.kind === "targetSelect") {
+  if (ui.kind === "strategyMenu") {
+    return (
+      <div style={ZONE_STYLE}>
+        {ui.strategies.map((id) => {
+          const s = gameData.strategies[id];
+          return (
+            <Btn
+              key={id}
+              label={`${s?.name ?? id} (MP${s?.mp ?? "?"})`}
+              accent="#b890ff"
+              onPress={() => dispatch({ type: "selectStrategy", strategyId: id })}
+            />
+          );
+        })}
+        <Btn label="취소" onPress={() => dispatch({ type: "menuCancel" })} />
+      </div>
+    );
+  }
+  if (ui.kind === "targetSelect" || ui.kind === "strategyTarget") {
+    const prompt = ui.kind === "targetSelect" ? "공격 대상을 선택하세요" : "책략 대상 칸을 선택하세요";
     return (
       <div style={ZONE_STYLE}>
         <span
           style={{
-            color: "#ffb4b4",
+            color: ui.kind === "targetSelect" ? "#ffb4b4" : "#d7c0ff",
             fontSize: 14,
             background: "rgba(24, 28, 33, 0.8)",
             padding: "8px 12px",
             borderRadius: 10,
           }}
         >
-          공격 대상을 선택하세요
+          {prompt}
         </span>
         <Btn label="취소" onPress={() => dispatch({ type: "cancel" })} />
       </div>
