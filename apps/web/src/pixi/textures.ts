@@ -61,6 +61,42 @@ interface TileManifestEntry {
 }
 type TilesManifest = Record<string, TileManifestEntry>;
 
+/**
+ * 특징 지형 → 오브젝트 데코 스프라이트 (slice_extras.py, /assets/tiles/).
+ * 톱다운 문법: 바닥은 베이스 텍스처, 그 위에 오브젝트를 얹는다 — 바닥을 그림 조각으로 채우지 않는다.
+ */
+const DECO_FILES: Record<string, string> = {
+  // forest는 캐노피 바닥(E-3)이 곧 숲 — 나무 데코 없음.
+  mountain: "mountain.png", // 바위 바닥(E-2) 위 봉우리 액센트 (희소 배치, TerrainLayer DECO_DENSITY)
+  gate: "gate.png",
+  village: "hut.png",
+  barracks: "camp.png",
+  depot: "storehouse.png",
+  bridge: "bridge.png",
+};
+
+/**
+ * 지형 → 시임리스 바닥 텍스처 (E-* 에셋, 576×576). getGround에서 (gx,gy) wrap 서브렉트.
+ * 미등록 지형은 단색 베이크 폴백.
+ */
+const GROUND_FILES: Record<string, string> = {
+  plain: "ground_plain.png",
+  grass: "ground_grass.png",
+  waste: "ground_waste.png",
+  mountain: "ground_mountain.png", // E-2 바위 스크리
+  forest: "ground_forest.png", // E-3 캐노피
+  // 전용 바닥 미보유 지형 — 기존 텍스처 재사용으로 회색 단색 폴백 제거(리뷰 P0).
+  wall: "ground_mountain.png", // 성벽 = 돌
+  fort: "ground_mountain.png", // 요새 = 돌
+  cliff: "ground_mountain.png", // 절벽 = 돌
+  gate: "ground_plain.png", // 관문 바닥(데코=문) = 흙
+  barracks: "ground_plain.png", // 병영(데코=막사) = 흙
+  village: "ground_plain.png", // 촌락(데코=오두막)
+  depot: "ground_plain.png", // 창고(데코=곳간)
+  bridge: "ground_plain.png", // 다리 — 물 텍스처(E-4) 전까지 흙
+};
+const GROUND_SIZE = 576; // 48 × 12 — 서브렉트가 깔끔히 wrap
+
 /** 스프라이트 포즈 키: "{view}_{pose}" */
 export type SpritePose = "front_idle" | "front_move" | "front_attack" | "back_idle" | "back_move" | "back_attack";
 
@@ -100,32 +136,22 @@ export class TextureResolver {
    * 키: "${terrainId}:${variantIdx}:${mx}:${my}" → Texture (48×48 서브렉트)
    */
   private readonly macroSubCache = new Map<string, Texture>();
+  /** 특징 지형 오브젝트 데코: terrainId → Texture. loadTiles() 내에서 로드. */
+  private readonly decoTex = new Map<string, Texture>();
+  /** 시임리스 바닥 원본: terrainId → Texture (576×576). */
+  private readonly groundTex = new Map<string, Texture>();
+  /** 바닥 서브렉트 캐시: "${terrainId}:${mx}:${my}" → Texture (48×48). */
+  private readonly groundSubCache = new Map<string, Texture>();
   /** Pixi Renderer 참조 — 타일 텍스처 베이크에 필요 */
   private readonly renderer: Renderer;
 
   constructor(renderer: Renderer) {
     this.renderer = renderer;
-    // 지형 14종: 베이스 색 + 살짝 어두운 외곽선(그리드 가독성)
+    // 지형 14종 단색 폴백 — 바닥 텍스처(getGround) 미보유 지형에만 보인다.
+    // 평평한 단색만. 빗금/삼각형 장식은 "미완성"으로 보여 제거(리뷰 P2). 그리드는 HighlightLayer 담당.
     for (const [id, color] of Object.entries(TERRAIN_COLORS)) {
       const g = new Graphics();
       g.rect(0, 0, TILE_SIZE, TILE_SIZE).fill(color);
-      g.rect(0, 0, TILE_SIZE, TILE_SIZE).stroke({ width: 1, color: darken(color, 0.8), alpha: 0.9 });
-      // 통행 불가/구조물 계열은 음영 패턴 한 줄로 구분감만 부여
-      if (id === "wall" || id === "cliff" || id === "river") {
-        g.moveTo(0, TILE_SIZE).lineTo(TILE_SIZE, 0).stroke({ width: 2, color: darken(color, 0.65) });
-      }
-      if (id === "mountain" || id === "fort") {
-        g.moveTo(8, TILE_SIZE - 10)
-          .lineTo(TILE_SIZE / 2, 10)
-          .lineTo(TILE_SIZE - 8, TILE_SIZE - 10)
-          .stroke({ width: 2, color: darken(color, 0.7) });
-      }
-      if (id === "forest") {
-        g.circle(TILE_SIZE / 2, TILE_SIZE / 2, 9).stroke({ width: 2, color: darken(color, 0.7) });
-      }
-      if (id === "gate") {
-        g.rect(10, 8, TILE_SIZE - 20, TILE_SIZE - 16).stroke({ width: 2, color: darken(color, 0.6) });
-      }
       this.bake(renderer, `terrain:${id}`, g);
     }
 
@@ -210,7 +236,100 @@ export class TextureResolver {
    * - kind="tile": {terrainId}_{n}.png (96×96) 로드 → 기존 외곽선 합성 베이크.
    * 실패 시 조용히 폴백(단색 베이크) 유지 — mount는 계속 진행.
    */
+  /** 특징 지형 오브젝트 데코 로드 (실패해도 베이스 유지 — throw 안 함). */
+  private async loadDecos(): Promise<void> {
+    const entries = Object.entries(DECO_FILES);
+    const urls = entries.map(([, f]) => `${TILE_BASE}/${f}`);
+    try {
+      const loaded = await Assets.load<Texture>(urls);
+      for (const [terrainId, f] of entries) {
+        const tex = loaded[`${TILE_BASE}/${f}`];
+        if (tex) this.decoTex.set(terrainId, tex);
+      }
+      console.info(`[TextureResolver] 지형 데코 로드 완료: ${this.decoTex.size}종`);
+    } catch (e) {
+      console.warn("[TextureResolver] 지형 데코 로드 오류 — 베이스만 유지", e);
+    }
+  }
+
+  /** 전투 배경(원경 패럴랙스) 텍스처. loadBackground() 후에만 채워진다. */
+  private bgTex: Texture | null = null;
+
+  /**
+   * 스테이지 painted 맵 배경 로드 (/assets/maps/{stageId}.png).
+   * 있으면 타일 렌더 대신 이 그림 한 장을 깔고, 격자 데이터는 게임 로직에만 쓴다.
+   * 없으면 null → 기존 타일 렌더 유지.
+   */
+  async loadMapBackground(stageId: string): Promise<Texture | null> {
+    const url = `/assets/maps/${stageId}.png`;
+    try {
+      const head = await fetch(url, { method: "HEAD" });
+      if (!head.ok) return null;
+      const tex = await Assets.load<Texture>(url);
+      if (tex) console.info(`[TextureResolver] 맵 배경 로드: ${stageId}`);
+      return tex ?? null;
+    } catch (e) {
+      console.warn(`[TextureResolver] 맵 배경 로드 오류(${stageId}) — 타일 렌더 유지`, e);
+      return null;
+    }
+  }
+
+  /** 맵 뒤 배경 텍스처 로드. 실패해도 null 반환(배경 없이 진행). */
+  async loadBackground(): Promise<Texture | null> {
+    try {
+      const tex = await Assets.load<Texture>("/assets/bg/battle_dawn.png");
+      this.bgTex = tex ?? null;
+      if (tex) console.info("[TextureResolver] 전투 배경 로드 완료");
+      return this.bgTex;
+    } catch (e) {
+      console.warn("[TextureResolver] 전투 배경 로드 오류 — 배경 없이 진행", e);
+      return null;
+    }
+  }
+
+  /** 시임리스 바닥 텍스처 로드 (실패해도 단색 베이크 유지). */
+  private async loadGround(): Promise<void> {
+    const entries = Object.entries(GROUND_FILES);
+    const urls = entries.map(([, f]) => `${TILE_BASE}/${f}`);
+    try {
+      const loaded = await Assets.load<Texture>(urls);
+      for (const [terrainId, f] of entries) {
+        const tex = loaded[`${TILE_BASE}/${f}`];
+        if (tex) this.groundTex.set(terrainId, tex);
+      }
+      console.info(`[TextureResolver] 시임리스 바닥 로드 완료: ${this.groundTex.size}종`);
+    } catch (e) {
+      console.warn("[TextureResolver] 바닥 텍스처 로드 오류 — 단색 폴백 유지", e);
+    }
+  }
+
+  /** 특징 지형의 오브젝트 데코 텍스처. 없으면 null (베이스만 표시). */
+  getDeco(terrainId: string): Texture | null {
+    return this.decoTex.get(terrainId) ?? null;
+  }
+
+  /**
+   * 시임리스 바닥의 (gx,gy) wrap 서브렉트 (48×48). 인접 칸이 이어진다.
+   * 미보유 지형/로드 전이면 null (호출자가 단색 베이크로 폴백).
+   */
+  getGround(terrainId: string, gx: number, gy: number): Texture | null {
+    const base = this.groundTex.get(terrainId);
+    if (!base) return null;
+    const period = Math.max(1, Math.floor(GROUND_SIZE / TILE_SIZE));
+    const mx = ((gx % period) + period) % period;
+    const my = ((gy % period) + period) % period;
+    const key = `${terrainId}:${mx}:${my}`;
+    const cached = this.groundSubCache.get(key);
+    if (cached) return cached;
+    const frame = new Rectangle(mx * TILE_SIZE, my * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    const sub = new Texture({ source: base.source, frame });
+    this.groundSubCache.set(key, sub);
+    return sub;
+  }
+
   async loadTiles(): Promise<void> {
+    await this.loadDecos();
+    await this.loadGround();
     let manifest: TilesManifest;
     try {
       const res = await fetch(`${TILE_BASE}/tiles-manifest.json`);

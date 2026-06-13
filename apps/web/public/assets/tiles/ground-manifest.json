@@ -1,0 +1,22 @@
+{
+  "plain": {
+    "file": "ground_plain.png",
+    "size": 576
+  },
+  "grass": {
+    "file": "ground_grass.png",
+    "size": 576
+  },
+  "waste": {
+    "file": "ground_waste.png",
+    "size": 576
+  },
+  "mountain": {
+    "file": "ground_mountain.png",
+    "size": 576
+  },
+  "forest": {
+    "file": "ground_forest.png",
+    "size": 576
+  }
+}

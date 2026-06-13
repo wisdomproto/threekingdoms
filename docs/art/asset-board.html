@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>에셋 프롬프트 보드 v1.1 — 수묵담채 확정판</title>
+<style>
+  :root {
+    --bg: #14161c; --panel: #1d212b; --panel2: #242936; --line: #333a4a;
+    --txt: #e8e6df; --dim: #9aa1b0; --acc: #d4a843; --acc2: #6fae6f; --red: #c75450;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--txt); font-family: 'Malgun Gothic', 'Segoe UI', sans-serif; line-height: 1.5; }
+  header { position: sticky; top: 0; z-index: 50; background: rgba(20,22,28,.96); border-bottom: 1px solid var(--line); padding: 10px 22px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  header h1 { font-size: 16px; margin: 0; color: var(--acc); }
+  header .sub { color: var(--dim); font-size: 12px; }
+  .stylefixed { font-size: 12.5px; color: #1a1407; background: var(--acc); border-radius: 14px; padding: 3px 12px; font-weight: bold; }
+  #progress { margin-left: auto; font-size: 12px; color: var(--dim); }
+  main { max-width: 1280px; margin: 0 auto; padding: 18px 22px 80px; }
+  .info { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--acc); border-radius: 8px; padding: 12px 16px; font-size: 13px; color: var(--dim); margin: 14px 0; }
+  .info b { color: var(--txt); }
+  h2.sec { font-size: 18px; color: var(--acc); border-bottom: 1px solid var(--line); padding-bottom: 6px; margin: 34px 0 6px; }
+  .secdesc { font-size: 13px; color: var(--dim); margin: 0 0 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .card.haspick { border-color: var(--acc2); }
+  .card h3 { margin: 0; font-size: 14.5px; display: flex; align-items: center; gap: 8px; }
+  .card h3 .pid { color: var(--acc); font-family: Consolas, monospace; font-size: 12.5px; }
+  .card h3 .multi { font-size: 10.5px; background: var(--panel2); border: 1px solid var(--acc2); color: var(--acc2); border-radius: 10px; padding: 1px 8px; white-space: nowrap; }
+  .card .note { font-size: 12px; color: var(--dim); }
+  .vrow { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; align-items: center; }
+  .vrow select { background: var(--panel2); color: var(--txt); border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; font-size: 12px; max-width: 100%; }
+  pre.prompt { background: #11141a; border: 1px solid var(--line); border-radius: 8px; padding: 10px; font-size: 11.5px; line-height: 1.45; white-space: pre-wrap; word-break: break-word; color: #c9d4e3; max-height: 150px; overflow: auto; margin: 0; font-family: Consolas, 'Malgun Gothic', monospace; }
+  .btnrow { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn { background: var(--panel2); color: var(--txt); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 12.5px; }
+  .btn:hover { border-color: var(--acc); }
+  .btn.primary { background: var(--acc); color: #1a1407; border-color: var(--acc); font-weight: bold; }
+  .drop { border: 1.5px dashed var(--line); border-radius: 8px; min-height: 86px; padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; cursor: pointer; transition: border-color .15s, background .15s; position: relative; }
+  .drop:focus, .drop.armed { border-color: var(--acc); background: rgba(212,168,67,.05); outline: none; }
+  .drop.dragover { border-color: var(--acc2); background: rgba(111,174,111,.08); }
+  .drop .hint { color: #5a6172; font-size: 11.5px; width: 100%; text-align: center; align-self: center; pointer-events: none; }
+  .thumb { position: relative; width: 96px; }
+  .thumb img { width: 96px; height: 96px; object-fit: cover; border-radius: 6px; border: 2px solid var(--line); display: block; cursor: zoom-in; }
+  .thumb.picked img { border-color: var(--acc); box-shadow: 0 0 6px rgba(212,168,67,.5); }
+  .thumb .ops { display: flex; gap: 2px; margin-top: 2px; }
+  .thumb .ops button { flex: 1; background: var(--panel2); border: 1px solid var(--line); color: var(--dim); border-radius: 4px; font-size: 10.5px; padding: 2px 0; cursor: pointer; }
+  .thumb .ops button:hover { color: var(--txt); border-color: var(--acc); }
+  .thumb.picked .ops .pk { color: var(--acc); border-color: var(--acc); }
+  #lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.92); display: none; align-items: center; justify-content: center; z-index: 100; cursor: zoom-out; }
+  #lightbox img { max-width: 94vw; max-height: 92vh; }
+  #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--acc); color: #1a1407; font-weight: bold; padding: 8px 20px; border-radius: 20px; font-size: 13px; display: none; z-index: 110; }
+</style>
+</head>
+<body>
+<header>
+  <h1>에셋 프롬프트 보드 v1.1</h1>
+  <span class="sub">사수관·호로관 수직 슬라이스 · 시트(한 장 多에셋) 방식 · 잘라 쓰는 건 Claude가 처리</span>
+  <span class="stylefixed">화풍: 수묵담채 (확정)</span>
+  <button class="btn" id="dirbtn" title="⬇ 저장이 향할 폴더 (docs\art 권장)">저장 폴더: 미연결</button>
+  <div id="progress"></div>
+</header>
+<main>
+  <div class="info">
+    <b>사용법</b> ① 카드의 <b>[프롬프트 복사]</b> → 생성기에 붙여넣어 생성 ② 결과 이미지를 복사한 뒤 <b>카드의 점선 영역 클릭 + Ctrl+V</b> (드래그&드롭/파일선택 가능) ③ 잘 나온 장은 ★픽.
+    <b>한 장에 여러 에셋이 그리드로 나오는 시트 방식</b>이라 — 셀 일부가 깨져도 살릴 셀이 있으면 픽하고, 깨진 셀만 따로 메모 주면 됩니다. 슬라이스(셀 분리·배경 제거)는 Claude가 합니다.<br>
+    저장은 이 브라우저 IndexedDB에 자동 보존(다시 열어도 유지). <b>⬇ 버튼은 연결된 폴더(상단에서 1회 연결, <code>docs\art</code> 선택)에 바로 파일로 저장</b>됩니다 — 픽한 컷은 ⬇ 눌러두면 Claude가 그 폴더에서 슬라이스 작업을 이어받습니다. 캐릭터 후속 생성(A-2~A-4)에는 <b>픽된 A-1 시트를 참조 이미지로 첨부</b>하세요.
+  </div>
+  <div id="board"></div>
+</main>
+<div id="lightbox"><img alt=""></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ───────────────────────── 공통 블록 ───────────────────────── */
+
+const STYLE = 'Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. Clean silhouette readability for game use. NOT photorealistic, NOT anime-cel.';
+const COMMON = 'Setting: Three Kingdoms era China (Han dynasty, ~190 AD), historically grounded armor and clothing with fantasy flair. Original character design — must NOT resemble any existing game\'s artwork (especially Koei Tecmo\'s style or illustrations). No text, no watermark, no logo, no UI elements in the image.';
+const NEGATIVE = 'Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects.';
+const SHEET_FMT = 'Character reference sheet layout on plain white background, everything in ONE image: full-body front view, side view, and back view standing in neutral A-pose, same scale, aligned in a row; plus two head close-ups with different expressions (calm / battle fury) in a corner. Flat even lighting, no dramatic shadows, character design sheet for game production.';
+const VFX_PREFIX = 'VFX sprite sheet on pure black background, additive-blending ready (bright elements on black), no characters, no scenery, game effect assets. All elements clearly separated with generous black spacing in a loose grid, each element complete and uncropped.';
+const GRID_NOTE = 'All cells same scale, generous white spacing between cells, no grid lines, no labels, each figure complete and uncropped.';
+
+/* ───────────────────────── 카드 데이터 ───────────────────────── */
+
+const SECTIONS = [
+{
+  id: 'A', title: 'A. 관우 기술 검증 세트 (최우선)',
+  desc: '순서: A-1 시트 픽 → 이후 모든 생성에 그 시트를 참조 첨부. A-4만 1컷 1장 (영상 소스라 해상도 확보).',
+  items: [
+    { id: 'A-1', title: '관우 레퍼런스 시트 (어른 비율 유지)', multi: '3뷰+표정 2',
+      note: '시트는 어른 비율이 맞음 — 일기토 영상·초상화·컷신의 마스터. 귀여운 SD는 A-3/B-2에서 변환 (투트랙). 체크: 3뷰 비율 일치 / 무기 분리 식별 / 실루엣만 봐도 관우.',
+      prompt: 'Character: GUAN YU, the God of War archetype — a towering, dignified warrior in his 30s-40s, very long flowing black beard (his signature), phoenix eyes, stern loyal expression. Deep green war robe over lamellar armor with gold trim, green official\'s hat or topknot. He holds his signature weapon: the Green Dragon Crescent Blade (guandao — long pole arm with a heavy curved single-edged blade, dragon motif at the socket).\n' + SHEET_FMT },
+    { id: 'A-2', title: '관우 무기 스킨 시트', multi: '한 장에 3종', needRef: true,
+      note: '⚠ A-1 픽 시트 첨부. Spine 무기 파츠 교체 데모용 3종이 나란히.',
+      prompt: 'Game weapon design sheet: THREE versions of the Green Dragon Crescent Blade (Chinese guandao pole arm) side by side on plain white background, vertical orientation, slight 3/4 angle, same scale, generous spacing. LEFT — classic version: heavy curved blade with engraved dragon motif, red tassel at the socket, dark wooden shaft with metal fittings. CENTER — meteorite version: dark meteorite-iron blade with gold-inlay dragon patterns, black tassel, dark iron fittings. RIGHT — ceremonial version: ornate jade-and-silver blade, pale green jade inlay, silver fittings, white tassel. Flat even lighting, no hands, no characters.' },
+    { id: 'A-3', title: '관우 쿼터뷰 스프라이트 시트 (SD)', multi: '한 장에 6포즈', needRef: true,
+      note: '⚠ A-1 픽 시트 첨부. 맵 유닛은 SD 귀여운 비율 (시트는 어른 비율 그대로 두는 투트랙 — 원작도 SD유닛+진지한 초상 구조). 등신 비교 가능.',
+      vars: { '등신': [
+        ['SD 2.5등신 (기본)', 'Super-deformed chibi proportion: about 2.5 heads tall, big head, small sturdy body, cute but dignified — keep his stern face, long beard and signature weapon clearly recognizable.'],
+        ['세미SD 4등신', 'Semi-deformed proportion: about 4 heads tall, compact heroic body, charming but less babyish — keep his stern face, long beard and signature weapon clearly recognizable.']
+      ]},
+      prompt: 'Sprite sheet of the SAME character as the attached reference sheet, converted to game-unit form, in ONE image: a 2-row × 3-column grid of full-body isometric quarter-view game sprites (camera elevated ~40 degrees) on plain white background.\n{등신}\nTOP ROW — facing front-left diagonal: (1) idle combat stance weapon ready, (2) mid-stride charging run, (3) wide horizontal slash with weapon trailing a motion arc.\nBOTTOM ROW — facing back-left diagonal (seen from behind): same three poses in the same order.\nKeep exact same costume colors and weapon as the reference. Clean silhouettes, slightly bold outlines, readable at small size. ' + GRID_NOTE },
+    { id: 'A-4', title: '일기토 키프레임 (1컷 1장 예외)', needRef: true,
+      note: '⚠ A-1 픽 시트 첨부. Seedance I2V 소스라 해상도 확보를 위해 장당 1컷. 변형 골라 3장. 16:9.',
+      vars: { '컷': [
+        ['① 관우 강타', 'GUAN YU (same as the attached reference) on horseback mid-gallop, Green Dragon Crescent Blade raised for a decisive strike, cape and beard streaming. Low camera angle, dust and dawn mist, besieged gate fortress blurred in background. Dramatic backlight.'],
+        ['② 화웅 리액션', 'An enemy champion general in dark iron armor recoiling on a rearing horse, his spear shattered mid-air, shock on his scarred face. Dust storm, dawn light, gate fortress background.'],
+        ['③ 격돌 와이드', 'Two mounted generals clashing at full gallop, weapons colliding in a burst of sparks, wide cinematic shot, dust and banners, dawn mist over a mountain pass battlefield.']
+      ]},
+      prompt: 'Cinematic duel keyframe: {컷} Single decisive moment, full body in frame, dynamic diagonal composition. 16:9 aspect ratio.' }
+  ]
+},
+{
+  id: 'B', title: 'B. 사수관·호로관 수직 슬라이스',
+  desc: '네임드 시트 5(어른 비율 마스터) + 병종 SD 시트 2(진영색별) + 네임드 SD 시트 5(B-5, 각자 B-1 시트 첨부) + 맵 3. 이숙·호진 등 단발 조연 적장만 병종 템플릿으로 커버(원작 방식).',
+  items: [
+    { id: 'B-1a', title: '유비 레퍼런스 시트', multi: '3뷰+표정',
+      prompt: 'Character: LIU BEI, benevolent warlord in his 30s, gentle but resolute face, long ears (classical iconography), modest dark-red and white robe over light leather armor reflecting humble origins — a straw-sandal era hero rising. Weapons: twin straight swords, one in each hand, elegant simple design.\n' + SHEET_FMT },
+    { id: 'B-1b', title: '장비 레퍼런스 시트', multi: '3뷰+표정',
+      prompt: 'Character: ZHANG FEI, a wild tiger of a man — massive build, fierce round eyes, bristling wire-like black beard, dark skin, leopard-pattern accents on rough heavy armor, open roaring expression. Weapon: serpent spear (long spear with a wavy snake-like blade).\n' + SHEET_FMT },
+    { id: 'B-1c', title: '여포 레퍼런스 시트 (적측 ★급)', multi: '3뷰+표정',
+      note: '최강 비주얼 투자 대상. 오만한 정점 포식자의 아우라.',
+      prompt: 'Character: LU BU, the unrivaled warrior — tall, imposing, beautiful and terrifying at once, arrogant eyes. Magnificent armor with golden pheasant-tail plumes on his headpiece, crimson and black with gold accents, fur-trimmed cloak. Weapon: sky-piercer halberd (ji — crescent axe blade plus spear point). Aura of an untouchable apex predator.\n' + SHEET_FMT },
+    { id: 'B-1d', title: '화웅 레퍼런스 시트', multi: '3뷰+표정',
+      note: '1장 중간보스 — 군주보다 덜 화려하게(스테핑스톤 빌런).',
+      prompt: 'Character: HUA XIONG, Dong Zhuo\'s vanguard champion — brutal veteran with a scarred face, heavy dark iron armor with bronze accents, war braids, intimidating bulk. Weapon: heavy dao saber. Menacing, but clearly less ornate than a warlord.\n' + SHEET_FMT },
+    { id: 'B-1e', title: '장료 레퍼런스 시트 (재등장 네임드)', multi: '3뷰+표정',
+      note: '호로관→서주·하비(여포군)→조조군으로 시리즈 내내 재등장. 야성적인 여포와 대비되는 "무인의 품격" 콘셉트.',
+      prompt: 'Character: ZHANG LIAO, a disciplined and honorable warrior serving under Lu Bu — composed dignified face with sharp eyes, short well-kept beard, practical steel-blue lamellar armor with minimal ornament, dark cloak. The calm professional soldier, a deliberate contrast to his wild master. Weapon: long-handled war glaive with a clean unadorned blade.\n' + SHEET_FMT },
+    { id: 'B-2', title: '병종 유닛 시트 (3병종 × 2포즈, SD)', multi: '한 장에 6유닛',
+      note: '투구로 얼굴 가림 = 색교체 양산형. SD 비율 (A-3과 등신 통일). 진영색 골라서 2장 (아군/동탁군).',
+      vars: { '진영': [
+        ['아군 (녹백)', 'Faction color scheme: green-and-white accents on armor and cloth.'],
+        ['동탁군 (흑적)', 'Faction color scheme: black-and-crimson accents on armor and cloth.']
+      ],
+      '등신': [
+        ['SD 2.5등신 (기본)', 'Super-deformed chibi proportion: about 2.5 heads tall, big heads, small sturdy bodies, cute but soldierly. Horses equally chibi — compact and round.'],
+        ['세미SD 4등신', 'Semi-deformed proportion: about 4 heads tall, compact bodies, charming but less babyish. Horses proportionally compact.']
+      ]},
+      prompt: 'Game unit sprite sheet in ONE image: a 3-row × 2-column grid of full-body isometric quarter-view sprites on plain white background, all facing front-left diagonal. Generic Han dynasty soldiers whose faces are partially hidden by helmets (for palette-swap mass production), cohesive squad-uniform look.\n{등신}\nROW 1 — short-spear infantryman with one-hand spear and large rectangular tower shield, lamellar cuirass, conical helmet: (left) idle stance, (right) thrusting attack with shield braced.\nROW 2 — archer with recurve composite bow, quiver at hip, lighter leather armor, wide-brim helmet: (left) idle bow held low, (right) drawing the bow at full anchor.\nROW 3 — light cavalryman on a sturdy Mongolian-type horse, lance and small round shield, minimal horse armor: (left) horse standing lance upright, (right) lance couched in mid-charge.\n{진영} Clean silhouettes, readable at small size. ' + GRID_NOTE },
+    ...[['B-5a', '유비', 'his twin straight swords and dark-red and white robe'],
+        ['B-5b', '장비', 'his serpent spear, wire-like beard and leopard-pattern accents'],
+        ['B-5c', '여포', 'his sky-piercer halberd, golden pheasant-tail plumes and crimson-gold armor'],
+        ['B-5d', '화웅', 'his heavy dao saber and dark iron armor with bronze accents'],
+        ['B-5e', '장료', 'his long-handled war glaive and practical steel-blue armor']
+       ].map(([id, nm, sig]) => ({
+      id, title: nm + ' SD 쿼터뷰 시트', multi: '한 장에 6포즈', needRef: true,
+      note: '⚠ ' + nm + ' 레퍼런스 시트(B-1) 픽본 첨부. A-3 관우와 같은 포맷 — 등신은 관우에서 확정한 것과 통일.',
+      vars: { '등신': [
+        ['SD 2.5등신 (기본)', 'Super-deformed chibi proportion: about 2.5 heads tall, big head, small sturdy body, cute but true to character — keep ' + sig + ' clearly recognizable.'],
+        ['세미SD 4등신', 'Semi-deformed proportion: about 4 heads tall, compact heroic body, charming but less babyish — keep ' + sig + ' clearly recognizable.']
+      ]},
+      prompt: 'Sprite sheet of the SAME character as the attached reference sheet, converted to game-unit form, in ONE image: a 2-row × 3-column grid of full-body isometric quarter-view game sprites (camera elevated ~40 degrees) on plain white background.\n{등신}\nTOP ROW — facing front-left diagonal: (1) idle combat stance weapon ready, (2) mid-stride charging run, (3) attack pose with the signature weapon in a motion arc.\nBOTTOM ROW — facing back-left diagonal (seen from behind): same three poses in the same order.\nKeep exact same costume colors and weapon as the reference. Clean silhouettes, slightly bold outlines, readable at small size. ' + GRID_NOTE
+    })),
+    { id: 'B-3a', title: '사수관 맵 무드보드 (마스터 컷)',
+      note: '엔진 아트 기준 잡기용 단독 컷. 시간대 변형으로 호로관(야간)까지 2장.',
+      vars: { '시간대': [['새벽 (사수관)', 'at dawn, pale golden morning mist'], ['황혼·횃불 (호로관)', 'at dusk, torchlit walls, deep blue shadows']] },
+      prompt: 'Isometric tactics-RPG battle map illustration, elevated 3/4 view: a fortified mountain pass in northern China {시간대}. A massive gate fortress with twin watchtowers on the left, a winding dirt road crossing grassy plains toward it, rocky mountain ridges along the top, sparse pine trees, a small stream with a wooden bridge. Hand-crafted game-map look with a clear walkable-grid feel but NO actual grid lines, no units, no UI. 16:9 aspect ratio.' },
+    { id: 'B-3b', title: '맵 타일/오브젝트 시트', multi: '한 장에 12조각',
+      note: '2~3회 생성해서 좋은 조각만 채택. 특정 조각만 재생성 요청도 OK.',
+      prompt: 'Isometric game tile set sheet in ONE image on plain white background, consistent 2:1 isometric diamond angle, same scale, arranged in a loose grid: (1) grass plain tile, (2) dirt road tile straight, (3) dirt road curve, (4) rocky mountain block, (5) pine tree, (6) shallow stream tile, (7) wooden bridge, (8) stone wall segment, (9) fortified gate centerpiece with twin towers (two tiles wide), (10) army camp tent, (11) supply depot hut, (12) treasure storehouse. Each element clearly separated with clean edges for cutting into sprites. ' + GRID_NOTE.replace('white spacing between cells', 'white spacing between elements') },
+    { id: 'B-4', title: '전투 배경 (패럴랙스 원경)',
+      prompt: 'Wide panoramic background art for the top edge of an isometric battle map: distant hazy mountains and a pale dawn sky over the Central Plains of China, very low detail at the bottom edge (fades to neutral), strong atmospheric perspective, no foreground objects. 21:9 aspect ratio, muted tones that will not compete with battle units.' },
+    { id: 'B-6', title: '산봉우리 오브젝트 (투명 배경)', multi: '한 장에 3변형',
+      note: '⭐ 돌산 액센트 교체용. 지금 산이 구린 핵심 — 바위 무더기 대신 단독 봉우리로. 바위 바닥(E-2) 위에 듬성듬성 얹습니다.',
+      prompt: 'Three separate mountain peak objects in a row on plain white background, top-down oblique view (camera ~50° above) for a tactics map. Rugged East Asian mountain peaks — weathered grey rock with a little sparse pine, each a distinct compact peak with a clear silhouette, three different shapes (one tall craggy, one broad, one twin-summit). Ink-wash painted style, soft contact shadow only at the very base. Each peak complete and separated with generous white spacing, clean croppable edges, NO ground slab attached. No grid, no labels.' },
+    { id: 'B-7', title: '다리 오브젝트 (투명 배경)', multi: '한 장에 2방향',
+      note: '강(E-4) 위에 놓는 다리. 가로/세로 2방향. 물과 함께 써야 의미 있음.',
+      prompt: 'Two traditional East Asian wooden bridges side by side on plain white background, top-down oblique view for a tactics map. Wooden plank deck with low railings, gentle arch. LEFT: oriented to span left-to-right (horizontal). RIGHT: oriented to span top-to-bottom (vertical). Ink-wash painted style, weathered wood tones. Each bridge complete and separated, clean croppable edges, NO water attached underneath. No grid, no labels.' }
+  ]
+},
+{
+  id: 'C', title: 'C. 이펙트 시트 (코드 합성용)',
+  desc: '프레임 시퀀스 아님 — 검은 배경 단일 발광 요소 모음(additive 블렌딩). 2장으로 압축.',
+  items: [
+    { id: 'C-1', title: '전투 이펙트 시트', multi: '한 장에 6요소', vfx: true,
+      note: '슬래시/크리티컬/일기토/먼지/코인 — 전투 연출 기본 세트.',
+      prompt: 'Six separate effect elements: (1) single curved sword-slash arc — sharp white-gold crescent light trail with thin tapering ends, (2) radial burst of golden light rays with sparks — critical-hit jackpot energy, (3) two crossed blade glints colliding at center — X-shaped spark flash, red versus green light clash, (4) horizontal dust kick-up puffs in three stages side by side, tan-grey, (5) small bouncing gold coins and a tiny treasure pouch — game pickup sprites, (6) small impact starburst flash.' },
+    { id: 'C-2', title: '책략 이펙트 시트', multi: '한 장에 5요소', vfx: true,
+      note: '화계/수계/산계/회복/사기저하 — 책략 연출 세트.',
+      prompt: 'Five separate effect elements: (1) stylized burst of flames — swirling fire tongues forming a loose dragon shape, orange-to-white hot core, ink-brush flame edges, (2) spiraling water vortex with foam crests — deep blue to cyan, (3) cluster of tumbling boulders with dust trail and motion-blurred debris, (4) soft rising green-gold healing motes with a gentle lotus-petal light swirl, (5) dark purple descending smoke wisps — drooping morale-break feel.' }
+  ]
+},
+{
+  id: 'E', title: 'E. 바닥 시임리스 텍스처 (지형 베이스 업그레이드)',
+  desc: '현재 바닥은 단색 + 오브젝트 데코. 이 텍스처가 오면 단색을 저대비 질감으로 교체한다. 시임리스 특성상 1장 = 1지형 (시트 묶음 불가).',
+  items: [
+    { id: 'E-1', title: '지형 바닥 텍스처', multi: '지형 골라 4장',
+      note: '⭐ 베이스 색 전면 교체(리뷰 결론): 밝은 황토 → 차분한 풀빛/세이지. 황토는 길·맨땅 악센트로만. 핵심: 매우 낮은 대비·낮은 채도(수묵 담채), 멀리서 거의 단색으로 보여야 유닛이 산다. 오브젝트 금지. ※ 평지를 새 베이스로 다시 뽑아 ground_plain 교체.',
+      vars: { '지형': [
+        ['평지 (풀빛 — 새 베이스)', 'open grassland ground, calm muted olive-sage green with very sparse faint dry earth patches, desaturated ink-wash tone'],
+        ['초원 (짙은 풀)', 'short grass meadow ground, soft muted green, slightly richer than the base plain'],
+        ['맨땅/길 (악센트)', 'bare packed dirt path ground, warm muted earth brown, low saturation — used only as paths/accents not the main field'],
+        ['숲 바닥', 'forest floor of moss and fallen needles, deep muted green']
+      ]},
+      prompt: 'SEAMLESS TILEABLE texture, strictly top-down view: {지형}. Painted in subtle East Asian ink-wash tones on textured paper feel. VERY LOW CONTRAST and low detail — must read as almost flat color from a distance, no objects, no rocks, no plants sticking out, no shadows with direction, no perspective, edges must wrap seamlessly (left matches right, top matches bottom). Square 1:1.' },
+    { id: 'E-2', title: '산악 바위 바닥 (시임리스)',
+      note: '⭐ 산맥 region의 베이스. 지금 산이 구린 핵심 원인 — 봉우리 일러스트를 전 칸에 깔아서. 이 바닥을 깔고 봉우리는 듬성듬성 액센트로만 올립니다. 저대비 필수.',
+      prompt: 'SEAMLESS TILEABLE texture, strictly top-down view: rugged rocky mountain ground — weathered grey-brown stone, gravel and scree with subtle cracks and tonal variation. Subtle East Asian ink-wash tones on textured paper feel. LOW CONTRAST and low detail — must read as one cohesive rocky surface from a distance, NO individual peaks, no objects sticking out, no perspective, no directional shadows, edges wrap seamlessly (left=right, top=bottom). Square 1:1.' },
+    { id: 'E-3', title: '숲 캐노피 바닥 (시임리스)',
+      note: '숲 region 베이스(위에서 본 나뭇잎 군집). 나무 스프라이트는 이 위에 액센트로만. 캐노피라 평지보다 대비 살짝 높아도 OK.',
+      prompt: 'SEAMLESS TILEABLE texture, strictly top-down view: dense forest canopy seen straight from directly above — clustered rounded treetop crowns in muted deep greens, soft organic clumps of foliage. Subtle East Asian ink-wash tones, textured paper feel. LOW-TO-MEDIUM CONTRAST — must read as a continuous forest mass from a distance, no visible trunks, no perspective, no directional shadows, edges wrap seamlessly (left=right, top=bottom). Square 1:1.' },
+    { id: 'E-4', title: '강물 시임리스 텍스처',
+      note: '강/하천 지면. 다리(B-7) 밑에 깔림. 흐르는 결, 너무 쨍하지 않게.',
+      prompt: 'SEAMLESS TILEABLE texture, strictly top-down view: calm river water — soft blue-green ripples and subtle flowing current lines, gentle muted reflections. Subtle East Asian ink-wash tones, textured paper feel. LOW-TO-MEDIUM CONTRAST — must read as a continuous water surface from a distance, no shoreline, no objects, no perspective, no directional shadows, edges wrap seamlessly (left=right, top=bottom). Square 1:1.' }
+  ]
+},
+{
+  id: 'D', title: 'D. UI 최소 세트',
+  desc: '전투 HUD가 도는 정도만. 텍스트는 절대 이미지에 넣지 않기.',
+  items: [
+    { id: 'D-1', title: 'UI 에셋 시트', multi: '한 장에 5요소',
+      prompt: 'Game UI asset sheet in ONE image on a plain dark background, East Asian historical fantasy theme matching the ink-wash style: (1) ornate square portrait frame — bronze-and-lacquer border with subtle dragon corner motifs, (2) horizontal HP gauge frame and fill bar — lacquered wood and jade, (3) morale gauge variant with a flame motif, (4) round action button styled like a bronze seal stamp with a blank center, (5) turn banner ribbon with a blank center for text. Flat presentation, each element clearly separated, no text anywhere.' }
+  ]
+}
+];
+
+/* ───────────────────────── 상태/저장 ───────────────────────── */
+
+const varState = JSON.parse(localStorage.getItem('ab_vars') || '{}');
+
+let db = null;
+function openDB() {
+  return new Promise((res, rej) => {
+    const rq = indexedDB.open('assetBoard', 2);
+    rq.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('imgs')) {
+        const st = d.createObjectStore('imgs', { keyPath: 'id', autoIncrement: true });
+        st.createIndex('byCard', 'card');
+      }
+      if (!d.objectStoreNames.contains('settings')) d.createObjectStore('settings');
+    };
+    rq.onsuccess = e => res(e.target.result);
+    rq.onerror = () => rej(rq.error);
+  });
+}
+function sGet(key) { return new Promise((res, rej) => { const r = db.transaction('settings', 'readonly').objectStore('settings').get(key); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+function sPut(key, val) { return new Promise((res, rej) => { const tx = db.transaction('settings', 'readwrite'); tx.objectStore('settings').put(val, key); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); }
+function dbAdd(rec) { return new Promise((res, rej) => { const tx = db.transaction('imgs', 'readwrite'); const r = tx.objectStore('imgs').add(rec); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+function dbDel(id) { return new Promise((res, rej) => { const tx = db.transaction('imgs', 'readwrite'); tx.objectStore('imgs').delete(id).onsuccess = () => res(); tx.onerror = () => rej(tx.error); }); }
+function dbPut(rec) { return new Promise((res, rej) => { const tx = db.transaction('imgs', 'readwrite'); tx.objectStore('imgs').put(rec).onsuccess = () => res(); tx.onerror = () => rej(tx.error); }); }
+function dbAll() { return new Promise((res, rej) => { const tx = db.transaction('imgs', 'readonly'); const r = tx.objectStore('imgs').getAll(); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+
+/* ───────────────────────── 프롬프트 조립 ───────────────────────── */
+
+function findItem(id) { for (const s of SECTIONS) for (const it of s.items) if (it.id === id) return it; return null; }
+
+/* ─────────── 저장 폴더 (File System Access API) ─────────── */
+
+let dirHandle = null;
+
+function updateDirUI() {
+  const b = document.getElementById('dirbtn');
+  if (dirHandle) { b.textContent = '저장 폴더: ' + dirHandle.name; b.style.borderColor = 'var(--acc2)'; b.style.color = 'var(--acc2)'; }
+  else { b.textContent = '저장 폴더: 미연결'; b.style.borderColor = ''; b.style.color = ''; }
+}
+
+async function restoreDir() {
+  try {
+    const saved = await sGet('dir');
+    if (saved && await saved.queryPermission({ mode: 'readwrite' }) === 'granted') dirHandle = saved;
+    else if (saved) dirHandle = null; // 권한 재요청은 사용자 제스처에서
+    updateDirUI();
+  } catch (e) { /* ignore */ }
+}
+
+async function ensureDir(interactive) {
+  if (dirHandle && await dirHandle.queryPermission({ mode: 'readwrite' }) === 'granted') return dirHandle;
+  try {
+    const saved = await sGet('dir');
+    if (saved && await saved.requestPermission({ mode: 'readwrite' }) === 'granted') {
+      dirHandle = saved; updateDirUI(); return dirHandle;
+    }
+  } catch (e) { /* fall through */ }
+  if (!interactive || !window.showDirectoryPicker) return null;
+  try {
+    dirHandle = await showDirectoryPicker({ id: 'assetArt', mode: 'readwrite' });
+    await sPut('dir', dirHandle);
+    updateDirUI();
+    toast('연결됨 — 이제 ⬇ 가 ' + dirHandle.name + ' 폴더로 바로 저장됩니다');
+    return dirHandle;
+  } catch (e) { return null; }
+}
+
+async function saveRecToDisk(rec) {
+  const dh = await ensureDir(true);
+  if (dh) {
+    try {
+      const fh = await dh.getFileHandle(rec.name, { create: true });
+      const w = await fh.createWritable();
+      await w.write(rec.blob); await w.close();
+      toast(dh.name + '\\' + rec.name + ' 저장됨');
+      return;
+    } catch (e) { toast('폴더 쓰기 실패 — 일반 다운로드로 대체'); }
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(rec.blob); a.download = rec.name; a.click();
+}
+
+function buildPrompt(item) {
+  let body = item.prompt;
+  if (item.vars) {
+    const vs = varState[item.id] || {};
+    for (const [vn, opts] of Object.entries(item.vars)) {
+      const idx = vs[vn] || 0;
+      body = body.split('{' + vn + '}').join(opts[idx][1]);
+    }
+  }
+  const parts = [];
+  if (item.vfx) parts.push(VFX_PREFIX);
+  else { parts.push(STYLE); parts.push(COMMON); }
+  parts.push(body);
+  parts.push(NEGATIVE);
+  return parts.join('\n\n');
+}
+
+/* ───────────────────────── 렌더 ───────────────────────── */
+
+const board = document.getElementById('board');
+
+function render() {
+  let html = '';
+  for (const sec of SECTIONS) {
+    html += `<h2 class="sec">${sec.title}</h2><p class="secdesc">${sec.desc}</p><div class="grid">`;
+    for (const it of sec.items) {
+      html += `<div class="card" id="card-${it.id}">
+        <h3><span class="pid">${it.id}</span> ${it.title} ${it.multi ? `<span class="multi">${it.multi}</span>` : ''}</h3>
+        ${it.note ? `<div class="note">${it.note}</div>` : ''}`;
+      if (it.vars) {
+        html += '<div class="vrow">';
+        for (const [vn, opts] of Object.entries(it.vars)) {
+          const cur = (varState[it.id] || {})[vn] || 0;
+          html += `<label>${vn} <select data-card="${it.id}" data-var="${vn}">` +
+            opts.map((o, i) => `<option value="${i}" ${i === cur ? 'selected' : ''}>${o[0]}</option>`).join('') +
+            '</select></label>';
+        }
+        html += '</div>';
+      }
+      html += `<pre class="prompt" id="pr-${it.id}"></pre>
+        <div class="btnrow">
+          <button class="btn primary" data-copy="${it.id}">프롬프트 복사</button>
+          <button class="btn" data-file="${it.id}">파일 선택…</button>
+        </div>
+        <div class="drop" tabindex="0" data-drop="${it.id}">
+          <span class="hint">클릭 후 Ctrl+V 로 생성 결과 붙여넣기 (드래그&드롭 가능)</span>
+        </div>
+      </div>`;
+    }
+    html += '</div>';
+  }
+  board.innerHTML = html;
+  for (const sec of SECTIONS) for (const it of sec.items) refreshPrompt(it.id);
+}
+
+function refreshPrompt(id) {
+  const el = document.getElementById('pr-' + id);
+  if (el) el.textContent = buildPrompt(findItem(id));
+}
+
+/* ───────────────────────── 이미지 표시 ───────────────────────── */
+
+const blobUrls = new Map();
+
+function thumbNode(rec) {
+  const div = document.createElement('div');
+  div.className = 'thumb' + (rec.pick ? ' picked' : '');
+  div.dataset.imgid = rec.id;
+  let url = blobUrls.get(rec.id);
+  if (!url) { url = URL.createObjectURL(rec.blob); blobUrls.set(rec.id, url); }
+  div.innerHTML = `<img src="${url}" title="${rec.name}">
+    <div class="ops">
+      <button class="pk" title="픽 토글">★</button>
+      <button class="dl" title="다운로드">⬇</button>
+      <button class="rm" title="삭제">✕</button>
+    </div>`;
+  return div;
+}
+
+async function addImageToCard(cardId, blob) {
+  const n = document.querySelectorAll(`#card-${CSS.escape(cardId)} .thumb`).length + 1;
+  const ext = (blob.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
+  const name = `${cardId}_ink_${String(n).padStart(2, '0')}.${ext}`;
+  const rec = { card: cardId, blob, name, pick: 0, at: Date.now() };
+  rec.id = await dbAdd(rec);
+  document.querySelector(`#card-${CSS.escape(cardId)} .drop`).appendChild(thumbNode(rec));
+  updateProgress();
+  toast(`${name} 저장됨`);
+}
+
+async function loadImages() {
+  const all = await dbAll();
+  all.sort((a, b) => a.at - b.at);
+  let orphans = 0;
+  for (const rec of all) {
+    const drop = document.querySelector(`#card-${CSS.escape(rec.card)} .drop`);
+    if (drop) drop.appendChild(thumbNode(rec));
+    else orphans++;
+  }
+  if (orphans) console.warn(orphans + ' images belong to old card ids (kept in DB, not shown)');
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = SECTIONS.reduce((a, s) => a + s.items.length, 0);
+  const done = new Set([...document.querySelectorAll('.thumb')].map(t => t.closest('.card').id)).size;
+  document.getElementById('progress').textContent = `이미지 있는 카드: ${done}/${total}`;
+  document.querySelectorAll('.card').forEach(c => c.classList.toggle('haspick', !!c.querySelector('.thumb.picked')));
+}
+
+/* ───────────────────────── 이벤트 ───────────────────────── */
+
+board.addEventListener('change', e => {
+  const sel = e.target.closest('select[data-card]');
+  if (!sel) return;
+  const { card, var: vn } = sel.dataset;
+  varState[card] = varState[card] || {};
+  varState[card][vn] = +sel.value;
+  localStorage.setItem('ab_vars', JSON.stringify(varState));
+  refreshPrompt(card);
+});
+
+board.addEventListener('click', async e => {
+  const cp = e.target.closest('button[data-copy]');
+  if (cp) {
+    const txt = buildPrompt(findItem(cp.dataset.copy));
+    try { await navigator.clipboard.writeText(txt); }
+    catch { const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+    toast('프롬프트 복사됨 — 생성기에 붙여넣으세요');
+    return;
+  }
+  const fb = e.target.closest('button[data-file]');
+  if (fb) {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
+    inp.onchange = () => { for (const f of inp.files) addImageToCard(fb.dataset.file, f); };
+    inp.click();
+    return;
+  }
+  const th = e.target.closest('.thumb');
+  if (th) {
+    const id = +th.dataset.imgid;
+    if (e.target.closest('.rm')) {
+      if (!confirm('이 이미지를 삭제할까요?')) return;
+      await dbDel(id); th.remove(); updateProgress(); return;
+    }
+    if (e.target.closest('.pk')) {
+      const all = await dbAll(); const rec = all.find(r => r.id === id);
+      rec.pick = rec.pick ? 0 : 1; await dbPut(rec);
+      th.classList.toggle('picked', !!rec.pick); updateProgress(); return;
+    }
+    if (e.target.closest('.dl')) {
+      const all = await dbAll(); const rec = all.find(r => r.id === id);
+      await saveRecToDisk(rec);
+      return;
+    }
+    if (e.target.tagName === 'IMG') {
+      const lb = document.getElementById('lightbox');
+      lb.querySelector('img').src = th.querySelector('img').src;
+      lb.style.display = 'flex';
+    }
+    return;
+  }
+  const dz = e.target.closest('.drop');
+  if (dz) { document.querySelectorAll('.drop.armed').forEach(d => d.classList.remove('armed')); dz.classList.add('armed'); dz.focus(); }
+});
+
+document.getElementById('lightbox').addEventListener('click', e => e.currentTarget.style.display = 'none');
+
+document.addEventListener('paste', e => {
+  const dz = document.activeElement.closest?.('.drop') || document.querySelector('.drop.armed');
+  if (!dz) return;
+  const items = e.clipboardData?.items || [];
+  let got = false;
+  for (const it of items) {
+    if (it.type.startsWith('image/')) { addImageToCard(dz.dataset.drop, it.getAsFile()); got = true; }
+  }
+  if (got) e.preventDefault();
+  else toast('클립보드에 이미지가 없습니다 — 이미지를 "복사"한 뒤 시도하세요');
+});
+
+board.addEventListener('dragover', e => { const dz = e.target.closest('.drop'); if (dz) { e.preventDefault(); dz.classList.add('dragover'); } });
+board.addEventListener('dragleave', e => { const dz = e.target.closest('.drop'); if (dz) dz.classList.remove('dragover'); });
+board.addEventListener('drop', e => {
+  const dz = e.target.closest('.drop');
+  if (!dz) return;
+  e.preventDefault(); dz.classList.remove('dragover');
+  for (const f of e.dataTransfer.files) if (f.type.startsWith('image/')) addImageToCard(dz.dataset.drop, f);
+});
+
+let toastTimer = null;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.style.display = 'none', 2200);
+}
+
+/* ───────────────────────── 시작 ───────────────────────── */
+document.getElementById('dirbtn').addEventListener('click', async () => {
+  dirHandle = null;
+  await ensureDir(true);
+});
+
+(async () => {
+  render();
+  try { db = await openDB(); await loadImages(); await restoreDir(); }
+  catch (err) {
+    document.querySelector('.info').insertAdjacentHTML('beforeend',
+      '<br><b style="color:var(--red)">⚠ 이 브라우저에서 IndexedDB를 열 수 없어 이미지 저장이 비활성화됩니다.</b> (' + err + ')');
+  }
+  if (!window.showDirectoryPicker) {
+    document.getElementById('dirbtn').title = '이 브라우저는 폴더 직접 저장(File System Access API)을 지원하지 않아 일반 다운로드로 동작합니다 (Chrome/Edge 권장)';
+  }
+})();
+</script>
+</body>
+</html>

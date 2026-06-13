@@ -1,0 +1,72 @@
+{
+  "slash": {
+    "file": "slash.png",
+    "w": 474,
+    "h": 424
+  },
+  "crit": {
+    "file": "crit.png",
+    "w": 510,
+    "h": 462
+  },
+  "duel_clash": {
+    "file": "duel_clash.png",
+    "w": 471,
+    "h": 375
+  },
+  "dust_1": {
+    "file": "dust_1.png",
+    "w": 391,
+    "h": 264
+  },
+  "dust_2": {
+    "file": "dust_2.png",
+    "w": 511,
+    "h": 264
+  },
+  "dust_3": {
+    "file": "dust_3.png",
+    "w": 515,
+    "h": 264
+  },
+  "coins": {
+    "file": "coins.png",
+    "w": 358,
+    "h": 260
+  },
+  "pouch": {
+    "file": "pouch.png",
+    "w": 510,
+    "h": 274
+  },
+  "impact": {
+    "file": "impact.png",
+    "w": 425,
+    "h": 285
+  },
+  "fire": {
+    "file": "fire.png",
+    "w": 719,
+    "h": 521
+  },
+  "water": {
+    "file": "water.png",
+    "w": 713,
+    "h": 501
+  },
+  "rock": {
+    "file": "rock.png",
+    "w": 548,
+    "h": 506
+  },
+  "heal": {
+    "file": "heal.png",
+    "w": 468,
+    "h": 515
+  },
+  "debuff": {
+    "file": "debuff.png",
+    "w": 513,
+    "h": 499
+  }
+}

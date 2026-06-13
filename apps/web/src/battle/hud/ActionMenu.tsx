@@ -24,7 +24,10 @@ const BUTTON_STYLE: React.CSSProperties = {
   minWidth: 92,
   padding: "0 20px",
   borderRadius: 14,
-  border: "1px solid #3a414a",
+  // 단축속성(border) 금지 — accent가 borderColor만 덮어쓰므로 개별 속성으로 분리 (React 경고 회피)
+  borderWidth: 1,
+  borderStyle: "solid",
+  borderColor: "#3a414a",
   background: "rgba(24, 28, 33, 0.92)",
   color: "#e8e6e3",
   fontSize: 17,

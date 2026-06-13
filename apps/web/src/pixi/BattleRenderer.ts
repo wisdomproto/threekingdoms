@@ -9,12 +9,13 @@
  *
  * 결선 순서: renderer 생성 → store 생성(presenter=renderer) → renderer.connect(store) → mount.
  */
-import { Application, Container } from "pixi.js";
+import { Application, Container, Graphics, Sprite, Texture } from "pixi.js";
 import type { Side } from "@tk/data";
 import type { BattleContext, BattleEvent, BattleState, Coord } from "@tk/engine";
 import type { Presenter, PresentedSnapshot } from "../battle/eventPlayer";
 import type { InputState, UiEvent } from "../battle/inputMachine";
 import { findPath } from "../battle/path";
+import { AtmosphereLayer } from "./atmosphere";
 import { CameraController } from "./camera";
 import { gridToWorld, TILE_SIZE } from "./projection";
 import { TextureResolver } from "./textures";
@@ -142,7 +143,64 @@ export class BattleRenderer implements Presenter {
       .catch((e) => console.warn("[BattleRenderer] loadTiles 예외 (단색 폴백 유지):", e));
     fx.world.zIndex = 3;
     world.addChild(terrain, highlights, units, fx.world);
-    app.stage.addChild(world, fx.screen);
+
+    // painted 맵 배경 (있으면 타일 렌더 대체) + 정합 확인용 격자 오버레이.
+    const mapW = this.ctx.map.width;
+    const mapH = this.ctx.map.height;
+    const mapBg = new Sprite();
+    mapBg.zIndex = -1; // terrain(0) 아래
+    mapBg.visible = false;
+    const gridOverlay = new Graphics();
+    for (let gx = 0; gx <= mapW; gx++) {
+      gridOverlay.moveTo(gx * TILE_SIZE, 0).lineTo(gx * TILE_SIZE, mapH * TILE_SIZE);
+    }
+    for (let gy = 0; gy <= mapH; gy++) {
+      gridOverlay.moveTo(0, gy * TILE_SIZE).lineTo(mapW * TILE_SIZE, gy * TILE_SIZE);
+    }
+    gridOverlay.stroke({ width: 1, color: 0xffffff, alpha: 0.12 });
+    gridOverlay.zIndex = 0.5; // 배경 위, 유닛 아래 — 정합 확인용
+    gridOverlay.visible = false;
+    world.addChild(mapBg, gridOverlay);
+    textures
+      .loadMapBackground(this.ctx.map.id)
+      .then((tex) => {
+        if (!tex) return;
+        mapBg.texture = tex;
+        mapBg.width = mapW * TILE_SIZE;
+        mapBg.height = mapH * TILE_SIZE;
+        mapBg.position.set(0, 0);
+        mapBg.visible = true;
+        terrain.visible = false; // 타일 끄고 그림으로
+        // gridOverlay.visible = true; // 정합 확인용 — 확정되어 기본 OFF (새 맵 검증 시 재활성)
+      })
+      .catch((e) => console.warn("[BattleRenderer] loadMapBackground 예외:", e));
+
+    // 맵 뒤 배경 (화면 고정 — 카메라 변환 밖). 휑한 가장자리를 원경 산수로 채운다.
+    const bg = new Sprite();
+    bg.anchor.set(0.5);
+    bg.visible = false;
+    const fitBackground = (): void => {
+      const tex = bg.texture;
+      if (!tex || tex === Texture.EMPTY || tex.width === 0) return;
+      const sw = app.screen.width;
+      const sh = app.screen.height;
+      bg.scale.set(Math.max(sw / tex.width, sh / tex.height)); // cover
+      bg.position.set(sw / 2, sh / 2);
+    };
+    textures
+      .loadBackground()
+      .then((tex) => {
+        if (tex) {
+          bg.texture = tex;
+          bg.visible = true;
+          fitBackground();
+        }
+      })
+      .catch((e) => console.warn("[BattleRenderer] loadBackground 예외:", e));
+    // 분위기 오버레이 (맵 위·스크린FX 아래) — 비네팅 + 따뜻한 글로우
+    const atmosphere = new AtmosphereLayer();
+    atmosphere.resize(app.screen.width, app.screen.height);
+    app.stage.addChild(bg, world, atmosphere, fx.screen); // bg → world → 분위기 → 스크린FX
 
     const worldSize = {
       width: this.ctx.map.width * TILE_SIZE,
@@ -190,12 +248,15 @@ export class BattleRenderer implements Presenter {
     const tick = (): void => {
       camera.update(app.ticker.deltaMS);
       terrain.cull(camera.viewWorldRect());
+      units.tickIdle(app.ticker.deltaMS);
     };
     app.ticker.add(tick);
 
     app.renderer.on("resize", () => {
       camera.resize({ width: app.screen.width, height: app.screen.height });
       fx.resize(app.screen.width, app.screen.height);
+      fitBackground();
+      atmosphere.resize(app.screen.width, app.screen.height);
     });
 
     // 하이라이트 = InputMachine 상태의 수동적 뷰 (좌표 해석은 committed 기준)

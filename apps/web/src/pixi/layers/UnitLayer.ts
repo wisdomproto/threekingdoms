@@ -55,6 +55,11 @@ export class UnitLayer extends Container {
     for (const v of this.views.values()) v.refreshSprite();
   }
 
+  /** ticker에서 매 프레임 — 전 유닛 idle 호흡 갱신 */
+  tickIdle(dtMS: number): void {
+    for (const v of this.views.values()) v.tickIdle(dtMS);
+  }
+
   /**
    * 선택된 유닛 ID를 설정합니다.
    * 이전 선택을 해제하고 새 유닛만 이름 라벨을 표시합니다.

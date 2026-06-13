@@ -1,0 +1,74 @@
+{
+  "grass": {
+    "file": "grass.png",
+    "w": 361,
+    "h": 276,
+    "terrain": "grass"
+  },
+  "road_straight": {
+    "file": "road_straight.png",
+    "w": 387,
+    "h": 248,
+    "terrain": "plain"
+  },
+  "road_curve": {
+    "file": "road_curve.png",
+    "w": 402,
+    "h": 249,
+    "terrain": "plain"
+  },
+  "mountain": {
+    "file": "mountain.png",
+    "w": 345,
+    "h": 346,
+    "terrain": "mountain"
+  },
+  "tree": {
+    "file": "tree.png",
+    "w": 358,
+    "h": 357,
+    "terrain": "forest"
+  },
+  "river": {
+    "file": "river.png",
+    "w": 403,
+    "h": 331,
+    "terrain": "river"
+  },
+  "bridge": {
+    "file": "bridge.png",
+    "w": 403,
+    "h": 272,
+    "terrain": "bridge"
+  },
+  "wall": {
+    "file": "wall.png",
+    "w": 332,
+    "h": 333,
+    "terrain": "wall"
+  },
+  "gate": {
+    "file": "gate.png",
+    "w": 513,
+    "h": 316,
+    "terrain": "gate"
+  },
+  "camp": {
+    "file": "camp.png",
+    "w": 387,
+    "h": 324,
+    "terrain": "barracks"
+  },
+  "hut": {
+    "file": "hut.png",
+    "w": 342,
+    "h": 296,
+    "terrain": "village"
+  },
+  "storehouse": {
+    "file": "storehouse.png",
+    "w": 309,
+    "h": 341,
+    "terrain": "depot"
+  }
+}

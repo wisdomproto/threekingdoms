@@ -1,0 +1,27 @@
+{
+  "portrait_frame": {
+    "file": "portrait_frame.png",
+    "w": 619,
+    "h": 588
+  },
+  "gauge_green": {
+    "file": "gauge_green.png",
+    "w": 809,
+    "h": 217
+  },
+  "gauge_red": {
+    "file": "gauge_red.png",
+    "w": 833,
+    "h": 219
+  },
+  "seal_button": {
+    "file": "seal_button.png",
+    "w": 341,
+    "h": 335
+  },
+  "banner_ribbon": {
+    "file": "banner_ribbon.png",
+    "w": 932,
+    "h": 290
+  }
+}
