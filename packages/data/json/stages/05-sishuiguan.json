@@ -4,6 +4,8 @@
   "mapId": "sishuiguan",
   "turnLimit": 30,
   "camera": { "zoom": 1.7, "focus": [50, 15] },
+  "reward": { "gold": 300, "exp": 0, "treasures": ["무술교본"] },
+  "levelCap": 12,
   "units": [
     {
       "commanderId": "유비",

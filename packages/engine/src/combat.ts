@@ -18,9 +18,18 @@ export function attackPower(u: UnitState): number {
 export function defensePower(u: UnitState): number {
   return Math.floor(u.leadership / 2) + LV_GROWTH * u.level;
 }
-/** 부대 정신력 = floor(지력/2) + 성장 (← 지력. 책략 위력/피해감소 — 현재 통상전 미사용) */
+/**
+ * 부대 정신력 = (floor(지력/2) + 성장) × 병법서 보정 (← 지력. 책략 위력/피해감소).
+ * bookBonus = 1 + 최고 book bonusPercent/100 (createBattle에서 산정, 없으면 1.0).
+ */
 export function spiritPower(u: UnitState): number {
-  return Math.floor(u.intelligence / 2) + LV_GROWTH * u.level;
+  const base = Math.floor(u.intelligence / 2) + LV_GROWTH * u.level;
+  return Math.floor(base * u.bookBonus);
+}
+
+/** 다음 레벨까지 필요 경험치 = level × 50 (§10 행동 기반 성장). */
+export function expForNextLevel(level: number): number {
+  return level * 50;
 }
 
 /** 영걸전 레거시 보정 커브 — 미사용(호환 위해 보존). */

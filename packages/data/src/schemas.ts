@@ -143,12 +143,28 @@ export const StageCameraSchema = z.object({
 });
 export type StageCamera = z.infer<typeof StageCameraSchema>;
 
+/**
+ * 스테이지 클리어 보상 (M1 결산 — §10/§12).
+ *  - gold: 클리어 자금. exp: 추가 경험치(전투 중 누적과 별도, 결산 시 분배 — 현재는 데이터만).
+ *  - treasures: 이 스테이지에서 확정 지급되는 보물 item id 목록.
+ */
+export const StageRewardSchema = z.object({
+  gold: z.number().int().min(0),
+  exp: z.number().int().min(0).default(0),
+  treasures: z.array(z.string()).default([]),
+});
+export type StageReward = z.infer<typeof StageRewardSchema>;
+
 export const StageSchema = z.object({
   id: z.string(),
   name: z.string(),
   mapId: z.string(),
   turnLimit: z.number().int().min(1),
   camera: StageCameraSchema.optional(),
+  // 결산 보상 (선택 — 미지정 스테이지는 보상 없음으로 취급)
+  reward: StageRewardSchema.optional(),
+  // 이 스테이지에서의 레벨캡 (§10 — 스테이지 진행 연동). 미지정 시 엔진 기본 99.
+  levelCap: z.number().int().min(1).max(99).optional(),
   units: z.array(StageUnitSchema),
   victory: z.discriminatedUnion("kind", [
     z.object({ kind: z.literal("defeatAll") }),
@@ -160,6 +176,43 @@ export const StageSchema = z.object({
   events: z.array(StageEventSchema),
 });
 export type Stage = z.infer<typeof StageSchema>;
+
+/**
+ * 로스터 엔트리 (§6 — 정규 로스터 + 게스트). 메타 진행에서 "보유 장수" 목록의 단위.
+ *  - commanderId: commanders.json id. classId: unitClasses.json id (초기 병종).
+ *  - joinChapter: 합류 장(1~5, §5 챕터).
+ *  - role: 편성/UI 분류. uniqueSkillId: §8 고유 스킬(있으면) — strategies.json 또는 별도 정의.
+ */
+export const RosterRoleSchema = z.enum(["lord", "melee", "caster", "support", "guest"]);
+export type RosterRole = z.infer<typeof RosterRoleSchema>;
+
+export const RosterEntrySchema = z.object({
+  commanderId: z.string(),
+  classId: z.string(),
+  joinChapter: z.number().int().min(1).max(5),
+  role: RosterRoleSchema,
+  uniqueSkillId: z.string().optional(),
+});
+export type RosterEntry = z.infer<typeof RosterEntrySchema>;
+
+/**
+ * 상점 (§10/§13 — 막간 출진 준비). 장 진행에 따라 재고가 해금된다.
+ *  - ShopItem.unlockChapter: 그 아이템이 구매 가능해지는 장(1~5). price: 자금.
+ *  - Shop.items: 이 상점에 진열되는 항목 목록.
+ */
+export const ShopItemSchema = z.object({
+  itemId: z.string(),
+  price: z.number().int().min(0),
+  unlockChapter: z.number().int().min(1).max(5).default(1),
+});
+export type ShopItem = z.infer<typeof ShopItemSchema>;
+
+export const ShopSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  items: z.array(ShopItemSchema),
+});
+export type Shop = z.infer<typeof ShopSchema>;
 
 export const InitialForceSchema = z.object({
   commanderId: z.string(),

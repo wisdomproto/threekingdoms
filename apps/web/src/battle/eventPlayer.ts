@@ -144,6 +144,9 @@ export class EventPlayer {
         return p.phaseChanged(e);
       case "battleEnded":
         return p.battleEnded(e);
+      default:
+        // 연출이 없는 메타 이벤트(levelUp 등)는 프레젠터 없이 통과 — 결산 연출은 별도 화면에서 처리
+        return Promise.resolve();
     }
   }
 

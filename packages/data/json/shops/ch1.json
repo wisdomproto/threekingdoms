@@ -1,0 +1,10 @@
+{
+  "id": "ch1",
+  "name": "1장 상점",
+  "items": [
+    { "itemId": "칠성검", "price": 300, "unlockChapter": 1 },
+    { "itemId": "삼첨도", "price": 250, "unlockChapter": 1 },
+    { "itemId": "상약", "price": 60, "unlockChapter": 1 },
+    { "itemId": "한방약", "price": 100, "unlockChapter": 1 }
+  ]
+}

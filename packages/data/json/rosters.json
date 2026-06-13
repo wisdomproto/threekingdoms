@@ -1,0 +1,19 @@
+{
+  "유비": { "commanderId": "유비", "classId": "footman", "joinChapter": 1, "role": "lord", "uniqueSkillId": "인덕" },
+  "관우": { "commanderId": "관우", "classId": "lightCavalry", "joinChapter": 1, "role": "melee", "uniqueSkillId": "무성" },
+  "장비": { "commanderId": "장비", "classId": "lightCavalry", "joinChapter": 1, "role": "melee", "uniqueSkillId": "포효" },
+  "간옹": { "commanderId": "간옹", "classId": "strategist", "joinChapter": 1, "role": "caster" },
+  "미축": { "commanderId": "미축", "classId": "strategist", "joinChapter": 1, "role": "support" },
+  "손건": { "commanderId": "손건", "classId": "strategist", "joinChapter": 2, "role": "support" },
+  "조운": { "commanderId": "조운", "classId": "lightCavalry", "joinChapter": 3, "role": "melee", "uniqueSkillId": "단기필마" },
+  "미방": { "commanderId": "미방", "classId": "footman", "joinChapter": 3, "role": "melee" },
+  "진등": { "commanderId": "진등", "classId": "strategist", "joinChapter": 3, "role": "caster" },
+  "서서": { "commanderId": "서서", "classId": "strategist", "joinChapter": 4, "role": "caster" },
+  "제갈량": { "commanderId": "제갈량", "classId": "strategist", "joinChapter": 4, "role": "caster", "uniqueSkillId": "동남풍" },
+  "관평": { "commanderId": "관평", "classId": "footman", "joinChapter": 4, "role": "melee" },
+  "유봉": { "commanderId": "유봉", "classId": "footman", "joinChapter": 4, "role": "melee" },
+  "주창": { "commanderId": "주창", "classId": "footman", "joinChapter": 4, "role": "melee" },
+  "주유": { "commanderId": "주유", "classId": "strategist", "joinChapter": 5, "role": "guest" },
+  "노숙": { "commanderId": "노숙", "classId": "strategist", "joinChapter": 5, "role": "guest" },
+  "황개": { "commanderId": "황개", "classId": "lightCavalry", "joinChapter": 5, "role": "guest" }
+}

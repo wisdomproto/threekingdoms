@@ -10,12 +10,14 @@ export interface UnitState {
   side: Side;
   x: number; y: number;
   level: number;
+  exp: number;                        // 누적 경험치 (§10 행동 기반). 레벨업 시 expForNextLevel(level)만큼 차감
   troops: number; maxTroops: number;  // 병력 = 원작 HP (병력 0 = 퇴각, 사망 없음)
   morale: number;                     // 사기 — 공/방 직접 가산. 변동 규칙 미해독으로 당분간 고정 100
   mp: number; maxMp: number;          // 책략치 = (레벨+10)×지력÷40
   war: number; leadership: number; intelligence: number;
   baseAtk: number; baseDef: number;
   weaponBonus: number;                // 1 + 최고 무기 bonusPercent/100 (소지품 중 최고 1개 — 원작 룰)
+  bookBonus: number;                  // 1 + 최고 병법서(book) bonusPercent/100 — 정신력(spiritPower)에 곱
   move: number;
   rangeMin: number; rangeMax: number;
   moved: boolean; acted: boolean; retreated: boolean;
@@ -42,6 +44,7 @@ export type BattleEvent =
   | { type: "damageDealt"; attackerId: string; defenderId: string; damage: number; counter: boolean }
   | { type: "strategyCast"; casterId: string; strategyId: string; target: Coord }
   | { type: "unitRetreated"; unitId: string }
+  | { type: "levelUp"; unitId: string; newLevel: number }
   | { type: "duelTriggered"; eventId: string; attackerId: string; defenderId: string; winnerId: string }
   | { type: "phaseChanged"; phase: Side; turn: number }
   | { type: "battleEnded"; result: "victory" | "defeat" };

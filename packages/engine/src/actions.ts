@@ -2,7 +2,7 @@ import type { Action, ActionResult, BattleContext, BattleEvent, BattleState, Uni
 import { getMovableTiles, unitAt } from "./movement";
 import {
   computeDamage, distance, getAttackableTargets,
-  strategyDamage, strategyAoeCells, getStrategyTargets,
+  strategyDamage, strategyAoeCells, getStrategyTargets, expForNextLevel,
 } from "./combat";
 import { findDuelTrigger } from "./events";
 
@@ -35,6 +35,37 @@ function dealDamage(
   ];
   if (retreated) events.push({ type: "unitRetreated", unitId: defender.id });
   return { state: replaceUnit(state, { ...defender, troops, retreated }), events };
+}
+
+/**
+ * 경험치 부여 (§10 행동 기반). 결정론 — 난수 없음.
+ *  gain = round(damage/2) + (대상 퇴각/전멸 시 defenderLevelAtHit×10 + 20 : 0)
+ *  누적 후 레벨업: while (exp >= level×50 && level < cap) { exp -= level×50; level++; emit levelUp }
+ *  cap = ctx.stage.levelCap ?? 99. defenderLevelAtHit = 피격 직전 대상 레벨(데미지 적용 전 값).
+ */
+function grantExp(
+  ctx: BattleContext,
+  state: BattleState,
+  attackerId: string,
+  damage: number,
+  defenderDowned: boolean,
+  defenderLevelAtHit: number,
+): { state: BattleState; events: BattleEvent[] } {
+  const events: BattleEvent[] = [];
+  const attacker = state.units.find((u) => u.id === attackerId);
+  if (!attacker) return { state, events };
+  const cap = ctx.stage.levelCap ?? 99;
+  const kill = defenderDowned ? defenderLevelAtHit * 10 + 20 : 0;
+  const gain = Math.round(damage / 2) + kill;
+
+  let level = attacker.level;
+  let exp = attacker.exp + gain;
+  while (exp >= expForNextLevel(level) && level < cap) {
+    exp -= expForNextLevel(level);
+    level += 1;
+    events.push({ type: "levelUp", unitId: attackerId, newLevel: level });
+  }
+  return { state: replaceUnit(state, { ...attacker, level, exp }), events };
 }
 
 /** 승패 판정. 충족 시 status 변경 + battleEnded 이벤트 */
@@ -124,9 +155,14 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
 
       // 일반 공격 — 원작 룰: 명중 100%, 분산 없음
       const dmg = computeDamage(ctx, unit, target);
+      const targetLevelAtHit = getUnit(next, target.id).level;
       const hit = dealDamage(next, unit, getUnit(next, target.id), dmg, false);
       next = hit.state;
       events.push(...hit.events);
+      // 경험치: 데미지 절반 + 격파(퇴각) 보너스
+      const atkExp = grantExp(ctx, next, unit.id, dmg, getUnit(next, target.id).retreated, targetLevelAtHit);
+      next = atkExp.state;
+      events.push(...atkExp.events);
 
       // 반격: 방어측 생존 + 공격측이 방어측 사거리 안
       const defender = getUnit(next, target.id);
@@ -134,9 +170,14 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
         const d = distance({ x: unit.x, y: unit.y }, { x: defender.x, y: defender.y });
         if (d >= defender.rangeMin && d <= defender.rangeMax) {
           const ctrDmg = computeDamage(ctx, defender, getUnit(next, unit.id), ctx.data.combat.counterRatio);
+          const attackerLevelAtHit = getUnit(next, unit.id).level;
           const ctr = dealDamage(next, defender, getUnit(next, unit.id), ctrDmg, true);
           next = ctr.state;
           events.push(...ctr.events);
+          // 반격 경험치는 반격자(방어측)에게
+          const ctrExp = grantExp(ctx, next, defender.id, ctrDmg, getUnit(next, unit.id).retreated, attackerLevelAtHit);
+          next = ctrExp.state;
+          events.push(...ctrExp.events);
         }
       }
       // 반격으로 공격자가 퇴각했어도 acted=true로 통일 — maybeAdvancePhase의 retreated 필터가 가드

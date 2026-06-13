@@ -19,10 +19,11 @@ import { BattleStore } from "./store";
 import type { Presenter, PresentedSnapshot } from "./eventPlayer";
 import type { UiEvent } from "./inputMachine";
 import { BattleRenderer } from "../pixi/BattleRenderer";
+import { readSortie, applySortieToStage } from "../meta/sortie";
 import { UnitPanel } from "./hud/UnitPanel";
 import { ActionMenu } from "./hud/ActionMenu";
 import { TurnBanner } from "./hud/TurnBanner";
-import { ResultOverlay } from "./hud/ResultOverlay";
+import { ResultSequence } from "./hud/ResultSequence";
 import { BattleControls } from "./hud/BattleControls";
 import { Minimap } from "./hud/Minimap";
 import type { InputState } from "./inputMachine";
@@ -98,10 +99,22 @@ function activeUnitId(ui: InputState): string | null {
   }
 }
 
+/**
+ * BattleContext 생성. 출진 페이로드(sessionStorage tk.sortie)가 있으면 그 stageId의
+ * stage를 고르고 player 슬롯을 편성으로 override한다. 없으면 사수관을 기존 그대로 로드
+ * (override 진입점이 no-op → 전투 테스트/직접 /battle 진입 회귀 없음).
+ */
 function makeCtx(): BattleContext {
-  const stage = gameData.stages["05-sishuiguan"];
-  const map = stage ? gameData.maps[stage.mapId] : undefined;
-  if (!stage || !map) throw new Error("사수관 데이터 누락 — @tk/data 로더 확인");
+  const sortie = readSortie();
+  const stageId = sortie?.stageId ?? "05-sishuiguan";
+  const baseStage = gameData.stages[stageId] ?? gameData.stages["05-sishuiguan"];
+  const map = baseStage ? gameData.maps[baseStage.mapId] : undefined;
+  if (!baseStage || !map) throw new Error("스테이지 데이터 누락 — @tk/data 로더 확인");
+  // 편성이 있으면 player 슬롯만 교체한 stage 사본을 만든다(없으면 원본 그대로).
+  const stage =
+    sortie && sortie.members.length > 0
+      ? { ...baseStage, units: applySortieToStage(baseStage, sortie.members) }
+      : baseStage;
   return { data: gameData, stage, map };
 }
 
@@ -186,7 +199,13 @@ export default function BattleScreen(): React.ReactElement {
           onCycleSpeed={cycleSpeed}
         />
       </div>
-      <ResultOverlay ui={snap.ui} vm={snap.vm} />
+      <ResultSequence
+        ui={snap.ui}
+        vm={snap.vm}
+        reward={ctx.stage.reward}
+        items={ctx.data.items}
+        stageId={ctx.stage.id}
+      />
     </div>
   );
 }
