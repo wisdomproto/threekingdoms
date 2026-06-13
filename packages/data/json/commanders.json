@@ -2,57 +2,57 @@
   "유비": {
     "id": "유비",
     "name": "유비",
-    "leadership": 91,
-    "war": 75,
-    "intelligence": 64,
+    "leadership": 72,
+    "war": 78,
+    "intelligence": 76,
     "faceId": 0
   },
   "관우": {
     "id": "관우",
     "name": "관우",
-    "leadership": 100,
-    "war": 98,
-    "intelligence": 80,
+    "leadership": 98,
+    "war": 96,
+    "intelligence": 90,
     "faceId": 1
   },
   "장비": {
     "id": "장비",
     "name": "장비",
-    "leadership": 83,
-    "war": 99,
-    "intelligence": 42,
+    "leadership": 74,
+    "war": 100,
+    "intelligence": 46,
     "faceId": 2
   },
   "동탁": {
     "id": "동탁",
     "name": "동탁",
-    "leadership": 78,
-    "war": 89,
-    "intelligence": 54,
+    "leadership": 92,
+    "war": 88,
+    "intelligence": 46,
     "faceId": 136
   },
   "여포": {
     "id": "여포",
     "name": "여포",
-    "leadership": 80,
+    "leadership": 100,
     "war": 100,
-    "intelligence": 21,
+    "intelligence": 12,
     "faceId": 148
   },
   "화웅": {
     "id": "화웅",
     "name": "화웅",
-    "leadership": 88,
+    "leadership": 82,
     "war": 90,
-    "intelligence": 29,
+    "intelligence": 38,
     "faceId": 138
   },
   "이유": {
     "id": "이유",
     "name": "이유",
-    "leadership": 77,
-    "war": 25,
-    "intelligence": 90,
+    "leadership": 66,
+    "war": 50,
+    "intelligence": 92,
     "faceId": 137
   },
   "공융": {
@@ -67,104 +67,104 @@
     "id": "조조",
     "name": "조조",
     "leadership": 98,
-    "war": 75,
-    "intelligence": 94,
+    "war": 82,
+    "intelligence": 92,
     "faceId": 27
   },
   "원소": {
     "id": "원소",
     "name": "원소",
-    "leadership": 71,
-    "war": 58,
-    "intelligence": 47,
+    "leadership": 76,
+    "war": 70,
+    "intelligence": 74,
     "faceId": 110
   },
   "손견": {
     "id": "손견",
     "name": "손견",
-    "leadership": 81,
-    "war": 90,
-    "intelligence": 62,
+    "leadership": 80,
+    "war": 92,
+    "intelligence": 72,
     "faceId": 77
   },
   "원술": {
     "id": "원술",
     "name": "원술",
-    "leadership": 71,
-    "war": 79,
-    "intelligence": 43,
+    "leadership": 58,
+    "war": 64,
+    "intelligence": 62,
     "faceId": 144
   },
   "공손찬": {
     "id": "공손찬",
     "name": "공손찬",
-    "leadership": 67,
-    "war": 71,
-    "intelligence": 55,
+    "leadership": 60,
+    "war": 60,
+    "intelligence": 60,
     "faceId": 107
   },
   "정보": {
     "id": "정보",
     "name": "정보",
-    "leadership": 73,
-    "war": 69,
-    "intelligence": 81,
+    "leadership": 84,
+    "war": 90,
+    "intelligence": 68,
     "faceId": 78
   },
   "황개": {
     "id": "황개",
     "name": "황개",
-    "leadership": 74,
-    "war": 86,
-    "intelligence": 66,
+    "leadership": 78,
+    "war": 90,
+    "intelligence": 58,
     "faceId": 170
   },
   "도겸": {
     "id": "도겸",
     "name": "도겸",
-    "leadership": 42,
-    "war": 53,
-    "intelligence": 61,
+    "leadership": 64,
+    "war": 74,
+    "intelligence": 72,
     "faceId": 189
   },
   "하후돈": {
     "id": "하후돈",
     "name": "하후돈",
-    "leadership": 87,
-    "war": 95,
-    "intelligence": 60,
+    "leadership": 82,
+    "war": 98,
+    "intelligence": 64,
     "faceId": 28
   },
   "하후연": {
     "id": "하후연",
     "name": "하후연",
-    "leadership": 86,
-    "war": 90,
-    "intelligence": 52,
+    "leadership": 80,
+    "war": 92,
+    "intelligence": 62,
     "faceId": 29
   },
   "조인": {
     "id": "조인",
     "name": "조인",
-    "leadership": 79,
-    "war": 80,
-    "intelligence": 62,
+    "leadership": 76,
+    "war": 88,
+    "intelligence": 66,
     "faceId": 30
   },
   "조홍": {
     "id": "조홍",
     "name": "조홍",
-    "leadership": 74,
-    "war": 74,
-    "intelligence": 47,
+    "leadership": 78,
+    "war": 64,
+    "intelligence": 82,
     "faceId": 31
   },
   "이숙": {
     "id": "이숙",
     "name": "이숙",
-    "leadership": 50,
-    "war": 54,
-    "intelligence": 68,
+    "leadership": 38,
+    "war": 34,
+    "intelligence": 82,
     "faceId": 139
   },
   "호진": {
@@ -194,9 +194,9 @@
   "염포": {
     "id": "염포",
     "name": "염포",
-    "leadership": 27,
-    "war": 36,
-    "intelligence": 80,
+    "leadership": 56,
+    "war": 48,
+    "intelligence": 84,
     "faceId": 200
   },
   "공손월": {
@@ -242,9 +242,9 @@
   "마속": {
     "id": "마속",
     "name": "마속",
-    "leadership": 54,
-    "war": 65,
-    "intelligence": 84,
+    "leadership": 58,
+    "war": 74,
+    "intelligence": 88,
     "faceId": 26
   },
   "이풍": {
@@ -266,17 +266,17 @@
   "요화": {
     "id": "요화",
     "name": "요화",
-    "leadership": 41,
-    "war": 78,
-    "intelligence": 60,
+    "leadership": 64,
+    "war": 80,
+    "intelligence": 34,
     "faceId": 16
   },
   "사마가": {
     "id": "사마가",
     "name": "사마가",
-    "leadership": 74,
-    "war": 91,
-    "intelligence": 18,
+    "leadership": 52,
+    "war": 88,
+    "intelligence": 28,
     "faceId": 216
   },
   "순상": {
@@ -298,9 +298,9 @@
   "왕보": {
     "id": "왕보",
     "name": "왕보",
-    "leadership": 74,
-    "war": 52,
-    "intelligence": 73,
+    "leadership": 76,
+    "war": 58,
+    "intelligence": 78,
     "faceId": 63
   },
   "조루": {
@@ -346,17 +346,17 @@
   "장포": {
     "id": "장포",
     "name": "장포",
-    "leadership": 83,
+    "leadership": 78,
     "war": 92,
-    "intelligence": 37,
+    "intelligence": 52,
     "faceId": 211
   },
   "한당": {
     "id": "한당",
     "name": "한당",
-    "leadership": 59,
-    "war": 60,
-    "intelligence": 42,
+    "leadership": 76,
+    "war": 84,
+    "intelligence": 60,
     "faceId": 88
   },
   "주연": {
@@ -370,81 +370,81 @@
   "이각": {
     "id": "이각",
     "name": "이각",
-    "leadership": 49,
-    "war": 63,
-    "intelligence": 42,
+    "leadership": 76,
+    "war": 76,
+    "intelligence": 60,
     "faceId": 141
   },
   "곽사": {
     "id": "곽사",
     "name": "곽사",
-    "leadership": 59,
-    "war": 61,
-    "intelligence": 33,
+    "leadership": 78,
+    "war": 74,
+    "intelligence": 62,
     "faceId": 142
   },
   "서영": {
     "id": "서영",
     "name": "서영",
-    "leadership": 38,
-    "war": 54,
-    "intelligence": 38,
+    "leadership": 74,
+    "war": 84,
+    "intelligence": 50,
     "faceId": 143
   },
   "전풍": {
     "id": "전풍",
     "name": "전풍",
-    "leadership": 88,
-    "war": 45,
-    "intelligence": 90,
+    "leadership": 68,
+    "war": 54,
+    "intelligence": 96,
     "faceId": 113
   },
   "저수": {
     "id": "저수",
     "name": "저수",
-    "leadership": 71,
-    "war": 60,
-    "intelligence": 85,
+    "leadership": 68,
+    "war": 52,
+    "intelligence": 94,
     "faceId": 114
   },
   "안량": {
     "id": "안량",
     "name": "안량",
-    "leadership": 84,
-    "war": 87,
-    "intelligence": 32,
+    "leadership": 70,
+    "war": 94,
+    "intelligence": 42,
     "faceId": 111
   },
   "문추": {
     "id": "문추",
     "name": "문추",
-    "leadership": 86,
-    "war": 91,
-    "intelligence": 19,
+    "leadership": 74,
+    "war": 94,
+    "intelligence": 36,
     "faceId": 112
   },
   "조운": {
     "id": "조운",
     "name": "조운",
-    "leadership": 87,
-    "war": 98,
-    "intelligence": 84,
+    "leadership": 82,
+    "war": 96,
+    "intelligence": 68,
     "faceId": 3
   },
   "봉기": {
     "id": "봉기",
     "name": "봉기",
     "leadership": 66,
-    "war": 54,
-    "intelligence": 82,
+    "war": 48,
+    "intelligence": 84,
     "faceId": 122
   },
   "허유": {
     "id": "허유",
     "name": "허유",
-    "leadership": 40,
-    "war": 45,
-    "intelligence": 61,
+    "leadership": 30,
+    "war": 46,
+    "intelligence": 82,
     "faceId": 123
   },
   "진진": {
@@ -490,33 +490,33 @@
   "곽가": {
     "id": "곽가",
     "name": "곽가",
-    "leadership": 32,
-    "war": 36,
-    "intelligence": 97,
+    "leadership": 64,
+    "war": 22,
+    "intelligence": 98,
     "faceId": 34
   },
   "우금": {
     "id": "우금",
     "name": "우금",
-    "leadership": 62,
-    "war": 60,
-    "intelligence": 52,
+    "leadership": 76,
+    "war": 78,
+    "intelligence": 60,
     "faceId": 39
   },
   "손건": {
     "id": "손건",
     "name": "손건",
-    "leadership": 34,
-    "war": 38,
-    "intelligence": 74,
+    "leadership": 58,
+    "war": 76,
+    "intelligence": 66,
     "faceId": 12
   },
   "미축": {
     "id": "미축",
     "name": "미축",
-    "leadership": 36,
-    "war": 40,
-    "intelligence": 64,
+    "leadership": 68,
+    "war": 72,
+    "intelligence": 68,
     "faceId": 13
   },
   "진등": {
@@ -538,25 +538,25 @@
   "허저": {
     "id": "허저",
     "name": "허저",
-    "leadership": 94,
-    "war": 97,
-    "intelligence": 25,
+    "leadership": 90,
+    "war": 98,
+    "intelligence": 36,
     "faceId": 37
   },
   "순욱": {
     "id": "순욱",
     "name": "순욱",
-    "leadership": 62,
-    "war": 37,
-    "intelligence": 96,
+    "leadership": 82,
+    "war": 54,
+    "intelligence": 98,
     "faceId": 32
   },
   "기영": {
     "id": "기영",
     "name": "기영",
-    "leadership": 70,
-    "war": 70,
-    "intelligence": 35,
+    "leadership": 84,
+    "war": 80,
+    "intelligence": 66,
     "faceId": 146
   },
   "동소": {
@@ -578,17 +578,17 @@
   "고순": {
     "id": "고순",
     "name": "고순",
-    "leadership": 63,
-    "war": 56,
-    "intelligence": 60,
+    "leadership": 90,
+    "war": 88,
+    "intelligence": 48,
     "faceId": 150
   },
   "위속": {
     "id": "위속",
     "name": "위속",
-    "leadership": 68,
-    "war": 72,
-    "intelligence": 46,
+    "leadership": 76,
+    "war": 78,
+    "intelligence": 42,
     "faceId": 151
   },
   "송겸": {
@@ -602,33 +602,33 @@
   "진궁": {
     "id": "진궁",
     "name": "진궁",
-    "leadership": 85,
-    "war": 54,
-    "intelligence": 80,
+    "leadership": 76,
+    "war": 68,
+    "intelligence": 90,
     "faceId": 149
   },
   "순유": {
     "id": "순유",
     "name": "순유",
-    "leadership": 60,
-    "war": 40,
+    "leadership": 80,
+    "war": 34,
     "intelligence": 94,
     "faceId": 33
   },
   "정욱": {
     "id": "정욱",
     "name": "정욱",
-    "leadership": 85,
-    "war": 25,
-    "intelligence": 90,
+    "leadership": 62,
+    "war": 58,
+    "intelligence": 92,
     "faceId": 35
   },
   "서황": {
     "id": "서황",
     "name": "서황",
-    "leadership": 83,
-    "war": 91,
-    "intelligence": 49,
+    "leadership": 90,
+    "war": 92,
+    "intelligence": 56,
     "faceId": 38
   },
   "장요": {
@@ -642,33 +642,33 @@
   "후성": {
     "id": "후성",
     "name": "후성",
-    "leadership": 65,
-    "war": 67,
-    "intelligence": 42,
+    "leadership": 70,
+    "war": 76,
+    "intelligence": 54,
     "faceId": 153
   },
   "미방": {
     "id": "미방",
     "name": "미방",
-    "leadership": 59,
-    "war": 63,
-    "intelligence": 25,
+    "leadership": 56,
+    "war": 78,
+    "intelligence": 52,
     "faceId": 14
   },
   "간옹": {
     "id": "간옹",
     "name": "간옹",
-    "leadership": 36,
-    "war": 42,
-    "intelligence": 74,
+    "leadership": 72,
+    "war": 54,
+    "intelligence": 68,
     "faceId": 15
   },
   "만총": {
     "id": "만총",
     "name": "만총",
-    "leadership": 30,
-    "war": 27,
-    "intelligence": 68,
+    "leadership": 68,
+    "war": 54,
+    "intelligence": 90,
     "faceId": 100
   },
   "허사": {
@@ -698,9 +698,9 @@
   "조성": {
     "id": "조성",
     "name": "조성",
-    "leadership": 66,
-    "war": 70,
-    "intelligence": 57,
+    "leadership": 74,
+    "war": 72,
+    "intelligence": 50,
     "faceId": 157
   },
   "손관": {
@@ -730,24 +730,24 @@
   "심배": {
     "id": "심배",
     "name": "심배",
-    "leadership": 73,
-    "war": 71,
-    "intelligence": 67,
+    "leadership": 64,
+    "war": 50,
+    "intelligence": 90,
     "faceId": 116
   },
   "곽도": {
     "id": "곽도",
     "name": "곽도",
-    "leadership": 31,
-    "war": 34,
-    "intelligence": 76,
+    "leadership": 56,
+    "war": 40,
+    "intelligence": 92,
     "faceId": 115
   },
   "가후": {
     "id": "가후",
     "name": "가후",
-    "leadership": 81,
-    "war": 40,
+    "leadership": 68,
+    "war": 52,
     "intelligence": 96,
     "faceId": 42
   },
@@ -778,9 +778,9 @@
   "마등": {
     "id": "마등",
     "name": "마등",
-    "leadership": 89,
-    "war": 94,
-    "intelligence": 53,
+    "leadership": 94,
+    "war": 90,
+    "intelligence": 52,
     "faceId": 185
   },
   "진림": {
@@ -802,33 +802,33 @@
   "유엽": {
     "id": "유엽",
     "name": "유엽",
-    "leadership": 73,
-    "war": 35,
-    "intelligence": 85,
+    "leadership": 78,
+    "war": 72,
+    "intelligence": 84,
     "faceId": 57
   },
   "장수": {
     "id": "장수",
     "name": "장수",
-    "leadership": 68,
-    "war": 74,
-    "intelligence": 53,
+    "leadership": 76,
+    "war": 80,
+    "intelligence": 62,
     "faceId": 155
   },
   "장합": {
     "id": "장합",
     "name": "장합",
-    "leadership": 88,
+    "leadership": 68,
     "war": 90,
-    "intelligence": 62,
+    "intelligence": 66,
     "faceId": 117
   },
   "고람": {
     "id": "고람",
     "name": "고람",
-    "leadership": 72,
-    "war": 75,
-    "intelligence": 50,
+    "leadership": 68,
+    "war": 80,
+    "intelligence": 54,
     "faceId": 125
   },
   "한맹": {
@@ -842,9 +842,9 @@
   "순우경": {
     "id": "순우경",
     "name": "순우경",
-    "leadership": 68,
-    "war": 73,
-    "intelligence": 62,
+    "leadership": 56,
+    "war": 72,
+    "intelligence": 40,
     "faceId": 127
   },
   "장기": {
@@ -890,9 +890,9 @@
   "서서": {
     "id": "서서",
     "name": "서서",
-    "leadership": 85,
-    "war": 44,
-    "intelligence": 97,
+    "leadership": 60,
+    "war": 60,
+    "intelligence": 60,
     "faceId": 5
   },
   "채모": {
@@ -906,33 +906,33 @@
   "이적": {
     "id": "이적",
     "name": "이적",
-    "leadership": 72,
-    "war": 21,
-    "intelligence": 84,
+    "leadership": 42,
+    "war": 38,
+    "intelligence": 80,
     "faceId": 11
   },
   "유기": {
     "id": "유기",
     "name": "유기",
     "leadership": 50,
-    "war": 30,
-    "intelligence": 63,
+    "war": 62,
+    "intelligence": 68,
     "faceId": 177
   },
   "이전": {
     "id": "이전",
     "name": "이전",
-    "leadership": 73,
-    "war": 72,
-    "intelligence": 47,
+    "leadership": 90,
+    "war": 82,
+    "intelligence": 68,
     "faceId": 41
   },
   "유봉": {
     "id": "유봉",
     "name": "유봉",
-    "leadership": 59,
-    "war": 63,
-    "intelligence": 57,
+    "leadership": 78,
+    "war": 64,
+    "intelligence": 74,
     "faceId": 18
   },
   "장무": {
@@ -970,9 +970,9 @@
   "문빙": {
     "id": "문빙",
     "name": "문빙",
-    "leadership": 78,
-    "war": 84,
-    "intelligence": 24,
+    "leadership": 82,
+    "war": 86,
+    "intelligence": 64,
     "faceId": 179
   },
   "왕위": {
@@ -1010,17 +1010,17 @@
   "위연": {
     "id": "위연",
     "name": "위연",
-    "leadership": 80,
-    "war": 92,
-    "intelligence": 51,
+    "leadership": 58,
+    "war": 94,
+    "intelligence": 54,
     "faceId": 7
   },
   "관평": {
     "id": "관평",
     "name": "관평",
-    "leadership": 78,
-    "war": 80,
-    "intelligence": 74,
+    "leadership": 74,
+    "war": 90,
+    "intelligence": 68,
     "faceId": 19
   },
   "하후란": {
@@ -1058,8 +1058,8 @@
   "방통": {
     "id": "방통",
     "name": "방통",
-    "leadership": 88,
-    "war": 51,
+    "leadership": 68,
+    "war": 64,
     "intelligence": 98,
     "faceId": 8
   },
@@ -1082,9 +1082,9 @@
   "하후은": {
     "id": "하후은",
     "name": "하후은",
-    "leadership": 58,
-    "war": 60,
-    "intelligence": 62,
+    "leadership": 74,
+    "war": 76,
+    "intelligence": 58,
     "faceId": 58
   },
   "안명": {
@@ -1122,49 +1122,49 @@
   "하후걸": {
     "id": "하후걸",
     "name": "하후걸",
-    "leadership": 55,
-    "war": 72,
-    "intelligence": 31,
+    "leadership": 86,
+    "war": 92,
+    "intelligence": 50,
     "faceId": 59
   },
   "손권": {
     "id": "손권",
     "name": "손권",
     "leadership": 80,
-    "war": 86,
-    "intelligence": 87,
+    "war": 74,
+    "intelligence": 82,
     "faceId": 79
   },
   "주유": {
     "id": "주유",
     "name": "주유",
-    "leadership": 88,
-    "war": 75,
-    "intelligence": 95,
+    "leadership": 80,
+    "war": 78,
+    "intelligence": 98,
     "faceId": 80
   },
   "노숙": {
     "id": "노숙",
     "name": "노숙",
-    "leadership": 78,
-    "war": 61,
-    "intelligence": 95,
+    "leadership": 64,
+    "war": 52,
+    "intelligence": 94,
     "faceId": 86
   },
   "장소": {
     "id": "장소",
     "name": "장소",
-    "leadership": 29,
-    "war": 32,
+    "leadership": 46,
+    "war": 24,
     "intelligence": 92,
     "faceId": 81
   },
   "제갈근": {
     "id": "제갈근",
     "name": "제갈근",
-    "leadership": 46,
-    "war": 55,
-    "intelligence": 91,
+    "leadership": 48,
+    "war": 36,
+    "intelligence": 92,
     "faceId": 82
   },
   "감택": {
@@ -1186,25 +1186,25 @@
   "여몽": {
     "id": "여몽",
     "name": "여몽",
-    "leadership": 80,
-    "war": 84,
-    "intelligence": 91,
+    "leadership": 76,
+    "war": 80,
+    "intelligence": 88,
     "faceId": 83
   },
   "태사자": {
     "id": "태사자",
     "name": "태사자",
-    "leadership": 81,
+    "leadership": 88,
     "war": 94,
-    "intelligence": 67,
+    "intelligence": 68,
     "faceId": 85
   },
   "육손": {
     "id": "육손",
     "name": "육손",
-    "leadership": 85,
-    "war": 80,
-    "intelligence": 95,
+    "leadership": 82,
+    "war": 76,
+    "intelligence": 96,
     "faceId": 87
   },
   "포용": {
@@ -1234,9 +1234,9 @@
   "주창": {
     "id": "주창",
     "name": "주창",
-    "leadership": 82,
-    "war": 85,
-    "intelligence": 40,
+    "leadership": 62,
+    "war": 92,
+    "intelligence": 42,
     "faceId": 20
   },
   "고옹": {
@@ -1298,9 +1298,9 @@
   "주태": {
     "id": "주태",
     "name": "주태",
-    "leadership": 78,
-    "war": 87,
-    "intelligence": 53,
+    "leadership": 68,
+    "war": 94,
+    "intelligence": 52,
     "faceId": 102
   },
   "채훈": {
@@ -1314,33 +1314,33 @@
   "정봉": {
     "id": "정봉",
     "name": "정봉",
-    "leadership": 70,
-    "war": 75,
-    "intelligence": 65,
+    "leadership": 74,
+    "war": 76,
+    "intelligence": 46,
     "faceId": 90
   },
   "서성": {
     "id": "서성",
     "name": "서성",
-    "leadership": 59,
-    "war": 72,
-    "intelligence": 70,
+    "leadership": 72,
+    "war": 70,
+    "intelligence": 74,
     "faceId": 91
   },
   "능통": {
     "id": "능통",
     "name": "능통",
-    "leadership": 71,
-    "war": 81,
-    "intelligence": 65,
+    "leadership": 76,
+    "war": 90,
+    "intelligence": 56,
     "faceId": 92
   },
   "진무": {
     "id": "진무",
     "name": "진무",
-    "leadership": 58,
-    "war": 69,
-    "intelligence": 55,
+    "leadership": 68,
+    "war": 72,
+    "intelligence": 50,
     "faceId": 93
   },
   "모개": {
@@ -1354,17 +1354,17 @@
   "황충": {
     "id": "황충",
     "name": "황충",
-    "leadership": 90,
-    "war": 95,
-    "intelligence": 67,
+    "leadership": 68,
+    "war": 92,
+    "intelligence": 62,
     "faceId": 6
   },
   "우금_2": {
     "id": "우금_2",
     "name": "우금",
-    "leadership": 73,
-    "war": 82,
-    "intelligence": 35,
+    "leadership": 76,
+    "war": 78,
+    "intelligence": 60,
     "faceId": 49
   },
   "진교": {
@@ -1386,9 +1386,9 @@
   "반장": {
     "id": "반장",
     "name": "반장",
-    "leadership": 72,
-    "war": 75,
-    "intelligence": 39,
+    "leadership": 78,
+    "war": 60,
+    "intelligence": 62,
     "faceId": 94
   },
   "마량": {
@@ -1498,33 +1498,33 @@
   "법정": {
     "id": "법정",
     "name": "법정",
-    "leadership": 66,
-    "war": 52,
-    "intelligence": 87,
+    "leadership": 48,
+    "war": 46,
+    "intelligence": 86,
     "faceId": 9
   },
   "유장": {
     "id": "유장",
     "name": "유장",
-    "leadership": 47,
-    "war": 52,
-    "intelligence": 51,
+    "leadership": 60,
+    "war": 60,
+    "intelligence": 60,
     "faceId": 159
   },
   "마초": {
     "id": "마초",
     "name": "마초",
-    "leadership": 88,
-    "war": 97,
-    "intelligence": 44,
+    "leadership": 86,
+    "war": 94,
+    "intelligence": 40,
     "faceId": 186
   },
   "맹달": {
     "id": "맹달",
     "name": "맹달",
-    "leadership": 71,
-    "war": 73,
-    "intelligence": 70,
+    "leadership": 82,
+    "war": 74,
+    "intelligence": 72,
     "faceId": 61
   },
   "왕누": {
@@ -1594,57 +1594,57 @@
   "오의": {
     "id": "오의",
     "name": "오의",
-    "leadership": 70,
-    "war": 71,
-    "intelligence": 69,
+    "leadership": 82,
+    "war": 80,
+    "intelligence": 46,
     "faceId": 171
   },
   "오란": {
     "id": "오란",
     "name": "오란",
-    "leadership": 85,
-    "war": 88,
-    "intelligence": 43,
+    "leadership": 80,
+    "war": 82,
+    "intelligence": 72,
     "faceId": 172
   },
   "뇌동": {
     "id": "뇌동",
     "name": "뇌동",
-    "leadership": 81,
-    "war": 86,
-    "intelligence": 43,
+    "leadership": 78,
+    "war": 84,
+    "intelligence": 42,
     "faceId": 173
   },
   "엄안": {
     "id": "엄안",
     "name": "엄안",
-    "leadership": 87,
-    "war": 86,
-    "intelligence": 71,
+    "leadership": 68,
+    "war": 84,
+    "intelligence": 62,
     "faceId": 23
   },
   "마대": {
     "id": "마대",
     "name": "마대",
-    "leadership": 74,
-    "war": 84,
-    "intelligence": 47,
+    "leadership": 90,
+    "war": 86,
+    "intelligence": 48,
     "faceId": 187
   },
   "장노": {
     "id": "장노",
     "name": "장노",
-    "leadership": 73,
-    "war": 72,
-    "intelligence": 80,
+    "leadership": 60,
+    "war": 44,
+    "intelligence": 88,
     "faceId": 191
   },
   "장위": {
     "id": "장위",
     "name": "장위",
-    "leadership": 62,
-    "war": 72,
-    "intelligence": 35,
+    "leadership": 70,
+    "war": 74,
+    "intelligence": 56,
     "faceId": 192
   },
   "양임": {
@@ -1690,25 +1690,25 @@
   "조창": {
     "id": "조창",
     "name": "조창",
-    "leadership": 93,
-    "war": 81,
-    "intelligence": 42,
+    "leadership": 76,
+    "war": 92,
+    "intelligence": 58,
     "faceId": 53
   },
   "조비": {
     "id": "조비",
     "name": "조비",
-    "leadership": 65,
-    "war": 68,
-    "intelligence": 65,
+    "leadership": 92,
+    "war": 70,
+    "intelligence": 68,
     "faceId": 67
   },
   "사마의": {
     "id": "사마의",
     "name": "사마의",
-    "leadership": 95,
-    "war": 48,
-    "intelligence": 99,
+    "leadership": 68,
+    "war": 78,
+    "intelligence": 100,
     "faceId": 66
   },
   "조휴": {
@@ -1722,9 +1722,9 @@
   "방덕": {
     "id": "방덕",
     "name": "방덕",
-    "leadership": 81,
-    "war": 94,
-    "intelligence": 65,
+    "leadership": 96,
+    "war": 90,
+    "intelligence": 78,
     "faceId": 188
   },
   "관해": {
@@ -1738,9 +1738,9 @@
   "악진": {
     "id": "악진",
     "name": "악진",
-    "leadership": 74,
-    "war": 74,
-    "intelligence": 39,
+    "leadership": 92,
+    "war": 78,
+    "intelligence": 76,
     "faceId": 40
   },
   "왕철": {
@@ -1906,9 +1906,9 @@
   "조식": {
     "id": "조식",
     "name": "조식",
-    "leadership": 13,
-    "war": 15,
-    "intelligence": 78,
+    "leadership": 60,
+    "war": 60,
+    "intelligence": 60,
     "faceId": 204
   },
   "사마사": {
@@ -1946,9 +1946,9 @@
   "강유": {
     "id": "강유",
     "name": "강유",
-    "leadership": 80,
-    "war": 90,
-    "intelligence": 94,
+    "leadership": 88,
+    "war": 84,
+    "intelligence": 92,
     "faceId": 21
   },
   "한영": {
@@ -1978,9 +1978,9 @@
   "유벽": {
     "id": "유벽",
     "name": "유벽",
-    "leadership": 65,
-    "war": 67,
-    "intelligence": 59,
+    "leadership": 68,
+    "war": 70,
+    "intelligence": 54,
     "faceId": 129
   },
   "유순": {
@@ -2002,32 +2002,32 @@
   "양수": {
     "id": "양수",
     "name": "양수",
-    "leadership": 28,
-    "war": 29,
-    "intelligence": 85,
+    "leadership": 60,
+    "war": 60,
+    "intelligence": 60,
     "faceId": 43
   },
   "왕평": {
     "id": "왕평",
     "name": "왕평",
-    "leadership": 72,
-    "war": 72,
-    "intelligence": 67,
+    "leadership": 84,
+    "war": 78,
+    "intelligence": 68,
     "faceId": 119
   },
   "유선": {
     "id": "유선",
     "name": "유선",
-    "leadership": 18,
-    "war": 22,
-    "intelligence": 20,
+    "leadership": 54,
+    "war": 40,
+    "intelligence": 56,
     "faceId": 196
   },
   "이엄": {
     "id": "이엄",
     "name": "이엄",
-    "leadership": 72,
-    "war": 75,
+    "leadership": 80,
+    "war": 68,
     "intelligence": 74,
     "faceId": 106
   },
@@ -2810,24 +2810,24 @@
   "축융": {
     "id": "축융",
     "name": "축융",
-    "leadership": 66,
-    "war": 82,
-    "intelligence": 32,
+    "leadership": 70,
+    "war": 84,
+    "intelligence": 30,
     "faceId": 231
   },
   "장완": {
     "id": "장완",
     "name": "장완",
-    "leadership": 73,
-    "war": 60,
-    "intelligence": 85,
+    "leadership": 60,
+    "war": 42,
+    "intelligence": 82,
     "faceId": 207
   },
   "비위": {
     "id": "비위",
     "name": "비위",
-    "leadership": 25,
-    "war": 23,
+    "leadership": 48,
+    "war": 40,
     "intelligence": 80,
     "faceId": 203
   }

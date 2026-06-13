@@ -8,12 +8,12 @@
  *    (분산 없음 계약 — v0.1 데미지 예보 UI의 기반).
  */
 import { describe, expect, it } from "vitest";
-import { applyAction, createBattle } from "@tk/engine";
+import { applyAction, createBattle, type Action } from "@tk/engine";
 import { chooseAction } from "@tk/sim";
 import { BattleStore } from "../store";
 import { TrackingPresenter } from "./fakePresenter";
 import { playGreedyToEnd } from "./greedyUi";
-import { sishuiCtx } from "./fixtures";
+import { sishuiCtx, withUnit } from "./fixtures";
 
 const ctx = sishuiCtx;
 const SEED = 42;
@@ -65,9 +65,9 @@ describe("fullBattle — 사수관 완주", () => {
     }
     expect(a.store.committedState).toEqual(pure);
 
-    // 회귀 베이스라인 메모: 그리디 vs 그리디(시드 42)는 일기토 미발동·22턴 defeat가 현재 균형.
-    // (일기토는 관우→화웅 직접 공격 조건 — 그리디는 최저 troops 대상을 치므로 안 걸린다.
-    //  사람 플레이/일기토 활용 전제의 스테이지라 시뮬 패배 자체는 설계 §11의 밸런스 이슈가 아니라 정책 한계.)
+    // 회귀 메모: UI 경유 완주 ≡ 순수 엔진 그리디 결과(상태/로그 동일)가 계약. 구체적 턴수·승패는
+    // commanders 스탯이 조조전으로 이식된 뒤 변동(맵=영걸전/시스템=조조전, §2-9) — 밸런스 재보정 전(§11)
+    // 이라 baseline 수치는 고정하지 않는다. 여기서 검증하는 건 결정론·경로 등가성뿐.
     expect(a.store.committedState.status).toBe(pure.status);
   }, 60_000);
 
@@ -83,28 +83,25 @@ describe("fullBattle — 사수관 완주", () => {
 });
 
 describe("결정론 회귀 — 드라이런 데미지 = 실제 커밋 데미지", () => {
-  it("모든 공격에 대해 복제 상태 드라이런의 damageDealt가 실제와 동일 (분산 없음)", () => {
-    let state = createBattle(ctx, SEED);
-    let checked = 0;
-    let guard = 0;
-    while (state.status === "ongoing" && guard++ < 10_000) {
-      const action = chooseAction(ctx, state);
-      if (!action) break;
-      if (action.type === "attack") {
-        // 드라이런: 깊은 복제 상태에 적용 — 예보가 실제 커밋과 한 치도 다르지 않아야 한다
-        const dry = applyAction(ctx, structuredClone(state), action);
-        const real = applyAction(ctx, state, action);
-        expect(dry.events.filter((e) => e.type === "damageDealt")).toEqual(
-          real.events.filter((e) => e.type === "damageDealt"),
-        );
-        expect(dry.state).toEqual(real.state);
-        state = real.state;
-        checked++;
-      } else {
-        state = applyAction(ctx, state, action).state;
-      }
-    }
-    expect(state.status).not.toBe("ongoing");
-    expect(checked).toBeGreaterThan(0);
-  }, 30_000);
+  // 결정론(dry==real)은 AI·밸런스·맵 경로와 무관한 applyAction 순수성 계약이다.
+  // 그리디 완주에 의존하면 commanders 조조전 이식 후 밸런스(§11)·맵별 경로에 흔들리므로,
+  // 인접 공격을 직접 구성해 속성만 검증한다. (유비→화웅: 일기토는 관우→화웅 한정이라 미발동)
+  it("복제 상태 드라이런의 damageDealt·결과 상태가 실제 커밋과 동일 (분산 없음)", () => {
+    const base = createBattle(ctx, SEED);
+    const def = base.units.find((u) => u.id === "화웅")!;
+    const occupied = new Set(base.units.filter((u) => !u.retreated).map((u) => `${u.x},${u.y}`));
+    const spot = ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const)
+      .map(([dx, dy]) => ({ x: def.x + dx, y: def.y + dy }))
+      .find((p) => p.x >= 0 && p.y >= 0 && p.x < ctx.map.width && p.y < ctx.map.height && !occupied.has(`${p.x},${p.y}`))!;
+    const state = withUnit(base, "유비", { x: spot.x, y: spot.y }); // 화웅 인접 배치
+    const action: Action = { type: "attack", unitId: "유비", targetId: "화웅" };
+
+    const dry = applyAction(ctx, structuredClone(state), action);
+    const real = applyAction(ctx, state, action);
+    expect(dry.events.filter((e) => e.type === "damageDealt")).toEqual(
+      real.events.filter((e) => e.type === "damageDealt"),
+    );
+    expect(dry.state).toEqual(real.state);
+    expect(real.events.some((e) => e.type === "damageDealt")).toBe(true); // 실제 교전 발생 확인
+  });
 });

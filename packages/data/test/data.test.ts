@@ -48,8 +48,9 @@ describe("게임 데이터 v2 무결성", () => {
     for (const [k, v] of Object.entries(gameData.unitClasses)) expect(v.id).toBe(k);
   });
 
-  it("생성된 장수 데이터가 레퍼런스와 일치 (관우/여포)", () => {
-    expect(gameData.commanders["관우"]).toMatchObject({ leadership: 100, war: 98, intelligence: 80 });
+  it("장수 데이터가 조조전 스탯으로 이식됨 (관우/여포, ×2 스케일)", () => {
+    // 맵=영걸전 / 시스템=조조전 (CLAUDE.md §2-9). commanders 스탯은 조조전 DATA.E5 값 ×2.
+    expect(gameData.commanders["관우"]).toMatchObject({ leadership: 98, war: 96, intelligence: 90 });
     expect(gameData.commanders["여포"]!.war).toBe(100);
     expect(Object.keys(gameData.commanders).length).toBeGreaterThan(300);
   });
