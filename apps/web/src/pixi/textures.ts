@@ -4,12 +4,18 @@
  * RenderTexture로 1회 베이크 → 전 스프라이트가 공유(풀 배칭).
  * v0.1(에셋 통합): loadSprites()로 manifest.json을 읽어 스프라이트 텍스처를 비동기 로드.
  *   getSprite(spriteId, pose) → Texture | null (null = 폴백 색 사각형 유지 필수)
- * v0.2(지형 타일): loadTiles()로 tiles-manifest.json을 읽어 지형 이미지 타일을 비동기 로드.
- *   getTerrain(terrainId, variant) → 이미지+1px 외곽선 합성 Texture.
+ * v0.2(지형 타일): loadTiles()로 tiles-manifest.json v2를 읽어 지형 이미지 타일을 비동기 로드.
+ *   manifest v2 형식: { terrainId: { kind: "macro"|"tile", size: 6|1, count: N } }
+ *   - kind="macro": terrainId_macro_{n}.png (288×288). getTerrain(id, x, y)에서
+ *     (x%6, y%6) 기반 서브렉트 Texture를 반환 — 인접 타일이 같은 매크로를 공유해 이어진 지도처럼 보임.
+ *     캐시 키: "${id}:macro:${n}:${mx}:${my}" (지형당 최대 6×6×count개).
+ *   - kind="tile": terrainId_{n}.png (96×96). 기존 변형 해시 방식 유지.
+ *   getTerrain 시그니처: (terrainId, x, y) — variant 해시는 내부에서 처리.
  *   미보유 지형/로드 전엔 기존 단색 베이크 반환 (폴백 유지 필수).
+ *   외곽선: macro 지형은 없음(이어짐이 핵심), tile 지형은 alpha 0.25로 완화.
  * 향후 atlas frame 반환 구현으로 교체해도 소비측 호출은 불변 — placeholder→에셋 교체 경로의 핵심.
  */
-import { Assets, Container, Graphics, Sprite, Texture, type Renderer } from "pixi.js";
+import { Assets, Container, Graphics, Rectangle, Sprite, Texture, type Renderer } from "pixi.js";
 import { TILE_SIZE } from "./projection";
 
 /** 지형 14종 베이스 색 (terrains.json의 id와 1:1) */
@@ -47,6 +53,14 @@ interface ManifestEntry {
 }
 type Manifest = Record<string, ManifestEntry>;
 
+/** tiles-manifest.json v2 형식 */
+interface TileManifestEntry {
+  kind: "macro" | "tile";
+  size: number; // macro=6, tile=1
+  count: number;
+}
+type TilesManifest = Record<string, TileManifestEntry>;
+
 /** 스프라이트 포즈 키: "{view}_{pose}" */
 export type SpritePose = "front_idle" | "front_move" | "front_attack" | "back_idle" | "back_move" | "back_attack";
 
@@ -68,10 +82,24 @@ export class TextureResolver {
   /** spriteId → pose → Texture. loadSprites() 완료 후에만 채워진다 */
   private readonly sprites = new Map<string, Map<string, Texture>>();
   /**
-   * terrainId → variant[] → Texture (이미지+외곽선 합성).
+   * 지형 메타: terrainId → TileManifestEntry.
    * loadTiles() 완료 후에만 채워진다.
    */
-  private readonly tiles = new Map<string, Texture[]>();
+  private readonly tileMeta = new Map<string, TileManifestEntry>();
+  /**
+   * tile 지형: terrainId → variant[] → Texture (이미지+외곽선 합성, 96×96).
+   */
+  private readonly tileTex = new Map<string, Texture[]>();
+  /**
+   * macro 지형: terrainId → variantIndex → rawTexture (288×288 원본).
+   * 서브렉트 텍스처는 macroSubRect 캐시에서 온디맨드 생성.
+   */
+  private readonly macroTex = new Map<string, Texture[]>();
+  /**
+   * macro 서브렉트 텍스처 캐시.
+   * 키: "${terrainId}:${variantIdx}:${mx}:${my}" → Texture (48×48 서브렉트)
+   */
+  private readonly macroSubCache = new Map<string, Texture>();
   /** Pixi Renderer 참조 — 타일 텍스처 베이크에 필요 */
   private readonly renderer: Renderer;
 
@@ -177,30 +205,44 @@ export class TextureResolver {
   }
 
   /**
-   * tiles-manifest.json { terrainId: variantCount } 를 로드하고
-   * {terrainId}_{n}.png 를 비동기 로드 → 이미지+1px 외곽선 합성 RenderTexture로 베이크.
+   * tiles-manifest.json v2 { terrainId: { kind, size, count } } 를 로드.
+   * - kind="macro": {terrainId}_macro_{n}.png (288×288) 로드 → 서브렉트는 온디맨드.
+   * - kind="tile": {terrainId}_{n}.png (96×96) 로드 → 기존 외곽선 합성 베이크.
    * 실패 시 조용히 폴백(단색 베이크) 유지 — mount는 계속 진행.
    */
   async loadTiles(): Promise<void> {
-    let manifest: Record<string, number>;
+    let manifest: TilesManifest;
     try {
       const res = await fetch(`${TILE_BASE}/tiles-manifest.json`);
       if (!res.ok) {
         console.warn(`[TextureResolver] tiles-manifest.json 로드 실패 (${res.status}) — 단색 폴백 유지`);
         return;
       }
-      manifest = (await res.json()) as Record<string, number>;
+      manifest = (await res.json()) as TilesManifest;
     } catch (e) {
       console.warn("[TextureResolver] tiles-manifest.json fetch 오류 — 단색 폴백 유지", e);
       return;
     }
 
-    // 모든 타일 URL 수집
-    const loadQueue: Array<{ terrainId: string; variant: number; url: string }> = [];
-    for (const [terrainId, count] of Object.entries(manifest)) {
-      for (let n = 0; n < count; n++) {
-        const url = `${TILE_BASE}/${terrainId}_${n}.png`;
-        loadQueue.push({ terrainId, variant: n, url });
+    // manifest v2와 v1(숫자) 둘 다 허용 — 이전 파일 호환
+    const normalizedManifest: TilesManifest = {};
+    for (const [tid, entry] of Object.entries(manifest)) {
+      if (typeof entry === "number") {
+        // v1 호환: 숫자 = tile kind
+        normalizedManifest[tid] = { kind: "tile", size: 1, count: entry as number };
+      } else {
+        normalizedManifest[tid] = entry as TileManifestEntry;
+      }
+    }
+
+    // URL 수집
+    const loadQueue: Array<{ terrainId: string; variant: number; url: string; kind: "macro" | "tile" }> = [];
+    for (const [terrainId, meta] of Object.entries(normalizedManifest)) {
+      for (let n = 0; n < meta.count; n++) {
+        const url = meta.kind === "macro"
+          ? `${TILE_BASE}/${terrainId}_macro_${n}.png`
+          : `${TILE_BASE}/${terrainId}_${n}.png`;
+        loadQueue.push({ terrainId, variant: n, url, kind: meta.kind });
       }
     }
 
@@ -212,50 +254,71 @@ export class TextureResolver {
       console.warn("[TextureResolver] 지형 타일 텍스처 로드 오류 — 부분 폴백", e);
     }
 
-    // 지형별 variants 배열 구성 + 외곽선 합성 베이크
-    const grouped = new Map<string, Array<{ variant: number; url: string }>>();
+    // 지형별 분류
+    const macroGrouped = new Map<string, Array<{ variant: number; url: string }>>();
+    const tileGrouped = new Map<string, Array<{ variant: number; url: string }>>();
+
     for (const q of loadQueue) {
-      if (!grouped.has(q.terrainId)) grouped.set(q.terrainId, []);
-      grouped.get(q.terrainId)!.push(q);
+      if (q.kind === "macro") {
+        if (!macroGrouped.has(q.terrainId)) macroGrouped.set(q.terrainId, []);
+        macroGrouped.get(q.terrainId)!.push(q);
+      } else {
+        if (!tileGrouped.has(q.terrainId)) tileGrouped.set(q.terrainId, []);
+        tileGrouped.get(q.terrainId)!.push(q);
+      }
     }
 
-    for (const [terrainId, entries] of grouped) {
-      const variants: Texture[] = [];
-      // 항상 원래 순서(variant 번호) 보장
+    // macro 지형: 원본 텍스처를 그대로 저장 (서브렉트는 온디맨드)
+    for (const [terrainId, entries] of macroGrouped) {
       entries.sort((a, b) => a.variant - b.variant);
+      const textures: Texture[] = [];
       for (const { url } of entries) {
         const rawTex = loaded[url];
         if (!rawTex) continue;
-        // 이미지 스프라이트 + 1px 외곽선 합성 → RenderTexture (그리드 가독성 유지)
+        textures.push(rawTex);
+      }
+      if (textures.length > 0) {
+        this.macroTex.set(terrainId, textures);
+        this.tileMeta.set(terrainId, normalizedManifest[terrainId]!);
+      }
+    }
+
+    // tile 지형: 기존 외곽선 합성 베이크 (alpha 0.25로 완화)
+    for (const [terrainId, entries] of tileGrouped) {
+      entries.sort((a, b) => a.variant - b.variant);
+      const variants: Texture[] = [];
+      for (const { url } of entries) {
+        const rawTex = loaded[url];
+        if (!rawTex) continue;
         const baked = this.bakeImageTile(rawTex, terrainId);
         variants.push(baked);
       }
       if (variants.length > 0) {
-        this.tiles.set(terrainId, variants);
+        this.tileTex.set(terrainId, variants);
+        this.tileMeta.set(terrainId, normalizedManifest[terrainId]!);
       }
     }
 
-    const totalVariants = [...this.tiles.values()].reduce((s, v) => s + v.length, 0);
-    console.info(`[TextureResolver] 지형 타일 로드 완료: ${this.tiles.size}종 ${totalVariants}변형`);
+    const macroCount = [...this.macroTex.values()].reduce((s, v) => s + v.length, 0);
+    const tileCount = [...this.tileTex.values()].reduce((s, v) => s + v.length, 0);
+    console.info(`[TextureResolver] 지형 타일 로드 완료: macro ${this.macroTex.size}종 ${macroCount}장, tile ${this.tileTex.size}종 ${tileCount}변형`);
   }
 
   /**
-   * 이미지 Texture + 1px 외곽선을 RenderTexture로 합성 베이크.
-   * 그리드 가독성을 위해 기존 단색 타일과 동일하게 어두운 외곽선을 씌운다.
+   * tile 지형: 이미지 Texture + 1px 외곽선 합성 (alpha 0.25로 완화).
+   * 그리드 가독성은 선택 하이라이트가 담당 — 외곽선은 보조 역할만.
    */
   private bakeImageTile(imageTex: Texture, terrainId: string): Texture {
-    // 이미지를 TILE_SIZE×TILE_SIZE 스프라이트로, 외곽선을 Graphics로 겹쳐 베이크
     const container = new Container();
     const sprite = new Sprite(imageTex);
     sprite.width = TILE_SIZE;
     sprite.height = TILE_SIZE;
 
-    // 외곽선 색: 해당 지형 단색 베이스의 어두운 버전. 없으면 기본 어두운 회색
     const baseColor = TERRAIN_COLORS[terrainId] ?? 0x333333;
     const outlineColor = darken(baseColor, 0.75);
 
     const outline = new Graphics();
-    outline.rect(0, 0, TILE_SIZE, TILE_SIZE).stroke({ width: 1, color: outlineColor, alpha: 0.85 });
+    outline.rect(0, 0, TILE_SIZE, TILE_SIZE).stroke({ width: 1, color: outlineColor, alpha: 0.25 });
 
     container.addChild(sprite, outline);
     const tex = this.renderer.generateTexture(container);
@@ -264,16 +327,54 @@ export class TextureResolver {
   }
 
   /**
-   * 지형 이미지 타일 텍스처 조회.
-   * @param terrainId  지형 ID (TERRAIN_COLORS 키와 동일)
-   * @param variant    변형 인덱스 — (x*7 + y*13) % variantCount 패턴으로 호출
-   * @returns 이미지+외곽선 합성 Texture. 미보유(로드 전 또는 해당 지형 없음) 시 단색 베이크 폴백.
+   * macro 지형: (x%6, y%6) 기반 48×48 서브렉트 Texture를 반환 (온디맨드 생성, 캐시).
+   * 매크로 텍스처 1장이 6×6 타일을 커버 → 인접 타일이 연속된 그림처럼 보임.
    */
-  getTerrain(terrainId: string, variant: number): Texture {
-    const variants = this.tiles.get(terrainId);
-    if (variants && variants.length > 0) {
-      return variants[variant % variants.length]!;
+  private getMacroSubRect(terrainId: string, variantIdx: number, mx: number, my: number): Texture | null {
+    const macros = this.macroTex.get(terrainId);
+    if (!macros || macros.length === 0) return null;
+    const baseTex = macros[variantIdx % macros.length];
+    if (!baseTex) return null;
+
+    const cacheKey = `${terrainId}:${variantIdx % macros.length}:${mx}:${my}`;
+    const cached = this.macroSubCache.get(cacheKey);
+    if (cached) return cached;
+
+    // 매크로 텍스처 실제 크기 (devicePixelRatio 무관하게 논리 크기 기준)
+    const macroLogical = TILE_SIZE * 6; // 288px
+    const cellSize = macroLogical / 6;  // 48px = TILE_SIZE
+
+    const frame = new Rectangle(mx * cellSize, my * cellSize, cellSize, cellSize);
+    const sub = new Texture({ source: baseTex.source, frame });
+    this.macroSubCache.set(cacheKey, sub);
+    return sub;
+  }
+
+  /**
+   * 지형 이미지 타일 텍스처 조회.
+   * @param terrainId  지형 ID
+   * @param x          그리드 x 좌표 (macro: x%6 → 서브렉트 컬럼)
+   * @param y          그리드 y 좌표 (macro: y%6 → 서브렉트 행)
+   * @returns Texture. 미보유(로드 전 또는 미지원 지형) 시 단색 베이크 폴백.
+   */
+  getTerrain(terrainId: string, x: number, y: number): Texture {
+    const meta = this.tileMeta.get(terrainId);
+
+    if (meta?.kind === "macro") {
+      // macro: 어떤 변형을 선택할지 결정 (count가 1이면 항상 0)
+      const variantIdx = meta.count > 1 ? ((x * 7 + y * 13) % meta.count) : 0;
+      const mx = x % meta.size;
+      const my = y % meta.size;
+      const sub = this.getMacroSubRect(terrainId, variantIdx, mx, my);
+      if (sub) return sub;
+    } else if (meta?.kind === "tile") {
+      const variants = this.tileTex.get(terrainId);
+      if (variants && variants.length > 0) {
+        const variant = (x * 7 + y * 13) % variants.length;
+        return variants[variant]!;
+      }
     }
+
     // 폴백: 기존 단색 베이크 (로드 전 또는 미지원 지형)
     return this.get("terrain", terrainId);
   }
@@ -296,10 +397,16 @@ export class TextureResolver {
     this.baked.clear();
     // sprites는 Assets 전역 캐시가 관리 — 여기서 개별 destroy 안 함 (공유 참조 보호)
     this.sprites.clear();
-    // tiles는 bakeImageTile()이 생성한 RenderTexture — TextureResolver가 소유
-    for (const variants of this.tiles.values()) {
+    // tileTex: bakeImageTile()이 생성한 RenderTexture — TextureResolver가 소유
+    for (const variants of this.tileTex.values()) {
       for (const tex of variants) tex.destroy(true);
     }
-    this.tiles.clear();
+    this.tileTex.clear();
+    // macroTex: Assets 전역 캐시가 관리 — 공유 참조 보호
+    this.macroTex.clear();
+    // macroSubCache: source 공유 Texture — source는 macroTex가 소유하므로 frame만 정리
+    for (const tex of this.macroSubCache.values()) tex.destroy(false);
+    this.macroSubCache.clear();
+    this.tileMeta.clear();
   }
 }

@@ -1,10 +1,42 @@
 {
-  "plain": 3,
-  "forest": 3,
-  "mountain": 3,
-  "river": 3,
-  "wall": 3,
-  "bridge": 2,
-  "waste": 2,
-  "grass": 2
+  "plain": {
+    "kind": "macro",
+    "size": 6,
+    "count": 2
+  },
+  "forest": {
+    "kind": "macro",
+    "size": 6,
+    "count": 2
+  },
+  "mountain": {
+    "kind": "macro",
+    "size": 6,
+    "count": 2
+  },
+  "waste": {
+    "kind": "macro",
+    "size": 6,
+    "count": 2
+  },
+  "grass": {
+    "kind": "macro",
+    "size": 6,
+    "count": 2
+  },
+  "river": {
+    "kind": "tile",
+    "size": 1,
+    "count": 3
+  },
+  "wall": {
+    "kind": "tile",
+    "size": 1,
+    "count": 3
+  },
+  "bridge": {
+    "kind": "tile",
+    "size": 1,
+    "count": 2
+  }
 }

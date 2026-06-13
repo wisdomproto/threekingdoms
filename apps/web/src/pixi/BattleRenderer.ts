@@ -195,10 +195,19 @@ export class BattleRenderer implements Presenter {
     });
 
     // 하이라이트 = InputMachine 상태의 수동적 뷰 (좌표 해석은 committed 기준)
+    // 선택 연동: uiState에서 선택된 unitId를 뽑아 UnitLayer.setSelected() 호출
+    const getSelectedUnitId = (ui: InputState): string | null => {
+      if (ui.kind === "selected" || ui.kind === "postMoveMenu" || ui.kind === "targetSelect") {
+        return ui.unitId;
+      }
+      return null;
+    };
     const unsubscribe = store.subscribe(() => {
       highlights.update(store.uiState, store.committedState);
+      units.setSelected(getSelectedUnitId(store.uiState));
     });
     highlights.update(store.uiState, store.committedState);
+    units.setSelected(getSelectedUnitId(store.uiState));
 
     this.scene = {
       app, world, tweens, textures, terrain, highlights, units, fx, camera, input,

@@ -32,10 +32,10 @@ const RETREAT_MS = 350;
 const LUNGE_PX = 10;
 
 /**
- * 스프라이트 표시 높이: 타일의 ~1.6배 (SD 비율 살리기).
- * 타일(48px) × 1.6 = 76.8 → 77px. 인접 타일 살짝 겹침 허용 (zIndex 정렬로 해결).
+ * 스프라이트 표시 높이: 타일의 1.25배 (세로 인접 유닛 겹침 완화).
+ * 타일(48px) × 1.25 = 60px. SD 비율은 약간 희생하지만 가독성 우선.
  */
-const SPRITE_DISPLAY_H = Math.round(TILE_SIZE * 1.6);
+const SPRITE_DISPLAY_H = Math.round(TILE_SIZE * 1.25); // 60px
 
 export interface UnitViewInit {
   id: string;
@@ -112,7 +112,7 @@ export class UnitView extends Container {
     this.barFill = new Graphics();
     this.addChild(this.barFill);
 
-    // ── 장수명 라벨 ──
+    // ── 장수명 라벨 (기본 숨김 — 선택 시에만 표시) ──
     this.nameLabel = new Text({
       text: init.name,
       style: {
@@ -123,6 +123,7 @@ export class UnitView extends Container {
       },
     });
     this.nameLabel.anchor.set(0.5, 1);
+    this.nameLabel.visible = false; // setSelected(true) 시에만 표시
     this.addChild(this.nameLabel);
 
     this.redrawBar();
@@ -205,6 +206,15 @@ export class UnitView extends Container {
     this.retreatedFlag = retreated;
     this.visible = !retreated;
     if (!retreated) this.alpha = 1;
+  }
+
+  /**
+   * 선택 상태를 설정합니다.
+   * 선택 시: 이름 라벨 표시. 비선택 시: 이름 라벨 숨김.
+   * 병력 바는 항상 표시 유지.
+   */
+  setSelected(selected: boolean): void {
+    this.nameLabel.visible = selected;
   }
 
   setFacing(dir: 1 | -1): void {

@@ -55,6 +55,17 @@ export class UnitLayer extends Container {
     for (const v of this.views.values()) v.refreshSprite();
   }
 
+  /**
+   * 선택된 유닛 ID를 설정합니다.
+   * 이전 선택을 해제하고 새 유닛만 이름 라벨을 표시합니다.
+   * @param selectedId 선택된 유닛 ID, null이면 모두 해제
+   */
+  setSelected(selectedId: string | null): void {
+    for (const [id, v] of this.views) {
+      v.setSelected(id === selectedId);
+    }
+  }
+
   /** committed로 강제 정합 — 연출 결과가 어긋났어도 진실로 덮는다 */
   sync(state: BattleState): void {
     for (const u of state.units) {

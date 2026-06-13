@@ -4,9 +4,10 @@
  * cacheAsTexture 미지원 런타임이면 베이크 없이 컬링만 동작 (설계가 허용한 폴백과 동등 —
  * 직교 + 유닛 7기는 컬링 없이도 60fps).
  *
- * 타일 이미지 지원 (v0.2):
- *   - 각 스프라이트 텍스처는 textures.getTerrain(id, variant)으로 조회.
- *     variant = (gx*7 + gy*13) % variantCount — 단조롭지 않은 해시 배치.
+ * 타일 이미지 지원 (v0.2, v2):
+ *   - 각 스프라이트 텍스처는 textures.getTerrain(id, gx, gy)으로 조회.
+ *     macro: (gx%6, gy%6) 기반 서브렉트 — 인접 타일이 연속 그림.
+ *     tile: (gx*7+gy*13) % count 해시 — 기존 방식 유지.
  *   - loadTiles() 완료 후 rebake() 를 호출하면 이미지 텍스처로 교체하고 청크 캐시 재생성.
  */
 import { Container, Sprite } from "pixi.js";
@@ -60,8 +61,7 @@ export class TerrainLayer extends Container {
             const gy = cy * CHUNK_TILES + ty;
             const terrain = terrainAt(ctx, gx, gy);
             // 초기 텍스처: 단색 베이크 (getTerrain이 폴백 포함이므로 loadTiles 전에도 안전)
-            const variant = (gx * 7 + gy * 13);
-            const sprite = new Sprite(textures.getTerrain(terrain.id, variant));
+            const sprite = new Sprite(textures.getTerrain(terrain.id, gx, gy));
             sprite.position.set(tx * TILE_SIZE, ty * TILE_SIZE);
             container.addChild(sprite);
             sprites.push({ sprite, gx, gy, terrainId: terrain.id });
@@ -98,8 +98,7 @@ export class TerrainLayer extends Container {
       }
       // 스프라이트 텍스처 교체
       for (const { sprite, gx, gy, terrainId } of chunk.sprites) {
-        const variant = (gx * 7 + gy * 13);
-        sprite.texture = this.textures.getTerrain(terrainId, variant);
+        sprite.texture = this.textures.getTerrain(terrainId, gx, gy);
       }
       // 캐시 재생성
       this.applyChunkCache(chunk.container);
