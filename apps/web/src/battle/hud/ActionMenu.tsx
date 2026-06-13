@@ -6,6 +6,7 @@
  * 모바일에서 취소 버튼 없이는 targetSelect를 빠져나갈 수 없다.
  */
 import type { InputState, UiEvent } from "../inputMachine";
+import { BUTTON_FRAME } from "./frames";
 
 const ZONE_STYLE: React.CSSProperties = {
   position: "absolute",
@@ -21,17 +22,18 @@ const ZONE_STYLE: React.CSSProperties = {
 
 const BUTTON_STYLE: React.CSSProperties = {
   minHeight: 56, // 엄지 존 최소 터치 크기 (설계 §2.3)
-  minWidth: 92,
-  padding: "0 20px",
-  borderRadius: 14,
-  // 단축속성(border) 금지 — accent가 borderColor만 덮어쓰므로 개별 속성으로 분리 (React 경고 회피)
-  borderWidth: 1,
-  borderStyle: "solid",
-  borderColor: "#3a414a",
-  background: "rgba(24, 28, 33, 0.92)",
+  minWidth: 88,
+  padding: "0 8px",
+  // 청동 알약 프레임(border-image) — accent는 텍스트 색으로만 반영
+  ...BUTTON_FRAME,
+  background: "rgba(20, 17, 12, 0.55)",
+  backgroundClip: "padding-box",
   color: "#e8e6e3",
   fontSize: 17,
   fontWeight: 600,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
   pointerEvents: "auto",
   cursor: "pointer",
   touchAction: "manipulation",
@@ -55,7 +57,7 @@ function Btn({
       disabled={disabled ?? false}
       style={{
         ...BUTTON_STYLE,
-        ...(accent ? { borderColor: accent, color: accent } : {}),
+        ...(accent ? { color: accent } : {}), // 프레임은 청동 고정, 강조는 글자색만
         ...(disabled ? { opacity: 0.4, cursor: "default" } : {}),
       }}
     >

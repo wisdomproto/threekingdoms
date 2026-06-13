@@ -24,6 +24,8 @@ import { ActionMenu } from "./hud/ActionMenu";
 import { TurnBanner } from "./hud/TurnBanner";
 import { ResultOverlay } from "./hud/ResultOverlay";
 import { BattleControls } from "./hud/BattleControls";
+import { Minimap } from "./hud/Minimap";
+import type { InputState } from "./inputMachine";
 
 /** 고정 시드 — dev 재현성 (seed + actionLog가 버그 재현 수단, 설계 §1 리플레이 기반) */
 const SEED = 20260612;
@@ -74,6 +76,20 @@ class PresenterDelegate implements Presenter {
   /** 프리뷰 취소 스냅 (원작 UX §수정명세-2) */
   previewCancel(unitId: string, to: Coord): void {
     this.target?.previewCancel(unitId, to);
+  }
+}
+
+/** 선택/조회 중인 유닛 id (미니맵 강조용) — UnitPanel과 동일 규칙 */
+function activeUnitId(ui: InputState): string | null {
+  switch (ui.kind) {
+    case "idle":
+      return ui.inspectedId ?? null;
+    case "selected":
+    case "postMoveMenu":
+    case "targetSelect":
+      return ui.unitId;
+    default:
+      return null;
   }
 }
 
@@ -131,6 +147,7 @@ export default function BattleScreen(): React.ReactElement {
   const dispatch = useCallback((e: UiEvent) => store.dispatchUi(e), [store]);
   const toggleAuto = useCallback(() => store.setAutoBattle(!store.autoBattle), [store]);
   const resetCamera = useCallback(() => delegate.target?.resetCamera(), [delegate]);
+  const selectedId = activeUnitId(snap.ui);
 
   return (
     <div style={{ position: "fixed", inset: 0, overflow: "hidden", background: "#1b1f24" }}>
@@ -138,7 +155,20 @@ export default function BattleScreen(): React.ReactElement {
       <TurnBanner ui={snap.ui} vm={snap.vm} dispatch={dispatch} />
       <UnitPanel ui={snap.ui} vm={snap.vm} />
       <ActionMenu ui={snap.ui} dispatch={dispatch} previewWalking={snap.previewWalking} />
-      <BattleControls auto={snap.autoBattle} onToggleAuto={toggleAuto} onResetCamera={resetCamera} />
+      <div
+        style={{
+          position: "absolute",
+          top: "calc(44px + env(safe-area-inset-top))",
+          right: 12,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-end",
+          gap: 8,
+        }}
+      >
+        <Minimap map={ctx.map} units={snap.vm.units} selectedId={selectedId} />
+        <BattleControls auto={snap.autoBattle} onToggleAuto={toggleAuto} onResetCamera={resetCamera} />
+      </div>
       <ResultOverlay ui={snap.ui} vm={snap.vm} />
     </div>
   );

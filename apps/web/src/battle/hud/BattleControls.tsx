@@ -5,12 +5,11 @@
  * - 자동전투: 아군 페이즈를 그리디 AI가 대신 진행 (토글). ON이면 강조 표시.
  * TurnBanner(상단 바)·ActionMenu/턴종료(하단)와 겹치지 않게 우상단 세로 스택에 둔다.
  */
+// 우측 컬럼(미니맵 아래)에 흐르도록 — 위치는 BattleScreen의 래퍼가 잡는다
 const STACK_STYLE: React.CSSProperties = {
-  position: "absolute",
-  top: "calc(52px + env(safe-area-inset-top))",
-  right: 12,
   display: "flex",
   flexDirection: "column",
+  alignItems: "flex-end",
   gap: 8,
   pointerEvents: "none",
   userSelect: "none",

@@ -6,6 +6,7 @@
  */
 import type { InputState } from "../inputMachine";
 import type { BattleVM, UnitVM } from "../viewmodel";
+import { PANEL_FRAME } from "./frames";
 
 function activeUnitId(ui: InputState): string | null {
   switch (ui.kind) {
@@ -22,12 +23,15 @@ function activeUnitId(ui: InputState): string | null {
 
 const PANEL_STYLE: React.CSSProperties = {
   position: "absolute",
-  top: 56,
+  top: 44,
   left: 12,
-  minWidth: 180,
-  padding: "10px 12px",
-  borderRadius: 10,
-  background: "rgba(15, 18, 22, 0.85)",
+  minWidth: 188,
+  maxWidth: 240,
+  padding: "2px 6px 4px",
+  // 청동 프레임(border-image) + 가운데만 어둡게(padding-box) — 프레임 안쪽에 내용
+  ...PANEL_FRAME,
+  background: "rgba(16, 14, 10, 0.86)",
+  backgroundClip: "padding-box",
   color: "#e8e6e3",
   fontSize: 14,
   lineHeight: 1.45,
@@ -60,6 +64,23 @@ function TroopsBar({ unit }: { unit: UnitVM }): React.ReactElement {
   );
 }
 
+/**
+ * 능력치 막대 (조조전 장수 정보 패널 §1: 공격력/방어력/정신력 등) — 1~100 스케일.
+ * 순발(민첩)·사기 막대는 엔진 미보유/고정값이라 생략 (sosoden-battle-ux-analysis §1).
+ */
+function StatBar({ label, value, color }: { label: string; value: number; color: string }): React.ReactElement {
+  const ratio = Math.max(0, Math.min(1, value / 100));
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginTop: 3 }}>
+      <span style={{ width: 40, color: "#9aa3ad", flexShrink: 0 }}>{label}</span>
+      <div style={{ flex: 1, height: 5, borderRadius: 3, background: "#2a2f36" }}>
+        <div style={{ width: `${Math.round(ratio * 100)}%`, height: "100%", borderRadius: 3, background: color }} />
+      </div>
+      <span style={{ width: 22, textAlign: "right", flexShrink: 0 }}>{value}</span>
+    </div>
+  );
+}
+
 export function UnitPanel({ ui, vm }: { ui: InputState; vm: BattleVM }): React.ReactElement | null {
   const id = activeUnitId(ui);
   const unit = id ? (vm.units.find((u) => u.id === id) ?? null) : null;
@@ -83,6 +104,22 @@ export function UnitPanel({ ui, vm }: { ui: InputState; vm: BattleVM }): React.R
         <span>
           {unit.mp} / {unit.maxMp}
         </span>
+      </div>
+      <div style={{ marginTop: 6, borderTop: "1px solid #2a2f36", paddingTop: 6 }}>
+        <StatBar label="공격력" value={unit.war} color="#ff8a5c" />
+        <StatBar label="방어력" value={unit.leadership} color="#7aa7ff" />
+        <StatBar label="정신력" value={unit.intelligence} color="#b890ff" />
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginTop: 6, color: "#c7cdd4" }}>
+        <span>
+          이동 <strong>{unit.move}</strong> · 사거리 <strong>{unit.rangeMin === unit.rangeMax ? unit.rangeMax : `${unit.rangeMin}~${unit.rangeMax}`}</strong>
+        </span>
+      </div>
+      <div style={{ fontSize: 12, marginTop: 2, color: "#9aa3ad" }}>
+        지형 <span style={{ color: "#c7cdd4" }}>{unit.terrainName}</span>
+        {unit.terrainGuard > 0 ? (
+          <span style={{ color: "#7ad99a" }}> · 방어 +{Math.round(unit.terrainGuard * 100)}%</span>
+        ) : null}
       </div>
     </div>
   );

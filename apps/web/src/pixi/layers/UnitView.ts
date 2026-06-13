@@ -84,6 +84,11 @@ export class UnitView extends Container {
   private view: "front" | "back" = "front";
   /** +1=우 | -1=좌 */
   private facing = 1;
+  /**
+   * 현재 포즈 — 미러 부호 보정용. 생성된 SD 아트가 idle/move=좌향인데 attack 포즈만
+   * 우향으로 그려져 있어(관우·장비·화웅 등 일관), 포즈별로 미러 기준 방향이 다르다.
+   */
+  private pose: "idle" | "move" | "attack" = "idle";
 
   /** 스프라이트 기본 스케일(텍스처 높이 맞춤). 호흡은 이 값에 곱한다. */
   private baseScale = 1;
@@ -170,6 +175,7 @@ export class UnitView extends Container {
    * 텍스처가 없으면 폴백(fallbackBase)을 표시.
    */
   private applySpriteTexture(view: "front" | "back", pose: "idle" | "move" | "attack"): void {
+    this.pose = pose; // 미러 부호는 포즈에 따라 다름 (applyScale) — 폴백 경로에서도 추적
     if (!this.spriteId) return; // 매핑 없음 → 항상 폴백
 
     const tex = this.textures.getSprite(this.spriteId, view, pose);
@@ -188,11 +194,13 @@ export class UnitView extends Container {
   }
 
   /** baseScale × facing × 호흡 변위를 spriteBase에 반영.
-   *  SD 아트 원본이 좌향(left-facing)이라, facing=+1(우향 의도)일 때 미러(scale.x<0)해야 한다 → -facing. */
+   *  idle/move 아트는 좌향(left-facing)이라 facing=+1(우향)일 때 미러(scale.x<0) → -facing.
+   *  attack 아트는 우향으로 그려져 있어 부호가 반대 → +facing (적이 왼쪽이면 좌로 휘두름). */
   private applyScale(): void {
     const taller = 1 + this.breathV;
     const narrower = 1 - this.breathV * 0.5; // 부피 보존감 — 늘면 살짝 좁게
-    this.spriteBase.scale.set(this.baseScale * -this.facing * narrower, this.baseScale * taller);
+    const mirror = this.pose === "attack" ? this.facing : -this.facing;
+    this.spriteBase.scale.set(this.baseScale * mirror * narrower, this.baseScale * taller);
   }
 
   /**

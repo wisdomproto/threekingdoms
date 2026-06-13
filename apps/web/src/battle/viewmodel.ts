@@ -4,6 +4,7 @@
  * 반환값은 전부 직렬화 가능한 평면 객체 (useSyncExternalStore 스냅샷에 그대로 실린다).
  */
 import type { Side } from "@tk/data";
+import { terrainAt } from "@tk/engine";
 import type { BattleContext, BattleState, UnitState } from "@tk/engine";
 
 export interface UnitVM {
@@ -21,6 +22,15 @@ export interface UnitVM {
   moved: boolean;
   acted: boolean;
   retreated: boolean;
+  // 조조전 장수 정보 패널 대응 (sosoden-battle-ux-analysis §1·§6)
+  war: number;          // 무력 → 공격력
+  leadership: number;   // 통솔 → 방어력
+  intelligence: number; // 지력 → 정신력
+  move: number;         // 이동력
+  rangeMin: number;
+  rangeMax: number;
+  terrainName: string;  // 현재 칸 지형명
+  terrainGuard: number; // 지형 방어 보정 (0~0.5)
 }
 
 export interface TurnVM {
@@ -36,6 +46,7 @@ export interface BattleVM {
 }
 
 export function unitVM(ctx: BattleContext, u: UnitState): UnitVM {
+  const terrain = terrainAt(ctx, u.x, u.y);
   return {
     id: u.id,
     name: ctx.data.commanders[u.id]?.name ?? u.id,
@@ -51,6 +62,14 @@ export function unitVM(ctx: BattleContext, u: UnitState): UnitVM {
     moved: u.moved,
     acted: u.acted,
     retreated: u.retreated,
+    war: u.war,
+    leadership: u.leadership,
+    intelligence: u.intelligence,
+    move: u.move,
+    rangeMin: u.rangeMin,
+    rangeMax: u.rangeMax,
+    terrainName: terrain.name,
+    terrainGuard: terrain.guard,
   };
 }
 
