@@ -256,22 +256,27 @@ export class TextureResolver {
   private bgTex: Texture | null = null;
 
   /**
-   * 스테이지 painted 맵 배경 로드 (/assets/maps/{stageId}.png).
+   * 스테이지 painted 맵 배경 로드 (/assets/maps/{stageId}.{webp,png}).
+   * webp 우선(업스케일 고해상 배경은 webp로 용량 절감), 없으면 png 폴백.
    * 있으면 타일 렌더 대신 이 그림 한 장을 깔고, 격자 데이터는 게임 로직에만 쓴다.
    * 없으면 null → 기존 타일 렌더 유지.
    */
   async loadMapBackground(stageId: string): Promise<Texture | null> {
-    const url = `/assets/maps/${stageId}.png`;
-    try {
-      const head = await fetch(url, { method: "HEAD" });
-      if (!head.ok) return null;
-      const tex = await Assets.load<Texture>(url);
-      if (tex) console.info(`[TextureResolver] 맵 배경 로드: ${stageId}`);
-      return tex ?? null;
-    } catch (e) {
-      console.warn(`[TextureResolver] 맵 배경 로드 오류(${stageId}) — 타일 렌더 유지`, e);
-      return null;
+    for (const ext of ["webp", "png"]) {
+      const url = `/assets/maps/${stageId}.${ext}`;
+      try {
+        const head = await fetch(url, { method: "HEAD" });
+        if (!head.ok) continue;
+        const tex = await Assets.load<Texture>(url);
+        if (tex) {
+          console.info(`[TextureResolver] 맵 배경 로드: ${stageId}.${ext}`);
+          return tex;
+        }
+      } catch (e) {
+        console.warn(`[TextureResolver] 맵 배경 로드 오류(${stageId}.${ext})`, e);
+      }
     }
+    return null; // 둘 다 없음 → 타일 렌더 유지
   }
 
   /** 맵 뒤 배경 텍스처 로드. 실패해도 null 반환(배경 없이 진행). */

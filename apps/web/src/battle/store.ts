@@ -53,6 +53,8 @@ export interface StoreSnapshot {
   previewWalking: boolean;
   /** 자동전투 ON 여부 — 컨트롤 버튼 표시 상태 */
   autoBattle: boolean;
+  /** 연출 배속 (1·2·3) — 버튼 라벨 + 렌더러 연동 */
+  speed: number;
 }
 
 /** 헤드리스 기본 Presenter — 모든 연출을 즉시 완료 (테스트·시뮬레이션용) */
@@ -83,6 +85,8 @@ export class BattleStore {
   private _previewWalking = false;
   /** 자동전투 ON — 아군 페이즈를 그리디 드라이버가 구동 (적 페이즈는 항상 자동) */
   private _autoBattle = false;
+  /** 연출 배속 (1=기본). 순수 표현 — 게임 상태 불변, 렌더러 TweenRunner에 전달 */
+  private _speed = 1;
 
   private listeners = new Set<() => void>();
   private snapshotCache: StoreSnapshot | null = null;
@@ -200,6 +204,18 @@ export class BattleStore {
     return this._autoBattle;
   }
 
+  get speed(): number {
+    return this._speed;
+  }
+
+  /** 배속 설정 — 게임 상태 불변. 렌더러가 store.speed를 읽거나 setSpeed를 직접 호출 */
+  setSpeed(speed: number): void {
+    const s = speed > 0 ? speed : 1;
+    if (this._speed === s) return;
+    this._speed = s;
+    this.notify();
+  }
+
   /**
    * 자동전투 토글. ON: 아군 페이즈를 그리디 드라이버가 구동(적 페이즈는 원래 자동).
    * 수동 선택 중(selected/postMoveMenu/targetSelect)에 켜면 프리뷰를 원위치로 되돌리고
@@ -255,6 +271,7 @@ export class BattleStore {
         vm: battleVM(this.ctx, this.settled),
         previewWalking: this._previewWalking,
         autoBattle: this._autoBattle,
+        speed: this._speed,
       };
     }
     return this.snapshotCache;

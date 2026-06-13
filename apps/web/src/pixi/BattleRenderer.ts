@@ -35,6 +35,8 @@ export interface RendererStore {
   readonly committedState: BattleState;
   readonly settledState: BattleState;
   readonly uiState: InputState;
+  /** 연출 배속 — mount 시 초기 적용 (이후 toggle은 setSpeed 직접 호출) */
+  readonly speed: number;
 }
 
 const PHASE_BANNER_MS = 600; // 설계 §6
@@ -76,6 +78,8 @@ export class BattleRenderer implements Presenter {
   /** 스테이지 camera 기본값 (resetCamera 복귀 지점) — mount에서 확정 */
   private defaultScale = DEFAULT_ZOOM;
   private defaultFocusWorld: { x: number; y: number } = { x: 0, y: 0 };
+  /** 연출 배속 — TweenRunner와 카메라 update에 일괄 적용 */
+  private speed = 1;
 
   constructor(ctx: BattleContext) {
     this.ctx = ctx;
@@ -119,6 +123,8 @@ export class BattleRenderer implements Presenter {
     app.canvas.style.touchAction = "none"; // 브라우저 팬/줌 가로채기 방지 (설계 리스크 §9-4)
 
     const tweens = new TweenRunner(app.ticker);
+    this.speed = store.speed > 0 ? store.speed : 1; // 재마운트 시 배속 보존
+    tweens.setTimeScale(this.speed);
     const textures = new TextureResolver(app.renderer);
     // 스프라이트 비동기 로드 — 실패 시 폴백(색 사각형) 유지, mount는 계속 진행.
     // 완료 시 이미 생성된 UnitView들을 갱신해야 한다 (아래 .then — 없으면 대기 유닛이 영원히 폴백).
@@ -266,7 +272,7 @@ export class BattleRenderer implements Presenter {
 
     // 카메라 트윈 진행 + 청크 컬링
     const tick = (): void => {
-      camera.update(app.ticker.deltaMS);
+      camera.update(app.ticker.deltaMS * this.speed); // 배속 시 카메라 추적도 함께 가속
       terrain.cull(camera.viewWorldRect());
       units.tickIdle(app.ticker.deltaMS);
     };
@@ -328,6 +334,12 @@ export class BattleRenderer implements Presenter {
   /** "기본 줌 복귀" 버튼 — 스테이지 기본 줌·포커스로 부드럽게 되돌린다 (수동 줌/팬 리셋) */
   resetCamera(): void {
     this.scene?.camera.focusOn(this.defaultFocusWorld, RESET_CAMERA_MS, this.defaultScale);
+  }
+
+  /** 배속 토글 — TweenRunner(이동/공격/배너/팝업) + 카메라 추적을 일괄 가속 */
+  setSpeed(speed: number): void {
+    this.speed = speed > 0 ? speed : 1;
+    this.scene?.tweens.setTimeScale(this.speed);
   }
 
   /**

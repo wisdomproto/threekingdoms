@@ -52,7 +52,7 @@
 </head>
 <body>
 <header>
-  <h1>에셋 프롬프트 보드 v1.1</h1>
+  <h1>에셋 프롬프트 보드 v1.2</h1>
   <span class="sub">사수관·호로관 수직 슬라이스 · 시트(한 장 多에셋) 방식 · 잘라 쓰는 건 Claude가 처리</span>
   <span class="stylefixed">화풍: 수묵담채 (확정)</span>
   <button class="btn" id="dirbtn" title="⬇ 저장이 향할 폴더 (docs\art 권장)">저장 폴더: 미연결</button>
@@ -167,7 +167,10 @@ const SECTIONS = [
       prompt: 'Three separate mountain peak objects in a row on plain white background, top-down oblique view (camera ~50° above) for a tactics map. Rugged East Asian mountain peaks — weathered grey rock with a little sparse pine, each a distinct compact peak with a clear silhouette, three different shapes (one tall craggy, one broad, one twin-summit). Ink-wash painted style, soft contact shadow only at the very base. Each peak complete and separated with generous white spacing, clean croppable edges, NO ground slab attached. No grid, no labels.' },
     { id: 'B-7', title: '다리 오브젝트 (투명 배경)', multi: '한 장에 2방향',
       note: '강(E-4) 위에 놓는 다리. 가로/세로 2방향. 물과 함께 써야 의미 있음.',
-      prompt: 'Two traditional East Asian wooden bridges side by side on plain white background, top-down oblique view for a tactics map. Wooden plank deck with low railings, gentle arch. LEFT: oriented to span left-to-right (horizontal). RIGHT: oriented to span top-to-bottom (vertical). Ink-wash painted style, weathered wood tones. Each bridge complete and separated, clean croppable edges, NO water attached underneath. No grid, no labels.' }
+      prompt: 'Two traditional East Asian wooden bridges side by side on plain white background, top-down oblique view for a tactics map. Wooden plank deck with low railings, gentle arch. LEFT: oriented to span left-to-right (horizontal). RIGHT: oriented to span top-to-bottom (vertical). Ink-wash painted style, weathered wood tones. Each bridge complete and separated, clean croppable edges, NO water attached underneath. No grid, no labels.' },
+    { id: 'B-8', title: '회복 지형 오브젝트 (움막/막사/창고)', multi: '한 장에 3종',
+      note: '⭐ 기능성 지형물 — 회복 칸 마커 (촌락=움막 / 병영=막사 / 보급=창고). 장식이 아니라 게임 요소라 명시 스프라이트로(영걸전 회복 지형). 칸 위에 얹어 "여기 서면 회복"을 한눈에. 바닥(E-*) 위 액센트로 배치.',
+      prompt: 'Three separate functional map structures in a row on plain white background, top-down oblique view (camera ~50° above) for a tactics map, each sized to sit on a single grid tile. LEFT — a small thatched-roof peasant hut (village / healing spot): round mud-wall hut with a conical straw roof and a tiny dark doorway. CENTER — a military camp war-tent (barracks / healing spot): a peaked canvas tent with rope guy-lines and a short banner pole. RIGHT — a timber supply storehouse (depot): a sturdy raised-floor granary hut with a slatted gable roof. Ink-wash painted style, muted earth tones with subtle bronze/wood accents, soft contact shadow only at the very base. Each structure complete and clearly separated with generous white spacing, clean croppable edges, NO ground slab attached. No grid, no labels.' }
   ]
 },
 {

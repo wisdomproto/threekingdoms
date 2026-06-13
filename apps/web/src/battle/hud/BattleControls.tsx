@@ -36,20 +36,28 @@ export function BattleControls({
   auto,
   onToggleAuto,
   onResetCamera,
+  speed,
+  onCycleSpeed,
 }: {
   auto: boolean;
   onToggleAuto: () => void;
   onResetCamera: () => void;
+  speed: number;
+  onCycleSpeed: () => void;
 }): React.ReactElement {
-  const autoStyle: React.CSSProperties = auto
-    ? { ...BTN_STYLE, borderColor: "#ffc24b", color: "#ffc24b", background: "rgba(50, 40, 14, 0.92)" }
-    : BTN_STYLE;
+  const accent = (active: boolean): React.CSSProperties =>
+    active
+      ? { ...BTN_STYLE, borderColor: "#ffc24b", color: "#ffc24b", background: "rgba(50, 40, 14, 0.92)" }
+      : BTN_STYLE;
   return (
     <div style={STACK_STYLE}>
       <button type="button" style={BTN_STYLE} onClick={onResetCamera}>
         ⟲ 기본 줌
       </button>
-      <button type="button" style={autoStyle} onClick={onToggleAuto}>
+      <button type="button" style={accent(speed > 1)} onClick={onCycleSpeed}>
+        ⏩ 배속 ×{speed}
+      </button>
+      <button type="button" style={accent(auto)} onClick={onToggleAuto}>
         {auto ? "⏸ 자동전투" : "▶ 자동전투"}
       </button>
     </div>

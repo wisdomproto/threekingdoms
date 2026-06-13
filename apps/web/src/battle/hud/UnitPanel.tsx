@@ -6,7 +6,33 @@
  */
 import type { InputState } from "../inputMachine";
 import type { BattleVM, UnitVM } from "../viewmodel";
-import { PANEL_FRAME } from "./frames";
+import { PANEL_FRAME, PORTRAIT_FRAME } from "./frames";
+
+/** 초상 보유 장수 (apps/web/public/assets/ui/portraits/{name}.webp). 생기는 대로 추가 */
+const PORTRAIT_IDS = new Set(["관우", "화웅"]);
+
+/** 청동 초상 프레임 + 얼굴 (조조전 장수 정보 패널 §1) */
+function PortraitBox({ name }: { name: string }): React.ReactElement {
+  return (
+    <div
+      style={{
+        ...PORTRAIT_FRAME,
+        borderWidth: "15px 11px 15px 11px",
+        width: 56,
+        height: 70,
+        flexShrink: 0,
+        background: "#1a1712",
+        backgroundClip: "padding-box",
+      }}
+    >
+      <img
+        src={`/assets/ui/portraits/${encodeURIComponent(name)}.webp`}
+        alt={name}
+        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+      />
+    </div>
+  );
+}
 
 function activeUnitId(ui: InputState): string | null {
   switch (ui.kind) {
@@ -87,16 +113,21 @@ export function UnitPanel({ ui, vm }: { ui: InputState; vm: BattleVM }): React.R
   if (!unit) return null;
   return (
     <div style={PANEL_STYLE}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-        <strong style={{ fontSize: 16 }}>{unit.name}</strong>
-        <span style={{ color: unit.side === "player" ? "#4da3ff" : "#ff6b6b" }}>
-          {unit.side === "player" ? "아군" : "적군"}
-        </span>
-      </div>
-      <div style={{ color: "#9aa3ad", fontSize: 12 }}>
-        {unit.className} · Lv.{unit.level}
-        {unit.acted ? " · 행동 완료" : ""}
-        {unit.retreated ? " · 퇴각" : ""}
+      <div style={{ display: "flex", gap: 8 }}>
+        {PORTRAIT_IDS.has(unit.name) ? <PortraitBox name={unit.name} /> : null}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+            <strong style={{ fontSize: 16 }}>{unit.name}</strong>
+            <span style={{ color: unit.side === "player" ? "#4da3ff" : "#ff6b6b" }}>
+              {unit.side === "player" ? "아군" : "적군"}
+            </span>
+          </div>
+          <div style={{ color: "#9aa3ad", fontSize: 12 }}>
+            {unit.className} · Lv.{unit.level}
+            {unit.acted ? " · 행동 완료" : ""}
+            {unit.retreated ? " · 퇴각" : ""}
+          </div>
+        </div>
       </div>
       <TroopsBar unit={unit} />
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginTop: 4 }}>

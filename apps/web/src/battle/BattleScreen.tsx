@@ -147,6 +147,12 @@ export default function BattleScreen(): React.ReactElement {
   const dispatch = useCallback((e: UiEvent) => store.dispatchUi(e), [store]);
   const toggleAuto = useCallback(() => store.setAutoBattle(!store.autoBattle), [store]);
   const resetCamera = useCallback(() => delegate.target?.resetCamera(), [delegate]);
+  // 배속 순환 1→2→3→1 — store(라벨)와 렌더러(연출) 동시 반영
+  const cycleSpeed = useCallback(() => {
+    const next = store.speed >= 3 ? 1 : store.speed + 1;
+    store.setSpeed(next);
+    delegate.target?.setSpeed(next);
+  }, [store, delegate]);
   const selectedId = activeUnitId(snap.ui);
 
   return (
@@ -167,7 +173,13 @@ export default function BattleScreen(): React.ReactElement {
         }}
       >
         <Minimap map={ctx.map} units={snap.vm.units} selectedId={selectedId} />
-        <BattleControls auto={snap.autoBattle} onToggleAuto={toggleAuto} onResetCamera={resetCamera} />
+        <BattleControls
+          auto={snap.autoBattle}
+          onToggleAuto={toggleAuto}
+          onResetCamera={resetCamera}
+          speed={snap.speed}
+          onCycleSpeed={cycleSpeed}
+        />
       </div>
       <ResultOverlay ui={snap.ui} vm={snap.vm} />
     </div>

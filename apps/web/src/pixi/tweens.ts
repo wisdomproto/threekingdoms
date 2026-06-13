@@ -20,9 +20,11 @@ export function easeInOut(t: number): number {
 export class TweenRunner {
   private readonly ticker: Ticker;
   private active: ActiveTween[] = [];
+  /** 배속 — 모든 트윈(이동/공격/배너/팝업) 진행을 일괄 가속. 1=기본 */
+  private timeScale = 1;
   private readonly tick = (ticker: Ticker): void => {
     if (this.active.length === 0) return;
-    const dt = ticker.deltaMS;
+    const dt = ticker.deltaMS * this.timeScale;
     const still: ActiveTween[] = [];
     for (const tw of this.active) {
       tw.elapsed += dt;
@@ -37,6 +39,11 @@ export class TweenRunner {
   constructor(ticker: Ticker) {
     this.ticker = ticker;
     ticker.add(this.tick);
+  }
+
+  /** 배속 설정 — 진행 중·이후 트윈에 즉시 반영 (1=기본, 2·3 등) */
+  setTimeScale(scale: number): void {
+    this.timeScale = scale > 0 ? scale : 1;
   }
 
   /** onUpdate(t)는 0..1 선형 진행률로 호출 (이징은 호출측에서 적용). t=1 보장 후 resolve */
