@@ -40,7 +40,7 @@
 9. **v1 전략 = 하이브리드 원작 재현 (맵=영걸전 / 시스템=조조전).** (2026-06-13 확정)
    - **맵·지형**: 영걸전 원작 맵을 원천으로 (근거: docs/reference/yeonggeoljeon-data.md, packages/data/json/maps·stages).
    - **전투 시스템 일체**(병종 체계·능력치·책략·아이템·전투 공식·일기토): 조조전 원작을 원천으로 (근거: docs/reference/sosoden-source-analysis.md, packages/data/json/sosoden/). 조조전이 영걸전 3부작 중 전투 시스템이 가장 정제됨 — 그 시스템을 유비전 무대에 얹는다.
-   - **UI/UX**: 조조전 원작 화면 문법 분석 = docs/reference/sosoden-battle-ux-analysis.md(전투 화면), sosoden-outbattle-ux-analysis.md(막간·상점·편성). 스크린샷·원본 추출로 레이아웃 확정. ⚠️ 넥슨 《조조전 Online》(모바일 리메이크)의 자원바·글로시 HUD는 원작 아님 — §2-1 "디자인 목표=조조전 온라인 비주얼"은 *톱다운+수묵 채색 화풍*만 가리키며 Online의 시스템 UI를 베끼는 게 아니다.
+   - **UI/UX**: 조조전 원작 화면 문법 분석 = docs/reference/sosoden-battle-ux-analysis.md(전투 화면), sosoden-outbattle-ux-analysis.md(막간·상점·편성). 스크린샷·원본 추출로 레이아웃 확정. **+ 실작동 레퍼런스** = docs/reference/yeonggeoljeon-remake-ux-analysis.md — "맵=영걸전/시스템=조조전" 조합을 그대로 쓴 팬 리메이크 플레이 영상을 프레임 분석(턴 루프·정보 위계·커맨드·일기토 2종·막간 셸의 *동적* UX). 정지 스샷이 못 잡는 게임 진행 흐름의 단일 참조. ⚠️ 넥슨 《조조전 Online》(모바일 리메이크)의 자원바·글로시 HUD는 원작 아님 — §2-1 "디자인 목표=조조전 온라인 비주얼"은 *톱다운+수묵 채색 화풍*만 가리키며 Online의 시스템 UI를 베끼는 게 아니다.
    - **시나리오**: 유비전(§5) 유지.
    - 차별화(병종 재편, 모바일 맵 축소, 병종 패시브 등)는 원작 재현으로 재미가 검증된 뒤 별도 단계. 아트/연출은 처음부터 독자 노선.
 
