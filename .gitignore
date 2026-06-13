@@ -11,3 +11,7 @@ test-output.txt
 docs/art/*.png
 # 폐기된 아이소메트릭 렌더러 에셋
 apps/web/public/assets/iso/
+
+# 조조전 대사 원문 추출 — 코에이 저작 텍스트(IP). 로컬 레퍼런스만, 커밋 금지.
+# 재생성: tools/hero-extract/eex_extract.py. 수치 테이블(generals/weapons/strategies)은 추적.
+packages/data/json/sosoden/scripts/
