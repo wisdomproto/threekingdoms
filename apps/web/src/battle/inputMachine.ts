@@ -20,6 +20,40 @@ function castableStrategies(
   return cls.strategies.filter((id) => getStrategyTargets(ctx, battle, unitId, id, from).length > 0);
 }
 
+/**
+ * 유닛이 들고 있는 사용 가능한 소모품(supplyItem/attackItem) id 목록 — 중복 보유 dedupe.
+ * weapon/book/horse/treasure 등 비소모성은 제외(useItem이 거부하는 category). 도구 버튼 표시 조건.
+ */
+export function usableItems(ctx: BattleContext, battle: BattleState, unitId: string): string[] {
+  const u = battle.units.find((x) => x.id === unitId);
+  if (!u) return [];
+  const out: string[] = [];
+  for (const id of u.items) {
+    if (out.includes(id)) continue;
+    const item = ctx.data.items[id];
+    if (item && (item.category === "supplyItem" || item.category === "attackItem")) out.push(id);
+  }
+  return out;
+}
+
+/**
+ * 선택한 도구의 사용 가능 대상 칸 목록 — supplyItem=아군, attackItem=적 (퇴각 제외).
+ * 엔진 useItem은 사거리 게이팅이 없으므로(좌표에 유닛이 있고 진영만 맞으면 OK) 맵 전역 후보를 돌려준다.
+ * 검증과 하이라이트 공용. 미지/비소모 item은 빈 배열.
+ */
+export function itemTargetTiles(
+  ctx: BattleContext, battle: BattleState, unitId: string, itemId: string,
+): Coord[] {
+  const u = battle.units.find((x) => x.id === unitId);
+  const item = ctx.data.items[itemId];
+  if (!u || !item) return [];
+  if (item.category !== "supplyItem" && item.category !== "attackItem") return [];
+  const wantAlly = item.category === "supplyItem";
+  return battle.units
+    .filter((t) => !t.retreated && (wantAlly ? t.side === u.side : t.side !== u.side))
+    .map((t) => ({ x: t.x, y: t.y }));
+}
+
 export type InputState =
   | { kind: "idle"; inspectedId?: string }
   | { kind: "selected"; unitId: string; movable: Coord[]; attackable: string[] }
@@ -36,6 +70,8 @@ export type InputState =
       attackable: string[];
       /** preview 기준 시전 가능 책략 id (계략 버튼 표시 조건) */
       strategies: string[];
+      /** 보유 소모품 id 목록 (도구 버튼 표시 조건) */
+      items: string[];
     }
   | {
       kind: "targetSelect";
@@ -45,6 +81,7 @@ export type InputState =
       movable: Coord[];
       attackable: string[];
       strategies: string[];
+      items: string[];
     }
   /** 계략: 책략 목록에서 선택 */
   | {
@@ -55,6 +92,7 @@ export type InputState =
       movable: Coord[];
       attackable: string[];
       strategies: string[];
+      items: string[];
     }
   /** 계략: 선택한 책략의 대상 칸 조준 */
   | {
@@ -65,8 +103,37 @@ export type InputState =
       movable: Coord[];
       attackable: string[];
       strategies: string[];
+      items: string[];
       strategyId: string;
       /** 시전 가능 대상 칸 (하이라이트) */
+      castTiles: Coord[];
+    }
+  /** 도구: 소지 소모품 목록에서 선택 */
+  | {
+      kind: "itemMenu";
+      unitId: string;
+      from: Coord;
+      preview: Coord;
+      movable: Coord[];
+      attackable: string[];
+      strategies: string[];
+      /** 사용 가능한 소모품 id 목록 (도구 버튼 진입 조건) */
+      items: string[];
+    }
+  /** 도구: 선택한 도구의 대상 칸 조준 (supplyItem=아군, attackItem=적) */
+  | {
+      kind: "itemTarget";
+      unitId: string;
+      from: Coord;
+      preview: Coord;
+      movable: Coord[];
+      attackable: string[];
+      strategies: string[];
+      items: string[];
+      itemId: string;
+      /** 회복약/공격아이템 = supplyItem/attackItem */
+      itemKind: "supplyItem" | "attackItem";
+      /** 사용 가능 대상 칸 (하이라이트) */
       castTiles: Coord[];
     }
   | { kind: "animating" }
@@ -81,6 +148,8 @@ export type UiEvent =
   | { type: "menuAttack" }
   | { type: "menuStrategy" }
   | { type: "selectStrategy"; strategyId: string }
+  | { type: "menuItem" }
+  | { type: "selectItem"; itemId: string }
   | { type: "menuWait" }
   | { type: "menuCancel" }
   | { type: "endTurnPressed" }
@@ -196,6 +265,7 @@ export function reduceInput(
             movable: state.movable,
             attackable: state.attackable,
             strategies: castableStrategies(ctx, battle, state.unitId, pos),
+            items: usableItems(ctx, battle, state.unitId),
           },
           effects: [],
         };
@@ -226,6 +296,7 @@ export function reduceInput(
             movable: state.movable,
             attackable: getAttackableTargets(ctx, battle, state.unitId, event.coord),
             strategies: castableStrategies(ctx, battle, state.unitId, event.coord),
+            items: usableItems(ctx, battle, state.unitId),
           },
           effects: [{ type: "focus", coord: event.coord }],
         };
@@ -243,6 +314,10 @@ export function reduceInput(
       if (event.type === "menuStrategy") {
         if (state.strategies.length === 0) return noop(state); // 시전 가능 책략 없음
         return { next: { ...state, kind: "strategyMenu" }, effects: [] };
+      }
+      if (event.type === "menuItem") {
+        if (state.items.length === 0) return noop(state); // 사용 가능 소모품 없음
+        return { next: { ...state, kind: "itemMenu" }, effects: [] };
       }
       if (event.type === "menuWait") {
         return {
@@ -325,6 +400,56 @@ export function reduceInput(
                 type: "strategy",
                 unitId: state.unitId,
                 strategyId: state.strategyId,
+                target: event.coord,
+              }),
+            },
+          ],
+        };
+      }
+      return noop(state);
+    }
+
+    case "itemMenu": {
+      if (event.type === "selectItem") {
+        if (!state.items.includes(event.itemId)) return noop(state);
+        const item = ctx.data.items[event.itemId];
+        if (!item || (item.category !== "supplyItem" && item.category !== "attackItem")) {
+          return noop(state);
+        }
+        const castTiles = itemTargetTiles(ctx, battle, state.unitId, event.itemId);
+        if (castTiles.length === 0) return noop(state); // 대상 없음 — 사용 불가
+        return {
+          next: {
+            ...state,
+            kind: "itemTarget",
+            itemId: event.itemId,
+            itemKind: item.category,
+            castTiles,
+          },
+          effects: [],
+        };
+      }
+      if (event.type === "cancel" || event.type === "menuCancel") {
+        return { next: { ...state, kind: "postMoveMenu" }, effects: [] };
+      }
+      return noop(state); // tapTile 등 무시 — 모달
+    }
+
+    case "itemTarget": {
+      if (event.type === "cancel" || event.type === "menuCancel") {
+        return { next: { ...state, kind: "itemMenu" }, effects: [] };
+      }
+      if (event.type === "tapTile") {
+        if (!state.castTiles.some((t) => sameCoord(t, event.coord))) return noop(state);
+        return {
+          next: { kind: "animating" },
+          effects: [
+            {
+              type: "commit",
+              actions: chainActions(state.unitId, state.from, state.preview, {
+                type: "useItem",
+                unitId: state.unitId,
+                itemId: state.itemId,
                 target: event.coord,
               }),
             },

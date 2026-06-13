@@ -92,6 +92,9 @@ export function ActionMenu({
         {ui.strategies.length > 0 ? (
           <Btn label="계략" accent="#b890ff" onPress={() => dispatch({ type: "menuStrategy" })} />
         ) : null}
+        {ui.items.length > 0 ? (
+          <Btn label="도구" accent="#7bd88f" onPress={() => dispatch({ type: "menuItem" })} />
+        ) : null}
         <Btn label="대기" accent="#4da3ff" onPress={() => dispatch({ type: "menuWait" })} />
         <Btn label="취소" onPress={() => dispatch({ type: "menuCancel" })} />
       </div>
@@ -115,13 +118,47 @@ export function ActionMenu({
       </div>
     );
   }
-  if (ui.kind === "targetSelect" || ui.kind === "strategyTarget") {
-    const prompt = ui.kind === "targetSelect" ? "공격 대상을 선택하세요" : "책략 대상 칸을 선택하세요";
+  if (ui.kind === "itemMenu") {
+    return (
+      <div style={ZONE_STYLE}>
+        {ui.items.map((id) => {
+          const it = gameData.items[id];
+          const isHeal = it?.category === "supplyItem";
+          return (
+            <Btn
+              key={id}
+              label={`${it?.name ?? id} (${isHeal ? "+" : ""}${it?.power ?? "?"})`}
+              accent={isHeal ? "#7bd88f" : "#ff8a5b"}
+              onPress={() => dispatch({ type: "selectItem", itemId: id })}
+            />
+          );
+        })}
+        <Btn label="취소" onPress={() => dispatch({ type: "menuCancel" })} />
+      </div>
+    );
+  }
+  if (ui.kind === "targetSelect" || ui.kind === "strategyTarget" || ui.kind === "itemTarget") {
+    const prompt =
+      ui.kind === "targetSelect"
+        ? "공격 대상을 선택하세요"
+        : ui.kind === "strategyTarget"
+          ? "책략 대상 칸을 선택하세요"
+          : ui.itemKind === "supplyItem"
+            ? "회복할 아군을 선택하세요"
+            : "공격할 적을 선택하세요";
+    const color =
+      ui.kind === "targetSelect"
+        ? "#ffb4b4"
+        : ui.kind === "strategyTarget"
+          ? "#d7c0ff"
+          : ui.itemKind === "supplyItem"
+            ? "#b9f0c6"
+            : "#ffc6a8";
     return (
       <div style={ZONE_STYLE}>
         <span
           style={{
-            color: ui.kind === "targetSelect" ? "#ffb4b4" : "#d7c0ff",
+            color,
             fontSize: 14,
             background: "rgba(24, 28, 33, 0.8)",
             padding: "8px 12px",

@@ -3,6 +3,7 @@ import { getMovableTiles, unitAt } from "./movement";
 import {
   computeDamage, distance, getAttackableTargets,
   strategyDamage, strategyAoeCells, getStrategyTargets, expForNextLevel,
+  spiritPower,
 } from "./combat";
 import { findDuelTrigger } from "./events";
 
@@ -35,6 +36,15 @@ function dealDamage(
   ];
   if (retreated) events.push({ type: "unitRetreated", unitId: defender.id });
   return { state: replaceUnit(state, { ...defender, troops, retreated }), events };
+}
+
+/** 병력 회복 → maxTroops 상한. 실제 회복량(클램프 후)과 갱신된 상태를 반환. 결정론. */
+function healTroops(
+  state: BattleState, target: UnitState, amount: number,
+): { state: BattleState; healed: number } {
+  const troops = Math.min(target.maxTroops, target.troops + Math.max(0, amount));
+  const healed = troops - target.troops;
+  return { state: replaceUnit(state, { ...target, troops }), healed };
 }
 
 /**
@@ -209,12 +219,63 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
         const isTarget = strat.target === "enemy" ? t.side !== unit.side : t.side === unit.side;
         if (!isTarget) continue;
         const caster = getUnit(next, unit.id);
-        const dmg = strategyDamage(caster, t, strat.power);
-        const hit = dealDamage(next, caster, getUnit(next, t.id), dmg, false);
-        next = hit.state;
-        events.push(...hit.events);
+        if (strat.category === "heal") {
+          // 회복 책략: 회복량 = power + round(시전 정신력 × power / 10), 상한 = maxTroops (결정론).
+          // 정신력이 높을수록 회복 효율이 커진다 — 책사/도사 지원 가치. 화계(데미지)는 불변.
+          const heal = strat.power + Math.round((spiritPower(caster) * strat.power) / 10);
+          const res = healTroops(next, getUnit(next, t.id), heal);
+          next = res.state;
+        } else {
+          const dmg = strategyDamage(caster, t, strat.power);
+          const hit = dealDamage(next, caster, getUnit(next, t.id), dmg, false);
+          next = hit.state;
+          events.push(...hit.events);
+        }
       }
       next = replaceUnit(next, { ...getUnit(next, unit.id), acted: true });
+      break;
+    }
+
+    case "useItem": {
+      assertCanAct(state, unit, false);
+      const item = ctx.data.items[action.itemId];
+      if (!item) throw new Error(`unknown item: ${action.itemId}`);
+      if (!unit.items.includes(action.itemId)) {
+        throw new Error(`${unit.id} does not have item ${action.itemId}`);
+      }
+      if (item.category !== "supplyItem" && item.category !== "attackItem") {
+        throw new Error(`item ${action.itemId} is not usable (category ${item.category})`);
+      }
+      // target 생략 시 시전자 자신
+      const tgtCoord = action.target ?? { x: unit.x, y: unit.y };
+      const tgt = unitAt(state, tgtCoord.x, tgtCoord.y);
+      if (!tgt || tgt.retreated) throw new Error(`no valid target at (${tgtCoord.x},${tgtCoord.y})`);
+
+      let amount = 0;
+      if (item.category === "supplyItem") {
+        // 회복약: 대상 아군 troops를 power만큼 회복 (상한 = maxTroops)
+        if (tgt.side !== unit.side) throw new Error(`supplyItem target must be ally`);
+        const res = healTroops(state, tgt, item.power);
+        next = res.state;
+        amount = res.healed;
+      } else {
+        // attackItem: 대상 적 troops를 power 고정 감소 (최소 0, 반격 없음)
+        if (tgt.side === unit.side) throw new Error(`attackItem target must be enemy`);
+        const hit = dealDamage(state, unit, tgt, item.power, false);
+        next = hit.state;
+        events.push(...hit.events);
+        amount = Math.min(item.power, tgt.troops); // 실제 가한 피해(병력이 더 적으면 그만큼)
+      }
+
+      // itemId 1개 소모 — 첫 번째 매칭만 제거 (중복 소지 지원)
+      const remaining = [...getUnit(next, unit.id).items];
+      const idx = remaining.indexOf(action.itemId);
+      if (idx >= 0) remaining.splice(idx, 1);
+      next = replaceUnit(next, { ...getUnit(next, unit.id), items: remaining, acted: true });
+
+      events.push({
+        type: "itemUsed", unitId: unit.id, itemId: action.itemId, target: action.target, amount,
+      });
       break;
     }
 

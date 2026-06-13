@@ -17,6 +17,8 @@ const CURSOR_TINT = 0xf2d35e;
 const CURSOR_ALPHA = 0.4;
 const STRATEGY_TINT = 0xb890ff; // 책략 시전 가능 칸 (보라)
 const STRATEGY_ALPHA = 0.4;
+const SUPPLY_TINT = 0x7bd88f; // 회복약 대상 아군 칸 (초록)
+const SUPPLY_ALPHA = 0.45;
 const GHOST_ALPHA = 0.55;
 const ORIGIN_TINT = 0xaaaaaa; // 출발지 마커 — 원작: 유닛이 걸어간 뒤 출발지에 잔상
 const ORIGIN_ALPHA = 0.4;
@@ -101,6 +103,21 @@ export class HighlightLayer extends Container {
         const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
         if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
         for (const t of ui.castTiles) this.place(t, STRATEGY_TINT, STRATEGY_ALPHA);
+        break;
+      }
+      case "itemMenu": {
+        const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
+        if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
+        break;
+      }
+      case "itemTarget": {
+        // 출발지 마커 + 도구 대상 칸 (회복약=초록 아군 / 공격아이템=적 빨강)
+        const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
+        if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
+        const supply = ui.itemKind === "supplyItem";
+        for (const t of ui.castTiles) {
+          this.place(t, supply ? SUPPLY_TINT : ATTACK_TINT, supply ? SUPPLY_ALPHA : ATTACK_ALPHA);
+        }
         break;
       }
       default:

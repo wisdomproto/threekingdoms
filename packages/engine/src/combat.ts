@@ -56,7 +56,9 @@ export function computeDamage(
   ctx: BattleContext, attacker: UnitState, defender: UnitState, ratio = 1,
 ): number {
   const guard = terrainAt(ctx, defender.x, defender.y).guard;
-  const atk = attackPower(attacker);
+  // 장비 런타임: 무기 보정(weaponBonus = 1 + 최고 무기 bonusPercent/100)을 부대 공격력에 곱한다.
+  // createBattle에서 산정된 값(미보유 = 1.0). 결정론 — 난수 없음.
+  const atk = attackPower(attacker) * (attacker.weaponBonus ?? 1);
   const def = defensePower(defender) * defFactor(ctx, attacker, defender);
   const raw = (atk - def) / 2 + attacker.level + DMG_BASE;
   return Math.max(ctx.data.combat.minDamage, Math.floor(Math.max(0, raw) * (1 - guard) * ratio));

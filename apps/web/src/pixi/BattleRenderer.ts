@@ -290,7 +290,8 @@ export class BattleRenderer implements Presenter {
     const getSelectedUnitId = (ui: InputState): string | null => {
       if (
         ui.kind === "selected" || ui.kind === "postMoveMenu" || ui.kind === "targetSelect" ||
-        ui.kind === "strategyMenu" || ui.kind === "strategyTarget"
+        ui.kind === "strategyMenu" || ui.kind === "strategyTarget" ||
+        ui.kind === "itemMenu" || ui.kind === "itemTarget"
       ) {
         return ui.unitId;
       }
@@ -450,6 +451,37 @@ export class BattleRenderer implements Presenter {
     const s = this.scene;
     if (!s) return;
     await s.units.view(e.unitId).play("retreat");
+  }
+
+  /**
+   * 도구 사용 연출 (W4). supplyItem(회복약)=대상 아군 위 초록 "+amount" 팝업 + 막대 갱신.
+   * attackItem(공격아이템)은 이 이벤트 앞에 damageDealt가 선행해 빨강 팝업·막대 갱신을 이미
+   * 처리했으므로 여기선 도구명 배너만 — 이중 팝업 방지.
+   */
+  async itemUsed(e: Ev<"itemUsed">): Promise<void> {
+    const s = this.scene;
+    if (!s) return;
+    const item = this.ctx.data.items[e.itemId];
+    const name = item?.name ?? e.itemId;
+    // target 생략 = 시전자 자신 위치 (useItem 계약). 좌표→대상 유닛은 committed에서 해석.
+    const self = this.store?.committedState.units.find((x) => x.id === e.unitId);
+    const coord = e.target ?? (self ? { x: self.x, y: self.y } : { x: 0, y: 0 });
+    s.units.view(e.unitId).faceToward(coord);
+    if (item?.category === "supplyItem") {
+      this.autoFocus(gridToWorld(coord), FOCUS_MS);
+      const target = this.store?.committedState.units.find(
+        (x) => x.x === coord.x && x.y === coord.y && !x.retreated,
+      );
+      await Promise.all([
+        s.fx.healPopup(gridToWorld(coord), e.amount),
+        s.fx.banner(`도구 · ${name}`, DUEL_BANNER_MS),
+      ]);
+      // committed는 이미 회복 반영 — 막대만 그 값으로 갱신(드레인 sync와 일치)
+      if (target) s.units.view(target.id).setTroops(target.troops);
+    } else {
+      // attackItem: 선행 damageDealt가 빨강 팝업·막대를 처리 — 여기선 도구명 배너만
+      await s.fx.banner(`도구 · ${name}`, DUEL_BANNER_MS);
+    }
   }
 
   async duelTriggered(e: Ev<"duelTriggered">): Promise<void> {

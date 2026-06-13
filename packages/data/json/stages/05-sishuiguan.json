@@ -42,7 +42,7 @@
       "classId": "strategist",
       "level": 1,
       "troops": 80,
-      "items": [],
+      "items": ["쌀", "폭탄"],
       "side": "player",
       "x": 52,
       "y": 15

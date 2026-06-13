@@ -33,11 +33,22 @@ describe("조조전 공식 (docs/reference/sosoden-combat-formula.md)", () => {
     expect(b).toBe(a); // RNG 없음 — 같은 입력 = 같은 값
   });
 
-  it("상성: 기병→보병은 방어 0.75배 → 데미지 증가", () => {
+  it("상성: 기병→보병은 방어 0.75배 → 데미지 증가 (관우 청룡언월도 weaponBonus 1.12 반영)", () => {
     // 관우(기병)→유비(보병 footman): lineAdvantage cavalry→infantry → 방어 ×0.75
-    // 관우 atk = 51. 유비 통솔91 footman(def=S) Lv1 → base45, 구간0→S+2 = 47, ×0.75 = 35.25
-    // dmg = floor((51 − 35.25)/2 + 1 + 25) = floor(7.875 + 26) = 33
-    expect(computeDamage(testCtx, get("관우"), get("유비"))).toBe(33);
+    // 관우 atk = 51 × 1.12(청룡언월도) = 57.12. 유비 통솔91 footman(def=S) Lv1 → base45, 구간0→S+2 = 47, ×0.75 = 35.25
+    // dmg = floor((57.12 − 35.25)/2 + 1 + 25) = floor(10.935 + 26) = 36
+    expect(computeDamage(testCtx, get("관우"), get("유비"))).toBe(36);
+  });
+
+  it("장비 런타임: weaponBonus가 부대 공격력에 곱해진다 (무기 미보유는 ×1 불변)", () => {
+    // 같은 관우라도 무기 제거(weaponBonus 1.0)하면 데미지가 줄어든다 — 무기 보정이 실제 반영됨을 증명
+    const guanyuArmed = get("관우");                       // 청룡언월도 1.12
+    const guanyuBare = { ...guanyuArmed, weaponBonus: 1 }; // 무기 없음
+    const armed = computeDamage(testCtx, guanyuArmed, get("유비"));
+    const bare = computeDamage(testCtx, guanyuBare, get("유비"));
+    expect(armed).toBe(36);
+    expect(bare).toBe(33); // 보정 없으면 기존 값
+    expect(armed).toBeGreaterThan(bare);
   });
 
   it("지형 guard: 산지(0.3) 위 방어자는 데미지 30% 경감", () => {

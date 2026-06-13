@@ -21,6 +21,7 @@ export interface UnitState {
   bookBonus: number;                  // 1 + 최고 병법서(book) bonusPercent/100 — 정신력(spiritPower)에 곱
   move: number;
   rangeMin: number; rangeMax: number;
+  items: string[];       // 소지품 item id 목록 — useItem 시 1개씩 소모. weapon/book 보정은 createBattle에서 미리 산정됨
   moved: boolean; acted: boolean; retreated: boolean;
 }
 
@@ -38,12 +39,18 @@ export type Action =
   | { type: "move"; unitId: string; to: Coord }
   | { type: "attack"; unitId: string; targetId: string }
   | { type: "strategy"; unitId: string; strategyId: string; target: Coord }
+  // 도구(아이템) 사용 — 소모품 2종: supplyItem(회복약)/attackItem(공격아이템).
+  // target은 효과 대상 유닛의 좌표(supplyItem=아군, attackItem=적). 생략 시 시전자 자신.
+  // 행동 1회 소비(acted). 사용한 itemId를 unit.items에서 1개 제거(소모).
+  | { type: "useItem"; unitId: string; itemId: string; target?: Coord }
   | { type: "wait"; unitId: string };
 
 export type BattleEvent =
   | { type: "unitMoved"; unitId: string; from: Coord; to: Coord }
   | { type: "damageDealt"; attackerId: string; defenderId: string; damage: number; counter: boolean }
   | { type: "strategyCast"; casterId: string; strategyId: string; target: Coord }
+  // 도구 사용 결과 — amount = 실제 회복/피해량(상한·하한 클램프 후). target = 효과 대상 좌표.
+  | { type: "itemUsed"; unitId: string; itemId: string; target?: Coord; amount: number }
   | { type: "unitRetreated"; unitId: string }
   | { type: "levelUp"; unitId: string; newLevel: number }
   | { type: "duelTriggered"; eventId: string; attackerId: string; defenderId: string; winnerId: string }

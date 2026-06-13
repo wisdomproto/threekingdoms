@@ -33,6 +33,8 @@ export interface Presenter {
   unitMoved(e: Ev<"unitMoved">): Promise<void>;
   damageDealt(e: Ev<"damageDealt">): Promise<void>;
   strategyCast(e: Ev<"strategyCast">): Promise<void>;
+  /** 도구 사용 피드백 — 미구현(옵셔널)이면 default로 흘러도 무방(W1). */
+  itemUsed?(e: Ev<"itemUsed">): Promise<void>;
   unitRetreated(e: Ev<"unitRetreated">): Promise<void>;
   duelTriggered(e: Ev<"duelTriggered">): Promise<void>;
   phaseChanged(e: Ev<"phaseChanged">): Promise<void>;
@@ -136,6 +138,8 @@ export class EventPlayer {
         return p.damageDealt(e);
       case "strategyCast":
         return p.strategyCast(e);
+      case "itemUsed":
+        return p.itemUsed?.(e) ?? Promise.resolve();
       case "unitRetreated":
         return p.unitRetreated(e);
       case "duelTriggered":

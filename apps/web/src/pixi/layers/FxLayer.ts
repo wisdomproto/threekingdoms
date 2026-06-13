@@ -10,6 +10,7 @@ const POPUP_MS = 650;
 const POPUP_RISE_PX = 28;
 const COUNTER_TINT = 0xffb74d; // 반격 데미지 색 구분 (설계 §6)
 const NORMAL_TINT = 0xffffff;
+const HEAL_TINT = 0x7bd88f; // 회복 팝업 색 (초록)
 
 export class FxLayer {
   /** 카메라 변환 하 — 데미지 팝업 */
@@ -54,6 +55,41 @@ export class FxLayer {
     }
     text.text = String(amount);
     text.tint = counter ? COUNTER_TINT : NORMAL_TINT;
+    text.visible = true;
+    text.alpha = 1;
+    const startY = at.y - 18;
+    text.position.set(at.x, startY);
+    const captured = text;
+    return this.tweens
+      .run(POPUP_MS, (t) => {
+        captured.position.y = startY - POPUP_RISE_PX * t;
+        captured.alpha = t < 0.6 ? 1 : 1 - (t - 0.6) / 0.4;
+      })
+      .then(() => {
+        captured.visible = false;
+      });
+  }
+
+  /** 회복 팝업 — damagePopup과 동형이나 "+N" 초록. 회복 책략/회복약 공용 */
+  healPopup(at: WorldPoint, amount: number): Promise<void> {
+    let text = this.popupPool.find((t) => !t.visible);
+    if (!text) {
+      text = new Text({
+        text: "",
+        style: {
+          fontFamily: "sans-serif",
+          fontSize: 18,
+          fontWeight: "bold",
+          fill: 0xffffff,
+          stroke: { color: 0x000000, width: 4 },
+        },
+      });
+      text.anchor.set(0.5);
+      this.popupPool.push(text);
+      this.world.addChild(text);
+    }
+    text.text = `+${amount}`;
+    text.tint = HEAL_TINT;
     text.visible = true;
     text.alpha = 1;
     const startY = at.y - 18;
