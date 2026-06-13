@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>에셋 프롬프트 보드 v1.1 — 수묵담채 확정판</title>
+<title>에셋 프롬프트 보드 v1.3 — 수묵담채 확정판</title>
 <style>
   :root {
     --bg: #14161c; --panel: #1d212b; --panel2: #242936; --line: #333a4a;
@@ -52,8 +52,8 @@
 </head>
 <body>
 <header>
-  <h1>에셋 프롬프트 보드 v1.2</h1>
-  <span class="sub">사수관·호로관 수직 슬라이스 · 시트(한 장 多에셋) 방식 · 잘라 쓰는 건 Claude가 처리</span>
+  <h1>에셋 프롬프트 보드 v1.3</h1>
+  <span class="sub">사수관·호로관 수직 슬라이스 + 정규 로스터 확장·적 네임드(F) · 시트(한 장 多에셋) 방식 · 잘라 쓰는 건 Claude가 처리</span>
   <span class="stylefixed">화풍: 수묵담채 (확정)</span>
   <button class="btn" id="dirbtn" title="⬇ 저장이 향할 폴더 (docs\art 권장)">저장 폴더: 미연결</button>
   <div id="progress"></div>
@@ -215,6 +215,82 @@ const SECTIONS = [
   items: [
     { id: 'D-1', title: 'UI 에셋 시트', multi: '한 장에 5요소',
       prompt: 'Game UI asset sheet in ONE image on a plain dark background, East Asian historical fantasy theme matching the ink-wash style: (1) ornate square portrait frame — bronze-and-lacquer border with subtle dragon corner motifs, (2) horizontal HP gauge frame and fill bar — lacquered wood and jade, (3) morale gauge variant with a flame motif, (4) round action button styled like a bronze seal stamp with a blank center, (5) turn banner ribbon with a blank center for text. Flat presentation, each element clearly separated, no text anywhere.' }
+  ]
+},
+{
+  id: 'F', title: 'F. 정규 로스터 확장 + 적 네임드',
+  desc: 'rosters.json·CLAUDE.md §6 확정 로스터 중 B에 없던 인물의 레퍼런스 시트(어른 비율 마스터) + 동탁(1장 거악) 시트 + ★급/주력 합류장 SD 쿼터뷰 시트. 시트는 B-1과 같은 톤·SHEET_FMT, SD 카드는 B-5식 .map 패턴(needRef, 해당 F 시트 픽본 첨부). 단발 조연 적장은 병종 템플릿(B-2)으로 커버 — 원작 방식. 게스트(주유·노숙·황개)는 고정 스펙이라 시트만, SD는 병종 템플릿 대용 가능.',
+  items: [
+    { id: 'F-1a', title: '조운(자룡) 레퍼런스 시트 (★급)', multi: '3뷰+표정',
+      note: '합류: 3장(임시)→정식. 고유 "단기필마"(포위 시 회피↑). ★급 — 일기토 영상·보이스·전용 골격 투자 대상.',
+      prompt: 'Character: ZHAO YUN (styled Zilong), a young and strikingly handsome cavalry hero in his 20s, calm fearless eyes, clean-shaven or with a faint youthful mustache, a lock of hair streaming. Gleaming silver-white lamellar armor with a flowing white cloak, the ideal noble warrior — the lone rider who carved through an army to save a child. Weapon: a long straight spear (qiang) with a bright leaf-shaped blade and a red tassel. Often paired with a white horse.\n' + SHEET_FMT },
+    { id: 'F-1b', title: '간옹 레퍼런스 시트', multi: '3뷰+표정',
+      note: '합류: 1장. 초반 유일 책략 담당 책사형 모사.',
+      prompt: 'Character: JIAN YONG, an easygoing witty advisor in his 30s-40s, relaxed half-smile, casual unhurried posture. A scholar\'s soft headcloth and comfortable loose robe rather than armor, sash tied loosely. No weapon — instead a leisurely detail in hand such as a wine cup or a folded paper fan, the demeanor of a clever man who is never in a rush.\n' + SHEET_FMT },
+    { id: 'F-1c', title: '미축 레퍼런스 시트', multi: '3뷰+표정',
+      note: '합류: 1장. 상인 출신 문관, 유비군의 온화한 후원자(자금줄).',
+      prompt: 'Character: MI ZHU, a merchant-turned-civil-official in his 40s, gentle benevolent face, well-fed dignified bearing. Rich fine-silk robes in warm tones with embroidered trim signalling wealth, jade belt ornament, soft cap. No weapon, the air of a generous patron and steady benefactor rather than a fighter.\n' + SHEET_FMT },
+    { id: 'F-1d', title: '손건 레퍼런스 시트', multi: '3뷰+표정',
+      note: '합류: 2장. 외교가 문관(보조).',
+      prompt: 'Character: SUN QIAN, a tidy diplomat-official in his 30s, composed courteous expression, neat short beard. Clean scholar\'s robes in muted blue-grey with a simple sash and proper official\'s cap, an envoy who travels and persuades. No weapon, holds a slim bamboo document scroll, the look of a careful negotiator.\n' + SHEET_FMT },
+    { id: 'F-1e', title: '미방 레퍼런스 시트', multi: '3뷰+표정',
+      note: '합류: 3장. 미축의 아우, 젊은 무관(보병계).',
+      prompt: 'Character: MI FANG, younger brother of Mi Zhu, a young military officer in his 20s, earnest determined face, light beard stubble. Practical foot-soldier officer armor — leather-and-scale cuirass in muted tones, a family resemblance to his refined brother but built for the field. Weapon: a straight infantry sword (jian) at his hip and a one-hand spear.\n' + SHEET_FMT },
+    { id: 'F-1f', title: '진등 레퍼런스 시트', multi: '3뷰+표정',
+      note: '합류: 3장(게스트성, 이후 이탈). 세련된 책략 문관.',
+      prompt: 'Character: CHEN DENG, a refined and shrewd strategist-official in his 30s, intelligent confident eyes, well-groomed thin beard, a slight knowing smile. Elegant tailored scholar\'s robes in deep indigo with subtle patterned trim, a man of local gentry sophistication and political cunning. No weapon, a folded fan or a sealed letter in hand.\n' + SHEET_FMT },
+    { id: 'F-1g', title: '서서 레퍼런스 시트', multi: '3뷰+표정',
+      note: '합류: 4장(이후 이탈 — 자원 환급 룰 대상). 검객 출신 책사.',
+      prompt: 'Character: XU SHU, a swordsman-turned-strategist in his 30s, thoughtful introspective face with a hint of past hardship, plain short beard. Simple unadorned dark robe of a wandering scholar over light travel clothing, modest and austere — a former blade-for-hire who chose the path of counsel. A plain straight sword (jian) is sheathed and carried but not drawn, signalling a fighter who now thinks more than he strikes.\n' + SHEET_FMT },
+    { id: 'F-1h', title: '제갈량 레퍼런스 시트 (★급, 아이코닉)', multi: '3뷰+표정',
+      note: '합류: 4장. 고유 책략 "동남풍". ★급 — 일기토·보이스·전용 골격 투자. 학우선·백학창의·윤건 실루엣 식별이 핵심.',
+      prompt: 'Character: ZHUGE LIANG, the iconic genius strategist in his late 20s-30s, serene intelligent face, long thin elegant beard, an aura of unshakable calm. Flowing white crane-feather robe (Taoist scholar style) over simple clothing, a dark Lunzhong-style cloth headband. Signature item: a white crane-feather feather-fan (yushan) held in one hand — his unmistakable silhouette. No armor, no weapon; the power is in the mind.\n' + SHEET_FMT },
+    { id: 'F-1i', title: '관평 레퍼런스 시트', multi: '3뷰+표정',
+      note: '합류: 4장. 관우의 아들/양자, 젊은 무장(보병계). 청룡 모티프는 절제.',
+      prompt: 'Character: GUAN PING, the young son and adopted heir of Guan Yu, a disciplined warrior in his early 20s, dutiful steady face with a faint resemblance to his father, short youthful beard just starting. Sturdy field armor in muted green tones echoing his father but plainer and more practical, a restrained subtle dragon motif (understated, not copying the father\'s ornament). Weapon: a one-hand saber (dao) and a small round shield.\n' + SHEET_FMT },
+    { id: 'F-1j', title: '유봉 레퍼런스 시트', multi: '3뷰+표정',
+      note: '합류: 4장. 유비의 양자, 젊은 전사(보병계).',
+      prompt: 'Character: LIU FENG, the adopted son of Liu Bei, a bold young fighter in his early 20s, eager headstrong face, clean-shaven. Practical scaled armor in muted dark-red and brown tones, a sash showing he belongs to Liu Bei\'s household, energetic athletic build. Weapon: a broad infantry saber (dao) carried with confidence.\n' + SHEET_FMT },
+    { id: 'F-1k', title: '주창 레퍼런스 시트', multi: '3뷰+표정',
+      note: '합류: 4장. 우직한 보병, 관우의 청룡언월도를 받쳐 드는 종자.',
+      prompt: 'Character: ZHOU CANG, a fiercely loyal rough foot-soldier in his 30s-40s, dark weathered skin, thick bushy black beard, a blunt honest devoted face, powerful stocky build. Plain rugged armor of a common but battle-hardened soldier, bare muscular arms. He reverently carries his lord\'s great pole-arm — a long heavy guandao crescent-blade glaive — as a faithful retainer who bears the master\'s weapon. Sturdy and unrefined, all loyalty and muscle.\n' + SHEET_FMT },
+    { id: 'F-1l', title: '주유 레퍼런스 시트 (게스트)', multi: '3뷰+표정',
+      note: '합류: 5장(게스트, 육성 불가 고정 스펙). 오나라 도독.',
+      prompt: 'Character: ZHOU YU, the elegant grand commander of Wu in his late 20s-30s, refined beautiful features, brilliant composed eyes, neat short beard, an air of cultured brilliance. Sophisticated officer\'s attire in deep teal and silver — lacquered scale armor worn lightly beneath a fine flowing robe, a leader who is equally scholar and warrior. Weapon: a slender straight sword (jian) at his side, worn with grace rather than menace.\n' + SHEET_FMT },
+    { id: 'F-1m', title: '노숙 레퍼런스 시트 (게스트)', multi: '3뷰+표정',
+      note: '합류: 5장(게스트, 고정 스펙). 침착한 외교 책략가.',
+      prompt: 'Character: LU SU, a calm steady strategist-diplomat in his 30s-40s, broad honest reassuring face, full well-kept beard, a settling trustworthy presence. Dignified civil-official robes in earthy muted green with a simple sash and proper cap, the bridge-builder between allies. No weapon, a document scroll in hand, the look of a patient long-term planner.\n' + SHEET_FMT },
+    { id: 'F-1n', title: '황개 레퍼런스 시트 (게스트)', multi: '3뷰+표정',
+      note: '합류: 5장(게스트, 고정 스펙). 고육계의 백전노장.',
+      prompt: 'Character: HUANG GAI, a grizzled veteran old general of Wu in his 50s-60s, deeply weathered scarred face, iron-grey beard, fierce unbowed eyes full of hard-won experience. Heavy battle-worn dark armor marked by countless campaigns, a seasoned commander who would endure flogging for a war stratagem. Weapon: a heavy iron whip-mace (or a stout saber), the gear of a frontline old soldier.\n' + SHEET_FMT },
+    { id: 'F-2', title: '동탁 레퍼런스 시트 (적 네임드 — 1장 거악)', multi: '3뷰+표정',
+      note: '적측. 1장의 거악, 잔혹·탐욕의 폭군 군벌. 화려하되 음습한 흑금 톤으로 군주급 위압.',
+      prompt: 'Character: DONG ZHUO, a corpulent tyrant warlord in his 50s, bloated heavy frame, jowled cruel face with cold greedy eyes and a thin sneering mouth, oiled dark beard. Opulent yet sinister lacquered black-and-gold armor draped with rich brocade silks, gaudy jade and gold ornaments betraying his greed, a heavy fur-trimmed mantle. The aura of cruelty and gluttony — the great villain who seized the capital. Weapon: an ornate broad saber too richly decorated for real war, worn as a symbol of usurped power.\n' + SHEET_FMT },
+    { id: 'F-3a', title: '하후돈 레퍼런스 시트 (후속 — 2장 이후 적측 ★급)', multi: '3뷰+표정',
+      note: '※ 후속(2장 이후 본격 등장). 조조군 맹장, 미래 ★급 투자 후보 — 미리 확보용.',
+      prompt: 'Character: XIAHOU DUN, a one-eyed ferocious general of Cao Cao in his 30s, a black eyepatch or scarred socket over one eye (his defining mark), fierce loyal glare, strong short beard. Dark practical lamellar armor with deep blue and iron-grey tones, a no-nonsense frontline commander\'s build. Weapon: a long heavy spear. Hardened and intense.\n' + SHEET_FMT },
+    { id: 'F-3b', title: '조조 레퍼런스 시트 (후속 — 2장 이후 적측 ★급)', multi: '3뷰+표정',
+      note: '※ 후속(2장 이후 본격 등장, 1장 영천에서 첫 조우). 미래 ★급 — 라이벌 군주, 미리 확보용.',
+      prompt: 'Character: CAO CAO, the brilliant and ambitious rival warlord in his 30s, sharp piercing intelligent eyes, a cunning confident half-smile, neat trimmed beard, compact commanding presence. Refined dark warlord\'s armor with crimson and black lacquer and gold accents beneath a fine cloak — equal parts general and statesman. Weapon: a pair of fine swords or a single ornate jian. The look of a man always three moves ahead.\n' + SHEET_FMT },
+    ...[['F-5a', '조운', 'his bright leaf-bladed straight spear, silver-white armor and white cloak'],
+        ['F-5b', '제갈량', 'his white crane-feather fan, flowing white robe and dark headband'],
+        ['F-5c', '동탁', 'his bloated frame, black-and-gold opulent armor and brocade silks'],
+        ['F-5d', '간옹', 'his scholar headcloth, loose robe and wine cup / fan'],
+        ['F-5e', '미축', 'his rich silk robes and benevolent merchant-patron look'],
+        ['F-5f', '미방', 'his foot-soldier armor, infantry sword and spear'],
+        ['F-5g', '서서', 'his plain dark scholar robe and sheathed straight sword'],
+        ['F-5h', '관평', 'his muted-green field armor, saber and small shield (restrained dragon motif)'],
+        ['F-5i', '유봉', 'his dark-red scaled armor and broad saber'],
+        ['F-5j', '주창', 'his rough armor and the great guandao glaive he carries for his lord']
+       ].map(([id, nm, sig]) => ({
+      id, title: nm + ' SD 쿼터뷰 시트', multi: '한 장에 6포즈', needRef: true,
+      note: '⚠ ' + nm + ' 레퍼런스 시트(F) 픽본 첨부. A-3/B-5와 같은 포맷 — 등신은 관우에서 확정한 것과 통일. (조연 적장·게스트는 SD 생략 가능, 병종 템플릿 B-2로 대용.)',
+      vars: { '등신': [
+        ['SD 2.5등신 (기본)', 'Super-deformed chibi proportion: about 2.5 heads tall, big head, small sturdy body, cute but true to character — keep ' + sig + ' clearly recognizable.'],
+        ['세미SD 4등신', 'Semi-deformed proportion: about 4 heads tall, compact heroic body, charming but less babyish — keep ' + sig + ' clearly recognizable.']
+      ]},
+      prompt: 'Sprite sheet of the SAME character as the attached reference sheet, converted to game-unit form, in ONE image: a 2-row × 3-column grid of full-body isometric quarter-view game sprites (camera elevated ~40 degrees) on plain white background.\n{등신}\nTOP ROW — facing front-left diagonal: (1) idle combat stance weapon ready, (2) mid-stride charging run, (3) attack pose with the signature weapon in a motion arc.\nBOTTOM ROW — facing back-left diagonal (seen from behind): same three poses in the same order.\nKeep exact same costume colors and weapon as the reference. Clean silhouettes, slightly bold outlines, readable at small size. ' + GRID_NOTE
+    }))
   ]
 }
 ];

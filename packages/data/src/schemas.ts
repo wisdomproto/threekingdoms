@@ -21,6 +21,31 @@ export type Line = z.infer<typeof LineSchema>;
 export const MoveClassSchema = z.enum(["foot", "cavalry", "bandit", "archerFoot"]);
 export type MoveClass = z.infer<typeof MoveClassSchema>;
 
+/**
+ * 조조전 병과 5스탯 등급 (docs/reference/sosoden-class-grades.md §1).
+ * 4=S / 3=A / 2=B / 1=C / (0=D). 레벨당 능력 상승치(등급계수)의 입력.
+ */
+export const GradeSchema = z.enum(["S", "A", "B", "C", "D"]);
+export type Grade = z.infer<typeof GradeSchema>;
+
+/**
+ * 병과별 5스탯 등급 [공·방·정·순·사]. terrain_c2_6 추출값(§1)을 우리 병종에 매핑.
+ *  - atk: 공격(←무력 성장), def: 방어(←통솔), spirit: 정신(←지력),
+ *    agility: 순발(←민첩, 명중/회피 — 현재 미사용 보존), morale: 사기(현재 고정 100 — 보존).
+ * optional + 미지정 시 전부 "C"(안전 기본) → 기존 JSON 무파손.
+ */
+export const ClassGradesSchema = z.object({
+  atk: GradeSchema,
+  def: GradeSchema,
+  spirit: GradeSchema,
+  agility: GradeSchema,
+  morale: GradeSchema,
+});
+export type ClassGrades = z.infer<typeof ClassGradesSchema>;
+
+/** grades 미지정 병종의 안전 기본 — 전 스탯 C */
+export const DEFAULT_GRADES: ClassGrades = { atk: "C", def: "C", spirit: "C", agility: "C", morale: "C" };
+
 export const UnitClassSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -34,6 +59,8 @@ export const UnitClassSchema = z.object({
   tier: z.number().int().min(1).max(3),      // 승급 단계
   moveClass: MoveClassSchema,
   strategies: z.array(z.string()).default([]), // 이 병종이 쓰는 책략 id 목록 (§8 병종별 리스트)
+  // 조조전 5스탯 등급(§1). 미지정 시 전부 "C" — 기존 JSON 무파손.
+  grades: ClassGradesSchema.default(DEFAULT_GRADES),
 }).refine((c) => c.rangeMin <= c.rangeMax, { message: "rangeMin must be <= rangeMax" });
 export type UnitClass = z.infer<typeof UnitClassSchema>;
 

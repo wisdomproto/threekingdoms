@@ -1,30 +1,30 @@
 import type { BattleContext, BattleState, Coord, UnitState } from "./types";
 import { terrainAt, unitAt } from "./movement";
+import { corpsStat } from "./growth";
 
 /**
- * 조조전 전투 공식 (docs/reference/sosoden-combat-formula.md).
- * 부대 능력 = floor(장수능력 / 2) + 성장(레벨). commanders.json 무력/통솔/지력 = 장수 원값.
+ * 조조전 전투 공식 (docs/reference/sosoden-combat-formula.md + sosoden-class-grades.md).
+ * 부대 능력 = floor(장수능력 / 2) + 성장. commanders.json 무력/통솔/지력 = 장수 원값.
  * 병력(troops)도 조조전 스케일(~100~150) — 영걸전 천 단위가 아님.
- * ⚠️ 등급계수(병과·스탯별 S~D 성장)는 원작 표 미확보 — 잠정 LV_GROWTH 상수. 플레이테스트로 튜닝.
+ * 성장 = **병과 등급계수 증분형 누적**(growth.ts corpsStat). 단일 LV_GROWTH 상수 폐기 —
+ * 레벨마다 그 시점 누적값의 구간으로 등급 가산치를 재조회한다(결정론, 난수 없음).
  */
-const LV_GROWTH = 3; // 레벨당 부대 능력 성장 (잠정 — 병과별 등급계수 확보 시 교체)
 const DMG_BASE = 25; // 데미지 상수항 (조조전 + 25)
 
-/** 부대 공격력 = floor(무력/2) + 성장 (← 무력) */
+/** 부대 공격력 = floor(무력/2) + 등급계수 누적성장 (← 무력, grades.atk) */
 export function attackPower(u: UnitState): number {
-  return Math.floor(u.war / 2) + LV_GROWTH * u.level;
+  return corpsStat(u.war, u.grades.atk, u.level);
 }
-/** 부대 방어력 = floor(통솔/2) + 성장 (← 통솔) */
+/** 부대 방어력 = floor(통솔/2) + 등급계수 누적성장 (← 통솔, grades.def) */
 export function defensePower(u: UnitState): number {
-  return Math.floor(u.leadership / 2) + LV_GROWTH * u.level;
+  return corpsStat(u.leadership, u.grades.def, u.level);
 }
 /**
- * 부대 정신력 = (floor(지력/2) + 성장) × 병법서 보정 (← 지력. 책략 위력/피해감소).
+ * 부대 정신력 = (floor(지력/2) + 등급계수 누적성장) × 병법서 보정 (← 지력, grades.spirit).
  * bookBonus = 1 + 최고 book bonusPercent/100 (createBattle에서 산정, 없으면 1.0).
  */
 export function spiritPower(u: UnitState): number {
-  const base = Math.floor(u.intelligence / 2) + LV_GROWTH * u.level;
-  return Math.floor(base * u.bookBonus);
+  return Math.floor(corpsStat(u.intelligence, u.grades.spirit, u.level) * u.bookBonus);
 }
 
 /** 다음 레벨까지 필요 경험치 = level × 50 (§10 행동 기반 성장). */

@@ -1,4 +1,4 @@
-import type { GameData, Stage, BattleMap, Side, Line, MoveClass } from "@tk/data";
+import type { GameData, Stage, BattleMap, Side, Line, MoveClass, ClassGrades } from "@tk/data";
 
 export interface Coord { x: number; y: number }
 
@@ -16,6 +16,7 @@ export interface UnitState {
   mp: number; maxMp: number;          // 책략치 = (레벨+10)×지력÷40
   war: number; leadership: number; intelligence: number;
   baseAtk: number; baseDef: number;
+  grades: ClassGrades;                // 병과 5스탯 등급(§1) — corpsStat 성장 입력
   weaponBonus: number;                // 1 + 최고 무기 bonusPercent/100 (소지품 중 최고 1개 — 원작 룰)
   bookBonus: number;                  // 1 + 최고 병법서(book) bonusPercent/100 — 정신력(spiritPower)에 곱
   move: number;

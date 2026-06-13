@@ -5,6 +5,9 @@ dist/
 tools/hero-extract/out/
 __pycache__/
 test-output.txt
+# 레퍼런스 영상·추출 프레임(대용량 + 서드파티 영걸전 리메이크 = IP). 분석 결과만 docs/reference로.
+downloads/
+*.mp4
 
 # 생성 에셋 원본 시트(대용량, 재생성 가능) — 게임은 public/assets의 슬라이스만 사용.
 # board.html/.md(레시피)는 추적. 블록아웃 layout_*.png는 export_layout.py로 재생성.

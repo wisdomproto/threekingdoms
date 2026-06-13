@@ -13,31 +13,31 @@ describe("조조전 공식 (docs/reference/sosoden-combat-formula.md)", () => {
     expect(adjustedStat(40)).toBe(40);
   });
 
-  it("부대 공격력 = floor(무력/2) + 성장(3×Lv)", () => {
-    // 관우 무력98 Lv1: floor(98/2) + 3×1 = 49 + 3 = 52
-    expect(attackPower(get("관우"))).toBe(52);
+  it("부대 공격력 = floor(무력/2) + 등급계수 누적성장 (기병 atk=S)", () => {
+    // 관우 무력98 lightCavalry(atk=S) Lv1: base floor(98/2)=49, 구간0(0~48 경계 49)→S+2 = 51
+    expect(attackPower(get("관우"))).toBe(51);
   });
 
-  it("부대 방어력 = floor(통솔/2) + 성장(3×Lv)", () => {
-    // 관우 통솔100 Lv1: floor(100/2) + 3×1 = 50 + 3 = 53
+  it("부대 방어력 = floor(통솔/2) + 등급계수 누적성장 (기병 def=A)", () => {
+    // 관우 통솔100 lightCavalry(def=A) Lv1: base 50, 구간1(50~68)→A+3 = 53
     expect(defensePower(get("관우"))).toBe(53);
   });
 
   it("데미지 = floor((공격력 − 방어력×상성)/2 + 공격Lv + 25), 명중 100% 결정론", () => {
     // 화웅(기병)→관우(기병): 동계열 상성 1.0
-    // 화웅 무력88 Lv3 → atk = 44+9 = 53. 관우 def = 53.
-    // dmg = floor((53 − 53×1.0)/2 + 3 + 25) = floor(0 + 28) = 28
+    // 화웅 무력90 기병(atk=S) Lv3 → base45, 3레벨 전부 구간0 +2씩 = 51. 관우 def = 53.
+    // dmg = floor((51 − 53)/2 + 3 + 25) = floor(-1 + 28) = 27
     const a = computeDamage(testCtx, get("화웅"), get("관우"));
     const b = computeDamage(testCtx, get("화웅"), get("관우"));
-    expect(a).toBe(28);
+    expect(a).toBe(27);
     expect(b).toBe(a); // RNG 없음 — 같은 입력 = 같은 값
   });
 
   it("상성: 기병→보병은 방어 0.75배 → 데미지 증가", () => {
     // 관우(기병)→유비(보병 footman): lineAdvantage cavalry→infantry → 방어 ×0.75
-    // 관우 atk = 52. 유비 통솔91 Lv1 → def = 45+3 = 48, ×0.75 = 36
-    // dmg = floor((52 − 36)/2 + 1 + 25) = floor(8 + 26) = 34
-    expect(computeDamage(testCtx, get("관우"), get("유비"))).toBe(34);
+    // 관우 atk = 51. 유비 통솔91 footman(def=S) Lv1 → base45, 구간0→S+2 = 47, ×0.75 = 35.25
+    // dmg = floor((51 − 35.25)/2 + 1 + 25) = floor(7.875 + 26) = 33
+    expect(computeDamage(testCtx, get("관우"), get("유비"))).toBe(33);
   });
 
   it("지형 guard: 산지(0.3) 위 방어자는 데미지 30% 경감", () => {

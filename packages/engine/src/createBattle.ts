@@ -23,7 +23,7 @@ export function createBattle(ctx: BattleContext, seed: number): BattleState {
       troops: p.troops, maxTroops: p.troops, morale: 100,
       mp: maxMp, maxMp,
       war: cmd.war, leadership: cmd.leadership, intelligence: cmd.intelligence,
-      baseAtk: cls.baseAtk, baseDef: cls.baseDef, weaponBonus, bookBonus,
+      baseAtk: cls.baseAtk, baseDef: cls.baseDef, grades: cls.grades, weaponBonus, bookBonus,
       move: cls.move, rangeMin: cls.rangeMin, rangeMax: cls.rangeMax,
       moved: false, acted: false, retreated: false,
     };

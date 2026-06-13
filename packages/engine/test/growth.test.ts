@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { createBattle } from "../src/createBattle";
 import { applyAction } from "../src/actions";
-import { expForNextLevel } from "../src/combat";
+import { expForNextLevel, attackPower } from "../src/combat";
 import { evaluateStage } from "../src/grade";
+import { corpsStat, growthCoeff } from "../src/growth";
 import type { BattleContext, BattleState, UnitState } from "../src/types";
 import { testCtx } from "./fixtures";
 
@@ -56,6 +57,75 @@ describe("성장 (exp/levelUp)", () => {
     const a = applyAction(testCtx, s, { type: "attack", unitId: "유비", targetId: "이숙" });
     const b = applyAction(testCtx, s, { type: "attack", unitId: "유비", targetId: "이숙" });
     expect(get(a.state, "유비").exp).toBe(get(b.state, "유비").exp);
+  });
+});
+
+describe("등급계수 성장 (corpsStat / growthCoeff — sosoden-class-grades.md §2)", () => {
+  it("구간표 룩업: 등급×현재값 구간 → 레벨당 가산치", () => {
+    // S: 0~48 +2 / 50~68 +3 / 70~88 +4 / 90+ +4(클램프)
+    expect(growthCoeff("S", 40)).toBe(2);
+    expect(growthCoeff("S", 60)).toBe(3);
+    expect(growthCoeff("S", 80)).toBe(4);
+    expect(growthCoeff("S", 95)).toBe(4);
+    // A: 70+ 빈칸 → +3 클램프
+    expect(growthCoeff("A", 40)).toBe(2);
+    expect(growthCoeff("A", 60)).toBe(3);
+    expect(growthCoeff("A", 80)).toBe(3);
+    // B: 0~48 +1 / 50~68 +2 / 70~88 +3
+    expect(growthCoeff("B", 40)).toBe(1);
+    expect(growthCoeff("B", 60)).toBe(2);
+    expect(growthCoeff("B", 80)).toBe(3);
+    // C: 70+ 빈칸 → +2 클램프
+    expect(growthCoeff("C", 40)).toBe(1);
+    expect(growthCoeff("C", 80)).toBe(2);
+    // D: 전 구간 +1 (원작 미정의 엣지)
+    expect(growthCoeff("D", 40)).toBe(1);
+    expect(growthCoeff("D", 95)).toBe(1);
+  });
+
+  it("Lv0 = floor(base/2) 초기값, 성장 없음", () => {
+    expect(corpsStat(98, "S", 0)).toBe(49);
+    expect(corpsStat(91, "B", 0)).toBe(45);
+  });
+
+  it("증분형 누적 — 레벨마다 그 시점 구간으로 재조회", () => {
+    // base 98 → 49. S등급. 49(구간0)+2=51 → 51(구간1)+3=54 → 54+3=57 ...
+    expect(corpsStat(98, "S", 1)).toBe(51);
+    expect(corpsStat(98, "S", 2)).toBe(54);
+    expect(corpsStat(98, "S", 3)).toBe(57);
+  });
+
+  it("결정론 — base·grade·level만의 함수, 같은 입력 같은 출력", () => {
+    expect(corpsStat(80, "A", 7)).toBe(corpsStat(80, "A", 7));
+    expect(corpsStat(50, "B", 12)).toBe(corpsStat(50, "B", 12));
+  });
+
+  it("단조증가 — 레벨↑ → 스탯 비감소(매 등급)", () => {
+    for (const g of ["S", "A", "B", "C", "D"] as const) {
+      for (const base of [40, 60, 90, 100]) {
+        let prev = corpsStat(base, g, 0);
+        for (let lv = 1; lv <= 50; lv++) {
+          const cur = corpsStat(base, g, lv);
+          expect(cur).toBeGreaterThanOrEqual(prev);
+          prev = cur;
+        }
+      }
+    }
+  });
+
+  it("등급 우열 — 동일 base·level에서 S ≥ A ≥ B ≥ C ≥ D", () => {
+    const base = 60, lv = 20;
+    const s = corpsStat(base, "S", lv), a = corpsStat(base, "A", lv);
+    const b = corpsStat(base, "B", lv), c = corpsStat(base, "C", lv), d = corpsStat(base, "D", lv);
+    expect(s).toBeGreaterThanOrEqual(a);
+    expect(a).toBeGreaterThanOrEqual(b);
+    expect(b).toBeGreaterThanOrEqual(c);
+    expect(c).toBeGreaterThanOrEqual(d);
+  });
+
+  it("attackPower가 corpsStat(무력, grades.atk, level)과 일치", () => {
+    const guanyu = createBattle(testCtx, 1).units.find((u) => u.id === "관우")!;
+    expect(attackPower(guanyu)).toBe(corpsStat(guanyu.war, guanyu.grades.atk, guanyu.level));
   });
 });
 
