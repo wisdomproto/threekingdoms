@@ -23,7 +23,7 @@ import { applyAction, createBattle } from "@tk/engine";
 import type { Action, BattleContext, BattleEvent, BattleState, Coord } from "@tk/engine";
 import { reduceInput, type InputState, type UiEvent } from "./inputMachine";
 import { EventPlayer, type Presenter } from "./eventPlayer";
-import { runEnemyPhase } from "./enemyTurnDriver";
+import { runEnemyPhase, runGreedyPhase } from "./enemyTurnDriver";
 import { battleVM, type BattleVM } from "./viewmodel";
 
 export interface BattleStoreOptions {
@@ -51,6 +51,8 @@ export interface StoreSnapshot {
   vm: BattleVM;
   /** 프리뷰 워크 진행 중 — ActionMenu·타깃 하이라이트 숨김 조건 */
   previewWalking: boolean;
+  /** 자동전투 ON 여부 — 컨트롤 버튼 표시 상태 */
+  autoBattle: boolean;
 }
 
 /** 헤드리스 기본 Presenter — 모든 연출을 즉시 완료 (테스트·시뮬레이션용) */
@@ -79,6 +81,8 @@ export class BattleStore {
   private readonly opts: BattleStoreOptions;
   /** 프리뷰 워크 진행 중 플래그 — 순수 데이터, Pixi 무관 */
   private _previewWalking = false;
+  /** 자동전투 ON — 아군 페이즈를 그리디 드라이버가 구동 (적 페이즈는 항상 자동) */
+  private _autoBattle = false;
 
   private listeners = new Set<() => void>();
   private snapshotCache: StoreSnapshot | null = null;
@@ -133,7 +137,7 @@ export class BattleStore {
   dispatchUi(event: UiEvent): void {
     const prevUi = this.ui;
     const prevKind = this.ui.kind;
-    const { next, effects } = reduceInput(this.ui, event, this.ctx, this.committed);
+    const { next, effects } = reduceInput(this.ui, event, this.ctx, this.committed, this._autoBattle);
     this.ui = next;
 
     const batch: BattleEvent[] = [];
@@ -187,7 +191,45 @@ export class BattleStore {
     }
 
     if (this.ui.kind === "enemyTurn" && prevKind !== "enemyTurn") this.startEnemyPhase();
+    if (this.ui.kind === "autoTurn" && prevKind !== "autoTurn") this.startAutoPhase();
     if (this.ui.kind === "idle" || this.ui.kind === "battleOver") this.flushIdleWaiters();
+    this.notify();
+  }
+
+  get autoBattle(): boolean {
+    return this._autoBattle;
+  }
+
+  /**
+   * 자동전투 토글. ON: 아군 페이즈를 그리디 드라이버가 구동(적 페이즈는 원래 자동).
+   * 수동 선택 중(selected/postMoveMenu/targetSelect)에 켜면 프리뷰를 원위치로 되돌리고
+   * idle로 정리한 뒤 즉시 자동 턴을 시작한다. OFF는 플래그만 내리면 드라이버가 다음
+   * 드레인에서 스스로 멈추고(shouldStop) idle로 복귀한다.
+   */
+  setAutoBattle(on: boolean): void {
+    if (this._autoBattle === on) return;
+    this._autoBattle = on;
+    if (
+      on &&
+      this.committed.phase === "player" &&
+      this.committed.status === "ongoing" &&
+      !this.player.playing
+    ) {
+      const cur = this.ui;
+      if (cur.kind === "postMoveMenu" || cur.kind === "targetSelect") {
+        // 진행 중 프리뷰 워크를 원위치로 되돌리고 선택 해제
+        if (cur.preview.x !== cur.from.x || cur.preview.y !== cur.from.y) {
+          this.opts.onPreviewCancel?.(cur.unitId, cur.from);
+        }
+        this._previewWalking = false;
+        this.ui = { kind: "idle" };
+      } else if (cur.kind === "selected") {
+        this.ui = { kind: "idle" };
+      }
+      if (this.ui.kind === "idle") {
+        this.dispatchUi({ type: "autoStart" }); // idle→autoTurn→startAutoPhase
+      }
+    }
     this.notify();
   }
 
@@ -212,6 +254,7 @@ export class BattleStore {
         ui: this.ui,
         vm: battleVM(this.ctx, this.settled),
         previewWalking: this._previewWalking,
+        autoBattle: this._autoBattle,
       };
     }
     return this.snapshotCache;
@@ -232,12 +275,28 @@ export class BattleStore {
       commit: (a) => this.commit(a),
       play: (events) => this.player.enqueue(events),
       ...(this.opts.onFocus ? { onFocus: this.opts.onFocus } : {}),
-    }).catch((err: unknown) => {
-      this.driverError = err;
-      const ws = this.idleWaiters;
-      this.idleWaiters = [];
-      for (const w of ws) w.reject(err);
-    });
+    }).catch((err: unknown) => this.onDriverError(err));
+  }
+
+  /** 자동전투(아군 페이즈) 드라이버 — autoTurn 진입 시 기동. auto OFF면 shouldStop으로 멈춘다 */
+  private startAutoPhase(): void {
+    runGreedyPhase({
+      ctx: this.ctx,
+      side: "player",
+      getState: () => this.committed,
+      commit: (a) => this.commit(a),
+      play: (events) => this.player.enqueue(events),
+      shouldStop: () => !this._autoBattle,
+      ...(this.opts.onFocus ? { onFocus: this.opts.onFocus } : {}),
+    }).catch((err: unknown) => this.onDriverError(err));
+  }
+
+  private onDriverError(err: unknown): void {
+    console.error("[battle driver]", err); // 진단: 드라이버 예외가 조용히 묻히지 않게
+    this.driverError = err;
+    const ws = this.idleWaiters;
+    this.idleWaiters = [];
+    for (const w of ws) w.reject(err);
   }
 
   private flushIdleWaiters(): void {

@@ -23,6 +23,7 @@ import { UnitPanel } from "./hud/UnitPanel";
 import { ActionMenu } from "./hud/ActionMenu";
 import { TurnBanner } from "./hud/TurnBanner";
 import { ResultOverlay } from "./hud/ResultOverlay";
+import { BattleControls } from "./hud/BattleControls";
 
 /** 고정 시드 — dev 재현성 (seed + actionLog가 버그 재현 수단, 설계 §1 리플레이 기반) */
 const SEED = 20260612;
@@ -128,6 +129,8 @@ export default function BattleScreen(): React.ReactElement {
 
   const snap = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
   const dispatch = useCallback((e: UiEvent) => store.dispatchUi(e), [store]);
+  const toggleAuto = useCallback(() => store.setAutoBattle(!store.autoBattle), [store]);
+  const resetCamera = useCallback(() => delegate.target?.resetCamera(), [delegate]);
 
   return (
     <div style={{ position: "fixed", inset: 0, overflow: "hidden", background: "#1b1f24" }}>
@@ -135,6 +138,7 @@ export default function BattleScreen(): React.ReactElement {
       <TurnBanner ui={snap.ui} vm={snap.vm} dispatch={dispatch} />
       <UnitPanel ui={snap.ui} vm={snap.vm} />
       <ActionMenu ui={snap.ui} dispatch={dispatch} previewWalking={snap.previewWalking} />
+      <BattleControls auto={snap.autoBattle} onToggleAuto={toggleAuto} onResetCamera={resetCamera} />
       <ResultOverlay ui={snap.ui} vm={snap.vm} />
     </div>
   );

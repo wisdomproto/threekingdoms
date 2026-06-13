@@ -113,11 +113,25 @@ export const StageUnitSchema = z.object({
   y: z.number().int().min(0),
 });
 
+/**
+ * 스테이지별 카메라 초기 연출 (feel-spec §데이터). 맵마다 스케일/긴장도가 달라
+ * 초기 줌·포커스를 데이터로 둔다. 없으면 렌더러 기본값(줌 1.5 + 아군 군주 스냅).
+ *  - zoom: 초기 배율 (없으면 기본). CameraController가 줌 한계로 클램프.
+ *  - focus: 초기 중심 그리드 칸 [x, y] (없으면 아군 군주, 그것도 없으면 맵 중앙).
+ * "기본 줌 복귀" 버튼도 이 값으로 되돌린다.
+ */
+export const StageCameraSchema = z.object({
+  zoom: z.number().positive().optional(),
+  focus: z.tuple([z.number().int().min(0), z.number().int().min(0)]).optional(),
+});
+export type StageCamera = z.infer<typeof StageCameraSchema>;
+
 export const StageSchema = z.object({
   id: z.string(),
   name: z.string(),
   mapId: z.string(),
   turnLimit: z.number().int().min(1),
+  camera: StageCameraSchema.optional(),
   units: z.array(StageUnitSchema),
   victory: z.discriminatedUnion("kind", [
     z.object({ kind: z.literal("defeatAll") }),

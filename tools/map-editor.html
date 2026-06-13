@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>맵 에디터 — 삼국지 SRPG (블록아웃 → JSON + img2img)</title>
+<style>
+  :root { --bg:#14161c; --panel:#1d212b; --panel2:#242936; --line:#333a4a; --txt:#e8e6df; --dim:#9aa1b0; --acc:#d4a843; --acc2:#6fae6f; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--txt); font-family:'Malgun Gothic','Segoe UI',sans-serif; }
+  body { display:flex; flex-direction:column; }
+  header { background:rgba(20,22,28,.96); border-bottom:1px solid var(--line); padding:8px 14px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  header h1 { font-size:14px; margin:0 10px 0 0; color:var(--acc); white-space:nowrap; }
+  .btn { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:6px 11px; cursor:pointer; font-size:12.5px; }
+  .btn:hover { border-color:var(--acc); }
+  .btn.on { background:var(--acc); color:#1a1407; border-color:var(--acc); font-weight:bold; }
+  .btn.go { background:var(--acc2); color:#0c1a0c; border-color:var(--acc2); font-weight:bold; }
+  header label { font-size:12px; color:var(--dim); display:flex; gap:4px; align-items:center; }
+  header input[type=number],header input[type=text] { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:3px 6px; font-size:12px; }
+  header input[type=range] { width:90px; }
+  main { flex:1; display:flex; min-height:0; }
+  #palette { width:172px; background:var(--panel); border-right:1px solid var(--line); overflow:auto; padding:8px; flex-shrink:0; }
+  #palette h2 { font-size:11px; color:var(--dim); margin:4px 2px 8px; text-transform:uppercase; letter-spacing:.5px; }
+  .terr { display:flex; align-items:center; gap:8px; padding:5px 7px; border-radius:6px; cursor:pointer; border:1px solid transparent; font-size:12.5px; }
+  .terr:hover { background:var(--panel2); }
+  .terr.sel { background:var(--panel2); border-color:var(--acc); }
+  .terr .sw { width:18px; height:18px; border-radius:4px; border:1px solid rgba(255,255,255,.2); flex-shrink:0; }
+  .terr .ch { color:var(--dim); font-family:Consolas,monospace; font-size:11px; margin-left:auto; }
+  #stage { flex:1; overflow:auto; position:relative; background:#0e1014; }
+  #wrap { position:relative; margin:18px; width:max-content; }
+  canvas { display:block; image-rendering:pixelated; }
+  #under { position:absolute; left:0; top:0; pointer-events:none; }
+  #grid { position:relative; cursor:crosshair; }
+  #side { width:200px; background:var(--panel); border-left:1px solid var(--line); padding:10px; overflow:auto; flex-shrink:0; font-size:12px; }
+  #side h2 { font-size:11px; color:var(--dim); margin:2px 0 8px; text-transform:uppercase; }
+  #stats div { display:flex; justify-content:space-between; padding:2px 0; color:var(--dim); }
+  #stats .bar { height:4px; background:var(--acc2); border-radius:2px; margin-top:1px; }
+  #hint { position:fixed; bottom:8px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.7); padding:4px 12px; border-radius:14px; font-size:11.5px; color:var(--dim); }
+  #toast { position:fixed; bottom:40px; left:50%; transform:translateX(-50%); background:var(--acc); color:#1a1407; font-weight:bold; padding:7px 18px; border-radius:18px; font-size:13px; display:none; z-index:50; }
+  .sep { width:1px; height:22px; background:var(--line); margin:0 4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>맵 에디터</h1>
+  <button class="btn" id="new">새 맵</button>
+  <button class="btn" id="load">불러오기</button>
+  <div class="sep"></div>
+  <button class="btn on" data-tool="paint" id="t-paint">칠하기</button>
+  <button class="btn" data-tool="fill" id="t-fill">채우기</button>
+  <label>브러시 <input type="number" id="brush" min="1" max="9" value="1" style="width:42px"></label>
+  <button class="btn" id="undo">↶ Undo</button>
+  <div class="sep"></div>
+  <label>언더레이 <input type="file" id="underfile" accept="image/*" style="width:120px; font-size:11px"></label>
+  <label>투명 <input type="range" id="underop" min="0" max="100" value="55"></label>
+  <div class="sep"></div>
+  <label>셀px <input type="number" id="cellpx" min="6" max="40" value="16" style="width:46px"></label>
+  <div class="sep"></div>
+  <button class="btn go" id="expjson">⬇ 맵 JSON</button>
+  <button class="btn go" id="expblock">⬇ 블록아웃 PNG</button>
+  <span id="dims" style="color:var(--dim); font-size:12px; margin-left:auto"></span>
+</header>
+<main>
+  <div id="palette"><h2>지형</h2><div id="terrlist"></div></div>
+  <div id="stage"><div id="wrap"><canvas id="under"></canvas><canvas id="grid"></canvas></div></div>
+  <div id="side">
+    <h2>맵 정보</h2>
+    <label style="color:var(--dim)">id <input type="text" id="mapid" style="width:100%;margin:3px 0 8px"></label>
+    <label style="color:var(--dim)">이름 <input type="text" id="mapname" style="width:100%;margin:3px 0 10px"></label>
+    <h2>지형 분포</h2>
+    <div id="stats"></div>
+  </div>
+</main>
+<div id="hint">클릭/드래그로 칠하기 · 숫자키 1~9 지형선택 · Ctrl+Z 실행취소 · 채우기=같은 지형 영역 일괄</div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* 지형 정의 — char/id/color는 export_layout.py · 게임 tileLegend와 일치 유지 */
+const TERRAINS = [
+  ['.', 'plain',    [217,207,157]],
+  ['g', 'grass',    [168,198,134]],
+  ['f', 'forest',   [74,110,70]],
+  ['m', 'mountain', [140,122,94]],
+  ['w', 'waste',    [199,181,143]],
+  ['r', 'river',    [106,158,201]],
+  ['b', 'bridge',   [176,138,90]],
+  ['#', 'wall',     [110,110,118]],
+  ['c', 'cliff',    [90,80,72]],
+  ['F', 'fort',     [158,142,122]],
+  ['G', 'gate',     [122,106,82]],
+  ['v', 'village',  [224,184,122]],
+  ['B', 'barracks', [207,158,106]],
+  ['d', 'depot',    [201,168,110]],
+];
+const BY_CHAR = Object.fromEntries(TERRAINS.map(t => [t[0], t]));
+const LEGEND = Object.fromEntries(TERRAINS.map(t => [t[0], t[1]]));
+const rgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+
+/* 상태 */
+let W = 56, H = 32;
+let id = 'newmap', name = '새 맵';
+let tiles = [];                 // H개의 char[] (W길이)
+let curChar = '.';
+let tool = 'paint';
+let cellPx = 16;
+let painting = false;
+const undoStack = [];
+
+function blankTiles(w, h) { return Array.from({ length: h }, () => Array(w).fill('.')); }
+
+function init() {
+  tiles = blankTiles(W, H);
+  buildPalette();
+  bind();
+  resizeCanvas();
+  render();
+  refreshInfo();
+}
+
+/* ── 팔레트 ── */
+function buildPalette() {
+  const el = document.getElementById('terrlist');
+  el.innerHTML = '';
+  TERRAINS.forEach(([ch, tid, col], i) => {
+    const d = document.createElement('div');
+    d.className = 'terr' + (ch === curChar ? ' sel' : '');
+    d.dataset.ch = ch;
+    d.innerHTML = `<span class="sw" style="background:${rgb(col)}"></span><span>${tid}</span><span class="ch">${i < 9 ? (i + 1) + '·' : ''}${ch}</span>`;
+    d.onclick = () => selectTerrain(ch);
+    el.appendChild(d);
+  });
+}
+function selectTerrain(ch) {
+  curChar = ch;
+  document.querySelectorAll('.terr').forEach(t => t.classList.toggle('sel', t.dataset.ch === ch));
+}
+
+/* ── 캔버스 ── */
+const gridC = document.getElementById('grid');
+const underC = document.getElementById('under');
+const gx = gridC.getContext('2d');
+
+function resizeCanvas() {
+  for (const c of [gridC, underC]) { c.width = W * cellPx; c.height = H * cellPx; }
+  document.getElementById('dims').textContent = `${W} × ${H}  (${cellPx}px)`;
+}
+
+function render() {
+  gx.clearRect(0, 0, gridC.width, gridC.height);
+  // 언더레이(밑그림) 있으면 칠한 색을 반투명으로 → 트레이싱할 수 있게 밑그림이 비친다
+  gx.globalAlpha = underImg ? 0.5 : 1;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const t = BY_CHAR[tiles[y][x]] || BY_CHAR['.'];
+    gx.fillStyle = rgb(t[2]);
+    gx.fillRect(x * cellPx, y * cellPx, cellPx, cellPx);
+  }
+  gx.globalAlpha = 1;
+  if (cellPx >= 10) {
+    gx.strokeStyle = 'rgba(255,255,255,.07)'; gx.lineWidth = 1;
+    gx.beginPath();
+    for (let x = 0; x <= W; x++) { gx.moveTo(x * cellPx + .5, 0); gx.lineTo(x * cellPx + .5, H * cellPx); }
+    for (let y = 0; y <= H; y++) { gx.moveTo(0, y * cellPx + .5); gx.lineTo(W * cellPx, y * cellPx + .5); }
+    gx.stroke();
+  }
+  refreshStats();
+}
+
+/* ── 칠하기 ── */
+function cellAt(ev) {
+  const r = gridC.getBoundingClientRect();
+  const x = Math.floor((ev.clientX - r.left) / cellPx);
+  const y = Math.floor((ev.clientY - r.top) / cellPx);
+  return (x >= 0 && y >= 0 && x < W && y < H) ? [x, y] : null;
+}
+function pushUndo() { undoStack.push(tiles.map(r => r.slice())); if (undoStack.length > 60) undoStack.shift(); }
+function paintAt(x, y) {
+  const b = Math.max(1, +document.getElementById('brush').value);
+  const o = Math.floor((b - 1) / 2);
+  for (let dy = 0; dy < b; dy++) for (let dx = 0; dx < b; dx++) {
+    const nx = x - o + dx, ny = y - o + dy;
+    if (nx >= 0 && ny >= 0 && nx < W && ny < H) tiles[ny][nx] = curChar;
+  }
+}
+function floodFill(x, y) {
+  const target = tiles[y][x];
+  if (target === curChar) return;
+  const st = [[x, y]];
+  while (st.length) {
+    const [cx, cy] = st.pop();
+    if (cx < 0 || cy < 0 || cx >= W || cy >= H || tiles[cy][cx] !== target) continue;
+    tiles[cy][cx] = curChar;
+    st.push([cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]);
+  }
+}
+
+function bind() {
+  gridC.addEventListener('mousedown', e => {
+    const c = cellAt(e); if (!c) return;
+    pushUndo();
+    if (tool === 'fill') floodFill(c[0], c[1]);
+    else { painting = true; paintAt(c[0], c[1]); }
+    render();
+  });
+  window.addEventListener('mousemove', e => {
+    if (!painting) return;
+    const c = cellAt(e); if (c) { paintAt(c[0], c[1]); render(); }
+  });
+  window.addEventListener('mouseup', () => painting = false);
+
+  document.querySelectorAll('[data-tool]').forEach(b => b.onclick = () => {
+    tool = b.dataset.tool;
+    document.querySelectorAll('[data-tool]').forEach(x => x.classList.toggle('on', x === b));
+  });
+  document.getElementById('undo').onclick = doUndo;
+  window.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); doUndo(); return; }
+    if (e.key >= '1' && e.key <= '9') { const t = TERRAINS[+e.key - 1]; if (t) selectTerrain(t[0]); }
+  });
+  document.getElementById('cellpx').onchange = e => { cellPx = Math.max(6, Math.min(40, +e.target.value)); resizeCanvas(); render(); fitUnder(); };
+  document.getElementById('new').onclick = newMap;
+  document.getElementById('load').onclick = loadMap;
+  document.getElementById('expjson').onclick = exportJSON;
+  document.getElementById('expblock').onclick = exportBlockout;
+  document.getElementById('mapid').oninput = e => id = e.target.value.trim() || 'newmap';
+  document.getElementById('mapname').oninput = e => name = e.target.value;
+  // 언더레이
+  document.getElementById('underfile').onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const url = URL.createObjectURL(f);
+    underImg = new Image();
+    underImg.onload = () => { fitUnder(); };
+    underImg.src = url;
+  };
+  document.getElementById('underop').oninput = e => { underC.style.opacity = e.target.value / 100; };
+  underC.style.opacity = 0.55;
+}
+function doUndo() { if (undoStack.length) { tiles = undoStack.pop(); render(); } }
+
+/* ── 언더레이(생성된 painted 맵을 밑에 깔아 트레이싱/정합 확인) ── */
+let underImg = null;
+function fitUnder() {
+  const uc = underC.getContext('2d');
+  uc.clearRect(0, 0, underC.width, underC.height);
+  if (underImg) uc.drawImage(underImg, 0, 0, underC.width, underC.height);
+}
+
+/* ── 통계 ── */
+function refreshStats() {
+  const cnt = {}; let total = W * H;
+  for (const row of tiles) for (const ch of row) cnt[ch] = (cnt[ch] || 0) + 1;
+  const el = document.getElementById('stats');
+  el.innerHTML = '';
+  Object.entries(cnt).sort((a, b) => b[1] - a[1]).forEach(([ch, n]) => {
+    const t = BY_CHAR[ch]; const pct = (n / total * 100).toFixed(1);
+    const d = document.createElement('div');
+    d.style.display = 'block';
+    d.innerHTML = `<div style="display:flex;justify-content:space-between"><span style="color:var(--txt)">${t[1]}</span><span>${pct}%</span></div><div class="bar" style="width:${pct}%;background:${rgb(t[2])}"></div>`;
+    el.appendChild(d);
+  });
+}
+function refreshInfo() {
+  document.getElementById('mapid').value = id;
+  document.getElementById('mapname').value = name;
+}
+
+/* ── 새 맵 / 불러오기 ── */
+function newMap() {
+  const w = +prompt('너비(칸)', W); if (!w) return;
+  const h = +prompt('높이(칸)', H); if (!h) return;
+  const nid = prompt('id (영문, 파일명)', 'stageXX') || 'newmap';
+  W = Math.max(8, Math.min(120, w)); H = Math.max(8, Math.min(120, h));
+  id = nid.trim(); name = nid;
+  tiles = blankTiles(W, H); undoStack.length = 0;
+  resizeCanvas(); render(); refreshInfo(); fitUnder();
+}
+function loadMap() {
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json,application/json';
+  inp.onchange = () => {
+    const f = inp.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      try {
+        const m = JSON.parse(rd.result);
+        W = m.width; H = m.height; id = m.id || 'map'; name = m.name || id;
+        tiles = m.tiles.map(row => {
+          const a = row.split('');
+          while (a.length < W) a.push('.');
+          return a.slice(0, W);
+        });
+        while (tiles.length < H) tiles.push(Array(W).fill('.'));
+        undoStack.length = 0;
+        resizeCanvas(); render(); refreshInfo(); fitUnder();
+        toast(`${id} 불러옴 (${W}×${H})`);
+      } catch (e) { alert('JSON 파싱 실패: ' + e); }
+    };
+    rd.readAsText(f);
+  };
+  inp.click();
+}
+
+/* ── Export ── */
+function download(name, blob) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+}
+function exportJSON() {
+  const map = { id, name, width: W, height: H, tileLegend: LEGEND, tiles: tiles.map(r => r.join('')) };
+  download(`${id}.json`, new Blob([JSON.stringify(map, null, 2)], { type: 'application/json' }));
+  toast(`${id}.json 저장 — packages/data/json/maps/ 에 넣으세요`);
+}
+function exportBlockout() {
+  // 블록아웃 = 순수 색 블록(그리드선 없음). img2img 입력용. 셀 24px 고정(export_layout.py와 동급)
+  const C = 24;
+  const cv = document.createElement('canvas'); cv.width = W * C; cv.height = H * C;
+  const c = cv.getContext('2d');
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const t = BY_CHAR[tiles[y][x]] || BY_CHAR['.'];
+    c.fillStyle = rgb(t[2]); c.fillRect(x * C, y * C, C, C);
+  }
+  cv.toBlob(b => { download(`layout_${id}.png`, b); toast(`layout_${id}.png 저장 — Gemini img2img 입력으로`); });
+}
+
+let toastT = null;
+function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', 2600); }
+
+init();
+</script>
+</body>
+</html>

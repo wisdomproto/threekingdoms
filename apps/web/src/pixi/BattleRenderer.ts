@@ -44,8 +44,10 @@ const FOCUS_MS = 250;
 const WHEEL_ZOOM_STEP = 1.12;
 /** 자동 포커스 발동 조건: 화면 중앙 ±CENTER_MARGIN 밖일 때만 이동 */
 const CENTER_MARGIN = 0.35;
-/** 초기 카메라 줌 — scale 1.0 (타일 48px) 고정, 이후 수동 줌은 유지 */
-const INITIAL_SCALE = 1.0;
+/** 스테이지 camera.zoom 미지정 시 기본 줌 (유닛 가독성). 스테이지별은 stage.camera로 오버라이드 */
+const DEFAULT_ZOOM = 1.5;
+/** "기본 줌 복귀" 버튼 트윈 시간 */
+const RESET_CAMERA_MS = 320;
 
 interface Scene {
   app: Application;
@@ -71,6 +73,9 @@ export class BattleRenderer implements Presenter {
   private destroyRequested = false;
   private mounting = false;
   private phase: Side = "player";
+  /** 스테이지 camera 기본값 (resetCamera 복귀 지점) — mount에서 확정 */
+  private defaultScale = DEFAULT_ZOOM;
+  private defaultFocusWorld: { x: number; y: number } = { x: 0, y: 0 };
 
   constructor(ctx: BattleContext) {
     this.ctx = ctx;
@@ -202,6 +207,21 @@ export class BattleRenderer implements Presenter {
     atmosphere.resize(app.screen.width, app.screen.height);
     app.stage.addChild(bg, world, atmosphere, fx.screen); // bg → world → 분위기 → 스크린FX
 
+    // 스테이지별 카메라 (feel-spec §데이터): zoom/focus를 데이터로 받아 초기 연출에 적용.
+    // 미지정이면 기본 줌 + 아군 군주(없으면 맵 중앙)로 폴백. resetCamera()도 이 값으로 복귀.
+    const camCfg = this.ctx.stage.camera;
+    this.defaultScale = camCfg?.zoom ?? DEFAULT_ZOOM;
+    let focusCoord: Coord;
+    if (camCfg?.focus) {
+      focusCoord = { x: camCfg.focus[0], y: camCfg.focus[1] };
+    } else {
+      const lord = store.settledState.units.find((u) => u.side === "player" && !u.retreated);
+      focusCoord = lord
+        ? { x: lord.x, y: lord.y }
+        : { x: Math.floor(mapW / 2), y: Math.floor(mapH / 2) };
+    }
+    this.defaultFocusWorld = gridToWorld(focusCoord);
+
     const worldSize = {
       width: this.ctx.map.width * TILE_SIZE,
       height: this.ctx.map.height * TILE_SIZE,
@@ -209,7 +229,7 @@ export class BattleRenderer implements Presenter {
     const camera = new CameraController(world, worldSize, {
       width: app.screen.width,
       height: app.screen.height,
-    }, INITIAL_SCALE);
+    }, this.defaultScale);
     fx.resize(app.screen.width, app.screen.height);
 
     // ResizeObserver: 컨테이너 크기 변화를 Pixi renderer에 직접 전파.
@@ -279,14 +299,9 @@ export class BattleRenderer implements Presenter {
       unsubscribe, onWheel, tick, resizeObserver,
     };
 
-    // 초기 상태 반영 + 아군 첫 유닛으로 카메라 스냅 (scale 1.0 고정, 위치만 맞춤)
-    // INITIAL_SCALE은 CameraController 생성자에서 이미 적용됨
+    // 초기 상태 반영 + 스테이지 기본 카메라(줌·포커스)로 즉시 스냅
     this.sync(store.settledState);
-    const lord = store.settledState.units.find((u) => u.side === "player" && !u.retreated);
-    if (lord) {
-      // ms=0 즉시 스냅 — 초기 1회만 scale 포함 위치 조정
-      camera.focusOn(gridToWorld({ x: lord.x, y: lord.y }), 0);
-    }
+    camera.focusOn(this.defaultFocusWorld, 0, this.defaultScale);
     terrain.cull(camera.viewWorldRect());
   }
 
@@ -308,6 +323,11 @@ export class BattleRenderer implements Presenter {
   /** store onFocus 결선용 — 그리드 좌표를 화면 중앙으로 */
   focusOn(coord: Coord, ms: number = FOCUS_MS): void {
     this.scene?.camera.focusOn(gridToWorld(coord), ms);
+  }
+
+  /** "기본 줌 복귀" 버튼 — 스테이지 기본 줌·포커스로 부드럽게 되돌린다 (수동 줌/팬 리셋) */
+  resetCamera(): void {
+    this.scene?.camera.focusOn(this.defaultFocusWorld, RESET_CAMERA_MS, this.defaultScale);
   }
 
   /**

@@ -42,6 +42,7 @@ const END_TURN_STYLE: React.CSSProperties = {
 
 function phaseLabel(ui: InputState, vm: BattleVM): string {
   if (ui.kind === "enemyTurn") return "적군 페이즈 진행 중…";
+  if (ui.kind === "autoTurn") return "자동전투 진행 중…";
   if (ui.kind === "animating") return "…";
   return vm.turn.phase === "player" ? "아군 페이즈" : "적군 페이즈";
 }

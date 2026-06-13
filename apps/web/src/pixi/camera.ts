@@ -149,6 +149,8 @@ interface FocusTween {
   fromOy: number;
   toOx: number;
   toOy: number;
+  fromScale: number;
+  toScale: number;
   elapsed: number;
   duration: number;
 }
@@ -217,13 +219,19 @@ export class CameraController {
     return isInCenter(this.state, this.viewport, worldPoint, margin);
   }
 
-  /** worldPoint(월드 px)를 화면 중앙으로 — ms=0이면 즉시 스냅 */
-  focusOn(worldPoint: Point, ms: number): void {
+  /**
+   * worldPoint(월드 px)를 화면 중앙으로 — ms=0이면 즉시 스냅.
+   * targetScale을 주면 줌도 함께 트윈한다("기본 줌 복귀" 버튼용). 생략하면 현재 줌 유지
+   * (자동 포커스 추적은 줌을 건드리지 않아야 하므로 기본 동작은 그대로).
+   */
+  focusOn(worldPoint: Point, ms: number, targetScale?: number): void {
+    const toScale = targetScale !== undefined ? clampZoom(targetScale) : this.state.scale;
+    // 목표 오프셋은 도착 줌 기준으로 계산 — 트윈 종료 시 정확히 중앙 정렬된다.
     const desired = clampPan(
       {
-        scale: this.state.scale,
-        ox: this.viewport.width / 2 - worldPoint.x * this.state.scale,
-        oy: this.viewport.height / 2 - worldPoint.y * this.state.scale,
+        scale: toScale,
+        ox: this.viewport.width / 2 - worldPoint.x * toScale,
+        oy: this.viewport.height / 2 - worldPoint.y * toScale,
       },
       this.viewport,
       this.worldSize,
@@ -239,6 +247,8 @@ export class CameraController {
       fromOy: this.state.oy,
       toOx: desired.ox,
       toOy: desired.oy,
+      fromScale: this.state.scale,
+      toScale: desired.scale,
       elapsed: 0,
       duration: ms,
     };
@@ -252,7 +262,7 @@ export class CameraController {
     const t = Math.min(1, tw.elapsed / tw.duration);
     const k = easeInOut(t);
     this.state = {
-      scale: this.state.scale,
+      scale: tw.fromScale + (tw.toScale - tw.fromScale) * k,
       ox: tw.fromOx + (tw.toOx - tw.fromOx) * k,
       oy: tw.fromOy + (tw.toOy - tw.fromOy) * k,
     };

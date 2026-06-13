@@ -270,6 +270,7 @@ describe("전이 전수 — 모든 (상태, 이벤트) 조합이 던지지 않�
     ts,
     { kind: "animating" },
     { kind: "enemyTurn" },
+    { kind: "autoTurn" },
     { kind: "battleOver", result: "victory" },
   ];
   const events: UiEvent[] = [
@@ -279,18 +280,24 @@ describe("전이 전수 — 모든 (상태, 이벤트) 조합이 던지지 않�
     { type: "menuWait" },
     { type: "menuCancel" },
     { type: "endTurnPressed" },
+    { type: "autoStart" },
     { type: "drained" },
   ];
 
-  /** 허용 전이표: 상태 kind → 이벤트 type → 기대 kind */
+  /**
+   * 허용 전이표: 상태 kind → 이벤트 type → 기대 kind.
+   * nearState는 아군 페이즈·진행 중이므로 auto=false(기본) drained는 idle로,
+   * idle×autoStart는 autoTurn으로 전이한다.
+   */
   const table: Record<InputState["kind"], Record<UiEvent["type"], InputState["kind"]>> = {
-    idle: { tapTile: "idle", cancel: "idle", menuAttack: "idle", menuWait: "idle", menuCancel: "idle", endTurnPressed: "animating", drained: "idle" },
-    selected: { tapTile: "idle", cancel: "idle", menuAttack: "selected", menuWait: "selected", menuCancel: "selected", endTurnPressed: "selected", drained: "selected" },
-    postMoveMenu: { tapTile: "postMoveMenu", cancel: "selected", menuAttack: "targetSelect", menuWait: "animating", menuCancel: "selected", endTurnPressed: "postMoveMenu", drained: "postMoveMenu" },
-    targetSelect: { tapTile: "targetSelect", cancel: "postMoveMenu", menuAttack: "targetSelect", menuWait: "targetSelect", menuCancel: "postMoveMenu", endTurnPressed: "targetSelect", drained: "targetSelect" },
-    animating: { tapTile: "animating", cancel: "animating", menuAttack: "animating", menuWait: "animating", menuCancel: "animating", endTurnPressed: "animating", drained: "idle" },
-    enemyTurn: { tapTile: "enemyTurn", cancel: "enemyTurn", menuAttack: "enemyTurn", menuWait: "enemyTurn", menuCancel: "enemyTurn", endTurnPressed: "enemyTurn", drained: "idle" },
-    battleOver: { tapTile: "battleOver", cancel: "battleOver", menuAttack: "battleOver", menuWait: "battleOver", menuCancel: "battleOver", endTurnPressed: "battleOver", drained: "battleOver" },
+    idle: { tapTile: "idle", cancel: "idle", menuAttack: "idle", menuWait: "idle", menuCancel: "idle", endTurnPressed: "animating", autoStart: "autoTurn", drained: "idle" },
+    selected: { tapTile: "idle", cancel: "idle", menuAttack: "selected", menuWait: "selected", menuCancel: "selected", endTurnPressed: "selected", autoStart: "selected", drained: "selected" },
+    postMoveMenu: { tapTile: "postMoveMenu", cancel: "selected", menuAttack: "targetSelect", menuWait: "animating", menuCancel: "selected", endTurnPressed: "postMoveMenu", autoStart: "postMoveMenu", drained: "postMoveMenu" },
+    targetSelect: { tapTile: "targetSelect", cancel: "postMoveMenu", menuAttack: "targetSelect", menuWait: "targetSelect", menuCancel: "postMoveMenu", endTurnPressed: "targetSelect", autoStart: "targetSelect", drained: "targetSelect" },
+    animating: { tapTile: "animating", cancel: "animating", menuAttack: "animating", menuWait: "animating", menuCancel: "animating", endTurnPressed: "animating", autoStart: "animating", drained: "idle" },
+    enemyTurn: { tapTile: "enemyTurn", cancel: "enemyTurn", menuAttack: "enemyTurn", menuWait: "enemyTurn", menuCancel: "enemyTurn", endTurnPressed: "enemyTurn", autoStart: "enemyTurn", drained: "idle" },
+    autoTurn: { tapTile: "autoTurn", cancel: "autoTurn", menuAttack: "autoTurn", menuWait: "autoTurn", menuCancel: "autoTurn", endTurnPressed: "autoTurn", autoStart: "autoTurn", drained: "idle" },
+    battleOver: { tapTile: "battleOver", cancel: "battleOver", menuAttack: "battleOver", menuWait: "battleOver", menuCancel: "battleOver", endTurnPressed: "battleOver", autoStart: "battleOver", drained: "battleOver" },
   };
 
   for (const st of states) {

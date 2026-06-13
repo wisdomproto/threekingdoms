@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  CameraController,
   MIN_TILE_SCREEN_PX,
   ZOOM_MAX,
   ZOOM_MIN,
@@ -138,6 +139,52 @@ describe("리사이즈 후 clampPan (ResizeObserver 시나리오)", () => {
     const result = clampPan(state, bigView, WORLD);
     expect(result.ox).toBeCloseTo((bigView.width - WORLD.width * 0.25) / 2, 6);
     expect(result.oy).toBeCloseTo((bigView.height - WORLD.height * 0.25) / 2, 6);
+  });
+});
+
+describe("CameraController.focusOn 줌 트윈 (기본 줌 복귀 버튼)", () => {
+  function makeTarget() {
+    const applied = { scale: 1, x: 0, y: 0 };
+    const target = {
+      scale: { set: (v: number) => { applied.scale = v; } },
+      position: { set: (x: number, y: number) => { applied.x = x; applied.y = y; } },
+    };
+    return { target, applied };
+  }
+  const center = { x: WORLD.width / 2, y: WORLD.height / 2 };
+
+  it("targetScale 지정 + ms=0 → 즉시 줌까지 스냅한다", () => {
+    const { target, applied } = makeTarget();
+    const cam = new CameraController(target, WORLD, VIEW, 1.0);
+    cam.focusOn(center, 0, 1.8);
+    expect(cam.current.scale).toBeCloseTo(1.8, 6);
+    expect(applied.scale).toBeCloseTo(1.8, 6); // Pixi에도 반영
+  });
+
+  it("ms>0 트윈은 update로 fromScale→toScale 보간된다", () => {
+    const { target } = makeTarget();
+    const cam = new CameraController(target, WORLD, VIEW, 1.0);
+    cam.focusOn(center, 100, 2.0);
+    expect(cam.current.scale).toBe(1.0); // 시작 직후 아직 시작값
+    cam.update(50); // 절반
+    expect(cam.current.scale).toBeGreaterThan(1.0);
+    expect(cam.current.scale).toBeLessThan(2.0);
+    cam.update(50); // 완료
+    expect(cam.current.scale).toBeCloseTo(2.0, 6);
+  });
+
+  it("targetScale 생략 시 줌 유지 (자동 포커스 추적은 줌 불변)", () => {
+    const { target } = makeTarget();
+    const cam = new CameraController(target, WORLD, VIEW, 1.3);
+    cam.focusOn(center, 0);
+    expect(cam.current.scale).toBe(1.3);
+  });
+
+  it("복귀 줌도 클램프된다", () => {
+    const { target } = makeTarget();
+    const cam = new CameraController(target, WORLD, VIEW, 1.0);
+    cam.focusOn(center, 0, 99); // 상한 초과
+    expect(cam.current.scale).toBe(ZOOM_MAX);
   });
 });
 

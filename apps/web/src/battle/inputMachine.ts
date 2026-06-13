@@ -35,6 +35,8 @@ export type InputState =
     }
   | { kind: "animating" }
   | { kind: "enemyTurn" }
+  /** 자동전투 진행 중(아군 페이즈) — enemyTurn처럼 입력을 잠그고 그리디 드라이버가 구동 */
+  | { kind: "autoTurn" }
   | { kind: "battleOver"; result: "victory" | "defeat" };
 
 export type UiEvent =
@@ -44,6 +46,8 @@ export type UiEvent =
   | { type: "menuWait" }
   | { type: "menuCancel" }
   | { type: "endTurnPressed" }
+  /** 자동전투 ON 진입 — idle(아군 페이즈)에서 autoTurn으로 전이 */
+  | { type: "autoStart" }
   /** EventPlayer 큐 소진 시 store가 내부 발행 */
   | { type: "drained" };
 
@@ -59,11 +63,14 @@ export interface ReduceResult {
 
 const noop = (state: InputState): ReduceResult => ({ next: state, effects: [] });
 
-/** 드레인 직후 공통 분기: 종료 → battleOver / 적 페이즈 → enemyTurn / 그 외 → idle */
-function afterDrain(battle: BattleState): InputState {
+/**
+ * 드레인 직후 공통 분기: 종료 → battleOver / 적 페이즈 → enemyTurn / 그 외 → idle.
+ * auto=true(자동전투 ON)이고 아군 페이즈면 idle 대신 autoTurn으로 — 드레인마다 자동 구동을 이어간다.
+ */
+function afterDrain(battle: BattleState, auto: boolean): InputState {
   if (battle.status !== "ongoing") return { kind: "battleOver", result: battle.status };
   if (battle.phase === "enemy") return { kind: "enemyTurn" };
-  return { kind: "idle" };
+  return auto ? { kind: "autoTurn" } : { kind: "idle" };
 }
 
 function sameCoord(a: Coord, b: Coord): boolean {
@@ -87,6 +94,7 @@ export function reduceInput(
   event: UiEvent,
   ctx: BattleContext,
   battle: BattleState,
+  auto = false,
 ): ReduceResult {
   switch (state.kind) {
     case "idle": {
@@ -120,6 +128,13 @@ export function reduceInput(
           .map((u) => ({ type: "wait", unitId: u.id }));
         if (waits.length === 0) return noop(state);
         return { next: { kind: "animating" }, effects: [{ type: "commit", actions: waits }] };
+      }
+      // 자동전투 ON 진입 — 아군 페이즈·진행 중이면 autoTurn으로 (store가 드라이버 기동)
+      if (event.type === "autoStart") {
+        if (battle.phase === "player" && battle.status === "ongoing") {
+          return { next: { kind: "autoTurn" }, effects: [] };
+        }
+        return noop(state);
       }
       return noop(state);
     }
@@ -239,13 +254,19 @@ export function reduceInput(
     }
 
     case "animating": {
-      if (event.type === "drained") return { next: afterDrain(battle), effects: [] };
+      if (event.type === "drained") return { next: afterDrain(battle, auto), effects: [] };
       return noop(state); // 재생 중 모든 입력 무시 (카메라는 InputAdapter 단계에서 별도 처리)
     }
 
     case "enemyTurn": {
-      if (event.type === "drained") return { next: afterDrain(battle), effects: [] };
+      if (event.type === "drained") return { next: afterDrain(battle, auto), effects: [] };
       return noop(state);
+    }
+
+    case "autoTurn": {
+      // 자동전투 구동 중 — 드레인마다 분기 재평가. auto OFF가 되면 afterDrain이 idle로 돌려준다.
+      if (event.type === "drained") return { next: afterDrain(battle, auto), effects: [] };
+      return noop(state); // 그 외 입력 무시 (enemyTurn과 동일)
     }
 
     case "battleOver":

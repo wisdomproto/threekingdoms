@@ -187,11 +187,12 @@ export class UnitView extends Container {
     this.repositionUI();
   }
 
-  /** baseScale × facing × 호흡 변위를 spriteBase에 반영 */
+  /** baseScale × facing × 호흡 변위를 spriteBase에 반영.
+   *  SD 아트 원본이 좌향(left-facing)이라, facing=+1(우향 의도)일 때 미러(scale.x<0)해야 한다 → -facing. */
   private applyScale(): void {
     const taller = 1 + this.breathV;
     const narrower = 1 - this.breathV * 0.5; // 부피 보존감 — 늘면 살짝 좁게
-    this.spriteBase.scale.set(this.baseScale * this.facing * narrower, this.baseScale * taller);
+    this.spriteBase.scale.set(this.baseScale * -this.facing * narrower, this.baseScale * taller);
   }
 
   /**

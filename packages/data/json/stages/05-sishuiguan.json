@@ -3,6 +3,7 @@
   "name": "사수관 전투",
   "mapId": "sishuiguan",
   "turnLimit": 30,
+  "camera": { "zoom": 1.7, "focus": [50, 15] },
   "units": [
     {
       "commanderId": "유비",
