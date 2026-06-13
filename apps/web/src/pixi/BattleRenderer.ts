@@ -41,6 +41,10 @@ const DUEL_BANNER_MS = 1100;
 const END_BANNER_MS = 1200;
 const FOCUS_MS = 250;
 const WHEEL_ZOOM_STEP = 1.12;
+/** 자동 포커스 발동 조건: 화면 중앙 ±CENTER_MARGIN 밖일 때만 이동 */
+const CENTER_MARGIN = 0.35;
+/** 초기 카메라 줌 — scale 1.0 (타일 48px) 고정, 이후 수동 줌은 유지 */
+const INITIAL_SCALE = 1.0;
 
 interface Scene {
   app: Application;
@@ -147,7 +151,7 @@ export class BattleRenderer implements Presenter {
     const camera = new CameraController(world, worldSize, {
       width: app.screen.width,
       height: app.screen.height,
-    });
+    }, INITIAL_SCALE);
     fx.resize(app.screen.width, app.screen.height);
 
     // ResizeObserver: 컨테이너 크기 변화를 Pixi renderer에 직접 전파.
@@ -214,10 +218,14 @@ export class BattleRenderer implements Presenter {
       unsubscribe, onWheel, tick, resizeObserver,
     };
 
-    // 초기 상태 반영 + 군주(첫 아군 유닛)로 카메라 스냅
+    // 초기 상태 반영 + 아군 첫 유닛으로 카메라 스냅 (scale 1.0 고정, 위치만 맞춤)
+    // INITIAL_SCALE은 CameraController 생성자에서 이미 적용됨
     this.sync(store.settledState);
     const lord = store.settledState.units.find((u) => u.side === "player" && !u.retreated);
-    if (lord) camera.focusOn(gridToWorld({ x: lord.x, y: lord.y }), 0);
+    if (lord) {
+      // ms=0 즉시 스냅 — 초기 1회만 scale 포함 위치 조정
+      camera.focusOn(gridToWorld({ x: lord.x, y: lord.y }), 0);
+    }
     terrain.cull(camera.viewWorldRect());
   }
 
@@ -241,6 +249,19 @@ export class BattleRenderer implements Presenter {
     this.scene?.camera.focusOn(gridToWorld(coord), ms);
   }
 
+  /**
+   * 자동 포커스 헬퍼 (연출 중 전용):
+   * worldPoint가 화면 중앙 ±CENTER_MARGIN 밖에 있을 때만 포커스 이동.
+   * scale은 변경하지 않는다 — 수동 줌 레벨 보존.
+   */
+  private autoFocus(worldPoint: ReturnType<typeof gridToWorld>, ms: number): void {
+    const s = this.scene;
+    if (!s) return;
+    if (!s.camera.isInCenter(worldPoint, CENTER_MARGIN)) {
+      s.camera.focusOn(worldPoint, ms);
+    }
+  }
+
   // ── Presenter 구현 (설계 §6 이벤트→연출 표) ────────────────────────────────
   async unitMoved(e: Ev<"unitMoved">): Promise<void> {
     const s = this.scene;
@@ -261,7 +282,8 @@ export class BattleRenderer implements Presenter {
       ),
     };
     const path = findPath(this.ctx, patched, e.unitId, e.to) ?? [e.from, e.to];
-    s.camera.focusOn(gridToWorld(e.to), Math.max(FOCUS_MS, path.length * 150 * 0.6));
+    // 자동 포커스: 목적지가 화면 중앙 ±35% 밖일 때만 이동 (scale 유지)
+    this.autoFocus(gridToWorld(e.to), Math.max(FOCUS_MS, path.length * 150 * 0.6));
     await view.moveAlong(path); // 타일당 150ms — 직선 금지 (벽/성문 관통 방지)
   }
 
@@ -284,7 +306,8 @@ export class BattleRenderer implements Presenter {
       ),
     };
     const path = findPath(this.ctx, patched, unitId, to) ?? [from, to];
-    s.camera.focusOn(gridToWorld(to), Math.max(FOCUS_MS, path.length * 100 * 0.6));
+    // 자동 포커스: 목적지가 화면 중앙 ±35% 밖일 때만 이동 (scale 유지)
+    this.autoFocus(gridToWorld(to), Math.max(FOCUS_MS, path.length * 100 * 0.6));
     await view.moveAlong(path, 100); // 타일당 100ms — 확정 이동(150ms)보다 약간 빠르게
   }
 
@@ -306,6 +329,8 @@ export class BattleRenderer implements Presenter {
     const defender = s.units.view(e.defenderId);
     attacker.faceToward({ x: defender.gridX, y: defender.gridY });
     defender.faceToward({ x: attacker.gridX, y: attacker.gridY });
+    // 공격/반격 연출 전: 방어자 위치 포커스 (화면 중앙 ±35% 밖일 때만, scale 유지)
+    this.autoFocus(gridToWorld({ x: defender.gridX, y: defender.gridY }), FOCUS_MS);
     const popupAt = gridToWorld({ x: defender.gridX, y: defender.gridY });
     await Promise.all([
       attacker.play("attack"),
@@ -336,6 +361,15 @@ export class BattleRenderer implements Presenter {
     this.phase = e.phase;
     if (!s) return;
     const label = e.phase === "player" ? `${e.turn}턴 — 아군 페이즈` : "적군 페이즈";
+    // 아군 페이즈 시작 시 미행동 첫 아군 유닛으로 자동 포커스 (scale 유지)
+    if (e.phase === "player" && this.store) {
+      const firstUnacted = this.store.committedState.units.find(
+        (u) => u.side === "player" && !u.retreated && !u.acted,
+      );
+      if (firstUnacted) {
+        this.autoFocus(gridToWorld({ x: firstUnacted.x, y: firstUnacted.y }), FOCUS_MS);
+      }
+    }
     await s.fx.banner(label, PHASE_BANNER_MS);
   }
 

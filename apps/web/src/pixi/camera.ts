@@ -102,6 +102,35 @@ export function zoomAt(
   return clampPan(next, viewport, worldSize);
 }
 
+/**
+ * 월드 좌표 worldPoint가 현재 뷰포트 중앙 ±margin 범위 안에 있는지 판정.
+ * margin=0.35(기본)이면 화면 중앙 70%×70% 사각형 안에 있을 때 true.
+ * 자동 포커스 발동 조건으로 사용 — 이미 충분히 화면 안에 있으면 카메라를 강제 이동하지 않는다.
+ *
+ * @param state  현재 카메라 상태
+ * @param viewport  화면 크기 (px)
+ * @param worldPoint  검사할 월드 좌표 (px)
+ * @param margin  0~0.5, 기본 0.35
+ */
+export function isInCenter(
+  state: CameraState,
+  viewport: Size,
+  worldPoint: Point,
+  margin = 0.35,
+): boolean {
+  const screen = worldToScreen(state, worldPoint);
+  const cx = viewport.width / 2;
+  const cy = viewport.height / 2;
+  const halfW = viewport.width * margin;
+  const halfH = viewport.height * margin;
+  return (
+    screen.x >= cx - halfW &&
+    screen.x <= cx + halfW &&
+    screen.y >= cy - halfH &&
+    screen.y <= cy + halfH
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Pixi 적용부 (설계 §2.2 CameraController) — 위 수학부의 유일한 소비자.
 // pixi.js를 직접 import하지 않고 구조적 타입(CameraTarget)으로 컨테이너를 받는다 —
@@ -135,11 +164,11 @@ export class CameraController {
   private readonly target: CameraTarget;
   private focusTween: FocusTween | null = null;
 
-  constructor(target: CameraTarget, worldSize: Size, viewport: Size) {
+  constructor(target: CameraTarget, worldSize: Size, viewport: Size, initialScale = 1) {
     this.target = target;
     this.worldSize = worldSize;
     this.viewport = viewport;
-    this.state = clampPan({ scale: clampZoom(1), ox: 0, oy: 0 }, viewport, worldSize);
+    this.state = clampPan({ scale: clampZoom(initialScale), ox: 0, oy: 0 }, viewport, worldSize);
     this.apply();
   }
 
@@ -178,6 +207,14 @@ export class CameraController {
       width: this.viewport.width / this.state.scale,
       height: this.viewport.height / this.state.scale,
     };
+  }
+
+  /**
+   * worldPoint(월드 px)가 현재 뷰포트 중앙 ±margin(기본 0.35) 안에 있는지 판정.
+   * 자동 포커스 발동 조건으로 사용 — true이면 카메라 이동 생략.
+   */
+  isInCenter(worldPoint: Point, margin = 0.35): boolean {
+    return isInCenter(this.state, this.viewport, worldPoint, margin);
   }
 
   /** worldPoint(월드 px)를 화면 중앙으로 — ms=0이면 즉시 스냅 */

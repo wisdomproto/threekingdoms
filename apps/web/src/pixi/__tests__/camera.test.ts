@@ -5,6 +5,7 @@ import {
   ZOOM_MIN,
   clampPan,
   clampZoom,
+  isInCenter,
   minZoom,
   panBy,
   screenToWorld,
@@ -137,5 +138,51 @@ describe("리사이즈 후 clampPan (ResizeObserver 시나리오)", () => {
     const result = clampPan(state, bigView, WORLD);
     expect(result.ox).toBeCloseTo((bigView.width - WORLD.width * 0.25) / 2, 6);
     expect(result.oy).toBeCloseTo((bigView.height - WORLD.height * 0.25) / 2, 6);
+  });
+});
+
+describe("isInCenter (자동 포커스 발동 조건 판정)", () => {
+  // 뷰포트 800×600, scale 1, 중앙 정렬 카메라 (맵보다 뷰포트가 작아 ox=-1000, oy=-500)
+  const state: CameraState = { scale: 1, ox: -1000, oy: -500 };
+  const viewport: Size = { width: 800, height: 600 };
+
+  it("화면 중앙에 있는 점 → true", () => {
+    // screen 중앙 = (400, 300) → world = (400-(-1000), 300-(-500)) = (1400, 800)
+    // worldToScreen: x*1 + (-1000) = 400 → x=1400
+    const center = { x: 1400, y: 800 };
+    expect(isInCenter(state, viewport, center, 0.35)).toBe(true);
+  });
+
+  it("화면 중앙 ±35% 안에 있는 점 → true", () => {
+    // halfW = 800*0.35 = 280, cx=400 → x in [120, 680]
+    // screen_x = 1200*1 + (-1000) = 200 → 200 in [120, 680] → true
+    const nearCenter = { x: 1200, y: 800 };
+    expect(isInCenter(state, viewport, nearCenter, 0.35)).toBe(true);
+  });
+
+  it("화면 중앙 ±35% 밖에 있는 점 → false", () => {
+    // screen_x = 50*1 + (-1000) = -950 → 화면 밖 → false
+    const far = { x: 50, y: 800 };
+    expect(isInCenter(state, viewport, far, 0.35)).toBe(false);
+  });
+
+  it("화면 가장자리 근처 → false", () => {
+    // screen_x = (1000+680+1)*1 + (-1000) = 681 → 681 > 680 → false
+    const edge = { x: 1681, y: 800 };
+    expect(isInCenter(state, viewport, edge, 0.35)).toBe(false);
+  });
+
+  it("margin 0.5이면 화면 전체가 범위 — 가장자리도 true", () => {
+    // halfW = 800*0.5=400, cx=400 → x in [0,800]
+    // screen_x = (1000+799)*1 + (-1000) = 799 → 0 <= 799 <= 800 → true
+    const almostEdge = { x: 1799, y: 800 };
+    expect(isInCenter(state, viewport, almostEdge, 0.5)).toBe(true);
+  });
+
+  it("margin 0이면 정확히 중앙점만 true", () => {
+    const exact = { x: 1400, y: 800 };
+    expect(isInCenter(state, viewport, exact, 0)).toBe(true);
+    const offByOne = { x: 1401, y: 800 };
+    expect(isInCenter(state, viewport, offByOne, 0)).toBe(false);
   });
 });
