@@ -21,6 +21,8 @@ import { depthOf, gridToWorld, TILE_SIZE } from "../projection";
 import { UNIT_BASE_SIZE, type TextureResolver } from "../textures";
 import { easeInOut, easeOut, easeOutBack, type TweenRunner } from "../tweens";
 import { resolveSpriteId } from "../spriteMap";
+import { SkeletonView, type AttachmentTextureResolver } from "./SkeletonView";
+import type { ClipName, Skeleton } from "../skeleton";
 
 export type UnitSequence = "idle" | "move" | "attack" | "hit" | "retreat";
 
@@ -109,6 +111,16 @@ export class UnitView extends Container {
   private fxSquashX = 1;
   private fxSquashY = 1;
 
+  /**
+   * 자체 컷아웃 리그 (§4 "유닛 = 시퀀스 재생기"). null이면 기존 스프라이트/폴백 경로.
+   * setSkeleton()으로 주입되면 renderMode='skeleton' — play()가 클립을 구동한다.
+   */
+  private skeletonView: SkeletonView | null = null;
+  /** idle 클립 루프 위상(초) — tickIdle에서 진행. 클립 duration으로 wrap. */
+  private skelIdlePhase = 0;
+  /** idle 클립 duration(초) 캐시 — 0이면 정적 포즈. */
+  private skelIdleDuration = 1;
+
   constructor(init: UnitViewInit, textures: TextureResolver, tweens: TweenRunner) {
     super();
     this.unitId = init.id;
@@ -176,8 +188,50 @@ export class UnitView extends Container {
 
   /** 에셋 로드 완료 후 외부(UnitLayer)에서 호출 — 현재 뷰의 idle 텍스처로 갱신, facing 보존 */
   refreshSprite(): void {
+    if (this.skeletonView) {
+      this.skeletonView.refresh();
+      return;
+    }
     this.applySpriteTexture(this.view, "idle");
     this.applyFacing();
+  }
+
+  /** 현재 렌더 모드 — 스켈레톤이 주입돼 있으면 'skeleton', 아니면 'sprite'(폴백 색사각 포함). */
+  get renderMode(): "sprite" | "skeleton" {
+    return this.skeletonView ? "skeleton" : "sprite";
+  }
+
+  /**
+   * 자체 컷아웃 리그를 주입해 renderMode='skeleton'로 전환 (§4).
+   * 스켈레톤이 있으면 SkeletonView가 베이스를 대체 — 스프라이트/폴백 사각형은 숨긴다.
+   * resolveTexture: 어태치먼트 image → Texture (미로드면 null → 해당 슬롯 미표시).
+   * 결정론·배속: 클립 진행은 play()가 TweenRunner로 구동(§ 기존 스프라이트 경로와 동일 규약).
+   */
+  setSkeleton(skeleton: Skeleton, resolveTexture: AttachmentTextureResolver): void {
+    if (this.skeletonView) {
+      this.removeChild(this.skeletonView);
+      this.skeletonView.destroy({ children: true });
+    }
+    const sv = new SkeletonView(skeleton, resolveTexture);
+    // 발 기준 정렬: 스켈레톤 원점(0,0)을 발끝(타일 하단)으로. 스프라이트 경로와 같은 feetY.
+    sv.position.set(0, TILE_SIZE / 2);
+    this.skeletonView = sv;
+    this.skelIdleDuration = skeleton.clips.idle?.duration ?? 0;
+    this.skelIdlePhase = 0;
+    // 스프라이트/폴백 베이스 숨김 — 스켈레톤이 화면을 차지한다.
+    this.spriteBase.visible = false;
+    this.fallbackBase.visible = false;
+    // 슬롯 정렬: 그림자(이미 addChild됨) 위, 바/라벨 아래에 끼우려 그림자 다음으로 올린다.
+    this.addChildAt(sv, this.getChildIndex(this.shadow) + 1);
+    sv.setPose("idle", 0);
+    this.applySkeletonFacing();
+    this.repositionUI();
+  }
+
+  /** 스켈레톤 좌우 미러 — 컨테이너 scale.x 부호로(스프라이트 미러와 동일 규약). */
+  private applySkeletonFacing(): void {
+    if (!this.skeletonView) return;
+    this.skeletonView.scale.x = Math.abs(this.skeletonView.scale.x) * this.facing;
   }
 
   /**
@@ -185,6 +239,7 @@ export class UnitView extends Container {
    * 텍스처가 없으면 폴백(fallbackBase)을 표시.
    */
   private applySpriteTexture(view: "front" | "back", pose: "idle" | "move" | "attack"): void {
+    if (this.skeletonView) return; // 스켈레톤 경로 — 스프라이트 포즈 텍스처 미사용
     this.pose = pose; // 미러 부호는 포즈에 따라 다름 (applyScale) — 폴백 경로에서도 추적
     if (!this.spriteId) return; // 매핑 없음 → 항상 폴백
 
@@ -207,6 +262,7 @@ export class UnitView extends Container {
    *  idle/move 아트는 좌향(left-facing)이라 facing=+1(우향)일 때 미러(scale.x<0) → -facing.
    *  attack 아트는 우향으로 그려져 있어 부호가 반대 → +facing (적이 왼쪽이면 좌로 휘두름). */
   private applyScale(): void {
+    if (this.skeletonView) return; // 스켈레톤은 자체 클립이 변형 담당 — 스프라이트 스쿼시 미적용
     const taller = (1 + this.breathV) * this.fxSquashY;
     const narrower = (1 - this.breathV * 0.5) * this.fxSquashX; // 부피 보존감 — 늘면 살짝 좁게
     const mirror = this.pose === "attack" ? this.facing : -this.facing;
@@ -218,6 +274,10 @@ export class UnitView extends Container {
    * scale.x 부호로 좌우 미러링.
    */
   private applyFacing(): void {
+    if (this.skeletonView) {
+      this.applySkeletonFacing();
+      return;
+    }
     if (this.spriteBase.visible) {
       this.applyScale();
     } else {
@@ -230,6 +290,13 @@ export class UnitView extends Container {
    * 스프라이트 표시 + 호흡 on + 미퇴각일 때만. 정지/이동 중엔 중립으로 복귀.
    */
   tickIdle(dtMS: number): void {
+    // 스켈레톤 경로: idle 클립을 루프 위상으로 진행(결정론 — t는 위상/duration).
+    if (this.skeletonView) {
+      if (this.retreatedFlag || !this.breathing || this.skelIdleDuration <= 0) return;
+      this.skelIdlePhase = (this.skelIdlePhase + dtMS / 1000) % this.skelIdleDuration;
+      this.skeletonView.setPose("idle", this.skelIdlePhase / this.skelIdleDuration);
+      return;
+    }
     if (!this.spriteBase.visible || this.retreatedFlag || !this.breathing) {
       if (this.breathV !== 0) {
         this.breathV = 0;
@@ -242,8 +309,33 @@ export class UnitView extends Container {
     this.applyScale();
   }
 
+  /**
+   * 스켈레톤 1회 클립(attack/hit/move 등) 재생 — progress 0→1 트윈(TweenRunner 경유 → 배속 존중).
+   * 끝나면 idle로 복귀. play() 내부 헬퍼.
+   */
+  private playSkeletonClip(clip: ClipName, durationMs: number): Promise<void> {
+    const sv = this.skeletonView;
+    if (!sv) return Promise.resolve();
+    sv.setClip(clip);
+    return this.tweens
+      .run(durationMs, (t) => sv.setPose(clip, t))
+      .then(() => {
+        sv.setPose("idle", this.skelIdleDuration > 0 ? this.skelIdlePhase / this.skelIdleDuration : 0);
+      });
+  }
+
   /** 병력 바 / 라벨을 현재 활성 베이스 위에 배치 */
   private repositionUI(): void {
+    if (this.skeletonView) {
+      // 스켈레톤도 발 기준(원점=발끝, feetY=타일 하단). 바/라벨은 스프라이트 경로와 동일 위치.
+      const feetY = TILE_SIZE / 2;
+      const headY = feetY - SPRITE_DISPLAY_H;
+      this.barBg.position.set(-BAR_WIDTH / 2, feetY + 2);
+      this.barFill.position.set(-BAR_WIDTH / 2, feetY + 2);
+      this.nameLabel.position.set(0, headY - 2);
+      this.shadow.position.set(0, feetY);
+      return;
+    }
     if (this.spriteBase.visible) {
       // 컨테이너 원점 = 타일 중심(gridToWorld). 발끝을 타일 하단(+TILE_SIZE/2)으로 내려
       // 유닛이 위 칸에 뜨지 않고 자기 칸 안에 서도록 한다. anchor=(0.5,1.0)이므로 발=spriteBase.y.
@@ -353,6 +445,7 @@ export class UnitView extends Container {
   async moveAlong(path: readonly Coord[], msPerTile: number = MOVE_MS_PER_TILE): Promise<void> {
     this.breathing = false; // 걷는 동안 호흡 정지
     this.applySpriteTexture(this.view, "move");
+    if (this.skeletonView) this.skeletonView.setClip("move");
     for (let i = 1; i < path.length; i++) {
       const from = path[i - 1];
       const to = path[i];
@@ -363,12 +456,15 @@ export class UnitView extends Container {
       const wt = gridToWorld(to);
       await this.tweens.run(msPerTile, (t) => {
         this.position.set(wf.x + (wt.x - wf.x) * t, wf.y + (wt.y - wf.y) * t);
+        // move 클립을 타일당 1주기로 진행(걸음). 결정론 — t로 구동.
+        if (this.skeletonView) this.skeletonView.setPose("move", t);
       });
       this.gridX = to.x;
       this.gridY = to.y;
       this.zIndex = depthOf(to.y);
     }
     this.applySpriteTexture(this.view, "idle");
+    if (this.skeletonView) this.skeletonView.setPose("idle", this.idleT());
     this.breathing = true; // 도착 → 호흡 재개
   }
 
@@ -378,6 +474,10 @@ export class UnitView extends Container {
    * 순수 표현 — 게임상태 불변, TweenRunner 경유라 배속 존중.
    */
   private playAttack(): Promise<void> {
+    if (this.skeletonView) {
+      // 스켈레톤: attack 클립을 ATTACK_MS 동안 1회 재생 + 컨테이너 lunge(위치)는 그대로 유지.
+      this.skeletonView.setClip("attack");
+    }
     this.applySpriteTexture(this.view, "attack");
     const ox = this.position.x;
     const dir = this.facing;
@@ -402,6 +502,8 @@ export class UnitView extends Container {
           stretch = 0.22 * (1 - k);
         }
         this.position.x = ox + dir * dx;
+        // 스켈레톤: 같은 t로 attack 클립 진행(배속 존중 — TweenRunner가 t를 구동).
+        if (this.skeletonView) this.skeletonView.setPose("attack", t);
         // 가로 늘면 세로 눌림(부피 보존). 돌진=가로 강조.
         this.fxSquashX = 1 + stretch * 0.5;
         this.fxSquashY = 1 - stretch * 0.35;
@@ -413,7 +515,13 @@ export class UnitView extends Container {
         this.fxSquashY = 1;
         this.applyScale();
         this.applySpriteTexture(this.view, "idle");
+        if (this.skeletonView) this.skeletonView.setPose("idle", this.idleT());
       });
+  }
+
+  /** 현재 idle 위상의 정규화 t(0..1) — 클립 복귀 시 매끄러운 idle 재개용. */
+  private idleT(): number {
+    return this.skelIdleDuration > 0 ? this.skelIdlePhase / this.skelIdleDuration : 0;
   }
 
   /**
@@ -427,8 +535,10 @@ export class UnitView extends Container {
     const push = -fromDir; // 맞은 쪽 반대로 밀림
     const dist = KNOCKBACK_PX * (0.5 + intensity); // intensity로 넉백 거리 가중
     this.activeBase.tint = 0xff8080;
+    if (this.skeletonView) this.skeletonView.setClip("hit");
     return this.tweens
       .run(HIT_MS, (t) => {
+        if (this.skeletonView) this.skeletonView.setPose("hit", t);
         // 0~0.3 급격히 밀림(easeOut) → 0.3~1 탄성 복귀 + 감쇠 진동
         let dx: number;
         if (t < 0.3) {
@@ -452,6 +562,7 @@ export class UnitView extends Container {
         this.fxSquashX = 1;
         this.fxSquashY = 1;
         this.applyScale();
+        if (this.skeletonView) this.skeletonView.setPose("idle", this.idleT());
       });
   }
 

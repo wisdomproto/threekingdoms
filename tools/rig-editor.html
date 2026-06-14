@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>리그 에디터 — 삼국지 SRPG (강체 컷아웃 → 스켈레톤 JSON)</title>
+<!--
+  자체 컷아웃 리그 툴 MVP (Spine 대체) — CLAUDE.md §4 "수작업 프레임 애니 금지 / 포즈+트윈 / 유닛=시퀀스 재생기".
+  강체(rigid) 컷아웃: 본은 affine(x,y,rot,scale)만, 메시 변형·IK 없음. 무기 슬롯 실시간 교체(§13 BM).
+
+  출력 스켈레톤 JSON 스키마 = apps/web/src/pixi/skeleton.ts 의 Skeleton 인터페이스와 1:1:
+    { version:1, name, bones[], slots[], attachments{slot:{name:att}}, clips{idle|move|attack|hit} }
+  런타임(apps/web/src/pixi/layers/SkeletonView.ts)이 poseSkeleton()으로 이 JSON을 그대로 소비한다.
+
+  좌표 규약: 캔버스 중심 아래쪽 "지면선"이 발(원점 0,0). y는 위로 갈수록 음수(스크린 좌표와 반대 —
+  skeleton.ts localToMat은 CCW 양의 회전 기준이며 런타임에서 발 기준 정렬한다).
+-->
+<style>
+  :root { --bg:#14161c; --panel:#1d212b; --panel2:#242936; --line:#333a4a; --txt:#e8e6df; --dim:#9aa1b0;
+          --acc:#d4a843; --acc2:#6fae6f; --bad:#e06a6a; --key:#d4a843; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--txt); font-family:'Malgun Gothic','Segoe UI',sans-serif; }
+  body { display:flex; flex-direction:column; overflow:hidden; }
+  header { background:rgba(20,22,28,.96); border-bottom:1px solid var(--line); padding:7px 12px; display:flex; gap:7px; align-items:center; flex-wrap:wrap; }
+  header h1 { font-size:14px; margin:0 8px 0 0; color:var(--acc); white-space:nowrap; }
+  .btn { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:5px 10px; cursor:pointer; font-size:12.5px; }
+  .btn:hover { border-color:var(--acc); }
+  .btn.on { background:var(--acc); color:#1a1407; border-color:var(--acc); font-weight:bold; }
+  .btn.go { background:var(--acc2); color:#0c1a0c; border-color:var(--acc2); font-weight:bold; }
+  .btn.warn { border-color:var(--bad); color:var(--bad); }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+  .sep { width:1px; height:22px; background:var(--line); margin:0 3px; }
+  header label { font-size:11.5px; color:var(--dim); display:flex; gap:4px; align-items:center; }
+  main { flex:1; display:flex; min-height:0; }
+  /* 좌측 파트 패널 */
+  #left { width:208px; background:var(--panel); border-right:1px solid var(--line); overflow:auto; padding:9px; flex-shrink:0; }
+  #left h2 { font-size:11px; color:var(--dim); margin:11px 2px 6px; text-transform:uppercase; letter-spacing:.5px; }
+  #left h2:first-child { margin-top:2px; }
+  .bonerow { display:flex; align-items:center; gap:6px; padding:5px 7px; border-radius:6px; cursor:pointer; border:1px solid transparent; font-size:12px; }
+  .bonerow:hover { background:var(--panel2); }
+  .bonerow.sel { background:var(--panel2); border-color:var(--acc); }
+  .bonerow .nm { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .bonerow .dep { color:var(--dim); font-size:10px; }
+  .bonerow .vis { font-size:13px; opacity:.7; }
+  .addbtn { width:100%; padding:7px; background:var(--panel2); border:1px dashed var(--line); color:var(--dim); border-radius:6px; cursor:pointer; font-size:12px; margin-top:6px; }
+  .addbtn:hover { border-color:var(--acc); color:var(--acc); }
+  /* 캔버스 */
+  #stage { flex:1; overflow:hidden; position:relative; background:#0e1014; }
+  #cv { display:block; position:absolute; inset:0; width:100%; height:100%; cursor:crosshair; }
+  /* 우측 인스펙터 */
+  #right { width:300px; background:var(--panel); border-left:1px solid var(--line); padding:0; overflow:auto; flex-shrink:0; font-size:12px; }
+  .ins { padding:11px 13px; }
+  .field { margin-bottom:9px; }
+  .field label { display:block; font-size:11px; color:var(--dim); margin-bottom:3px; }
+  .field input,.field select { width:100%; background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:5px 7px; font-size:12.5px; }
+  .field input:focus,.field select:focus { outline:none; border-color:var(--acc); }
+  .row2 { display:flex; gap:8px; } .row2 > * { flex:1; }
+  .row3 { display:flex; gap:6px; } .row3 > * { flex:1; }
+  .sectlabel { font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:.5px; margin:6px 0 8px; border-bottom:1px solid var(--line); padding-bottom:4px; }
+  .hint { font-size:10.5px; color:#6c7588; margin-top:4px; line-height:1.45; }
+  .attchip { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:12px; background:var(--panel2); border:1px solid var(--line); cursor:pointer; font-size:11px; margin:0 4px 4px 0; }
+  .attchip.on { border-color:var(--acc); color:var(--acc); }
+  .attchip .x { color:var(--dim); }
+  /* 하단 타임라인 */
+  #timeline { height:148px; background:var(--panel); border-top:1px solid var(--line); display:flex; flex-direction:column; flex-shrink:0; }
+  .tlhead { display:flex; gap:6px; align-items:center; padding:6px 11px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  .clipbtn { padding:4px 12px; }
+  .tlbody { flex:1; overflow:auto; padding:6px 11px; }
+  .track { display:flex; align-items:center; gap:8px; height:24px; }
+  .track .tnm { width:96px; font-size:11px; color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex-shrink:0; }
+  .lane { position:relative; flex:1; height:14px; background:var(--panel2); border-radius:7px; cursor:pointer; }
+  .key { position:absolute; top:50%; width:9px; height:9px; background:var(--key); border:1px solid #1a1407; border-radius:2px; transform:translate(-50%,-50%) rotate(45deg); cursor:grab; }
+  .key.sel { background:#fff; }
+  .playhead { position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--acc2); pointer-events:none; }
+  #scrub { flex:1; }
+  #toast { position:fixed; bottom:160px; left:50%; transform:translateX(-50%); background:var(--acc); color:#1a1407; font-weight:bold; padding:7px 18px; border-radius:18px; font-size:13px; display:none; z-index:80; }
+  #toast.bad { background:var(--bad); color:#fff; }
+  #hint { position:fixed; bottom:154px; left:12px; background:rgba(0,0,0,.72); padding:4px 12px; border-radius:14px; font-size:11px; color:var(--dim); pointer-events:none; }
+  /* 붙여넣기 모달 */
+  #pasteModal { position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center; z-index:90; }
+  #pasteModal.on { display:flex; }
+  #pasteBox { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px; width:min(720px,93vw); }
+  #pasteBox h3 { margin:0 0 6px; color:var(--acc); font-size:13px; }
+  #pasteBox p { color:var(--dim); font-size:11.5px; margin:0 0 8px; }
+  #pasteArea { width:100%; height:280px; background:#0e1014; color:var(--txt); border:1px solid var(--line); border-radius:6px; font-family:Consolas,monospace; font-size:12px; padding:8px; }
+  #pasteBox .prow { display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>리그 에디터</h1>
+  <button class="btn" id="newRig">새로</button>
+  <button class="btn" id="openRig">열기</button>
+  <div class="sep"></div>
+  <button class="btn go" id="saveRig">⬇ 스켈레톤 JSON</button>
+  <button class="btn" id="dlImages">파트 PNG 묶음</button>
+  <div class="sep"></div>
+  <label>이름 <input type="text" id="rigName" value="unit" style="width:90px"></label>
+  <label>줌 <input type="range" id="zoom" min="40" max="320" value="140" style="width:90px"></label>
+  <span id="status" style="color:var(--dim); font-size:11.5px; margin-left:auto"></span>
+</header>
+<main>
+  <div id="left">
+    <h2>본 / 파트</h2>
+    <div id="bonelist"></div>
+    <label class="addbtn" for="addPart">+ 파트 이미지 추가</label>
+    <input type="file" id="addPart" accept="image/*" multiple hidden>
+    <button class="addbtn" id="addEmptyBone">+ 빈 본 (이미지 없음)</button>
+    <h2>무기 슬롯</h2>
+    <div id="weaponInfo" class="hint">무기 슬롯으로 지정된 본에 여러 어태치먼트(무기)를 추가해 실시간 교체를 미리봅니다.</div>
+    <label class="addbtn" for="addWeaponAtt" id="addWeaponLabel" style="display:none">+ 무기 어태치먼트</label>
+    <input type="file" id="addWeaponAtt" accept="image/*" hidden>
+  </div>
+  <div id="stage"><canvas id="cv"></canvas></div>
+  <div id="right"><div class="ins" id="inspector"></div></div>
+</main>
+<div id="timeline">
+  <div class="tlhead">
+    <button class="btn clipbtn on" data-clip="idle">idle</button>
+    <button class="btn clipbtn" data-clip="move">move</button>
+    <button class="btn clipbtn" data-clip="attack">attack</button>
+    <button class="btn clipbtn" data-clip="hit">hit</button>
+    <div class="sep"></div>
+    <label>길이(초) <input type="number" id="clipDur" min="0.1" max="10" step="0.1" value="2" style="width:54px"></label>
+    <button class="btn" id="playBtn">▶ 재생</button>
+    <input type="range" id="scrub" min="0" max="1000" value="0">
+    <span id="tlabel" style="color:var(--dim); width:78px; text-align:right; font-size:11px">0.00s</span>
+    <div class="sep"></div>
+    <button class="btn" id="setKey">키 찍기</button>
+    <button class="btn warn" id="delKey">키 삭제</button>
+  </div>
+  <div class="tlbody" id="tracks"></div>
+</div>
+<div id="hint">캔버스: 드래그=본 이동 · Shift+드래그=회전 · 본 클릭=선택 · 타임라인 레인 클릭=현재본 키 찍기</div>
+<div id="toast"></div>
+<div id="pasteModal"><div id="pasteBox">
+  <h3>스켈레톤 JSON</h3>
+  <p id="pasteDesc">붙여넣어 열거나, 내용을 복사해 저장하세요.</p>
+  <textarea id="pasteArea" spellcheck="false"></textarea>
+  <div class="prow">
+    <button class="btn" id="pasteCancel">닫기</button>
+    <button class="btn go" id="pasteLoad">불러오기</button>
+  </div>
+</div></div>
+
+<script>
+'use strict';
+const hasFS = 'showOpenFilePicker' in window;
+
+/* ═══════════════════════ 상태 ═══════════════════════
+   model: skeleton.ts Skeleton 과 동형. 단 어태치먼트 image 는 런타임 파일명.
+   imgCache: image(파일명) → {img:HTMLImageElement, dataUri} (에디터 프리뷰·PNG 묶음용, JSON엔 미포함).
+   부모-자식 본 계층, 슬롯=본에 붙는 그리기 단위, 어태치먼트=이미지+오프셋. */
+let model = blankModel();
+const imgCache = new Map();      // image filename → { img, dataUri, w, h }
+let rigHandle = null;
+
+let curClip = 'idle';
+let selBone = null;              // bone name
+let selKey = null;               // { bone, idx } (현재 클립)
+let playTime = 0;                // 초
+let playing = false;
+let zoom = 1.4;
+
+/* 캔버스 */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let camX = 0, camY = 0;          // 지면선(발) 화면 위치 — resize에서 설정
+
+function blankModel() {
+  return {
+    version: 1,
+    name: 'unit',
+    bones: [],
+    slots: [],
+    attachments: {},            // slot → { attName → attachment }
+    clips: {
+      idle:   { duration: 2,   timelines: {} },
+      move:   { duration: 0.6, timelines: {} },
+      attack: { duration: 0.5, timelines: {} },
+      hit:    { duration: 0.3, timelines: {} },
+    },
+  };
+}
+
+/* ═══════════════════════ 파트/본 추가 ═══════════════════════ */
+function uniqueName(base) {
+  let n = base, i = 1;
+  while (model.bones.some(b => b.name === n)) n = `${base}${i++}`;
+  return n;
+}
+function fileToImage(file) {
+  return new Promise((res, rej) => {
+    const rd = new FileReader();
+    rd.onload = () => {
+      const img = new Image();
+      img.onload = () => res({ img, dataUri: rd.result });
+      img.onerror = rej;
+      img.src = rd.result;
+    };
+    rd.onerror = rej;
+    rd.readAsDataURL(file);
+  });
+}
+async function addParts(files) {
+  for (const file of files) {
+    const { img, dataUri } = await fileToImage(file);
+    const base = (file.name.replace(/\.[^.]+$/, '') || 'part').replace(/[^a-zA-Z0-9_]/g, '_');
+    const boneName = uniqueName(base);
+    const imageName = `${boneName}.png`;
+    imgCache.set(imageName, { img, dataUri, w: img.naturalWidth, h: img.naturalHeight });
+    // 본: 루트가 없으면 첫 본은 루트, 이후는 직전 선택 본 자식(없으면 첫 본).
+    const parent = model.bones.length === 0 ? null : (selBone || model.bones[0].name);
+    model.bones.push({ name: boneName, parent, x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 });
+    // 슬롯 + 어태치먼트
+    model.slots.push({ name: boneName, bone: boneName, attachment: imageName, z: model.slots.length });
+    model.attachments[boneName] = {
+      [imageName]: { name: imageName, image: imageName, x: 0, y: -img.naturalHeight / 2,
+        rotation: 0, scaleX: 1, scaleY: 1, width: img.naturalWidth, height: img.naturalHeight },
+    };
+    selBone = boneName;
+  }
+  renderAll();
+  toast('파트 추가 — 캔버스에서 드래그로 배치');
+}
+function addEmptyBone() {
+  const name = uniqueName('bone');
+  const parent = model.bones.length === 0 ? null : (selBone || model.bones[0].name);
+  model.bones.push({ name, parent, x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 });
+  selBone = name;
+  renderAll();
+}
+async function addWeaponAttachment(file) {
+  if (!selBone) return;
+  const slot = model.slots.find(s => s.bone === selBone);
+  if (!slot) { toast('이 본엔 슬롯이 없습니다 (이미지 파트만 무기 교체 가능)', true); return; }
+  const { img, dataUri } = await fileToImage(file);
+  const attName = (file.name.replace(/\.[^.]+$/, '') || 'weapon').replace(/[^a-zA-Z0-9_]/g, '_');
+  const imageName = `${attName}.png`;
+  imgCache.set(imageName, { img, dataUri, w: img.naturalWidth, h: img.naturalHeight });
+  if (!model.attachments[slot.name]) model.attachments[slot.name] = {};
+  // 첫 어태치먼트의 오프셋을 재사용 (같은 손 위치)
+  const existing = Object.values(model.attachments[slot.name])[0];
+  model.attachments[slot.name][imageName] = {
+    name: imageName, image: imageName,
+    x: existing ? existing.x : 0, y: existing ? existing.y : -img.naturalHeight / 2,
+    rotation: 0, scaleX: 1, scaleY: 1, width: img.naturalWidth, height: img.naturalHeight,
+  };
+  slot.attachment = imageName; // 새 무기로 미리보기 전환
+  renderAll();
+  toast('무기 어태치먼트 추가 — 칩으로 교체 미리보기');
+}
+
+/* ═══════════════════════ 본 삭제 ═══════════════════════ */
+function deleteBone(name) {
+  // 자식은 조부모로 재부모
+  const bone = model.bones.find(b => b.name === name);
+  const grand = bone ? bone.parent : null;
+  model.bones = model.bones.filter(b => b.name !== name);
+  for (const b of model.bones) if (b.parent === name) b.parent = grand;
+  model.slots = model.slots.filter(s => s.bone !== name);
+  delete model.attachments[name];
+  for (const c of Object.values(model.clips)) delete c.timelines[name];
+  if (selBone === name) selBone = model.bones[0] ? model.bones[0].name : null;
+  renderAll();
+}
+
+/* ═══════════════════════ 포즈 계산 (skeleton.ts 미러) ═══════════════════════
+   localToMat / mulMat / 클립 보간 — 런타임과 같은 수식. 캔버스 프리뷰용. */
+const DEG = Math.PI / 180;
+function localToMat(x, y, rotDeg, sx, sy) {
+  const r = rotDeg * DEG, cos = Math.cos(r), sin = Math.sin(r);
+  return { a: cos * sx, b: sin * sx, c: -sin * sy, d: cos * sy, tx: x, ty: y };
+}
+function mulMat(p, c) {
+  return {
+    a: p.a * c.a + p.c * c.b, b: p.b * c.a + p.d * c.b,
+    c: p.a * c.c + p.c * c.d, d: p.b * c.c + p.d * c.d,
+    tx: p.a * c.tx + p.c * c.ty + p.tx, ty: p.b * c.tx + p.d * c.ty + p.ty,
+  };
+}
+function clamp01(t) { return t < 0 ? 0 : t > 1 ? 1 : t; }
+function sampleTrack(track, time) {
+  if (!track || track.length === 0) return { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 };
+  if (time <= track[0].time) return track[0];
+  if (time >= track[track.length - 1].time) return track[track.length - 1];
+  for (let i = 1; i < track.length; i++) {
+    const k1 = track[i];
+    if (time <= k1.time) {
+      const k0 = track[i - 1], span = k1.time - k0.time, u = span > 0 ? (time - k0.time) / span : 0;
+      return {
+        x: k0.x + (k1.x - k0.x) * u, y: k0.y + (k1.y - k0.y) * u,
+        rotation: k0.rotation + (k1.rotation - k0.rotation) * u,
+        scaleX: k0.scaleX + (k1.scaleX - k0.scaleX) * u, scaleY: k0.scaleY + (k1.scaleY - k0.scaleY) * u,
+      };
+    }
+  }
+  return track[track.length - 1];
+}
+/** clip+t → boneName → world Mat */
+function computeWorlds(clip, t) {
+  const time = clamp01(t) * clip.duration;
+  const byName = new Map(model.bones.map(b => [b.name, b]));
+  const worlds = new Map(), visiting = new Set();
+  function resolve(name) {
+    if (worlds.has(name)) return worlds.get(name);
+    if (visiting.has(name)) return { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 };
+    visiting.add(name);
+    const b = byName.get(name);
+    if (!b) { visiting.delete(name); const id = { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 }; worlds.set(name, id); return id; }
+    const kf = sampleTrack(clip.timelines[name], time);
+    const local = localToMat(b.x + kf.x, b.y + kf.y, b.rotation + kf.rotation, b.scaleX * kf.scaleX, b.scaleY * kf.scaleY);
+    const w = b.parent ? mulMat(resolve(b.parent), local) : local;
+    visiting.delete(name); worlds.set(name, w); return w;
+  }
+  for (const b of model.bones) resolve(b.name);
+  return worlds;
+}
+
+/* ═══════════════════════ 캔버스 렌더 ═══════════════════════ */
+function resize() {
+  const r = document.getElementById('stage').getBoundingClientRect();
+  cv.width = Math.floor(r.width * devicePixelRatio);
+  cv.height = Math.floor(r.height * devicePixelRatio);
+  camX = cv.width / 2 / devicePixelRatio;
+  camY = cv.height * 0.72 / devicePixelRatio;      // 발(원점)을 화면 아래쪽 72%에
+  draw();
+}
+function draw() {
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  const W = cv.width / devicePixelRatio, H = cv.height / devicePixelRatio;
+  // 지면 그리드
+  ctx.strokeStyle = 'rgba(255,255,255,.06)';
+  for (let gx = -10; gx <= 10; gx++) { const x = camX + gx * 24 * zoom; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  // 지면선(발 기준)
+  ctx.strokeStyle = 'rgba(111,174,111,.5)';
+  ctx.beginPath(); ctx.moveTo(0, camY); ctx.lineTo(W, camY); ctx.stroke();
+  ctx.fillStyle = 'rgba(111,174,111,.5)'; ctx.font = '10px sans-serif'; ctx.fillText('지면 (발 y=0)', 6, camY - 4);
+
+  const clip = model.clips[curClip];
+  const worlds = computeWorlds(clip, clip.duration > 0 ? playTime / clip.duration : 0);
+
+  // 슬롯 z 오름차순으로 어태치먼트 그리기
+  const drawSlots = model.slots.slice().sort((a, b) => a.z - b.z);
+  for (const slot of drawSlots) {
+    const attName = slot.attachment;
+    if (!attName) continue;
+    const att = model.attachments[slot.name] && model.attachments[slot.name][attName];
+    if (!att) continue;
+    const cache = imgCache.get(att.image);
+    const bw = worlds.get(slot.bone) || { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 };
+    const am = mulMat(bw, localToMat(att.x, att.y, att.rotation, att.scaleX, att.scaleY));
+    ctx.save();
+    // 화면 변환: 원점=발(camX,camY), y 위로 음수 → screenY = camY + ty*zoom (ty 음수면 위로)
+    ctx.setTransform(am.a * zoom * devicePixelRatio, am.b * zoom * devicePixelRatio,
+                     am.c * zoom * devicePixelRatio, am.d * zoom * devicePixelRatio,
+                     (camX + am.tx * zoom) * devicePixelRatio, (camY + am.ty * zoom) * devicePixelRatio);
+    if (cache) {
+      ctx.drawImage(cache.img, -att.width / 2, -att.height / 2, att.width, att.height);
+    } else {
+      ctx.fillStyle = 'rgba(212,168,67,.25)'; ctx.fillRect(-att.width / 2, -att.height / 2, att.width, att.height);
+      ctx.strokeStyle = 'var(--acc)'; ctx.strokeRect(-att.width / 2, -att.height / 2, att.width, att.height);
+    }
+    ctx.restore();
+  }
+
+  // 본 핸들 (선택본 강조)
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  for (const b of model.bones) {
+    const w = worlds.get(b.name) || { tx: 0, ty: 0, a: 1, b: 0 };
+    const sx = camX + w.tx * zoom, sy = camY + w.ty * zoom;
+    const isSel = b.name === selBone;
+    ctx.fillStyle = isSel ? '#fff' : 'rgba(212,168,67,.85)';
+    ctx.beginPath(); ctx.arc(sx, sy, isSel ? 6 : 4, 0, Math.PI * 2); ctx.fill();
+    // 회전 방향 표시
+    ctx.strokeStyle = ctx.fillStyle;
+    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + w.a * 18, sy + w.b * 18); ctx.stroke();
+    if (isSel) { ctx.fillStyle = 'var(--acc)'; ctx.font = '11px sans-serif'; ctx.fillText(b.name, sx + 9, sy - 7); }
+  }
+}
+
+/** 화면 좌표 → 가장 가까운 본 이름 (히트 반경 12px) */
+function pickBone(mx, my) {
+  const clip = model.clips[curClip];
+  const worlds = computeWorlds(clip, clip.duration > 0 ? playTime / clip.duration : 0);
+  let best = null, bestD = 14 * 14;
+  for (const b of model.bones) {
+    const w = worlds.get(b.name); if (!w) continue;
+    const sx = camX + w.tx * zoom, sy = camY + w.ty * zoom;
+    const d = (sx - mx) ** 2 + (sy - my) ** 2;
+    if (d < bestD) { bestD = d; best = b.name; }
+  }
+  return best;
+}
+
+/* ═══════════════════════ 캔버스 드래그 (이동/회전) ═══════════════════════
+   드래그 = 선택 본의 "현재 클립 현재 시각" 키프레임 델타를 갱신.
+   현재 시각에 키가 없으면 자동 생성(셋업 기준 델타). Shift=회전. */
+let drag = null;
+cv.addEventListener('pointerdown', (e) => {
+  const r = cv.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const hit = pickBone(mx, my);
+  if (hit) { selBone = hit; renderInspector(); renderBoneList(); }
+  if (!selBone) return;
+  drag = { x0: mx, y0: my, rot: e.shiftKey, startKf: getOrMakeKeyAtTime(selBone) };
+  cv.setPointerCapture(e.pointerId);
+});
+cv.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  const r = cv.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const kf = drag.startKf;
+  if (drag.rot) {
+    const dx = mx - camX, dy = my - camY;
+    kf.rotation = drag.startRot != null ? drag.startRot : kf.rotation;
+    if (drag.startRot == null) drag.startRot = kf.rotation;
+    kf.rotation = drag.startRot + (mx - drag.x0) * 0.7; // 가로 드래그=회전(도)
+  } else {
+    if (drag.bx == null) { drag.bx = kf.x; drag.by = kf.y; }
+    kf.x = drag.bx + (mx - drag.x0) / zoom;
+    kf.y = drag.by + (my - drag.y0) / zoom;
+  }
+  draw(); renderInspector(); renderTracks();
+});
+cv.addEventListener('pointerup', () => { drag = null; });
+
+/** 선택 본의 현재 클립·현재 시각 키프레임을 얻거나(없으면) 생성. 반환=수정 가능한 키 객체. */
+function getOrMakeKeyAtTime(boneName) {
+  const clip = model.clips[curClip];
+  if (!clip.timelines[boneName]) clip.timelines[boneName] = [];
+  const track = clip.timelines[boneName];
+  const t = +playTime.toFixed(4);
+  let k = track.find(k => Math.abs(k.time - t) < 1e-3);
+  if (!k) {
+    // 현재 보간값을 시드로 새 키 — 점프 방지
+    const seed = sampleTrack(track, t);
+    k = { time: t, x: seed.x, y: seed.y, rotation: seed.rotation, scaleX: seed.scaleX, scaleY: seed.scaleY };
+    track.push(k); track.sort((a, b) => a.time - b.time);
+    selKey = { bone: boneName, idx: track.indexOf(k) };
+  } else {
+    selKey = { bone: boneName, idx: track.indexOf(k) };
+  }
+  return k;
+}
+
+/* ═══════════════════════ 타임라인 ═══════════════════════ */
+function setClip(name) {
+  curClip = name; playTime = 0; playing = false; selKey = null;
+  document.querySelectorAll('.clipbtn').forEach(b => b.classList.toggle('on', b.dataset.clip === name));
+  document.getElementById('clipDur').value = model.clips[name].duration;
+  document.getElementById('playBtn').textContent = '▶ 재생';
+  renderAll();
+}
+function renderTracks() {
+  const clip = model.clips[curClip];
+  const host = document.getElementById('tracks');
+  host.innerHTML = '';
+  for (const b of model.bones) {
+    const track = clip.timelines[b.name] || [];
+    const row = document.createElement('div'); row.className = 'track';
+    const nm = document.createElement('div'); nm.className = 'tnm'; nm.textContent = b.name;
+    if (b.name === selBone) nm.style.color = 'var(--acc)';
+    const lane = document.createElement('div'); lane.className = 'lane';
+    lane.onclick = (e) => {
+      const lr = lane.getBoundingClientRect();
+      const u = Math.max(0, Math.min(1, (e.clientX - lr.left) / lr.width));
+      playTime = +(u * clip.duration).toFixed(4);
+      selBone = b.name; getOrMakeKeyAtTime(b.name);
+      renderAll();
+    };
+    for (let i = 0; i < track.length; i++) {
+      const k = track[i];
+      const dot = document.createElement('div'); dot.className = 'key';
+      if (selKey && selKey.bone === b.name && selKey.idx === i) dot.classList.add('sel');
+      dot.style.left = (clip.duration > 0 ? k.time / clip.duration * 100 : 0) + '%';
+      dot.onclick = (ev) => { ev.stopPropagation(); playTime = k.time; selBone = b.name; selKey = { bone: b.name, idx: i }; renderAll(); };
+      lane.appendChild(dot);
+    }
+    // 플레이헤드
+    const ph = document.createElement('div'); ph.className = 'playhead';
+    ph.style.left = (clip.duration > 0 ? playTime / clip.duration * 100 : 0) + '%';
+    lane.appendChild(ph);
+    row.appendChild(nm); row.appendChild(lane); host.appendChild(row);
+  }
+  const dur = clip.duration;
+  document.getElementById('scrub').value = Math.round(dur > 0 ? playTime / dur * 1000 : 0);
+  document.getElementById('tlabel').textContent = playTime.toFixed(2) + 's';
+}
+function setKeyHere() {
+  if (!selBone) { toast('본을 먼저 선택하세요', true); return; }
+  getOrMakeKeyAtTime(selBone);
+  renderAll(); toast('키 찍음');
+}
+function delKeyHere() {
+  if (!selKey) { toast('삭제할 키를 선택하세요', true); return; }
+  const track = model.clips[curClip].timelines[selKey.bone];
+  if (track) { track.splice(selKey.idx, 1); if (track.length === 0) delete model.clips[curClip].timelines[selKey.bone]; }
+  selKey = null; renderAll();
+}
+
+/* 재생 루프 */
+let raf = null, lastT = 0;
+function loop(ts) {
+  if (!playing) return;
+  const dt = (ts - lastT) / 1000; lastT = ts;
+  const dur = model.clips[curClip].duration;
+  const loopable = curClip === 'idle' || curClip === 'move';
+  playTime += dt;
+  if (playTime >= dur) { if (loopable) playTime = playTime % dur; else { playTime = dur; playing = false; document.getElementById('playBtn').textContent = '▶ 재생'; } }
+  draw(); renderTracks();
+  if (playing) raf = requestAnimationFrame(loop);
+}
+function togglePlay() {
+  playing = !playing;
+  document.getElementById('playBtn').textContent = playing ? '⏸ 정지' : '▶ 재생';
+  if (playing) { lastT = performance.now(); if (playTime >= model.clips[curClip].duration) playTime = 0; raf = requestAnimationFrame(loop); }
+}
+
+/* ═══════════════════════ 패널 렌더 ═══════════════════════ */
+function renderBoneList() {
+  const host = document.getElementById('bonelist'); host.innerHTML = '';
+  for (const b of model.bones) {
+    const row = document.createElement('div'); row.className = 'bonerow' + (b.name === selBone ? ' sel' : '');
+    const depth = boneDepth(b.name);
+    row.innerHTML = `<span class="dep">${'·'.repeat(depth)}</span><span class="nm">${b.name}</span>`;
+    const hasImg = model.slots.some(s => s.bone === b.name && s.attachment);
+    const vis = document.createElement('span'); vis.className = 'vis'; vis.textContent = hasImg ? '🖼' : '○';
+    row.appendChild(vis);
+    row.onclick = () => { selBone = b.name; selKey = null; renderAll(); };
+    host.appendChild(row);
+  }
+  // 무기 슬롯 추가 라벨 노출: 선택 본에 슬롯 있으면
+  const hasSlot = selBone && model.slots.some(s => s.bone === selBone);
+  document.getElementById('addWeaponLabel').style.display = hasSlot ? 'block' : 'none';
+}
+function boneDepth(name) {
+  let d = 0, cur = model.bones.find(b => b.name === name), guard = 0;
+  while (cur && cur.parent && guard++ < 50) { d++; cur = model.bones.find(b => b.name === cur.parent); }
+  return d;
+}
+function renderInspector() {
+  const host = document.getElementById('inspector');
+  if (!selBone) { host.innerHTML = '<div class="hint">본을 선택하면 셋업 변환을 편집합니다.</div>'; return; }
+  const b = model.bones.find(x => x.name === selBone);
+  if (!b) { host.innerHTML = ''; return; }
+  const slot = model.slots.find(s => s.bone === selBone);
+  const parentOpts = ['<option value="">(루트)</option>']
+    .concat(model.bones.filter(x => x.name !== b.name && !isDescendant(x.name, b.name))
+      .map(x => `<option value="${x.name}" ${b.parent === x.name ? 'selected' : ''}>${x.name}</option>`)).join('');
+  let html = `<div class="sectlabel">본 — 셋업 포즈</div>
+    <div class="field"><label>이름</label><input id="f-name" value="${b.name}"></div>
+    <div class="field"><label>부모</label><select id="f-parent">${parentOpts}</select></div>
+    <div class="row2">
+      <div class="field"><label>x (피벗)</label><input type="number" id="f-x" step="0.5" value="${b.x}"></div>
+      <div class="field"><label>y (피벗)</label><input type="number" id="f-y" step="0.5" value="${b.y}"></div>
+    </div>
+    <div class="row3">
+      <div class="field"><label>회전°</label><input type="number" id="f-rot" step="1" value="${b.rotation}"></div>
+      <div class="field"><label>scaleX</label><input type="number" id="f-sx" step="0.05" value="${b.scaleX}"></div>
+      <div class="field"><label>scaleY</label><input type="number" id="f-sy" step="0.05" value="${b.scaleY}"></div>
+    </div>`;
+  if (slot) {
+    const atts = model.attachments[slot.name] || {};
+    html += `<div class="sectlabel">슬롯 / 어태치먼트</div>
+      <div class="field"><label>그리기 순서 z (작을수록 뒤)</label><input type="number" id="f-z" step="1" value="${slot.z}"></div>`;
+    const chips = Object.keys(atts).map(an =>
+      `<span class="attchip ${slot.attachment === an ? 'on' : ''}" data-att="${an}">${an}<span class="x" data-del="${an}">✕</span></span>`).join('');
+    html += `<div class="field"><label>어태치먼트 (무기 슬롯 교체 미리보기)</label><div id="attchips">${chips || '<span class="hint">없음</span>'}</div></div>`;
+    const att = atts[slot.attachment];
+    if (att) {
+      html += `<div class="sectlabel">어태치먼트 오프셋 — ${att.name}</div>
+        <div class="row2">
+          <div class="field"><label>오프셋 x</label><input type="number" id="a-x" step="0.5" value="${att.x}"></div>
+          <div class="field"><label>오프셋 y</label><input type="number" id="a-y" step="0.5" value="${att.y}"></div>
+        </div>
+        <div class="row3">
+          <div class="field"><label>회전°</label><input type="number" id="a-rot" step="1" value="${att.rotation}"></div>
+          <div class="field"><label>width</label><input type="number" id="a-w" step="1" value="${att.width}"></div>
+          <div class="field"><label>height</label><input type="number" id="a-h" step="1" value="${att.height}"></div>
+        </div>`;
+    }
+  }
+  html += `<div class="sectlabel">현재 클립 키 (${curClip} @ ${playTime.toFixed(2)}s)</div>`;
+  const k = currentKey(selBone);
+  if (k) {
+    html += `<div class="row3">
+      <div class="field"><label>Δx</label><input type="number" id="k-x" step="0.5" value="${k.x}"></div>
+      <div class="field"><label>Δy</label><input type="number" id="k-y" step="0.5" value="${k.y}"></div>
+      <div class="field"><label>Δ회전°</label><input type="number" id="k-rot" step="1" value="${k.rotation}"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>×scaleX</label><input type="number" id="k-sx" step="0.05" value="${k.scaleX}"></div>
+      <div class="field"><label>×scaleY</label><input type="number" id="k-sy" step="0.05" value="${k.scaleY}"></div>
+    </div>`;
+  } else {
+    html += `<div class="hint">이 시각에 키 없음 — 캔버스 드래그·"키 찍기"로 생성.</div>`;
+  }
+  html += `<button class="btn warn" id="delBone" style="width:100%;margin-top:8px">이 본 삭제</button>`;
+  host.innerHTML = html;
+  bindInspector(b, slot);
+}
+function currentKey(boneName) {
+  const track = model.clips[curClip].timelines[boneName];
+  if (!track) return null;
+  return track.find(k => Math.abs(k.time - playTime) < 1e-3) || null;
+}
+function isDescendant(name, ancestor) {
+  let cur = model.bones.find(b => b.name === name), guard = 0;
+  while (cur && cur.parent && guard++ < 50) { if (cur.parent === ancestor) return true; cur = model.bones.find(b => b.name === cur.parent); }
+  return false;
+}
+function bindInspector(b, slot) {
+  const set = (id, fn) => { const el = document.getElementById(id); if (el) el.onchange = () => { fn(el); draw(); renderTracks(); }; };
+  document.getElementById('f-name').onchange = (e) => { renameBone(b.name, e.target.value); };
+  set('f-parent', el => { b.parent = el.value || null; renderBoneList(); });
+  set('f-x', el => b.x = +el.value); set('f-y', el => b.y = +el.value);
+  set('f-rot', el => b.rotation = +el.value); set('f-sx', el => b.scaleX = +el.value); set('f-sy', el => b.scaleY = +el.value);
+  if (slot) {
+    set('f-z', el => slot.z = +el.value);
+    const att = model.attachments[slot.name][slot.attachment];
+    if (att) {
+      set('a-x', el => att.x = +el.value); set('a-y', el => att.y = +el.value); set('a-rot', el => att.rotation = +el.value);
+      set('a-w', el => att.width = +el.value); set('a-h', el => att.height = +el.value);
+    }
+    document.querySelectorAll('#attchips .attchip').forEach(chip => {
+      chip.onclick = (e) => {
+        if (e.target.dataset.del) {
+          const an = e.target.dataset.del;
+          delete model.attachments[slot.name][an];
+          if (slot.attachment === an) slot.attachment = Object.keys(model.attachments[slot.name])[0] || null;
+        } else { slot.attachment = chip.dataset.att; }
+        renderAll();
+      };
+    });
+  }
+  const k = currentKey(selBone);
+  if (k) {
+    set('k-x', el => k.x = +el.value); set('k-y', el => k.y = +el.value); set('k-rot', el => k.rotation = +el.value);
+    set('k-sx', el => k.scaleX = +el.value); set('k-sy', el => k.scaleY = +el.value);
+  }
+  document.getElementById('delBone').onclick = () => { if (confirm(`본 "${b.name}" 삭제?`)) deleteBone(b.name); };
+}
+function renameBone(oldName, newName) {
+  newName = (newName || '').replace(/[^a-zA-Z0-9_]/g, '_');
+  if (!newName || newName === oldName) { renderInspector(); return; }
+  if (model.bones.some(b => b.name === newName)) { toast('중복 이름', true); renderInspector(); return; }
+  for (const b of model.bones) { if (b.name === oldName) b.name = newName; if (b.parent === oldName) b.parent = newName; }
+  for (const s of model.slots) { if (s.bone === oldName) s.bone = newName; if (s.name === oldName) s.name = newName; }
+  if (model.attachments[oldName]) { model.attachments[newName] = model.attachments[oldName]; delete model.attachments[oldName]; }
+  for (const c of Object.values(model.clips)) { if (c.timelines[oldName]) { c.timelines[newName] = c.timelines[oldName]; delete c.timelines[oldName]; } }
+  if (selBone === oldName) selBone = newName;
+  renderAll();
+}
+function renderAll() { renderBoneList(); renderInspector(); renderTracks(); draw(); updateStatus(); }
+function updateStatus() {
+  document.getElementById('status').textContent = `${model.bones.length}본 · ${model.slots.length}슬롯 · ${rigHandle ? rigHandle.name : '미저장'}`;
+}
+
+/* ═══════════════════════ 직렬화 / 파일 I/O ═══════════════════════ */
+function serialize() {
+  model.name = document.getElementById('rigName').value.trim() || 'unit';
+  // 키프레임 시간 보장 정렬 + 숫자 라운드(노이즈 제거)
+  const round = n => Math.round(n * 1000) / 1000;
+  const clips = {};
+  for (const [cn, c] of Object.entries(model.clips)) {
+    const timelines = {};
+    for (const [bn, track] of Object.entries(c.timelines)) {
+      if (!track.length) continue;
+      timelines[bn] = track.slice().sort((a, b) => a.time - b.time).map(k => ({
+        time: round(k.time), x: round(k.x), y: round(k.y), rotation: round(k.rotation), scaleX: round(k.scaleX), scaleY: round(k.scaleY),
+      }));
+    }
+    clips[cn] = { duration: c.duration, timelines };
+  }
+  const out = {
+    version: 1, name: model.name,
+    bones: model.bones.map(b => ({ name: b.name, parent: b.parent, x: round(b.x), y: round(b.y), rotation: round(b.rotation), scaleX: round(b.scaleX), scaleY: round(b.scaleY) })),
+    slots: model.slots.map(s => ({ name: s.name, bone: s.bone, attachment: s.attachment, z: s.z })),
+    attachments: {},
+    clips,
+  };
+  for (const [sn, atts] of Object.entries(model.attachments)) {
+    out.attachments[sn] = {};
+    for (const [an, a] of Object.entries(atts)) {
+      out.attachments[sn][an] = { name: a.name, image: a.image, x: round(a.x), y: round(a.y), rotation: round(a.rotation), scaleX: round(a.scaleX), scaleY: round(a.scaleY), width: a.width, height: a.height };
+    }
+  }
+  return JSON.stringify(out, null, 2) + '\n';
+}
+function loadObject(obj) {
+  if (!obj || obj.version !== 1 || !Array.isArray(obj.bones)) { toast('스켈레톤 JSON이 아님 (version:1 필요)', true); return false; }
+  model = {
+    version: 1, name: obj.name || 'unit',
+    bones: obj.bones.map(b => ({ name: b.name, parent: b.parent ?? null, x: b.x || 0, y: b.y || 0, rotation: b.rotation || 0, scaleX: b.scaleX ?? 1, scaleY: b.scaleY ?? 1 })),
+    slots: (obj.slots || []).map(s => ({ name: s.name, bone: s.bone, attachment: s.attachment ?? null, z: s.z || 0 })),
+    attachments: obj.attachments || {},
+    clips: { idle: { duration: 2, timelines: {} }, move: { duration: 0.6, timelines: {} }, attack: { duration: 0.5, timelines: {} }, hit: { duration: 0.3, timelines: {} } },
+  };
+  for (const cn of ['idle', 'move', 'attack', 'hit']) {
+    const c = obj.clips && obj.clips[cn];
+    if (c) model.clips[cn] = { duration: c.duration || 1, timelines: c.timelines || {} };
+  }
+  document.getElementById('rigName').value = model.name;
+  selBone = model.bones[0] ? model.bones[0].name : null; selKey = null; playTime = 0;
+  setClip('idle');
+  toast(`리그 "${model.name}" 로드 — 파트 PNG는 별도 로드 필요(프리뷰 회색)`);
+  return true;
+}
+async function openRig() {
+  if (!hasFS) { openPaste(); return; }
+  try {
+    const [h] = await window.showOpenFilePicker({ types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] });
+    const text = await (await h.getFile()).text();
+    rigHandle = h; loadObject(JSON.parse(text));
+  } catch (e) { if (e.name !== 'AbortError') toast('열기 실패: ' + e.message, true); }
+}
+async function saveRig() {
+  const txt = serialize();
+  const fname = `${model.name}.skeleton.json`;
+  if (!hasFS) { openPasteExport(txt, fname); return; }
+  try {
+    if (!rigHandle) rigHandle = await window.showSaveFilePicker({ suggestedName: fname, types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] });
+    const w = await rigHandle.createWritable(); await w.write(txt); await w.close();
+    updateStatus(); toast(`저장 → ${rigHandle.name}`);
+  } catch (e) { if (e.name !== 'AbortError') toast('저장 실패: ' + e.message, true); }
+}
+function download(name, href) { const a = document.createElement('a'); a.href = href; a.download = name; a.click(); }
+function dlImages() {
+  const seen = new Set();
+  let n = 0;
+  for (const atts of Object.values(model.attachments)) for (const a of Object.values(atts)) {
+    if (seen.has(a.image)) continue; seen.add(a.image);
+    const cache = imgCache.get(a.image); if (!cache) continue;
+    download(a.image, cache.dataUri); n++;
+  }
+  toast(n ? `${n}개 파트 PNG 저장 — /assets/skeletons/${model.name}/ 에 두세요` : '저장할 파트 이미지 없음', !n);
+}
+
+/* 붙여넣기 폴백 */
+function openPaste() { document.getElementById('pasteArea').value = ''; document.getElementById('pasteDesc').textContent = '스켈레톤 JSON을 붙여넣고 불러오기.'; document.getElementById('pasteModal').classList.add('on'); }
+function openPasteExport(txt, fname) { document.getElementById('pasteArea').value = txt; document.getElementById('pasteDesc').textContent = `File System Access 미지원 — 복사해 ${fname} 로 저장하세요.`; document.getElementById('pasteModal').classList.add('on'); }
+function closePaste() { document.getElementById('pasteModal').classList.remove('on'); }
+function doPasteLoad() { const t = document.getElementById('pasteArea').value.trim(); if (!t) { closePaste(); return; } try { if (loadObject(JSON.parse(t))) closePaste(); } catch (e) { toast('파싱 실패: ' + e.message, true); } }
+
+/* ═══════════════════════ 새로 / 유틸 ═══════════════════════ */
+function doNew() {
+  if (model.bones.length && !confirm('새 리그로 초기화? (저장 안 한 내용 사라짐)')) return;
+  model = blankModel(); imgCache.clear(); rigHandle = null; selBone = null; selKey = null; playTime = 0;
+  document.getElementById('rigName').value = 'unit';
+  setClip('idle'); toast('새 리그');
+}
+let toastT = null;
+function toast(m, bad) { const t = document.getElementById('toast'); t.textContent = m; t.className = bad ? 'bad' : ''; t.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', 2600); }
+
+/* ═══════════════════════ 이벤트 결선 ═══════════════════════ */
+document.getElementById('newRig').onclick = doNew;
+document.getElementById('openRig').onclick = openRig;
+document.getElementById('saveRig').onclick = saveRig;
+document.getElementById('dlImages').onclick = dlImages;
+document.getElementById('addPart').onchange = (e) => { addParts([...e.target.files]); e.target.value = ''; };
+document.getElementById('addEmptyBone').onclick = addEmptyBone;
+document.getElementById('addWeaponAtt').onchange = (e) => { if (e.target.files[0]) addWeaponAttachment(e.target.files[0]); e.target.value = ''; };
+document.getElementById('rigName').onchange = updateStatus;
+document.getElementById('zoom').oninput = (e) => { zoom = +e.target.value / 100; draw(); };
+document.querySelectorAll('.clipbtn').forEach(b => b.onclick = () => setClip(b.dataset.clip));
+document.getElementById('clipDur').onchange = (e) => { model.clips[curClip].duration = Math.max(0.1, +e.target.value || 1); if (playTime > model.clips[curClip].duration) playTime = model.clips[curClip].duration; renderTracks(); };
+document.getElementById('playBtn').onclick = togglePlay;
+document.getElementById('scrub').oninput = (e) => { playing = false; document.getElementById('playBtn').textContent = '▶ 재생'; playTime = +e.target.value / 1000 * model.clips[curClip].duration; draw(); renderTracks(); renderInspector(); };
+document.getElementById('setKey').onclick = setKeyHere;
+document.getElementById('delKey').onclick = delKeyHere;
+document.getElementById('pasteCancel').onclick = closePaste;
+document.getElementById('pasteLoad').onclick = doPasteLoad;
+window.addEventListener('resize', resize);
+window.addEventListener('beforeunload', (e) => { if (model.bones.length) { e.preventDefault(); e.returnValue = ''; } });
+
+/* init */
+resize(); setClip('idle');
+</script>
+</body>
+</html>
