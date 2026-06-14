@@ -17,7 +17,7 @@
  *
  * 전부 읽기 전용 — 상태를 커밋하지 않는다. computeDamage/distance는 엔진 export.
  */
-import { computeDamage, distance, areFoes } from "@tk/engine";
+import { computeDamage, distance, areFoes, flankingCount, flankMultiplier } from "@tk/engine";
 import type { BattleContext, BattleState, Coord, UnitState } from "@tk/engine";
 
 export interface CounterPreview {
@@ -27,12 +27,14 @@ export interface CounterPreview {
 }
 
 export interface AttackPreview {
-  /** 공격자가 가할 피해 */
+  /** 공격자가 가할 피해 (협공 보너스 포함) */
   damage: number;
   /** 이 피해로 방어자가 퇴각(병력 0)하는가 — 강조색 트리거 */
   willRetreat: boolean;
   /** 반격이 발생하면 그 추정치. 미발생(방어자 퇴각/사거리 밖) 시 생략 */
   counter?: CounterPreview;
+  /** 협공 발동 시 — 대상 포위도(공격자 포함)와 추가피해%. 미발동이면 생략 */
+  flank?: { surround: number; bonusPercent: number };
 }
 
 /** 공격자를 `pos`에 놓은 가상 사본 — 위치 의존 계산(지형 guard/거리)을 이동 후 기준으로 맞춘다 */
@@ -62,10 +64,20 @@ export function buildAttackPreview(
 
   const attacker = relocated(rawAttacker, from ?? { x: rawAttacker.x, y: rawAttacker.y });
 
-  const damage = computeDamage(ctx, attacker, defender);
+  // 협공: 엔진은 공격 시점에 공격자가 `from`에 서 있으므로, 그 위치를 반영한 가상 state로 포위도를 센다.
+  const moved = attacker !== rawAttacker;
+  const flankState: BattleState = moved
+    ? { ...state, units: state.units.map((u) => (u.id === attackerId ? attacker : u)) }
+    : state;
+  const surround = flankingCount(flankState, attacker, defender);
+  const flankMult = flankMultiplier(ctx, surround);
+  const flank =
+    flankMult > 1 ? { surround, bonusPercent: Math.round((flankMult - 1) * 100) } : undefined;
+
+  const damage = computeDamage(ctx, attacker, defender, 1, flankMult);
   const willRetreat = defender.troops - damage <= 0;
 
-  // 반격: 방어자 생존 + 공격자가 방어자 사거리 안 (actions.ts:178-182)
+  // 반격: 방어자 생존 + 공격자가 방어자 사거리 안 (actions.ts:178-182). 반격엔 협공 미적용(엔진과 일치).
   if (!willRetreat) {
     const d = distance({ x: attacker.x, y: attacker.y }, { x: defender.x, y: defender.y });
     if (d >= defender.rangeMin && d <= defender.rangeMax) {
@@ -74,8 +86,9 @@ export function buildAttackPreview(
         damage,
         willRetreat,
         counter: { damage: counterDamage, willRetreat: attacker.troops - counterDamage <= 0 },
+        flank,
       };
     }
   }
-  return { damage, willRetreat };
+  return { damage, willRetreat, flank };
 }

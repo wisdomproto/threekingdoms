@@ -5,7 +5,7 @@ import { getMovableTiles, unitAt } from "./movement";
 import {
   computeDamage, distance, getAttackableTargets,
   strategyDamage, strategyAoeCells, getStrategyTargets, expForNextLevel,
-  spiritPower,
+  spiritPower, flankingCount, flankMultiplier,
 } from "./combat";
 import { findDuelTrigger } from "./events";
 import { spawnUnit } from "./createBattle";
@@ -350,8 +350,13 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
         break;
       }
 
-      // 일반 공격 — 원작 룰: 명중 100%, 분산 없음
-      const dmg = computeDamage(ctx, unit, target);
+      // 일반 공격 — 원작 룰: 명중 100%, 분산 없음. + 협공(결정론): 대상 포위도에 따른 확정 추가피해.
+      const flankN = flankingCount(state, unit, target);
+      const flankMult = flankMultiplier(ctx, flankN);
+      const dmg = computeDamage(ctx, unit, target, 1, flankMult);
+      if (flankMult > 1) {
+        events.push({ type: "flank", attackerId: unit.id, defenderId: target.id, surround: flankN, bonusPercent: Math.round((flankMult - 1) * 100) });
+      }
       const targetLevelAtHit = getUnit(next, target.id).level;
       const hit = dealDamage(next, unit, getUnit(next, target.id), dmg, false);
       next = hit.state;

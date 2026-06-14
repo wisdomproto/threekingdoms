@@ -4,5 +4,6 @@
   "counterRatio": 0.5,
   "minDamage": 1,
   "maxTurns": 30,
-  "lineAdvantage": { "cavalry": "infantry", "infantry": "archer", "archer": "cavalry" }
+  "lineAdvantage": { "cavalry": "infantry", "infantry": "archer", "archer": "cavalry" },
+  "flank": { "threshold": 2, "stepPercent": 20, "maxStacks": 3 }
 }

@@ -54,7 +54,7 @@ function defFactor(ctx: BattleContext, attacker: UnitState, defender: UnitState)
  *   - ratio: 반격 0.5용. guard: 지형 방어보정(영걸전 잔존 — 조조전 점유 ×1.2는 후속)
  */
 export function computeDamage(
-  ctx: BattleContext, attacker: UnitState, defender: UnitState, ratio = 1,
+  ctx: BattleContext, attacker: UnitState, defender: UnitState, ratio = 1, flankMult = 1,
 ): number {
   const guard = terrainAt(ctx, defender.x, defender.y).guard;
   // 장비 런타임: 무기 보정(weaponBonus = 1 + 최고 무기 bonusPercent/100)을 부대 공격력에 곱한다.
@@ -62,7 +62,32 @@ export function computeDamage(
   const atk = attackPower(attacker) * (attacker.weaponBonus ?? 1);
   const def = defensePower(defender) * defFactor(ctx, attacker, defender);
   const raw = (atk - def) / 2 + attacker.level + DMG_BASE;
-  return Math.max(ctx.data.combat.minDamage, Math.floor(Math.max(0, raw) * (1 - guard) * ratio));
+  // flankMult: 협공 배율(결정론 ≥1.0). 지형·반격ratio와 동일하게 최종 곱연산.
+  return Math.max(ctx.data.combat.minDamage, Math.floor(Math.max(0, raw) * (1 - guard) * ratio * flankMult));
+}
+
+/** 대상 4방(상하좌우)에서 공격자 진영 부대가 점유한 칸 수 — 협공 포위도(공격자 포함). 결정론. */
+export function flankingCount(state: BattleState, attacker: UnitState, defender: UnitState): number {
+  const dirs: Coord[] = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
+  let n = 0;
+  for (const d of dirs) {
+    const u = unitAt(state, defender.x + d.x, defender.y + d.y);
+    if (u && !u.retreated && !areFoes(u.side, attacker.side)) n += 1;
+  }
+  return n;
+}
+
+/**
+ * 협공 포위도(count) → 결정론 데미지 배율 (cfg.flank).
+ *   count < threshold → 1.0(미발동).
+ *   그 외 stacks = min(count − threshold + 1, maxStacks), 배율 = 1 + stacks×stepPercent/100.
+ * 첫 발동(=threshold)은 항상 1스택 — threshold 값을 바꿔도 점프 없음.
+ */
+export function flankMultiplier(ctx: BattleContext, count: number): number {
+  const f = ctx.data.combat.flank;
+  if (count < f.threshold) return 1;
+  const stacks = Math.min(count - f.threshold + 1, f.maxStacks);
+  return 1 + (stacks * f.stepPercent) / 100;
 }
 
 export function distance(a: Coord, b: Coord): number {

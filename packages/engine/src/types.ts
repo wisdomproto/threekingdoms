@@ -81,6 +81,8 @@ export type Action =
 export type BattleEvent =
   | { type: "unitMoved"; unitId: string; from: Coord; to: Coord }
   | { type: "damageDealt"; attackerId: string; defenderId: string; damage: number; counter: boolean }
+  // 협공 발동(결정론) — surround = 대상 포위도(공격자 포함), bonusPercent = 추가피해%. 연출용.
+  | { type: "flank"; attackerId: string; defenderId: string; surround: number; bonusPercent: number }
   | { type: "strategyCast"; casterId: string; strategyId: string; target: Coord }
   // 도구 사용 결과 — amount = 실제 회복/피해량(상한·하한 클램프 후). target = 효과 대상 좌표.
   | { type: "itemUsed"; unitId: string; itemId: string; target?: Coord; amount: number }

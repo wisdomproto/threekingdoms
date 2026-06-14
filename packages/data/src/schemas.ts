@@ -108,6 +108,16 @@ export const CombatConfigSchema = z.object({
   maxTurns: z.number().int().min(1),
   // attacker line → 유리한 defender line. 키도 Line으로 검증, 자기참조 금지
   lineAdvantage: z.record(LineSchema, LineSchema),
+  /**
+   * 협공(결정론 게임성 격상, CLAUDE.md §7) — 대상 인접(4방)에 공격자 진영 부대가
+   * threshold기 이상이면 발동. 초과 1기당 stepPercent% 추가 피해, maxStacks까지 누적.
+   * 난수 없음. 미지정 데이터도 통과하게 default 제공.
+   */
+  flank: z.object({
+    threshold: z.number().int().min(2),   // 발동 최소 포위 수(공격자 포함)
+    stepPercent: z.number().min(0),        // threshold 초과 1기당 추가 피해 %
+    maxStacks: z.number().int().min(0),    // 추가 피해 누적 상한(스택 수)
+  }).default({ threshold: 2, stepPercent: 20, maxStacks: 3 }),
 }).refine(
   (c) => Object.entries(c.lineAdvantage).every(([k, v]) => k !== v),
   { message: "lineAdvantage must not be self-referential" },

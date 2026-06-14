@@ -1,7 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { createBattle } from "../src/createBattle";
-import { adjustedStat, attackPower, defensePower, computeDamage, getAttackableTargets } from "../src/combat";
+import {
+  adjustedStat, attackPower, defensePower, computeDamage, getAttackableTargets,
+  flankingCount, flankMultiplier,
+} from "../src/combat";
 import { testCtx } from "./fixtures";
+import type { BattleState, UnitState } from "../src/types";
 
 const state = createBattle(testCtx, 42);
 const get = (id: string) => state.units.find((u) => u.id === id)!;
@@ -71,5 +75,56 @@ describe("getAttackableTargets (모델 무관 — 동작 유지)", () => {
   });
   it("궁병(2~2)은 인접 공격 불가", () => {
     expect(getAttackableTargets(testCtx, state, "이숙", { x: 5, y: 2 })).not.toContain("화웅"); // 거리 1
+  });
+});
+
+describe("협공 (결정론 게임성 격상, CLAUDE.md §7)", () => {
+  // 합성 시나리오: testMap(8×6) 안쪽에 적 방어자를 (4,3)에 두고 주변을 통제 배치.
+  const scene = (units: UnitState[]): BattleState => ({ ...state, units });
+  const atk = (): UnitState => ({ ...get("관우"), x: 5, y: 3 }); // player, 동쪽 인접
+  const def = (): UnitState => ({ ...get("화웅"), x: 4, y: 3 }); // enemy 방어자
+  const ally = (x: number, y: number, over: Partial<UnitState> = {}): UnitState =>
+    ({ ...get("유비"), id: `ally_${x}_${y}`, x, y, ...over }); // player 측 (공격자 진영)
+
+  describe("flankingCount — 포위도", () => {
+    it("공격자만 인접 = 1 (협공 미발동 경계)", () => {
+      expect(flankingCount(scene([atk(), def()]), atk(), def())).toBe(1);
+    });
+    it("공격자 + 반대편 아군 = 2 (협공 발동)", () => {
+      expect(flankingCount(scene([atk(), def(), ally(3, 3)]), atk(), def())).toBe(2);
+    });
+    it("대각선 아군은 세지 않는다(4방만)", () => {
+      expect(flankingCount(scene([atk(), def(), ally(3, 2)]), atk(), def())).toBe(1);
+    });
+    it("퇴각한 인접 아군은 제외", () => {
+      const s = scene([atk(), def(), ally(3, 3, { retreated: true })]);
+      expect(flankingCount(s, atk(), def())).toBe(1);
+    });
+    it("대상 인접의 적(공격자의 foe)은 포위로 세지 않는다", () => {
+      const enemy2: UnitState = { ...get("화웅"), id: "enemy2", x: 4, y: 4 };
+      expect(flankingCount(scene([atk(), def(), ally(3, 3), enemy2]), atk(), def())).toBe(2);
+    });
+    it("4방 전부 아군 점유 = 4 (완전 포위)", () => {
+      const s = scene([atk(), def(), ally(3, 3), ally(4, 2), ally(4, 4)]);
+      expect(flankingCount(s, atk(), def())).toBe(4);
+    });
+  });
+
+  describe("flankMultiplier — 결정론 배율 (threshold 2 / step 20% / maxStacks 3)", () => {
+    it("미발동(1) = 1.0", () => expect(flankMultiplier(testCtx, 1)).toBe(1));
+    it("2기 포위 = +20%", () => expect(flankMultiplier(testCtx, 2)).toBeCloseTo(1.2));
+    it("3기 = +40%", () => expect(flankMultiplier(testCtx, 3)).toBeCloseTo(1.4));
+    it("4기 = +60%", () => expect(flankMultiplier(testCtx, 4)).toBeCloseTo(1.6));
+    it("5기 이상은 maxStacks(3)로 캡 = +60%", () => expect(flankMultiplier(testCtx, 5)).toBeCloseTo(1.6));
+  });
+
+  it("computeDamage: 협공 배율이 피해를 결정론으로 키운다", () => {
+    const a = atk();
+    const d = def();
+    const base = computeDamage(testCtx, a, d); // flankMult 기본 1
+    const flanked = computeDamage(testCtx, a, d, 1, flankMultiplier(testCtx, 2));
+    expect(computeDamage(testCtx, a, d, 1, 1)).toBe(base); // 1.0 = 무보너스 동일
+    expect(flanked).toBeGreaterThan(base);
+    expect(flanked).toBe(computeDamage(testCtx, a, d, 1, 1.2)); // 결정론 — 재현
   });
 });

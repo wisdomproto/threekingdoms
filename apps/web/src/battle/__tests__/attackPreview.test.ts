@@ -108,6 +108,28 @@ describe("buildAttackPreview", () => {
     expect(damageEvents(res.events).some((dd) => dd.counter)).toBe(false);
   });
 
+  it("협공: 대상 반대편 아군이 있으면 flank 발동 + 피해가 엔진과 일치", () => {
+    const s0 = meleeState(); // 장비(zf), 조잠(zf.x-1) — 협공 없음
+    const cao = findUnit(s0, "조잠");
+    // 조잠 서쪽(장비 반대편)에 아군 유비 배치 → 장비(동)+유비(서) 협공 2기
+    const s = withUnit(s0, "유비", { x: cao.x - 1, y: cao.y });
+
+    const noFlank = buildAttackPreview(ctx, s0, "장비", { x: cao.x, y: cao.y })!;
+    expect(noFlank.flank).toBeUndefined(); // 공격자만 인접 = 미발동
+
+    const withFlank = buildAttackPreview(ctx, s, "장비", { x: cao.x, y: cao.y })!;
+    expect(withFlank.flank).toBeDefined();
+    expect(withFlank.flank!.surround).toBe(2);
+    expect(withFlank.flank!.bonusPercent).toBe(20);
+    expect(withFlank.damage).toBeGreaterThan(noFlank.damage); // 확정 추가피해
+
+    // 엔진 교차검증: applyAction 피해가 예측과 정확히 일치 + flank 이벤트 emit
+    const res = applyAction(ctx, s, { type: "attack", unitId: "장비", targetId: "조잠" });
+    const hit = damageEvents(res.events).find((d) => !d.counter && d.defenderId === "조잠");
+    expect(withFlank.damage).toBe(hit!.damage);
+    expect(res.events.some((e) => e.type === "flank" && e.defenderId === "조잠")).toBe(true);
+  });
+
   it("이동 후 공격: from(preview) 기준으로 평가 — move→attack 엔진 결과와 일치", () => {
     const s0 = createBattle(ctx, SEED);
     const zf = findUnit(s0, "장비");
