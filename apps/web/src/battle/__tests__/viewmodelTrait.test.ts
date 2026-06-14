@@ -50,3 +50,11 @@ describe("classTraitText — 상성 방향 (lineAdvantage 파생)", () => {
     expect(traitOf("조잠")).toContain("기병계에 약함");
   });
 });
+
+describe("classPassiveText — 병종 패시브 설명 (§7)", () => {
+  const passiveOf = (id: string): string | undefined => unitVM(ctx, findUnit(battle, id)).passiveText;
+  it("기병(관우): 돌격", () => expect(passiveOf("관우")).toContain("돌격"));
+  it("보병(조잠): 철벽", () => expect(passiveOf("조잠")).toContain("철벽"));
+  it("궁병(이숙): 저격", () => expect(passiveOf("이숙")).toContain("저격"));
+  it("보조계(간옹): 패시브 없음", () => expect(passiveOf("간옹")).toBeUndefined());
+});

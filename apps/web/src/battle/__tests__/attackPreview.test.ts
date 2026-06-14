@@ -130,6 +130,25 @@ describe("buildAttackPreview", () => {
     expect(res.events.some((e) => e.type === "flank" && e.defenderId === "조잠")).toBe(true);
   });
 
+  it("기병 돌격: 이동 후 공격이면 charge 발동(+20%), 제자리면 미발동", () => {
+    const s0 = createBattle(ctx, SEED);
+    const zf = findUnit(s0, "장비"); // lightCavalry = 기병
+
+    // 이동 후 공격: preview(조잠 인접 칸)로 이동 예정 → 돌격
+    const cao = { x: zf.x - 2, y: zf.y };
+    let s = withUnit(s0, "조잠", { x: cao.x, y: cao.y, troops: 9999, maxTroops: 99999 });
+    s = withUnit(s, "장비", { x: zf.x, y: zf.y, troops: 9999, maxTroops: 99999, moved: false });
+    const movedPrev = buildAttackPreview(ctx, s, "장비", cao, { x: zf.x - 1, y: zf.y })!;
+    expect(movedPrev.charge).toBeDefined();
+    expect(movedPrev.charge!.bonusPercent).toBe(20);
+
+    // 제자리 공격(현위치에서 인접 적, from 미지정): 돌격 없음
+    let s2 = withUnit(s0, "조잠", { x: zf.x - 1, y: zf.y, troops: 9999, maxTroops: 99999 });
+    s2 = withUnit(s2, "장비", { x: zf.x, y: zf.y, troops: 9999, maxTroops: 99999, moved: false });
+    const stillPrev = buildAttackPreview(ctx, s2, "장비", { x: zf.x - 1, y: zf.y })!;
+    expect(stillPrev.charge).toBeUndefined();
+  });
+
   it("이동 후 공격: from(preview) 기준으로 평가 — move→attack 엔진 결과와 일치", () => {
     const s0 = createBattle(ctx, SEED);
     const zf = findUnit(s0, "장비");

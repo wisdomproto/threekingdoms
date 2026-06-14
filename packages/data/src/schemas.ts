@@ -118,6 +118,17 @@ export const CombatConfigSchema = z.object({
     stepPercent: z.number().min(0),        // threshold 초과 1기당 추가 피해 %
     maxStacks: z.number().int().min(0),    // 추가 피해 누적 상한(스택 수)
   }).default({ threshold: 2, stepPercent: 20, maxStacks: 3 }),
+  /**
+   * 병종 패시브(결정론 게임성 격상, CLAUDE.md §7) — 자동 발동, 난수 없음.
+   *  - cavalryChargePercent: 기병 돌격 — 이동 후 개시 공격 시 피해 +%.
+   *  - infantryBulwarkPercent: 보병 철벽 — 방어자가 보병 계열이면 피격 피해 −%.
+   *  - archerSnipePiercePercent: 궁병 저격 — 공격자가 궁병 계열이면 대상 지형 guard를 −% 관통.
+   */
+  passives: z.object({
+    cavalryChargePercent: z.number().min(0),
+    infantryBulwarkPercent: z.number().min(0).max(100),
+    archerSnipePiercePercent: z.number().min(0).max(100),
+  }).default({ cavalryChargePercent: 20, infantryBulwarkPercent: 15, archerSnipePiercePercent: 50 }),
 }).refine(
   (c) => Object.entries(c.lineAdvantage).every(([k, v]) => k !== v),
   { message: "lineAdvantage must not be self-referential" },

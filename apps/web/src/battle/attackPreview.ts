@@ -17,7 +17,7 @@
  *
  * 전부 읽기 전용 — 상태를 커밋하지 않는다. computeDamage/distance는 엔진 export.
  */
-import { computeDamage, distance, areFoes, flankingCount, flankMultiplier } from "@tk/engine";
+import { computeDamage, distance, areFoes, flankingCount, flankMultiplier, chargeMultiplier } from "@tk/engine";
 import type { BattleContext, BattleState, Coord, UnitState } from "@tk/engine";
 
 export interface CounterPreview {
@@ -35,11 +35,8 @@ export interface AttackPreview {
   counter?: CounterPreview;
   /** 협공 발동 시 — 대상 포위도(공격자 포함)와 추가피해%. 미발동이면 생략 */
   flank?: { surround: number; bonusPercent: number };
-}
-
-/** 공격자를 `pos`에 놓은 가상 사본 — 위치 의존 계산(지형 guard/거리)을 이동 후 기준으로 맞춘다 */
-function relocated(unit: UnitState, pos: Coord): UnitState {
-  return unit.x === pos.x && unit.y === pos.y ? unit : { ...unit, x: pos.x, y: pos.y };
+  /** 기병 돌격 발동 시(이동 후 공격) — 추가피해%. 미발동이면 생략 */
+  charge?: { bonusPercent: number };
 }
 
 /**
@@ -62,11 +59,15 @@ export function buildAttackPreview(
   // 적대 진영(camp 다름)만 타깃 — 우군(같은 camp)은 피해 예측 대상이 아니다
   if (!areFoes(defender.side, rawAttacker.side)) return null;
 
-  const attacker = relocated(rawAttacker, from ?? { x: rawAttacker.x, y: rawAttacker.y });
+  // 엔진은 move→attack 순으로 처리하므로, 이동 예정이면 공격자를 from에 두고 moved=true로 맞춘다
+  // (협공 포위도·기병 돌격 판정 모두 '공격 시점' 상태와 일치시키기 위함).
+  const dest = from ?? { x: rawAttacker.x, y: rawAttacker.y };
+  const willMove = dest.x !== rawAttacker.x || dest.y !== rawAttacker.y;
+  const attacker: UnitState = willMove
+    ? { ...rawAttacker, x: dest.x, y: dest.y, moved: true }
+    : rawAttacker;
 
-  // 협공: 엔진은 공격 시점에 공격자가 `from`에 서 있으므로, 그 위치를 반영한 가상 state로 포위도를 센다.
-  const moved = attacker !== rawAttacker;
-  const flankState: BattleState = moved
+  const flankState: BattleState = willMove
     ? { ...state, units: state.units.map((u) => (u.id === attackerId ? attacker : u)) }
     : state;
   const surround = flankingCount(flankState, attacker, defender);
@@ -74,7 +75,12 @@ export function buildAttackPreview(
   const flank =
     flankMult > 1 ? { surround, bonusPercent: Math.round((flankMult - 1) * 100) } : undefined;
 
-  const damage = computeDamage(ctx, attacker, defender, 1, flankMult);
+  // 기병 돌격: 이동 후 공격 시 추가피해 (개시 공격에만 — 반격 제외, 엔진과 일치)
+  const chargeMult = chargeMultiplier(ctx, attacker);
+  const charge =
+    chargeMult > 1 ? { bonusPercent: Math.round((chargeMult - 1) * 100) } : undefined;
+
+  const damage = computeDamage(ctx, attacker, defender, 1, flankMult * chargeMult);
   const willRetreat = defender.troops - damage <= 0;
 
   // 반격: 방어자 생존 + 공격자가 방어자 사거리 안 (actions.ts:178-182). 반격엔 협공 미적용(엔진과 일치).
@@ -87,8 +93,9 @@ export function buildAttackPreview(
         willRetreat,
         counter: { damage: counterDamage, willRetreat: attacker.troops - counterDamage <= 0 },
         flank,
+        charge,
       };
     }
   }
-  return { damage, willRetreat, flank };
+  return { damage, willRetreat, flank, charge };
 }

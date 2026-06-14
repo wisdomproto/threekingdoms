@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { createBattle } from "../src/createBattle";
 import {
   adjustedStat, attackPower, defensePower, computeDamage, getAttackableTargets,
-  flankingCount, flankMultiplier,
+  flankingCount, flankMultiplier, chargeMultiplier,
 } from "../src/combat";
 import { testCtx } from "./fixtures";
 import type { BattleState, UnitState } from "../src/types";
@@ -37,21 +37,22 @@ describe("조조전 공식 (docs/reference/sosoden-combat-formula.md)", () => {
     expect(b).toBe(a); // RNG 없음 — 같은 입력 = 같은 값
   });
 
-  it("상성: 기병→보병은 방어 0.75배 → 데미지 증가 (관우 청룡언월도 weaponBonus 1.12 반영)", () => {
+  it("상성: 기병→보병은 방어 0.75배 → 데미지 증가 (관우 청룡언월도 weaponBonus 1.12 반영, 보병 철벽 −15%)", () => {
     // 관우(기병)→유비(보병 footman): lineAdvantage cavalry→infantry → 방어 ×0.75
     // 관우 atk = 51 × 1.12(청룡언월도) = 57.12. 유비 통솔91 footman(def=S) Lv1 → base45, 구간0→S+2 = 47, ×0.75 = 35.25
-    // dmg = floor((57.12 − 35.25)/2 + 1 + 25) = floor(10.935 + 26) = 36
-    expect(computeDamage(testCtx, get("관우"), get("유비"))).toBe(36);
+    // raw = (57.12 − 35.25)/2 + 1 + 25 = 36.935. 유비=보병 → 철벽 ×0.85 → floor(31.39) = 31
+    expect(computeDamage(testCtx, get("관우"), get("유비"))).toBe(31);
   });
 
   it("장비 런타임: weaponBonus가 부대 공격력에 곱해진다 (무기 미보유는 ×1 불변)", () => {
-    // 같은 관우라도 무기 제거(weaponBonus 1.0)하면 데미지가 줄어든다 — 무기 보정이 실제 반영됨을 증명
+    // 같은 관우라도 무기 제거(weaponBonus 1.0)하면 데미지가 줄어든다 — 무기 보정이 실제 반영됨을 증명.
+    // 유비=보병 → 둘 다 철벽 −15% 적용(armed 36.935→31, bare 33.875→28). 무기 보정 차이는 보존.
     const guanyuArmed = get("관우");                       // 청룡언월도 1.12
     const guanyuBare = { ...guanyuArmed, weaponBonus: 1 }; // 무기 없음
     const armed = computeDamage(testCtx, guanyuArmed, get("유비"));
     const bare = computeDamage(testCtx, guanyuBare, get("유비"));
-    expect(armed).toBe(36);
-    expect(bare).toBe(33); // 보정 없으면 기존 값
+    expect(armed).toBe(31);
+    expect(bare).toBe(28); // 보정 없으면 더 낮음
     expect(armed).toBeGreaterThan(bare);
   });
 
@@ -126,5 +127,37 @@ describe("협공 (결정론 게임성 격상, CLAUDE.md §7)", () => {
     expect(computeDamage(testCtx, a, d, 1, 1)).toBe(base); // 1.0 = 무보너스 동일
     expect(flanked).toBeGreaterThan(base);
     expect(flanked).toBe(computeDamage(testCtx, a, d, 1, 1.2)); // 결정론 — 재현
+  });
+});
+
+describe("병종 패시브 (결정론 게임성 격상, CLAUDE.md §7)", () => {
+  // 상성을 고정하려고 공격자를 산적계(어떤 계열에도 상성 없음=1.0)로, 방어자도 보조계로 둬
+  // 변수를 패시브 하나로 격리한다.
+  it("보병 철벽: 방어자가 보병이면 피해 경감 (보조계 대비)", () => {
+    const raider = { ...get("관우"), line: "bandit" as const }; // 상성 중립 공격자
+    const inf = { ...get("유비"), line: "infantry" as const, x: 5, y: 1 }; // 평지
+    const sup = { ...get("유비"), line: "support" as const, x: 5, y: 1 };
+    const dmgInf = computeDamage(testCtx, raider, inf);
+    const dmgSup = computeDamage(testCtx, raider, sup);
+    expect(dmgInf).toBeLessThan(dmgSup); // 철벽 −15% 만큼 보병이 덜 맞는다
+  });
+
+  it("궁병 저격: 공격자가 궁병이면 대상 엄폐(지형 guard)를 관통 (엄폐 무시 → 더 큰 피해)", () => {
+    // 방어자를 산지(2,3, guard 0.3) 보조계로 — 상성 1.0 고정, 지형만 변수
+    const target = { ...get("유비"), line: "support" as const, x: 2, y: 3 };
+    const cav = { ...get("관우"), line: "cavalry" as const }; // guard 전체 적용
+    const arc = { ...get("관우"), line: "archer" as const }; // guard 50% 관통
+    const dmgCav = computeDamage(testCtx, cav, target);
+    const dmgArc = computeDamage(testCtx, arc, target);
+    expect(dmgArc).toBeGreaterThan(dmgCav); // 저격이 엄폐를 깎아 피해 ↑
+  });
+
+  it("기병 돌격: 기병이 이동 후(moved) 공격 시에만 배율>1", () => {
+    const cavMoved = { ...get("관우"), line: "cavalry" as const, moved: true };
+    const cavStill = { ...get("관우"), line: "cavalry" as const, moved: false };
+    const footMoved = { ...get("유비"), line: "infantry" as const, moved: true };
+    expect(chargeMultiplier(testCtx, cavMoved)).toBeCloseTo(1.2); // 이동 기병 = +20%
+    expect(chargeMultiplier(testCtx, cavStill)).toBe(1); // 제자리 기병 = 무
+    expect(chargeMultiplier(testCtx, footMoved)).toBe(1); // 비기병 = 무
   });
 });

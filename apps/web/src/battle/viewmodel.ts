@@ -57,6 +57,7 @@ export interface UnitVM {
   classId?: string;             // 병종 id (특성/책략 탭 lookup 키)
   grades?: ClassGrades;         // 병종 5스탯 등급 [공·방·정·순·사] (특성 탭 뱃지)
   traitText?: string;           // 병종 상성/약점 설명문 (§8 부대특성 — lineAdvantage 파생)
+  passiveText?: string;         // 병종 패시브 설명문 (§7 — combat.passives 파생, 없으면 미설정)
   equipment?: ItemVM[];         // 소지품(장비/소모품) 해석 목록 (장비 탭)
   strategies?: StrategyVM[];    // 병종 보유 책략 해석 목록 (책략 탭)
 }
@@ -126,6 +127,23 @@ function classTraitText(
   return s;
 }
 
+/** 병종 패시브 설명문 (§7 게임성 격상) — combat.passives 수치에서 파생. 패시브 없는 계열은 빈 문자열 */
+function classPassiveText(
+  line: string,
+  passives: { cavalryChargePercent: number; infantryBulwarkPercent: number; archerSnipePiercePercent: number },
+): string {
+  switch (line) {
+    case "cavalry":
+      return `돌격 — 이동 후 공격 시 피해 +${passives.cavalryChargePercent}%`;
+    case "infantry":
+      return `철벽 — 피격 피해 −${passives.infantryBulwarkPercent}%`;
+    case "archer":
+      return `저격 — 대상 지형 엄폐를 ${passives.archerSnipePiercePercent}% 관통`;
+    default:
+      return "";
+  }
+}
+
 export function unitVM(ctx: BattleContext, u: UnitState): UnitVM {
   const terrain = terrainAt(ctx, u.x, u.y);
   const cls = ctx.data.unitClasses[u.classId];
@@ -179,6 +197,7 @@ export function unitVM(ctx: BattleContext, u: UnitState): UnitVM {
     classId: u.classId,
     grades: cls?.grades,
     traitText: cls ? classTraitText(cls.line, ctx.data.combat.lineAdvantage, u.rangeMax) : undefined,
+    passiveText: cls ? classPassiveText(cls.line, ctx.data.combat.passives) || undefined : undefined,
     equipment,
     strategies,
   };

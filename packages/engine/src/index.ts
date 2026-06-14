@@ -5,7 +5,7 @@ export { getMovableTiles, terrainAt, moveCostFor, unitAt, pathCostField } from "
 export {
   adjustedStat, attackPower, defensePower, spiritPower, computeDamage, getAttackableTargets, distance,
   strategyDamage, strategyAoeCells, getStrategyTargets, expForNextLevel,
-  flankingCount, flankMultiplier,
+  flankingCount, flankMultiplier, chargeMultiplier,
 } from "./combat";
 export { evaluateStage } from "./grade";
 export { corpsStat, growthCoeff } from "./growth";

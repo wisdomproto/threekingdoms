@@ -19,6 +19,7 @@ const RETREAT_COLOR = "#ff5d5d"; // 격파 임박 — 강조
 const DAMAGE_COLOR = "#ffd27a"; // 일반 피해 (청동 호박색)
 const COUNTER_COLOR = "#c7cdd4"; // 반격 (회색조 — 우리가 받는 피해)
 const FLANK_COLOR = "#ff9a3d"; // 협공 (§10 대상군과 같은 주황)
+const CHARGE_COLOR = "#7bd3ff"; // 기병 돌격 (질주 — 하늘색)
 
 const PANEL_STYLE: React.CSSProperties = {
   position: "absolute",
@@ -99,6 +100,11 @@ export function AttackForecast({
               {r.preview.damage}
               {r.preview.willRetreat ? " 격파" : ""}
             </strong>
+            {r.preview.charge ? (
+              <span style={{ marginLeft: 6, fontSize: 12, fontWeight: 700, color: CHARGE_COLOR }}>
+                돌격+{r.preview.charge.bonusPercent}%
+              </span>
+            ) : null}
             {r.preview.flank ? (
               <span style={{ marginLeft: 6, fontSize: 12, fontWeight: 700, color: FLANK_COLOR }}>
                 협공+{r.preview.flank.bonusPercent}%

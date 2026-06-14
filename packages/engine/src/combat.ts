@@ -56,14 +56,29 @@ function defFactor(ctx: BattleContext, attacker: UnitState, defender: UnitState)
 export function computeDamage(
   ctx: BattleContext, attacker: UnitState, defender: UnitState, ratio = 1, flankMult = 1,
 ): number {
-  const guard = terrainAt(ctx, defender.x, defender.y).guard;
+  const p = ctx.data.combat.passives;
+  // 궁병 저격(패시브): 공격자가 궁병 계열이면 대상 지형 guard를 일부 관통(엄폐 무시).
+  const rawGuard = terrainAt(ctx, defender.x, defender.y).guard;
+  const guard = attacker.line === "archer" ? rawGuard * (1 - p.archerSnipePiercePercent / 100) : rawGuard;
   // 장비 런타임: 무기 보정(weaponBonus = 1 + 최고 무기 bonusPercent/100)을 부대 공격력에 곱한다.
   // createBattle에서 산정된 값(미보유 = 1.0). 결정론 — 난수 없음.
   const atk = attackPower(attacker) * (attacker.weaponBonus ?? 1);
   const def = defensePower(defender) * defFactor(ctx, attacker, defender);
   const raw = (atk - def) / 2 + attacker.level + DMG_BASE;
   // flankMult: 협공 배율(결정론 ≥1.0). 지형·반격ratio와 동일하게 최종 곱연산.
-  return Math.max(ctx.data.combat.minDamage, Math.floor(Math.max(0, raw) * (1 - guard) * ratio * flankMult));
+  const base = Math.max(0, raw) * (1 - guard) * ratio * flankMult;
+  // 보병 철벽(패시브): 방어자가 보병 계열이면 최종 피해를 일부 경감.
+  const bulwark = defender.line === "infantry" ? 1 - p.infantryBulwarkPercent / 100 : 1;
+  return Math.max(ctx.data.combat.minDamage, Math.floor(base * bulwark));
+}
+
+/**
+ * 기병 돌격(패시브) → 결정론 데미지 배율. 공격자가 기병 계열이고 이번 턴 이동 후
+ * 공격(moved=true)할 때만 발동. 제자리 공격·비기병은 1.0. 개시 공격에만 곱한다(반격 제외).
+ */
+export function chargeMultiplier(ctx: BattleContext, attacker: UnitState): number {
+  if (attacker.line !== "cavalry" || !attacker.moved) return 1;
+  return 1 + ctx.data.combat.passives.cavalryChargePercent / 100;
 }
 
 /** 대상 4방(상하좌우)에서 공격자 진영 부대가 점유한 칸 수 — 협공 포위도(공격자 포함). 결정론. */
