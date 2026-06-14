@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>스테이지 에디터 — 삼국지 SRPG (stage + map + 블록아웃)</title>
+<style>
+  :root { --bg:#14161c; --panel:#1d212b; --panel2:#242936; --line:#333a4a; --txt:#e8e6df; --dim:#9aa1b0; --acc:#d4a843; --acc2:#6fae6f; --bad:#e06a6a;
+          --player:#4f8fe0; --ally:#e0954f; --enemy:#e05a5a; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--txt); font-family:'Malgun Gothic','Segoe UI',sans-serif; }
+  body { display:flex; flex-direction:column; }
+  header { background:rgba(20,22,28,.96); border-bottom:1px solid var(--line); padding:7px 12px; display:flex; gap:7px; align-items:center; flex-wrap:wrap; }
+  header h1 { font-size:14px; margin:0 8px 0 0; color:var(--acc); white-space:nowrap; }
+  .btn { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:5px 10px; cursor:pointer; font-size:12.5px; }
+  .btn:hover { border-color:var(--acc); }
+  .btn.on { background:var(--acc); color:#1a1407; border-color:var(--acc); font-weight:bold; }
+  .btn.go { background:var(--acc2); color:#0c1a0c; border-color:var(--acc2); font-weight:bold; }
+  .btn.warn { border-color:var(--bad); color:var(--bad); }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+  .sep { width:1px; height:22px; background:var(--line); margin:0 3px; }
+  header label { font-size:11.5px; color:var(--dim); display:flex; gap:4px; align-items:center; }
+  header input[type=number],header input[type=text] { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:3px 6px; font-size:12px; }
+  main { flex:1; display:flex; min-height:0; }
+  /* 좌측 팔레트 */
+  #left { width:178px; background:var(--panel); border-right:1px solid var(--line); overflow:auto; padding:8px; flex-shrink:0; }
+  #left h2 { font-size:11px; color:var(--dim); margin:10px 2px 6px; text-transform:uppercase; letter-spacing:.5px; }
+  #left h2:first-child { margin-top:2px; }
+  .terr { display:flex; align-items:center; gap:7px; padding:4px 6px; border-radius:6px; cursor:pointer; border:1px solid transparent; font-size:12px; }
+  .terr:hover { background:var(--panel2); }
+  .terr.sel { background:var(--panel2); border-color:var(--acc); }
+  .terr .sw { width:16px; height:16px; border-radius:4px; border:1px solid rgba(255,255,255,.2); flex-shrink:0; }
+  .terr .ch { color:var(--dim); font-family:Consolas,monospace; font-size:10.5px; margin-left:auto; }
+  .moderow { display:flex; gap:5px; margin-bottom:6px; }
+  .moderow .btn { flex:1; text-align:center; padding:5px 4px; font-size:11.5px; }
+  /* 캔버스 */
+  #stage { flex:1; overflow:auto; position:relative; background:#0e1014; }
+  #wrap { position:relative; margin:16px; width:max-content; }
+  canvas { display:block; image-rendering:pixelated; position:absolute; left:0; top:0; }
+  #grid { position:relative; cursor:crosshair; }
+  /* 우측 인스펙터 */
+  #right { width:340px; background:var(--panel); border-left:1px solid var(--line); padding:0; overflow:auto; flex-shrink:0; font-size:12px; display:flex; flex-direction:column; }
+  .tabs { display:flex; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--panel); z-index:5; }
+  .tab { flex:1; padding:8px 4px; text-align:center; cursor:pointer; font-size:11.5px; color:var(--dim); border-bottom:2px solid transparent; }
+  .tab.on { color:var(--acc); border-bottom-color:var(--acc); font-weight:bold; }
+  .tabbody { padding:11px 13px; }
+  .field { margin-bottom:10px; }
+  .field label { display:block; font-size:11px; color:var(--dim); margin-bottom:3px; }
+  .field .hint { font-size:10px; color:#6c7588; margin-top:3px; line-height:1.4; }
+  .field input,.field select { width:100%; background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:5px 7px; font-size:12.5px; }
+  .field input:focus,.field select:focus { outline:none; border-color:var(--acc); }
+  .field.invalid input,.field.invalid select { border-color:var(--bad); }
+  .field .msg { color:var(--bad); font-size:10px; margin-top:3px; display:none; }
+  .field.invalid .msg { display:block; }
+  .row2 { display:flex; gap:8px; } .row2 > * { flex:1; }
+  .card { background:var(--panel2); border:1px solid var(--line); border-radius:7px; padding:9px; margin-bottom:9px; position:relative; }
+  .card .del { position:absolute; top:6px; right:6px; background:none; border:none; color:var(--dim); cursor:pointer; font-size:14px; line-height:1; }
+  .card .del:hover { color:var(--bad); }
+  .card h3 { margin:0 0 7px; font-size:11.5px; color:var(--acc); }
+  .card.err { border-color:var(--bad); }
+  .addbtn { width:100%; padding:6px; background:var(--panel2); border:1px dashed var(--line); color:var(--dim); border-radius:6px; cursor:pointer; font-size:12px; }
+  .addbtn:hover { border-color:var(--acc); color:var(--acc); }
+  .multi { max-height:120px; overflow:auto; background:var(--panel2); border:1px solid var(--line); border-radius:5px; padding:4px; }
+  .multi label { display:flex; gap:5px; align-items:center; padding:2px 3px; font-size:11.5px; color:var(--txt); cursor:pointer; }
+  .multi input { width:auto; }
+  .pickbtn { font-size:10.5px; padding:2px 7px; }
+  .pickbtn.active { background:var(--acc); color:#1a1407; border-color:var(--acc); }
+  .sectlabel { font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:.5px; margin:4px 0 7px; border-bottom:1px solid var(--line); padding-bottom:4px; }
+  /* 유닛 인스펙터 (배치 패널) */
+  #unitInspect .ptag { display:inline-block; padding:1px 7px; border-radius:9px; font-size:10px; font-weight:bold; }
+  /* 하단 검증 배너 */
+  #valbanner { margin:9px 13px; background:rgba(224,106,106,.12); border:1px solid var(--bad); color:var(--bad); border-radius:6px; padding:7px 9px; font-size:11px; display:none; line-height:1.5; }
+  #valbanner.on { display:block; }
+  #valbanner.ok { background:rgba(111,174,111,.1); border-color:var(--acc2); color:var(--acc2); }
+  /* 통계 */
+  #stats div.bar { height:3px; border-radius:2px; margin-top:1px; }
+  /* 붙여넣기 모달 */
+  #pasteModal { position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center; z-index:60; }
+  #pasteModal.on { display:flex; }
+  #pasteBox { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px; width:min(720px,93vw); }
+  #pasteBox h3 { margin:0 0 6px; color:var(--acc); font-size:13px; }
+  #pasteBox p { color:var(--dim); font-size:11.5px; margin:0 0 8px; }
+  .pastetabs { display:flex; gap:6px; margin-bottom:8px; }
+  #pasteArea { width:100%; height:300px; background:#0e1014; color:var(--txt); border:1px solid var(--line); border-radius:6px; font-family:Consolas,monospace; font-size:12px; padding:8px; }
+  #pasteBox .prow { display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
+  #hint { position:fixed; bottom:7px; left:calc(50% - 80px); transform:translateX(-50%); background:rgba(0,0,0,.72); padding:4px 12px; border-radius:14px; font-size:11px; color:var(--dim); pointer-events:none; }
+  #toast { position:fixed; bottom:34px; left:50%; transform:translateX(-50%); background:var(--acc); color:#1a1407; font-weight:bold; padding:7px 18px; border-radius:18px; font-size:13px; display:none; z-index:80; }
+  #toast.bad { background:var(--bad); color:#fff; }
+</style>
+</head>
+<body>
+<header>
+  <h1>스테이지 에디터</h1>
+  <button class="btn" id="newStage">새로</button>
+  <button class="btn" id="openStage">스테이지 열기</button>
+  <button class="btn" id="openMap">맵 열기</button>
+  <button class="btn" id="pasteIn">붙여넣기</button>
+  <div class="sep"></div>
+  <button class="btn go" id="saveStage">⬇ stage JSON</button>
+  <button class="btn go" id="saveMap">⬇ map JSON</button>
+  <button class="btn go" id="expBlock">⬇ 블록아웃 PNG</button>
+  <div class="sep"></div>
+  <label>셀px <input type="number" id="cellpx" min="6" max="40" value="15" style="width:44px"></label>
+  <button class="btn" id="undo">↶</button>
+  <span id="dims" style="color:var(--dim); font-size:12px; margin-left:auto"></span>
+</header>
+<main>
+  <div id="left">
+    <div class="moderow">
+      <button class="btn on" data-mode="terrain" id="m-terrain">지형</button>
+      <button class="btn" data-mode="unit" id="m-unit">유닛</button>
+    </div>
+    <div id="terrainPanel">
+      <div class="moderow">
+        <button class="btn on" data-tool="paint" id="t-paint">칠하기</button>
+        <button class="btn" data-tool="fill" id="t-fill">채우기</button>
+      </div>
+      <label style="font-size:11px;color:var(--dim);display:flex;gap:5px;align-items:center;margin-bottom:7px">브러시
+        <input type="number" id="brush" min="1" max="9" value="1" style="width:40px;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:5px;padding:2px 5px"></label>
+      <h2>지형</h2>
+      <div id="terrlist"></div>
+      <h2>지형 분포</h2>
+      <div id="stats"></div>
+    </div>
+    <div id="unitPanel" style="display:none">
+      <div class="field">
+        <label>배치 진영 (칸 클릭=배치)</label>
+        <select id="placeSide">
+          <option value="player">아군 (player)</option>
+          <option value="ally">우군 (ally)</option>
+          <option value="enemy">적군 (enemy)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>병종 기본값</label>
+        <select id="placeClass"></select>
+      </div>
+      <h2>배치된 유닛</h2>
+      <div id="unitList" style="font-size:11.5px"></div>
+    </div>
+  </div>
+
+  <div id="stage"><div id="wrap">
+    <canvas id="terrC"></canvas>
+    <canvas id="unitC"></canvas>
+    <canvas id="grid"></canvas>
+  </div></div>
+
+  <div id="right">
+    <div class="tabs">
+      <div class="tab on" data-tab="meta">메타</div>
+      <div class="tab" data-tab="unit">유닛</div>
+      <div class="tab" data-tab="obj">목표/패배</div>
+      <div class="tab" data-tab="duel">일기토</div>
+      <div class="tab" data-tab="adv">증원/전략</div>
+    </div>
+    <div id="valbanner"></div>
+    <div class="tabbody" id="tabbody"></div>
+  </div>
+</main>
+
+<div id="pasteModal"><div id="pasteBox">
+  <h3 id="pasteTitle">JSON 붙여넣기 / 내보내기</h3>
+  <p id="pasteDesc">stage 또는 map JSON을 붙여넣고 해당 버튼을 누르세요.</p>
+  <textarea id="pasteArea" spellcheck="false"></textarea>
+  <div class="prow">
+    <button class="btn" id="pasteCancel">닫기</button>
+    <button class="btn" id="pasteAsMap">맵으로 읽기</button>
+    <button class="btn go" id="pasteAsStage">스테이지로 읽기</button>
+  </div>
+</div></div>
+
+<div id="hint">지형: 클릭/드래그 칠하기 · 1~9 지형선택 · Ctrl+Z · 유닛: 칸 클릭 배치, 클릭한 유닛 우측 편집 · 좌표 집기 모드는 우측 버튼</div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   선언적 config — schemas.ts(StageSchema 외)와 1:1. 2탄/스키마 변경 시 이 블록.
+   ─ 지형 char/id/color는 map-editor.html · export_layout.py · 게임 tileLegend와
+     동일 유지. 유닛/목표/패배/증원/전략/일기토는 StageSchema 계약(M3①) 그대로.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const TERRAINS = [
+  ['.', 'plain',    [217,207,157]],
+  ['g', 'grass',    [168,198,134]],
+  ['f', 'forest',   [74,110,70]],
+  ['m', 'mountain', [140,122,94]],
+  ['w', 'waste',    [199,181,143]],
+  ['r', 'river',    [106,158,201]],
+  ['b', 'bridge',   [176,138,90]],
+  ['#', 'wall',     [110,110,118]],
+  ['c', 'cliff',    [90,80,72]],
+  ['F', 'fort',     [158,142,122]],
+  ['G', 'gate',     [122,106,82]],
+  ['v', 'village',  [224,184,122]],
+  ['B', 'barracks', [207,158,106]],
+  ['d', 'depot',    [201,168,110]],
+];
+const BY_CHAR = Object.fromEntries(TERRAINS.map(t => [t[0], t]));
+const LEGEND = Object.fromEntries(TERRAINS.map(t => [t[0], t[1]]));
+const rgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+
+const SIDES = {
+  player: { label: '아군',  color: 'var(--player)', raw: '#4f8fe0' },
+  ally:   { label: '우군',  color: 'var(--ally)',   raw: '#e0954f' },
+  enemy:  { label: '적군',  color: 'var(--enemy)',  raw: '#e05a5a' },
+};
+const SIDE_KEYS = Object.keys(SIDES);
+
+/* commanders/unitClasses/items.json — 있으면 fetch로 로드, 실패 시 폴백.
+   같은 tools/ 폴더에서 file:// 로 열면 fetch 차단될 수 있어 폴백 목록 내장. */
+const FALLBACK_COMMANDERS = ['유비','관우','장비','조운','제갈량','간옹','미축','손건','공손찬','화웅','조잠','이숙','호진','여포','동탁','조조','하후돈'];
+const FALLBACK_CLASSES = ['footman','pikeman','chariot','archer','crossbowman','catapult','lightCavalry','heavyCavalry','guardCavalry','bandit','brigand','outlaw','band','beastUnit','brawler','sorcerer','tribesman','civilian','transport','strategist','lord'];
+const FALLBACK_ITEMS = ['청룡언월도','사모','쌀','폭탄','무술교본'];
+
+let COMMANDERS = FALLBACK_COMMANDERS.map(id => ({ id, name: id }));
+let CLASSES = FALLBACK_CLASSES.map(id => ({ id, name: id }));
+let ITEMS = FALLBACK_ITEMS.map(id => ({ id, name: id }));
+
+/* ═══════════════════════ 상태 ═══════════════════════ */
+let W = 56, H = 32;
+let mapId = 'newmap', mapName = '새 맵';
+let tiles = [];               // H개의 char[] (W)
+let loadedLegend = null;      // 불러온 map의 tileLegend(키 순서/미사용 키 보존 → round-trip 무파손)
+let stage = newStageMeta();   // 스테이지 메타·목표 등 (units는 stage.units)
+let curChar = '.';
+let mode = 'terrain';         // 'terrain' | 'unit'
+let tool = 'paint';
+let cellPx = 15;
+let painting = false;
+let selUnit = null;           // 선택된 유닛 객체(stage.units[i] 또는 증원 유닛)
+let activeTab = 'meta';
+let coordPick = null;         // { cb(x,y), label } — 좌표 집기 모드
+const undoStack = [];
+let pasteTarget = null;
+const hasFS = 'showOpenFilePicker' in window;
+let stageHandle = null, mapHandle = null;
+
+function newStageMeta() {
+  return {
+    id: 'stageXX', name: '새 스테이지', mapId: 'newmap', turnLimit: 30,
+    camera: null, reward: null, levelCap: null,
+    units: [],
+    objectives: [{ kind: 'defeatAll', optional: false }],
+    failConditions: [],
+    reinforcements: [],
+    strategyConditions: [],
+    events: [],
+  };
+}
+function blankTiles(w, h) { return Array.from({ length: h }, () => Array(w).fill('.')); }
+
+/* ═══════════════════════ 부팅 ═══════════════════════ */
+async function init() {
+  tiles = blankTiles(W, H);
+  await loadRefData();
+  buildPalette();
+  bind();
+  resizeCanvas();
+  renderTerrain(); renderUnits(); renderGrid();
+  refreshInfo();
+  renderTab();
+  refreshValidation();
+}
+
+async function loadRefData() {
+  const tryLoad = async (rel) => {
+    try { const r = await fetch(rel); if (!r.ok) return null; return await r.json(); }
+    catch { return null; }
+  };
+  const recToList = (obj) => Object.entries(obj).map(([k, v]) => ({ id: (v && v.id) || k, name: (v && v.name) || k }));
+  const c = await tryLoad('../packages/data/json/commanders.json');
+  const u = await tryLoad('../packages/data/json/unitClasses.json');
+  const it = await tryLoad('../packages/data/json/items.json');
+  if (c) COMMANDERS = recToList(c);
+  if (u) CLASSES = recToList(u);
+  if (it) ITEMS = recToList(it);
+}
+
+/* ═══════════════════════ 좌측 팔레트 ═══════════════════════ */
+function buildPalette() {
+  const el = document.getElementById('terrlist');
+  el.innerHTML = '';
+  TERRAINS.forEach(([ch, tid, col], i) => {
+    const d = document.createElement('div');
+    d.className = 'terr' + (ch === curChar ? ' sel' : '');
+    d.dataset.ch = ch;
+    d.innerHTML = `<span class="sw" style="background:${rgb(col)}"></span><span>${tid}</span><span class="ch">${i < 9 ? (i + 1) + '·' : ''}${ch}</span>`;
+    d.onclick = () => selectTerrain(ch);
+    el.appendChild(d);
+  });
+  // 배치 병종 드롭다운
+  const pc = document.getElementById('placeClass');
+  pc.innerHTML = '';
+  CLASSES.forEach(cl => { const o = document.createElement('option'); o.value = cl.id; o.textContent = `${cl.name} (${cl.id})`; pc.appendChild(o); });
+  pc.value = 'footman';
+}
+function selectTerrain(ch) {
+  curChar = ch;
+  document.querySelectorAll('.terr').forEach(t => t.classList.toggle('sel', t.dataset.ch === ch));
+}
+
+/* ═══════════════════════ 캔버스 ═══════════════════════ */
+const terrC = document.getElementById('terrC');
+const unitC = document.getElementById('unitC');
+const gridC = document.getElementById('grid');
+const tx = terrC.getContext('2d');
+const ux = unitC.getContext('2d');
+const gx = gridC.getContext('2d');
+
+function resizeCanvas() {
+  for (const c of [terrC, unitC, gridC]) { c.width = W * cellPx; c.height = H * cellPx; }
+  document.getElementById('dims').textContent = `${W} × ${H}  (${cellPx}px)`;
+}
+
+function renderTerrain() {
+  tx.clearRect(0, 0, terrC.width, terrC.height);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const t = BY_CHAR[tiles[y][x]] || BY_CHAR['.'];
+    tx.fillStyle = rgb(t[2]);
+    tx.fillRect(x * cellPx, y * cellPx, cellPx, cellPx);
+  }
+  refreshStats();
+}
+function renderGrid() {
+  gx.clearRect(0, 0, gridC.width, gridC.height);
+  if (cellPx >= 9) {
+    gx.strokeStyle = 'rgba(255,255,255,.07)'; gx.lineWidth = 1;
+    gx.beginPath();
+    for (let x = 0; x <= W; x++) { gx.moveTo(x * cellPx + .5, 0); gx.lineTo(x * cellPx + .5, H * cellPx); }
+    for (let y = 0; y <= H; y++) { gx.moveTo(0, y * cellPx + .5); gx.lineTo(W * cellPx, y * cellPx + .5); }
+    gx.stroke();
+  }
+  // 좌표 집기 모드 표시
+  if (coordPick) {
+    gx.fillStyle = 'rgba(212,168,67,.12)';
+    gx.fillRect(0, 0, gridC.width, gridC.height);
+  }
+}
+function renderUnits() {
+  ux.clearRect(0, 0, unitC.width, unitC.height);
+  const all = allPlacedUnits();
+  all.forEach(({ u, reinforce }) => {
+    const s = SIDES[u.side] || SIDES.enemy;
+    const cx = u.x * cellPx + cellPx / 2, cy = u.y * cellPx + cellPx / 2;
+    const r = Math.max(4, cellPx * 0.36);
+    ux.beginPath(); ux.arc(cx, cy, r, 0, Math.PI * 2);
+    ux.fillStyle = s.raw; ux.fill();
+    ux.lineWidth = (u === selUnit) ? 3 : 1.5;
+    ux.strokeStyle = (u === selUnit) ? '#fff' : 'rgba(0,0,0,.5)';
+    ux.stroke();
+    if (reinforce) { // 증원 유닛은 점선 테두리
+      ux.setLineDash([3, 2]); ux.lineWidth = 2; ux.strokeStyle = '#fff';
+      ux.beginPath(); ux.arc(cx, cy, r + 2.5, 0, Math.PI * 2); ux.stroke(); ux.setLineDash([]);
+    }
+    if (cellPx >= 13) {
+      ux.fillStyle = '#fff'; ux.font = `${Math.max(8, cellPx * 0.5)}px 'Malgun Gothic'`;
+      ux.textAlign = 'center'; ux.textBaseline = 'bottom';
+      ux.fillText((u.commanderId || '').slice(0, 3), cx, u.y * cellPx - 1);
+    }
+  });
+}
+function renderAll() { renderTerrain(); renderUnits(); renderGrid(); }
+
+/* 배치된 모든 유닛 = stage.units + 증원 units (증원은 reinforce:true) */
+function allPlacedUnits() {
+  const out = stage.units.map(u => ({ u, reinforce: false }));
+  (stage.reinforcements || []).forEach(r => (r.units || []).forEach(u => out.push({ u, reinforce: true })));
+  return out;
+}
+
+/* ═══════════════════════ 지형 칠하기 ═══════════════════════ */
+function cellAt(ev) {
+  const r = gridC.getBoundingClientRect();
+  const x = Math.floor((ev.clientX - r.left) / cellPx);
+  const y = Math.floor((ev.clientY - r.top) / cellPx);
+  return (x >= 0 && y >= 0 && x < W && y < H) ? [x, y] : null;
+}
+function pushUndo() {
+  undoStack.push({ tiles: tiles.map(r => r.slice()), units: JSON.parse(JSON.stringify(stage.units)) });
+  if (undoStack.length > 60) undoStack.shift();
+}
+function doUndo() {
+  if (!undoStack.length) return;
+  const s = undoStack.pop();
+  tiles = s.tiles; stage.units = s.units; selUnit = null;
+  renderAll(); renderTab(); refreshValidation();
+}
+function paintAt(x, y) {
+  const b = Math.max(1, +document.getElementById('brush').value);
+  const o = Math.floor((b - 1) / 2);
+  for (let dy = 0; dy < b; dy++) for (let dx = 0; dx < b; dx++) {
+    const nx = x - o + dx, ny = y - o + dy;
+    if (nx >= 0 && ny >= 0 && nx < W && ny < H) tiles[ny][nx] = curChar;
+  }
+}
+function floodFill(x, y) {
+  const target = tiles[y][x];
+  if (target === curChar) return;
+  const st = [[x, y]];
+  while (st.length) {
+    const [cx, cy] = st.pop();
+    if (cx < 0 || cy < 0 || cx >= W || cy >= H || tiles[cy][cx] !== target) continue;
+    tiles[cy][cx] = curChar;
+    st.push([cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1]);
+  }
+}
+
+/* ═══════════════════════ 유닛 배치 ═══════════════════════ */
+function unitAt(x, y) {
+  const hit = allPlacedUnits().find(({ u }) => u.x === x && u.y === y);
+  return hit ? hit.u : null;
+}
+function placeOrSelect(x, y) {
+  const existing = unitAt(x, y);
+  if (existing) { selUnit = existing; switchTab('unit'); renderUnits(); return; }
+  pushUndo();
+  const u = {
+    commanderId: COMMANDERS[0] ? COMMANDERS[0].id : '',
+    classId: document.getElementById('placeClass').value || 'footman',
+    level: 1, troops: 100, items: [],
+    side: document.getElementById('placeSide').value || 'enemy',
+    x, y,
+  };
+  stage.units.push(u);
+  selUnit = u;
+  switchTab('unit');
+  renderUnits(); refreshValidation();
+  toast(`${SIDES[u.side].label} 유닛 배치 (${x},${y})`);
+}
+
+function bind() {
+  gridC.addEventListener('mousedown', e => {
+    const c = cellAt(e); if (!c) return;
+    if (coordPick) { const cb = coordPick.cb; coordPick = null; renderGrid(); cb(c[0], c[1]); return; }
+    if (mode === 'terrain') {
+      pushUndo();
+      if (tool === 'fill') floodFill(c[0], c[1]); else { painting = true; paintAt(c[0], c[1]); }
+      renderTerrain(); renderUnits();
+    } else {
+      placeOrSelect(c[0], c[1]);
+    }
+  });
+  window.addEventListener('mousemove', e => {
+    if (!painting) return;
+    const c = cellAt(e); if (c) { paintAt(c[0], c[1]); renderTerrain(); }
+  });
+  window.addEventListener('mouseup', () => { if (painting) { painting = false; refreshValidation(); } });
+
+  // 모드 전환
+  document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => {
+    mode = b.dataset.mode;
+    document.querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('on', x === b));
+    document.getElementById('terrainPanel').style.display = mode === 'terrain' ? '' : 'none';
+    document.getElementById('unitPanel').style.display = mode === 'unit' ? '' : 'none';
+    gridC.style.cursor = mode === 'terrain' ? 'crosshair' : 'pointer';
+    if (mode === 'unit') refreshUnitList();
+  });
+  // 지형 도구
+  document.querySelectorAll('[data-tool]').forEach(b => b.onclick = () => {
+    tool = b.dataset.tool;
+    document.querySelectorAll('[data-tool]').forEach(x => x.classList.toggle('on', x === b));
+  });
+  document.getElementById('undo').onclick = doUndo;
+  window.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); doUndo(); return; }
+    if (mode === 'terrain' && e.key >= '1' && e.key <= '9') { const t = TERRAINS[+e.key - 1]; if (t) selectTerrain(t[0]); }
+    if (e.key === 'Escape' && coordPick) { coordPick = null; renderGrid(); toast('좌표 집기 취소'); }
+  });
+  document.getElementById('cellpx').onchange = e => { cellPx = Math.max(6, Math.min(40, +e.target.value)); resizeCanvas(); renderAll(); };
+
+  document.getElementById('newStage').onclick = doNew;
+  document.getElementById('openStage').onclick = () => openFile('stage');
+  document.getElementById('openMap').onclick = () => openFile('map');
+  document.getElementById('saveStage').onclick = () => saveStageFile();
+  document.getElementById('saveMap').onclick = () => saveMapFile();
+  document.getElementById('expBlock').onclick = exportBlockout;
+  document.getElementById('pasteIn').onclick = () => openPaste(null);
+  document.getElementById('placeSide').onchange = () => {};
+
+  // 우측 탭
+  document.querySelectorAll('.tab').forEach(t => t.onclick = () => switchTab(t.dataset.tab));
+  // 붙여넣기 모달
+  document.getElementById('pasteCancel').onclick = closePaste;
+  document.getElementById('pasteAsStage').onclick = () => doPasteLoad('stage');
+  document.getElementById('pasteAsMap').onclick = () => doPasteLoad('map');
+  document.getElementById('pasteModal').onclick = e => { if (e.target.id === 'pasteModal') closePaste(); };
+}
+
+function switchTab(t) {
+  activeTab = t;
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x.dataset.tab === t));
+  renderTab();
+}
+
+/* ═══════════════════════ 통계 / 정보 ═══════════════════════ */
+function refreshStats() {
+  const cnt = {}; const total = W * H;
+  for (const row of tiles) for (const ch of row) cnt[ch] = (cnt[ch] || 0) + 1;
+  const el = document.getElementById('stats');
+  el.innerHTML = '';
+  Object.entries(cnt).sort((a, b) => b[1] - a[1]).forEach(([ch, n]) => {
+    const t = BY_CHAR[ch]; if (!t) return; const pct = (n / total * 100).toFixed(1);
+    const d = document.createElement('div');
+    d.innerHTML = `<div style="display:flex;justify-content:space-between;color:var(--dim);font-size:11px"><span>${t[1]}</span><span>${pct}%</span></div><div class="bar" style="width:${pct}%;background:${rgb(t[2])}"></div>`;
+    el.appendChild(d);
+  });
+}
+function refreshInfo() { document.getElementById('dims').textContent = `${W} × ${H}  (${cellPx}px)`; }
+
+function refreshUnitList() {
+  const el = document.getElementById('unitList'); if (!el) return;
+  el.innerHTML = '';
+  if (!stage.units.length) { el.innerHTML = '<span style="color:var(--dim)">아직 없음. 칸을 클릭해 배치.</span>'; return; }
+  stage.units.forEach((u) => {
+    const s = SIDES[u.side] || SIDES.enemy;
+    const d = document.createElement('div');
+    d.style.cssText = 'padding:3px 4px;border-radius:4px;cursor:pointer;display:flex;gap:6px;align-items:center';
+    if (u === selUnit) d.style.background = 'var(--panel2)';
+    d.innerHTML = `<span style="width:9px;height:9px;border-radius:50%;background:${s.raw};flex-shrink:0"></span>`
+      + `<span>${esc(u.commanderId)}</span><span style="color:var(--dim);margin-left:auto">${u.x},${u.y}</span>`;
+    d.onclick = () => { selUnit = u; switchTab('unit'); renderUnits(); refreshUnitList(); };
+    el.appendChild(d);
+  });
+}
+
+/* ═══════════════════════ 우측 인스펙터 (선언적) ═══════════════════════ */
+function renderTab() {
+  const body = document.getElementById('tabbody');
+  body.innerHTML = '';
+  if (activeTab === 'meta') renderMetaTab(body);
+  else if (activeTab === 'unit') renderUnitTab(body);
+  else if (activeTab === 'obj') renderObjTab(body);
+  else if (activeTab === 'duel') renderDuelTab(body);
+  else if (activeTab === 'adv') renderAdvTab(body);
+  refreshValidation();
+}
+
+/* 폼 헬퍼들 */
+function field(parent, label, hint, inputEl) {
+  const w = document.createElement('div'); w.className = 'field';
+  const l = document.createElement('label'); l.textContent = label; w.appendChild(l);
+  w.appendChild(inputEl);
+  if (hint) { const h = document.createElement('div'); h.className = 'hint'; h.textContent = hint; w.appendChild(h); }
+  parent.appendChild(w); return w;
+}
+function inputNum(val, oninput, attrs) {
+  const i = document.createElement('input'); i.type = 'number'; i.step = 1;
+  if (attrs) { if (attrs.min != null) i.min = attrs.min; if (attrs.max != null) i.max = attrs.max; }
+  i.value = (val == null ? '' : val);
+  i.oninput = () => oninput(i.value === '' ? null : Number(i.value));
+  return i;
+}
+function inputText(val, oninput) {
+  const i = document.createElement('input'); i.type = 'text'; i.value = val == null ? '' : val;
+  i.oninput = () => oninput(i.value);
+  return i;
+}
+function selectEl(options, val, oninput) {
+  const s = document.createElement('select');
+  options.forEach(o => { const op = document.createElement('option'); op.value = o.value; op.textContent = o.label; s.appendChild(op); });
+  s.value = val;
+  s.onchange = () => oninput(s.value);
+  return s;
+}
+function commanderOptions() { return COMMANDERS.map(c => ({ value: c.id, label: c.name === c.id ? c.id : `${c.name} (${c.id})` })); }
+function classOptions() { return CLASSES.map(c => ({ value: c.id, label: `${c.name} (${c.id})` })); }
+/** 배치 유닛(commanderId) 드롭다운 옵션 — 오타 방지용 참조 */
+function placedUnitOptions() {
+  const seen = new Set(); const out = [];
+  allPlacedUnits().forEach(({ u }) => { if (u.commanderId && !seen.has(u.commanderId)) { seen.add(u.commanderId); out.push({ value: u.commanderId, label: `${u.commanderId} (${SIDES[u.side].label})` }); } });
+  return out;
+}
+function duelOptions() { return (stage.events || []).map(e => ({ value: e.id, label: e.id })); }
+
+/* 좌표 집기 버튼 */
+function coordPickRow(parent, label, getX, getY, setXY) {
+  const w = document.createElement('div'); w.className = 'field';
+  const l = document.createElement('label'); l.textContent = label; w.appendChild(l);
+  const row = document.createElement('div'); row.className = 'row2';
+  const ix = inputNum(getX(), v => setXY(v == null ? 0 : v, getY()), { min: 0, max: W - 1 });
+  const iy = inputNum(getY(), v => setXY(getX(), v == null ? 0 : v), { min: 0, max: H - 1 });
+  row.appendChild(ix); row.appendChild(iy);
+  const pick = document.createElement('button'); pick.className = 'btn pickbtn'; pick.textContent = '집기';
+  pick.style.flex = '0 0 auto';
+  pick.onclick = () => {
+    coordPick = { cb: (x, y) => { setXY(x, y); renderTab(); toast(`좌표 (${x},${y})`); } };
+    renderGrid(); toast('격자에서 칸을 클릭하세요 (Esc 취소)');
+  };
+  row.appendChild(pick);
+  w.appendChild(row);
+  parent.appendChild(w); return w;
+}
+
+/* ── 메타 탭 ── */
+function renderMetaTab(b) {
+  field(b, 'stage id', '파일명 기준. 예: 05-sishuiguan', inputText(stage.id, v => { stage.id = v.trim(); refreshValidation(); }));
+  field(b, 'name', '표시 이름', inputText(stage.name, v => { stage.name = v; refreshValidation(); }));
+  field(b, 'mapId', 'map JSON의 id와 일치해야 함', inputText(stage.mapId, v => { stage.mapId = v.trim(); refreshValidation(); }));
+  field(b, 'turnLimit', '턴 제한 (정수 ≥1)', inputNum(stage.turnLimit, v => { stage.turnLimit = v; refreshValidation(); }, { min: 1 }));
+  field(b, 'levelCap (선택)', '이 스테이지 레벨캡 1~99. 비우면 미지정', inputNum(stage.levelCap, v => { stage.levelCap = v; refreshValidation(); }, { min: 1, max: 99 }));
+
+  const camHdr = document.createElement('div'); camHdr.className = 'sectlabel'; camHdr.textContent = '카메라 (선택)'; b.appendChild(camHdr);
+  const camChk = document.createElement('label'); camChk.style.cssText = 'display:flex;gap:6px;font-size:11.5px;color:var(--dim);margin-bottom:8px';
+  const cc = document.createElement('input'); cc.type = 'checkbox'; cc.style.width = 'auto'; cc.checked = !!stage.camera;
+  cc.onchange = () => { stage.camera = cc.checked ? { zoom: 1.5, focus: null } : null; renderTab(); };
+  camChk.appendChild(cc); camChk.appendChild(document.createTextNode('카메라 지정')); b.appendChild(camChk);
+  if (stage.camera) {
+    field(b, 'zoom', '초기 배율 (양수)', (() => { const i = document.createElement('input'); i.type = 'number'; i.step = '0.1'; i.value = stage.camera.zoom ?? ''; i.oninput = () => { stage.camera.zoom = i.value === '' ? undefined : Number(i.value); refreshValidation(); }; return i; })());
+    const hasFocus = Array.isArray(stage.camera.focus);
+    const fchk = document.createElement('label'); fchk.style.cssText = 'display:flex;gap:6px;font-size:11.5px;color:var(--dim);margin-bottom:6px';
+    const fc = document.createElement('input'); fc.type = 'checkbox'; fc.style.width = 'auto'; fc.checked = hasFocus;
+    fc.onchange = () => { stage.camera.focus = fc.checked ? [Math.floor(W / 2), Math.floor(H / 2)] : null; renderTab(); };
+    fchk.appendChild(fc); fchk.appendChild(document.createTextNode('focus 지정')); b.appendChild(fchk);
+    if (hasFocus) coordPickRow(b, 'focus [x,y]', () => stage.camera.focus[0], () => stage.camera.focus[1], (x, y) => { stage.camera.focus = [x, y]; refreshValidation(); });
+  }
+
+  const rwHdr = document.createElement('div'); rwHdr.className = 'sectlabel'; rwHdr.textContent = '보상 (선택)'; b.appendChild(rwHdr);
+  const rwChk = document.createElement('label'); rwChk.style.cssText = 'display:flex;gap:6px;font-size:11.5px;color:var(--dim);margin-bottom:8px';
+  const rc = document.createElement('input'); rc.type = 'checkbox'; rc.style.width = 'auto'; rc.checked = !!stage.reward;
+  rc.onchange = () => { stage.reward = rc.checked ? { gold: 0, exp: 0, treasures: [] } : null; renderTab(); };
+  rwChk.appendChild(rc); rwChk.appendChild(document.createTextNode('보상 지정')); b.appendChild(rwChk);
+  if (stage.reward) {
+    field(b, 'gold', '정수 ≥0', inputNum(stage.reward.gold, v => { stage.reward.gold = v == null ? 0 : v; refreshValidation(); }, { min: 0 }));
+    field(b, 'exp', '정수 ≥0', inputNum(stage.reward.exp, v => { stage.reward.exp = v == null ? 0 : v; refreshValidation(); }, { min: 0 }));
+    field(b, 'treasures (보물 item)', '복수 선택', multiItem(stage.reward.treasures, arr => { stage.reward.treasures = arr; refreshValidation(); }));
+  }
+
+  // 맵 메타 (블록아웃/맵 export용)
+  const mpHdr = document.createElement('div'); mpHdr.className = 'sectlabel'; mpHdr.textContent = '맵 (map JSON)'; b.appendChild(mpHdr);
+  field(b, 'map id', 'mapId와 보통 동일', inputText(mapId, v => { mapId = v.trim() || 'newmap'; refreshValidation(); }));
+  field(b, 'map name', '', inputText(mapName, v => { mapName = v; }));
+  const sizeRow = document.createElement('div'); sizeRow.className = 'row2';
+  sizeRow.appendChild((() => { const w = document.createElement('div'); w.className = 'field'; const l = document.createElement('label'); l.textContent = 'width'; w.appendChild(l); w.appendChild(inputNum(W, v => resizeGrid(v == null ? W : v, H), { min: 1, max: 120 })); return w; })());
+  sizeRow.appendChild((() => { const w = document.createElement('div'); w.className = 'field'; const l = document.createElement('label'); l.textContent = 'height'; w.appendChild(l); w.appendChild(inputNum(H, v => resizeGrid(W, v == null ? H : v), { min: 1, max: 120 })); return w; })());
+  b.appendChild(sizeRow);
+}
+
+function resizeGrid(nw, nh) {
+  nw = Math.max(1, Math.min(120, nw | 0)); nh = Math.max(1, Math.min(120, nh | 0));
+  const nt = blankTiles(nw, nh);
+  for (let y = 0; y < Math.min(H, nh); y++) for (let x = 0; x < Math.min(W, nw); x++) nt[y][x] = tiles[y][x];
+  tiles = nt; W = nw; H = nh;
+  // 범위 벗어난 유닛 클램프
+  allPlacedUnits().forEach(({ u }) => { u.x = Math.min(u.x, W - 1); u.y = Math.min(u.y, H - 1); });
+  resizeCanvas(); renderAll(); refreshValidation();
+}
+
+/* 멀티 아이템 선택 */
+function multiItem(selected, onchange) {
+  const box = document.createElement('div'); box.className = 'multi';
+  const sel = new Set(selected || []);
+  ITEMS.forEach(it => {
+    const l = document.createElement('label');
+    const c = document.createElement('input'); c.type = 'checkbox'; c.checked = sel.has(it.id);
+    c.onchange = () => { if (c.checked) sel.add(it.id); else sel.delete(it.id); onchange([...sel]); };
+    l.appendChild(c); l.appendChild(document.createTextNode(`${it.name === it.id ? it.id : it.name + ' (' + it.id + ')'}`));
+    box.appendChild(l);
+  });
+  // 추가로 selected 중 ITEMS에 없는 것도 표시 (외부 데이터 보존)
+  (selected || []).filter(id => !ITEMS.some(it => it.id === id)).forEach(id => {
+    const l = document.createElement('label');
+    const c = document.createElement('input'); c.type = 'checkbox'; c.checked = true;
+    c.onchange = () => { if (c.checked) sel.add(id); else sel.delete(id); onchange([...sel]); };
+    l.appendChild(c); l.appendChild(document.createTextNode(`${id} (미정의)`));
+    box.appendChild(l);
+  });
+  return box;
+}
+
+/* ── 유닛 탭 ── */
+function renderUnitTab(b) {
+  if (!selUnit) { b.innerHTML = '<div style="color:var(--dim);padding:14px 2px;line-height:1.6">유닛 모드(좌측)에서 격자 칸을 클릭해 배치하거나, 배치된 유닛을 클릭해 선택하세요.</div>'; return; }
+  const u = selUnit;
+  const head = document.createElement('div'); head.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:9px';
+  const s = SIDES[u.side];
+  head.innerHTML = `<span class="ptag" style="background:${s.raw};color:#fff">${s.label}</span>`;
+  const del = document.createElement('button'); del.className = 'btn warn'; del.textContent = '삭제'; del.style.padding = '3px 9px';
+  del.onclick = () => { pushUndo(); removeUnit(u); selUnit = null; renderUnits(); renderTab(); refreshUnitList(); toast('유닛 삭제'); };
+  head.appendChild(del); b.appendChild(head);
+
+  field(b, 'commanderId', 'commanders.json 참조', selectEl(commanderOptions(), u.commanderId, v => { u.commanderId = v; renderUnits(); refreshUnitList(); refreshValidation(); }));
+  field(b, 'classId', 'unitClasses.json 참조', selectEl(classOptions(), u.classId, v => { u.classId = v; refreshValidation(); }));
+  field(b, 'side', '아군/우군/적군', selectEl(SIDE_KEYS.map(k => ({ value: k, label: `${SIDES[k].label} (${k})` })), u.side, v => { u.side = v; renderUnits(); refreshUnitList(); renderTab(); }));
+  const lr = document.createElement('div'); lr.className = 'row2';
+  lr.appendChild((() => { const w = document.createElement('div'); w.className = 'field'; const l = document.createElement('label'); l.textContent = 'level (1~99)'; w.appendChild(l); w.appendChild(inputNum(u.level, v => { u.level = v; refreshValidation(); }, { min: 1, max: 99 })); return w; })());
+  lr.appendChild((() => { const w = document.createElement('div'); w.className = 'field'; const l = document.createElement('label'); l.textContent = 'troops (≥1)'; w.appendChild(l); w.appendChild(inputNum(u.troops, v => { u.troops = v; refreshValidation(); }, { min: 1 })); return w; })());
+  b.appendChild(lr);
+  coordPickRow(b, '위치 [x,y]', () => u.x, () => u.y, (x, y) => { u.x = x; u.y = y; renderUnits(); refreshUnitList(); refreshValidation(); });
+  field(b, 'items', '소지 아이템(복수)', multiItem(u.items, arr => { u.items = arr; refreshValidation(); }));
+}
+function removeUnit(u) {
+  const i = stage.units.indexOf(u);
+  if (i >= 0) { stage.units.splice(i, 1); return; }
+  (stage.reinforcements || []).forEach(r => { const j = (r.units || []).indexOf(u); if (j >= 0) r.units.splice(j, 1); });
+}
+
+/* ── 목표/패배 탭 ── */
+function renderObjTab(b) {
+  const oh = document.createElement('div'); oh.className = 'sectlabel'; oh.textContent = '승리 목표 (objectives — AND)'; b.appendChild(oh);
+  (stage.objectives || []).forEach((o, i) => b.appendChild(objCard(o, i)));
+  const add = document.createElement('button'); add.className = 'addbtn'; add.textContent = '＋ 목표 추가';
+  add.onclick = () => { (stage.objectives = stage.objectives || []).push({ kind: 'defeatAll', optional: false }); renderTab(); };
+  b.appendChild(add);
+
+  const fh = document.createElement('div'); fh.className = 'sectlabel'; fh.style.marginTop = '14px'; fh.textContent = '패배 조건 (failConditions — OR)'; b.appendChild(fh);
+  (stage.failConditions || []).forEach((f, i) => b.appendChild(failCard(f, i)));
+  const addf = document.createElement('button'); addf.className = 'addbtn'; addf.textContent = '＋ 패배조건 추가';
+  addf.onclick = () => { (stage.failConditions = stage.failConditions || []).push({ kind: 'unitRetreated', unitId: '' }); renderTab(); };
+  b.appendChild(addf);
+}
+const OBJ_KINDS = [
+  { value: 'defeatAll', label: '전멸 (defeatAll)' },
+  { value: 'defeatUnit', label: '특정 유닛 격파 (defeatUnit)' },
+  { value: 'reachTile', label: '칸 도달 (reachTile)' },
+  { value: 'surviveTurns', label: '턴 버티기 (surviveTurns)' },
+  { value: 'captureTile', label: '칸 점령 (captureTile)' },
+];
+function objCard(o, i) {
+  const card = document.createElement('div'); card.className = 'card';
+  const del = document.createElement('button'); del.className = 'del'; del.textContent = '×';
+  del.onclick = () => { stage.objectives.splice(i, 1); renderTab(); };
+  card.appendChild(del);
+  field(card, 'kind', null, selectEl(OBJ_KINDS, o.kind, v => { convertObj(o, v); renderTab(); }));
+  if (o.kind === 'defeatUnit') field(card, 'unitId (격파 대상)', '배치 유닛 참조', selectEl(placedUnitOptions(), o.unitId, v => { o.unitId = v; refreshValidation(); }));
+  if (o.kind === 'reachTile') {
+    field(card, 'unitId (선택, 비우면 아무 아군)', '', selectEl([{ value: '', label: '(아무 아군)' }, ...placedUnitOptions()], o.unitId || '', v => { o.unitId = v || undefined; refreshValidation(); }));
+    coordPickRow(card, '도달 [x,y]', () => o.x ?? 0, () => o.y ?? 0, (x, y) => { o.x = x; o.y = y; refreshValidation(); });
+  }
+  if (o.kind === 'surviveTurns') field(card, 'turns (≥1)', '', inputNum(o.turns ?? 1, v => { o.turns = v; refreshValidation(); }, { min: 1 }));
+  if (o.kind === 'captureTile') {
+    coordPickRow(card, '점령 [x,y]', () => o.x ?? 0, () => o.y ?? 0, (x, y) => { o.x = x; o.y = y; refreshValidation(); });
+    field(card, 'side (점령 진영)', '', selectEl(SIDE_KEYS.map(k => ({ value: k, label: SIDES[k].label })), o.side || 'player', v => { o.side = v; refreshValidation(); }));
+  }
+  const opt = document.createElement('label'); opt.style.cssText = 'display:flex;gap:6px;font-size:11px;color:var(--dim)';
+  const oc = document.createElement('input'); oc.type = 'checkbox'; oc.style.width = 'auto'; oc.checked = !!o.optional;
+  oc.onchange = () => { o.optional = oc.checked; };
+  opt.appendChild(oc); opt.appendChild(document.createTextNode('optional (보너스 목표)')); card.appendChild(opt);
+  return card;
+}
+function convertObj(o, kind) {
+  Object.keys(o).forEach(k => { if (k !== 'optional') delete o[k]; });
+  o.kind = kind;
+  if (kind === 'defeatUnit') o.unitId = '';
+  if (kind === 'reachTile') { o.x = 0; o.y = 0; }
+  if (kind === 'surviveTurns') o.turns = 1;
+  if (kind === 'captureTile') { o.x = 0; o.y = 0; o.side = 'player'; }
+}
+const FAIL_KINDS = [
+  { value: 'unitRetreated', label: '유닛 퇴각 (unitRetreated)' },
+  { value: 'allRetreated', label: '전원 퇴각 (allRetreated)' },
+  { value: 'turnLimitExceeded', label: '턴 초과 (turnLimitExceeded)' },
+];
+function failCard(f, i) {
+  const card = document.createElement('div'); card.className = 'card';
+  const del = document.createElement('button'); del.className = 'del'; del.textContent = '×';
+  del.onclick = () => { stage.failConditions.splice(i, 1); renderTab(); };
+  card.appendChild(del);
+  field(card, 'kind', null, selectEl(FAIL_KINDS, f.kind, v => { convertFail(f, v); renderTab(); }));
+  if (f.kind === 'unitRetreated') field(card, 'unitId', '배치 유닛 참조', selectEl(placedUnitOptions(), f.unitId, v => { f.unitId = v; refreshValidation(); }));
+  if (f.kind === 'allRetreated') field(card, 'unitIds (전부 퇴각 시 패배)', '복수 선택', multiPlacedUnit(f.unitIds, arr => { f.unitIds = arr; refreshValidation(); }));
+  return card;
+}
+function convertFail(f, kind) {
+  Object.keys(f).forEach(k => delete f[k]); f.kind = kind;
+  if (kind === 'unitRetreated') f.unitId = '';
+  if (kind === 'allRetreated') f.unitIds = [];
+}
+function multiPlacedUnit(selected, onchange) {
+  const box = document.createElement('div'); box.className = 'multi';
+  const sel = new Set(selected || []);
+  const opts = placedUnitOptions();
+  opts.forEach(o => {
+    const l = document.createElement('label');
+    const c = document.createElement('input'); c.type = 'checkbox'; c.checked = sel.has(o.value);
+    c.onchange = () => { if (c.checked) sel.add(o.value); else sel.delete(o.value); onchange([...sel]); };
+    l.appendChild(c); l.appendChild(document.createTextNode(o.label));
+    box.appendChild(l);
+  });
+  (selected || []).filter(id => !opts.some(o => o.value === id)).forEach(id => {
+    const l = document.createElement('label');
+    const c = document.createElement('input'); c.type = 'checkbox'; c.checked = true;
+    c.onchange = () => { if (c.checked) sel.add(id); else sel.delete(id); onchange([...sel]); };
+    l.appendChild(c); l.appendChild(document.createTextNode(`${id} (미배치)`));
+    box.appendChild(l);
+  });
+  return box;
+}
+
+/* ── 일기토 탭 ── */
+function renderDuelTab(b) {
+  const h = document.createElement('div'); h.className = 'sectlabel'; h.textContent = '일기토 (events: duel)'; b.appendChild(h);
+  (stage.events || []).forEach((e, i) => b.appendChild(duelCard(e, i)));
+  const add = document.createElement('button'); add.className = 'addbtn'; add.textContent = '＋ 일기토 추가';
+  add.onclick = () => {
+    const a = placedUnitOptions();
+    (stage.events = stage.events || []).push({
+      id: uniqueDuelId(),
+      type: 'duel',
+      trigger: { kind: 'attack', attackerId: a[0] ? a[0].value : '', defenderId: a[1] ? a[1].value : (a[0] ? a[0].value : '') },
+      outcome: { winnerId: a[0] ? a[0].value : '', loserRetreats: true },
+      once: true,
+    });
+    renderTab();
+  };
+  b.appendChild(add);
+}
+function uniqueDuelId() { let n = 1, id; do { id = `duel_${n++}`; } while ((stage.events || []).some(e => e.id === id)); return id; }
+function duelCard(e, i) {
+  const card = document.createElement('div'); card.className = 'card';
+  const del = document.createElement('button'); del.className = 'del'; del.textContent = '×';
+  del.onclick = () => { stage.events.splice(i, 1); renderTab(); };
+  card.appendChild(del);
+  field(card, 'id', '고유 식별자', inputText(e.id, v => { e.id = v.trim(); refreshValidation(); }));
+  const opts = placedUnitOptions();
+  field(card, 'attackerId', '공격자(배치 유닛)', selectEl(opts, e.trigger.attackerId, v => { e.trigger.attackerId = v; fixWinner(e); renderTab(); }));
+  field(card, 'defenderId', '방어자(배치 유닛)', selectEl(opts, e.trigger.defenderId, v => { e.trigger.defenderId = v; fixWinner(e); renderTab(); }));
+  field(card, 'winnerId', 'attacker 또는 defender여야 함', selectEl(
+    [{ value: e.trigger.attackerId, label: `${e.trigger.attackerId} (attacker)` }, { value: e.trigger.defenderId, label: `${e.trigger.defenderId} (defender)` }],
+    e.outcome.winnerId, v => { e.outcome.winnerId = v; refreshValidation(); }));
+  const lr = document.createElement('label'); lr.style.cssText = 'display:flex;gap:6px;font-size:11px;color:var(--dim);margin-bottom:6px';
+  const lc = document.createElement('input'); lc.type = 'checkbox'; lc.style.width = 'auto'; lc.checked = !!e.outcome.loserRetreats;
+  lc.onchange = () => { e.outcome.loserRetreats = lc.checked; }; lr.appendChild(lc); lr.appendChild(document.createTextNode('loserRetreats (패자 퇴각)')); card.appendChild(lr);
+  const oc = document.createElement('label'); oc.style.cssText = 'display:flex;gap:6px;font-size:11px;color:var(--dim)';
+  const occ = document.createElement('input'); occ.type = 'checkbox'; occ.style.width = 'auto'; occ.checked = !!e.once;
+  occ.onchange = () => { e.once = occ.checked; }; oc.appendChild(occ); oc.appendChild(document.createTextNode('once (1회만)')); card.appendChild(oc);
+  return card;
+}
+function fixWinner(e) { if (e.outcome.winnerId !== e.trigger.attackerId && e.outcome.winnerId !== e.trigger.defenderId) e.outcome.winnerId = e.trigger.attackerId; }
+
+/* ── 증원/전략 탭 ── */
+function renderAdvTab(b) {
+  const rh = document.createElement('div'); rh.className = 'sectlabel'; rh.textContent = '증원 (reinforcements)'; b.appendChild(rh);
+  (stage.reinforcements || []).forEach((r, i) => b.appendChild(reinforceCard(r, i)));
+  const addr = document.createElement('button'); addr.className = 'addbtn'; addr.textContent = '＋ 증원 추가';
+  addr.onclick = () => { (stage.reinforcements = stage.reinforcements || []).push({ id: uniqueReinforceId(), side: 'enemy', units: [], trigger: { kind: 'turn', turn: 5 }, once: true }); renderTab(); };
+  b.appendChild(addr);
+
+  const sh = document.createElement('div'); sh.className = 'sectlabel'; sh.style.marginTop = '14px'; sh.textContent = '전략조건 (strategyConditions — 보물 게이트)'; b.appendChild(sh);
+  (stage.strategyConditions || []).forEach((s, i) => b.appendChild(strategyCard(s, i)));
+  const adds = document.createElement('button'); adds.className = 'addbtn'; adds.textContent = '＋ 전략조건 추가';
+  adds.onclick = () => { (stage.strategyConditions = stage.strategyConditions || []).push({ id: uniqueStratId(), description: '', trigger: { kind: 'duelOccurred', duelId: (stage.events[0] || {}).id || '' }, reward: { treasures: [] } }); renderTab(); };
+  b.appendChild(adds);
+}
+function uniqueReinforceId() { let n = 1, id; do { id = `reinf_${n++}`; } while ((stage.reinforcements || []).some(r => r.id === id)); return id; }
+function uniqueStratId() { let n = 1, id; do { id = `strat_${n++}`; } while ((stage.strategyConditions || []).some(s => s.id === id)); return id; }
+
+const REINF_TRIG = [
+  { value: 'turn', label: '특정 턴 (turn)' },
+  { value: 'unitDefeated', label: '유닛 격파 시 (unitDefeated)' },
+];
+function reinforceCard(r, i) {
+  const card = document.createElement('div'); card.className = 'card';
+  const del = document.createElement('button'); del.className = 'del'; del.textContent = '×';
+  del.onclick = () => { stage.reinforcements.splice(i, 1); selUnit = null; renderUnits(); renderTab(); };
+  card.appendChild(del);
+  field(card, 'id', null, inputText(r.id, v => { r.id = v.trim(); refreshValidation(); }));
+  field(card, 'side', null, selectEl(SIDE_KEYS.map(k => ({ value: k, label: SIDES[k].label })), r.side, v => { r.side = v; (r.units || []).forEach(u => u.side = v); renderUnits(); refreshValidation(); }));
+  field(card, 'trigger.kind', null, selectEl(REINF_TRIG, r.trigger.kind, v => { r.trigger = v === 'turn' ? { kind: 'turn', turn: 5 } : { kind: 'unitDefeated', unitId: '' }; renderTab(); }));
+  if (r.trigger.kind === 'turn') field(card, 'turn (≥1)', '', inputNum(r.trigger.turn, v => { r.trigger.turn = v; refreshValidation(); }, { min: 1 }));
+  if (r.trigger.kind === 'unitDefeated') field(card, 'unitId (이 유닛 격파 시)', '배치 유닛 참조', selectEl(placedUnitOptions(), r.trigger.unitId, v => { r.trigger.unitId = v; refreshValidation(); }));
+  // 증원 유닛 목록
+  const ul = document.createElement('div'); ul.style.cssText = 'font-size:11px;color:var(--dim);margin:6px 0';
+  ul.textContent = `증원 유닛 ${r.units.length}기` + (r.units.length ? '：' + r.units.map(u => u.commanderId).join(', ') : '');
+  card.appendChild(ul);
+  const addu = document.createElement('button'); addu.className = 'addbtn'; addu.textContent = '＋ 증원 유닛 추가(중앙 배치)';
+  addu.onclick = () => {
+    pushUndo();
+    const u = { commanderId: COMMANDERS[0] ? COMMANDERS[0].id : '', classId: 'footman', level: 1, troops: 100, items: [], side: r.side, x: Math.floor(W / 2), y: Math.floor(H / 2) };
+    r.units.push(u); selUnit = u; switchTab('unit'); renderUnits();
+    toast('증원 유닛 추가 — 유닛 탭에서 위치 설정');
+  };
+  card.appendChild(addu);
+  return card;
+}
+
+const STRAT_TRIG = [
+  { value: 'duelOccurred', label: '일기토 발동 (duelOccurred)' },
+  { value: 'duelsInOrder', label: '순서대로 일기토 (duelsInOrder)' },
+  { value: 'unitReachedTile', label: '유닛 칸 도달 (unitReachedTile)' },
+];
+function strategyCard(s, i) {
+  const card = document.createElement('div'); card.className = 'card';
+  const del = document.createElement('button'); del.className = 'del'; del.textContent = '×';
+  del.onclick = () => { stage.strategyConditions.splice(i, 1); renderTab(); };
+  card.appendChild(del);
+  field(card, 'id', null, inputText(s.id, v => { s.id = v.trim(); refreshValidation(); }));
+  field(card, 'description', '설명', inputText(s.description, v => { s.description = v; refreshValidation(); }));
+  field(card, 'trigger.kind', null, selectEl(STRAT_TRIG, s.trigger.kind, v => {
+    if (v === 'duelOccurred') s.trigger = { kind: 'duelOccurred', duelId: (stage.events[0] || {}).id || '' };
+    else if (v === 'duelsInOrder') s.trigger = { kind: 'duelsInOrder', duelIds: [] };
+    else s.trigger = { kind: 'unitReachedTile', unitId: '', x: 0, y: 0 };
+    renderTab();
+  }));
+  if (s.trigger.kind === 'duelOccurred') field(card, 'duelId', '정의된 일기토 참조', selectEl(duelOptions(), s.trigger.duelId, v => { s.trigger.duelId = v; refreshValidation(); }));
+  if (s.trigger.kind === 'duelsInOrder') field(card, 'duelIds (순서대로)', '복수 선택', multiDuel(s.trigger.duelIds, arr => { s.trigger.duelIds = arr; refreshValidation(); }));
+  if (s.trigger.kind === 'unitReachedTile') {
+    field(card, 'unitId', '배치 유닛 참조', selectEl(placedUnitOptions(), s.trigger.unitId, v => { s.trigger.unitId = v; refreshValidation(); }));
+    coordPickRow(card, '도달 [x,y]', () => s.trigger.x, () => s.trigger.y, (x, y) => { s.trigger.x = x; s.trigger.y = y; refreshValidation(); });
+  }
+  const rh = document.createElement('div'); rh.style.cssText = 'font-size:10.5px;color:var(--dim);margin:6px 0 3px'; rh.textContent = 'reward'; card.appendChild(rh);
+  field(card, 'treasures', '복수 선택', multiItem(s.reward.treasures, arr => { s.reward.treasures = arr; refreshValidation(); }));
+  field(card, 'gold (선택)', '비우면 미지정', inputNum(s.reward.gold, v => { if (v == null) delete s.reward.gold; else s.reward.gold = v; refreshValidation(); }, { min: 0 }));
+  return card;
+}
+function multiDuel(selected, onchange) {
+  const box = document.createElement('div'); box.className = 'multi';
+  const sel = new Set(selected || []);
+  duelOptions().forEach(o => {
+    const l = document.createElement('label');
+    const c = document.createElement('input'); c.type = 'checkbox'; c.checked = sel.has(o.value);
+    c.onchange = () => { if (c.checked) sel.add(o.value); else sel.delete(o.value); onchange([...sel]); };
+    l.appendChild(c); l.appendChild(document.createTextNode(o.value));
+    box.appendChild(l);
+  });
+  return box;
+}
+
+/* ═══════════════════════ 검증 (StageSchema 규칙 인라인) ═══════════════════════ */
+function validate() {
+  const errs = [];
+  const E = m => errs.push(m);
+  // 메타
+  if (!stage.id || !stage.id.trim()) E('stage.id 가 비어 있습니다.');
+  if (!stage.name || !stage.name.trim()) E('stage.name 이 비어 있습니다.');
+  if (!stage.mapId || !stage.mapId.trim()) E('stage.mapId 가 비어 있습니다.');
+  else if (mapId && stage.mapId !== mapId) E(`stage.mapId("${stage.mapId}") ≠ map.id("${mapId}").`);
+  if (!Number.isInteger(stage.turnLimit) || stage.turnLimit < 1) E('turnLimit 은 1 이상 정수여야 합니다.');
+  if (stage.levelCap != null && (!Number.isInteger(stage.levelCap) || stage.levelCap < 1 || stage.levelCap > 99)) E('levelCap 은 1~99 정수여야 합니다.');
+  if (stage.camera) {
+    if (stage.camera.zoom != null && !(stage.camera.zoom > 0)) E('camera.zoom 은 양수여야 합니다.');
+    if (Array.isArray(stage.camera.focus)) { const [fx, fy] = stage.camera.focus; if (!inBounds(fx, fy)) E(`camera.focus [${fx},${fy}] 가 맵 범위 밖.`); }
+  }
+  if (stage.reward) {
+    if (!Number.isInteger(stage.reward.gold) || stage.reward.gold < 0) E('reward.gold 은 0 이상 정수.');
+    if (!Number.isInteger(stage.reward.exp) || stage.reward.exp < 0) E('reward.exp 은 0 이상 정수.');
+  }
+  // 승리 조건 최소 1 (objectives 또는 legacy victory)
+  const hasObj = (stage.objectives && stage.objectives.length > 0);
+  if (!hasObj && !stage.victory) E('objectives(또는 legacy victory)가 최소 1개 있어야 합니다.');
+  // 유닛
+  if (!stage.units.length) E('유닛이 하나도 없습니다.');
+  allPlacedUnits().forEach(({ u }, i) => {
+    const tag = `유닛[${u.commanderId || '?'}]`;
+    if (!u.commanderId) E(`${tag} commanderId 비어 있음.`);
+    if (!u.classId) E(`${tag} classId 비어 있음.`);
+    if (!Number.isInteger(u.level) || u.level < 1 || u.level > 99) E(`${tag} level 1~99 정수 아님.`);
+    if (!Number.isInteger(u.troops) || u.troops < 1) E(`${tag} troops ≥1 정수 아님.`);
+    if (!SIDE_KEYS.includes(u.side)) E(`${tag} side 부적합.`);
+    if (!inBounds(u.x, u.y)) E(`${tag} 좌표 (${u.x},${u.y}) 가 맵 범위(0~${W - 1},0~${H - 1}) 밖.`);
+  });
+  // 좌표 중복 (같은 칸 2유닛 — 경고)
+  const occ = {};
+  allPlacedUnits().forEach(({ u }) => { const k = `${u.x},${u.y}`; if (occ[k]) E(`칸 (${k}) 에 유닛이 겹쳐 있습니다 (${occ[k]}, ${u.commanderId}).`); else occ[k] = u.commanderId; });
+  // 목표 좌표/참조
+  const placedIds = new Set(allPlacedUnits().map(({ u }) => u.commanderId));
+  (stage.objectives || []).forEach(o => {
+    if (o.kind === 'defeatUnit' && !o.unitId) E('objective.defeatUnit: unitId 비어 있음.');
+    if (o.kind === 'defeatUnit' && o.unitId && !placedIds.has(o.unitId)) E(`objective.defeatUnit unitId "${o.unitId}" 미배치.`);
+    if (o.kind === 'reachTile' && !inBounds(o.x, o.y)) E(`objective.reachTile (${o.x},${o.y}) 범위 밖.`);
+    if (o.kind === 'captureTile' && !inBounds(o.x, o.y)) E(`objective.captureTile (${o.x},${o.y}) 범위 밖.`);
+    if (o.kind === 'surviveTurns' && (!Number.isInteger(o.turns) || o.turns < 1)) E('objective.surviveTurns turns ≥1 정수 아님.');
+  });
+  (stage.failConditions || []).forEach(f => {
+    if (f.kind === 'unitRetreated' && !f.unitId) E('failCondition.unitRetreated: unitId 비어 있음.');
+    if (f.kind === 'allRetreated' && (!f.unitIds || !f.unitIds.length)) E('failCondition.allRetreated: unitIds 비어 있음.');
+  });
+  // 일기토
+  const duelIds = new Set();
+  (stage.events || []).forEach(e => {
+    if (!e.id) E('duel id 비어 있음.');
+    else if (duelIds.has(e.id)) E(`duel id 중복: ${e.id}`); else duelIds.add(e.id);
+    if (!e.trigger.attackerId) E(`duel ${e.id}: attackerId 비어 있음.`);
+    if (!e.trigger.defenderId) E(`duel ${e.id}: defenderId 비어 있음.`);
+    if (e.outcome.winnerId !== e.trigger.attackerId && e.outcome.winnerId !== e.trigger.defenderId)
+      E(`duel ${e.id}: winnerId 는 attacker/defender 중 하나여야 함.`);
+  });
+  // 증원
+  (stage.reinforcements || []).forEach(r => {
+    if (!r.id) E('reinforcement id 비어 있음.');
+    if (r.trigger.kind === 'turn' && (!Number.isInteger(r.trigger.turn) || r.trigger.turn < 1)) E(`reinforcement ${r.id}: turn ≥1 정수 아님.`);
+    if (r.trigger.kind === 'unitDefeated' && !r.trigger.unitId) E(`reinforcement ${r.id}: unitId 비어 있음.`);
+  });
+  // 전략조건
+  (stage.strategyConditions || []).forEach(s => {
+    if (!s.id) E('strategyCondition id 비어 있음.');
+    if (s.trigger.kind === 'duelOccurred' && !s.trigger.duelId) E(`strategyCondition ${s.id}: duelId 비어 있음.`);
+    if (s.trigger.kind === 'duelOccurred' && s.trigger.duelId && !duelIds.has(s.trigger.duelId)) E(`strategyCondition ${s.id}: duelId "${s.trigger.duelId}" 미정의.`);
+    if (s.trigger.kind === 'duelsInOrder' && (!s.trigger.duelIds || !s.trigger.duelIds.length)) E(`strategyCondition ${s.id}: duelIds 비어 있음.`);
+    if (s.trigger.kind === 'unitReachedTile' && !inBounds(s.trigger.x, s.trigger.y)) E(`strategyCondition ${s.id}: 좌표 범위 밖.`);
+  });
+  // 맵
+  if (!mapId || !mapId.trim()) E('map.id 가 비어 있습니다.');
+  if (tiles.length !== H || tiles.some(r => r.length !== W)) E('맵 tiles 크기 불일치.');
+  return errs;
+}
+function inBounds(x, y) { return Number.isInteger(x) && Number.isInteger(y) && x >= 0 && y >= 0 && x < W && y < H; }
+
+function refreshValidation() {
+  const errs = validate();
+  const b = document.getElementById('valbanner');
+  if (errs.length) {
+    b.className = 'on';
+    b.innerHTML = `⚠ ${errs.length}개 오류 (저장 차단):<br>` + errs.slice(0, 8).map(esc).join('<br>') + (errs.length > 8 ? '<br>…' : '');
+  } else {
+    b.className = 'on ok';
+    b.innerHTML = '✓ 검증 통과 — 저장 가능';
+  }
+  document.getElementById('saveStage').disabled = errs.length > 0;
+  document.getElementById('saveMap').disabled = errs.length > 0;
+  return errs.length === 0;
+}
+
+/* ═══════════════════════ 직렬화 ═══════════════════════ */
+function serializeUnit(u) {
+  return { commanderId: u.commanderId, classId: u.classId, level: u.level, troops: u.troops, items: u.items || [], side: u.side, x: u.x, y: u.y };
+}
+function serializeStage() {
+  const out = { id: stage.id, name: stage.name, mapId: stage.mapId, turnLimit: stage.turnLimit };
+  if (stage.camera) {
+    const cam = {};
+    if (stage.camera.zoom != null) cam.zoom = stage.camera.zoom;
+    if (Array.isArray(stage.camera.focus)) cam.focus = stage.camera.focus;
+    out.camera = cam;
+  }
+  if (stage.reward) out.reward = { gold: stage.reward.gold, exp: stage.reward.exp, treasures: stage.reward.treasures || [] };
+  if (stage.levelCap != null) out.levelCap = stage.levelCap;
+  out.units = stage.units.map(serializeUnit);
+  if (stage.objectives && stage.objectives.length) out.objectives = stage.objectives.map(o => {
+    const c = { kind: o.kind };
+    if (o.kind === 'defeatUnit') c.unitId = o.unitId;
+    if (o.kind === 'reachTile') { if (o.unitId) c.unitId = o.unitId; c.x = o.x; c.y = o.y; }
+    if (o.kind === 'surviveTurns') c.turns = o.turns;
+    if (o.kind === 'captureTile') { c.x = o.x; c.y = o.y; c.side = o.side || 'player'; }
+    if (o.optional) c.optional = true;
+    return c;
+  });
+  if (stage.failConditions && stage.failConditions.length) out.failConditions = stage.failConditions.map(f => {
+    if (f.kind === 'unitRetreated') return { kind: f.kind, unitId: f.unitId };
+    if (f.kind === 'allRetreated') return { kind: f.kind, unitIds: f.unitIds };
+    return { kind: f.kind };
+  });
+  if (stage.reinforcements && stage.reinforcements.length) out.reinforcements = stage.reinforcements.map(r => ({
+    id: r.id, side: r.side, units: (r.units || []).map(serializeUnit), trigger: { ...r.trigger }, once: true,
+  }));
+  if (stage.strategyConditions && stage.strategyConditions.length) out.strategyConditions = stage.strategyConditions.map(s => {
+    const reward = { treasures: s.reward.treasures || [] };
+    if (s.reward.gold != null) reward.gold = s.reward.gold;
+    return { id: s.id, description: s.description, trigger: { ...s.trigger }, reward };
+  });
+  if (stage.victory) out.victory = stage.victory;
+  if (stage.defeat) out.defeat = stage.defeat;
+  out.events = (stage.events || []).map(e => ({
+    id: e.id, type: 'duel',
+    trigger: { kind: 'attack', attackerId: e.trigger.attackerId, defenderId: e.trigger.defenderId },
+    outcome: { winnerId: e.outcome.winnerId, loserRetreats: !!e.outcome.loserRetreats },
+    once: !!e.once,
+  }));
+  return JSON.stringify(out, null, 2) + '\n';
+}
+function serializeMap() {
+  // round-trip 보존: 불러온 맵이 있으면 그 legend(키 순서·미사용 키)를 그대로 기반으로 쓰고,
+  // 새로 등장한 char만 TERRAINS에서 보강. 신규 맵은 사용된 char만 TERRAINS 순서로.
+  const used = new Set(); tiles.forEach(r => r.forEach(ch => used.add(ch)));
+  let legend;
+  if (loadedLegend) {
+    legend = { ...loadedLegend };
+    TERRAINS.forEach(([ch, tid]) => { if (used.has(ch) && !(ch in legend)) legend[ch] = tid; });
+  } else {
+    legend = {}; TERRAINS.forEach(([ch, tid]) => { if (used.has(ch)) legend[ch] = tid; });
+  }
+  const map = { id: mapId, name: mapName, width: W, height: H, tileLegend: legend, tiles: tiles.map(r => r.join('')) };
+  return JSON.stringify(map, null, 2) + '\n';
+}
+
+/* ═══════════════════════ 로드 ═══════════════════════ */
+function loadStageObject(obj) {
+  if (!obj || typeof obj !== 'object') { toast('stage 객체가 아님', true); return false; }
+  stage = {
+    id: obj.id || 'stageXX', name: obj.name || '', mapId: obj.mapId || '',
+    turnLimit: obj.turnLimit ?? 30,
+    camera: obj.camera ? { zoom: obj.camera.zoom, focus: Array.isArray(obj.camera.focus) ? obj.camera.focus.slice() : null } : null,
+    reward: obj.reward ? { gold: obj.reward.gold ?? 0, exp: obj.reward.exp ?? 0, treasures: obj.reward.treasures || [] } : null,
+    levelCap: obj.levelCap ?? null,
+    units: (obj.units || []).map(u => ({ commanderId: u.commanderId, classId: u.classId, level: u.level, troops: u.troops, items: u.items || [], side: u.side, x: u.x, y: u.y })),
+    objectives: (obj.objectives || []).map(o => ({ ...o })),
+    failConditions: (obj.failConditions || []).map(f => ({ ...f })),
+    reinforcements: (obj.reinforcements || []).map(r => ({ id: r.id, side: r.side, trigger: { ...r.trigger }, once: true, units: (r.units || []).map(u => ({ commanderId: u.commanderId, classId: u.classId, level: u.level, troops: u.troops, items: u.items || [], side: u.side, x: u.x, y: u.y })) })),
+    strategyConditions: (obj.strategyConditions || []).map(s => ({ id: s.id, description: s.description, trigger: { ...s.trigger }, reward: { treasures: (s.reward && s.reward.treasures) || [], ...(s.reward && s.reward.gold != null ? { gold: s.reward.gold } : {}) } })),
+    victory: obj.victory || null,
+    defeat: obj.defeat || null,
+    events: (obj.events || []).map(e => ({ id: e.id, type: 'duel', trigger: { ...e.trigger }, outcome: { ...e.outcome }, once: e.once })),
+  };
+  selUnit = null; undoStack.length = 0;
+  renderAll(); renderTab(); refreshUnitList(); refreshValidation();
+  toast(`스테이지 "${stage.id}" 로드`);
+  return true;
+}
+function loadMapObject(m) {
+  if (!m || typeof m !== 'object' || !m.tiles) { toast('map 객체가 아님', true); return false; }
+  W = m.width; H = m.height; mapId = m.id || 'map'; mapName = m.name || mapId;
+  loadedLegend = (m.tileLegend && typeof m.tileLegend === 'object') ? { ...m.tileLegend } : null;
+  tiles = m.tiles.map(row => { const a = String(row).split(''); while (a.length < W) a.push('.'); return a.slice(0, W); });
+  while (tiles.length < H) tiles.push(Array(W).fill('.'));
+  selUnit = null; undoStack.length = 0;
+  resizeCanvas(); renderAll(); renderTab(); refreshValidation();
+  toast(`맵 "${mapId}" 로드 (${W}×${H})`);
+  return true;
+}
+
+/* ═══════════════════════ 파일 I/O ═══════════════════════ */
+async function openFile(kind) {
+  if (!hasFS) { openPaste(kind); return; }
+  try {
+    const [h] = await window.showOpenFilePicker({ types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] });
+    const text = await (await h.getFile()).text();
+    const obj = JSON.parse(text);
+    if (kind === 'stage') { stageHandle = h; loadStageObject(obj); }
+    else { mapHandle = h; loadMapObject(obj); }
+  } catch (e) { if (e.name !== 'AbortError') toast('열기 실패: ' + e.message, true); }
+}
+async function saveStageFile() {
+  if (!refreshValidation()) { toast('오류가 있어 저장 차단됨', true); return; }
+  const txt = serializeStage();
+  if (!hasFS) { openPasteExport(txt, `${stage.id}.json`); return; }
+  try {
+    if (!stageHandle) stageHandle = await window.showSaveFilePicker({ suggestedName: `${stage.id}.json`, types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] });
+    const w = await stageHandle.createWritable(); await w.write(txt); await w.close();
+    toast(`stage 저장 → ${stageHandle.name}`);
+  } catch (e) { if (e.name !== 'AbortError') toast('저장 실패: ' + e.message, true); }
+}
+async function saveMapFile() {
+  if (!refreshValidation()) { toast('오류가 있어 저장 차단됨', true); return; }
+  const txt = serializeMap();
+  if (!hasFS) { openPasteExport(txt, `${mapId}.json`); return; }
+  try {
+    if (!mapHandle) mapHandle = await window.showSaveFilePicker({ suggestedName: `${mapId}.json`, types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] });
+    const w = await mapHandle.createWritable(); await w.write(txt); await w.close();
+    toast(`map 저장 → ${mapHandle.name}`);
+  } catch (e) { if (e.name !== 'AbortError') toast('저장 실패: ' + e.message, true); }
+}
+function download(name, blob) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); }
+function exportBlockout() {
+  const C = 24;
+  const cv = document.createElement('canvas'); cv.width = W * C; cv.height = H * C;
+  const c = cv.getContext('2d');
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const t = BY_CHAR[tiles[y][x]] || BY_CHAR['.']; c.fillStyle = rgb(t[2]); c.fillRect(x * C, y * C, C, C); }
+  cv.toBlob(bl => { download(`layout_${mapId}.png`, bl); toast(`layout_${mapId}.png — Gemini img2img 입력`); });
+}
+
+/* ═══════════════════════ 붙여넣기 폴백 ═══════════════════════ */
+function openPaste(kind) {
+  pasteTarget = kind;
+  document.getElementById('pasteArea').value = '';
+  document.getElementById('pasteModal').classList.add('on');
+}
+function openPasteExport(txt, fname) {
+  document.getElementById('pasteArea').value = txt;
+  document.getElementById('pasteDesc').textContent = `File System Access 미지원 — 아래 내용을 복사해 ${fname} 로 저장하세요.`;
+  document.getElementById('pasteModal').classList.add('on');
+}
+function closePaste() { document.getElementById('pasteModal').classList.remove('on'); }
+function doPasteLoad(kind) {
+  const txt = document.getElementById('pasteArea').value.trim();
+  if (!txt) { closePaste(); return; }
+  try { const obj = JSON.parse(txt); if (kind === 'stage' ? loadStageObject(obj) : loadMapObject(obj)) closePaste(); }
+  catch (e) { toast('JSON 파싱 실패: ' + e.message, true); }
+}
+
+/* ═══════════════════════ 새로 ═══════════════════════ */
+function doNew() {
+  if (!confirm('새 스테이지로 초기화할까요? (저장 안 한 내용은 사라집니다)')) return;
+  const w = +prompt('맵 너비(칸)', W) || W;
+  const h = +prompt('맵 높이(칸)', H) || H;
+  W = Math.max(8, Math.min(120, w)); H = Math.max(8, Math.min(120, h));
+  const nid = (prompt('stage id', 'stageXX') || 'stageXX').trim();
+  mapId = nid; mapName = nid; loadedLegend = null;
+  tiles = blankTiles(W, H);
+  stage = newStageMeta(); stage.id = nid; stage.name = nid; stage.mapId = nid;
+  selUnit = null; undoStack.length = 0; stageHandle = null; mapHandle = null;
+  resizeCanvas(); renderAll(); renderTab(); refreshUnitList(); refreshValidation();
+  toast('새 스테이지');
+}
+
+/* ═══════════════════════ 유틸 ═══════════════════════ */
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+let toastT = null;
+function toast(m, bad) { const t = document.getElementById('toast'); t.textContent = m; t.className = bad ? 'bad' : ''; t.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', 2600); }
+window.addEventListener('beforeunload', e => { if (stage.units.length || tiles.some(r => r.some(ch => ch !== '.'))) { e.preventDefault(); e.returnValue = ''; } });
+
+init();
+</script>
+</body>
+</html>
