@@ -12,6 +12,14 @@ const COUNTER_TINT = 0xffb74d; // 반격 데미지 색 구분 (설계 §6)
 const NORMAL_TINT = 0xffffff;
 const HEAL_TINT = 0x7bd88f; // 회복 팝업 색 (초록)
 
+// 격파/퇴각 VFX (§11 "흰빛+연두 파편으로 흩어지며 소멸") — 순수 표현, 게임상태 불변
+const RETREAT_MS = 600;
+const RETREAT_SHARDS = 10;
+const RETREAT_SHARD_DIST = 34; // px — 파편 비산 거리
+const RETREAT_FLASH_R = 24; // px — 중심 섬광 반경
+const SHARD_LIGHT = 0xffffff; // 흰빛
+const SHARD_GREEN = 0xa7e8b0; // 연두 파편
+
 export class FxLayer {
   /** 카메라 변환 하 — 데미지 팝업 */
   readonly world = new Container();
@@ -102,6 +110,56 @@ export class FxLayer {
       })
       .then(() => {
         captured.visible = false;
+      });
+  }
+
+  /**
+   * 격파/퇴각 버스트 (§11) — 중심 섬광 + 파편(흰빛/연두) 방사 흩어짐 + 페이드.
+   * 월드 공간(카메라 변환 하). 순수 표현: 게임 상태 불변, TweenRunner 경유라 배속(timeScale) 존중.
+   * 즉사 아님(설계 §10 퇴각만) — 톤은 "소멸"이되 잔혹X.
+   */
+  retreatBurst(at: WorldPoint): Promise<void> {
+    const root = new Container();
+    root.position.set(at.x, at.y);
+
+    // 중심 섬광 (흰빛 원)
+    const flash = new Graphics();
+    flash.circle(0, 0, RETREAT_FLASH_R).fill({ color: SHARD_LIGHT, alpha: 0.9 });
+    root.addChild(flash);
+
+    // 파편 — 각도 균등 분산, 흰빛/연두 교차
+    const shards: { g: Graphics; vx: number; vy: number }[] = [];
+    for (let i = 0; i < RETREAT_SHARDS; i++) {
+      const ang = (i / RETREAT_SHARDS) * Math.PI * 2 + (i % 2) * 0.4;
+      const g = new Graphics();
+      const size = 3 + (i % 3);
+      g.rect(-size / 2, -size / 2, size, size).fill({
+        color: i % 2 === 0 ? SHARD_GREEN : SHARD_LIGHT,
+        alpha: 1,
+      });
+      g.rotation = ang;
+      root.addChild(g);
+      shards.push({ g, vx: Math.cos(ang) * RETREAT_SHARD_DIST, vy: Math.sin(ang) * RETREAT_SHARD_DIST });
+    }
+
+    this.world.addChild(root);
+    return this.tweens
+      .run(RETREAT_MS, (t) => {
+        // 섬광: 빠르게 확장하며 사라짐
+        const fs = 1 + t * 0.8;
+        flash.scale.set(fs);
+        flash.alpha = Math.max(0, 1 - t * 2.2);
+        // 파편: 바깥으로 + 살짝 위로(중력 역) 비산하며 페이드
+        const ease = 1 - (1 - t) * (1 - t); // ease-out
+        for (const s of shards) {
+          s.g.position.set(s.vx * ease, s.vy * ease - 6 * t);
+          s.g.alpha = Math.max(0, 1 - t);
+          s.g.scale.set(Math.max(0.2, 1 - t * 0.7));
+        }
+      })
+      .then(() => {
+        this.world.removeChild(root);
+        root.destroy({ children: true });
       });
   }
 

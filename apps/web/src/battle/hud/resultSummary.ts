@@ -26,9 +26,47 @@ export interface ResultSummary {
   turnsUsed: number;
   turnLimit: number;
   playerRetreats: number;
+  /**
+   * 연출 위계(설계 §12 "보상의 내용물은 설계대로, 전달 방식은 카지노처럼").
+   * 수치/등급은 그대로 두고, "얼마나 화려하게 깔지"만 등급·보상 규모에서 파생한다.
+   * ResultSequence가 잭팟 플래시·코인 물량·텍스트 강도를 이 값으로 차등한다.
+   */
+  fanfare: Fanfare;
+}
+
+/** 결산 연출 강도 — 순수 파생(난수 없음). 내용물 불변, 표현만 차등. */
+export interface Fanfare {
+  /** S등급 잭팟(금빛 플래시 + 최대 코인 물량). */
+  jackpot: boolean;
+  /** 0=차분 1=보통 2=화려 3=잭팟. 별 펀치 글로우·코인 수·exp 번쩍을 스케일. */
+  level: 0 | 1 | 2 | 3;
+  /** 코인 팝 개수(자금 규모·등급 기반, 표현용 상한). */
+  coinPops: number;
 }
 
 const STARS: Record<ResultSummary["grade"], number> = { S: 4, A: 3, B: 2, C: 1 };
+
+/** 등급 → 기본 연출 강도. S만 잭팟. */
+const GRADE_FANFARE: Record<ResultSummary["grade"], 0 | 1 | 2 | 3> = {
+  S: 3,
+  A: 2,
+  B: 1,
+  C: 0,
+};
+
+/**
+ * 연출 강도 파생(순수). 등급이 1차, 자금 규모가 코인 물량을 가산한다.
+ * 코인 팝은 표현이므로 6~14개로 클램프(너무 많으면 산만·성능).
+ */
+export function deriveFanfare(grade: ResultSummary["grade"], gold: number): Fanfare {
+  const level = GRADE_FANFARE[grade];
+  const g = Math.max(0, Math.floor(gold));
+  // 자금 0이면 코인 없음. 그 외 등급 베이스 + 자금 로그 스케일.
+  const base = level + 1; // C=1 … S=4
+  const byGold = g <= 0 ? 0 : Math.min(10, Math.round(Math.log10(g + 1) * 3));
+  const coinPops = g <= 0 ? 0 : Math.min(14, Math.max(6, base + byGold));
+  return { jackpot: grade === "S", level, coinPops };
+}
 
 /** 아군 페이즈 종료 시점 퇴각 아군 수 — vm.units에서 도출 */
 export function countPlayerRetreats(vm: BattleVM): number {
@@ -58,15 +96,17 @@ export function buildResultSummary(
     totalTreasures,
   });
 
+  const gold = reward?.gold ?? 0;
   return {
     grade,
     score,
     stars: STARS[grade],
-    gold: reward?.gold ?? 0,
+    gold,
     exp: reward?.exp ?? 0,
     treasures: treasureIds.map((id) => ({ id, name: items[id]?.name ?? id })),
     turnsUsed: vm.turn.turn,
     turnLimit: vm.turn.turnLimit,
     playerRetreats,
+    fanfare: deriveFanfare(grade, gold),
   };
 }

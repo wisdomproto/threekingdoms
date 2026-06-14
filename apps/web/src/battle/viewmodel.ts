@@ -3,9 +3,27 @@
  * committed가 연출보다 앞서가도 HUD 수치는 드레인 시점(settled)에만 갱신된다 — 스포일러 차단.
  * 반환값은 전부 직렬화 가능한 평면 객체 (useSyncExternalStore 스냅샷에 그대로 실린다).
  */
-import type { Side } from "@tk/data";
+import type { ClassGrades, Side } from "@tk/data";
 import { terrainAt, attackPower, defensePower, spiritPower } from "@tk/engine";
 import type { BattleContext, BattleState, UnitState } from "@tk/engine";
+
+/** 장비 탭 1행 — unit.items를 gameData.items 효과로 해석한 표시용 (UnitPanel §8 장비탭) */
+export interface ItemVM {
+  id: string;
+  name: string;
+  category: string;
+  /** 사람이 읽는 효과 요약 (예: "공격 +15%", "회복 80", "특수") */
+  effect: string;
+}
+
+/** 책략 탭 1행 — 병종 strategies를 gameData.strategies로 해석 (UnitPanel §8 책략탭) */
+export interface StrategyVM {
+  id: string;
+  name: string;
+  mp: number;
+  category: string;
+  target: "enemy" | "ally";
+}
 
 export interface UnitVM {
   id: string;
@@ -35,6 +53,31 @@ export interface UnitVM {
   rangeMax: number;
   terrainName: string;  // 현재 칸 지형명
   terrainGuard: number; // 지형 방어 보정 (0~0.5)
+  // ── 장수 패널 탭화(Tier 3 §8). 전부 optional — 기존 UnitVM 리터럴(테스트 등) 무파손 ──
+  classId?: string;             // 병종 id (특성/책략 탭 lookup 키)
+  grades?: ClassGrades;         // 병종 5스탯 등급 [공·방·정·순·사] (특성 탭 뱃지)
+  equipment?: ItemVM[];         // 소지품(장비/소모품) 해석 목록 (장비 탭)
+  strategies?: StrategyVM[];    // 병종 보유 책략 해석 목록 (책략 탭)
+}
+
+/** 도구/장비 효과 요약 문구 — category + power/bonusPercent를 사람이 읽는 한 줄로 */
+function itemEffect(category: string, power: number, bonusPercent: number): string {
+  switch (category) {
+    case "weapon":
+      return bonusPercent > 0 ? `공격 +${bonusPercent}%` : "무기";
+    case "book":
+      return bonusPercent > 0 ? `정신 +${bonusPercent}%` : "병법서";
+    case "horse":
+      return "기동";
+    case "supplyItem":
+      return power < 255 ? `회복 ${power}` : "회복";
+    case "attackItem":
+      return power < 255 ? `피해 ${power}` : "공격 도구";
+    case "treasure":
+      return "보물";
+    default:
+      return "기타";
+  }
 }
 
 export interface TurnVM {
@@ -51,6 +94,28 @@ export interface BattleVM {
 
 export function unitVM(ctx: BattleContext, u: UnitState): UnitVM {
   const terrain = terrainAt(ctx, u.x, u.y);
+  const cls = ctx.data.unitClasses[u.classId];
+  // 소지품 → 장비 탭 행 (gameData.items 미등록 id는 id를 이름으로 폴백)
+  const equipment: ItemVM[] = u.items.map((id) => {
+    const it = ctx.data.items[id];
+    return {
+      id,
+      name: it?.name ?? id,
+      category: it?.category ?? "기타",
+      effect: it ? itemEffect(it.category, it.power, it.bonusPercent) : "—",
+    };
+  });
+  // 병종 책략 → 책략 탭 행 (strategies.json 해석)
+  const strategies: StrategyVM[] = (cls?.strategies ?? []).map((id) => {
+    const s = ctx.data.strategies[id];
+    return {
+      id,
+      name: s?.name ?? id,
+      mp: s?.mp ?? 0,
+      category: s?.category ?? "—",
+      target: s?.target ?? "enemy",
+    };
+  });
   return {
     id: u.id,
     name: ctx.data.commanders[u.id]?.name ?? u.id,
@@ -77,6 +142,10 @@ export function unitVM(ctx: BattleContext, u: UnitState): UnitVM {
     rangeMax: u.rangeMax,
     terrainName: terrain.name,
     terrainGuard: terrain.guard,
+    classId: u.classId,
+    grades: cls?.grades,
+    equipment,
+    strategies,
   };
 }
 

@@ -521,7 +521,11 @@ export class BattleRenderer implements Presenter {
   async unitRetreated(e: Ev<"unitRetreated">): Promise<void> {
     const s = this.scene;
     if (!s) return;
-    await s.units.view(e.unitId).play("retreat");
+    // 격파/퇴각 VFX (§11): 유닛 위치에 흰빛+연두 파편 버스트를 retreat 모션과 병행.
+    // 순수 표현 — 게임 상태 불변, FxLayer가 TweenRunner로 배속(timeScale)을 존중한다.
+    const view = s.units.view(e.unitId);
+    const burstAt = gridToWorld({ x: view.gridX, y: view.gridY });
+    await Promise.all([view.play("retreat"), s.fx.retreatBurst(burstAt)]);
   }
 
   /**

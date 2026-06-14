@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import type { Item, StageReward } from "@tk/data";
 import type { BattleVM, UnitVM } from "../viewmodel";
-import { buildResultSummary, countPlayerRetreats } from "../hud/resultSummary";
+import { buildResultSummary, countPlayerRetreats, deriveFanfare } from "../hud/resultSummary";
 import { addMetaGold, readMetaGold } from "../hud/metaGold";
 
 function unit(partial: Partial<UnitVM>): UnitVM {
@@ -105,6 +105,52 @@ describe("buildResultSummary", () => {
     const c = buildResultSummary(vmWith(19, 20, [unit({ side: "player" })]), reward, ITEMS);
     expect(c.grade).toBe("C");
     expect(c.stars).toBe(1);
+  });
+
+  it("fanfare가 요약에 포함되고 S는 잭팟", () => {
+    const reward: StageReward = { gold: 300, exp: 50, treasures: ["무술교본"] };
+    const s = buildResultSummary(vmWith(4, 20, [unit({ side: "player" })]), reward, ITEMS);
+    expect(s.grade).toBe("S");
+    expect(s.fanfare.jackpot).toBe(true);
+    expect(s.fanfare.level).toBe(3);
+    expect(s.fanfare.coinPops).toBeGreaterThan(0);
+  });
+});
+
+describe("deriveFanfare (연출 강도 파생 — 순수, 내용물 불변)", () => {
+  it("S만 잭팟, 등급 내림차순으로 level 차등", () => {
+    expect(deriveFanfare("S", 100).jackpot).toBe(true);
+    expect(deriveFanfare("A", 100).jackpot).toBe(false);
+    expect(deriveFanfare("S", 100).level).toBe(3);
+    expect(deriveFanfare("A", 100).level).toBe(2);
+    expect(deriveFanfare("B", 100).level).toBe(1);
+    expect(deriveFanfare("C", 100).level).toBe(0);
+  });
+
+  it("자금 0이면 코인 팝 0(표현 억제)", () => {
+    expect(deriveFanfare("S", 0).coinPops).toBe(0);
+    expect(deriveFanfare("C", 0).coinPops).toBe(0);
+  });
+
+  it("코인 팝은 6~14로 클램프", () => {
+    for (const grade of ["S", "A", "B", "C"] as const) {
+      for (const gold of [1, 50, 300, 5000, 99999]) {
+        const f = deriveFanfare(grade, gold);
+        expect(f.coinPops).toBeGreaterThanOrEqual(6);
+        expect(f.coinPops).toBeLessThanOrEqual(14);
+      }
+    }
+  });
+
+  it("자금이 많을수록 코인 팝이 많거나 같다(단조 증가)", () => {
+    const lo = deriveFanfare("A", 50).coinPops;
+    const hi = deriveFanfare("A", 50000).coinPops;
+    expect(hi).toBeGreaterThanOrEqual(lo);
+  });
+
+  it("음수/소수 자금은 안전 처리(코인 0 또는 정상 범위)", () => {
+    expect(deriveFanfare("S", -100).coinPops).toBe(0);
+    expect(deriveFanfare("S", 12.9).coinPops).toBeGreaterThanOrEqual(6);
   });
 });
 

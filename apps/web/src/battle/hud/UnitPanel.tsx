@@ -4,9 +4,11 @@
  * 순수 표시 컴포넌트: settled 기반 BattleVM + InputState만 받아 그린다 (스토어 직접 접근 금지).
  * 표시 대상: selected/postMoveMenu/targetSelect의 unitId, idle의 inspectedId.
  */
+import { useState } from "react";
+import type { Grade } from "@tk/data";
 import type { InputState } from "../inputMachine";
 import { rangeGrid } from "../rangeGrid";
-import type { BattleVM, UnitVM } from "../viewmodel";
+import type { BattleVM, ItemVM, StrategyVM, UnitVM } from "../viewmodel";
 import { PANEL_FRAME, PORTRAIT_FRAME } from "./frames";
 
 /** 초상 보유 장수 (apps/web/public/assets/ui/portraits/{name}.webp). 생기는 대로 추가 */
@@ -209,41 +211,70 @@ function RangeGridMini({ unit }: { unit: UnitVM }): React.ReactElement {
   );
 }
 
-export function UnitPanel({ ui, vm }: { ui: InputState; vm: BattleVM }): React.ReactElement | null {
-  const id = activeUnitId(ui);
-  const unit = id ? (vm.units.find((u) => u.id === id) ?? null) : null;
-  if (!unit) return null;
+/** 탭 식별자 (§8 5탭 → v1 4탭 + 비활성 열전). 데이터 없는 lore는 "준비 중" */
+type TabId = "ability" | "equip" | "strategy" | "trait";
+
+const TABS: { id: TabId; label: string }[] = [
+  { id: "ability", label: "능력" },
+  { id: "equip", label: "장비" },
+  { id: "strategy", label: "책략" },
+  { id: "trait", label: "특성" },
+];
+
+/** 등급(S~D) 색 — S=금/A=청록/B=청/C=회/D=적갈 (특성 탭 뱃지) */
+function gradeColor(g: Grade): string {
+  switch (g) {
+    case "S": return "#e7c14b";
+    case "A": return "#5fd1b0";
+    case "B": return "#7aa7ff";
+    case "C": return "#9aa3ad";
+    default:  return "#c2795a";
+  }
+}
+
+function GradeBadge({ label, grade }: { label: string; grade: Grade }): React.ReactElement {
+  const c = gradeColor(grade);
   return (
-    <div style={PANEL_STYLE}>
-      <div style={{ display: "flex", gap: 8 }}>
-        {PORTRAIT_IDS.has(unit.name) ? <PortraitBox name={unit.name} /> : null}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-            <strong style={{ fontSize: 16 }}>{unit.name}</strong>
-            <span style={{ color: sideColor(unit.side) }}>
-              {sideLabel(unit.side)}
-            </span>
-          </div>
-          <div style={{ color: "#9aa3ad", fontSize: 12 }}>
-            {unit.className} · Lv.{unit.level}
-            {unit.acted ? " · 행동 완료" : ""}
-            {unit.retreated ? " · 퇴각" : ""}
-          </div>
-        </div>
-      </div>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, minWidth: 0 }}>
+      <span style={{ fontSize: 10, color: "#9aa3ad" }}>{label}</span>
+      <span
+        style={{
+          marginTop: 1,
+          minWidth: 20,
+          textAlign: "center",
+          fontSize: 13,
+          fontWeight: 800,
+          color: c,
+          border: `1px solid ${c}`,
+          borderRadius: 3,
+          padding: "0 2px",
+          background: "#16130f",
+        }}
+      >
+        {grade}
+      </span>
+    </div>
+  );
+}
+
+/** 탭 본문 공통 빈 상태 행 */
+function EmptyRow({ text }: { text: string }): React.ReactElement {
+  return <div style={{ fontSize: 12, color: "#6b727c", padding: "6px 0", textAlign: "center" }}>{text}</div>;
+}
+
+/** 능력 탭 — 기존 기본능력/파생/공격범위(설계 §8 능력+열전 통합 표시) */
+function AbilityTab({ unit }: { unit: UnitVM }): React.ReactElement {
+  return (
+    <>
       <TroopsBar unit={unit} />
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginTop: 4 }}>
         <span>MP</span>
-        <span>
-          {unit.mp} / {unit.maxMp}
-        </span>
+        <span>{unit.mp} / {unit.maxMp}</span>
       </div>
-      {/* ── 1계층: 기본능력(장수 원값) ── */}
       <div style={{ marginTop: 6, borderTop: "1px solid #2a2f36", paddingTop: 5 }}>
         <div style={{ fontSize: 10, color: "#7c8088", letterSpacing: 1 }}>기본능력</div>
         <BaseAbilities unit={unit} />
       </div>
-      {/* ── 2계층: 파생 능력치(전투 실값) + 공격범위 격자. 괄호=장수 원값 ── */}
       <div style={{ marginTop: 6, display: "flex", gap: 8, alignItems: "flex-start" }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 10, color: "#7c8088", letterSpacing: 1, marginBottom: 1 }}>파생</div>
@@ -259,11 +290,163 @@ export function UnitPanel({ ui, vm }: { ui: InputState; vm: BattleVM }): React.R
         </div>
         <RangeGridMini unit={unit} />
       </div>
-      <div style={{ fontSize: 12, marginTop: 2, color: "#9aa3ad" }}>
+      <div style={{ fontSize: 12, marginTop: 4, color: "#9aa3ad" }}>
         지형 <span style={{ color: "#c7cdd4" }}>{unit.terrainName}</span>
         {unit.terrainGuard > 0 ? (
           <span style={{ color: "#7ad99a" }}> · 방어 +{Math.round(unit.terrainGuard * 100)}%</span>
         ) : null}
+      </div>
+    </>
+  );
+}
+
+/** 장비 탭 — unit.equipment(해석된 소지품) 목록 (§8 장비 3슬롯) */
+function EquipTab({ items }: { items: ItemVM[] | undefined }): React.ReactElement {
+  if (!items || items.length === 0) return <EmptyRow text="소지품 없음" />;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 4, paddingTop: 2 }}>
+      {items.map((it, i) => (
+        <div
+          key={`${it.id}-${i}`}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 6,
+            background: "#161310",
+            border: "1px solid #3a352b",
+            borderRadius: 3,
+            padding: "3px 7px",
+          }}
+        >
+          <span style={{ fontSize: 13, color: "#e8e6e3", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {it.name}
+          </span>
+          <span style={{ fontSize: 11, color: "#c89b5a", flexShrink: 0 }}>{it.effect}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** 책략 탭 — 병종 strategies 목록 + MP (§8 책략. 무신처럼 비면 안내) */
+function StrategyTab({ strategies, mp }: { strategies: StrategyVM[] | undefined; mp: number }): React.ReactElement {
+  if (!strategies || strategies.length === 0) return <EmptyRow text="보유 책략 없음" />;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 4, paddingTop: 2 }}>
+      {strategies.map((s) => {
+        const affordable = mp >= s.mp;
+        return (
+          <div
+            key={s.id}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 6,
+              background: "#161310",
+              border: "1px solid #3a352b",
+              borderRadius: 3,
+              padding: "3px 7px",
+              opacity: affordable ? 1 : 0.5,
+            }}
+          >
+            <span style={{ fontSize: 13, color: s.target === "ally" ? "#7ad99a" : "#e8e6e3" }}>{s.name}</span>
+            <span style={{ fontSize: 11, color: affordable ? "#7aa7ff" : "#ff6b6b", flexShrink: 0 }}>MP {s.mp}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** 특성 탭 — 병종 5스탯 등급 뱃지 + 공격범위 격자 (§8 부대특성) */
+function TraitTab({ unit }: { unit: UnitVM }): React.ReactElement {
+  const g = unit.grades;
+  return (
+    <div style={{ paddingTop: 2 }}>
+      <div style={{ fontSize: 12, color: "#c7cdd4", marginBottom: 5 }}>
+        병종 <strong>{unit.className}</strong>
+      </div>
+      {g ? (
+        <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
+          <GradeBadge label="공격" grade={g.atk} />
+          <GradeBadge label="방어" grade={g.def} />
+          <GradeBadge label="정신" grade={g.spirit} />
+          <GradeBadge label="순발" grade={g.agility} />
+          <GradeBadge label="사기" grade={g.morale} />
+        </div>
+      ) : (
+        <EmptyRow text="등급 정보 없음" />
+      )}
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <RangeGridMini unit={unit} />
+      </div>
+    </div>
+  );
+}
+
+/** 탭 버튼 — 패널 내부 상태만 토글 (turn 상태기계 불오염). pointerEvents:auto로 탭은 클릭 가능 */
+function TabStrip({ active, onSelect }: { active: TabId; onSelect: (t: TabId) => void }): React.ReactElement {
+  return (
+    <div style={{ display: "flex", gap: 2, marginTop: 6, pointerEvents: "auto" }}>
+      {TABS.map((t) => {
+        const on = t.id === active;
+        return (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => onSelect(t.id)}
+            style={{
+              flex: 1,
+              minHeight: 26,
+              fontSize: 12,
+              fontWeight: on ? 700 : 500,
+              color: on ? "#16130f" : "#c7cdd4",
+              background: on ? "#c89b5a" : "#1d1a14",
+              border: "1px solid #3a352b",
+              borderBottom: on ? "1px solid #c89b5a" : "1px solid #3a352b",
+              borderRadius: "4px 4px 0 0",
+              cursor: "pointer",
+              touchAction: "manipulation",
+            }}
+          >
+            {t.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export function UnitPanel({ ui, vm }: { ui: InputState; vm: BattleVM }): React.ReactElement | null {
+  const [tab, setTab] = useState<TabId>("ability");
+  const id = activeUnitId(ui);
+  const unit = id ? (vm.units.find((u) => u.id === id) ?? null) : null;
+  if (!unit) return null;
+  return (
+    <div style={PANEL_STYLE}>
+      <div style={{ display: "flex", gap: 8 }}>
+        {PORTRAIT_IDS.has(unit.name) ? <PortraitBox name={unit.name} /> : null}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+            <strong style={{ fontSize: 16 }}>{unit.name}</strong>
+            <span style={{ color: sideColor(unit.side) }}>{sideLabel(unit.side)}</span>
+          </div>
+          <div style={{ color: "#9aa3ad", fontSize: 12 }}>
+            {unit.className} · Lv.{unit.level}
+            {unit.acted ? " · 행동 완료" : ""}
+            {unit.retreated ? " · 퇴각" : ""}
+          </div>
+        </div>
+      </div>
+      <TabStrip active={tab} onSelect={setTab} />
+      {/* 탭 본문 — 상단 경계는 활성 탭과 이어 보이게 */}
+      <div style={{ borderTop: "1px solid #c89b5a", paddingTop: 5 }}>
+        {tab === "ability" ? <AbilityTab unit={unit} /> : null}
+        {tab === "equip" ? <EquipTab items={unit.equipment} /> : null}
+        {tab === "strategy" ? <StrategyTab strategies={unit.strategies} mp={unit.mp} /> : null}
+        {tab === "trait" ? <TraitTab unit={unit} /> : null}
       </div>
     </div>
   );
