@@ -50,6 +50,11 @@ export class UnitLayer extends Container {
     return v;
   }
 
+  /** 미등록이면 throw 대신 undefined — 커맨드 메뉴 앵커 등 표현 전용 조회에 사용 */
+  tryView(id: string): UnitView | undefined {
+    return this.views.get(id);
+  }
+
   /** loadSprites() 완료 후 호출 — 폴백으로 생성된 뷰에 스프라이트 텍스처 적용 */
   refreshSprites(): void {
     for (const v of this.views.values()) v.refreshSprite();

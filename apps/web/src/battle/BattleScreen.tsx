@@ -12,7 +12,7 @@
  *
  * HUD는 useSyncExternalStore로 settled 기반 뷰모델 스냅샷만 구독 (설계 §4 스포일러 차단).
  */
-import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { gameData } from "@tk/data";
 import type { BattleContext, BattleEvent, BattleState, Coord } from "@tk/engine";
 import { BattleStore } from "./store";
@@ -25,7 +25,9 @@ import { InspectPopup } from "./hud/InspectPopup";
 import { AttackForecast } from "./hud/AttackForecast";
 import { ActionMenu } from "./hud/ActionMenu";
 import { TurnBanner } from "./hud/TurnBanner";
+import { ObjectiveBanner } from "./hud/ObjectiveBanner";
 import { ResultSequence } from "./hud/ResultSequence";
+import { DialogueOverlay } from "./dialogue/DialogueOverlay";
 import { BattleControls } from "./hud/BattleControls";
 import { Minimap } from "./hud/Minimap";
 import type { InputState } from "./inputMachine";
@@ -152,6 +154,20 @@ export default function BattleScreen(): React.ReactElement {
   const { ctx, store, delegate } = sessionRef.current;
 
   const mountRef = useRef<HTMLDivElement | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  // 컨테이너 크기(CSS px) — ActionMenu 좌/우 자동 전환·클램프 기준 (§174).
+  // 캔버스 좌표계와 동일 원점(컨테이너 좌상단)이라 menuAnchor와 좌표가 맞물린다.
+  const [viewport, setViewport] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const r = entries[0]?.contentRect;
+      if (r && r.width > 0 && r.height > 0) setViewport({ width: r.width, height: r.height });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const el = mountRef.current;
@@ -181,13 +197,27 @@ export default function BattleScreen(): React.ReactElement {
   const selectedId = activeUnitId(snap.ui);
 
   return (
-    <div style={{ position: "fixed", inset: 0, overflow: "hidden", background: "#1b1f24" }}>
+    <div
+      ref={rootRef}
+      style={{ position: "fixed", inset: 0, overflow: "hidden", background: "#1b1f24" }}
+    >
       <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
       <TurnBanner ui={snap.ui} vm={snap.vm} dispatch={dispatch} />
+      <ObjectiveBanner
+        vm={snap.vm}
+        stage={ctx.stage}
+        nameOf={(id) => ctx.data.commanders[id]?.name ?? id}
+      />
       <UnitPanel ui={snap.ui} vm={snap.vm} />
       <InspectPopup inspectedId={snap.inspectedId} activeId={selectedId} vm={snap.vm} />
       <AttackForecast ui={snap.ui} ctx={ctx} committed={store.committedState} />
-      <ActionMenu ui={snap.ui} dispatch={dispatch} previewWalking={snap.previewWalking} />
+      <ActionMenu
+        ui={snap.ui}
+        dispatch={dispatch}
+        anchor={snap.menuAnchor}
+        viewport={viewport}
+        previewWalking={snap.previewWalking}
+      />
       <div
         style={{
           position: "absolute",
@@ -208,6 +238,7 @@ export default function BattleScreen(): React.ReactElement {
           onCycleSpeed={cycleSpeed}
         />
       </div>
+      <DialogueOverlay store={store} dialogue={ctx.stage.dialogue} />
       <ResultSequence
         ui={snap.ui}
         vm={snap.vm}

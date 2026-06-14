@@ -100,6 +100,33 @@
   ],
   "objectives": [{ "kind": "defeatUnit", "unitId": "화웅" }],
   "failConditions": [{ "kind": "unitRetreated", "unitId": "유비" }],
+  "dialogue": [
+    {
+      "id": "intro_sishuiguan",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+        { "speaker": "원술", "side": "ally", "text": "한낱 짚신 장수 형제가 관문을 넘겠다고? 제후들의 술자리에 끼어들 자리는 없다." },
+        { "speaker": "유비", "side": "player", "text": "공을 다투러 온 것이 아니오. 화웅의 목을 베어 연합의 길을 트면 그뿐." },
+        { "speaker": "관우", "side": "player", "text": "형님, 저 자는 제게 맡기십시오. 술이 식기 전에 돌아오겠습니다." }
+      ]
+    },
+    {
+      "id": "duel_guanyu_huaxiong_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_huaxiong" },
+      "lines": [
+        { "speaker": "화웅", "side": "enemy", "text": "이름 없는 졸개가 감히 내 앞을 막아서느냐!" },
+        { "speaker": "관우", "side": "player", "text": "이름은 벤 뒤에 알려주마. 청룡언월도가 네 마지막 스승이 될 것이다." }
+      ]
+    },
+    {
+      "id": "outro_sishuiguan_victory",
+      "trigger": { "kind": "battleEnd", "result": "victory" },
+      "lines": [
+        { "speaker": "관우", "side": "player", "text": "약속대로, 술은 아직 따뜻합니다." },
+        { "speaker": "유비", "side": "player", "text": "오늘 이 이름, 천하가 기억하게 될 것이다." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_guanyu_huaxiong",

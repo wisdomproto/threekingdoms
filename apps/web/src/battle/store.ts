@@ -46,11 +46,31 @@ export interface BattleStoreOptions {
   onPreviewCancel?: (unitId: string, to: Coord) => void;
 }
 
+/**
+ * 커맨드 메뉴 앵커 (레퍼런스 §9 "유닛 옆 세로 리스트").
+ * 렌더러가 매 틱 활성 유닛의 스크린 좌표를 산출해 push — ActionMenu가 absolute로 따라가
+ * 카메라 팬/줌에 추종한다(§263 "카메라 행동 유닛 따라 팬").
+ * 좌표계 = 캔버스 CSS px (left=화면 좌, top=화면 상). 순수 데이터 — Pixi import 없음.
+ */
+export interface MenuAnchor {
+  /** 유닛 셀 중심의 스크린 x (CSS px) */
+  x: number;
+  /** 유닛 셀 중심의 스크린 y (CSS px) */
+  y: number;
+  /** 셀의 화면상 반폭(px) — 좌/우 자동 전환 시 유닛을 가리지 않게 메뉴를 셀 밖으로 밀어내는 거리 */
+  half: number;
+}
+
 export interface StoreSnapshot {
   ui: InputState;
   vm: BattleVM;
   /** 프리뷰 워크 진행 중 — ActionMenu·타깃 하이라이트 숨김 조건 */
   previewWalking: boolean;
+  /**
+   * 커맨드 메뉴 앵커 — 활성(이동/선택) 유닛의 스크린 좌표. 메뉴 비표시 상태면 null.
+   * 렌더러가 setMenuAnchor로 갱신(매 틱). ActionMenu가 읽어 absolute 위치 산출.
+   */
+  menuAnchor: MenuAnchor | null;
   /** 자동전투 ON 여부 — 컨트롤 버튼 표시 상태 */
   autoBattle: boolean;
   /** 연출 배속 (1·2·3) — 버튼 라벨 + 렌더러 연동 */
@@ -98,6 +118,8 @@ export class BattleStore {
   private _speed = 1;
   /** 조회(호버/탭) 중인 유닛 id — 순수 표현 채널 (Tier 1-2/1-3). inputMachine 무관 */
   private _inspectedId: string | null = null;
+  /** 커맨드 메뉴 앵커 — 렌더러가 매 틱 활성 유닛 스크린좌표를 push. 메뉴 비표시면 null */
+  private _menuAnchor: MenuAnchor | null = null;
 
   private listeners = new Set<() => void>();
   private snapshotCache: StoreSnapshot | null = null;
@@ -141,6 +163,31 @@ export class BattleStore {
 
   get inspectedId(): string | null {
     return this._inspectedId;
+  }
+
+  get menuAnchor(): MenuAnchor | null {
+    return this._menuAnchor;
+  }
+
+  /**
+   * 커맨드 메뉴 앵커 설정 (레퍼런스 §9·§263) — 렌더러가 매 틱 활성 유닛 스크린좌표를 push.
+   * 매 프레임 호출되므로 ε(0.5px) 이내 변화는 무시해 불필요한 React 리렌더를 막는다.
+   * 표현 전용 — inputMachine 전이를 일으키지 않는다.
+   */
+  setMenuAnchor(anchor: MenuAnchor | null): void {
+    const prev = this._menuAnchor;
+    if (prev === anchor) return;
+    if (prev && anchor) {
+      if (
+        Math.abs(prev.x - anchor.x) < 0.5 &&
+        Math.abs(prev.y - anchor.y) < 0.5 &&
+        Math.abs(prev.half - anchor.half) < 0.5
+      ) {
+        return;
+      }
+    }
+    this._menuAnchor = anchor;
+    this.notify();
   }
 
   /**
@@ -299,6 +346,7 @@ export class BattleStore {
         autoBattle: this._autoBattle,
         speed: this._speed,
         inspectedId: this._inspectedId,
+        menuAnchor: this._menuAnchor,
       };
     }
     return this.snapshotCache;

@@ -281,12 +281,58 @@ export const StrategyConditionSchema = z.object({
 });
 export type StrategyCondition = z.infer<typeof StrategyConditionSchema>;
 
+/**
+ * 스테이지 대사/스토리 (C — 레퍼런스 §344 말풍선 대화창 복제).
+ * 순수 표현 데이터 — 엔진/결정론 불변. apps/web의 대사 디렉터가 전투 진행을
+ * read-only로 구독하다가 트리거 충족 시 해당 dialogue를 큐잉, DialogueOverlay가
+ * 말풍선으로 한 줄씩 재생한다(탭→다음, 초상 좌/우, 화자명 파랑, 청동 액자).
+ *
+ * 트리거 종류 (레퍼런스 동작 충실 복제 — 전투 인트로/일기토/목표·패배 시점):
+ *  - battleStart: 전투 개시 직후 1회 (인트로 컷).
+ *  - battleEnd: 종료 시. result 지정 시 그 결과(victory|defeat)에만 발동, 생략 시 결과 무관.
+ *  - turn: 그 turn(아군 페이즈 진입)에 도달하면 1회.
+ *  - unitRetreated: 그 unitId가 퇴각하면 1회.
+ *  - duelOccurred: 그 duelId 일기토가 발동되면 1회 (duelHistory 기준).
+ * 각 dialogue는 한 번만 재생된다(디렉터가 id로 중복 방지).
+ */
+export const DialogueTriggerSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("battleStart") }),
+  z.object({ kind: z.literal("battleEnd"), result: z.enum(["victory", "defeat"]).optional() }),
+  z.object({ kind: z.literal("turn"), n: z.number().int().min(1) }),
+  z.object({ kind: z.literal("unitRetreated"), unitId: z.string() }),
+  z.object({ kind: z.literal("duelOccurred"), duelId: z.string() }),
+]);
+export type DialogueTrigger = z.infer<typeof DialogueTriggerSchema>;
+
+/**
+ * 대사 한 줄 (말풍선 1개 = 탭 1회).
+ *  - speaker: 화자명(파랑 글씨로 표시). text: 본문(검정).
+ *  - side: 초상 좌/우 코너 배치 결정 — player/ally=좌, enemy=우 (레퍼런스 §344 가변 코너).
+ *  - portraitId: 초상 이미지 키(선택). 미지정 시 화자명만.
+ */
+export const DialogueLineSchema = z.object({
+  speaker: z.string(),
+  side: SideSchema.optional(),
+  portraitId: z.string().optional(),
+  text: z.string(),
+});
+export type DialogueLine = z.infer<typeof DialogueLineSchema>;
+
+export const StageDialogueSchema = z.object({
+  id: z.string(),
+  trigger: DialogueTriggerSchema,
+  lines: z.array(DialogueLineSchema).min(1),
+});
+export type StageDialogue = z.infer<typeof StageDialogueSchema>;
+
 export const StageSchema = z.object({
   id: z.string(),
   name: z.string(),
   mapId: z.string(),
   turnLimit: z.number().int().min(1),
   camera: StageCameraSchema.optional(),
+  // 대사/스토리 (C — §344 말풍선). 순수 표현·하위호환(미지정 = 대사 없음). 디렉터가 read-only 구독.
+  dialogue: z.array(StageDialogueSchema).optional(),
   // 결산 보상 (선택 — 미지정 스테이지는 보상 없음으로 취급)
   reward: StageRewardSchema.optional(),
   // 이 스테이지에서의 레벨캡 (§10 — 스테이지 진행 연동). 미지정 시 엔진 기본 99.

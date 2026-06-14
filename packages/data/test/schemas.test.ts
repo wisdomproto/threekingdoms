@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   CommanderSchema, UnitClassSchema, TerrainSchema, ItemSchema,
   CombatConfigSchema, BattleMapSchema, StageSchema, StageEventSchema,
+  StageDialogueSchema,
 } from "../src/schemas";
 
 describe("스키마 v2 (원작 모델)", () => {
@@ -97,6 +98,55 @@ describe("스키마 v2 (원작 모델)", () => {
         reward: { treasures: ["적로"], gold: 200 },
       }],
       events: [],
+    })).not.toThrow();
+  });
+
+  it("C 대사: 5종 트리거 + 말풍선 라인 파싱", () => {
+    expect(() => StageDialogueSchema.parse({
+      id: "d1", trigger: { kind: "battleStart" },
+      lines: [{ speaker: "원술", side: "ally", text: "대사" }],
+    })).not.toThrow();
+    expect(() => StageDialogueSchema.parse({
+      id: "d2", trigger: { kind: "battleEnd", result: "victory" },
+      lines: [{ speaker: "관우", text: "이겼다" }],
+    })).not.toThrow();
+    expect(() => StageDialogueSchema.parse({
+      id: "d3", trigger: { kind: "turn", n: 3 },
+      lines: [{ speaker: "x", text: "y", portraitId: "p1" }],
+    })).not.toThrow();
+    expect(() => StageDialogueSchema.parse({
+      id: "d4", trigger: { kind: "duelOccurred", duelId: "duel_x" },
+      lines: [{ speaker: "화웅", side: "enemy", text: "졸개" }],
+    })).not.toThrow();
+    expect(() => StageDialogueSchema.parse({
+      id: "d5", trigger: { kind: "unitRetreated", unitId: "화웅" },
+      lines: [{ speaker: "유비", side: "player", text: "물러섰군" }],
+    })).not.toThrow();
+    // 잘못된 트리거 종류
+    expect(() => StageDialogueSchema.parse({
+      id: "bad", trigger: { kind: "nope" }, lines: [{ speaker: "x", text: "y" }],
+    })).toThrow();
+    // lines 비어있으면 거부
+    expect(() => StageDialogueSchema.parse({
+      id: "empty", trigger: { kind: "battleStart" }, lines: [],
+    })).toThrow();
+  });
+
+  it("C 대사: StageSchema에 dialogue 통합 + 하위호환(미지정 허용)", () => {
+    // dialogue 포함 스테이지
+    expect(() => StageSchema.parse({
+      id: "s", name: "s", mapId: "m", turnLimit: 30,
+      units: [{ commanderId: "관우", classId: "lightCavalry", level: 1, troops: 100,
+                items: [], side: "player", x: 0, y: 0 }],
+      objectives: [{ kind: "defeatAll" }],
+      dialogue: [{ id: "intro", trigger: { kind: "battleStart" },
+                  lines: [{ speaker: "유비", side: "player", text: "출진" }] }],
+      events: [],
+    })).not.toThrow();
+    // dialogue 미지정 — 기존 스테이지 무파손
+    expect(() => StageSchema.parse({
+      id: "s2", name: "s2", mapId: "m", turnLimit: 30,
+      units: [], victory: { kind: "defeatAll" }, events: [],
     })).not.toThrow();
   });
 

@@ -30,6 +30,25 @@ import { threatTiles } from "../battle/threatRange";
 
 type Ev<T extends BattleEvent["type"]> = Extract<BattleEvent, { type: T }>;
 
+/**
+ * 커맨드 메뉴(레퍼런스 §9 세로 리스트)가 떠 있는 ui 상태의 활성 유닛 id.
+ * postMoveMenu/strategyMenu/itemMenu + 표적 조준(targetSelect/strategyTarget/itemTarget)에서
+ * 메뉴/취소가 유닛 옆에 앵커된다. selected(이동범위만 표시)·기타 상태는 null.
+ */
+function menuUnitId(ui: InputState): string | null {
+  switch (ui.kind) {
+    case "postMoveMenu":
+    case "strategyMenu":
+    case "itemMenu":
+    case "targetSelect":
+    case "strategyTarget":
+    case "itemTarget":
+      return ui.unitId;
+    default:
+      return null;
+  }
+}
+
 /** BattleStore의 구조적 부분집합 — 클래스 직접 의존 대신 필요한 표면만 */
 export interface RendererStore {
   dispatchUi(event: UiEvent): void;
@@ -43,6 +62,11 @@ export interface RendererStore {
   readonly inspectedId: string | null;
   /** 호버/탭 조회 채널 (Tier 1-2). inputMachine 무관 — 좌표에 유닛 없으면 null */
   setInspected(unitId: string | null): void;
+  /**
+   * 커맨드 메뉴 앵커 (레퍼런스 §9·§263) — 활성 유닛의 스크린 좌표를 매 틱 push.
+   * 메뉴 비표시 상태면 null. ε 이내 변화는 store가 무시(불필요 리렌더 방지).
+   */
+  setMenuAnchor(anchor: { x: number; y: number; half: number } | null): void;
 }
 
 const PHASE_BANNER_MS = 600; // 설계 §6
@@ -299,10 +323,13 @@ export class BattleRenderer implements Presenter {
     };
     app.canvas.addEventListener("wheel", onWheel, { passive: false });
 
-    // 카메라 트윈 진행 + 청크 컬링 + 타격 흔들림
+    // 카메라 트윈 진행 + 청크 컬링 + 타격 흔들림 + 커맨드 메뉴 앵커 추종
     const tick = (): void => {
       const dt = app.ticker.deltaMS * this.speed; // 배속 시 카메라 추적·흔들림도 함께 가속
       camera.update(dt); // camera.apply()가 world.position을 base로 세팅
+      // 커맨드 메뉴 앵커 (레퍼런스 §9·§263): 활성 유닛 스크린좌표를 store에 push.
+      // shake 가산 전 camera.current 기준으로 투영해 메뉴가 타격 흔들림에 떨지 않게 한다.
+      this.updateMenuAnchor(camera, units);
       // 카메라 미세 흔들림: camera 적용 직후 world.position에 가산·감쇠 (camera.ts 불간섭).
       if (this.shakeAmp > 0.05) {
         this.shakePhase += dt * 0.06;
@@ -440,6 +467,34 @@ export class BattleRenderer implements Presenter {
     if (k === this.threatKey) return;
     this.threatKey = k;
     threat.setTiles(threatTiles(this.ctx, battle, u.id));
+  }
+
+  /**
+   * 커맨드 메뉴 앵커 갱신 (레퍼런스 §9 "유닛 옆 세로 리스트" + §263 "카메라 행동 유닛 따라 팬").
+   * 활성(메뉴 표시) ui 상태의 유닛을 그 **시각 위치**(UnitView gridX/gridY — 프리뷰 워크 반영)에서
+   * 스크린 px로 투영해 store에 push한다. shake 가산 전 camera.current 기준이라 흔들림에 떨지 않는다.
+   * 비표시 상태면 null. ε 이내 변화는 store.setMenuAnchor가 무시한다(불필요 리렌더 방지).
+   */
+  private updateMenuAnchor(camera: CameraController, units: UnitLayer): void {
+    const store = this.store;
+    if (!store) return;
+    const ui = store.uiState;
+    const unitId = menuUnitId(ui);
+    if (!unitId) {
+      store.setMenuAnchor(null);
+      return;
+    }
+    const view = units.tryView(unitId);
+    if (!view) {
+      store.setMenuAnchor(null);
+      return;
+    }
+    // 셀 중심 월드좌표 → 스크린 px (CSS px, 캔버스 좌상단 기준 = BattleScreen 컨테이너 기준)
+    const centerWorld = gridToWorld({ x: view.gridX, y: view.gridY });
+    const center = camera.worldToScreen(centerWorld);
+    // 셀의 화면상 반폭 = (타일/2) × 현재 줌. 좌/우 자동 전환 시 유닛을 가리지 않을 거리.
+    const half = (TILE_SIZE / 2) * camera.current.scale;
+    store.setMenuAnchor({ x: center.x, y: center.y, half });
   }
 
   /**

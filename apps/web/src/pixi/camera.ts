@@ -200,6 +200,11 @@ export class CameraController {
     return screenToWorld(this.state, p);
   }
 
+  /** 월드 px → 스크린 px (현재 카메라 상태 기준). 커맨드 메뉴 앵커 투영용 (레퍼런스 §9·§263) */
+  worldToScreen(p: Point): Point {
+    return worldToScreen(this.state, p);
+  }
+
   /** 컬링용 — 현재 뷰포트가 비추는 월드 좌표 rect */
   viewWorldRect(): { x: number; y: number; width: number; height: number } {
     const tl = screenToWorld(this.state, { x: 0, y: 0 });
