@@ -4,12 +4,12 @@
  * 메뉴가 유닛을 가리지 않고(셀 반폭+여백만큼 밀림) 화면 밖으로 나가지 않음을 보장한다.
  */
 import { describe, expect, it } from "vitest";
-import { placeMenu } from "../hud/ActionMenu";
+import { MENU_WIDTH, menuPanelHeight, placeMenu } from "../hud/ActionMenu";
 import type { MenuAnchor } from "../store";
 
 const VP = { width: 800, height: 600 };
 const HALF = 24; // 줌 1.0 기준 셀 반폭(48/2)
-const MENU_W = 96; // ActionMenu MENU_WIDTH와 동치(상수 동기화 가정)
+const MENU_W = MENU_WIDTH; // ActionMenu에서 직접 import — 상수 드리프트 방지
 
 function anchor(x: number, y: number): MenuAnchor {
   return { x, y, half: HALF };
@@ -41,7 +41,7 @@ describe("placeMenu — 좌/우 자동 전환(§174)", () => {
     const tall = placeMenu(anchor(400, 5), 8, VP); // 상단 근처
     expect(tall.top).toBeGreaterThanOrEqual(0);
     const low = placeMenu(anchor(400, VP.height - 5), 8, VP); // 하단 근처
-    const menuH = 8 * 46 + 7 * 6;
+    const menuH = menuPanelHeight(8);
     expect(low.top + menuH).toBeLessThanOrEqual(VP.height);
   });
 

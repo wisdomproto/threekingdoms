@@ -35,8 +35,9 @@ describe("우군(ally) 페이즈", () => {
     expect(store.uiState.kind).toBe("idle");
     expect(store.committedState.phase).toBe("player");
 
-    // 유비 wait → 턴 종료 → ally 페이즈로 진입, runAiPhases 기동
+    // 유비 wait → 턴 종료(확인 "예") → ally 페이즈로 진입, runAiPhases 기동
     store.dispatchUi({ type: "endTurnPressed" });
+    store.dispatchUi({ type: "endTurnConfirm" });
     await store.whenIdle(); // ally·enemy 페이즈가 끝나고 player로 복귀할 때까지
 
     // 한 라운드(player→ally→enemy) 완주 후 다시 player 입력 가능
@@ -48,6 +49,7 @@ describe("우군(ally) 페이즈", () => {
   it("우군이 ally 페이즈에 실제로 행동(적 추격/교전)해 actionLog에 우군 액션이 남는다", async () => {
     const store = new BattleStore(ctx, 7);
     store.dispatchUi({ type: "endTurnPressed" });
+    store.dispatchUi({ type: "endTurnConfirm" });
     await store.whenIdle();
     const allyActed = store.actionLog.some((a) => a.unitId === "공손찬");
     expect(allyActed).toBe(true);

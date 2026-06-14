@@ -25,6 +25,19 @@ const BAR_STYLE: React.CSSProperties = {
   userSelect: "none",
 };
 
+/** 스테이지명 배지 (§5 "스테이지명 배지(좌)") — 상태 띠 좌측 청동 알약 */
+const STAGE_BADGE_STYLE: React.CSSProperties = {
+  padding: "2px 10px",
+  borderRadius: 4,
+  border: "1px solid #6f5a34",
+  background: "rgba(20, 17, 12, 0.7)",
+  color: "#e8d9b0",
+  fontSize: 13,
+  fontWeight: 700,
+  letterSpacing: "0.04em",
+  whiteSpace: "nowrap",
+};
+
 const END_TURN_STYLE: React.CSSProperties = {
   position: "absolute",
   right: 12,
@@ -50,9 +63,19 @@ function phaseLabel(ui: InputState, vm: BattleVM): string {
   return vm.turn.phase === "player" ? "아군 페이즈" : vm.turn.phase === "ally" ? "우군 페이즈" : "적군 페이즈";
 }
 
-/** 진영 색조 (§11 진영별 화면 색조): 아군 파랑 / 우군 주황 / 적 빨강 */
+/**
+ * 풀스크린 페이즈 배너의 진영 색조 — 레퍼런스 §11 충실 복제:
+ *   "진영별 화면 색조 다름(적=청색조, 아군=흙/세피아조)".
+ * 이건 *피아식별 색*(아군 파랑/적 빨강 — 미니맵·패널·하단 텍스트 라벨에서 유지)이 아니라
+ * 페이즈 전체에 까는 **무드/온도 워시**다: 아군 차례=따뜻한 세피아(안전), 적 차례=차가운 청색조(위협).
+ * → 온도 단서라 적 유닛(빨강 점)과 충돌하지 않는다. (ux-fidelity-checklist §11 #5)
+ */
 function phaseTint(phase: Side): string {
-  return phase === "enemy" ? "#ff5a4d" : phase === "ally" ? "#ffa53d" : "#4da3ff";
+  return phase === "enemy"
+    ? "#5f93c4" // 적 = 청색조(차가운 강철빛)
+    : phase === "ally"
+      ? "#d8b24a" // 우군 = 따뜻한 금빛
+      : "#c2884c"; // 아군 = 흙/세피아조
 }
 function phaseBannerLabel(phase: Side, turn: number): string {
   return phase === "player" ? `아군 차례 — ${turn}턴`
@@ -160,10 +183,13 @@ export function TurnBanner({
   ui,
   vm,
   dispatch,
+  stageName,
 }: {
   ui: InputState;
   vm: BattleVM;
   dispatch: (e: UiEvent) => void;
+  /** 스테이지명 (§5 좌측 배지) — BattleScreen이 ctx.stage.name 전달 */
+  stageName?: string;
 }): React.ReactElement {
   const canEndTurn =
     ui.kind === "idle" && vm.turn.phase === "player" && vm.status === "ongoing";
@@ -171,9 +197,13 @@ export function TurnBanner({
     <>
       <PhaseFlash phase={vm.turn.phase} turn={vm.turn.turn} status={vm.status} />
       <div style={BAR_STYLE}>
-        <strong>
-          {vm.turn.turn}턴 <span style={{ color: "#9aa3ad" }}>/ {vm.turn.turnLimit}</span>
-        </strong>
+        {/* 좌: 스테이지명 배지 + 턴 수 (§5 "스테이지명 배지(좌) / 턴 수(우)") */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {stageName ? <span style={STAGE_BADGE_STYLE}>{stageName}</span> : null}
+          <strong>
+            {vm.turn.turn}턴 <span style={{ color: "#9aa3ad" }}>/ {vm.turn.turnLimit}</span>
+          </strong>
+        </div>
         <span style={{ color: vm.turn.phase === "player" ? "#4da3ff" : vm.turn.phase === "ally" ? "#ffa53d" : "#ff6b6b" }}>
           {phaseLabel(ui, vm)}
         </span>

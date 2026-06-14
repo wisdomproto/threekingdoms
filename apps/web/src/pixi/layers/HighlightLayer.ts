@@ -11,8 +11,12 @@ import { SIDE_COLORS, type TextureResolver } from "../textures";
 
 const MOVE_TINT = 0x3a7bd5;
 const MOVE_ALPHA = 0.35;
-const ATTACK_TINT = 0xd54a3a;
-const ATTACK_ALPHA = 0.45;
+// §10 색 위계: 공격 *가능 범위* = 빨강 / 공격 *대상군*(적이 있는 칸) = 주황.
+// 표적 모드에서 빨강 범위 위에 주황 대상칸을 덧칠해 "어디까지 치나 / 지금 누구를 노리나"를 분리.
+const ATTACK_TINT = 0xd54a3a; // 공격 가능 범위 (빨강)
+const ATTACK_ALPHA = 0.4;
+const TARGET_TINT = 0xff9a3d; // 공격 대상군 (주황 채움)
+const TARGET_ALPHA = 0.55;
 // 선택 유닛 커서 — 레퍼런스(§10) "흰 사각 테두리". 채움 칸(이동/공격/위협)과 톤 분리.
 const CURSOR_COLOR = 0xffffff;
 const CURSOR_INSET = 2; // px — 타일 안쪽으로 들여 그려 인접 칸과 겹침 방지
@@ -27,14 +31,16 @@ const ORIGIN_ALPHA = 0.4;
 
 export class HighlightLayer extends Container {
   private readonly textures: TextureResolver;
+  private readonly bounds: { width: number; height: number };
   private readonly pool: Sprite[] = [];
   private used = 0;
   /** 선택 유닛 커서 — 흰 사각 테두리(§10). 풀과 별개의 단일 Graphics, 항상 맨 위 */
   private readonly selectCursor = new Graphics();
 
-  constructor(textures: TextureResolver) {
+  constructor(textures: TextureResolver, bounds: { width: number; height: number }) {
     super();
     this.textures = textures;
+    this.bounds = bounds;
     this.sortableChildren = true; // 커서(zIndex 1000)를 풀 스프라이트(기본 0) 위로 보장
     // 외곽선 사각형 한 번만 그려두고 position/visible만 토글 (매 update 재드로 회피)
     const inner = CURSOR_INSET;
@@ -89,14 +95,36 @@ export class HighlightLayer extends Container {
     return out;
   }
 
+  /**
+   * from 위치 기준 공격 *가능 범위* 칸 (맨해튼 [rangeMin,rangeMax], 맵 안). §10 빨강 레이어.
+   * 엔진 getAttackableTargets와 동일한 거리 규약(맨해튼) — 적 유무와 무관한 '사거리 커버리지'.
+   */
+  private attackRangeTiles(battle: BattleState, unitId: string, from: Coord): Coord[] {
+    const u = battle.units.find((x) => x.id === unitId);
+    if (!u) return [];
+    const out: Coord[] = [];
+    for (let dy = -u.rangeMax; dy <= u.rangeMax; dy++) {
+      for (let dx = -u.rangeMax; dx <= u.rangeMax; dx++) {
+        const d = Math.abs(dx) + Math.abs(dy);
+        if (d < u.rangeMin || d > u.rangeMax) continue;
+        const x = from.x + dx;
+        const y = from.y + dy;
+        if (x < 0 || y < 0 || x >= this.bounds.width || y >= this.bounds.height) continue;
+        out.push({ x, y });
+      }
+    }
+    return out;
+  }
+
   update(ui: InputState, battle: BattleState): void {
     this.releaseAll();
     this.placeCursor(null); // 기본 숨김 — 선택/행동 흐름에서만 표시
     switch (ui.kind) {
       case "selected": {
         for (const t of ui.movable) this.place(t, MOVE_TINT, MOVE_ALPHA);
+        // 제자리에서 칠 수 있는 적 = 대상군(주황). 이동범위(파랑) 위에 얹는다.
         for (const t of this.targetCoords(battle, ui.attackable)) {
-          this.place(t, ATTACK_TINT, ATTACK_ALPHA);
+          this.place(t, TARGET_TINT, TARGET_ALPHA);
         }
         const u = battle.units.find((x) => x.id === ui.unitId);
         // 선택 유닛 = 흰 사각 테두리 커서 (§10). 채움 칸과 톤 분리.
@@ -113,11 +141,14 @@ export class HighlightLayer extends Container {
         break;
       }
       case "targetSelect": {
-        // targetSelect에서도 출발지 마커 유지 + 공격 범위 하이라이트
+        // 출발지 마커 + §10 2계층: 공격 가능 범위(빨강) → 그 위에 대상군(주황)
         const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
         if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
-        for (const t of this.targetCoords(battle, ui.attackable)) {
+        for (const t of this.attackRangeTiles(battle, ui.unitId, ui.preview)) {
           this.place(t, ATTACK_TINT, ATTACK_ALPHA);
+        }
+        for (const t of this.targetCoords(battle, ui.attackable)) {
+          this.place(t, TARGET_TINT, TARGET_ALPHA);
         }
         this.placeCursor(ui.preview);
         break;
@@ -147,8 +178,9 @@ export class HighlightLayer extends Container {
         const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
         if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
         const supply = ui.itemKind === "supplyItem";
+        // 회복=초록 아군 / 공격아이템 대상칸=주황 대상군(§10)
         for (const t of ui.castTiles) {
-          this.place(t, supply ? SUPPLY_TINT : ATTACK_TINT, supply ? SUPPLY_ALPHA : ATTACK_ALPHA);
+          this.place(t, supply ? SUPPLY_TINT : TARGET_TINT, supply ? SUPPLY_ALPHA : TARGET_ALPHA);
         }
         this.placeCursor(ui.preview);
         break;

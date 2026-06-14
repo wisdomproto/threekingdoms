@@ -140,6 +140,8 @@ export type InputState =
   | { kind: "enemyTurn" }
   /** 자동전투 진행 중(아군 페이즈) — enemyTurn처럼 입력을 잠그고 그리디 드라이버가 구동 */
   | { kind: "autoTurn" }
+  /** 턴 종료 확인 (§11 "전부대 명령 끝냅니까?") — 미행동 부대가 남아 있을 때만 진입 */
+  | { kind: "confirmEndTurn"; remaining: number }
   | { kind: "battleOver"; result: "victory" | "defeat" };
 
 export type UiEvent =
@@ -153,6 +155,8 @@ export type UiEvent =
   | { type: "menuWait" }
   | { type: "menuCancel" }
   | { type: "endTurnPressed" }
+  /** 턴 종료 확인 다이얼로그에서 "예" — 미행동 부대를 일괄 대기 처리 */
+  | { type: "endTurnConfirm" }
   /** 자동전투 ON 진입 — idle(아군 페이즈)에서 autoTurn으로 전이 */
   | { type: "autoStart" }
   /** EventPlayer 큐 소진 시 store가 내부 발행 */
@@ -251,11 +255,12 @@ export function reduceInput(
       }
       if (event.type === "endTurnPressed") {
         if (battle.phase !== "player" || battle.status !== "ongoing") return noop(state);
-        const waits: Action[] = battle.units
-          .filter((u) => u.side === "player" && !u.retreated && !u.acted)
-          .map((u) => ({ type: "wait", unitId: u.id }));
-        if (waits.length === 0) return noop(state);
-        return { next: { kind: "animating" }, effects: [{ type: "commit", actions: waits }] };
+        const remaining = battle.units.filter(
+          (u) => u.side === "player" && !u.retreated && !u.acted,
+        ).length;
+        // 미행동 부대가 없으면 종료할 게 없음(noop). 남아 있으면 확인 다이얼로그(§11).
+        if (remaining === 0) return noop(state);
+        return { next: { kind: "confirmEndTurn", remaining }, effects: [] };
       }
       // 자동전투 ON 진입 — 아군 페이즈·진행 중이면 autoTurn으로 (store가 드라이버 기동)
       if (event.type === "autoStart") {
@@ -263,6 +268,23 @@ export function reduceInput(
           return { next: { kind: "autoTurn" }, effects: [] };
         }
         return noop(state);
+      }
+      return noop(state);
+    }
+    case "confirmEndTurn": {
+      if (event.type === "endTurnConfirm") {
+        if (battle.phase !== "player" || battle.status !== "ongoing") {
+          return { next: { kind: "idle" }, effects: [] };
+        }
+        const waits: Action[] = battle.units
+          .filter((u) => u.side === "player" && !u.retreated && !u.acted)
+          .map((u) => ({ type: "wait", unitId: u.id }));
+        if (waits.length === 0) return { next: { kind: "idle" }, effects: [] };
+        return { next: { kind: "animating" }, effects: [{ type: "commit", actions: waits }] };
+      }
+      // "아니오" — 취소하고 아군 페이즈로 복귀
+      if (event.type === "cancel" || event.type === "menuCancel") {
+        return { next: { kind: "idle" }, effects: [] };
       }
       return noop(state);
     }

@@ -33,8 +33,10 @@ describe("Bug 1 재현 및 수정 확인: 2턴에서 아군 유닛 선택 가능
     expect(store.committedState.phase).toBe("player");
     expect(store.committedState.turn).toBe(1);
 
-    // 1턴: 즉시 턴 종료 (미행동 아군 전원 wait 커밋)
+    // 1턴: 턴 종료 → 확인 다이얼로그 → "예"로 미행동 아군 전원 wait 커밋
     store.dispatchUi({ type: "endTurnPressed" });
+    expect(store.uiState.kind).toBe("confirmEndTurn");
+    store.dispatchUi({ type: "endTurnConfirm" });
     expect(store.uiState.kind).toBe("animating");
 
     // 적 턴 자동 진행 + 완료 대기
@@ -77,9 +79,10 @@ describe("Bug 1 재현 및 수정 확인: 2턴에서 아군 유닛 선택 가능
       store.dispatchUi({ type: "tapTile", coord: { x: first.x, y: first.y } });
       expect(store.uiState.kind).toBe("selected");
 
-      // 선택 취소 후 턴 종료
+      // 선택 취소 후 턴 종료 (확인 다이얼로그 "예")
       store.dispatchUi({ type: "cancel" });
       store.dispatchUi({ type: "endTurnPressed" });
+      if (store.uiState.kind === "confirmEndTurn") store.dispatchUi({ type: "endTurnConfirm" });
     }
   }, 30_000);
 

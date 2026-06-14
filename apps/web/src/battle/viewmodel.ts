@@ -56,6 +56,7 @@ export interface UnitVM {
   // ── 장수 패널 탭화(Tier 3 §8). 전부 optional — 기존 UnitVM 리터럴(테스트 등) 무파손 ──
   classId?: string;             // 병종 id (특성/책략 탭 lookup 키)
   grades?: ClassGrades;         // 병종 5스탯 등급 [공·방·정·순·사] (특성 탭 뱃지)
+  traitText?: string;           // 병종 상성/약점 설명문 (§8 부대특성 — lineAdvantage 파생)
   equipment?: ItemVM[];         // 소지품(장비/소모품) 해석 목록 (장비 탭)
   strategies?: StrategyVM[];    // 병종 보유 책략 해석 목록 (책략 탭)
 }
@@ -92,6 +93,37 @@ export interface BattleVM {
   units: UnitVM[];
   /** 전략조건으로 적립된 보상(보물·자금) — 결산에서 stage.reward와 병합·중복제거(M3① §2-1) */
   pendingRewards: PendingReward[];
+}
+
+/** line(병종 계열) 한글명 */
+const LINE_KO: Record<string, string> = {
+  infantry: "보병계",
+  cavalry: "기병계",
+  archer: "궁병계",
+  bandit: "산적계",
+  support: "보조계",
+};
+
+/**
+ * 병종 상성/약점 설명문 (§8 "병종 설명문 + <특성:…>") — combat.lineAdvantage에서 *파생*.
+ * 손수 작성한 21개 문자열 대신 엔진의 실제 상성 규칙을 그대로 풀어써 항상 일치한다.
+ *   lineAdvantage[X] = Y → X는 Y에 강함. 역참조로 X에 강한 계열 = X가 약한 상대.
+ *   rangeMax>1 = 간접 공격(무반격, §7).
+ */
+function classTraitText(
+  line: string,
+  lineAdvantage: Record<string, string>,
+  rangeMax: number,
+): string {
+  const ko = (l: string): string => LINE_KO[l] ?? l;
+  const strongVs = lineAdvantage[line];
+  const weakTo = Object.entries(lineAdvantage).find(([, v]) => v === line)?.[0];
+  const rel: string[] = [];
+  if (strongVs) rel.push(`${ko(strongVs)}에 강함`);
+  if (weakTo) rel.push(`${ko(weakTo)}에 약함`);
+  let s = rel.length ? `${ko(line)} — ${rel.join(" · ")}.` : `${ko(line)} — 상성 보정 없음.`;
+  if (rangeMax > 1) s += " 간접 공격이라 반격을 받지 않는다.";
+  return s;
 }
 
 export function unitVM(ctx: BattleContext, u: UnitState): UnitVM {
@@ -146,6 +178,7 @@ export function unitVM(ctx: BattleContext, u: UnitState): UnitVM {
     terrainGuard: terrain.guard,
     classId: u.classId,
     grades: cls?.grades,
+    traitText: cls ? classTraitText(cls.line, ctx.data.combat.lineAdvantage, u.rangeMax) : undefined,
     equipment,
     strategies,
   };

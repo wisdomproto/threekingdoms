@@ -25,6 +25,7 @@ import { InspectPopup } from "./hud/InspectPopup";
 import { AttackForecast } from "./hud/AttackForecast";
 import { ActionMenu } from "./hud/ActionMenu";
 import { TurnBanner } from "./hud/TurnBanner";
+import { EndTurnConfirm } from "./hud/EndTurnConfirm";
 import { ObjectiveBanner } from "./hud/ObjectiveBanner";
 import { ResultSequence } from "./hud/ResultSequence";
 import { DialogueOverlay } from "./dialogue/DialogueOverlay";
@@ -202,7 +203,7 @@ export default function BattleScreen(): React.ReactElement {
       style={{ position: "fixed", inset: 0, overflow: "hidden", background: "#1b1f24" }}
     >
       <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
-      <TurnBanner ui={snap.ui} vm={snap.vm} dispatch={dispatch} />
+      <TurnBanner ui={snap.ui} vm={snap.vm} dispatch={dispatch} stageName={ctx.stage.name} />
       <ObjectiveBanner
         vm={snap.vm}
         stage={ctx.stage}
@@ -229,7 +230,7 @@ export default function BattleScreen(): React.ReactElement {
           gap: 8,
         }}
       >
-        <Minimap map={ctx.map} units={snap.vm.units} selectedId={selectedId} />
+        <Minimap map={ctx.map} units={snap.vm.units} selectedId={selectedId} viewport={snap.viewport} />
         <BattleControls
           auto={snap.autoBattle}
           onToggleAuto={toggleAuto}
@@ -239,6 +240,7 @@ export default function BattleScreen(): React.ReactElement {
         />
       </div>
       <DialogueOverlay store={store} dialogue={ctx.stage.dialogue} />
+      <EndTurnConfirm ui={snap.ui} dispatch={dispatch} />
       <ResultSequence
         ui={snap.ui}
         vm={snap.vm}

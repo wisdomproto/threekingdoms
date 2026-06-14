@@ -76,18 +76,47 @@ export function InspectPopup({
   // 진영 라벨/색 (Tier 2-1): 아군 파랑 / 우군 주황 / 적 빨강.
   const sideLabel = unit.side === "enemy" ? "적군" : unit.side === "ally" ? "우군" : "아군";
   const sideColor = unit.side === "enemy" ? "#ff6b6b" : unit.side === "ally" ? "#ffa53d" : "#4da3ff";
+  const mpRatio = unit.maxMp > 0 ? Math.max(0, Math.min(1, unit.mp / unit.maxMp)) : 0;
+  const guardPct = Math.round(unit.terrainGuard * 100);
 
   return (
     <div style={PANEL_STYLE}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
-        <strong style={{ fontSize: 15 }}>{unit.name}</strong>
-        <span style={{ color: sideColor, fontSize: 11 }}>
-          {sideLabel}
-        </span>
-      </div>
-      <div style={{ color: "#9aa3ad", fontSize: 11 }}>
-        {unit.className} · Lv.{unit.level}
-        {unit.acted ? " · 행동 완료" : ""}
+      {/* §7-A "[미니초상] 이름 병종 Lv N" — 초상 미보유 시 진영색+이니셜 폴백 */}
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+        <div
+          aria-hidden
+          style={{
+            width: 34,
+            height: 34,
+            flexShrink: 0,
+            borderRadius: 5,
+            border: `1.5px solid ${sideColor}`,
+            background: "rgba(0, 0, 0, 0.35)",
+            color: sideColor,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 18,
+            fontWeight: 800,
+          }}
+        >
+          {unit.name.slice(0, 1)}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
+            <strong style={{ fontSize: 15 }}>{unit.name}</strong>
+            <span style={{ color: sideColor, fontSize: 11 }}>{sideLabel}</span>
+          </div>
+          <div style={{ color: "#9aa3ad", fontSize: 11 }}>
+            {unit.className} · Lv.{unit.level}
+            {unit.acted ? " · 행동 완료" : ""}
+          </div>
+          {/* §7-A "지형명 보정%" 상시 노출 */}
+          <div style={{ color: "#cdbd92", fontSize: 11 }}>
+            {unit.terrainName}
+            {guardPct > 0 ? <span style={{ color: "#7bd88f" }}> +{guardPct}%</span> : null}
+          </div>
+        </div>
       </div>
       {/* HP */}
       <div style={{ marginTop: 5 }}>
@@ -108,6 +137,22 @@ export function InspectPopup({
           />
         </div>
       </div>
+      {/* MP (§7-A "⚑ MP 현재/최대 (노랑 바)") — MP 보유 병종만 */}
+      {unit.maxMp > 0 && (
+        <div style={{ marginTop: 4 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11 }}>
+            <span>책략</span>
+            <span style={{ fontVariantNumeric: "tabular-nums" }}>
+              {unit.mp} / {unit.maxMp}
+            </span>
+          </div>
+          <div style={{ height: 5, borderRadius: 3, background: "#2a2f36", marginTop: 2 }}>
+            <div
+              style={{ width: `${Math.round(mpRatio * 100)}%`, height: "100%", borderRadius: 3, background: "#e8c84a" }}
+            />
+          </div>
+        </div>
+      )}
       {/* 핵심 파생스탯 */}
       <div style={{ marginTop: 5, borderTop: "1px solid #2a2f36", paddingTop: 4 }}>
         <MiniBar label="공격" value={unit.atk} color="#ff8a5c" />

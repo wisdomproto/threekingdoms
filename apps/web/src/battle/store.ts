@@ -61,6 +61,14 @@ export interface MenuAnchor {
   half: number;
 }
 
+/** 미니맵 뷰포트 박스 (§6) — 카메라 가시영역을 *타일 좌표*로. 렌더러가 매 틱 push */
+export interface MinimapViewport {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 export interface StoreSnapshot {
   ui: InputState;
   vm: BattleVM;
@@ -71,6 +79,8 @@ export interface StoreSnapshot {
    * 렌더러가 setMenuAnchor로 갱신(매 틱). ActionMenu가 읽어 absolute 위치 산출.
    */
   menuAnchor: MenuAnchor | null;
+  /** 미니맵 카메라 뷰포트 박스(타일 좌표) — 렌더러가 매 틱 갱신. 미설정이면 null */
+  viewport: MinimapViewport | null;
   /** 자동전투 ON 여부 — 컨트롤 버튼 표시 상태 */
   autoBattle: boolean;
   /** 연출 배속 (1·2·3) — 버튼 라벨 + 렌더러 연동 */
@@ -120,6 +130,8 @@ export class BattleStore {
   private _inspectedId: string | null = null;
   /** 커맨드 메뉴 앵커 — 렌더러가 매 틱 활성 유닛 스크린좌표를 push. 메뉴 비표시면 null */
   private _menuAnchor: MenuAnchor | null = null;
+  /** 미니맵 뷰포트 박스(타일) — 렌더러가 매 틱 push */
+  private _viewport: MinimapViewport | null = null;
 
   private listeners = new Set<() => void>();
   private snapshotCache: StoreSnapshot | null = null;
@@ -187,6 +199,31 @@ export class BattleStore {
       }
     }
     this._menuAnchor = anchor;
+    this.notify();
+  }
+
+  get viewport(): MinimapViewport | null {
+    return this._viewport;
+  }
+
+  /**
+   * 미니맵 뷰포트 박스 설정 (§6) — 렌더러가 매 틱 카메라 가시영역(타일)을 push.
+   * 매 프레임 호출되므로 ε(0.25타일) 이내 변화는 무시해 불필요한 리렌더를 막는다.
+   */
+  setViewport(rect: MinimapViewport | null): void {
+    const prev = this._viewport;
+    if (prev === rect) return;
+    if (prev && rect) {
+      if (
+        Math.abs(prev.x - rect.x) < 0.25 &&
+        Math.abs(prev.y - rect.y) < 0.25 &&
+        Math.abs(prev.w - rect.w) < 0.25 &&
+        Math.abs(prev.h - rect.h) < 0.25
+      ) {
+        return;
+      }
+    }
+    this._viewport = rect;
     this.notify();
   }
 
@@ -347,6 +384,7 @@ export class BattleStore {
         speed: this._speed,
         inspectedId: this._inspectedId,
         menuAnchor: this._menuAnchor,
+        viewport: this._viewport,
       };
     }
     return this.snapshotCache;

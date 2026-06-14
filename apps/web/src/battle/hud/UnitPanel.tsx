@@ -368,6 +368,12 @@ function TraitTab({ unit }: { unit: UnitVM }): React.ReactElement {
       <div style={{ fontSize: 12, color: "#c7cdd4", marginBottom: 5 }}>
         병종 <strong>{unit.className}</strong>
       </div>
+      {/* §8 병종 특성 설명문 (상성/약점) — lineAdvantage 파생 */}
+      {unit.traitText ? (
+        <div style={{ fontSize: 11, color: "#cdbd92", lineHeight: 1.5, marginBottom: 8 }}>
+          {unit.traitText}
+        </div>
+      ) : null}
       {g ? (
         <div style={{ display: "flex", gap: 4, marginBottom: 8 }}>
           <GradeBadge label="공격" grade={g.atk} />

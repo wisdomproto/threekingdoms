@@ -22,30 +22,40 @@ import { gameData } from "@tk/data";
 import type { CSSProperties } from "react";
 import type { InputState, UiEvent } from "../inputMachine";
 import type { MenuAnchor } from "../store";
-import { BUTTON_FRAME } from "./frames";
 
-/** 메뉴 폭(px) — 한글 2~3자 + 청동 프레임 인셋 고려 */
-const MENU_WIDTH = 96;
-/** 버튼 높이(px) — 모바일 터치 타깃 (≥44px 권장, 세로 리스트라 약간 더) */
-const BUTTON_H = 46;
-/** 버튼 간 간격(px) */
-const GAP = 6;
+/**
+ * 메뉴 패널 폭(px, box-sizing:border-box — 패딩 포함). 한글 2~3자 + 내부 패딩.
+ * 레퍼런스 §9 "돌/회색 버튼" = 불투명 패널 → 맵/유닛이 비치지 않게 한 장으로 묶는다.
+ */
+export const MENU_WIDTH = 96;
+/** 버튼 높이(px) — 촘촘한 세로 리스트(border-image 프레임 제거로 비대화 해소) */
+const BUTTON_H = 34;
+/** 버튼 간 간격(px) — 패널 배경이 채우므로 맵이 비치지 않음 */
+const GAP = 3;
+/** 패널 내부 패딩(px) — 버튼과 청동 테두리 사이 */
+const PANEL_PAD = 6;
 /** 유닛 셀과 메뉴 사이 여백(px) — 셀 반폭에 더해 메뉴를 셀 밖으로 민다 */
 const SIDE_PAD = 10;
 /** 화면 가장자리 안전 여백(px) */
 const EDGE = 8;
 
+/** 항목 수 → 패널 전체 높이(px). placeMenu 세로 클램프·테스트가 공유 */
+export function menuPanelHeight(itemCount: number): number {
+  return itemCount * BUTTON_H + (itemCount - 1) * GAP + 2 * PANEL_PAD;
+}
+
+/** 불투명 돌 버튼(플랫) — 청동 얇은 테두리. accent는 텍스트 색으로만 반영 */
 const BUTTON_STYLE: CSSProperties = {
   height: BUTTON_H,
   width: "100%",
   padding: "0 6px",
-  // 청동 알약 프레임(border-image) — accent는 텍스트 색으로만 반영
-  ...BUTTON_FRAME,
-  background: "rgba(20, 17, 12, 0.72)",
-  backgroundClip: "padding-box",
-  color: "#e8e6e3",
-  fontSize: 16,
-  fontWeight: 600,
+  border: "1px solid rgba(120, 98, 60, 0.5)",
+  borderRadius: 4,
+  background: "linear-gradient(180deg, rgba(56, 48, 35, 0.98), rgba(34, 29, 20, 0.98))",
+  color: "#ece8e0",
+  fontSize: 15,
+  fontWeight: 700,
+  letterSpacing: "0.04em",
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
@@ -93,7 +103,7 @@ export function placeMenu(
   itemCount: number,
   viewport: { width: number; height: number },
 ): { left: number; top: number } {
-  const menuH = itemCount * BUTTON_H + (itemCount - 1) * GAP;
+  const menuH = menuPanelHeight(itemCount);
   const offset = anchor.half + SIDE_PAD; // 셀 중심에서 메뉴 안쪽 변까지
 
   // 가로: 기본 우측(메뉴 좌변 = center + offset). 우측 초과 시 좌측으로 뒤집기.
@@ -224,9 +234,16 @@ export function ActionMenu({
         left,
         top,
         width: MENU_WIDTH,
+        boxSizing: "border-box",
+        padding: PANEL_PAD,
         display: "flex",
         flexDirection: "column",
         gap: GAP,
+        // 불투명 돌 패널 — 맵/유닛 스프라이트가 버튼 사이로 비치지 않게 한 장으로 묶는다(레퍼런스 §9)
+        background: "rgba(16, 13, 9, 0.97)",
+        border: "1.5px solid #6f5a34",
+        borderRadius: 7,
+        boxShadow: "0 4px 14px rgba(0, 0, 0, 0.55)",
         pointerEvents: "auto",
         // 선택을 흐트러뜨리지 않게 — 메뉴 위 텍스트 드래그 선택 방지
         userSelect: "none",

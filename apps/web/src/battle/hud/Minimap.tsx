@@ -7,6 +7,7 @@
 import { useEffect, useRef } from "react";
 import type { BattleMap } from "@tk/data";
 import type { UnitVM } from "../viewmodel";
+import type { MinimapViewport } from "../store";
 import { MINIMAP_FRAME } from "./frames";
 
 /** 지형 id → 미니맵 색 (export_layout 팔레트의 채도 낮춘 버전) */
@@ -34,10 +35,13 @@ export function Minimap({
   map,
   units,
   selectedId,
+  viewport,
 }: {
   map: BattleMap;
   units: UnitVM[];
   selectedId: string | null;
+  /** 카메라 가시영역(타일 좌표) — 흰 뷰포트 박스(§6). 미설정이면 미표시 */
+  viewport?: MinimapViewport | null;
 }): React.ReactElement {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const boxH = Math.max(40, Math.round((BOX_W * map.height) / map.width));
@@ -86,7 +90,20 @@ export function Minimap({
         ctx.stroke();
       }
     }
-  }, [map, units, selectedId, boxH]);
+
+    // 카메라 뷰포트 박스 (§6 "흰 뷰포트 박스") — 맵 경계로 클램프
+    if (viewport) {
+      const x0 = Math.max(0, viewport.x) * cw;
+      const y0 = Math.max(0, viewport.y) * ch;
+      const x1 = Math.min(map.width, viewport.x + viewport.w) * cw;
+      const y1 = Math.min(map.height, viewport.y + viewport.h) * ch;
+      if (x1 > x0 && y1 > y0) {
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.92)";
+        ctx.strokeRect(x0 + 0.5, y0 + 0.5, x1 - x0 - 1, y1 - y0 - 1);
+      }
+    }
+  }, [map, units, selectedId, boxH, viewport]);
 
   return (
     <div

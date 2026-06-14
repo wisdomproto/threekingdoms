@@ -67,6 +67,8 @@ export interface RendererStore {
    * 메뉴 비표시 상태면 null. ε 이내 변화는 store가 무시(불필요 리렌더 방지).
    */
   setMenuAnchor(anchor: { x: number; y: number; half: number } | null): void;
+  /** 미니맵 뷰포트 박스(§6) — 카메라 가시영역을 타일 좌표로 매 틱 push */
+  setViewport(rect: { x: number; y: number; w: number; h: number } | null): void;
 }
 
 const PHASE_BANNER_MS = 600; // 설계 §6
@@ -186,7 +188,10 @@ export class BattleRenderer implements Presenter {
     world.sortableChildren = true;
     const terrain = new TerrainLayer(this.ctx, textures);
     terrain.zIndex = 0;
-    const highlights = new HighlightLayer(textures);
+    const highlights = new HighlightLayer(textures, {
+      width: this.ctx.map.width,
+      height: this.ctx.map.height,
+    });
     highlights.zIndex = 1;
     // 위협범위(Tier 1-3): 하이라이트 위·유닛 아래. sortableChildren으로 채움/외곽선 정렬.
     const threat = new ThreatLayer(textures);
@@ -330,6 +335,14 @@ export class BattleRenderer implements Presenter {
       // 커맨드 메뉴 앵커 (레퍼런스 §9·§263): 활성 유닛 스크린좌표를 store에 push.
       // shake 가산 전 camera.current 기준으로 투영해 메뉴가 타격 흔들림에 떨지 않게 한다.
       this.updateMenuAnchor(camera, units);
+      // 미니맵 뷰포트 박스(§6): 카메라 가시영역(월드px) → 타일 좌표로 store에 push.
+      const vr = camera.viewWorldRect();
+      store.setViewport({
+        x: vr.x / TILE_SIZE,
+        y: vr.y / TILE_SIZE,
+        w: vr.width / TILE_SIZE,
+        h: vr.height / TILE_SIZE,
+      });
       // 카메라 미세 흔들림: camera 적용 직후 world.position에 가산·감쇠 (camera.ts 불간섭).
       if (this.shakeAmp > 0.05) {
         this.shakePhase += dt * 0.06;
