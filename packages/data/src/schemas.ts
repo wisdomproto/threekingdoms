@@ -164,6 +164,7 @@ export const StageUnitSchema = z.object({
   x: z.number().int().min(0),
   y: z.number().int().min(0),
 });
+export type StageUnit = z.infer<typeof StageUnitSchema>;
 
 /**
  * 스테이지별 카메라 초기 연출 (feel-spec §데이터). 맵마다 스케일/긴장도가 달라
@@ -190,6 +191,96 @@ export const StageRewardSchema = z.object({
 });
 export type StageReward = z.infer<typeof StageRewardSchema>;
 
+/**
+ * 승리 목표 (M3① — yeonggeoljeon-remake-stages.md §2-4 비섬멸 목표 카탈로그).
+ * objectives는 AND 결합: optional:false 인 목표가 **전부** 충족되면 승리.
+ * optional:true 는 보너스 목표(승리 판정에 영향 없음 — 평가/보상 게이트용 추적 슬롯).
+ *  - defeatAll: 적대 진영(camp=hostile) 전원 퇴각 (기존 victory.defeatAll과 동치).
+ *  - defeatUnit: 특정 유닛 퇴각 (기존 victory.defeatUnit과 동치).
+ *  - reachTile: unitId(생략 시 아무 아군=camp friendly) 가 (x,y) 칸에 도달 — 탈출/도하.
+ *  - surviveTurns: 그 turns 까지 패배조건에 안 걸리고 버티면 충족 — 방어전.
+ *    (turn > turns 즉 turns번째 라운드를 온전히 끝낸 직후 충족. turnLimit 의미론과 동일.)
+ *  - captureTile: side(기본 player) 진영 유닛이 (x,y) 칸을 점유 중이면 충족 — 점령.
+ */
+export const ObjectiveSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("defeatAll"), optional: z.boolean().default(false) }),
+  z.object({ kind: z.literal("defeatUnit"), unitId: z.string(), optional: z.boolean().default(false) }),
+  z.object({
+    kind: z.literal("reachTile"),
+    unitId: z.string().optional(),
+    x: z.number().int().min(0),
+    y: z.number().int().min(0),
+    optional: z.boolean().default(false),
+  }),
+  z.object({ kind: z.literal("surviveTurns"), turns: z.number().int().min(1), optional: z.boolean().default(false) }),
+  z.object({
+    kind: z.literal("captureTile"),
+    x: z.number().int().min(0),
+    y: z.number().int().min(0),
+    side: SideSchema.default("player"),
+    optional: z.boolean().default(false),
+  }),
+]);
+export type Objective = z.infer<typeof ObjectiveSchema>;
+
+/**
+ * 패배 조건 (M3① — §2-4 호위/탈출/시간압박). 하나라도 충족되면 즉시 패배.
+ *  - unitRetreated: 그 유닛(군주 등)이 퇴각하면 패배 (기존 defeat.lordRetreat과 동치).
+ *  - allRetreated: unitIds(호위 대상=백성 등)가 **전부** 퇴각하면 패배. 일부 손실은 허용.
+ *  - turnLimitExceeded: turnLimit 초과 시 패배. 명시한 스테이지에서만 "시간 내 목표 미달=패배".
+ *    (미명시 시 turnLimit 초과는 기존대로 단순 종료=defeat — 하위호환 절 참조.)
+ */
+export const FailConditionSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("unitRetreated"), unitId: z.string() }),
+  z.object({ kind: z.literal("allRetreated"), unitIds: z.array(z.string()).min(1) }),
+  z.object({ kind: z.literal("turnLimitExceeded") }),
+]);
+export type FailCondition = z.infer<typeof FailConditionSchema>;
+
+/**
+ * 증원 트리거 (M3① — §2-6 증원/적대 전환). 트리거 충족 시 units를 전장에 투입.
+ *  - kind:"turn": 그 turn 의 페이즈 전환(턴 증가) 시점에 스폰.
+ *  - kind:"unitDefeated": unitId 가 퇴각한 직후 스폰.
+ * once:true 고정 — 한 번만 투입(spawnedReinforcements로 중복 방지). units는 StageUnit 형식.
+ */
+export const ReinforcementTriggerSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("turn"), turn: z.number().int().min(1) }),
+  z.object({ kind: z.literal("unitDefeated"), unitId: z.string() }),
+]);
+export const ReinforcementSchema = z.object({
+  id: z.string(),
+  side: SideSchema,
+  units: z.array(StageUnitSchema),
+  trigger: ReinforcementTriggerSchema,
+  once: z.literal(true).default(true),
+});
+export type Reinforcement = z.infer<typeof ReinforcementSchema>;
+
+/**
+ * 전략조건 = 보물 게이트 (M3① — §2-1). 충족 시 보상 적립 + strategyConditionMet 이벤트.
+ * 승패에 직접 영향 없음(서브 클리어 조건 — S랭크/보물 도감용). 트리거:
+ *  - duelOccurred: 그 duelId 일기토가 발동되면 충족.
+ *  - duelsInOrder: duelIds 가 **그 순서대로** 발동되면 충족(강하 [적로] 패턴).
+ *    (duelHistory가 duelIds를 부분수열이 아닌 "순서 보존 포함"으로 만족하면 충족 — 아래 엔진 규칙.)
+ *  - unitReachedTile: unitId 가 (x,y) 에 도달하면 충족(회남 성채 피신 패턴).
+ * reward: 충족 시 적립되는 보물 item id 목록(+선택적 gold). pendingRewards로 누적.
+ */
+export const StrategyConditionTriggerSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("duelOccurred"), duelId: z.string() }),
+  z.object({ kind: z.literal("duelsInOrder"), duelIds: z.array(z.string()).min(1) }),
+  z.object({ kind: z.literal("unitReachedTile"), unitId: z.string(), x: z.number().int().min(0), y: z.number().int().min(0) }),
+]);
+export const StrategyConditionSchema = z.object({
+  id: z.string(),
+  description: z.string(),
+  trigger: StrategyConditionTriggerSchema,
+  reward: z.object({
+    treasures: z.array(z.string()).default([]),
+    gold: z.number().int().min(0).optional(),
+  }),
+});
+export type StrategyCondition = z.infer<typeof StrategyConditionSchema>;
+
 export const StageSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -201,15 +292,28 @@ export const StageSchema = z.object({
   // 이 스테이지에서의 레벨캡 (§10 — 스테이지 진행 연동). 미지정 시 엔진 기본 99.
   levelCap: z.number().int().min(1).max(99).optional(),
   units: z.array(StageUnitSchema),
+  // ── M3① 신규 목표 시스템 (있으면 victory/defeat보다 우선) ──────────────────
+  // objectives: 승리 목표(AND, optional은 보너스). failConditions: 패배 조건(OR).
+  // 둘 다 optional — 미지정 스테이지는 기존 victory/defeat로 폴백(하위호환 절).
+  objectives: z.array(ObjectiveSchema).optional(),
+  failConditions: z.array(FailConditionSchema).optional(),
+  // 증원 (§2-6). 트리거 시 units를 전장 투입. 미지정 = 증원 없음.
+  reinforcements: z.array(ReinforcementSchema).optional(),
+  // 전략조건=보물 게이트 (§2-1). 충족 시 보상 적립 + 이벤트(승패 무관). 미지정 = 없음.
+  strategyConditions: z.array(StrategyConditionSchema).optional(),
+  // ── 레거시 승패 계약 (하위호환 — objectives/failConditions 미지정 시 사용) ──
   victory: z.discriminatedUnion("kind", [
     z.object({ kind: z.literal("defeatAll") }),
     z.object({ kind: z.literal("defeatUnit"), unitId: z.string() }),
-  ]),
+  ]).optional(),
   defeat: z.discriminatedUnion("kind", [
     z.object({ kind: z.literal("lordRetreat"), unitId: z.string() }),
-  ]),
+  ]).optional(),
   events: z.array(StageEventSchema),
-});
+}).refine(
+  (s) => (s.objectives && s.objectives.length > 0) || s.victory !== undefined,
+  { message: "stage must define objectives or legacy victory" },
+);
 export type Stage = z.infer<typeof StageSchema>;
 
 /**

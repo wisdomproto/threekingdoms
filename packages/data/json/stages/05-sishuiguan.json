@@ -98,8 +98,8 @@
       "y": 14
     }
   ],
-  "victory": { "kind": "defeatUnit", "unitId": "화웅" },
-  "defeat": { "kind": "lordRetreat", "unitId": "유비" },
+  "objectives": [{ "kind": "defeatUnit", "unitId": "화웅" }],
+  "failConditions": [{ "kind": "unitRetreated", "unitId": "유비" }],
   "events": [
     {
       "id": "duel_guanyu_huaxiong",

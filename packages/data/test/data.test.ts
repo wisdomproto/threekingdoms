@@ -100,12 +100,30 @@ describe("게임 데이터 v2 무결성", () => {
       const terrainId = m.tileLegend[m.tiles[u.y]![u.x]!]!;
       expect(gameData.terrains[terrainId]!.moveCost.default).toBeLessThan(99);
     }
-    if ("unitId" in s.victory) expect(placed.has(s.victory.unitId)).toBe(true);
-    expect(placed.has(s.defeat.unitId)).toBe(true);
+    // M3① 신규 목표 시스템으로 마이그레이션됨 — objectives/failConditions 우선.
+    for (const o of s.objectives ?? []) {
+      if ("unitId" in o && o.unitId !== undefined) expect(placed.has(o.unitId)).toBe(true);
+    }
+    for (const f of s.failConditions ?? []) {
+      if (f.kind === "unitRetreated") expect(placed.has(f.unitId)).toBe(true);
+      if (f.kind === "allRetreated") for (const id of f.unitIds) expect(placed.has(id)).toBe(true);
+    }
+    // 레거시 필드가 남아 있으면(폴백 스테이지) 그쪽도 검증
+    if (s.victory && "unitId" in s.victory) expect(placed.has(s.victory.unitId)).toBe(true);
+    if (s.defeat) expect(placed.has(s.defeat.unitId)).toBe(true);
     for (const e of s.events) {
       expect(placed.has(e.trigger.attackerId)).toBe(true);
       expect(placed.has(e.trigger.defenderId)).toBe(true);
     }
+  });
+
+  it("사수관 M3① 마이그레이션: objectives=[defeatUnit 화웅] / failConditions=[unitRetreated 유비]", () => {
+    const s = gameData.stages["05-sishuiguan"]!;
+    expect(s.objectives).toEqual([{ kind: "defeatUnit", unitId: "화웅", optional: false }]);
+    expect(s.failConditions).toEqual([{ kind: "unitRetreated", unitId: "유비" }]);
+    // 레거시 필드는 제거됨 — 새 시스템 우선
+    expect(s.victory).toBeUndefined();
+    expect(s.defeat).toBeUndefined();
   });
 
   it("사수관: 아군 병종은 원작 편성과 일치, 병력은 조조전 스케일(~100)", () => {

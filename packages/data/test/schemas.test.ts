@@ -60,6 +60,56 @@ describe("스키마 v2 (원작 모델)", () => {
     })).not.toThrow();
   });
 
+  it("M3① objectives/failConditions: 새 목표 시스템 파싱", () => {
+    expect(() => StageSchema.parse({
+      id: "s", name: "s", mapId: "m", turnLimit: 30,
+      units: [{ commanderId: "관우", classId: "lightCavalry", level: 1, troops: 100,
+                items: [], side: "player", x: 0, y: 0 }],
+      objectives: [
+        { kind: "reachTile", unitId: "관우", x: 5, y: 5 },
+        { kind: "surviveTurns", turns: 10, optional: true },
+        { kind: "captureTile", x: 3, y: 3 },
+      ],
+      failConditions: [
+        { kind: "unitRetreated", unitId: "유비" },
+        { kind: "allRetreated", unitIds: ["백성1", "백성2"] },
+        { kind: "turnLimitExceeded" },
+      ],
+      events: [],
+    })).not.toThrow();
+  });
+
+  it("M3① reinforcements/strategyConditions: 트리거·보상 파싱", () => {
+    expect(() => StageSchema.parse({
+      id: "s", name: "s", mapId: "m", turnLimit: 30,
+      units: [{ commanderId: "관우", classId: "lightCavalry", level: 1, troops: 100,
+                items: [], side: "player", x: 0, y: 0 }],
+      objectives: [{ kind: "defeatAll" }],
+      reinforcements: [{
+        id: "r1", side: "enemy",
+        trigger: { kind: "turn", turn: 6 },
+        units: [{ commanderId: "태사자", classId: "lightCavalry", level: 5, troops: 120,
+                  items: [], side: "enemy", x: 1, y: 1 }],
+      }],
+      strategyConditions: [{
+        id: "sc1", description: "일기토 순서",
+        trigger: { kind: "duelsInOrder", duelIds: ["dA", "dB"] },
+        reward: { treasures: ["적로"], gold: 200 },
+      }],
+      events: [],
+    })).not.toThrow();
+  });
+
+  it("M3① objectives도 victory도 없으면 거부 (승리 계약 필수)", () => {
+    expect(() => StageSchema.parse({
+      id: "s", name: "s", mapId: "m", turnLimit: 30, units: [], events: [],
+    })).toThrow();
+    // 빈 objectives 배열도 거부 (victory 없음)
+    expect(() => StageSchema.parse({
+      id: "s", name: "s", mapId: "m", turnLimit: 30, units: [], objectives: [], events: [],
+    })).toThrow();
+  });
+
   it("일기토 이벤트: winnerId 교차 검증 유지", () => {
     expect(() => StageEventSchema.parse({
       id: "e", type: "duel",

@@ -1,4 +1,4 @@
-import type { Side } from "@tk/data";
+import type { Side, Objective, FailCondition } from "@tk/data";
 import type { Action, ActionResult, BattleContext, BattleEvent, BattleState, UnitState } from "./types";
 import { areFoes, camp } from "./types";
 import { getMovableTiles, unitAt } from "./movement";
@@ -8,6 +8,7 @@ import {
   spiritPower,
 } from "./combat";
 import { findDuelTrigger } from "./events";
+import { spawnUnit } from "./createBattle";
 
 function getUnit(state: BattleState, id: string): UnitState {
   const u = state.units.find((u) => u.id === id);
@@ -80,30 +81,100 @@ function grantExp(
   return { state: replaceUnit(state, { ...attacker, level, exp }), events };
 }
 
-/** 승패 판정. 충족 시 status 변경 + battleEnded 이벤트 */
+/** id로 유닛을 찾되 없으면 undefined (미투입 증원 대상 등 — 던지지 않음) */
+function findUnit(state: BattleState, id: string): UnitState | undefined {
+  return state.units.find((u) => u.id === id);
+}
+
+/** 유닛이 퇴각 상태인가. 미투입(부재) 유닛은 "아직 안 퇴각"으로 본다(false). */
+function isRetreated(state: BattleState, id: string): boolean {
+  return findUnit(state, id)?.retreated === true;
+}
+
+/**
+ * 단일 승리 목표 충족 여부 (M3①). 부재 유닛 대상은 미충족으로 안전 처리.
+ *  - surviveTurns: turn > turns (그 turns번째 라운드를 온전히 끝낸 직후 충족 — turnLimit 의미론과 동일)
+ *  - reachTile/captureTile: 점유는 retreated 아닌 유닛의 (x,y) 일치로 판정.
+ */
+function objectiveMet(ctx: BattleContext, state: BattleState, o: Objective): boolean {
+  switch (o.kind) {
+    case "defeatAll":
+      return !state.units.some((u) => camp(u.side) === "hostile" && !u.retreated);
+    case "defeatUnit":
+      return isRetreated(state, o.unitId);
+    case "reachTile": {
+      if (o.unitId !== undefined) {
+        const u = findUnit(state, o.unitId);
+        return !!u && !u.retreated && u.x === o.x && u.y === o.y;
+      }
+      // unitId 생략 = 아무 아군(camp friendly)이 그 칸에 도달
+      return state.units.some((u) => camp(u.side) === "friendly" && !u.retreated && u.x === o.x && u.y === o.y);
+    }
+    case "surviveTurns":
+      return state.turn > o.turns;
+    case "captureTile":
+      return state.units.some((u) => u.side === o.side && !u.retreated && u.x === o.x && u.y === o.y);
+  }
+}
+
+/** 단일 패배 조건 충족 여부 (M3①). */
+function failConditionMet(ctx: BattleContext, state: BattleState, f: FailCondition): boolean {
+  switch (f.kind) {
+    case "unitRetreated":
+      return isRetreated(state, f.unitId);
+    case "allRetreated":
+      // 호위 대상 전부 퇴각 시 패배. 전원이 (퇴각했거나 부재)면 충족 — 단 1명도 존재·생존 시 미충족.
+      return f.unitIds.every((id) => isRetreated(state, id)) &&
+        f.unitIds.some((id) => findUnit(state, id) !== undefined);
+    case "turnLimitExceeded":
+      return state.turn > ctx.stage.turnLimit;
+  }
+}
+
+/**
+ * 승패 판정 (M3①). objectives/failConditions가 있으면 그쪽 우선, 없으면 레거시 victory/defeat 폴백.
+ * 최상위 계약 보존: status는 "ongoing"|"victory"|"defeat"만, battleEnded 이벤트도 동일.
+ *
+ * 우선순위(원작 룰 — 동시 발생 시 패배 우선):
+ *  1) failConditions 중 하나라도 충족 → defeat
+ *  2) turnLimit 처리: failConditions에 turnLimitExceeded가 **명시**됐으면 위 1)에서 처리.
+ *     명시 안 했으면 기존대로 turn > turnLimit 단순 종료=defeat (하위호환).
+ *  3) 모든 non-optional objective 충족 → victory
+ */
 function checkOutcome(ctx: BattleContext, state: BattleState): { state: BattleState; events: BattleEvent[] } {
   if (state.status !== "ongoing") return { state, events: [] };
-  const v = ctx.stage.victory;
-  const d = ctx.stage.defeat;
-  const retreated = (id: string) => getUnit(state, id).retreated;
 
-  // 패배 체크 우선 — 군주 퇴각과 마지막 적 격파가 동시 발생하면 defeat (원작 룰)
-  // 턴 제한: turn은 maybeAdvancePhase의 적→아군 전환에서만 증가하므로,
-  // turn > turnLimit은 "turnLimit번째 라운드를 온전히 끝낸 직후"에만 참이 된다 (sim runner의 turn <= maxTurns 의미론과 일치)
-  if (state.turn > ctx.stage.turnLimit) {
-    return { state: { ...state, status: "defeat" }, events: [{ type: "battleEnded", result: "defeat" }] };
+  const objectives = ctx.stage.objectives;
+  const failConditions = ctx.stage.failConditions;
+  const useNew = objectives !== undefined && objectives.length > 0;
+
+  const defeat = (): { state: BattleState; events: BattleEvent[] } =>
+    ({ state: { ...state, status: "defeat" }, events: [{ type: "battleEnded", result: "defeat" }] });
+  const victory = (): { state: BattleState; events: BattleEvent[] } =>
+    ({ state: { ...state, status: "victory" }, events: [{ type: "battleEnded", result: "victory" }] });
+
+  if (useNew) {
+    // 패배 우선
+    if (failConditions?.some((f) => failConditionMet(ctx, state, f))) return defeat();
+    // turnLimitExceeded를 명시하지 않았으면 기존 단순 종료 룰 유지(하위호환)
+    const hasTurnLimitFail = failConditions?.some((f) => f.kind === "turnLimitExceeded") ?? false;
+    if (!hasTurnLimitFail && state.turn > ctx.stage.turnLimit) return defeat();
+    // 필수 목표 전부 충족 시 승리
+    const required = objectives.filter((o) => !o.optional);
+    if (required.length > 0 && required.every((o) => objectiveMet(ctx, state, o))) return victory();
+    return { state, events: [] };
   }
-  if (d.kind === "lordRetreat" && retreated(d.unitId)) {
-    return { state: { ...state, status: "defeat" }, events: [{ type: "battleEnded", result: "defeat" }] };
-  }
-  // 적대 진영(camp=hostile) 생존 여부 — defeatAll 승리 판정. 우군 전멸은 패배 아님(스테이지 미명시 시).
+
+  // ── 레거시 폴백 (objectives 미지정 스테이지) ──
+  const v = ctx.stage.victory!;
+  const d = ctx.stage.defeat;
+  if (state.turn > ctx.stage.turnLimit) return defeat();
+  if (d?.kind === "lordRetreat" && isRetreated(state, d.unitId)) return defeat();
   const enemiesAlive = state.units.some((u) => camp(u.side) === "hostile" && !u.retreated);
   const victoryMet =
     (v.kind === "defeatAll" && !enemiesAlive) ||
-    (v.kind === "defeatUnit" && retreated(v.unitId));
-  if (victoryMet) {
-    return { state: { ...state, status: "victory" }, events: [{ type: "battleEnded", result: "victory" }] };
-  }
+    (v.kind === "defeatUnit" && isRetreated(state, v.unitId));
+  if (victoryMet) return victory();
   return { state, events: [] };
 }
 
@@ -150,6 +221,84 @@ function maybeAdvancePhase(state: BattleState): { state: BattleState; events: Ba
   };
 }
 
+/**
+ * 증원 트리거 평가 → 충족분 투입 (M3① §2-6). 결정론.
+ *  - turn 트리거: state.turn 이 trigger.turn 이상이 된 뒤 첫 평가에서 스폰(턴 도달 시점 직후).
+ *  - unitDefeated 트리거: 그 유닛이 퇴각한 뒤 첫 평가에서 스폰.
+ * once 보장: spawnedReinforcements에 id 누적. 투입 유닛은 spawnUnit(정규 초기화)으로 생성.
+ * 매 액션 처리 끝(checkOutcome 전)과 페이즈 전환 직후 호출돼도 중복 없음(id 가드).
+ */
+function applyReinforcements(ctx: BattleContext, state: BattleState): { state: BattleState; events: BattleEvent[] } {
+  if (state.status !== "ongoing") return { state, events: [] };
+  let next = state;
+  const events: BattleEvent[] = [];
+  for (const r of ctx.stage.reinforcements ?? []) {
+    if (next.spawnedReinforcements.includes(r.id)) continue;
+    const fire =
+      (r.trigger.kind === "turn" && next.turn >= r.trigger.turn) ||
+      (r.trigger.kind === "unitDefeated" && isRetreated(next, r.trigger.unitId));
+    if (!fire) continue;
+    const spawned = r.units.map((p) => spawnUnit(ctx.data, { ...p, side: r.side }));
+    next = {
+      ...next,
+      units: [...next.units, ...spawned],
+      spawnedReinforcements: [...next.spawnedReinforcements, r.id],
+    };
+    events.push({
+      type: "reinforcementArrived", reinforcementId: r.id, side: r.side,
+      unitIds: spawned.map((u) => u.id),
+    });
+  }
+  return { state: next, events };
+}
+
+/**
+ * 전략조건(보물 게이트) 평가 (M3① §2-1). 충족 시 metStrategyConditions push + pendingRewards 적립
+ * + strategyConditionMet 이벤트. 승패 무관. 결정론. 일기토 발동/유닛 이동 커밋 후 호출.
+ *  - duelOccurred: duelHistory에 그 id 포함 시.
+ *  - duelsInOrder: duelHistory가 duelIds를 "순서 보존 포함"(부분수열)하면 충족.
+ *  - unitReachedTile: 그 유닛이 (x,y) 점유 시.
+ */
+function duelsInOrderSatisfied(history: string[], ids: string[]): boolean {
+  let i = 0;
+  for (const h of history) {
+    if (h === ids[i]) i++;
+    if (i === ids.length) return true;
+  }
+  return i === ids.length;
+}
+
+function evaluateStrategyConditions(ctx: BattleContext, state: BattleState): { state: BattleState; events: BattleEvent[] } {
+  let next = state;
+  const events: BattleEvent[] = [];
+  for (const sc of ctx.stage.strategyConditions ?? []) {
+    if (next.metStrategyConditions.includes(sc.id)) continue;
+    let met = false;
+    switch (sc.trigger.kind) {
+      case "duelOccurred":
+        met = next.duelHistory.includes(sc.trigger.duelId);
+        break;
+      case "duelsInOrder":
+        met = duelsInOrderSatisfied(next.duelHistory, sc.trigger.duelIds);
+        break;
+      case "unitReachedTile": {
+        const u = findUnit(next, sc.trigger.unitId);
+        met = !!u && !u.retreated && u.x === sc.trigger.x && u.y === sc.trigger.y;
+        break;
+      }
+    }
+    if (!met) continue;
+    const gold = sc.reward.gold ?? 0;
+    next = {
+      ...next,
+      metStrategyConditions: [...next.metStrategyConditions, sc.id],
+      pendingRewards: [...next.pendingRewards, { conditionId: sc.id, treasures: [...sc.reward.treasures], gold }],
+    };
+    events.push({ type: "strategyConditionMet", id: sc.id, treasures: [...sc.reward.treasures], gold });
+  }
+  return { state: next, events };
+}
+
 export function applyAction(ctx: BattleContext, state: BattleState, action: Action): ActionResult {
   const unit = getUnit(state, action.unitId);
   const events: BattleEvent[] = [];
@@ -184,7 +333,11 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
           type: "duelTriggered", eventId: duel.id,
           attackerId: unit.id, defenderId: target.id, winnerId: duel.outcome.winnerId,
         });
-        next = { ...state, firedEvents: [...state.firedEvents, duel.id] };
+        next = {
+          ...state,
+          firedEvents: [...state.firedEvents, duel.id],
+          duelHistory: [...state.duelHistory, duel.id], // 전략조건(순서) 판정용 발동 이력
+        };
         if (duel.outcome.loserRetreats) {
           const loser = getUnit(next, loserId);
           next = replaceUnit(next, { ...loser, troops: 0, retreated: true });
@@ -318,6 +471,16 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
     }
   }
 
+  // 행동 결과(이동/격파 등) 반영 후 전략조건·증원 평가 → 승패 판정.
+  // 순서: 증원(unitDefeated 트리거 — 이번 행동의 퇴각 반영) → 전략조건(이동 도달·일기토) → 승패.
+  const reinf = applyReinforcements(ctx, next);
+  next = reinf.state;
+  events.push(...reinf.events);
+
+  const sc = evaluateStrategyConditions(ctx, next);
+  next = sc.state;
+  events.push(...sc.events);
+
   const outcome = checkOutcome(ctx, next);
   next = outcome.state;
   events.push(...outcome.events);
@@ -326,7 +489,16 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
   next = phase.state;
   events.push(...phase.events);
 
-  // 턴 증가 직후 재판정 — 턴 제한 패배가 "아군 페이즈 시작 시점"(phaseChanged 직후)에 잡히도록.
+  // 페이즈 전환(턴 증가) 직후 — turn 트리거 증원 투입 + 전략조건 재평가(증원 등 상태 변화 반영).
+  const reinf2 = applyReinforcements(ctx, next);
+  next = reinf2.state;
+  events.push(...reinf2.events);
+
+  const sc2 = evaluateStrategyConditions(ctx, next);
+  next = sc2.state;
+  events.push(...sc2.events);
+
+  // 턴 증가 직후 재판정 — 턴 제한 패배/생존 목표(surviveTurns)가 "다음 페이즈 시작 시점"에 잡히도록.
   // 첫 checkOutcome에서 이미 종료됐다면 조기 반환되고, 유닛 상태는 그 사이 불변이라 이중 판정 위험 없음
   const lateOutcome = checkOutcome(ctx, next);
   next = lateOutcome.state;

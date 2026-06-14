@@ -42,6 +42,13 @@ export interface UnitState {
   moved: boolean; acted: boolean; retreated: boolean;
 }
 
+/** 전략조건 보상 적립분 (M3① — §2-1 보물 게이트). 결산에서 지급. */
+export interface PendingReward {
+  conditionId: string;       // 어느 strategyCondition에서 나온 보상인가
+  treasures: string[];       // 적립된 보물 item id
+  gold: number;              // 적립된 자금(없으면 0)
+}
+
 export interface BattleState {
   turn: number;
   phase: Side;
@@ -50,6 +57,15 @@ export interface BattleState {
   /** mulberry32 내부 상태. signed int32라 음수 가능. 원작 공식은 분산이 없어 전투 중 갱신되지 않음 — 기연/일반 일기토 확률 등 미래 RNG 용도로 보존 */
   rngState: number;
   firedEvents: string[]; // once 이벤트 중복 발동 방지
+  // ── M3① 목표 시스템 추적 필드 ──────────────────────────────────────────
+  /** 발동된 일기토 id를 발동 순서대로 기록 — duelsInOrder 전략조건 판정용 */
+  duelHistory: string[];
+  /** 이미 충족된 전략조건 id — 중복 적립 방지 */
+  metStrategyConditions: string[];
+  /** 이미 투입된 증원 id — 중복 스폰 방지 */
+  spawnedReinforcements: string[];
+  /** 전략조건으로 적립된 보상 (결산 지급 대기). 결정론적 누적 */
+  pendingRewards: PendingReward[];
 }
 
 export type Action =
@@ -72,6 +88,10 @@ export type BattleEvent =
   | { type: "levelUp"; unitId: string; newLevel: number }
   | { type: "duelTriggered"; eventId: string; attackerId: string; defenderId: string; winnerId: string }
   | { type: "phaseChanged"; phase: Side; turn: number }
+  // M3① 증원 도착 — units = 새로 투입된 유닛 id 목록 (BattleState.units에 추가된 직후)
+  | { type: "reinforcementArrived"; reinforcementId: string; side: Side; unitIds: string[] }
+  // M3① 전략조건 충족 — reward = 적립된 보물/자금 (결산 지급 대기). 승패 무관
+  | { type: "strategyConditionMet"; id: string; treasures: string[]; gold: number }
   | { type: "battleEnded"; result: "victory" | "defeat" };
 
 /** 정적 컨텍스트 — map은 stage.mapId로 해석된 BattleMap */
