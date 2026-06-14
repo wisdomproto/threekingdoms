@@ -148,9 +148,17 @@ function itemsFor(ui: InputState, dispatch: (e: UiEvent) => void): Item[] {
         disabled: ui.items.length === 0,
         onPress: () => dispatch({ type: "menuItem" }),
       },
-      // ── 미구현(차별화 백로그) — 자리표시 dim ──
+      // ── 교환: 미구현(차별화 백로그) — 자리표시 dim ──
       { key: "trade", label: "교환", placeholder: true }, // 아이템 주고받기
-      { key: "assist", label: "협공", placeholder: true }, // 포위 협공
+      // 협공: 포위 가능 시 점등(주황) → 공격 타깃팅 진입(예측에 협공+N% 노출). 불가 시 dim.
+      {
+        key: "assist",
+        label: "협공",
+        accent: "#ff9a3d",
+        disabled: !ui.canFlank,
+        onPress: () => dispatch({ type: "menuAttack" }),
+      },
+      // ── 필살: 미구현(차별화 백로그) — 자리표시 dim ──
       { key: "ultimate", label: "필살", placeholder: true }, // 네임드 특수기
       // ──────────────────────────────────────
       {

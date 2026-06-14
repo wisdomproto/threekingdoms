@@ -73,6 +73,7 @@ export interface RendererStore {
 
 const PHASE_BANNER_MS = 600; // 설계 §6
 const DUEL_BANNER_MS = 1100;
+const FLANK_BANNER_MS = 650; // 협공 — 데미지 직전 짧은 펀치(블로킹 최소)
 const END_BANNER_MS = 1200;
 const FOCUS_MS = 250;
 const WHEEL_ZOOM_STEP = 1.12;
@@ -692,6 +693,17 @@ export class BattleRenderer implements Presenter {
       `일기토! ${name(e.attackerId)} vs ${name(e.defenderId)} — ${name(e.winnerId)} 승리`,
       DUEL_BANNER_MS,
     );
+  }
+
+  async flank(e: Ev<"flank">): Promise<void> {
+    const s = this.scene;
+    if (!s) return;
+    // 협공 발동(데미지 직전) — 대상에 잭팟 플래시 + 가벼운 흔들림 + 짧은 「협공!」 배너.
+    const defender = s.units.view(e.defenderId);
+    const at = gridToWorld({ x: defender.gridX, y: defender.gridY });
+    void s.fx.impactFlash(at);
+    this.triggerShake(SHAKE_PX_HIT);
+    await s.fx.banner(`협공! +${e.bonusPercent}%`, FLANK_BANNER_MS);
   }
 
   async phaseChanged(e: Ev<"phaseChanged">): Promise<void> {

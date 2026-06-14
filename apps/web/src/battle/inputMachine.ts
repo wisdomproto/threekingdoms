@@ -7,7 +7,10 @@
  * 들고 즉시 postMoveMenu로 진입한다(§5 표의 "movePreview → 즉시 postMoveMenu"를 한 전이로 구현).
  * 취소(menuCancel)는 커밋이 없었으므로 무손실로 selected에 복귀한다.
  */
-import { getAttackableTargets, getMovableTiles, getStrategyTargets, unitAt } from "@tk/engine";
+import {
+  getAttackableTargets, getMovableTiles, getStrategyTargets, unitAt,
+  flankingCount, flankMultiplier,
+} from "@tk/engine";
 import type { Action, BattleContext, BattleState, Coord } from "@tk/engine";
 
 /** preview(또는 현위치)에서 시전 가능한 책략 id 목록 — MP 충분 + 사정거리 내 표적 존재 */
@@ -34,6 +37,27 @@ export function usableItems(ctx: BattleContext, battle: BattleState, unitId: str
     if (item && (item.category === "supplyItem" || item.category === "attackItem")) out.push(id);
   }
   return out;
+}
+
+/**
+ * preview 위치에서 협공 가능한 적이 1기 이상인가 (협공 버튼 점등 조건).
+ * 공격자를 from(이동 후 칸)에 가상 배치한 state로 포위도를 세 엔진 처리와 일치시킨다.
+ */
+function flankOpportunity(
+  ctx: BattleContext, battle: BattleState, unitId: string, from: Coord, attackable: string[],
+): boolean {
+  if (attackable.length === 0) return false;
+  const u = battle.units.find((x) => x.id === unitId);
+  if (!u) return false;
+  const moved = u.x !== from.x || u.y !== from.y;
+  const fState: BattleState = moved
+    ? { ...battle, units: battle.units.map((x) => (x.id === unitId ? { ...x, x: from.x, y: from.y } : x)) }
+    : battle;
+  const attacker = moved ? fState.units.find((x) => x.id === unitId)! : u;
+  return attackable.some((id) => {
+    const t = fState.units.find((x) => x.id === id && !x.retreated);
+    return t !== undefined && flankMultiplier(ctx, flankingCount(fState, attacker, t)) > 1;
+  });
 }
 
 /**
@@ -72,6 +96,8 @@ export type InputState =
       strategies: string[];
       /** 보유 소모품 id 목록 (도구 버튼 표시 조건) */
       items: string[];
+      /** preview 위치에서 협공 가능한 적이 1기 이상 (협공 버튼 점등 조건) */
+      canFlank: boolean;
     }
   | {
       kind: "targetSelect";
@@ -236,6 +262,7 @@ export function reduceInput(
                 attackable: getAttackableTargets(ctx, battle, u.id),
                 strategies: castableStrategies(ctx, battle, u.id, pos),
                 items: usableItems(ctx, battle, u.id),
+                canFlank: flankOpportunity(ctx, battle, u.id, pos, getAttackableTargets(ctx, battle, u.id)),
               },
               effects: [{ type: "focus", coord: event.coord }],
             };
@@ -309,6 +336,7 @@ export function reduceInput(
             attackable: state.attackable,
             strategies: castableStrategies(ctx, battle, state.unitId, pos),
             items: usableItems(ctx, battle, state.unitId),
+            canFlank: flankOpportunity(ctx, battle, state.unitId, pos, state.attackable),
           },
           effects: [],
         };
@@ -340,6 +368,10 @@ export function reduceInput(
             attackable: getAttackableTargets(ctx, battle, state.unitId, event.coord),
             strategies: castableStrategies(ctx, battle, state.unitId, event.coord),
             items: usableItems(ctx, battle, state.unitId),
+            canFlank: flankOpportunity(
+              ctx, battle, state.unitId, event.coord,
+              getAttackableTargets(ctx, battle, state.unitId, event.coord),
+            ),
           },
           effects: [{ type: "focus", coord: event.coord }],
         };
@@ -393,7 +425,14 @@ export function reduceInput(
 
     case "targetSelect": {
       if (event.type === "cancel" || event.type === "menuCancel") {
-        return { next: { ...state, kind: "postMoveMenu" }, effects: [] };
+        return {
+          next: {
+            ...state,
+            kind: "postMoveMenu",
+            canFlank: flankOpportunity(ctx, battle, state.unitId, state.preview, state.attackable),
+          },
+          effects: [],
+        };
       }
       if (event.type === "tapTile") {
         const target = unitAt(battle, event.coord.x, event.coord.y);
@@ -423,7 +462,14 @@ export function reduceInput(
         return { next: { ...state, kind: "strategyTarget", strategyId: event.strategyId, castTiles }, effects: [] };
       }
       if (event.type === "cancel" || event.type === "menuCancel") {
-        return { next: { ...state, kind: "postMoveMenu" }, effects: [] };
+        return {
+          next: {
+            ...state,
+            kind: "postMoveMenu",
+            canFlank: flankOpportunity(ctx, battle, state.unitId, state.preview, state.attackable),
+          },
+          effects: [],
+        };
       }
       return noop(state); // tapTile 등 무시 — 모달
     }
@@ -473,7 +519,14 @@ export function reduceInput(
         };
       }
       if (event.type === "cancel" || event.type === "menuCancel") {
-        return { next: { ...state, kind: "postMoveMenu" }, effects: [] };
+        return {
+          next: {
+            ...state,
+            kind: "postMoveMenu",
+            canFlank: flankOpportunity(ctx, battle, state.unitId, state.preview, state.attackable),
+          },
+          effects: [],
+        };
       }
       return noop(state); // tapTile 등 무시 — 모달
     }
