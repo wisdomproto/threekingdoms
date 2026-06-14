@@ -16,8 +16,15 @@ import { useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import type { Shop as ShopData, Item } from "@tk/data";
 import { PANEL_FRAME } from "../../battle/hud/frames";
-import { getMeta, spendGold, addItem } from "../metaStore";
+import { getMeta, spendGold, addItem, addGold, canWatchGoldAd, recordAdGold } from "../metaStore";
+import { RewardedAdButton } from "../RewardedAdButton";
 import { buildShopRows, type ShopRow } from "./shopItemView";
+
+/**
+ * 광고 1회 시청당 충전되는 *확정* 골드(§13 가드레일 — 소액·랜덤 없음, 전투력 영향 없음).
+ * "확정 장비 구매용" 자금만 늘려주므로 밸런스 시뮬레이션을 깨지 않는다.
+ */
+const AD_GOLD_REWARD = 100;
 
 export interface ShopProps {
   /** 진열 상점(gameData.shops.ch1 등). */
@@ -68,14 +75,33 @@ export function Shop({
     onPurchase?.(row.itemId); // 부모가 gold/inventory 재조회
   }
 
+  // 광고 골드 충전(§13 shop_gold) — 완주 시에만 호출. *확정* 소액 골드 + 일일 캡 기록.
+  // 골드 지급(addGold)과 캡 기록(recordAdGold)은 분리돼 있어 둘 다 호출해야 한다.
+  function handleAdGold(): void {
+    addGold(AD_GOLD_REWARD);
+    recordAdGold();
+    setTick((t) => t + 1); // 캡/affordable 재평가
+    onPurchase?.(""); // 부모가 보유 자금(gold prop) 재조회 — itemId 없는 잔액 갱신 신호
+  }
+
   return (
     <section style={panelStyle} aria-label="상점">
       <header style={headerStyle}>
         <h2 style={titleStyle}>{shop.name}</h2>
-        <span style={goldStyle} aria-label="보유 자금">
-          <span style={{ color: C.inkDim, fontSize: 12, marginRight: 4 }}>자금</span>
-          {gold.toLocaleString()}
-        </span>
+        <div style={headerRightStyle}>
+          {/* 광고 보고 +골드(§13 shop_gold) — adFree면 RewardedAdButton이 null 반환(미표시).
+              완주 시 *확정* 소액 골드 충전, 일일 캡 도달 시 "오늘 마감"으로 비활성. */}
+          <RewardedAdButton
+            placement="shop_gold"
+            label={`광고 보고 +${AD_GOLD_REWARD}골드`}
+            capReached={!canWatchGoldAd()}
+            onReward={handleAdGold}
+          />
+          <span style={goldStyle} aria-label="보유 자금">
+            <span style={{ color: C.inkDim, fontSize: 12, marginRight: 4 }}>자금</span>
+            {gold.toLocaleString()}
+          </span>
+        </div>
       </header>
 
       {rows.length === 0 ? (
@@ -148,10 +174,18 @@ const panelStyle: CSSProperties = {
 
 const headerStyle: CSSProperties = {
   display: "flex",
-  alignItems: "baseline",
+  alignItems: "center",
   justifyContent: "space-between",
   marginBottom: 10,
   gap: 8,
+  flexWrap: "wrap",
+};
+
+// 제목 우측: [광고 보고 +골드] 버튼 + 보유 자금. 좁은 폭에서 줄바꿈 허용.
+const headerRightStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
 };
 
 const titleStyle: CSSProperties = {

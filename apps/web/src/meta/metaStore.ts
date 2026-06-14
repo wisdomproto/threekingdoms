@@ -15,6 +15,7 @@
  */
 import { gameData } from "@tk/data";
 import type { RosterEntry } from "@tk/data";
+import { registerAdFreeProvider } from "./adService";
 
 /** 장수별 메타 진행(레벨/경험치/장착) — 전투에 주입될 편성 단위의 영속 부분. */
 export interface RosterProgress {
@@ -22,6 +23,14 @@ export interface RosterProgress {
   exp: number;
   /** 장착 itemId 목록(무기/방어구/보조). 인벤토리에서 빠지진 않고 "장착 표시"만. */
   equipped: string[];
+}
+
+/** 일일 광고 캡 카운터(§13 — 상점 골드 충전 일일 캡). 날짜가 바뀌면 롤오버. */
+export interface AdGoldCap {
+  /** YYYY-MM-DD(로컬). 이 날짜의 시청 횟수만 집계. */
+  date: string;
+  /** 오늘 시청 횟수. */
+  count: number;
 }
 
 /** 영속되는 메타 상태 전체. localStorage `tk.meta.v1`에 JSON으로 직렬화된다. */
@@ -34,7 +43,14 @@ export interface MetaState {
   clearedStages: string[];
   /** commanderId → 진행. 미보유 장수는 키가 없을 수 있음(getRoster가 기본값 채움). */
   rosterProgress: Record<string, RosterProgress>;
+  /** 광고제거(통구매/IAP §13). true면 AdService가 광고 UI를 띄우지 않음. 기본 false. */
+  adFree: boolean;
+  /** 상점 골드 충전 일일 캡 카운터(§13). 미설정/날짜 경과는 0으로 간주. */
+  adGoldCap?: AdGoldCap;
 }
+
+/** 상점 골드 충전 광고 일일 캡(§13 "소액·일일 캡"). 하루 최대 시청 횟수. */
+export const AD_GOLD_DAILY_CAP = 5;
 
 /** getRoster() 반환 단위 — RosterEntry(정적) + 메타 진행(동적) 합본. 편성 화면이 그대로 소비. */
 export interface RosterUnit {
@@ -51,9 +67,17 @@ export interface RosterUnit {
 const STORAGE_KEY = "tk.meta.v1";
 const LEGACY_GOLD_KEY = "tk.meta.gold"; // metaGold.ts와 공유 — 결산 경로 호환
 
-/** 신규 게임 초기값(§15 — 시작 자금 0, 빈 인벤토리/클리어). */
+/** 신규 게임 초기값(§15 — 시작 자금 0, 빈 인벤토리/클리어, 광고 ON). */
 export function initialMeta(): MetaState {
-  return { gold: 0, inventory: [], clearedStages: [], rosterProgress: {} };
+  return { gold: 0, inventory: [], clearedStages: [], rosterProgress: {}, adFree: false };
+}
+
+/** 로컬 날짜 키(YYYY-MM-DD). 캡 롤오버 기준. 테스트는 now 주입 가능. */
+export function localDateKey(now: Date = new Date()): string {
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
 /** 합류 기본 레벨(§6 후발 합류 평균 보정은 추후 — 지금은 1). */
@@ -87,6 +111,37 @@ export function reduceRemoveItem(s: MetaState, itemId: string): MetaState {
   const inventory = s.inventory.slice();
   inventory.splice(i, 1);
   return { ...s, inventory };
+}
+
+/** 광고제거 플래그 설정(통구매/IAP §13). 동일값이면 불변 참조. */
+export function reduceSetAdFree(s: MetaState, on: boolean): MetaState {
+  if (s.adFree === on) return s;
+  return { ...s, adFree: on };
+}
+
+/** 오늘 날짜 기준 시청 횟수(날짜가 바뀌었으면 0). */
+export function adGoldCountToday(s: MetaState, dateKey: string): number {
+  const cap = s.adGoldCap;
+  if (!cap || cap.date !== dateKey) return 0;
+  return cap.count;
+}
+
+/**
+ * 상점 골드 충전 광고를 더 볼 수 있는가(§13 일일 캡). 날짜 롤오버는 0으로 리셋되어 자동 처리.
+ * 가드레일: 이 캡은 *골드 충전*에만 — 진행/전투를 막지 않는다(거부해도 무손실).
+ */
+export function canWatchAdForGold(s: MetaState, dateKey: string = localDateKey()): boolean {
+  return adGoldCountToday(s, dateKey) < AD_GOLD_DAILY_CAP;
+}
+
+/**
+ * 광고 골드 충전 1회 기록(시청 완주 후 호출). 날짜가 바뀌었으면 카운터를 새 날짜 1로 리셋.
+ * 캡 도달 상태에서 호출돼도 그대로 증가(상한 enforcement는 canWatchAdForGold가 사전 차단).
+ * **골드 지급은 하지 않는다** — addGold를 별도로 호출(보상=골드만, §13 가드레일).
+ */
+export function reduceRecordAdGold(s: MetaState, dateKey: string = localDateKey()): MetaState {
+  const prev = adGoldCountToday(s, dateKey);
+  return { ...s, adGoldCap: { date: dateKey, count: prev + 1 } };
 }
 
 export function reduceMarkCleared(s: MetaState, stageId: string): MetaState {
@@ -175,6 +230,8 @@ function loadFromStorage(): MetaState {
       inventory: Array.isArray(parsed.inventory) ? parsed.inventory.filter((x) => typeof x === "string") : [],
       clearedStages: Array.isArray(parsed.clearedStages) ? parsed.clearedStages.filter((x) => typeof x === "string") : [],
       rosterProgress: isRosterProgressMap(parsed.rosterProgress) ? parsed.rosterProgress : {},
+      adFree: parsed.adFree === true, // 누락/구버전은 false(광고 ON)
+      adGoldCap: isAdGoldCap(parsed.adGoldCap) ? parsed.adGoldCap : undefined,
     };
     // legacy gold가 v1보다 크면(결산이 v1 밖에서 누적했을 수 있음) 더 큰 값 채택.
     const legacy = readLegacyGold();
@@ -183,6 +240,15 @@ function loadFromStorage(): MetaState {
   } catch {
     return memory ?? initialMeta();
   }
+}
+
+function isAdGoldCap(v: unknown): v is AdGoldCap {
+  return (
+    typeof v === "object" &&
+    v !== null &&
+    typeof (v as AdGoldCap).date === "string" &&
+    typeof (v as AdGoldCap).count === "number"
+  );
 }
 
 function isRosterProgressMap(v: unknown): v is Record<string, RosterProgress> {
@@ -261,7 +327,7 @@ export function getRoster(rosters: Record<string, RosterEntry> = gameData.roster
   return selectRoster(loadFromStorage(), rosters);
 }
 
-/** 신규 게임 초기화 — v1 + legacy gold 키 모두 정리. */
+/** 신규 게임 초기화 — v1 + legacy gold 키 모두 정리. adFree는 보존하지 않음(초기값 false). */
 export function reset(): void {
   memory = initialMeta();
   if (!hasStorage()) return;
@@ -272,3 +338,41 @@ export function reset(): void {
     // 무시 — 메모리 캐시는 초기화됨.
   }
 }
+
+// ---------------------------------------------------------------------------
+// 광고 배관 공개 API (§13) — adService가 isAdFree를 읽고, 적용처가 캡/기록을 쓴다.
+// ---------------------------------------------------------------------------
+
+/** 광고제거(adFree) 여부. adService.getAdService()가 이 판정을 읽는다(registerAdFreeProvider). */
+export function isAdFree(): boolean {
+  return loadFromStorage().adFree;
+}
+
+/** 광고제거 설정(통구매/IAP §13). 이후 모든 광고 호출이 즉시 단락된다. */
+export function setAdFree(on: boolean): void {
+  saveToStorage(reduceSetAdFree(loadFromStorage(), on));
+}
+
+/** 오늘 상점 골드 광고를 더 볼 수 있는가(§13 일일 캡). 적용처 버튼의 capReached 판정 소스. */
+export function canWatchGoldAd(dateKey: string = localDateKey()): boolean {
+  return canWatchAdForGold(loadFromStorage(), dateKey);
+}
+
+/** 오늘 상점 골드 광고 시청 횟수(표시용). */
+export function getAdGoldCount(dateKey: string = localDateKey()): number {
+  return adGoldCountToday(loadFromStorage(), dateKey);
+}
+
+/**
+ * 광고 골드 충전 1회 기록(시청 완주 직후 호출). **골드는 별도 addGold로 지급**한다 —
+ * 이 함수는 캡 카운터만 증가(보상=골드만, 진행 차단 없음 — §13 가드레일).
+ * 새 합계 카운트 반환.
+ */
+export function recordAdGold(dateKey: string = localDateKey()): number {
+  const next = reduceRecordAdGold(loadFromStorage(), dateKey);
+  saveToStorage(next);
+  return next.adGoldCap!.count;
+}
+
+// adService 싱글톤이 런타임에 adFree를 읽도록 판정 함수를 등록(느슨 결합, 순환 import 없음).
+registerAdFreeProvider(isAdFree);

@@ -12,6 +12,11 @@ import {
   reduceRemoveItem,
   reduceMarkCleared,
   reduceSetEquipped,
+  reduceSetAdFree,
+  reduceRecordAdGold,
+  canWatchAdForGold,
+  adGoldCountToday,
+  AD_GOLD_DAILY_CAP,
   selectRoster,
   getMeta,
   addGold,
@@ -21,6 +26,10 @@ import {
   markCleared,
   getRoster,
   reset,
+  isAdFree,
+  setAdFree,
+  canWatchGoldAd,
+  recordAdGold,
 } from "../metaStore";
 
 describe("순수 reducer", () => {
@@ -64,6 +73,72 @@ describe("순수 reducer", () => {
   });
 });
 
+describe("광고 reducer (§13 — adFree + 일일 캡)", () => {
+  it("setAdFree는 동일값이면 불변 참조, 다르면 토글", () => {
+    const s = initialMeta();
+    expect(s.adFree).toBe(false);
+    expect(reduceSetAdFree(s, false)).toBe(s); // 변화 없음
+    const on = reduceSetAdFree(s, true);
+    expect(on.adFree).toBe(true);
+    expect(reduceSetAdFree(on, true)).toBe(on);
+  });
+
+  it("adGoldCountToday는 날짜 일치할 때만 카운트, 불일치/미설정은 0", () => {
+    const s = { ...initialMeta(), adGoldCap: { date: "2026-06-14", count: 3 } };
+    expect(adGoldCountToday(s, "2026-06-14")).toBe(3);
+    expect(adGoldCountToday(s, "2026-06-15")).toBe(0); // 날짜 롤오버
+    expect(adGoldCountToday(initialMeta(), "2026-06-14")).toBe(0); // 미설정
+  });
+
+  it("recordAdGold는 같은 날 증가, 날짜 바뀌면 1로 리셋", () => {
+    let s = initialMeta();
+    s = reduceRecordAdGold(s, "2026-06-14");
+    expect(s.adGoldCap).toEqual({ date: "2026-06-14", count: 1 });
+    s = reduceRecordAdGold(s, "2026-06-14");
+    expect(s.adGoldCap!.count).toBe(2);
+    // 다음 날 — 카운터 롤오버
+    s = reduceRecordAdGold(s, "2026-06-15");
+    expect(s.adGoldCap).toEqual({ date: "2026-06-15", count: 1 });
+  });
+
+  it("canWatchAdForGold는 캡 미만이면 true, 도달하면 false", () => {
+    const dk = "2026-06-14";
+    let s = initialMeta();
+    expect(canWatchAdForGold(s, dk)).toBe(true);
+    for (let i = 0; i < AD_GOLD_DAILY_CAP; i++) s = reduceRecordAdGold(s, dk);
+    expect(adGoldCountToday(s, dk)).toBe(AD_GOLD_DAILY_CAP);
+    expect(canWatchAdForGold(s, dk)).toBe(false); // 도달 → 마감
+    // 날짜가 바뀌면 다시 시청 가능(진행 인질 아님)
+    expect(canWatchAdForGold(s, "2026-06-15")).toBe(true);
+  });
+});
+
+describe("광고 공개 API (node 메모리 캐시)", () => {
+  beforeEach(() => reset());
+
+  it("setAdFree/isAdFree 왕복", () => {
+    expect(isAdFree()).toBe(false);
+    setAdFree(true);
+    expect(isAdFree()).toBe(true);
+    setAdFree(false);
+    expect(isAdFree()).toBe(false);
+  });
+
+  it("recordAdGold가 캡 카운트를 영속(메모리)하고 canWatchGoldAd가 마감 판정", () => {
+    const dk = "2026-06-14";
+    expect(canWatchGoldAd(dk)).toBe(true);
+    for (let i = 0; i < AD_GOLD_DAILY_CAP; i++) recordAdGold(dk);
+    expect(canWatchGoldAd(dk)).toBe(false);
+    expect(canWatchGoldAd("2026-06-15")).toBe(true); // 롤오버
+  });
+
+  it("reset은 adFree를 초기값(false)으로 되돌린다", () => {
+    setAdFree(true);
+    reset();
+    expect(isAdFree()).toBe(false);
+  });
+});
+
 describe("selectRoster 해금 게이팅", () => {
   const rosters: Record<string, RosterEntry> = {
     유비: { commanderId: "유비", classId: "footman", joinChapter: 1, role: "lord" },
@@ -93,7 +168,7 @@ describe("공개 API (node 비브라우저 — 메모리 캐시 폴백)", () => 
 
   it("getMeta 초기값은 빈 상태", () => {
     const m = getMeta();
-    expect(m).toEqual({ gold: 0, inventory: [], clearedStages: [], rosterProgress: {} });
+    expect(m).toEqual({ gold: 0, inventory: [], clearedStages: [], rosterProgress: {}, adFree: false });
   });
 
   it("addGold→spendGold 흐름이 메모리 캐시로 일관", () => {

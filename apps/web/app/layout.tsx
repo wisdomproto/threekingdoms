@@ -1,4 +1,5 @@
 import type { Viewport } from "next";
+import { AdHost } from "../src/meta/AdHost";
 
 export const metadata = { title: "삼국지 SRPG (가칭)" };
 
@@ -20,7 +21,11 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* 전역 광고 호스트(클라이언트 아일랜드) — adService 큐를 구독해 가짜 광고 모달/전면 렌더. */}
+        <AdHost />
+      </body>
     </html>
   );
 }

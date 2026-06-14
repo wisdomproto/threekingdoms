@@ -18,8 +18,10 @@ import Link from "next/link";
 import { gameData, stages } from "@tk/data";
 import { Formation } from "../../src/meta/screens/Formation";
 import { Shop } from "../../src/meta/screens/Shop";
+import { LoadingTransition } from "../../src/meta/screens/LoadingTransition";
 import { getMeta, getRoster } from "../../src/meta/metaStore";
 import { writeSortie, type SortieMember } from "../../src/meta/sortie";
+import { shouldShowInterstitial } from "../../src/meta/interstitialPolicy";
 
 /** id "05-sishuiguan" → 5. 챕터 매핑(상점 unlockChapter 필터)에 사용. 파싱 실패 시 1. */
 function stageNumber(id: string): number {
@@ -61,14 +63,37 @@ export function PrepShell(): React.ReactElement {
 
   const [selected, setSelected] = useState<SortieMember[]>([]);
 
+  // 출진 클릭 후 로딩/전면광고 전환 셸을 띄울지(true면 <LoadingTransition/> 오버레이).
+  // showAd = 이번 전환에 전면광고를 끼울지(절제형 빈도 규칙 — adFree는 adService가 단락).
+  const [transition, setTransition] = useState<{ showAd: boolean } | null>(null);
+
   // 상점 구매 후 — 잔액/인벤토리(장비 후보)를 재조회하도록 셸 상태를 무효화.
   const onPurchase = useCallback(() => setRefreshKey((k) => k + 1), []);
 
   const onSortie = useCallback(() => {
     // 편성이 비면 기존 동작(stage JSON 그대로)으로 출진 — sortie.ts 계약상 override 안 함.
     writeSortie({ stageId, members: selected });
+    // §13 절제형: clearedStages 진행 척도 + 보스 규칙으로 이번 전환의 전면광고 노출 결정.
+    // 결정 후 로딩 셸을 띄운다(직접 router.push 대체). 실제 전투 진입은 onEnter에서.
+    const showAd = shouldShowInterstitial(getMeta().clearedStages.length, stageId);
+    setTransition({ showAd });
+  }, [stageId, selected]);
+
+  // 로딩 셸의 "전장으로" → 실제 전투 진입(광고/카드 완료 후).
+  const onEnterBattle = useCallback(() => {
     router.push(`/battle?stage=${encodeURIComponent(stageId)}`);
-  }, [router, stageId, selected]);
+  }, [router, stageId]);
+
+  if (transition) {
+    return (
+      <LoadingTransition
+        stageId={stageId}
+        stageName={stage.name}
+        showAd={transition.showAd}
+        onEnter={onEnterBattle}
+      />
+    );
+  }
 
   return (
     <main style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>

@@ -27,6 +27,7 @@ import { PANEL_FRAME, BUTTON_FRAME } from "./frames";
 import { buildResultSummary } from "./resultSummary";
 import { addGold, markCleared } from "../../meta/metaStore";
 import { clearSortie } from "../../meta/sortie";
+import { RewardedAdButton } from "../../meta/RewardedAdButton";
 
 const OVERLAY_STYLE: React.CSSProperties = {
   position: "absolute",
@@ -243,6 +244,10 @@ export function ResultSequence({
   const [flash, setFlash] = useState(false);
   // 스킵되면 즉시 최종 상태로 고정.
   const [skipped, setSkipped] = useState(false);
+  // 결산 보상 2배(§12/§13 result_double) — 광고 완주 시 1회만. 표시 자금을 2배로 재연출.
+  const [doubled, setDoubled] = useState(false);
+  // 2배 재연출용 자금 카운트업 rAF 핸들(언마운트/스킵 시 취소).
+  const doubleRafRef = useRef<number | null>(null);
   // 메타 반영(클리어 기록 + 자금 + 출진 소비)은 승리당 1회만.
   const metaCommitted = useRef(false);
   // 자금 카운트업 rAF 핸들(언마운트/스킵 시 취소).
@@ -256,6 +261,7 @@ export function ResultSequence({
       setExpFilled(false);
       setFlash(false);
       setSkipped(false);
+      setDoubled(false);
       return;
     }
     if (!metaCommitted.current) {
@@ -303,8 +309,38 @@ export function ResultSequence({
     return () => {
       for (const t of timers) clearTimeout(t);
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+      if (doubleRafRef.current != null) cancelAnimationFrame(doubleRafRef.current);
     };
   }, [victory, summary, stageId]);
+
+  /**
+   * 결산 보상 2배(result_double) — 광고 완주 콜백. **1회만**(doubled 가드).
+   * 차액(baseGold)을 metaStore에 추가하고, 화면 자금 카운트업을 2배로 재연출 + 잭팟 플래시 1회.
+   * 내용물 차등이 아니라 *설계된 보상의 2배 표현*(§12/§13) — 골드/표현만(전투력 랜덤 없음).
+   */
+  const onDoubleReward = () => {
+    if (!summary || doubled) return;
+    setDoubled(true);
+    const baseGold = summary.gold;
+    if (baseGold > 0) {
+      addGold(baseGold); // 차액(=원래 획득액)을 메타에 누적 — 총 2배. legacy 키도 mirror.
+      // 화면 자금: baseGold → 2*baseGold 카운트업 재연출(스킵돼 있어도 부드럽게 차오름).
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+      if (doubleRafRef.current != null) cancelAnimationFrame(doubleRafRef.current);
+      const from = baseGold;
+      const to = baseGold * 2;
+      const start = performance.now();
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - start) / GOLD_ROLLUP_MS);
+        const eased = 1 - Math.pow(1 - t, 3);
+        setGoldShown(Math.round(from + (to - from) * eased));
+        if (t < 1) doubleRafRef.current = requestAnimationFrame(tick);
+      };
+      doubleRafRef.current = requestAnimationFrame(tick);
+    }
+    // 잭팟 플래시 1회(2배 잭팟 강조).
+    setFlash(true);
+  };
 
   // 스킵: 모든 연출을 즉시 최종 상태로. (탭/클릭/Enter/Space)
   const finish = () => {
@@ -539,7 +575,7 @@ export function ResultSequence({
                 textShadow: jackpot ? `0 0 10px ${JACKPOT_GOLD}66` : "none",
               }}
             >
-              +{(skipped ? summary.gold : goldShown).toLocaleString()}
+              +{(doubled ? goldShown : skipped ? summary.gold : goldShown).toLocaleString()}
             </span>
           </div>
         </Reveal>
@@ -583,15 +619,31 @@ export function ResultSequence({
       {/* 스킵 힌트 / 버튼: 시퀀스 끝나면 버튼, 아니면 힌트 */}
       {sequenceDone ? (
         <div
-          style={{ display: "flex", gap: 12, marginTop: 4 }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 12,
+            marginTop: 4,
+          }}
           onClick={(e) => e.stopPropagation()}
         >
-          <button type="button" style={BUTTON_STYLE} onClick={() => window.location.reload()}>
-            다시 도전
-          </button>
-          <a href="/stages" style={BUTTON_STYLE}>
-            전장 선택
-          </a>
+          {/* 결산 보상 2배(§12/§13) — 광고 완주 1회만. 누르면 사라짐. adFree면 버튼 자체 미표시. */}
+          {!doubled && (
+            <RewardedAdButton
+              placement="result_double"
+              label="광고 보고 보상 2배"
+              onReward={onDoubleReward}
+            />
+          )}
+          <div style={{ display: "flex", gap: 12 }}>
+            <button type="button" style={BUTTON_STYLE} onClick={() => window.location.reload()}>
+              다시 도전
+            </button>
+            <a href="/stages" style={BUTTON_STYLE}>
+              전장 선택
+            </a>
+          </div>
         </div>
       ) : (
         <div style={{ fontSize: 12, color: "#7a828c", marginTop: 4 }}>탭하여 건너뛰기</div>
