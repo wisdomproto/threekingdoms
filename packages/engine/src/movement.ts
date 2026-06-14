@@ -71,3 +71,42 @@ export function getMovableTiles(ctx: BattleContext, state: BattleState, unitId: 
   result.sort((a, b) => (a.y !== b.y ? a.y - b.y : a.x - b.x));
   return result;
 }
+
+/**
+ * goal 칸으로부터의 **지형비용 최단거리 장(field)**. 이동력·유닛 점유 무시(전역),
+ * 통행 불가(IMPASSABLE) 지형만 막는다. moveClass별 이동비용을 쓴다.
+ *
+ * 용도: 그리디 라우팅(탈출/점령 목표)이 맨해튼 거리만 쓰면 강·협곡 같은 통행불가
+ * 지형에 막혀 다리를 우회하지 못하고 정체(제자리 wait)한다. 이 장으로 "다리를 건너는
+ * 우회가 실제로는 목표에 가까워지는 길"임을 인식시킨다. 반환: key "x,y" → 비용(도달 가능
+ * 칸만). 도달 불가 칸은 미포함(호출자는 Infinity로 간주).
+ */
+export function pathCostField(
+  ctx: BattleContext, goal: Coord, moveClass: MoveClass | string,
+): Map<string, number> {
+  const { width, height } = ctx.map;
+  const key = (x: number, y: number) => `${x},${y}`;
+  const dist = new Map<string, number>();
+  const goalCost = moveCostFor(terrainAt(ctx, goal.x, goal.y), moveClass);
+  if (goalCost >= IMPASSABLE) return dist; // 목표 칸 자체가 통행 불가면 라우팅 불가
+  dist.set(key(goal.x, goal.y), 0);
+  const frontier: Array<{ x: number; y: number; cost: number }> = [{ x: goal.x, y: goal.y, cost: 0 }];
+  while (frontier.length > 0) {
+    frontier.sort((a, b) => a.cost - b.cost);
+    const cur = frontier.shift()!;
+    if (cur.cost > (dist.get(key(cur.x, cur.y)) ?? Infinity)) continue;
+    for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]] as const) {
+      const nx = cur.x + dx, ny = cur.y + dy;
+      if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+      // 진입 비용 = 들어가려는 칸(nx,ny)의 지형비용 (getMovableTiles와 동일 규약)
+      const cost = moveCostFor(terrainAt(ctx, nx, ny), moveClass);
+      if (cost >= IMPASSABLE) continue;
+      const next = cur.cost + cost;
+      if (next < (dist.get(key(nx, ny)) ?? Infinity)) {
+        dist.set(key(nx, ny), next);
+        frontier.push({ x: nx, y: ny, cost: next });
+      }
+    }
+  }
+  return dist;
+}

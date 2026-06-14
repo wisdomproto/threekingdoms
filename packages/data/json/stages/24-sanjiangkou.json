@@ -1,0 +1,349 @@
+{
+  "id": "24-sanjiangkou",
+  "name": "삼강구",
+  "mapId": "sanjiangkou",
+  "turnLimit": 30,
+  "camera": {
+    "zoom": 1.2,
+    "focus": [
+      26,
+      22
+    ]
+  },
+  "reward": {
+    "gold": 1400,
+    "exp": 0,
+    "treasures": [
+      "보병차"
+    ]
+  },
+  "levelCap": 23,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 20,
+      "troops": 200,
+      "items": [],
+      "side": "player",
+      "x": 26,
+      "y": 36
+    },
+    {
+      "commanderId": "관우",
+      "classId": "heavyCavalry",
+      "level": 21,
+      "troops": 210,
+      "items": [
+        "청룡언월도"
+      ],
+      "side": "player",
+      "x": 24,
+      "y": 35
+    },
+    {
+      "commanderId": "장비",
+      "classId": "heavyCavalry",
+      "level": 21,
+      "troops": 205,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 28,
+      "y": 35
+    },
+    {
+      "commanderId": "조운",
+      "classId": "heavyCavalry",
+      "level": 20,
+      "troops": 195,
+      "items": [
+        "적로"
+      ],
+      "side": "player",
+      "x": 22,
+      "y": 36
+    },
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 20,
+      "troops": 150,
+      "items": [],
+      "side": "player",
+      "x": 26,
+      "y": 37
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 19,
+      "troops": 140,
+      "items": [
+        "쌀"
+      ],
+      "side": "player",
+      "x": 30,
+      "y": 37
+    },
+    {
+      "commanderId": "미축",
+      "classId": "band",
+      "level": 18,
+      "troops": 130,
+      "items": [],
+      "side": "player",
+      "x": 20,
+      "y": 37
+    },
+    {
+      "commanderId": "관평",
+      "classId": "footman",
+      "level": 18,
+      "troops": 150,
+      "items": [],
+      "side": "player",
+      "x": 32,
+      "y": 36
+    },
+    {
+      "commanderId": "조잠",
+      "classId": "archer",
+      "level": 18,
+      "troops": 130,
+      "items": [],
+      "side": "player",
+      "x": 18,
+      "y": 37
+    },
+    {
+      "commanderId": "주유",
+      "classId": "strategist",
+      "level": 22,
+      "troops": 180,
+      "items": [],
+      "side": "ally",
+      "x": 10,
+      "y": 36
+    },
+    {
+      "commanderId": "노숙",
+      "classId": "strategist",
+      "level": 20,
+      "troops": 150,
+      "items": [],
+      "side": "ally",
+      "x": 8,
+      "y": 37
+    },
+    {
+      "commanderId": "황개",
+      "classId": "heavyCavalry",
+      "level": 21,
+      "troops": 190,
+      "items": [],
+      "side": "ally",
+      "x": 9,
+      "y": 35
+    },
+    {
+      "commanderId": "정보",
+      "classId": "footman",
+      "level": 20,
+      "troops": 160,
+      "items": [],
+      "side": "ally",
+      "x": 12,
+      "y": 36
+    },
+    {
+      "commanderId": "한당",
+      "classId": "archer",
+      "level": 19,
+      "troops": 140,
+      "items": [],
+      "side": "ally",
+      "x": 11,
+      "y": 37
+    },
+    {
+      "commanderId": "채모",
+      "classId": "heavyCavalry",
+      "level": 22,
+      "troops": 230,
+      "items": [],
+      "side": "enemy",
+      "x": 25,
+      "y": 16
+    },
+    {
+      "commanderId": "장윤",
+      "classId": "footman",
+      "level": 21,
+      "troops": 200,
+      "items": [],
+      "side": "enemy",
+      "x": 28,
+      "y": 17
+    },
+    {
+      "commanderId": "문빙",
+      "classId": "heavyCavalry",
+      "level": 21,
+      "troops": 205,
+      "items": [],
+      "side": "enemy",
+      "x": 24,
+      "y": 28
+    },
+    {
+      "commanderId": "채중",
+      "classId": "archer",
+      "level": 19,
+      "troops": 150,
+      "items": [],
+      "side": "enemy",
+      "x": 30,
+      "y": 28
+    },
+    {
+      "commanderId": "진무",
+      "classId": "footman",
+      "level": 19,
+      "troops": 160,
+      "items": [],
+      "side": "enemy",
+      "x": 9,
+      "y": 12
+    },
+    {
+      "commanderId": "반장",
+      "classId": "archer",
+      "level": 18,
+      "troops": 140,
+      "items": [],
+      "side": "enemy",
+      "x": 9,
+      "y": 20
+    },
+    {
+      "commanderId": "감녕",
+      "classId": "heavyCavalry",
+      "level": 20,
+      "troops": 180,
+      "items": [],
+      "side": "enemy",
+      "x": 26,
+      "y": 16
+    },
+    {
+      "commanderId": "조성",
+      "classId": "footman",
+      "level": 18,
+      "troops": 150,
+      "items": [],
+      "side": "enemy",
+      "x": 27,
+      "y": 17
+    },
+    {
+      "commanderId": "이숙",
+      "classId": "lightCavalry",
+      "level": 18,
+      "troops": 140,
+      "items": [],
+      "side": "enemy",
+      "x": 27,
+      "y": 14
+    },
+    {
+      "commanderId": "송겸",
+      "classId": "archer",
+      "level": 17,
+      "troops": 120,
+      "items": [],
+      "side": "enemy",
+      "x": 29,
+      "y": 17
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "defeatAll"
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "reinforcements": [
+    {
+      "id": "caocao_fleet_2nd_wave",
+      "side": "enemy",
+      "trigger": {
+        "kind": "unitDefeated",
+        "unitId": "감녕"
+      },
+      "units": [
+        {
+          "commanderId": "우금",
+          "classId": "heavyCavalry",
+          "level": 20,
+          "troops": 180,
+          "items": [],
+          "side": "enemy",
+          "x": 26,
+          "y": 2
+        },
+        {
+          "commanderId": "악진",
+          "classId": "archer",
+          "level": 19,
+          "troops": 150,
+          "items": [],
+          "side": "enemy",
+          "x": 28,
+          "y": 2
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_huanggai_caimao_reward",
+      "description": "우군 황개의 분전으로 적 제독 채모를 일기토로 꺾으면, 노획한 수군 병기 [연노]를 얻는다.",
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_huanggai_caimao"
+      },
+      "reward": {
+        "treasures": [
+          "연노"
+        ],
+        "gold": 300
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_huanggai_caimao",
+      "type": "duel",
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "황개",
+        "defenderId": "채모"
+      },
+      "outcome": {
+        "winnerId": "황개",
+        "loserRetreats": false
+      },
+      "once": true
+    }
+  ]
+}

@@ -1,0 +1,194 @@
+{
+  "id": "15-xutian",
+  "name": "허전 사냥",
+  "mapId": "xutian",
+  "turnLimit": 18,
+  "camera": { "zoom": 1.5, "focus": [20, 13] },
+  "reward": { "gold": 700, "exp": 0, "treasures": [] },
+  "levelCap": 22,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 19,
+      "troops": 175,
+      "items": [],
+      "side": "player",
+      "x": 19,
+      "y": 25
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 20,
+      "troops": 190,
+      "items": ["청룡언월도", "적토마"],
+      "side": "player",
+      "x": 17,
+      "y": 25
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 20,
+      "troops": 185,
+      "items": ["사모"],
+      "side": "player",
+      "x": 21,
+      "y": 25
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 19,
+      "troops": 180,
+      "items": [],
+      "side": "player",
+      "x": 15,
+      "y": 26
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 19,
+      "troops": 130,
+      "items": ["쌀"],
+      "side": "player",
+      "x": 23,
+      "y": 26
+    },
+    {
+      "commanderId": "미축",
+      "classId": "sorcerer",
+      "level": 18,
+      "troops": 120,
+      "items": [],
+      "side": "player",
+      "x": 13,
+      "y": 26
+    },
+    {
+      "commanderId": "허저",
+      "classId": "heavyCavalry",
+      "level": 22,
+      "troops": 240,
+      "items": [],
+      "side": "enemy",
+      "x": 20,
+      "y": 5
+    },
+    {
+      "commanderId": "왕충",
+      "classId": "footman",
+      "level": 18,
+      "troops": 130,
+      "items": [],
+      "side": "enemy",
+      "x": 16,
+      "y": 7
+    },
+    {
+      "commanderId": "유대",
+      "classId": "footman",
+      "level": 18,
+      "troops": 130,
+      "items": [],
+      "side": "enemy",
+      "x": 24,
+      "y": 7
+    },
+    {
+      "commanderId": "채양",
+      "classId": "archer",
+      "level": 18,
+      "troops": 115,
+      "items": [],
+      "side": "enemy",
+      "x": 18,
+      "y": 4
+    },
+    {
+      "commanderId": "하후걸",
+      "classId": "archer",
+      "level": 17,
+      "troops": 110,
+      "items": [],
+      "side": "enemy",
+      "x": 22,
+      "y": 4
+    },
+    {
+      "commanderId": "하후란",
+      "classId": "lightCavalry",
+      "level": 17,
+      "troops": 120,
+      "items": [],
+      "side": "enemy",
+      "x": 13,
+      "y": 13
+    },
+    {
+      "commanderId": "하후상",
+      "classId": "lightCavalry",
+      "level": 17,
+      "troops": 120,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 13
+    }
+  ],
+  "objectives": [
+    { "kind": "defeatUnit", "unitId": "허저" }
+  ],
+  "failConditions": [
+    { "kind": "unitRetreated", "unitId": "유비" },
+    { "kind": "turnLimitExceeded" }
+  ],
+  "reinforcements": [
+    {
+      "id": "caocao_guard_arrives",
+      "side": "enemy",
+      "trigger": { "kind": "turn", "turn": 6 },
+      "units": [
+        {
+          "commanderId": "하후은",
+          "classId": "lightCavalry",
+          "level": 17,
+          "troops": 120,
+          "items": [],
+          "side": "enemy",
+          "x": 19,
+          "y": 1
+        },
+        {
+          "commanderId": "하후덕",
+          "classId": "footman",
+          "level": 17,
+          "troops": 125,
+          "items": [],
+          "side": "enemy",
+          "x": 21,
+          "y": 1
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_guanyu_xuchu_reward",
+      "description": "관우가 허저와 일기토를 벌여 조조 사냥터의 호위를 꺾으면 [무술교본]을 노획한다.",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_xuchu" },
+      "reward": { "treasures": ["무술교본"], "gold": 250 }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_guanyu_xuchu",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "관우", "defenderId": "허저" },
+      "outcome": { "winnerId": "관우", "loserRetreats": false },
+      "once": true
+    }
+  ]
+}

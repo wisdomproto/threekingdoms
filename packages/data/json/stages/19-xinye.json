@@ -1,0 +1,251 @@
+{
+  "id": "19-xinye",
+  "name": "신야 철수전",
+  "mapId": "xinye",
+  "turnLimit": 18,
+  "camera": { "zoom": 1.3, "focus": [24, 10] },
+  "reward": { "gold": 1100, "exp": 0, "treasures": ["근위개"] },
+  "levelCap": 32,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 14,
+      "troops": 220,
+      "items": [],
+      "side": "player",
+      "x": 24,
+      "y": 6
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 15,
+      "troops": 230,
+      "items": ["청룡언월도"],
+      "side": "player",
+      "x": 21,
+      "y": 6
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 15,
+      "troops": 230,
+      "items": ["사모"],
+      "side": "player",
+      "x": 27,
+      "y": 6
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 14,
+      "troops": 210,
+      "items": [],
+      "side": "player",
+      "x": 18,
+      "y": 7
+    },
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 13,
+      "troops": 160,
+      "items": ["쌀"],
+      "side": "player",
+      "x": 30,
+      "y": 7
+    },
+    {
+      "commanderId": "미축",
+      "classId": "strategist",
+      "level": 12,
+      "troops": 150,
+      "items": [],
+      "side": "player",
+      "x": 24,
+      "y": 8
+    },
+    {
+      "commanderId": "관평",
+      "classId": "footman",
+      "level": 12,
+      "troops": 180,
+      "items": [],
+      "side": "player",
+      "x": 16,
+      "y": 8
+    },
+    {
+      "commanderId": "유봉",
+      "classId": "archer",
+      "level": 12,
+      "troops": 160,
+      "items": [],
+      "side": "player",
+      "x": 32,
+      "y": 8
+    },
+
+    {
+      "commanderId": "유벽",
+      "classId": "civilian",
+      "level": 5,
+      "troops": 70,
+      "items": [],
+      "side": "ally",
+      "x": 22,
+      "y": 9
+    },
+    {
+      "commanderId": "공지",
+      "classId": "civilian",
+      "level": 5,
+      "troops": 70,
+      "items": [],
+      "side": "ally",
+      "x": 24,
+      "y": 9
+    },
+    {
+      "commanderId": "이적",
+      "classId": "civilian",
+      "level": 5,
+      "troops": 70,
+      "items": [],
+      "side": "ally",
+      "x": 26,
+      "y": 9
+    },
+    {
+      "commanderId": "진응",
+      "classId": "civilian",
+      "level": 5,
+      "troops": 70,
+      "items": [],
+      "side": "ally",
+      "x": 23,
+      "y": 10
+    },
+    {
+      "commanderId": "진진",
+      "classId": "civilian",
+      "level": 5,
+      "troops": 70,
+      "items": [],
+      "side": "ally",
+      "x": 25,
+      "y": 10
+    },
+
+    {
+      "commanderId": "조인",
+      "classId": "heavyCavalry",
+      "level": 15,
+      "troops": 240,
+      "items": [],
+      "side": "enemy",
+      "x": 24,
+      "y": 0
+    },
+    {
+      "commanderId": "조홍",
+      "classId": "lightCavalry",
+      "level": 14,
+      "troops": 210,
+      "items": [],
+      "side": "enemy",
+      "x": 10,
+      "y": 6
+    },
+    {
+      "commanderId": "이전",
+      "classId": "archer",
+      "level": 13,
+      "troops": 180,
+      "items": [],
+      "side": "enemy",
+      "x": 38,
+      "y": 6
+    },
+    {
+      "commanderId": "악진",
+      "classId": "footman",
+      "level": 13,
+      "troops": 190,
+      "items": [],
+      "side": "enemy",
+      "x": 14,
+      "y": 12
+    },
+    {
+      "commanderId": "우금",
+      "classId": "lightCavalry",
+      "level": 13,
+      "troops": 190,
+      "items": [],
+      "side": "enemy",
+      "x": 34,
+      "y": 12
+    }
+  ],
+  "objectives": [
+    { "kind": "reachTile", "unitId": "유비", "x": 23, "y": 38 },
+    { "kind": "reachTile", "x": 24, "y": 37, "optional": true }
+  ],
+  "failConditions": [
+    { "kind": "unitRetreated", "unitId": "유비" },
+    {
+      "kind": "allRetreated",
+      "unitIds": ["유벽", "공지", "이적", "진응", "진진"]
+    },
+    { "kind": "turnLimitExceeded" }
+  ],
+  "reinforcements": [
+    {
+      "id": "pursuit_vanguard",
+      "side": "enemy",
+      "trigger": { "kind": "turn", "turn": 4 },
+      "units": [
+        {
+          "commanderId": "하후돈",
+          "classId": "heavyCavalry",
+          "level": 16,
+          "troops": 250,
+          "items": [],
+          "side": "enemy",
+          "x": 20,
+          "y": 0
+        },
+        {
+          "commanderId": "하후연",
+          "classId": "archer",
+          "level": 14,
+          "troops": 190,
+          "items": [],
+          "side": "enemy",
+          "x": 28,
+          "y": 0
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "zhaoyun_rearguard_book",
+      "description": "조운이 추격 선봉 조인과 일기토를 벌여 후미를 끊으면 [육도]를 노획한다.",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_caoren" },
+      "reward": { "treasures": ["육도"], "gold": 300 }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_zhaoyun_caoren",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "조운", "defenderId": "조인" },
+      "outcome": { "winnerId": "조운", "loserRetreats": false },
+      "once": true
+    }
+  ]
+}

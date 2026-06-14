@@ -1,0 +1,231 @@
+{
+  "id": "23-jiangxia",
+  "name": "강하 방어전",
+  "mapId": "jiangxia",
+  "turnLimit": 35,
+  "camera": { "zoom": 1.6, "focus": [30, 20] },
+  "reward": { "gold": 1400, "exp": 0, "treasures": [] },
+  "levelCap": 44,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 38,
+      "troops": 320,
+      "items": ["옥새"],
+      "side": "player",
+      "x": 50,
+      "y": 19
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 39,
+      "troops": 350,
+      "items": ["청룡언월도", "적토마"],
+      "side": "player",
+      "x": 40,
+      "y": 14
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 39,
+      "troops": 350,
+      "items": ["사모"],
+      "side": "player",
+      "x": 40,
+      "y": 22
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 38,
+      "troops": 340,
+      "items": ["삼첨도"],
+      "side": "player",
+      "x": 38,
+      "y": 18
+    },
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 37,
+      "troops": 250,
+      "items": ["둔갑천서", "농무서"],
+      "side": "player",
+      "x": 48,
+      "y": 21
+    },
+    {
+      "commanderId": "관평",
+      "classId": "footman",
+      "level": 35,
+      "troops": 280,
+      "items": [],
+      "side": "player",
+      "x": 42,
+      "y": 16
+    },
+    {
+      "commanderId": "주창",
+      "classId": "bandit",
+      "level": 35,
+      "troops": 270,
+      "items": [],
+      "side": "player",
+      "x": 42,
+      "y": 24
+    },
+    {
+      "commanderId": "미축",
+      "classId": "sorcerer",
+      "level": 34,
+      "troops": 220,
+      "items": ["상약", "쌀"],
+      "side": "player",
+      "x": 50,
+      "y": 17
+    },
+    {
+      "commanderId": "손권",
+      "classId": "lord",
+      "level": 36,
+      "troops": 300,
+      "items": [],
+      "side": "ally",
+      "x": 58,
+      "y": 30
+    },
+    {
+      "commanderId": "주유",
+      "classId": "strategist",
+      "level": 36,
+      "troops": 260,
+      "items": [],
+      "side": "ally",
+      "x": 56,
+      "y": 32
+    },
+    {
+      "commanderId": "장무",
+      "classId": "heavyCavalry",
+      "level": 40,
+      "troops": 400,
+      "items": ["적로"],
+      "side": "enemy",
+      "x": 22,
+      "y": 14
+    },
+    {
+      "commanderId": "진손",
+      "classId": "lightCavalry",
+      "level": 38,
+      "troops": 320,
+      "items": [],
+      "side": "enemy",
+      "x": 22,
+      "y": 22
+    },
+    {
+      "commanderId": "여건",
+      "classId": "footman",
+      "level": 35,
+      "troops": 280,
+      "items": [],
+      "side": "enemy",
+      "x": 18,
+      "y": 15
+    },
+    {
+      "commanderId": "왕개",
+      "classId": "archer",
+      "level": 35,
+      "troops": 250,
+      "items": [],
+      "side": "enemy",
+      "x": 18,
+      "y": 23
+    },
+    {
+      "commanderId": "양앙",
+      "classId": "footman",
+      "level": 34,
+      "troops": 260,
+      "items": [],
+      "side": "enemy",
+      "x": 14,
+      "y": 18
+    },
+    {
+      "commanderId": "조성",
+      "classId": "archer",
+      "level": 34,
+      "troops": 240,
+      "items": [],
+      "side": "enemy",
+      "x": 24,
+      "y": 18
+    }
+  ],
+  "objectives": [
+    { "kind": "surviveTurns", "turns": 35 },
+    { "kind": "defeatUnit", "unitId": "장무", "optional": true }
+  ],
+  "failConditions": [
+    { "kind": "unitRetreated", "unitId": "유비" }
+  ],
+  "reinforcements": [
+    {
+      "id": "wu_pursuit_wave",
+      "side": "enemy",
+      "trigger": { "kind": "turn", "turn": 8 },
+      "units": [
+        {
+          "commanderId": "학맹",
+          "classId": "footman",
+          "level": 34,
+          "troops": 250,
+          "items": [],
+          "side": "enemy",
+          "x": 26,
+          "y": 14
+        },
+        {
+          "commanderId": "조잠",
+          "classId": "archer",
+          "level": 34,
+          "troops": 230,
+          "items": [],
+          "side": "enemy",
+          "x": 26,
+          "y": 22
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "jiangxia_duel_order_dilu",
+      "description": "허자장의 충고대로 장비 vs 진손 → 조운 vs 장무 순서로 일기토를 성사시키면 명마 [적로]를 얻는다.",
+      "trigger": { "kind": "duelsInOrder", "duelIds": ["duel_zhangfei_chensun", "duel_zhaoyun_zhangwu"] },
+      "reward": { "treasures": ["적로"], "gold": 400 }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_zhangfei_chensun",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "장비", "defenderId": "진손" },
+      "outcome": { "winnerId": "장비", "loserRetreats": true },
+      "once": true
+    },
+    {
+      "id": "duel_zhaoyun_zhangwu",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "조운", "defenderId": "장무" },
+      "outcome": { "winnerId": "조운", "loserRetreats": true },
+      "once": true
+    }
+  ]
+}

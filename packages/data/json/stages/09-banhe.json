@@ -1,0 +1,194 @@
+{
+  "id": "09-banhe",
+  "name": "반하 전투",
+  "mapId": "banhe",
+  "turnLimit": 18,
+  "camera": { "zoom": 1.4, "focus": [22, 17] },
+  "reward": { "gold": 650, "exp": 0, "treasures": [] },
+  "levelCap": 17,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 8,
+      "troops": 140,
+      "items": [],
+      "side": "player",
+      "x": 22,
+      "y": 30
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 8,
+      "troops": 150,
+      "items": ["청룡언월도"],
+      "side": "player",
+      "x": 20,
+      "y": 30
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 8,
+      "troops": 150,
+      "items": ["사모"],
+      "side": "player",
+      "x": 24,
+      "y": 30
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 7,
+      "troops": 135,
+      "items": [],
+      "side": "player",
+      "x": 13,
+      "y": 28
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 8,
+      "troops": 105,
+      "items": ["쌀", "폭탄"],
+      "side": "player",
+      "x": 26,
+      "y": 28
+    },
+    {
+      "commanderId": "미방",
+      "classId": "footman",
+      "level": 7,
+      "troops": 120,
+      "items": [],
+      "side": "player",
+      "x": 18,
+      "y": 29
+    },
+    {
+      "commanderId": "조잠",
+      "classId": "archer",
+      "level": 7,
+      "troops": 105,
+      "items": [],
+      "side": "player",
+      "x": 28,
+      "y": 29
+    },
+    {
+      "commanderId": "봉기",
+      "classId": "footman",
+      "level": 9,
+      "troops": 150,
+      "items": [],
+      "side": "enemy",
+      "x": 22,
+      "y": 3
+    },
+    {
+      "commanderId": "국의",
+      "classId": "lightCavalry",
+      "level": 8,
+      "troops": 135,
+      "items": [],
+      "side": "enemy",
+      "x": 13,
+      "y": 7
+    },
+    {
+      "commanderId": "한맹",
+      "classId": "archer",
+      "level": 8,
+      "troops": 115,
+      "items": [],
+      "side": "enemy",
+      "x": 28,
+      "y": 7
+    },
+    {
+      "commanderId": "경무",
+      "classId": "footman",
+      "level": 7,
+      "troops": 110,
+      "items": [],
+      "side": "enemy",
+      "x": 12,
+      "y": 13
+    },
+    {
+      "commanderId": "관순",
+      "classId": "footman",
+      "level": 7,
+      "troops": 110,
+      "items": [],
+      "side": "enemy",
+      "x": 29,
+      "y": 13
+    },
+    {
+      "commanderId": "엄강",
+      "classId": "archer",
+      "level": 7,
+      "troops": 100,
+      "items": [],
+      "side": "enemy",
+      "x": 22,
+      "y": 9
+    }
+  ],
+  "objectives": [
+    { "kind": "defeatAll" }
+  ],
+  "failConditions": [
+    { "kind": "unitRetreated", "unitId": "유비" },
+    { "kind": "turnLimitExceeded" }
+  ],
+  "reinforcements": [
+    {
+      "id": "yuanshao_relief",
+      "side": "enemy",
+      "trigger": { "kind": "turn", "turn": 6 },
+      "units": [
+        {
+          "commanderId": "공손월",
+          "classId": "lightCavalry",
+          "level": 7,
+          "troops": 110,
+          "items": [],
+          "side": "enemy",
+          "x": 13,
+          "y": 2
+        },
+        {
+          "commanderId": "원윤",
+          "classId": "archer",
+          "level": 7,
+          "troops": 100,
+          "items": [],
+          "side": "enemy",
+          "x": 28,
+          "y": 2
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_zhaoyun_juyi_reward",
+      "description": "조운이 적장 국의와 일기토를 벌여 반하의 선봉을 꺾으면 [마술지침서]를 노획한다.",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_juyi" },
+      "reward": { "treasures": ["마술지침서"], "gold": 200 }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_zhaoyun_juyi",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "조운", "defenderId": "국의" },
+      "outcome": { "winnerId": "조운", "loserRetreats": false },
+      "once": true
+    }
+  ]
+}

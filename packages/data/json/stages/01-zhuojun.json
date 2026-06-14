@@ -1,0 +1,84 @@
+{
+  "id": "01-zhuojun",
+  "name": "탁군 의용군",
+  "mapId": "zhuojun",
+  "turnLimit": 20,
+  "camera": { "zoom": 1.6, "focus": [8, 12] },
+  "reward": { "gold": 120, "exp": 0, "treasures": [] },
+  "levelCap": 6,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 1,
+      "troops": 100,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 11
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 1,
+      "troops": 100,
+      "items": ["청룡언월도"],
+      "side": "player",
+      "x": 5,
+      "y": 9
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 1,
+      "troops": 100,
+      "items": ["사모"],
+      "side": "player",
+      "x": 5,
+      "y": 13
+    },
+    {
+      "commanderId": "관해",
+      "classId": "footman",
+      "level": 2,
+      "troops": 90,
+      "items": [],
+      "side": "enemy",
+      "x": 34,
+      "y": 11
+    },
+    {
+      "commanderId": "보병대",
+      "classId": "footman",
+      "level": 1,
+      "troops": 70,
+      "items": [],
+      "side": "enemy",
+      "x": 33,
+      "y": 9
+    },
+    {
+      "commanderId": "적병",
+      "classId": "bandit",
+      "level": 1,
+      "troops": 70,
+      "items": [],
+      "side": "enemy",
+      "x": 33,
+      "y": 13
+    },
+    {
+      "commanderId": "궁병대",
+      "classId": "archer",
+      "level": 1,
+      "troops": 60,
+      "items": [],
+      "side": "enemy",
+      "x": 36,
+      "y": 11
+    }
+  ],
+  "objectives": [{ "kind": "defeatAll" }],
+  "failConditions": [{ "kind": "unitRetreated", "unitId": "유비" }],
+  "events": []
+}

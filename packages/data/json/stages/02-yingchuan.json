@@ -1,0 +1,165 @@
+{
+  "id": "02-yingchuan",
+  "name": "영천 구원전",
+  "mapId": "yingchuan",
+  "turnLimit": 25,
+  "camera": { "zoom": 1.5, "focus": [22, 22] },
+  "reward": { "gold": 200, "exp": 0, "treasures": ["무술교본"] },
+  "levelCap": 8,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 3,
+      "troops": 110,
+      "items": [],
+      "side": "player",
+      "x": 20,
+      "y": 30
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 3,
+      "troops": 115,
+      "items": ["청룡언월도"],
+      "side": "player",
+      "x": 22,
+      "y": 31
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 3,
+      "troops": 115,
+      "items": ["사모"],
+      "side": "player",
+      "x": 24,
+      "y": 30
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 3,
+      "troops": 85,
+      "items": ["쌀", "폭탄"],
+      "side": "player",
+      "x": 22,
+      "y": 29
+    },
+    {
+      "commanderId": "조조",
+      "classId": "lightCavalry",
+      "level": 5,
+      "troops": 130,
+      "items": [],
+      "side": "ally",
+      "x": 38,
+      "y": 30
+    },
+    {
+      "commanderId": "하후돈",
+      "classId": "lightCavalry",
+      "level": 4,
+      "troops": 110,
+      "items": [],
+      "side": "ally",
+      "x": 40,
+      "y": 31
+    },
+    {
+      "commanderId": "공융",
+      "classId": "strategist",
+      "level": 4,
+      "troops": 90,
+      "items": [],
+      "side": "ally",
+      "x": 43,
+      "y": 14
+    },
+    {
+      "commanderId": "관해",
+      "classId": "bandit",
+      "level": 5,
+      "troops": 160,
+      "items": [],
+      "side": "enemy",
+      "x": 40,
+      "y": 14
+    },
+    {
+      "commanderId": "요화",
+      "classId": "bandit",
+      "level": 4,
+      "troops": 105,
+      "items": [],
+      "side": "enemy",
+      "x": 39,
+      "y": 12
+    },
+    {
+      "commanderId": "두습",
+      "classId": "bandit",
+      "level": 4,
+      "troops": 100,
+      "items": [],
+      "side": "enemy",
+      "x": 39,
+      "y": 16
+    },
+    {
+      "commanderId": "왕보",
+      "classId": "archer",
+      "level": 4,
+      "troops": 95,
+      "items": [],
+      "side": "enemy",
+      "x": 44,
+      "y": 18
+    },
+    {
+      "commanderId": "조루",
+      "classId": "footman",
+      "level": 3,
+      "troops": 95,
+      "items": [],
+      "side": "enemy",
+      "x": 24,
+      "y": 16
+    },
+    {
+      "commanderId": "학맹",
+      "classId": "bandit",
+      "level": 3,
+      "troops": 90,
+      "items": [],
+      "side": "enemy",
+      "x": 20,
+      "y": 16
+    }
+  ],
+  "objectives": [
+    { "kind": "defeatAll" },
+    { "kind": "defeatUnit", "unitId": "관해", "optional": true }
+  ],
+  "failConditions": [
+    { "kind": "unitRetreated", "unitId": "유비" }
+  ],
+  "strategyConditions": [
+    {
+      "id": "rescue_kongrong",
+      "description": "공융을 구원하기 전에 관해를 일기토로 베어 포위를 푼다. 공융이 [의협교본]을 사례로 건넨다.",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_guanhai" },
+      "reward": { "treasures": ["의협교본"], "gold": 150 }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_guanyu_guanhai",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "관우", "defenderId": "관해" },
+      "outcome": { "winnerId": "관우", "loserRetreats": false },
+      "once": true
+    }
+  ]
+}

@@ -1,0 +1,296 @@
+{
+  "id": "16-guandu-escape",
+  "name": "관도 탈출",
+  "mapId": "guandu-escape",
+  "turnLimit": 35,
+  "camera": {
+    "zoom": 1.2,
+    "focus": [
+      8,
+      20
+    ]
+  },
+  "reward": {
+    "gold": 1200,
+    "exp": 0,
+    "treasures": []
+  },
+  "levelCap": 27,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 22,
+      "troops": 240,
+      "items": [
+        "옥새"
+      ],
+      "side": "player",
+      "x": 2,
+      "y": 20
+    },
+    {
+      "commanderId": "관우",
+      "classId": "guardCavalry",
+      "level": 23,
+      "troops": 270,
+      "items": [
+        "청룡언월도",
+        "적토마"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 19
+    },
+    {
+      "commanderId": "장비",
+      "classId": "guardCavalry",
+      "level": 23,
+      "troops": 265,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 21
+    },
+    {
+      "commanderId": "조운",
+      "classId": "guardCavalry",
+      "level": 22,
+      "troops": 255,
+      "items": [
+        "적로"
+      ],
+      "side": "player",
+      "x": 3,
+      "y": 18
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 21,
+      "troops": 190,
+      "items": [
+        "손자의병법서",
+        "폭탄"
+      ],
+      "side": "player",
+      "x": 2,
+      "y": 22
+    },
+    {
+      "commanderId": "미축",
+      "classId": "sorcerer",
+      "level": 20,
+      "troops": 175,
+      "items": [
+        "상약"
+      ],
+      "side": "player",
+      "x": 3,
+      "y": 23
+    },
+    {
+      "commanderId": "미방",
+      "classId": "footman",
+      "level": 20,
+      "troops": 200,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 22
+    },
+    {
+      "commanderId": "유벽",
+      "classId": "footman",
+      "level": 18,
+      "troops": 160,
+      "items": [],
+      "side": "ally",
+      "x": 5,
+      "y": 20
+    },
+    {
+      "commanderId": "조인",
+      "classId": "heavyCavalry",
+      "level": 24,
+      "troops": 280,
+      "items": [],
+      "side": "enemy",
+      "x": 44,
+      "y": 25
+    },
+    {
+      "commanderId": "허저",
+      "classId": "brawler",
+      "level": 24,
+      "troops": 270,
+      "items": [],
+      "side": "enemy",
+      "x": 42,
+      "y": 25
+    },
+    {
+      "commanderId": "이전",
+      "classId": "archer",
+      "level": 22,
+      "troops": 210,
+      "items": [],
+      "side": "enemy",
+      "x": 46,
+      "y": 25
+    },
+    {
+      "commanderId": "악진",
+      "classId": "lightCavalry",
+      "level": 22,
+      "troops": 220,
+      "items": [],
+      "side": "enemy",
+      "x": 42,
+      "y": 15
+    },
+    {
+      "commanderId": "조성",
+      "classId": "footman",
+      "level": 20,
+      "troops": 180,
+      "items": [],
+      "side": "enemy",
+      "x": 28,
+      "y": 26
+    },
+    {
+      "commanderId": "조순",
+      "classId": "archer",
+      "level": 20,
+      "troops": 170,
+      "items": [],
+      "side": "enemy",
+      "x": 30,
+      "y": 14
+    },
+    {
+      "commanderId": "왕충",
+      "classId": "lightCavalry",
+      "level": 20,
+      "troops": 180,
+      "items": [],
+      "side": "enemy",
+      "x": 50,
+      "y": 25
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "reachTile",
+      "unitId": "유비",
+      "x": 61,
+      "y": 19
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "reinforcements": [
+    {
+      "id": "caocao_pursuit_north",
+      "side": "enemy",
+      "trigger": {
+        "kind": "turn",
+        "turn": 5
+      },
+      "units": [
+        {
+          "commanderId": "서황",
+          "classId": "heavyCavalry",
+          "level": 23,
+          "troops": 240,
+          "items": [],
+          "side": "enemy",
+          "x": 6,
+          "y": 4
+        },
+        {
+          "commanderId": "한맹",
+          "classId": "lightCavalry",
+          "level": 21,
+          "troops": 190,
+          "items": [],
+          "side": "enemy",
+          "x": 10,
+          "y": 3
+        }
+      ]
+    },
+    {
+      "id": "caocao_pursuit_rear",
+      "side": "enemy",
+      "trigger": {
+        "kind": "turn",
+        "turn": 9
+      },
+      "units": [
+        {
+          "commanderId": "우금",
+          "classId": "heavyCavalry",
+          "level": 23,
+          "troops": 240,
+          "items": [],
+          "side": "enemy",
+          "x": 4,
+          "y": 34
+        },
+        {
+          "commanderId": "조하",
+          "classId": "lightCavalry",
+          "level": 21,
+          "troops": 185,
+          "items": [],
+          "side": "enemy",
+          "x": 2,
+          "y": 36
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_zhaoyun_xuchu_reward",
+      "description": "조운이 허저를 일기토로 막아 추격을 끊으면 [낙석서]를 노획한다.",
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhaoyun_xuchu"
+      },
+      "reward": {
+        "treasures": [
+          "낙석서"
+        ],
+        "gold": 300
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_zhaoyun_xuchu",
+      "type": "duel",
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "조운",
+        "defenderId": "허저"
+      },
+      "outcome": {
+        "winnerId": "조운",
+        "loserRetreats": true
+      },
+      "once": true
+    }
+  ]
+}

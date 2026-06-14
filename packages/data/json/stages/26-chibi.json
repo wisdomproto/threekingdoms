@@ -1,0 +1,396 @@
+{
+  "id": "26-chibi",
+  "name": "적벽대전",
+  "mapId": "chibi",
+  "turnLimit": 30,
+  "camera": {
+    "zoom": 1.1,
+    "focus": [
+      13,
+      20
+    ]
+  },
+  "reward": {
+    "gold": 2400,
+    "exp": 0,
+    "treasures": [
+      "둔갑천서"
+    ]
+  },
+  "levelCap": 45,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 40,
+      "troops": 360,
+      "items": [],
+      "side": "player",
+      "x": 13,
+      "y": 32
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 41,
+      "troops": 380,
+      "items": [
+        "청룡언월도"
+      ],
+      "side": "player",
+      "x": 11,
+      "y": 25
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 41,
+      "troops": 375,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 15,
+      "y": 25
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 40,
+      "troops": 360,
+      "items": [],
+      "side": "player",
+      "x": 10,
+      "y": 26
+    },
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 40,
+      "troops": 300,
+      "items": [
+        "폭탄",
+        "쌀"
+      ],
+      "side": "player",
+      "x": 13,
+      "y": 27
+    },
+    {
+      "commanderId": "미축",
+      "classId": "strategist",
+      "level": 37,
+      "troops": 280,
+      "items": [
+        "쌀"
+      ],
+      "side": "player",
+      "x": 16,
+      "y": 27
+    },
+    {
+      "commanderId": "관평",
+      "classId": "footman",
+      "level": 36,
+      "troops": 300,
+      "items": [],
+      "side": "player",
+      "x": 9,
+      "y": 27
+    },
+    {
+      "commanderId": "주창",
+      "classId": "bandit",
+      "level": 36,
+      "troops": 290,
+      "items": [],
+      "side": "player",
+      "x": 17,
+      "y": 26
+    },
+    {
+      "commanderId": "주유",
+      "classId": "strategist",
+      "level": 42,
+      "troops": 360,
+      "items": [],
+      "side": "ally",
+      "x": 21,
+      "y": 24
+    },
+    {
+      "commanderId": "황개",
+      "classId": "lightCavalry",
+      "level": 40,
+      "troops": 340,
+      "items": [],
+      "side": "ally",
+      "x": 23,
+      "y": 25
+    },
+    {
+      "commanderId": "감녕",
+      "classId": "lightCavalry",
+      "level": 40,
+      "troops": 330,
+      "items": [],
+      "side": "ally",
+      "x": 25,
+      "y": 26
+    },
+    {
+      "commanderId": "노숙",
+      "classId": "strategist",
+      "level": 38,
+      "troops": 300,
+      "items": [],
+      "side": "ally",
+      "x": 22,
+      "y": 26
+    },
+    {
+      "commanderId": "한당",
+      "classId": "archer",
+      "level": 37,
+      "troops": 300,
+      "items": [],
+      "side": "ally",
+      "x": 26,
+      "y": 27
+    },
+    {
+      "commanderId": "조조",
+      "classId": "guardCavalry",
+      "level": 45,
+      "troops": 480,
+      "items": [],
+      "side": "enemy",
+      "x": 15,
+      "y": 2
+    },
+    {
+      "commanderId": "하후돈",
+      "classId": "heavyCavalry",
+      "level": 43,
+      "troops": 420,
+      "items": [],
+      "side": "enemy",
+      "x": 13,
+      "y": 4
+    },
+    {
+      "commanderId": "허저",
+      "classId": "footman",
+      "level": 42,
+      "troops": 410,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 4
+    },
+    {
+      "commanderId": "장합",
+      "classId": "lightCavalry",
+      "level": 41,
+      "troops": 380,
+      "items": [],
+      "side": "enemy",
+      "x": 13,
+      "y": 7
+    },
+    {
+      "commanderId": "서황",
+      "classId": "footman",
+      "level": 41,
+      "troops": 380,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 7
+    },
+    {
+      "commanderId": "우금",
+      "classId": "archer",
+      "level": 40,
+      "troops": 350,
+      "items": [],
+      "side": "enemy",
+      "x": 10,
+      "y": 14
+    },
+    {
+      "commanderId": "조인",
+      "classId": "heavyCavalry",
+      "level": 41,
+      "troops": 380,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 14
+    },
+    {
+      "commanderId": "채모",
+      "classId": "archer",
+      "level": 38,
+      "troops": 330,
+      "items": [],
+      "side": "enemy",
+      "x": 34,
+      "y": 3
+    },
+    {
+      "commanderId": "장윤",
+      "classId": "archer",
+      "level": 37,
+      "troops": 320,
+      "items": [],
+      "side": "enemy",
+      "x": 37,
+      "y": 4
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "defeatUnit",
+      "unitId": "조조",
+      "optional": false
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    },
+    {
+      "kind": "unitRetreated",
+      "unitId": "주유"
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "reinforcements": [
+    {
+      "id": "huangkai_fire_ships",
+      "side": "ally",
+      "trigger": {
+        "kind": "turn",
+        "turn": 4
+      },
+      "units": [
+        {
+          "commanderId": "정보",
+          "classId": "archer",
+          "level": 38,
+          "troops": 310,
+          "items": [],
+          "side": "ally",
+          "x": 13,
+          "y": 19
+        },
+        {
+          "commanderId": "주태",
+          "classId": "lightCavalry",
+          "level": 38,
+          "troops": 320,
+          "items": [],
+          "side": "ally",
+          "x": 14,
+          "y": 19
+        }
+      ]
+    },
+    {
+      "id": "cao_rear_guard",
+      "side": "enemy",
+      "trigger": {
+        "kind": "unitDefeated",
+        "unitId": "조인"
+      },
+      "units": [
+        {
+          "commanderId": "이전",
+          "classId": "archer",
+          "level": 39,
+          "troops": 330,
+          "items": [],
+          "side": "enemy",
+          "x": 7,
+          "y": 7
+        },
+        {
+          "commanderId": "악진",
+          "classId": "footman",
+          "level": 39,
+          "troops": 340,
+          "items": [],
+          "side": "enemy",
+          "x": 21,
+          "y": 7
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "huangkai_kurou_reward",
+      "description": "황개의 고육계가 조조 수채에 닿아 화공이 점화되면 [칠성검]을 노획한다.",
+      "trigger": {
+        "kind": "unitReachedTile",
+        "unitId": "황개",
+        "x": 13,
+        "y": 6
+      },
+      "reward": {
+        "treasures": [
+          "칠성검"
+        ],
+        "gold": 500
+      }
+    },
+    {
+      "id": "guanyu_caoren_duel_reward",
+      "description": "관우가 조인을 일기토로 격파해 강북 수채로 가는 길을 연다.",
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_guanyu_caoren"
+      },
+      "reward": {
+        "treasures": [
+          "방천화극"
+        ],
+        "gold": 400
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_guanyu_caoren",
+      "type": "duel",
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "관우",
+        "defenderId": "조인"
+      },
+      "outcome": {
+        "winnerId": "관우",
+        "loserRetreats": false
+      },
+      "once": true
+    },
+    {
+      "id": "duel_zhangfei_xuchu",
+      "type": "duel",
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "장비",
+        "defenderId": "허저"
+      },
+      "outcome": {
+        "winnerId": "장비",
+        "loserRetreats": false
+      },
+      "once": true
+    }
+  ]
+}

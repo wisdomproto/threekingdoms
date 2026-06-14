@@ -42,6 +42,17 @@ const sishuiMap = gameData.maps["sishuiguan"];
 if (!sishuiStage || !sishuiMap) throw new Error("사수관 데이터 누락 — @tk/data 로더 확인");
 export const sishuiCtx: BattleContext = { data: gameData, stage: sishuiStage, map: sishuiMap };
 
+/**
+ * 하비1차 ctx (12-xiapi1) — 비섬멸 *탈출* 목표 픽스처. 유비(31,15)가 reachTile 목표 (0,15)로
+ * 좌측 탈출, 적은 우측(x=36~40)에 배치. 순수 그리디 "최단거리 적 돌진"이면 유비가 *우측(적)*으로
+ * 가지만, policy.ts의 목표 인식(escapeGoalFor)이면 유비가 *좌측(목표)*으로 라우팅된다.
+ * 자동전투(player 페이즈)가 같은 chooseAction을 공유하는지 검증하는 판별 픽스처.
+ */
+const xiapiStage = gameData.stages["12-xiapi1"];
+const xiapiMap = gameData.maps["xiapi1"];
+if (!xiapiStage || !xiapiMap) throw new Error("하비1차 데이터 누락 — @tk/data 로더 확인");
+export const xiapi1Ctx: BattleContext = { data: gameData, stage: xiapiStage, map: xiapiMap };
+
 export function findUnit(state: BattleState, id: string): UnitState {
   const u = state.units.find((x) => x.id === id);
   if (!u) throw new Error(`픽스처에 없는 유닛: ${id}`);

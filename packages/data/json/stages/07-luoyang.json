@@ -1,0 +1,192 @@
+{
+  "id": "07-luoyang",
+  "name": "낙양 진입",
+  "mapId": "luoyang",
+  "turnLimit": 28,
+  "camera": { "zoom": 1.5, "focus": [10, 8] },
+  "reward": { "gold": 500, "exp": 0, "treasures": [] },
+  "levelCap": 14,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 6,
+      "troops": 125,
+      "items": [],
+      "side": "player",
+      "x": 2,
+      "y": 8
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 6,
+      "troops": 135,
+      "items": ["청룡언월도"],
+      "side": "player",
+      "x": 2,
+      "y": 7
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 6,
+      "troops": 135,
+      "items": ["사모"],
+      "side": "player",
+      "x": 1,
+      "y": 8
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 5,
+      "troops": 120,
+      "items": [],
+      "side": "player",
+      "x": 1,
+      "y": 7
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 6,
+      "troops": 95,
+      "items": ["쌀", "폭탄"],
+      "side": "player",
+      "x": 3,
+      "y": 8
+    },
+    {
+      "commanderId": "미방",
+      "classId": "footman",
+      "level": 5,
+      "troops": 105,
+      "items": [],
+      "side": "player",
+      "x": 3,
+      "y": 7
+    },
+    {
+      "commanderId": "이각",
+      "classId": "footman",
+      "level": 7,
+      "troops": 130,
+      "items": [],
+      "side": "enemy",
+      "x": 13,
+      "y": 8
+    },
+    {
+      "commanderId": "곽사",
+      "classId": "archer",
+      "level": 7,
+      "troops": 110,
+      "items": [],
+      "side": "enemy",
+      "x": 12,
+      "y": 12
+    },
+    {
+      "commanderId": "서영",
+      "classId": "lightCavalry",
+      "level": 6,
+      "troops": 115,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 12
+    },
+    {
+      "commanderId": "호진",
+      "classId": "footman",
+      "level": 5,
+      "troops": 95,
+      "items": [],
+      "side": "enemy",
+      "x": 22,
+      "y": 18
+    },
+    {
+      "commanderId": "이숙",
+      "classId": "archer",
+      "level": 5,
+      "troops": 90,
+      "items": [],
+      "side": "enemy",
+      "x": 33,
+      "y": 9
+    },
+    {
+      "commanderId": "이유",
+      "classId": "strategist",
+      "level": 6,
+      "troops": 100,
+      "items": ["낙석서"],
+      "side": "enemy",
+      "x": 38,
+      "y": 18
+    },
+    {
+      "commanderId": "동탁",
+      "classId": "chariot",
+      "level": 8,
+      "troops": 160,
+      "items": [],
+      "side": "enemy",
+      "x": 43,
+      "y": 24
+    }
+  ],
+  "objectives": [{ "kind": "defeatAll" }],
+  "failConditions": [
+    { "kind": "unitRetreated", "unitId": "유비" },
+    { "kind": "turnLimitExceeded" }
+  ],
+  "reinforcements": [
+    {
+      "id": "fire_rear_guard",
+      "side": "enemy",
+      "trigger": { "kind": "turn", "turn": 5 },
+      "units": [
+        {
+          "commanderId": "조잠",
+          "classId": "footman",
+          "level": 5,
+          "troops": 90,
+          "items": [],
+          "side": "enemy",
+          "x": 33,
+          "y": 24
+        },
+        {
+          "commanderId": "조성",
+          "classId": "archer",
+          "level": 5,
+          "troops": 85,
+          "items": [],
+          "side": "enemy",
+          "x": 34,
+          "y": 25
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_guanyu_xurong_reward",
+      "description": "관우가 서영과 일기토를 벌여 불타는 대로를 뚫으면 [궁술지침서]를 노획한다.",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_xurong" },
+      "reward": { "treasures": ["궁술지침서"], "gold": 200 }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_guanyu_xurong",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "관우", "defenderId": "서영" },
+      "outcome": { "winnerId": "관우", "loserRetreats": false },
+      "once": true
+    }
+  ]
+}

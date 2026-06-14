@@ -1,0 +1,201 @@
+{
+  "id": "18-bowangpo",
+  "name": "박망파",
+  "mapId": "bowangpo",
+  "turnLimit": 30,
+  "camera": { "zoom": 1.2, "focus": [22, 14] },
+  "reward": { "gold": 1400, "exp": 0, "treasures": [] },
+  "levelCap": 32,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 24,
+      "troops": 230,
+      "items": ["옥새"],
+      "side": "player",
+      "x": 9,
+      "y": 16
+    },
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 22,
+      "troops": 180,
+      "items": ["둔갑천서"],
+      "side": "player",
+      "x": 8,
+      "y": 17
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 25,
+      "troops": 240,
+      "items": ["청룡언월도", "적토마"],
+      "side": "player",
+      "x": 11,
+      "y": 15
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 24,
+      "troops": 235,
+      "items": ["사모"],
+      "side": "player",
+      "x": 12,
+      "y": 18
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 24,
+      "troops": 230,
+      "items": ["적로"],
+      "side": "player",
+      "x": 13,
+      "y": 14
+    },
+    {
+      "commanderId": "미축",
+      "classId": "sorcerer",
+      "level": 21,
+      "troops": 160,
+      "items": ["상약"],
+      "side": "player",
+      "x": 8,
+      "y": 19
+    },
+    {
+      "commanderId": "하후돈",
+      "classId": "heavyCavalry",
+      "level": 26,
+      "troops": 260,
+      "items": ["근위개"],
+      "side": "enemy",
+      "x": 31,
+      "y": 14
+    },
+    {
+      "commanderId": "이전",
+      "classId": "lightCavalry",
+      "level": 23,
+      "troops": 200,
+      "items": [],
+      "side": "enemy",
+      "x": 26,
+      "y": 13
+    },
+    {
+      "commanderId": "악진",
+      "classId": "footman",
+      "level": 22,
+      "troops": 190,
+      "items": [],
+      "side": "enemy",
+      "x": 27,
+      "y": 16
+    },
+    {
+      "commanderId": "여건",
+      "classId": "archer",
+      "level": 21,
+      "troops": 170,
+      "items": [],
+      "side": "enemy",
+      "x": 30,
+      "y": 11
+    },
+    {
+      "commanderId": "우금",
+      "classId": "catapult",
+      "level": 21,
+      "troops": 165,
+      "items": [],
+      "side": "enemy",
+      "x": 33,
+      "y": 17
+    }
+  ],
+  "objectives": [
+    { "kind": "defeatUnit", "unitId": "하후돈" }
+  ],
+  "failConditions": [
+    { "kind": "unitRetreated", "unitId": "유비" },
+    { "kind": "turnLimitExceeded" }
+  ],
+  "reinforcements": [
+    {
+      "id": "huoshao_liufeng_guanping",
+      "side": "player",
+      "trigger": { "kind": "turn", "turn": 4 },
+      "units": [
+        {
+          "commanderId": "유봉",
+          "classId": "footman",
+          "level": 20,
+          "troops": 150,
+          "items": ["폭탄"],
+          "side": "player",
+          "x": 22,
+          "y": 13
+        },
+        {
+          "commanderId": "관평",
+          "classId": "footman",
+          "level": 20,
+          "troops": 150,
+          "items": ["폭탄"],
+          "side": "player",
+          "x": 22,
+          "y": 12
+        }
+      ]
+    },
+    {
+      "id": "xiahoudun_rearguard",
+      "side": "enemy",
+      "trigger": { "kind": "turn", "turn": 6 },
+      "units": [
+        {
+          "commanderId": "하후연",
+          "classId": "archer",
+          "level": 22,
+          "troops": 170,
+          "items": [],
+          "side": "enemy",
+          "x": 36,
+          "y": 18
+        },
+        {
+          "commanderId": "조홍",
+          "classId": "footman",
+          "level": 21,
+          "troops": 175,
+          "items": [],
+          "side": "enemy",
+          "x": 36,
+          "y": 20
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_guanyu_lidian_reward",
+      "description": "관우가 이전과 일기토를 벌여 적 선봉을 깨면 [가죽방패](근위개)를 노획한다.",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_lidian" },
+      "reward": { "treasures": ["근위개"], "gold": 300 }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_guanyu_lidian",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "관우", "defenderId": "이전" },
+      "outcome": { "winnerId": "관우", "loserRetreats": false },
+      "once": true
+    }
+  ]
+}

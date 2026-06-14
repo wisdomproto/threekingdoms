@@ -1,0 +1,83 @@
+{
+  "id": "25-wulin",
+  "name": "오림 기습",
+  "mapId": "wulin",
+  "turnLimit": 22,
+  "camera": { "zoom": 1.3, "focus": [20, 20] },
+  "reward": { "gold": 1400, "exp": 0, "treasures": ["업화서"] },
+  "levelCap": 38,
+  "units": [
+    { "commanderId": "유비", "classId": "lord", "level": 30, "troops": 230, "items": ["자웅일대검"], "side": "player", "x": 17, "y": 31 },
+    { "commanderId": "관우", "classId": "lightCavalry", "level": 31, "troops": 260, "items": ["청룡언월도", "적토마"], "side": "player", "x": 16, "y": 30 },
+    { "commanderId": "장비", "classId": "lightCavalry", "level": 31, "troops": 255, "items": ["사모"], "side": "player", "x": 18, "y": 30 },
+    { "commanderId": "조운", "classId": "lightCavalry", "level": 30, "troops": 250, "items": ["삼첨도", "적로"], "side": "player", "x": 16, "y": 31 },
+    { "commanderId": "제갈량", "classId": "strategist", "level": 30, "troops": 200, "items": ["둔갑천서", "화룡서"], "side": "player", "x": 18, "y": 31 },
+    { "commanderId": "관평", "classId": "footman", "level": 28, "troops": 210, "items": ["장창"], "side": "player", "x": 17, "y": 32 },
+    { "commanderId": "주창", "classId": "footman", "level": 27, "troops": 200, "items": [], "side": "player", "x": 19, "y": 31 },
+    { "commanderId": "미축", "classId": "strategist", "level": 27, "troops": 175, "items": ["상약"], "side": "player", "x": 19, "y": 32 },
+
+    { "commanderId": "황개", "classId": "lightCavalry", "level": 32, "troops": 240, "items": ["술"], "side": "ally", "x": 25, "y": 31 },
+    { "commanderId": "주유", "classId": "strategist", "level": 31, "troops": 210, "items": ["초열서"], "side": "ally", "x": 24, "y": 31 },
+    { "commanderId": "감녕", "classId": "lightCavalry", "level": 30, "troops": 230, "items": ["청강검"], "side": "ally", "x": 26, "y": 31 },
+    { "commanderId": "정봉", "classId": "footman", "level": 29, "troops": 205, "items": [], "side": "ally", "x": 24, "y": 30 },
+    { "commanderId": "능통", "classId": "archer", "level": 29, "troops": 195, "items": ["연노"], "side": "ally", "x": 26, "y": 30 },
+
+    { "commanderId": "조조", "classId": "lord", "level": 33, "troops": 280, "items": ["의천검", "맹덕신서"], "side": "enemy", "x": 21, "y": 1 },
+    { "commanderId": "채모", "classId": "footman", "level": 30, "troops": 230, "items": ["근위개"], "side": "enemy", "x": 12, "y": 1 },
+    { "commanderId": "채중", "classId": "archer", "level": 28, "troops": 195, "items": [], "side": "enemy", "x": 31, "y": 1 },
+    { "commanderId": "장요", "classId": "lightCavalry", "level": 31, "troops": 245, "items": ["방천화극"], "side": "enemy", "x": 20, "y": 2 },
+    { "commanderId": "하후돈", "classId": "lightCavalry", "level": 31, "troops": 240, "items": [], "side": "enemy", "x": 13, "y": 2 },
+    { "commanderId": "문빙", "classId": "footman", "level": 29, "troops": 215, "items": [], "side": "enemy", "x": 32, "y": 2 },
+    { "commanderId": "우금", "classId": "archer", "level": 29, "troops": 200, "items": ["연노"], "side": "enemy", "x": 22, "y": 1 },
+    { "commanderId": "악진", "classId": "footman", "level": 28, "troops": 195, "items": [], "side": "enemy", "x": 30, "y": 2 },
+    { "commanderId": "보병대", "classId": "footman", "level": 26, "troops": 160, "items": [], "side": "enemy", "x": 11, "y": 4 },
+    { "commanderId": "궁병대", "classId": "archer", "level": 26, "troops": 150, "items": [], "side": "enemy", "x": 17, "y": 4 },
+    { "commanderId": "보병대_2", "classId": "footman", "level": 26, "troops": 160, "items": [], "side": "enemy", "x": 23, "y": 4 },
+    { "commanderId": "궁병대_2", "classId": "archer", "level": 26, "troops": 150, "items": [], "side": "enemy", "x": 29, "y": 4 }
+  ],
+  "objectives": [
+    { "kind": "defeatUnit", "unitId": "조조" }
+  ],
+  "failConditions": [
+    { "kind": "unitRetreated", "unitId": "유비" },
+    { "kind": "unitRetreated", "unitId": "황개" },
+    { "kind": "turnLimitExceeded" }
+  ],
+  "reinforcements": [
+    {
+      "id": "huanggai_fireship",
+      "side": "ally",
+      "trigger": { "kind": "turn", "turn": 4 },
+      "units": [
+        { "commanderId": "여몽", "classId": "lightCavalry", "level": 30, "troops": 225, "items": [], "side": "ally", "x": 11, "y": 19 },
+        { "commanderId": "태사자", "classId": "archer", "level": 30, "troops": 210, "items": [], "side": "ally", "x": 10, "y": 20 }
+      ]
+    },
+    {
+      "id": "caocao_rally",
+      "side": "enemy",
+      "trigger": { "kind": "unitDefeated", "unitId": "채모" },
+      "units": [
+        { "commanderId": "서황", "classId": "footman", "level": 30, "troops": 220, "items": [], "side": "enemy", "x": 14, "y": 5 },
+        { "commanderId": "이전", "classId": "archer", "level": 28, "troops": 185, "items": [], "side": "enemy", "x": 24, "y": 5 }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "huanggai_ruse_reward",
+      "description": "황개가 거짓 투항으로 접근해 채모를 일기토로 베어 화공의 불씨를 댕기면 [화룡서]를 노획한다.",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_huanggai_caimao" },
+      "reward": { "treasures": ["화룡서"], "gold": 400 }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_huanggai_caimao",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "황개", "defenderId": "채모" },
+      "outcome": { "winnerId": "황개", "loserRetreats": true },
+      "once": true
+    }
+  ]
+}

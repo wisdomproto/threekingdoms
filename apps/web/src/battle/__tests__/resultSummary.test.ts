@@ -4,6 +4,7 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import type { Item, StageReward } from "@tk/data";
+import type { PendingReward } from "@tk/engine";
 import type { BattleVM, UnitVM } from "../viewmodel";
 import { buildResultSummary, countPlayerRetreats, deriveFanfare } from "../hud/resultSummary";
 import { addMetaGold, readMetaGold } from "../hud/metaGold";
@@ -39,16 +40,23 @@ function unit(partial: Partial<UnitVM>): UnitVM {
   };
 }
 
-function vmWith(turn: number, turnLimit: number, units: UnitVM[]): BattleVM {
+function vmWith(
+  turn: number,
+  turnLimit: number,
+  units: UnitVM[],
+  pendingRewards: PendingReward[] = [],
+): BattleVM {
   return {
     turn: { turn, turnLimit, phase: "player" },
     status: "victory",
     units,
+    pendingRewards,
   };
 }
 
 const ITEMS: Record<string, Item> = {
   무술교본: { id: "무술교본", name: "무술교본", category: "book", power: 0, bonusPercent: 5 },
+  검술지침서: { id: "검술지침서", name: "검술지침서", category: "book", power: 0, bonusPercent: 5 },
 };
 
 describe("countPlayerRetreats", () => {
@@ -105,6 +113,28 @@ describe("buildResultSummary", () => {
     const c = buildResultSummary(vmWith(19, 20, [unit({ side: "player" })]), reward, ITEMS);
     expect(c.grade).toBe("C");
     expect(c.stars).toBe(1);
+  });
+
+  it("전략조건 노획분(pendingRewards)이 보물·자금에 병합된다", () => {
+    const reward: StageReward = { gold: 600, exp: 0, treasures: [] };
+    const pending: PendingReward[] = [
+      { conditionId: "duel_zhangfei_lijue_reward", treasures: ["검술지침서"], gold: 200 },
+    ];
+    const vm = vmWith(4, 20, [unit({ side: "player" })], pending);
+    const s = buildResultSummary(vm, reward, ITEMS);
+    expect(s.treasures).toEqual([{ id: "검술지침서", name: "검술지침서" }]);
+    expect(s.gold).toBe(800); // 600 + 200
+  });
+
+  it("같은 보물 id가 stage.reward와 pendingRewards 양쪽에 있어도 카드 1장(중복제거)", () => {
+    // 데이터가 잘못 양쪽에 같은 id를 넣어도 결산엔 phantom 중복이 보이지 않아야 한다.
+    const reward: StageReward = { gold: 600, exp: 0, treasures: ["검술지침서"] };
+    const pending: PendingReward[] = [
+      { conditionId: "dup", treasures: ["검술지침서"], gold: 0 },
+    ];
+    const vm = vmWith(4, 20, [unit({ side: "player" })], pending);
+    const s = buildResultSummary(vm, reward, ITEMS);
+    expect(s.treasures).toEqual([{ id: "검술지침서", name: "검술지침서" }]);
   });
 
   it("fanfare가 요약에 포함되고 S는 잭팟", () => {

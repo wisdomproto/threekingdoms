@@ -1,0 +1,241 @@
+{
+  "id": "21-changbanqiao",
+  "name": "장판교",
+  "mapId": "changbanqiao",
+  "turnLimit": 5,
+  "camera": {
+    "zoom": 1.6,
+    "focus": [
+      19,
+      15
+    ]
+  },
+  "reward": {
+    "gold": 700,
+    "exp": 0,
+    "treasures": [
+      "사모"
+    ]
+  },
+  "levelCap": 30,
+  "units": [
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 26,
+      "troops": 520,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 18,
+      "y": 15
+    },
+    {
+      "commanderId": "관평",
+      "classId": "footman",
+      "level": 18,
+      "troops": 150,
+      "items": [],
+      "side": "player",
+      "x": 19,
+      "y": 16
+    },
+    {
+      "commanderId": "주창",
+      "classId": "archer",
+      "level": 18,
+      "troops": 140,
+      "items": [],
+      "side": "player",
+      "x": 19,
+      "y": 17
+    },
+    {
+      "commanderId": "조조",
+      "classId": "lord",
+      "level": 24,
+      "troops": 200,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 2
+    },
+    {
+      "commanderId": "하후돈",
+      "classId": "lightCavalry",
+      "level": 22,
+      "troops": 180,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 5
+    },
+    {
+      "commanderId": "하후연",
+      "classId": "lightCavalry",
+      "level": 22,
+      "troops": 175,
+      "items": [],
+      "side": "enemy",
+      "x": 22,
+      "y": 5
+    },
+    {
+      "commanderId": "허저",
+      "classId": "footman",
+      "level": 22,
+      "troops": 185,
+      "items": [],
+      "side": "enemy",
+      "x": 18,
+      "y": 6
+    },
+    {
+      "commanderId": "악진",
+      "classId": "footman",
+      "level": 20,
+      "troops": 160,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6
+    },
+    {
+      "commanderId": "이전",
+      "classId": "archer",
+      "level": 20,
+      "troops": 150,
+      "items": [],
+      "side": "enemy",
+      "x": 14,
+      "y": 4
+    },
+    {
+      "commanderId": "우금",
+      "classId": "archer",
+      "level": 20,
+      "troops": 150,
+      "items": [],
+      "side": "enemy",
+      "x": 25,
+      "y": 4
+    },
+    {
+      "commanderId": "서황",
+      "classId": "lightCavalry",
+      "level": 21,
+      "troops": 165,
+      "items": [],
+      "side": "enemy",
+      "x": 11,
+      "y": 4
+    },
+    {
+      "commanderId": "조인",
+      "classId": "footman",
+      "level": 21,
+      "troops": 165,
+      "items": [],
+      "side": "enemy",
+      "x": 28,
+      "y": 4
+    },
+    {
+      "commanderId": "조홍",
+      "classId": "footman",
+      "level": 19,
+      "troops": 140,
+      "items": [],
+      "side": "enemy",
+      "x": 8,
+      "y": 3
+    },
+    {
+      "commanderId": "문빙",
+      "classId": "lightCavalry",
+      "level": 19,
+      "troops": 145,
+      "items": [],
+      "side": "enemy",
+      "x": 31,
+      "y": 3
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "surviveTurns",
+      "turns": 5
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "unitRetreated",
+      "unitId": "장비"
+    }
+  ],
+  "reinforcements": [
+    {
+      "id": "cao_vanguard_turn2",
+      "side": "enemy",
+      "trigger": {
+        "kind": "turn",
+        "turn": 2
+      },
+      "units": [
+        {
+          "commanderId": "조순",
+          "classId": "footman",
+          "level": 18,
+          "troops": 130,
+          "items": [],
+          "side": "enemy",
+          "x": 19,
+          "y": 3
+        },
+        {
+          "commanderId": "조성",
+          "classId": "archer",
+          "level": 18,
+          "troops": 125,
+          "items": [],
+          "side": "enemy",
+          "x": 20,
+          "y": 3
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_zhangfei_xuchu_reward",
+      "description": "장비가 다리 위에서 허저와 일기토를 벌여 조조군의 간담을 서늘하게 하면 [장팔사모 비전서]를 얻는다.",
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhangfei_xuchu"
+      },
+      "reward": {
+        "treasures": [
+          "검술지침서"
+        ],
+        "gold": 250
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_zhangfei_xuchu",
+      "type": "duel",
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "장비",
+        "defenderId": "허저"
+      },
+      "outcome": {
+        "winnerId": "장비",
+        "loserRetreats": false
+      },
+      "once": true
+    }
+  ]
+}

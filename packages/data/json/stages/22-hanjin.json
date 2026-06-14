@@ -1,0 +1,247 @@
+{
+  "id": "22-hanjin",
+  "name": "한진 도하",
+  "mapId": "hanjin",
+  "turnLimit": 24,
+  "camera": { "zoom": 1.3, "focus": [30, 28] },
+  "reward": { "gold": 1400, "exp": 0, "treasures": [] },
+  "levelCap": 38,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 24,
+      "troops": 240,
+      "items": ["적토마"],
+      "side": "player",
+      "x": 34,
+      "y": 30
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 25,
+      "troops": 255,
+      "items": [],
+      "side": "player",
+      "x": 32,
+      "y": 31
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 25,
+      "troops": 255,
+      "items": ["사모"],
+      "side": "player",
+      "x": 36,
+      "y": 31
+    },
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 23,
+      "troops": 200,
+      "items": ["기상서"],
+      "side": "player",
+      "x": 38,
+      "y": 32
+    },
+    {
+      "commanderId": "관평",
+      "classId": "footman",
+      "level": 22,
+      "troops": 215,
+      "items": [],
+      "side": "player",
+      "x": 30,
+      "y": 32
+    },
+    {
+      "commanderId": "미방",
+      "classId": "archer",
+      "level": 22,
+      "troops": 200,
+      "items": [],
+      "side": "player",
+      "x": 39,
+      "y": 33
+    },
+    {
+      "commanderId": "미축",
+      "classId": "strategist",
+      "level": 21,
+      "troops": 185,
+      "items": ["상약"],
+      "side": "player",
+      "x": 31,
+      "y": 33
+    },
+    {
+      "commanderId": "손건",
+      "classId": "strategist",
+      "level": 21,
+      "troops": 185,
+      "items": [],
+      "side": "player",
+      "x": 37,
+      "y": 33
+    },
+    {
+      "commanderId": "하후돈",
+      "classId": "heavyCavalry",
+      "level": 27,
+      "troops": 300,
+      "items": [],
+      "side": "enemy",
+      "x": 41,
+      "y": 7
+    },
+    {
+      "commanderId": "하후은",
+      "classId": "lightCavalry",
+      "level": 24,
+      "troops": 230,
+      "items": [],
+      "side": "enemy",
+      "x": 39,
+      "y": 9
+    },
+    {
+      "commanderId": "우금",
+      "classId": "archer",
+      "level": 24,
+      "troops": 220,
+      "items": [],
+      "side": "enemy",
+      "x": 43,
+      "y": 9
+    },
+    {
+      "commanderId": "이전",
+      "classId": "footman",
+      "level": 23,
+      "troops": 215,
+      "items": [],
+      "side": "enemy",
+      "x": 40,
+      "y": 12
+    },
+    {
+      "commanderId": "악진",
+      "classId": "lightCavalry",
+      "level": 23,
+      "troops": 215,
+      "items": [],
+      "side": "enemy",
+      "x": 36,
+      "y": 14
+    },
+    {
+      "commanderId": "서황",
+      "classId": "heavyCavalry",
+      "level": 24,
+      "troops": 230,
+      "items": [],
+      "side": "enemy",
+      "x": 33,
+      "y": 24
+    },
+    {
+      "commanderId": "문빙",
+      "classId": "archer",
+      "level": 22,
+      "troops": 195,
+      "items": [],
+      "side": "enemy",
+      "x": 35,
+      "y": 23
+    }
+  ],
+  "objectives": [
+    { "kind": "reachTile", "unitId": "유비", "x": 0, "y": 19 }
+  ],
+  "failConditions": [
+    { "kind": "unitRetreated", "unitId": "유비" },
+    { "kind": "turnLimitExceeded" }
+  ],
+  "reinforcements": [
+    {
+      "id": "guan_yu_relief",
+      "side": "player",
+      "trigger": { "kind": "turn", "turn": 4 },
+      "units": [
+        {
+          "commanderId": "관우",
+          "classId": "lightCavalry",
+          "level": 27,
+          "troops": 280,
+          "items": ["청룡언월도", "적토마"],
+          "side": "player",
+          "x": 41,
+          "y": 35
+        },
+        {
+          "commanderId": "주창",
+          "classId": "footman",
+          "level": 22,
+          "troops": 200,
+          "items": [],
+          "side": "player",
+          "x": 42,
+          "y": 36
+        }
+      ]
+    },
+    {
+      "id": "cao_pursuit_north",
+      "side": "enemy",
+      "trigger": { "kind": "turn", "turn": 6 },
+      "units": [
+        {
+          "commanderId": "장합",
+          "classId": "lightCavalry",
+          "level": 24,
+          "troops": 225,
+          "items": [],
+          "side": "enemy",
+          "x": 33,
+          "y": 2
+        },
+        {
+          "commanderId": "조인",
+          "classId": "heavyCavalry",
+          "level": 25,
+          "troops": 245,
+          "items": [],
+          "side": "enemy",
+          "x": 37,
+          "y": 3
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_zhaoyun_xiahouen_treasure",
+      "description": "조운이 다리 위에서 하후은과 일기토를 벌여 베어 넘기면 [적로]를 노획한다.",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_xiahouen" },
+      "reward": { "treasures": ["적로"], "gold": 400 }
+    },
+    {
+      "id": "guanyu_ferry_arrival",
+      "description": "관우가 강 서안 나루까지 본대를 엄호하며 도달하면 도하 보급을 확보한다.",
+      "trigger": { "kind": "unitReachedTile", "unitId": "관우", "x": 0, "y": 19 },
+      "reward": { "treasures": [], "gold": 300 }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_zhaoyun_xiahouen",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "조운", "defenderId": "하후은" },
+      "outcome": { "winnerId": "조운", "loserRetreats": true },
+      "once": true
+    }
+  ]
+}

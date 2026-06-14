@@ -1,0 +1,261 @@
+{
+  "id": "04-zhangjue",
+  "name": "장각 토벌",
+  "mapId": "zhangjue",
+  "turnLimit": 34,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      10,
+      4
+    ]
+  },
+  "reward": {
+    "gold": 400,
+    "exp": 0,
+    "treasures": [
+      "둔갑천서"
+    ]
+  },
+  "levelCap": 8,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 4,
+      "troops": 115,
+      "items": [],
+      "side": "player",
+      "x": 22,
+      "y": 27
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 4,
+      "troops": 120,
+      "items": [
+        "청룡언월도"
+      ],
+      "side": "player",
+      "x": 20,
+      "y": 27
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 4,
+      "troops": 120,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 24,
+      "y": 27
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 4,
+      "troops": 85,
+      "items": [
+        "쌀",
+        "폭탄"
+      ],
+      "side": "player",
+      "x": 22,
+      "y": 28
+    },
+    {
+      "commanderId": "미축",
+      "classId": "footman",
+      "level": 3,
+      "troops": 95,
+      "items": [],
+      "side": "player",
+      "x": 19,
+      "y": 28
+    },
+    {
+      "commanderId": "조잠",
+      "classId": "archer",
+      "level": 3,
+      "troops": 90,
+      "items": [],
+      "side": "player",
+      "x": 25,
+      "y": 28
+    },
+    {
+      "commanderId": "관해",
+      "classId": "sorcerer",
+      "level": 6,
+      "troops": 150,
+      "items": [],
+      "side": "enemy",
+      "x": 24,
+      "y": 17
+    },
+    {
+      "commanderId": "유벽",
+      "classId": "bandit",
+      "level": 5,
+      "troops": 115,
+      "items": [],
+      "side": "enemy",
+      "x": 22,
+      "y": 18
+    },
+    {
+      "commanderId": "장연",
+      "classId": "bandit",
+      "level": 5,
+      "troops": 115,
+      "items": [],
+      "side": "enemy",
+      "x": 20,
+      "y": 16
+    },
+    {
+      "commanderId": "요술사",
+      "classId": "sorcerer",
+      "level": 4,
+      "troops": 90,
+      "items": [],
+      "side": "enemy",
+      "x": 10,
+      "y": 7
+    },
+    {
+      "commanderId": "적병",
+      "classId": "bandit",
+      "level": 4,
+      "troops": 100,
+      "items": [],
+      "side": "enemy",
+      "x": 4,
+      "y": 13
+    },
+    {
+      "commanderId": "궁병대",
+      "classId": "archer",
+      "level": 4,
+      "troops": 95,
+      "items": [],
+      "side": "enemy",
+      "x": 24,
+      "y": 13
+    },
+    {
+      "commanderId": "적병_2",
+      "classId": "bandit",
+      "level": 4,
+      "troops": 100,
+      "items": [],
+      "side": "enemy",
+      "x": 37,
+      "y": 13
+    },
+    {
+      "commanderId": "보병대",
+      "classId": "footman",
+      "level": 3,
+      "troops": 90,
+      "items": [],
+      "side": "enemy",
+      "x": 22,
+      "y": 16
+    },
+    {
+      "commanderId": "궁병대_2",
+      "classId": "archer",
+      "level": 3,
+      "troops": 85,
+      "items": [],
+      "side": "enemy",
+      "x": 22,
+      "y": 11
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "defeatUnit",
+      "unitId": "관해"
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "reinforcements": [
+    {
+      "id": "yellowturban_rally",
+      "side": "enemy",
+      "trigger": {
+        "kind": "turn",
+        "turn": 6
+      },
+      "units": [
+        {
+          "commanderId": "적병_3",
+          "classId": "bandit",
+          "level": 4,
+          "troops": 95,
+          "items": [],
+          "side": "enemy",
+          "x": 9,
+          "y": 5
+        },
+        {
+          "commanderId": "적병_4",
+          "classId": "bandit",
+          "level": 4,
+          "troops": 95,
+          "items": [],
+          "side": "enemy",
+          "x": 13,
+          "y": 5
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "breach_fortress_grimoire",
+      "description": "관우가 황건 본진 제단(10,1)까지 돌입하면 장각의 [낙석서]를 노획한다.",
+      "trigger": {
+        "kind": "unitReachedTile",
+        "unitId": "관우",
+        "x": 10,
+        "y": 1
+      },
+      "reward": {
+        "treasures": [
+          "낙석서"
+        ],
+        "gold": 150
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_guanyu_youbi",
+      "type": "duel",
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "관우",
+        "defenderId": "유벽"
+      },
+      "outcome": {
+        "winnerId": "관우",
+        "loserRetreats": true
+      },
+      "once": true
+    }
+  ]
+}

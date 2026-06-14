@@ -1,0 +1,205 @@
+{
+  "id": "27-huarongdao",
+  "name": "화용도",
+  "mapId": "huarongdao",
+  "turnLimit": 24,
+  "camera": { "zoom": 1.3, "focus": [16, 22] },
+  "reward": { "gold": 2500, "exp": 0, "treasures": ["의천검"] },
+  "levelCap": 46,
+  "units": [
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 40,
+      "troops": 220,
+      "items": ["청룡언월도", "적토마"],
+      "side": "player",
+      "x": 15,
+      "y": 23
+    },
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 40,
+      "troops": 210,
+      "items": ["의천검"],
+      "side": "player",
+      "x": 13,
+      "y": 25
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 40,
+      "troops": 215,
+      "items": ["사모"],
+      "side": "player",
+      "x": 17,
+      "y": 25
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 40,
+      "troops": 215,
+      "items": ["청강검"],
+      "side": "player",
+      "x": 11,
+      "y": 27
+    },
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 40,
+      "troops": 180,
+      "items": ["둔갑천서", "낙석서"],
+      "side": "player",
+      "x": 19,
+      "y": 27
+    },
+    {
+      "commanderId": "관평",
+      "classId": "footman",
+      "level": 38,
+      "troops": 195,
+      "items": [],
+      "side": "player",
+      "x": 9,
+      "y": 28
+    },
+    {
+      "commanderId": "주창",
+      "classId": "footman",
+      "level": 38,
+      "troops": 190,
+      "items": [],
+      "side": "player",
+      "x": 21,
+      "y": 28
+    },
+    {
+      "commanderId": "유봉",
+      "classId": "archer",
+      "level": 38,
+      "troops": 180,
+      "items": ["연노"],
+      "side": "player",
+      "x": 14,
+      "y": 29
+    },
+    {
+      "commanderId": "조조",
+      "classId": "lord",
+      "level": 42,
+      "troops": 160,
+      "items": ["맹덕신서"],
+      "side": "enemy",
+      "x": 16,
+      "y": 4
+    },
+    {
+      "commanderId": "허저",
+      "classId": "heavyCavalry",
+      "level": 41,
+      "troops": 205,
+      "items": [],
+      "side": "enemy",
+      "x": 14,
+      "y": 5
+    },
+    {
+      "commanderId": "장요",
+      "classId": "lightCavalry",
+      "level": 41,
+      "troops": 200,
+      "items": [],
+      "side": "enemy",
+      "x": 18,
+      "y": 5
+    },
+    {
+      "commanderId": "서황",
+      "classId": "footman",
+      "level": 40,
+      "troops": 195,
+      "items": [],
+      "side": "enemy",
+      "x": 15,
+      "y": 7
+    },
+    {
+      "commanderId": "문빙",
+      "classId": "archer",
+      "level": 39,
+      "troops": 175,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 7
+    },
+    {
+      "commanderId": "악진",
+      "classId": "footman",
+      "level": 39,
+      "troops": 170,
+      "items": [],
+      "side": "enemy",
+      "x": 13,
+      "y": 9
+    }
+  ],
+  "objectives": [
+    { "kind": "defeatUnit", "unitId": "조조" }
+  ],
+  "failConditions": [
+    { "kind": "unitRetreated", "unitId": "유비" },
+    { "kind": "unitRetreated", "unitId": "관우" },
+    { "kind": "turnLimitExceeded" }
+  ],
+  "reinforcements": [
+    {
+      "id": "reinf_cao_rearguard_turn4",
+      "side": "enemy",
+      "trigger": { "kind": "turn", "turn": 4 },
+      "units": [
+        {
+          "commanderId": "조홍",
+          "classId": "footman",
+          "level": 38,
+          "troops": 165,
+          "items": [],
+          "side": "enemy",
+          "x": 16,
+          "y": 2
+        },
+        {
+          "commanderId": "우금",
+          "classId": "archer",
+          "level": 38,
+          "troops": 160,
+          "items": [],
+          "side": "enemy",
+          "x": 14,
+          "y": 3
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_guanyu_caocao_reward",
+      "description": "관우가 조조와 일기토를 벌여 그 목을 노리면 [의협교본]을 얻는다. 관우의 선택 — 1부 엔딩 분기의 씨앗.",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_caocao" },
+      "reward": { "treasures": ["의협교본"], "gold": 800 }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_guanyu_caocao",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "관우", "defenderId": "조조" },
+      "outcome": { "winnerId": "관우", "loserRetreats": false },
+      "once": true
+    }
+  ]
+}

@@ -1,0 +1,304 @@
+{
+  "id": "11-xiaopei",
+  "name": "소패 공방전",
+  "mapId": "xiaopei",
+  "turnLimit": 14,
+  "camera": {
+    "zoom": 1.4,
+    "focus": [
+      24,
+      30
+    ]
+  },
+  "reward": {
+    "gold": 900,
+    "exp": 0,
+    "treasures": [
+      "고취구"
+    ]
+  },
+  "levelCap": 18,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 9,
+      "troops": 150,
+      "items": [],
+      "side": "player",
+      "x": 24,
+      "y": 33
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 9,
+      "troops": 160,
+      "items": [
+        "청룡언월도"
+      ],
+      "side": "player",
+      "x": 22,
+      "y": 28
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 9,
+      "troops": 160,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 26,
+      "y": 28
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 8,
+      "troops": 145,
+      "items": [],
+      "side": "player",
+      "x": 24,
+      "y": 27
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 9,
+      "troops": 110,
+      "items": [
+        "쌀",
+        "폭탄"
+      ],
+      "side": "player",
+      "x": 21,
+      "y": 32
+    },
+    {
+      "commanderId": "미방",
+      "classId": "footman",
+      "level": 8,
+      "troops": 120,
+      "items": [],
+      "side": "player",
+      "x": 19,
+      "y": 29
+    },
+    {
+      "commanderId": "조잠",
+      "classId": "archer",
+      "level": 8,
+      "troops": 110,
+      "items": [],
+      "side": "player",
+      "x": 28,
+      "y": 29
+    },
+    {
+      "commanderId": "진등",
+      "classId": "strategist",
+      "level": 7,
+      "troops": 95,
+      "items": [],
+      "side": "player",
+      "x": 27,
+      "y": 32
+    },
+    {
+      "commanderId": "여포",
+      "classId": "heavyCavalry",
+      "level": 10,
+      "troops": 175,
+      "items": [
+        "방천화극",
+        "적토마"
+      ],
+      "side": "enemy",
+      "x": 24,
+      "y": 6
+    },
+    {
+      "commanderId": "고순",
+      "classId": "footman",
+      "level": 9,
+      "troops": 140,
+      "items": [],
+      "side": "enemy",
+      "x": 12,
+      "y": 14
+    },
+    {
+      "commanderId": "장요",
+      "classId": "lightCavalry",
+      "level": 9,
+      "troops": 140,
+      "items": [],
+      "side": "enemy",
+      "x": 34,
+      "y": 14
+    },
+    {
+      "commanderId": "진궁",
+      "classId": "strategist",
+      "level": 8,
+      "troops": 100,
+      "items": [],
+      "side": "enemy",
+      "x": 24,
+      "y": 4
+    },
+    {
+      "commanderId": "위속",
+      "classId": "footman",
+      "level": 7,
+      "troops": 110,
+      "items": [],
+      "side": "enemy",
+      "x": 12,
+      "y": 10
+    },
+    {
+      "commanderId": "후성",
+      "classId": "lightCavalry",
+      "level": 7,
+      "troops": 110,
+      "items": [],
+      "side": "enemy",
+      "x": 34,
+      "y": 10
+    },
+    {
+      "commanderId": "학맹",
+      "classId": "archer",
+      "level": 7,
+      "troops": 100,
+      "items": [],
+      "side": "enemy",
+      "x": 18,
+      "y": 12
+    },
+    {
+      "commanderId": "조성",
+      "classId": "archer",
+      "level": 7,
+      "troops": 100,
+      "items": [],
+      "side": "enemy",
+      "x": 30,
+      "y": 12
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "surviveTurns",
+      "turns": 12
+    },
+    {
+      "kind": "defeatUnit",
+      "unitId": "여포",
+      "optional": true
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    }
+  ],
+  "reinforcements": [
+    {
+      "id": "reinf_gaoshun_vanguard_turn4",
+      "side": "enemy",
+      "trigger": {
+        "kind": "turn",
+        "turn": 4
+      },
+      "units": [
+        {
+          "commanderId": "조표",
+          "classId": "footman",
+          "level": 7,
+          "troops": 100,
+          "items": [],
+          "side": "enemy",
+          "x": 12,
+          "y": 17
+        },
+        {
+          "commanderId": "송겸",
+          "classId": "archer",
+          "level": 7,
+          "troops": 95,
+          "items": [],
+          "side": "enemy",
+          "x": 34,
+          "y": 17
+        }
+      ]
+    },
+    {
+      "id": "reinf_lubu_press_turn7",
+      "side": "enemy",
+      "trigger": {
+        "kind": "turn",
+        "turn": 7
+      },
+      "units": [
+        {
+          "commanderId": "경무",
+          "classId": "lightCavalry",
+          "level": 7,
+          "troops": 105,
+          "items": [],
+          "side": "enemy",
+          "x": 18,
+          "y": 7
+        },
+        {
+          "commanderId": "진기",
+          "classId": "footman",
+          "level": 7,
+          "troops": 105,
+          "items": [],
+          "side": "enemy",
+          "x": 30,
+          "y": 7
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_guanyu_zhangliao_reward",
+      "description": "관우가 장요와 일기토를 벌여 성문 앞 포위를 풀어내면 [근위개]를 노획한다.",
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_guanyu_zhangliao"
+      },
+      "reward": {
+        "treasures": [
+          "근위개"
+        ],
+        "gold": 200
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_guanyu_zhangliao",
+      "type": "duel",
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "관우",
+        "defenderId": "장요"
+      },
+      "outcome": {
+        "winnerId": "관우",
+        "loserRetreats": false
+      },
+      "once": true
+    }
+  ]
+}

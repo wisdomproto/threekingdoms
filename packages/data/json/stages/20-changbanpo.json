@@ -1,0 +1,252 @@
+{
+  "id": "20-changbanpo",
+  "name": "장판파",
+  "mapId": "changbanpo",
+  "turnLimit": 30,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      22,
+      18
+    ]
+  },
+  "reward": {
+    "gold": 900,
+    "exp": 0,
+    "treasures": [
+      "근위개"
+    ]
+  },
+  "levelCap": 30,
+  "units": [
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 20,
+      "troops": 340,
+      "items": [
+        "청강검",
+        "적토마"
+      ],
+      "side": "player",
+      "x": 16,
+      "y": 22
+    },
+    {
+      "commanderId": "유선",
+      "classId": "civilian",
+      "level": 6,
+      "troops": 60,
+      "items": [],
+      "side": "ally",
+      "x": 14,
+      "y": 23
+    },
+    {
+      "commanderId": "미축",
+      "classId": "civilian",
+      "level": 8,
+      "troops": 80,
+      "items": [],
+      "side": "ally",
+      "x": 18,
+      "y": 23
+    },
+    {
+      "commanderId": "손건",
+      "classId": "civilian",
+      "level": 8,
+      "troops": 80,
+      "items": [],
+      "side": "ally",
+      "x": 15,
+      "y": 24
+    },
+    {
+      "commanderId": "하후은",
+      "classId": "heavyCavalry",
+      "level": 13,
+      "troops": 170,
+      "items": [
+        "청강검"
+      ],
+      "side": "enemy",
+      "x": 40,
+      "y": 11
+    },
+    {
+      "commanderId": "조순",
+      "classId": "lightCavalry",
+      "level": 12,
+      "troops": 130,
+      "items": [],
+      "side": "enemy",
+      "x": 40,
+      "y": 23
+    },
+    {
+      "commanderId": "하후돈",
+      "classId": "heavyCavalry",
+      "level": 13,
+      "troops": 150,
+      "items": [],
+      "side": "enemy",
+      "x": 36,
+      "y": 9
+    },
+    {
+      "commanderId": "우금",
+      "classId": "archer",
+      "level": 12,
+      "troops": 120,
+      "items": [],
+      "side": "enemy",
+      "x": 42,
+      "y": 10
+    },
+    {
+      "commanderId": "이전",
+      "classId": "archer",
+      "level": 12,
+      "troops": 120,
+      "items": [],
+      "side": "enemy",
+      "x": 40,
+      "y": 22
+    },
+    {
+      "commanderId": "악진",
+      "classId": "footman",
+      "level": 12,
+      "troops": 130,
+      "items": [],
+      "side": "enemy",
+      "x": 12,
+      "y": 26
+    },
+    {
+      "commanderId": "조인",
+      "classId": "lightCavalry",
+      "level": 12,
+      "troops": 130,
+      "items": [],
+      "side": "enemy",
+      "x": 44,
+      "y": 13
+    },
+    {
+      "commanderId": "하후연",
+      "classId": "archer",
+      "level": 12,
+      "troops": 115,
+      "items": [],
+      "side": "enemy",
+      "x": 40,
+      "y": 8
+    },
+    {
+      "commanderId": "조홍",
+      "classId": "footman",
+      "level": 11,
+      "troops": 110,
+      "items": [],
+      "side": "enemy",
+      "x": 10,
+      "y": 24
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "reachTile",
+      "unitId": "조운",
+      "x": 34,
+      "y": 18
+    },
+    {
+      "kind": "defeatUnit",
+      "unitId": "하후은",
+      "optional": true
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "unitRetreated",
+      "unitId": "조운"
+    },
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "유선",
+        "미축",
+        "손건"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "reinforcements": [
+    {
+      "id": "cao_pursuit_main",
+      "side": "enemy",
+      "trigger": {
+        "kind": "turn",
+        "turn": 8
+      },
+      "units": [
+        {
+          "commanderId": "조진",
+          "classId": "lightCavalry",
+          "level": 11,
+          "troops": 110,
+          "items": [],
+          "side": "enemy",
+          "x": 25,
+          "y": 8
+        },
+        {
+          "commanderId": "조휴",
+          "classId": "archer",
+          "level": 11,
+          "troops": 100,
+          "items": [],
+          "side": "enemy",
+          "x": 26,
+          "y": 6
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_zhaoyun_xiahouen_reward",
+      "description": "조운이 하후은을 일기토로 베어 청강검과 함께 [근위개]를 노획하면 추격을 단숨에 흩는다.",
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhaoyun_xiahouen"
+      },
+      "reward": {
+        "treasures": [
+          "마개"
+        ],
+        "gold": 300
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_zhaoyun_xiahouen",
+      "type": "duel",
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "조운",
+        "defenderId": "하후은"
+      },
+      "outcome": {
+        "winnerId": "조운",
+        "loserRetreats": true
+      },
+      "once": true
+    }
+  ]
+}

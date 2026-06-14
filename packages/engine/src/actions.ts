@@ -154,14 +154,17 @@ function checkOutcome(ctx: BattleContext, state: BattleState): { state: BattleSt
     ({ state: { ...state, status: "victory" }, events: [{ type: "battleEnded", result: "victory" }] });
 
   if (useNew) {
-    // 패배 우선
+    // 패배 우선 (명시 failConditions는 승리보다 우선 — 원작 동시발생 룰)
     if (failConditions?.some((f) => failConditionMet(ctx, state, f))) return defeat();
+    // 필수 목표 전부 충족 시 승리 — *암묵* turnLimit 종료보다 먼저 판정한다.
+    //  surviveTurns:N + turnLimit:N + (turnLimitExceeded 미명시) 조합에서, turn>N 시점에
+    //  생존 목표가 막 충족되는데 암묵 turnLimit 패배가 선점해버리는 버그 방지.
+    //  (turnLimitExceeded를 *명시*한 스테이지는 위 패배-우선에서 이미 처리됨 → 의도된 시간압박 유지.)
+    const required = objectives.filter((o) => !o.optional);
+    if (required.length > 0 && required.every((o) => objectiveMet(ctx, state, o))) return victory();
     // turnLimitExceeded를 명시하지 않았으면 기존 단순 종료 룰 유지(하위호환)
     const hasTurnLimitFail = failConditions?.some((f) => f.kind === "turnLimitExceeded") ?? false;
     if (!hasTurnLimitFail && state.turn > ctx.stage.turnLimit) return defeat();
-    // 필수 목표 전부 충족 시 승리
-    const required = objectives.filter((o) => !o.optional);
-    if (required.length > 0 && required.every((o) => objectiveMet(ctx, state, o))) return victory();
     return { state, events: [] };
   }
 

@@ -1,0 +1,154 @@
+{
+  "id": "13-yuanshu",
+  "name": "원술 토벌",
+  "mapId": "yuanshu",
+  "turnLimit": 25,
+  "camera": { "zoom": 1.4, "focus": [22, 12] },
+  "reward": { "gold": 700, "exp": 0, "treasures": [] },
+  "levelCap": 24,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 13,
+      "troops": 180,
+      "items": [],
+      "side": "player",
+      "x": 27,
+      "y": 11
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 13,
+      "troops": 190,
+      "items": ["청룡언월도"],
+      "side": "player",
+      "x": 26,
+      "y": 10
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 13,
+      "troops": 190,
+      "items": ["사모"],
+      "side": "player",
+      "x": 26,
+      "y": 12
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 12,
+      "troops": 175,
+      "items": [],
+      "side": "player",
+      "x": 28,
+      "y": 9
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 13,
+      "troops": 140,
+      "items": ["쌀", "폭탄"],
+      "side": "player",
+      "x": 28,
+      "y": 13
+    },
+    {
+      "commanderId": "미방",
+      "classId": "footman",
+      "level": 12,
+      "troops": 160,
+      "items": [],
+      "side": "player",
+      "x": 29,
+      "y": 11
+    },
+    {
+      "commanderId": "원술",
+      "classId": "pikeman",
+      "level": 24,
+      "troops": 288,
+      "items": [],
+      "side": "enemy",
+      "x": 6,
+      "y": 9
+    },
+    {
+      "commanderId": "진기",
+      "classId": "heavyCavalry",
+      "level": 22,
+      "troops": 215,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 11
+    },
+    {
+      "commanderId": "이풍",
+      "classId": "footman",
+      "level": 21,
+      "troops": 165,
+      "items": [],
+      "side": "enemy",
+      "x": 5,
+      "y": 11
+    },
+    {
+      "commanderId": "악취",
+      "classId": "archer",
+      "level": 21,
+      "troops": 150,
+      "items": [],
+      "side": "enemy",
+      "x": 4,
+      "y": 8
+    },
+    {
+      "commanderId": "한섬",
+      "classId": "lightCavalry",
+      "level": 21,
+      "troops": 160,
+      "items": [],
+      "side": "enemy",
+      "x": 8,
+      "y": 7
+    },
+    {
+      "commanderId": "원윤",
+      "classId": "beastUnit",
+      "level": 19,
+      "troops": 140,
+      "items": [],
+      "side": "enemy",
+      "x": 14,
+      "y": 22
+    }
+  ],
+  "objectives": [
+    { "kind": "defeatAll" }
+  ],
+  "failConditions": [
+    { "kind": "unitRetreated", "unitId": "유비" }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_zhangfei_jiling_reward",
+      "description": "허자장이 \"기령과 장비의 일기토를 보여주면 [의협교본]을 주겠네\" — 장비를 기령(진기)과 맞붙여 일기토를 발동시키면 노획한다.",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_jiling" },
+      "reward": { "treasures": ["의협교본"], "gold": 300 }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_zhangfei_jiling",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "장비", "defenderId": "진기" },
+      "outcome": { "winnerId": "장비", "loserRetreats": true },
+      "once": true
+    }
+  ]
+}

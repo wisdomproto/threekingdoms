@@ -4,7 +4,10 @@
  *
  * 입력은 BattleVM + stage.reward(StageReward) + items 맵.
  * evaluateStage(@tk/engine)로 등급/점수를 산정하고, 보상 카드 표시용으로 풀어낸다.
- * MVP 가정(설계 phase-1 계약): 보물은 전부 획득으로 간주(treasuresObtained=total).
+ * 보물 = stage.reward.treasures(무조건 보상) + vm.pendingRewards(전략조건 노획분)를
+ * **id 기준 중복제거**해 병합한다(같은 id가 양쪽에 있어도 카드 1장). 자금도 양쪽을 합산.
+ * MVP 가정(설계 phase-1 계약): 표시된 보물은 전부 획득으로 간주(treasuresObtained=total).
+ * 전략조건 보상은 정의상 "획득한" 것이므로 이 가정과 정합한다.
  */
 import { evaluateStage } from "@tk/engine";
 import type { StageReward, Item } from "@tk/data";
@@ -82,9 +85,13 @@ export function buildResultSummary(
   reward: StageReward | undefined,
   items: Record<string, Item>,
 ): ResultSummary {
-  const treasureIds = reward?.treasures ?? [];
+  const pending = vm.pendingRewards ?? [];
+  // stage.reward(무조건) + 전략조건 노획분을 id 기준 중복제거해 병합(같은 id는 카드 1장).
+  const treasureIds = [
+    ...new Set([...(reward?.treasures ?? []), ...pending.flatMap((p) => p.treasures)]),
+  ];
   const totalTreasures = treasureIds.length;
-  // MVP: 전부 획득으로 간주
+  // MVP: 표시된 보물은 전부 획득으로 간주(전략조건 보상은 정의상 획득분)
   const treasuresObtained = totalTreasures;
   const playerRetreats = countPlayerRetreats(vm);
 
@@ -96,7 +103,7 @@ export function buildResultSummary(
     totalTreasures,
   });
 
-  const gold = reward?.gold ?? 0;
+  const gold = (reward?.gold ?? 0) + pending.reduce((sum, p) => sum + p.gold, 0);
   return {
     grade,
     score,

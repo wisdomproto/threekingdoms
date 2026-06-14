@@ -1,0 +1,151 @@
+{
+  "id": "03-guangzong",
+  "name": "광종 전투",
+  "mapId": "guangzong",
+  "turnLimit": 25,
+  "camera": { "zoom": 1.5, "focus": [40, 16] },
+  "reward": { "gold": 250, "exp": 0, "treasures": ["무술교본"] },
+  "levelCap": 8,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 2,
+      "troops": 100,
+      "items": [],
+      "side": "player",
+      "x": 44,
+      "y": 16
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 2,
+      "troops": 105,
+      "items": ["청룡언월도"],
+      "side": "player",
+      "x": 44,
+      "y": 15
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 2,
+      "troops": 105,
+      "items": ["사모"],
+      "side": "player",
+      "x": 44,
+      "y": 17
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 2,
+      "troops": 80,
+      "items": ["폭탄"],
+      "side": "player",
+      "x": 45,
+      "y": 16
+    },
+    {
+      "commanderId": "공손찬",
+      "classId": "lightCavalry",
+      "level": 3,
+      "troops": 100,
+      "items": [],
+      "side": "ally",
+      "x": 43,
+      "y": 19
+    },
+    {
+      "commanderId": "관해",
+      "classId": "footman",
+      "level": 4,
+      "troops": 160,
+      "items": [],
+      "side": "enemy",
+      "x": 3,
+      "y": 16
+    },
+    {
+      "commanderId": "유벽",
+      "classId": "archer",
+      "level": 3,
+      "troops": 95,
+      "items": [],
+      "side": "enemy",
+      "x": 8,
+      "y": 14
+    },
+    {
+      "commanderId": "곽적",
+      "classId": "footman",
+      "level": 3,
+      "troops": 95,
+      "items": [],
+      "side": "enemy",
+      "x": 8,
+      "y": 18
+    },
+    {
+      "commanderId": "정덕",
+      "classId": "bandit",
+      "level": 2,
+      "troops": 90,
+      "items": [],
+      "side": "enemy",
+      "x": 11,
+      "y": 16
+    },
+    {
+      "commanderId": "장연",
+      "classId": "bandit",
+      "level": 2,
+      "troops": 90,
+      "items": [],
+      "side": "enemy",
+      "x": 14,
+      "y": 9
+    }
+  ],
+  "objectives": [{ "kind": "defeatUnit", "unitId": "관해" }],
+  "failConditions": [{ "kind": "unitRetreated", "unitId": "유비" }],
+  "reinforcements": [
+    {
+      "id": "yellowturban_sally",
+      "side": "enemy",
+      "trigger": { "kind": "turn", "turn": 4 },
+      "units": [
+        {
+          "commanderId": "보병대",
+          "classId": "footman",
+          "level": 2,
+          "troops": 80,
+          "items": [],
+          "side": "enemy",
+          "x": 14,
+          "y": 22
+        },
+        {
+          "commanderId": "궁병대",
+          "classId": "archer",
+          "level": 2,
+          "troops": 75,
+          "items": [],
+          "side": "enemy",
+          "x": 14,
+          "y": 23
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "seize_barracks",
+      "description": "성내 병영을 점거하면 군량을 확보한다",
+      "trigger": { "kind": "unitReachedTile", "unitId": "장비", "x": 7, "y": 7 },
+      "reward": { "treasures": ["콩"], "gold": 100 }
+    }
+  ],
+  "events": []
+}

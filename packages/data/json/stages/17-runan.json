@@ -1,0 +1,214 @@
+{
+  "id": "17-runan",
+  "name": "여남 전투",
+  "mapId": "runan",
+  "turnLimit": 35,
+  "camera": { "zoom": 1.2, "focus": [10, 28] },
+  "reward": { "gold": 1600, "exp": 0, "treasures": [] },
+  "levelCap": 35,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 24,
+      "troops": 240,
+      "items": ["적로"],
+      "side": "player",
+      "x": 5,
+      "y": 30
+    },
+    {
+      "commanderId": "관우",
+      "classId": "heavyCavalry",
+      "level": 25,
+      "troops": 270,
+      "items": ["청룡언월도", "적토마"],
+      "side": "player",
+      "x": 4,
+      "y": 31
+    },
+    {
+      "commanderId": "장비",
+      "classId": "heavyCavalry",
+      "level": 24,
+      "troops": 260,
+      "items": ["사모"],
+      "side": "player",
+      "x": 6,
+      "y": 31
+    },
+    {
+      "commanderId": "조운",
+      "classId": "guardCavalry",
+      "level": 24,
+      "troops": 255,
+      "items": ["삼첨도"],
+      "side": "player",
+      "x": 5,
+      "y": 32
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 22,
+      "troops": 180,
+      "items": ["손자의병법서", "쌀"],
+      "side": "player",
+      "x": 3,
+      "y": 29
+    },
+    {
+      "commanderId": "미축",
+      "classId": "sorcerer",
+      "level": 21,
+      "troops": 170,
+      "items": ["상약"],
+      "side": "player",
+      "x": 7,
+      "y": 30
+    },
+    {
+      "commanderId": "관평",
+      "classId": "footman",
+      "level": 20,
+      "troops": 200,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 33
+    },
+    {
+      "commanderId": "주창",
+      "classId": "bandit",
+      "level": 20,
+      "troops": 195,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 33
+    },
+    {
+      "commanderId": "유벽",
+      "classId": "footman",
+      "level": 18,
+      "troops": 160,
+      "items": [],
+      "side": "ally",
+      "x": 8,
+      "y": 28
+    },
+    {
+      "commanderId": "허저",
+      "classId": "heavyCavalry",
+      "level": 26,
+      "troops": 300,
+      "items": [],
+      "side": "enemy",
+      "x": 22,
+      "y": 27
+    },
+    {
+      "commanderId": "조인",
+      "classId": "guardCavalry",
+      "level": 27,
+      "troops": 320,
+      "items": [],
+      "side": "enemy",
+      "x": 36,
+      "y": 20
+    },
+    {
+      "commanderId": "이전",
+      "classId": "archer",
+      "level": 23,
+      "troops": 210,
+      "items": [],
+      "side": "enemy",
+      "x": 28,
+      "y": 13
+    },
+    {
+      "commanderId": "악진",
+      "classId": "lightCavalry",
+      "level": 23,
+      "troops": 220,
+      "items": [],
+      "side": "enemy",
+      "x": 28,
+      "y": 31
+    },
+    {
+      "commanderId": "우금",
+      "classId": "footman",
+      "level": 23,
+      "troops": 215,
+      "items": [],
+      "side": "enemy",
+      "x": 30,
+      "y": 24
+    },
+    {
+      "commanderId": "채양",
+      "classId": "lightCavalry",
+      "level": 22,
+      "troops": 200,
+      "items": [],
+      "side": "enemy",
+      "x": 33,
+      "y": 33
+    }
+  ],
+  "objectives": [
+    { "kind": "reachTile", "unitId": "유비", "x": 61, "y": 21 }
+  ],
+  "failConditions": [
+    { "kind": "unitRetreated", "unitId": "유비" },
+    { "kind": "turnLimitExceeded" }
+  ],
+  "reinforcements": [
+    {
+      "id": "caoren_pursuit",
+      "side": "enemy",
+      "trigger": { "kind": "turn", "turn": 6 },
+      "units": [
+        {
+          "commanderId": "하후돈",
+          "classId": "heavyCavalry",
+          "level": 25,
+          "troops": 260,
+          "items": [],
+          "side": "enemy",
+          "x": 12,
+          "y": 6
+        },
+        {
+          "commanderId": "악취",
+          "classId": "archer",
+          "level": 21,
+          "troops": 190,
+          "items": [],
+          "side": "enemy",
+          "x": 14,
+          "y": 6
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_zhaoyun_xuchu_reward",
+      "description": "조운이 허저와 일기토를 벌여 추격을 저지하면 [근위개]를 노획한다.",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_xuchu" },
+      "reward": { "treasures": ["근위개"], "gold": 400 }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_zhaoyun_xuchu",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "조운", "defenderId": "허저" },
+      "outcome": { "winnerId": "조운", "loserRetreats": true },
+      "once": true
+    }
+  ]
+}

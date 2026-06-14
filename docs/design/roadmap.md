@@ -11,6 +11,8 @@
 > 갱신(2026-06-14): **W1**(성장 exp/레벨업/레벨캡 + 결산 평가 S~C + 보상/로스터/상점 스키마) · **W2**(막간 셸: 타이틀→스테이지선택→편성→상점→출진→전투override→결산, localStorage 메타) 착지. 전 패키지 green(engine 59/web 239/sim 3/data 22), 막간 라우트 실렌더 검증. 조조전 **병과 5스탯 등급표·등급계수 확보**(docs/reference/sosoden-class-grades.md) → W3(등급계수 이식+밸런스) 착수 가능.
 >
 > 갱신(2026-06-14, 후속): W3(등급계수 증분성장)·W4(도구/장비런타임/회복책략)·Tier1~3(전술피드백·진영3종·패널탭·격파VFX)·카지노 결산·광고 훅(§13)·전투 모션 주스·군주병종·**M3①(스테이지 스키마/엔진: 다목표·탈출·호위·생존·점령·증원·전략조건=보물게이트, 27스테이지 데이터 계약 확정)** 착지. **데이터 에디터 4종**(tools/{item,class,character,strategy}-editor.html) — 무기·병종·캐릭터·책략 양산(2탄 재사용). 전 패키지 green(engine 106/web 334/data 26/sim 10). 다음: 스테이지 에디터 → M3② 27스테이지 데이터 양산(레퍼런스=docs/reference/yeonggeoljeon-remake-stages.md).
+>
+> 갱신(2026-06-14, M3② 완성): **스테이지 에디터**(tools/stage-editor.html, 지형+유닛+목표/전략조건/증원→stage JSON) + **데이터 에디터 대시보드**(tools/index.html) 추가. **27스테이지 데이터 1차 양산 완료**(05·06·08·10·12 + 신규 22 = §5 전 스테이지, sim 완주 검증). ⚠️ 1차=근사 그리드 맵·일부 보스 commanders 대체(장각→관해 등) — painted 배경·정밀 HEXZMAP·보스 데이터 보강은 폴리시 후속. **자체 컷아웃 리그 툴 MVP**(tools/rig-editor.html + apps/web SkeletonView 런타임, Spine 대체·무기슬롯) + **인게임 자동전투 목표인식**(탈출/방어/호위/점령 — engine pathCostField 우회 라우팅). 전 패키지 green(engine 106/web 354/data 28/sim 10). 2부(가상통일) 레퍼런스 확보=docs/reference/yeonggeoljeon-remake-stages-act2.md(post-v1). 다음: 폴리시(맵 painted·보스 보강·★ 리깅)·M2 잔여 깊이.
 
 | 영역 | 상태 | 비고 |
 |---|---|---|

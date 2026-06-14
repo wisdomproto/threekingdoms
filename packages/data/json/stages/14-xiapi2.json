@@ -1,0 +1,339 @@
+{
+  "id": "14-xiapi2",
+  "name": "하비 2차",
+  "mapId": "xiapi2",
+  "turnLimit": 40,
+  "camera": {
+    "zoom": 1.2,
+    "focus": [
+      24,
+      38
+    ]
+  },
+  "reward": {
+    "gold": 1400,
+    "exp": 0,
+    "treasures": [
+      "방천화극"
+    ]
+  },
+  "levelCap": 26,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 23,
+      "troops": 252,
+      "items": [],
+      "side": "player",
+      "x": 24,
+      "y": 44
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 24,
+      "troops": 276,
+      "items": [
+        "청룡언월도",
+        "적토마"
+      ],
+      "side": "player",
+      "x": 23,
+      "y": 42
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 24,
+      "troops": 270,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 25,
+      "y": 42
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 23,
+      "troops": 258,
+      "items": [
+        "삼첨도"
+      ],
+      "side": "player",
+      "x": 21,
+      "y": 43
+    },
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 23,
+      "troops": 195,
+      "items": [
+        "손자의병법서",
+        "쌀"
+      ],
+      "side": "player",
+      "x": 27,
+      "y": 43
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 22,
+      "troops": 184,
+      "items": [
+        "폭탄"
+      ],
+      "side": "player",
+      "x": 19,
+      "y": 44
+    },
+    {
+      "commanderId": "미방",
+      "classId": "footman",
+      "level": 22,
+      "troops": 206,
+      "items": [],
+      "side": "player",
+      "x": 29,
+      "y": 44
+    },
+    {
+      "commanderId": "미축",
+      "classId": "strategist",
+      "level": 21,
+      "troops": 172,
+      "items": [
+        "술"
+      ],
+      "side": "player",
+      "x": 17,
+      "y": 45
+    },
+    {
+      "commanderId": "여포",
+      "classId": "guardCavalry",
+      "level": 24,
+      "troops": 360,
+      "items": [
+        "적로"
+      ],
+      "side": "enemy",
+      "x": 24,
+      "y": 18
+    },
+    {
+      "commanderId": "장요",
+      "classId": "lightCavalry",
+      "level": 20,
+      "troops": 250,
+      "items": [],
+      "side": "enemy",
+      "x": 24,
+      "y": 12
+    },
+    {
+      "commanderId": "고순",
+      "classId": "footman",
+      "level": 19,
+      "troops": 230,
+      "items": [],
+      "side": "enemy",
+      "x": 13,
+      "y": 24
+    },
+    {
+      "commanderId": "진궁",
+      "classId": "strategist",
+      "level": 18,
+      "troops": 170,
+      "items": [],
+      "side": "enemy",
+      "x": 35,
+      "y": 24
+    },
+    {
+      "commanderId": "후성",
+      "classId": "lightCavalry",
+      "level": 16,
+      "troops": 160,
+      "items": [],
+      "side": "enemy",
+      "x": 24,
+      "y": 22
+    },
+    {
+      "commanderId": "위속",
+      "classId": "archer",
+      "level": 17,
+      "troops": 150,
+      "items": [],
+      "side": "enemy",
+      "x": 13,
+      "y": 22
+    },
+    {
+      "commanderId": "학맹",
+      "classId": "footman",
+      "level": 17,
+      "troops": 160,
+      "items": [],
+      "side": "enemy",
+      "x": 35,
+      "y": 22
+    },
+    {
+      "commanderId": "조성",
+      "classId": "archer",
+      "level": 16,
+      "troops": 140,
+      "items": [],
+      "side": "enemy",
+      "x": 20,
+      "y": 30
+    },
+    {
+      "commanderId": "기병대",
+      "classId": "lightCavalry",
+      "level": 15,
+      "troops": 120,
+      "items": [],
+      "side": "enemy",
+      "x": 28,
+      "y": 30
+    },
+    {
+      "commanderId": "보병대",
+      "classId": "footman",
+      "level": 15,
+      "troops": 120,
+      "items": [],
+      "side": "enemy",
+      "x": 24,
+      "y": 28
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "defeatUnit",
+      "unitId": "여포",
+      "optional": false
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "reinforcements": [
+    {
+      "id": "houcheng_gate_revolt",
+      "side": "enemy",
+      "trigger": {
+        "kind": "turn",
+        "turn": 12
+      },
+      "units": [
+        {
+          "commanderId": "보병대_2",
+          "classId": "footman",
+          "level": 15,
+          "troops": 110,
+          "items": [],
+          "side": "enemy",
+          "x": 10,
+          "y": 28
+        },
+        {
+          "commanderId": "궁병대",
+          "classId": "archer",
+          "level": 15,
+          "troops": 105,
+          "items": [],
+          "side": "enemy",
+          "x": 38,
+          "y": 28
+        }
+      ]
+    },
+    {
+      "id": "caocao_allied_relief",
+      "side": "ally",
+      "trigger": {
+        "kind": "turn",
+        "turn": 13
+      },
+      "units": [
+        {
+          "commanderId": "조조",
+          "classId": "lord",
+          "level": 20,
+          "troops": 250,
+          "items": [],
+          "side": "ally",
+          "x": 24,
+          "y": 46
+        },
+        {
+          "commanderId": "하후돈",
+          "classId": "lightCavalry",
+          "level": 19,
+          "troops": 220,
+          "items": [],
+          "side": "ally",
+          "x": 22,
+          "y": 46
+        },
+        {
+          "commanderId": "허저",
+          "classId": "footman",
+          "level": 19,
+          "troops": 230,
+          "items": [],
+          "side": "ally",
+          "x": 26,
+          "y": 46
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_guanyu_zhangliao_reward",
+      "description": "관우가 장료와 일기토를 벌여 항복을 권하면 [검술지침서]를 노획한다.",
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_guanyu_zhangliao"
+      },
+      "reward": {
+        "treasures": [
+          "검술지침서"
+        ],
+        "gold": 300
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_guanyu_zhangliao",
+      "type": "duel",
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "관우",
+        "defenderId": "장요"
+      },
+      "outcome": {
+        "winnerId": "관우",
+        "loserRetreats": false
+      },
+      "once": true
+    }
+  ]
+}

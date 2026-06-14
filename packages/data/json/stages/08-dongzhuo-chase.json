@@ -1,0 +1,231 @@
+{
+  "id": "08-dongzhuo-chase",
+  "name": "동탁 추격전",
+  "mapId": "dongzhuo-chase",
+  "turnLimit": 16,
+  "camera": { "zoom": 1.4, "focus": [18, 16] },
+  "reward": { "gold": 600, "exp": 0, "treasures": [] },
+  "levelCap": 16,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 7,
+      "troops": 130,
+      "items": [],
+      "side": "player",
+      "x": 18,
+      "y": 31
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 7,
+      "troops": 140,
+      "items": ["청룡언월도"],
+      "side": "player",
+      "x": 16,
+      "y": 31
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 7,
+      "troops": 140,
+      "items": ["사모"],
+      "side": "player",
+      "x": 20,
+      "y": 31
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 6,
+      "troops": 125,
+      "items": [],
+      "side": "player",
+      "x": 14,
+      "y": 32
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 7,
+      "troops": 100,
+      "items": ["쌀", "폭탄"],
+      "side": "player",
+      "x": 22,
+      "y": 32
+    },
+    {
+      "commanderId": "미방",
+      "classId": "footman",
+      "level": 6,
+      "troops": 110,
+      "items": [],
+      "side": "player",
+      "x": 12,
+      "y": 32
+    },
+    {
+      "commanderId": "조잠",
+      "classId": "archer",
+      "level": 6,
+      "troops": 100,
+      "items": [],
+      "side": "player",
+      "x": 24,
+      "y": 32
+    },
+    {
+      "commanderId": "이각",
+      "classId": "footman",
+      "level": 7,
+      "troops": 130,
+      "items": [],
+      "side": "enemy",
+      "x": 18,
+      "y": 2
+    },
+    {
+      "commanderId": "곽사",
+      "classId": "archer",
+      "level": 7,
+      "troops": 110,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 2
+    },
+    {
+      "commanderId": "서영",
+      "classId": "lightCavalry",
+      "level": 7,
+      "troops": 120,
+      "items": [],
+      "side": "enemy",
+      "x": 18,
+      "y": 4
+    },
+    {
+      "commanderId": "호진",
+      "classId": "footman",
+      "level": 6,
+      "troops": 100,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 5
+    },
+    {
+      "commanderId": "조성",
+      "classId": "archer",
+      "level": 6,
+      "troops": 95,
+      "items": [],
+      "side": "enemy",
+      "x": 15,
+      "y": 13
+    },
+    {
+      "commanderId": "이숙",
+      "classId": "lightCavalry",
+      "level": 6,
+      "troops": 100,
+      "items": [],
+      "side": "enemy",
+      "x": 20,
+      "y": 14
+    },
+    {
+      "commanderId": "송겸",
+      "classId": "footman",
+      "level": 5,
+      "troops": 90,
+      "items": [],
+      "side": "enemy",
+      "x": 18,
+      "y": 18
+    }
+  ],
+  "objectives": [
+    { "kind": "captureTile", "x": 18, "y": 1, "side": "player" }
+  ],
+  "failConditions": [
+    { "kind": "unitRetreated", "unitId": "유비" },
+    { "kind": "turnLimitExceeded" }
+  ],
+  "reinforcements": [
+    {
+      "id": "ambush_west_forest",
+      "side": "enemy",
+      "trigger": { "kind": "unitDefeated", "unitId": "송겸" },
+      "units": [
+        {
+          "commanderId": "서상",
+          "classId": "footman",
+          "level": 6,
+          "troops": 95,
+          "items": [],
+          "side": "enemy",
+          "x": 4,
+          "y": 18
+        },
+        {
+          "commanderId": "양앙",
+          "classId": "archer",
+          "level": 6,
+          "troops": 90,
+          "items": [],
+          "side": "enemy",
+          "x": 5,
+          "y": 20
+        }
+      ]
+    },
+    {
+      "id": "ambush_east_forest",
+      "side": "enemy",
+      "trigger": { "kind": "unitDefeated", "unitId": "이숙" },
+      "units": [
+        {
+          "commanderId": "여건",
+          "classId": "lightCavalry",
+          "level": 6,
+          "troops": 100,
+          "items": [],
+          "side": "enemy",
+          "x": 36,
+          "y": 11
+        },
+        {
+          "commanderId": "왕개",
+          "classId": "archer",
+          "level": 6,
+          "troops": 90,
+          "items": [],
+          "side": "enemy",
+          "x": 37,
+          "y": 13
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_zhangfei_lijue_reward",
+      "description": "장비가 이각과 일기토를 벌여 추격로를 뚫으면 [검술지침서]를 노획한다.",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_lijue" },
+      "reward": { "treasures": ["검술지침서"], "gold": 200 }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_zhangfei_lijue",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "장비", "defenderId": "이각" },
+      "outcome": { "winnerId": "장비", "loserRetreats": false },
+      "once": true
+    }
+  ]
+}

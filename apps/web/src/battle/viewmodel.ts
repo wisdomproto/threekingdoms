@@ -5,7 +5,7 @@
  */
 import type { ClassGrades, Side } from "@tk/data";
 import { terrainAt, attackPower, defensePower, spiritPower } from "@tk/engine";
-import type { BattleContext, BattleState, UnitState } from "@tk/engine";
+import type { BattleContext, BattleState, UnitState, PendingReward } from "@tk/engine";
 
 /** 장비 탭 1행 — unit.items를 gameData.items 효과로 해석한 표시용 (UnitPanel §8 장비탭) */
 export interface ItemVM {
@@ -90,6 +90,8 @@ export interface BattleVM {
   turn: TurnVM;
   status: BattleState["status"];
   units: UnitVM[];
+  /** 전략조건으로 적립된 보상(보물·자금) — 결산에서 stage.reward와 병합·중복제거(M3① §2-1) */
+  pendingRewards: PendingReward[];
 }
 
 export function unitVM(ctx: BattleContext, u: UnitState): UnitVM {
@@ -172,5 +174,6 @@ export function battleVM(ctx: BattleContext, settled: BattleState): BattleVM {
     turn: turnVM(ctx, settled),
     status: settled.status,
     units: settled.units.map((u) => unitVM(ctx, u)),
+    pendingRewards: settled.pendingRewards,
   };
 }

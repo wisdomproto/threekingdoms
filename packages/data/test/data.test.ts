@@ -146,4 +146,48 @@ describe("게임 데이터 v2 무결성", () => {
     expect(liubei.troops).toBeGreaterThan(0);
     expect(liubei.troops).toBeLessThanOrEqual(300);
   });
+
+  it("27스테이지 전부 로더 배선 + 맵 1:1 (B 신규 스테이지 등록)", () => {
+    expect(Object.keys(gameData.stages).length).toBe(27);
+    expect(Object.keys(gameData.maps).length).toBe(27);
+    // 레코드 키 = id, mapId가 실존 맵을 가리킨다
+    for (const [k, s] of Object.entries(gameData.stages)) {
+      expect(s.id).toBe(k);
+      expect(gameData.maps[s.mapId], `${k} → map ${s.mapId}`).toBeDefined();
+    }
+    for (const [k, m] of Object.entries(gameData.maps)) expect(m.id).toBe(k);
+  });
+
+  it("모든 스테이지: 참조 무결성 + 배치 in-bounds·통행가능 (전 스테이지 일괄)", () => {
+    for (const [k, s] of Object.entries(gameData.stages)) {
+      const m = gameData.maps[s.mapId]!;
+      const placed = new Set(s.units.map((u) => u.commanderId));
+      for (const u of s.units) {
+        expect(gameData.commanders[u.commanderId], `${k}:${u.commanderId}`).toBeDefined();
+        expect(gameData.unitClasses[u.classId], `${k}:${u.commanderId}/${u.classId}`).toBeDefined();
+        for (const it of u.items) expect(gameData.items[it], `${k}:${it}`).toBeDefined();
+        expect(u.x, `${k}:${u.commanderId}.x`).toBeLessThan(m.width);
+        expect(u.y, `${k}:${u.commanderId}.y`).toBeLessThan(m.height);
+        const terrainId = m.tileLegend[m.tiles[u.y]![u.x]!];
+        expect(terrainId, `${k}:${u.commanderId} legend@(${u.x},${u.y})`).toBeDefined();
+        expect(gameData.terrains[terrainId!]!.moveCost.default, `${k}:${u.commanderId} impassable`).toBeLessThan(99);
+      }
+      // 목표/패배/이벤트/증원의 유닛·참조 무결성
+      for (const o of s.objectives ?? []) {
+        if ("unitId" in o && o.unitId !== undefined) expect(placed.has(o.unitId), `${k}:obj ${o.unitId}`).toBe(true);
+      }
+      for (const f of s.failConditions ?? []) {
+        if (f.kind === "unitRetreated") expect(placed.has(f.unitId), `${k}:fail ${f.unitId}`).toBe(true);
+        if (f.kind === "allRetreated") for (const id of f.unitIds) expect(placed.has(id), `${k}:fail ${id}`).toBe(true);
+      }
+      for (const e of s.events) {
+        expect(placed.has(e.trigger.attackerId), `${k}:duel atk ${e.trigger.attackerId}`).toBe(true);
+        expect(placed.has(e.trigger.defenderId), `${k}:duel def ${e.trigger.defenderId}`).toBe(true);
+      }
+      for (const r of s.reinforcements ?? []) for (const u of r.units) {
+        expect(gameData.commanders[u.commanderId], `${k}:reinf ${u.commanderId}`).toBeDefined();
+        expect(gameData.unitClasses[u.classId], `${k}:reinf ${u.classId}`).toBeDefined();
+      }
+    }
+  });
 });
