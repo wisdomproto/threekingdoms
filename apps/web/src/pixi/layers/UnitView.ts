@@ -19,7 +19,7 @@ import type { Side } from "@tk/data";
 import type { Coord } from "@tk/engine";
 import { depthOf, gridToWorld, TILE_SIZE } from "../projection";
 import { UNIT_BASE_SIZE, type TextureResolver } from "../textures";
-import { easeInOut, type TweenRunner } from "../tweens";
+import { easeInOut, easeOut, easeOutBack, type TweenRunner } from "../tweens";
 import { resolveSpriteId } from "../spriteMap";
 
 export type UnitSequence = "idle" | "move" | "attack" | "hit" | "retreat";
@@ -27,10 +27,12 @@ export type UnitSequence = "idle" | "move" | "attack" | "hit" | "retreat";
 const BAR_WIDTH = UNIT_BASE_SIZE;
 const BAR_HEIGHT = 5;
 const MOVE_MS_PER_TILE = 150; // 설계 §6: unitMoved는 경로 타일당 150ms
-const ATTACK_MS = 220;
-const HIT_MS = 180;
+const ATTACK_MS = 260; // 앤티시페이션+오버슈트+복귀 재배분 여유로 약간 늘림
+const HIT_MS = 200;
 const RETREAT_MS = 350;
-const LUNGE_PX = 10;
+const LUNGE_PX = 13; // 오버슈트 최대 전진(px) — 기존 10에서 상향(찰진 돌진)
+const ANTICIPATE_PX = 5; // lunge 전 뒤로 당기는 거리(px)
+const KNOCKBACK_PX = 9; // 피격 기본 넉백(px) — intensity로 가중
 
 /** idle 호흡: 세로 진폭(±%)과 주기(ms). 조조전 온라인풍 "살아있는" 느낌 */
 const BREATH_AMP = 0.03;
@@ -99,6 +101,13 @@ export class UnitView extends Container {
   private breathV = 0;
   /** 호흡 on/off — 이동 중엔 끔 */
   private breathing = true;
+
+  /**
+   * 타격 주스용 스쿼시/스트레치 배율 (§4) — 공격 lunge·피격에 곱한다.
+   * applyScale이 baseScale·미러·호흡과 함께 합성. 1=중립. 순수 표현(게임상태 무관).
+   */
+  private fxSquashX = 1;
+  private fxSquashY = 1;
 
   constructor(init: UnitViewInit, textures: TextureResolver, tweens: TweenRunner) {
     super();
@@ -198,8 +207,8 @@ export class UnitView extends Container {
    *  idle/move 아트는 좌향(left-facing)이라 facing=+1(우향)일 때 미러(scale.x<0) → -facing.
    *  attack 아트는 우향으로 그려져 있어 부호가 반대 → +facing (적이 왼쪽이면 좌로 휘두름). */
   private applyScale(): void {
-    const taller = 1 + this.breathV;
-    const narrower = 1 - this.breathV * 0.5; // 부피 보존감 — 늘면 살짝 좁게
+    const taller = (1 + this.breathV) * this.fxSquashY;
+    const narrower = (1 - this.breathV * 0.5) * this.fxSquashX; // 부피 보존감 — 늘면 살짝 좁게
     const mirror = this.pose === "attack" ? this.facing : -this.facing;
     this.spriteBase.scale.set(this.baseScale * mirror * narrower, this.baseScale * taller);
   }
@@ -326,10 +335,18 @@ export class UnitView extends Container {
       case "attack":
         return this.playAttack();
       case "hit":
-        return this.playHit();
+        return this.playHit(); // 방향·강도 미지정 기본값 (직접 호출은 playHitFrom 사용)
       case "retreat":
         return this.playRetreat();
     }
+  }
+
+  /**
+   * 방향·강도 지정 피격 (§4) — BattleRenderer.damageDealt가 공격 방향·피해비례 강도로 호출.
+   * fromDir: 공격이 들어온 x방향(+1=오른쪽 공격자, -1=왼쪽). intensity: 0~1+ 넉백 가중.
+   */
+  playHitFrom(fromDir: 1 | -1, intensity: number): Promise<void> {
+    return this.playHit(fromDir, intensity);
   }
 
   /** 경로(시작 타일 포함)를 따라 타일당 msPerTile 트윈. zIndex/facing을 타일마다 갱신 */
@@ -355,32 +372,105 @@ export class UnitView extends Container {
     this.breathing = true; // 도착 → 호흡 재개
   }
 
+  /**
+   * 통상공격 모션 (§4 타격 주스): 앤티시페이션(살짝 뒤로) → 오버슈트 돌진(easeBack) → 복귀.
+   * 돌진 정점에 스쿼시/스트레치(가로로 늘고 세로로 눌림)로 "찰진" 무게감.
+   * 순수 표현 — 게임상태 불변, TweenRunner 경유라 배속 존중.
+   */
   private playAttack(): Promise<void> {
     this.applySpriteTexture(this.view, "attack");
     const ox = this.position.x;
     const dir = this.facing;
+    // 구간 비율: 0~ANT_END 당김 / ANT_END~LUNGE_END 돌진 / 이후 복귀
+    const ANT_END = 0.22;
+    const LUNGE_END = 0.5;
     return this.tweens
       .run(ATTACK_MS, (t) => {
-        // 전진 후 복귀 (0→1→0 왕복)
-        const swing = t < 0.5 ? t * 2 : (1 - t) * 2;
-        this.position.x = ox + dir * LUNGE_PX * easeInOut(swing);
+        let dx: number;
+        let stretch = 0; // -1(눌림)~+1(늘어남)
+        if (t < ANT_END) {
+          const k = easeInOut(t / ANT_END);
+          dx = -ANTICIPATE_PX * k; // 뒤로 당김
+          stretch = -0.18 * k; // 웅크림(세로 눌림)
+        } else if (t < LUNGE_END) {
+          const k = easeOutBack((t - ANT_END) / (LUNGE_END - ANT_END), 2.2);
+          dx = -ANTICIPATE_PX + (LUNGE_PX + ANTICIPATE_PX) * k; // 오버슈트 돌진
+          stretch = 0.22 * Math.min(1, k); // 앞으로 쭉(가로 늘림)
+        } else {
+          const k = easeInOut((t - LUNGE_END) / (1 - LUNGE_END));
+          dx = LUNGE_PX * (1 - k); // 복귀
+          stretch = 0.22 * (1 - k);
+        }
+        this.position.x = ox + dir * dx;
+        // 가로 늘면 세로 눌림(부피 보존). 돌진=가로 강조.
+        this.fxSquashX = 1 + stretch * 0.5;
+        this.fxSquashY = 1 - stretch * 0.35;
+        this.applyScale();
       })
       .then(() => {
+        this.position.x = ox;
+        this.fxSquashX = 1;
+        this.fxSquashY = 1;
+        this.applyScale();
         this.applySpriteTexture(this.view, "idle");
       });
   }
 
-  private playHit(): Promise<void> {
+  /**
+   * 피격 모션 (§4): 빨강 틴트 + 공격 반대 방향 넉백(intensity 비례) → 탄성 복귀 + 잔진동.
+   * 피격 순간 세로로 눌리는 스쿼시. intensity: 0~1+ (피해/퇴각임박으로 호출측이 가중).
+   * @param fromDir  공격이 들어온 방향(+1=오른쪽에서, -1=왼쪽에서). 넉백은 그 반대로.
+   * @param intensity 넉백/스쿼시 가중 (기본 0.4). 1+면 강한 타격.
+   */
+  private playHit(fromDir: 1 | -1 = 1, intensity = 0.4): Promise<void> {
     const ox = this.position.x;
-    // 피격: 스프라이트 틴트 적용 (색 사각형과 동일한 방식)
+    const push = -fromDir; // 맞은 쪽 반대로 밀림
+    const dist = KNOCKBACK_PX * (0.5 + intensity); // intensity로 넉백 거리 가중
     this.activeBase.tint = 0xff8080;
     return this.tweens
       .run(HIT_MS, (t) => {
-        this.position.x = ox + Math.sin(t * Math.PI * 4) * 3 * (1 - t);
+        // 0~0.3 급격히 밀림(easeOut) → 0.3~1 탄성 복귀 + 감쇠 진동
+        let dx: number;
+        if (t < 0.3) {
+          dx = dist * easeOut(t / 0.3);
+        } else {
+          const u = (t - 0.3) / 0.7;
+          const settle = (1 - easeOut(u)); // 1→0
+          const jitter = Math.sin(u * Math.PI * 5) * 2 * (1 - u);
+          dx = dist * settle + jitter;
+        }
+        this.position.x = ox + push * dx;
+        // 피격 순간 세로 눌림(움찔). 초반에 깊고 빠르게 회복.
+        const squash = (1 - t) * 0.18 * (0.6 + intensity);
+        this.fxSquashY = 1 - squash;
+        this.fxSquashX = 1 + squash * 0.6;
+        this.applyScale();
       })
       .then(() => {
         this.activeBase.tint = 0xffffff;
         this.position.x = ox;
+        this.fxSquashX = 1;
+        this.fxSquashY = 1;
+        this.applyScale();
+      });
+  }
+
+  /**
+   * 임팩트 화이트 플래시 (§4) — 피격 프레임에 베이스를 잠깐 흰색으로 띄웠다 본색 복귀.
+   * playHit의 빨강 틴트보다 "맞은 순간" 신호가 강하다. 짧게(부분 구간) 깔고 빠진다.
+   * 순수 표현. 단독 Promise라 호출측이 hit와 병행/직전 배치 가능.
+   */
+  flash(): Promise<void> {
+    const base = this.activeBase;
+    base.tint = 0xffffff; // 흰 플래시 (가산 느낌)
+    base.alpha = 1;
+    return this.tweens
+      .run(90, (t) => {
+        // 흰색에서 빠르게 빠지며 피격 틴트(빨강)로 자연 인계 — playHit가 동시 진행
+        base.alpha = 1 - 0.15 * t;
+      })
+      .then(() => {
+        base.alpha = 1;
       });
   }
 

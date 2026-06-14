@@ -34,7 +34,8 @@ describe("게임 데이터 v2 무결성", () => {
   it("승급 라인이 3단계로 완결된다", () => {
     for (const line of ["infantry", "archer", "cavalry", "bandit"] as const) {
       const tiers = Object.values(gameData.unitClasses)
-        .filter((c) => c.line === line).map((c) => c.tier).sort();
+        // lord(군주/전차)는 단일 등급 특수 병종 — 상성은 infantry 라인이지만 3승급 체계 밖.
+        .filter((c) => c.line === line && c.id !== "lord").map((c) => c.tier).sort();
       expect(tiers).toEqual([1, 2, 3]);
     }
   });
@@ -111,12 +112,20 @@ describe("게임 데이터 v2 무결성", () => {
     // 병종(classId)은 원작 초기 편성 유지. 병력(troops)은 조조전 hp 스케일(~100~150)로
     // 재조정됨 — 영걸전 천 단위가 아님 (combat.ts 조조전 공식과 짝). docs/reference/sosoden-combat-formula.md
     const s = gameData.stages["05-sishuiguan"]!;
-    for (const name of ["유비", "관우", "장비"]) {
+    // 관우/장비는 원작 영걸전 초기 편성(initialForces) 병종을 그대로 유지.
+    for (const name of ["관우", "장비"]) {
       const u = s.units.find((x) => x.commanderId === name)!;
       const f = gameData.initialForces[name]!;
       expect(u.classId).toBe(f.classId);
       expect(u.troops).toBeGreaterThan(0);
       expect(u.troops).toBeLessThanOrEqual(300); // 조조전 스케일
     }
+    // 유비는 군주(lord)로 재배정 — initialForces(영걸전 raw 추출=footman)와 의도적으로 다름.
+    // (CLAUDE.md §6 유비=군주계 / 레퍼런스 군주=전차. roster·stage 레이어에서 lord로 배정,
+    //  initialForces는 원작 추출 원형 보존.)
+    const liubei = s.units.find((x) => x.commanderId === "유비")!;
+    expect(liubei.classId).toBe("lord");
+    expect(liubei.troops).toBeGreaterThan(0);
+    expect(liubei.troops).toBeLessThanOrEqual(300);
   });
 });

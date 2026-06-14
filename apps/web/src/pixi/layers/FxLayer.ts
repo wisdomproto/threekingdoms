@@ -4,7 +4,7 @@
  */
 import { Container, Graphics, Text } from "pixi.js";
 import type { WorldPoint } from "../projection";
-import type { TweenRunner } from "../tweens";
+import { easeOut, type TweenRunner } from "../tweens";
 
 const POPUP_MS = 650;
 const POPUP_RISE_PX = 28;
@@ -19,6 +19,15 @@ const RETREAT_SHARD_DIST = 34; // px — 파편 비산 거리
 const RETREAT_FLASH_R = 24; // px — 중심 섬광 반경
 const SHARD_LIGHT = 0xffffff; // 흰빛
 const SHARD_GREEN = 0xa7e8b0; // 연두 파편
+
+// ── 통상공격 타격 주스 (§4 절차적, 에셋 무의존 / 순수 표현) ──────────────────
+const SLASH_MS = 200; // 슬래시 호 수명
+const SLASH_LEN = 46; // 호의 호현(chord) 길이 (px, 타일≈48)
+const SLASH_BOW = 16; // 호의 활 휘는 정도 (px)
+const SLASH_GOLD = 0xfff2c4; // 흰금빛 베기
+const PIERCE_TINT = 0x9fd8ff; // 간접(궁/포) 충격 — 차가운 청백
+const FLASH_MS = 110; // 임팩트 플래시 수명
+const FLASH_R = 22; // 임팩트 플래시 반경 (px)
 
 export class FxLayer {
   /** 카메라 변환 하 — 데미지 팝업 */
@@ -160,6 +169,84 @@ export class FxLayer {
       .then(() => {
         this.world.removeChild(root);
         root.destroy({ children: true });
+      });
+  }
+
+  /**
+   * 슬래시 아크 (§4 타격 주스) — 공격자→방어자 방향으로 휘두르는 흰금빛 호(arc) 1회.
+   * 방어자 칸 위에 절차적 Graphics로 그리고, 휘두르는 방향으로 쓸고 지나가며 페이드.
+   * indirect=true(궁/포)면 베기 대신 차가운 청백 "관통/충격" 톤 + 직선형 스트로크.
+   * 월드 공간(카메라 변환 하). 순수 표현 — 게임 상태 불변, TweenRunner로 배속 존중.
+   */
+  slashArc(from: WorldPoint, to: WorldPoint, indirect = false): Promise<void> {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const ang = Math.atan2(dy, dx); // 공격 진행 방향
+    const color = indirect ? PIERCE_TINT : SLASH_GOLD;
+
+    const root = new Container();
+    // 타격점을 방어자 몸통 높이(타일 중심보다 살짝 위)에 둔다
+    root.position.set(to.x - (dx / len) * 6, to.y - (dy / len) * 6 - 8);
+    root.rotation = ang;
+
+    const g = new Graphics();
+    root.addChild(g);
+    this.world.addChild(root);
+
+    const drawArc = (progress: number, alpha: number): void => {
+      g.clear();
+      if (indirect) {
+        // 관통: 진행 방향 짧은 창 스트로크 + 충격 점
+        const half = SLASH_LEN * 0.5;
+        g.moveTo(-half * (1 - progress) - 4, 0)
+          .lineTo(half, 0)
+          .stroke({ width: 4, color, alpha });
+        g.circle(half, 0, 3 + 4 * (1 - progress)).fill({ color, alpha: alpha * 0.8 });
+      } else {
+        // 베기: 호현 SLASH_LEN, 활 SLASH_BOW. progress로 호를 "쓸어내리며" 회전 인상.
+        const sweep = (progress - 0.5) * 0.9; // -0.45..+0.45 rad 회전
+        g.rotation = sweep;
+        const half = SLASH_LEN * 0.5;
+        const bow = SLASH_BOW * (0.6 + 0.4 * Math.sin(progress * Math.PI));
+        // 두 겹 호: 굵은 안쪽 + 가는 바깥 잔상으로 속도감
+        g.moveTo(-half, half * 0.18)
+          .quadraticCurveTo(0, -bow, half, half * 0.18)
+          .stroke({ width: 5, color, alpha });
+        g.moveTo(-half, half * 0.18 + 5)
+          .quadraticCurveTo(0, -bow + 5, half, half * 0.18 + 5)
+          .stroke({ width: 2, color: 0xffffff, alpha: alpha * 0.7 });
+      }
+    };
+
+    return this.tweens
+      .run(SLASH_MS, (t) => {
+        const e = easeOut(t);
+        drawArc(e, t < 0.35 ? 1 : 1 - (t - 0.35) / 0.65);
+      })
+      .then(() => {
+        this.world.removeChild(root);
+        root.destroy({ children: true });
+      });
+  }
+
+  /**
+   * 임팩트 플래시 (§4 타격 주스) — 타격점에 짧고 강한 흰빛 원 1회(빠르게 확장·소멸).
+   * 묵직한 "맞았다" 신호. 월드 공간, 순수 표현, 배속 존중.
+   */
+  impactFlash(at: WorldPoint): Promise<void> {
+    const flash = new Graphics();
+    flash.circle(0, 0, FLASH_R).fill({ color: 0xffffff, alpha: 1 });
+    flash.position.set(at.x, at.y - 6);
+    this.world.addChild(flash);
+    return this.tweens
+      .run(FLASH_MS, (t) => {
+        flash.scale.set(0.5 + t * 1.1);
+        flash.alpha = Math.max(0, 1 - t);
+      })
+      .then(() => {
+        this.world.removeChild(flash);
+        flash.destroy();
       });
   }
 

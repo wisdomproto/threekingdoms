@@ -20,7 +20,18 @@ export const COMMANDER_SPRITE_MAP: Record<string, string> = {
   화웅:   "huaxiong",
   장료:   "zhangliao",
   // 미생성분: 이숙, 호진, 조잠, 간옹, 조운, 제갈량 등 → 폴백(색 사각형)
+  // 유비는 군주(lord) 병종이지만 전용 SD 스프라이트가 있으므로 commanderId 직매핑으로 처리.
 };
+
+/**
+ * lord(군주/전차) 병종 — 전용 SD 에셋 아직 없음.
+ * 네임드 군주(유비)는 COMMANDER_SPRITE_MAP에서 잡히고, 그 외 익명 군주 유닛은
+ * 아래 CLASS_SIDE_SPRITE_MAP에 lord 키가 없으므로 resolveSpriteId가 null을 반환 →
+ * TextureResolver의 진영색 베이스(player=파랑/ally=주황/enemy=빨강 라운드 사각)로 폴백.
+ * "깨지지 않게"의 요구는 색 사각형 폴백으로 충족된다(존재하지 않는 spriteId 매핑 금지 —
+ * 그럴 경우 getSprite가 매번 빈 텍스처를 찾다 null로 떨어져 동일 결과지만 의도가 불명확해짐).
+ * → 전용 lord 스프라이트가 생기면 여기 'lord_player'/'lord_enemy'를 추가한다.
+ */
 
 /**
  * classId + "_" + side → spriteId  (템플릿 유닛).

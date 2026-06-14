@@ -56,6 +56,13 @@ const CENTER_MARGIN = 0.35;
 const DEFAULT_ZOOM = 1.5;
 /** "기본 줌 복귀" 버튼 트윈 시간 */
 const RESET_CAMERA_MS = 320;
+/** 카메라 미세 흔들림 (§4): 기본 타격 진폭(px) / 큰 피해·일기토 진폭 / 감쇠 시간상수(ms) */
+const SHAKE_PX_HIT = 2.4;
+const SHAKE_PX_BIG = 5.5;
+const SHAKE_DECAY_MS = 90; // 작을수록 빨리 잦아듦 (묵직한 1회 펀치)
+/** 히트스톱(연출 정지) — 기본 타격 / 큰 피해·일기토 (ms, TweenRunner 경유라 배속 존중) */
+const HITSTOP_MS_HIT = 55;
+const HITSTOP_MS_BIG = 95;
 
 interface Scene {
   app: Application;
@@ -89,6 +96,13 @@ export class BattleRenderer implements Presenter {
   private speed = 1;
   /** 위협범위 캐시 키 (inspectedId + committed 식별) — 호버 변경/상태 변화 시에만 재산출 */
   private threatKey: string | null = null;
+  /**
+   * 카메라 미세 흔들림 상태 (§4 타격 주스) — 순수 표현. 남은 진폭(px)과 위상.
+   * tick에서 camera.apply() 직후 world.position에 가산·감쇠한다(camera.ts 불간섭).
+   * deltaMS×speed로 감쇠해 배속을 존중한다.
+   */
+  private shakeAmp = 0;
+  private shakePhase = 0;
 
   constructor(ctx: BattleContext) {
     this.ctx = ctx;
@@ -285,9 +299,20 @@ export class BattleRenderer implements Presenter {
     };
     app.canvas.addEventListener("wheel", onWheel, { passive: false });
 
-    // 카메라 트윈 진행 + 청크 컬링
+    // 카메라 트윈 진행 + 청크 컬링 + 타격 흔들림
     const tick = (): void => {
-      camera.update(app.ticker.deltaMS * this.speed); // 배속 시 카메라 추적도 함께 가속
+      const dt = app.ticker.deltaMS * this.speed; // 배속 시 카메라 추적·흔들림도 함께 가속
+      camera.update(dt); // camera.apply()가 world.position을 base로 세팅
+      // 카메라 미세 흔들림: camera 적용 직후 world.position에 가산·감쇠 (camera.ts 불간섭).
+      if (this.shakeAmp > 0.05) {
+        this.shakePhase += dt * 0.06;
+        const ox = Math.sin(this.shakePhase * 2.7) * this.shakeAmp;
+        const oy = Math.cos(this.shakePhase * 3.1) * this.shakeAmp * 0.8;
+        world.position.set(world.position.x + ox, world.position.y + oy);
+        this.shakeAmp *= Math.exp(-dt / SHAKE_DECAY_MS); // 지수 감쇠 (배속 존중)
+      } else {
+        this.shakeAmp = 0;
+      }
       terrain.cull(camera.viewWorldRect());
       units.tickIdle(app.ticker.deltaMS);
     };
@@ -430,6 +455,11 @@ export class BattleRenderer implements Presenter {
     }
   }
 
+  /** 타격 카메라 흔들림 발동 (§4) — 진폭을 max로 갱신(중첩 시 더 큰 쪽 유지). 순수 표현. */
+  private triggerShake(amp: number): void {
+    if (amp > this.shakeAmp) this.shakeAmp = amp;
+  }
+
   // ── Presenter 구현 (설계 §6 이벤트→연출 표) ────────────────────────────────
   async unitMoved(e: Ev<"unitMoved">): Promise<void> {
     const s = this.scene;
@@ -499,10 +529,35 @@ export class BattleRenderer implements Presenter {
     defender.faceToward({ x: attacker.gridX, y: attacker.gridY });
     // 공격/반격 연출 전: 방어자 위치 포커스 (화면 중앙 ±35% 밖일 때만, scale 유지)
     this.autoFocus(gridToWorld({ x: defender.gridX, y: defender.gridY }), FOCUS_MS);
+    const aPos = gridToWorld({ x: attacker.gridX, y: attacker.gridY });
     const popupAt = gridToWorld({ x: defender.gridX, y: defender.gridY });
+
+    // ── 타격 주스 파라미터 산출 (§4, 순수 표현) ──
+    // 간접(궁/포): 공격자-방어자 그리드 거리>1 → 베기 대신 관통 톤.
+    const dist = Math.abs(attacker.gridX - defender.gridX) + Math.abs(attacker.gridY - defender.gridY);
+    const indirect = dist > 1;
+    // 강도: 피해/최대병력 비율 + 퇴각 임박(남은 병력 0) 보정. 0.3~1.4로 클램프.
+    const ratio = defender.maxTroops > 0 ? e.damage / defender.maxTroops : 0.3;
+    const lethal = defender.troops - e.damage <= 0;
+    const intensity = Math.max(0.3, Math.min(1.4, ratio * 2 + (lethal ? 0.5 : 0)));
+    // 넉백/플래시 방향: 공격자가 방어자 기준 어느 x쪽인가 (+1=오른쪽, -1=왼쪽)
+    const fromDir: 1 | -1 = attacker.gridX >= defender.gridX ? 1 : -1;
+    const big = intensity >= 0.85 || e.counter; // 큰 피해·반격은 더 묵직하게
+
+    // 타격 프레임(공격자 돌진이 닿는 순간)에 슬래시·플래시·흔들림·히트스톱을 동기 발사.
+    // 공격 모션 시작 후 ~110ms(배속존중) 지연 — playAttack의 lunge 정점(LUNGE_END≈0.5)에 근접.
+    const strike = (): void => {
+      void s.fx.slashArc(aPos, popupAt, indirect);
+      void s.fx.impactFlash(popupAt);
+      void defender.flash();
+      this.triggerShake(big ? SHAKE_PX_BIG : SHAKE_PX_HIT);
+      s.tweens.hitstop(big ? HITSTOP_MS_BIG : HITSTOP_MS_HIT); // 묵직한 정지(배속 존중)
+    };
+    void s.tweens.delay(110).then(strike);
+
     await Promise.all([
       attacker.play("attack"),
-      defender.play("hit"),
+      defender.playHitFrom(fromDir, intensity),
       s.fx.damagePopup(popupAt, e.damage, e.counter),
     ]);
     defender.setTroops(defender.troops - e.damage);
@@ -563,6 +618,8 @@ export class BattleRenderer implements Presenter {
     const s = this.scene;
     if (!s) return;
     const name = (id: string): string => this.ctx.data.commanders[id]?.name ?? id;
+    // 일기토 발동 — 큰 화면 흔들림 1회로 무게감(§4 "특히 일기토/큰 피해").
+    this.triggerShake(SHAKE_PX_BIG);
     await s.fx.banner(
       `일기토! ${name(e.attackerId)} vs ${name(e.defenderId)} — ${name(e.winnerId)} 승리`,
       DUEL_BANNER_MS,

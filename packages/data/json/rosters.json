@@ -1,5 +1,5 @@
 {
-  "유비": { "commanderId": "유비", "classId": "footman", "joinChapter": 1, "role": "lord", "uniqueSkillId": "인덕" },
+  "유비": { "commanderId": "유비", "classId": "lord", "joinChapter": 1, "role": "lord", "uniqueSkillId": "인덕" },
   "관우": { "commanderId": "관우", "classId": "lightCavalry", "joinChapter": 1, "role": "melee", "uniqueSkillId": "무성" },
   "장비": { "commanderId": "장비", "classId": "lightCavalry", "joinChapter": 1, "role": "melee", "uniqueSkillId": "포효" },
   "간옹": { "commanderId": "간옹", "classId": "strategist", "joinChapter": 1, "role": "caster" },

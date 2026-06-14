@@ -3,7 +3,7 @@
 > 자동 생성 (`pnpm --filter @tk/sim balance`). 표의 수치는 측정값이며 **이 리포트 갱신은 밸런스 데이터를 바꾸지 않는다**.
 > 생성기: `packages/sim/src/balance.ts` + `balance-cli.ts`, 합성 픽스처 `packages/sim/src/fixtures.ts`.
 > 측정 대상 공식: `packages/engine/src/combat.ts`(computeDamage), `growth.ts`(corpsStat 등급계수 증분성장).
-> 마지막 생성: 2026-06-13
+> 마지막 생성: 2026-06-14
 
 ## 왜 이 리포트가 필요했나
 

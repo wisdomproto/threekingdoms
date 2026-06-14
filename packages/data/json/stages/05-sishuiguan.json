@@ -9,7 +9,7 @@
   "units": [
     {
       "commanderId": "유비",
-      "classId": "footman",
+      "classId": "lord",
       "level": 1,
       "troops": 100,
       "items": [],
