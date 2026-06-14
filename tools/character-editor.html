@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>캐릭터 에디터 — 삼국지 SRPG (commanders + rosters 합본 편집)</title>
+<style>
+  :root { --bg:#14161c; --panel:#1d212b; --panel2:#242936; --line:#333a4a; --txt:#e8e6df; --dim:#9aa1b0; --acc:#d4a843; --acc2:#6fae6f; --err:#e06a5a; --bronze:#a9763e; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--txt); font-family:'Malgun Gothic','Segoe UI',sans-serif; font-size:13px; }
+  body { display:flex; flex-direction:column; }
+  header { background:rgba(20,22,28,.96); border-bottom:1px solid var(--line); padding:8px 14px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  header h1 { font-size:14px; margin:0 10px 0 0; color:var(--acc); white-space:nowrap; }
+  .btn { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:6px 11px; cursor:pointer; font-size:12.5px; }
+  .btn:hover { border-color:var(--acc); }
+  .btn.go { background:var(--acc2); color:#0c1a0c; border-color:var(--acc2); font-weight:bold; }
+  .btn.bronze { background:var(--bronze); color:#1a1206; border-color:var(--bronze); font-weight:bold; }
+  .btn:disabled { opacity:.4; cursor:not-allowed; }
+  .sep { width:1px; height:22px; background:var(--line); margin:0 4px; }
+  main { flex:1; display:flex; min-height:0; }
+  /* 목록 */
+  #listcol { width:430px; background:var(--panel); border-right:1px solid var(--line); display:flex; flex-direction:column; flex-shrink:0; min-height:0; }
+  #filters { padding:8px; border-bottom:1px solid var(--line); display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  #filters input[type=text], #filters select { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:4px 7px; font-size:12px; }
+  #search { flex:1; min-width:120px; }
+  #listwrap { flex:1; overflow:auto; min-height:0; }
+  table.list { width:100%; border-collapse:collapse; }
+  table.list th { position:sticky; top:0; background:var(--panel2); color:var(--dim); font-size:11px; text-align:left; padding:5px 8px; border-bottom:1px solid var(--line); text-transform:uppercase; letter-spacing:.4px; white-space:nowrap; cursor:pointer; user-select:none; }
+  table.list td { padding:4px 8px; border-bottom:1px solid rgba(255,255,255,.04); font-size:12px; white-space:nowrap; }
+  table.list tr { cursor:pointer; }
+  table.list tr:hover td { background:var(--panel2); }
+  table.list tr.sel td { background:rgba(212,168,67,.16); }
+  table.list tr.invalid td:first-child { box-shadow:inset 3px 0 0 var(--err); }
+  .pill { display:inline-block; font-size:10.5px; padding:1px 6px; border-radius:9px; background:var(--panel2); border:1px solid var(--line); color:var(--dim); }
+  .pill.noroster { color:#7a8090; border-style:dashed; }
+  .num { font-family:Consolas,monospace; text-align:right; }
+  /* 폼 */
+  #formcol { flex:1; overflow:auto; padding:14px 18px; min-width:0; }
+  #formcol h2 { font-size:12px; color:var(--dim); margin:0 0 10px; text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid var(--line); padding-bottom:6px; }
+  #formcol h2.sec { margin-top:22px; color:var(--bronze); }
+  .field { display:flex; align-items:center; gap:10px; margin:7px 0; }
+  .field label { width:130px; color:var(--dim); font-size:12.5px; flex-shrink:0; }
+  .field input[type=text], .field input[type=number], .field select { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:5px 8px; font-size:13px; width:220px; }
+  .field input.invalid, .field select.invalid { border-color:var(--err); background:rgba(224,106,90,.1); }
+  .field .hint { color:var(--dim); font-size:11px; }
+  .field .err { color:var(--err); font-size:11px; }
+  .field .derived { color:var(--acc2); font-size:11px; }
+  .rangebar { display:inline-block; width:90px; height:5px; background:var(--panel2); border-radius:3px; overflow:hidden; vertical-align:middle; margin-left:2px; }
+  .rangebar i { display:block; height:100%; background:var(--acc); }
+  #noselect { color:var(--dim); padding:40px; text-align:center; font-size:13px; }
+  .rosterToggle { display:flex; align-items:center; gap:8px; margin:4px 0 12px; }
+  fieldset.roster { border:1px solid var(--line); border-radius:8px; padding:6px 14px 12px; margin:0; }
+  fieldset.roster[disabled] { opacity:.45; }
+  fieldset.roster legend { color:var(--bronze); font-size:11.5px; padding:0 6px; }
+  /* 하단 상태 */
+  #status { border-top:1px solid var(--line); background:rgba(20,22,28,.96); padding:6px 14px; display:flex; gap:14px; align-items:center; font-size:12px; flex-wrap:wrap; }
+  #status .ok { color:var(--acc2); }
+  #status .bad { color:var(--err); font-weight:bold; }
+  #toast { position:fixed; bottom:44px; left:50%; transform:translateX(-50%); background:var(--acc); color:#1a1407; font-weight:bold; padding:8px 20px; border-radius:18px; font-size:13px; display:none; z-index:60; max-width:80%; text-align:center; }
+  #pastebox { position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:70; }
+  #pastebox .card { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px; width:680px; max-width:92%; }
+  #pastebox h3 { margin:0 0 8px; color:var(--acc); font-size:14px; }
+  #pastebox textarea { width:100%; height:200px; background:var(--bg); color:var(--txt); border:1px solid var(--line); border-radius:6px; font-family:Consolas,monospace; font-size:12px; padding:8px; resize:vertical; }
+  #pastebox .row { display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
+  #pastebox .which { display:flex; gap:8px; margin-bottom:8px; }
+  #pastebox .which select { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:4px 8px; }
+  code { background:var(--panel2); padding:1px 5px; border-radius:4px; font-size:11.5px; color:var(--acc); }
+</style>
+</head>
+<body>
+<header>
+  <h1>캐릭터 에디터</h1>
+  <button class="btn" id="openFiles">파일 열기</button>
+  <button class="btn" id="paste">JSON 붙여넣기</button>
+  <div class="sep"></div>
+  <button class="btn" id="addRow">+ 추가</button>
+  <button class="btn" id="dupRow" disabled>복제</button>
+  <button class="btn" id="delRow" disabled>삭제</button>
+  <div class="sep"></div>
+  <button class="btn bronze" id="saveFiles" disabled title="File System Access 핸들로 같은 파일에 덮어쓰기 (없으면 다운로드 폴백)">💾 저장</button>
+  <button class="btn go" id="exportCmd">⬇ commanders.json</button>
+  <button class="btn go" id="exportRos">⬇ rosters.json</button>
+  <span id="fileInfo" style="color:var(--dim); margin-left:auto; font-size:11.5px"></span>
+</header>
+
+<main>
+  <div id="listcol">
+    <div id="filters">
+      <input type="text" id="search" placeholder="검색: id/이름/병종/고유스킬…">
+      <select id="fRole"><option value="">역할 전체</option></select>
+      <select id="fClass"><option value="">병종 전체</option></select>
+      <select id="fRoster">
+        <option value="">로스터 전체</option>
+        <option value="yes">로스터 있음</option>
+        <option value="no">로스터 없음</option>
+      </select>
+      <select id="fValid">
+        <option value="">검증 전체</option>
+        <option value="bad">오류만</option>
+      </select>
+    </div>
+    <div id="listwrap"><table class="list" id="listTable"></table></div>
+  </div>
+
+  <div id="formcol">
+    <div id="noselect">왼쪽에서 장수를 선택하거나, <b>파일 열기</b>로 commanders.json + rosters.json 을 불러오세요.<br><br>
+      대상: <code>packages/data/json/commanders.json</code> + <code>rosters.json</code> (둘 다 <code>Record&lt;id,{...}&gt;</code> 객체맵).</div>
+    <div id="form" style="display:none"></div>
+  </div>
+</main>
+
+<div id="status">
+  <span id="counts"></span>
+  <span id="validSummary"></span>
+</div>
+
+<div id="toast"></div>
+
+<div id="pastebox">
+  <div class="card">
+    <h3>JSON 붙여넣기</h3>
+    <div class="which">
+      <label style="color:var(--dim)">대상</label>
+      <select id="pasteWhich">
+        <option value="commanders">commanders.json</option>
+        <option value="rosters">rosters.json</option>
+        <option value="unitClasses">unitClasses.json (병종 드롭다운용 · 선택)</option>
+      </select>
+    </div>
+    <textarea id="pasteText" placeholder='{"유비":{"id":"유비","name":"유비","leadership":72,...}, ...}'></textarea>
+    <div class="row">
+      <button class="btn" id="pasteCancel">취소</button>
+      <button class="btn go" id="pasteApply">적용</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ────────────────────────────────────────────────────────────────────────
+ * 선언적 필드 config — 후속작/스키마 변경 시 이 블록만 고친다.
+ * 규칙은 packages/data/src/schemas.ts 와 동일하게 인라인 유지(zod import 안 함).
+ *   - CommanderSchema: id, name, leadership/war/intelligence 1~100(int), faceId 0~255(int)
+ *   - RosterEntrySchema: commanderId, classId(=unitClasses id), joinChapter 1~5(int),
+ *                        role enum, uniqueSkillId? string
+ * ──────────────────────────────────────────────────────────────────────── */
+const ROLES = ['lord', 'melee', 'caster', 'support', 'guest'];
+
+// 한 행 = commander 스탯 + (optional) roster 배정. group 으로 폼 섹션을 나눈다.
+const FIELDS = [
+  // ── commander (필수, 모든 장수) ──
+  { key: 'id',           group: 'commander', label: 'id (고유)',    type: 'text',   required: true,  derived: 'rosterKey',
+    note: '한글 이름 기반. 동명이인은 _2 접미. commanders/rosters 양쪽 키.' },
+  { key: 'name',         group: 'commander', label: '이름',          type: 'text',   required: true },
+  { key: 'war',          group: 'commander', label: '무력 (war)',    type: 'int', min: 1, max: 100, required: true, bar: true, hint: '→ 공격 공식' },
+  { key: 'leadership',   group: 'commander', label: '통솔 (leadership)', type: 'int', min: 1, max: 100, required: true, bar: true, hint: '→ 방어 공식' },
+  { key: 'intelligence', group: 'commander', label: '지력 (intelligence)', type: 'int', min: 1, max: 100, required: true, bar: true, hint: '→ 정신/책략MP' },
+  { key: 'faceId',       group: 'commander', label: 'faceId',        type: 'int', min: 0, max: 255, required: true, hint: 'FACE 초상 인덱스 0~255' },
+  // ── roster (선택: 배정된 장수만) ──
+  { key: 'classId',      group: 'roster', label: 'classId (병종)', type: 'enum-class', required: true,
+    note: 'unitClasses.json id. 초기 병종.' },
+  { key: 'joinChapter',  group: 'roster', label: 'joinChapter (합류 장)', type: 'int', min: 1, max: 5, required: true, hint: '1~5장' },
+  { key: 'role',         group: 'roster', label: 'role (역할)',    type: 'enum', options: ROLES, required: true },
+  { key: 'uniqueSkillId',group: 'roster', label: 'uniqueSkillId',  type: 'text', required: false, hint: '고유 스킬 id (선택)' },
+];
+const CMD_KEYS = FIELDS.filter(f => f.group === 'commander').map(f => f.key);
+const ROS_KEYS = FIELDS.filter(f => f.group === 'roster').map(f => f.key);
+
+/* ── 상태 ── */
+let commanders = {};      // Record<id, commander>
+let rosters = {};         // Record<commanderId, rosterEntry>
+let classIds = [];        // unitClasses.json 키 목록 (드롭다운)
+let order = [];           // 행 순서 (commanders 삽입 순 + roster-only id)
+let selId = null;
+let dirty = false;
+
+// File System Access 핸들 (열기→같은 핸들에 저장)
+let cmdHandle = null, rosHandle = null;
+
+const supportsFS = 'showOpenFilePicker' in window;
+
+/* ── 빌드: 폼 ── */
+function buildForm() {
+  const f = document.getElementById('form');
+  f.innerHTML = '';
+  let html = '<h2>장수 편집</h2>';
+  html += FIELDS.filter(x => x.group === 'commander').map(fieldHtml).join('');
+  html += '<h2 class="sec">로스터 배정 (편성 대상 장수만)</h2>';
+  html += `<div class="rosterToggle"><input type="checkbox" id="hasRoster"><label for="hasRoster" style="color:var(--txt);cursor:pointer">이 장수를 로스터에 배정 (rosters.json 항목 생성)</label></div>`;
+  html += `<fieldset class="roster" id="rosterFs"><legend>RosterEntry</legend>`;
+  html += FIELDS.filter(x => x.group === 'roster').map(fieldHtml).join('');
+  html += `</fieldset>`;
+  f.innerHTML = html;
+
+  FIELDS.forEach(fl => {
+    const el = document.getElementById('fld_' + fl.key);
+    if (el) el.addEventListener('input', () => onFieldInput(fl));
+  });
+  document.getElementById('hasRoster').addEventListener('change', onToggleRoster);
+}
+
+function fieldHtml(fl) {
+  let input;
+  if (fl.type === 'enum') {
+    input = `<select id="fld_${fl.key}">${(fl.options || []).map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
+  } else if (fl.type === 'enum-class') {
+    input = `<select id="fld_${fl.key}"></select>`; // 옵션은 런타임 채움
+  } else if (fl.type === 'int') {
+    input = `<input type="number" id="fld_${fl.key}" step="1"${fl.min != null ? ` min="${fl.min}"` : ''}${fl.max != null ? ` max="${fl.max}"` : ''}>`;
+  } else {
+    input = `<input type="text" id="fld_${fl.key}">`;
+  }
+  const bar = fl.bar ? `<span class="rangebar"><i id="bar_${fl.key}"></i></span>` : '';
+  const meta = fl.hint ? `<span class="hint">${fl.hint}</span>` : (fl.note ? `<span class="hint">${fl.note}</span>` : '');
+  return `<div class="field" id="row_${fl.key}">
+    <label>${fl.label}${fl.required ? ' *' : ''}</label>
+    ${input}${bar}
+    <span id="meta_${fl.key}">${meta}</span>
+    <span class="err" id="err_${fl.key}"></span>
+  </div>`;
+}
+
+function fillClassDropdowns() {
+  const sel = document.getElementById('fld_classId');
+  const flt = document.getElementById('fClass');
+  if (sel) {
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— 선택 —</option>' + classIds.map(c => `<option value="${c}">${c}</option>`).join('');
+    sel.value = cur;
+  }
+  if (flt) {
+    const cur = flt.value;
+    flt.innerHTML = '<option value="">병종 전체</option>' + classIds.map(c => `<option value="${c}">${c}</option>`).join('');
+    flt.value = cur;
+  }
+}
+
+/* ── 검증 (schemas.ts 와 동일 규칙, zod 미사용) ── */
+function isInt(v) { return Number.isInteger(v); }
+function vCommander(c) {
+  const e = {};
+  if (typeof c.id !== 'string' || !c.id.trim()) e.id = 'id 필수(문자열)';
+  if (typeof c.name !== 'string' || !c.name.trim()) e.name = 'name 필수(문자열)';
+  for (const k of ['leadership', 'war', 'intelligence']) {
+    if (!isInt(c[k]) || c[k] < 1 || c[k] > 100) e[k] = '정수 1~100';
+  }
+  if (!isInt(c.faceId) || c.faceId < 0 || c.faceId > 255) e.faceId = '정수 0~255';
+  return e;
+}
+function vRoster(r, validClassIds) {
+  const e = {};
+  if (typeof r.commanderId !== 'string' || !r.commanderId.trim()) e.commanderId = 'commanderId 필수';
+  if (typeof r.classId !== 'string' || !r.classId.trim()) e.classId = 'classId 필수';
+  else if (validClassIds.length && !validClassIds.includes(r.classId)) e.classId = `unitClasses에 없는 병종: ${r.classId}`;
+  if (!isInt(r.joinChapter) || r.joinChapter < 1 || r.joinChapter > 5) e.joinChapter = '정수 1~5';
+  if (!ROLES.includes(r.role)) e.role = `role enum: ${ROLES.join('/')}`;
+  if (r.uniqueSkillId != null && typeof r.uniqueSkillId !== 'string') e.uniqueSkillId = '문자열이어야 함';
+  return e;
+}
+// 행 단위 종합 오류(맵: fieldKey→msg). roster 없으면 roster 필드 무시.
+function rowErrors(id) {
+  const c = commanders[id];
+  const errs = {};
+  if (c) Object.assign(errs, vCommander(c));
+  else errs.id = 'commanders 항목 없음(로스터 전용)'; // roster만 있는 dangling
+  const r = rosters[id];
+  if (r) Object.assign(errs, vRoster(r, classIds));
+  return errs;
+}
+function isRowValid(id) { return Object.keys(rowErrors(id)).length === 0; }
+
+/* ── 목록 렌더 ── */
+function classNameOf(cid) { return cid; }
+function rebuildOrder() {
+  const seen = new Set();
+  const out = [];
+  for (const id of Object.keys(commanders)) { out.push(id); seen.add(id); }
+  for (const id of Object.keys(rosters)) if (!seen.has(id)) out.push(id);
+  order = out;
+}
+function renderList() {
+  rebuildOrder();
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const fRole = document.getElementById('fRole').value;
+  const fClass = document.getElementById('fClass').value;
+  const fRoster = document.getElementById('fRoster').value;
+  const fValid = document.getElementById('fValid').value;
+
+  const rows = order.filter(id => {
+    const c = commanders[id] || {};
+    const r = rosters[id];
+    if (fRole && (!r || r.role !== fRole)) return false;
+    if (fClass && (!r || r.classId !== fClass)) return false;
+    if (fRoster === 'yes' && !r) return false;
+    if (fRoster === 'no' && r) return false;
+    if (fValid === 'bad' && isRowValid(id)) return false;
+    if (q) {
+      const hay = [id, c.name, r && r.classId, r && r.role, r && r.uniqueSkillId].filter(Boolean).join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const t = document.getElementById('listTable');
+  t.innerHTML = `<thead><tr>
+    <th>id</th><th>이름</th><th class="num">무</th><th class="num">통</th><th class="num">지</th>
+    <th>병종</th><th>장</th><th>역할</th></tr></thead><tbody>` +
+    rows.map(id => {
+      const c = commanders[id] || {};
+      const r = rosters[id];
+      const bad = !isRowValid(id);
+      const rosterCell = r
+        ? `<td>${esc(r.classId || '')}</td><td class="num">${r.joinChapter ?? ''}</td><td><span class="pill">${esc(r.role || '')}</span></td>`
+        : `<td colspan="3"><span class="pill noroster">로스터 없음</span></td>`;
+      return `<tr data-id="${esc(id)}" class="${id === selId ? 'sel' : ''}${bad ? ' invalid' : ''}">
+        <td>${esc(id)}</td><td>${esc(c.name || '')}</td>
+        <td class="num">${c.war ?? ''}</td><td class="num">${c.leadership ?? ''}</td><td class="num">${c.intelligence ?? ''}</td>
+        ${rosterCell}</tr>`;
+    }).join('') + '</tbody>';
+
+  t.querySelectorAll('tbody tr').forEach(tr => tr.onclick = () => selectRow(tr.dataset.id));
+  document.getElementById('counts').textContent =
+    `표시 ${rows.length} / 장수 ${Object.keys(commanders).length} · 로스터 ${Object.keys(rosters).length} · 병종 ${classIds.length}`;
+  renderValidSummary();
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])); }
+
+function renderValidSummary() {
+  let cmdBad = 0, rosBad = 0;
+  for (const id of Object.keys(commanders)) if (Object.keys(vCommander(commanders[id])).length) cmdBad++;
+  for (const id of Object.keys(rosters)) {
+    const e = vRoster(rosters[id], classIds);
+    if (!commanders[id]) e._dangling = 1;
+    if (Object.keys(e).length) rosBad++;
+  }
+  const el = document.getElementById('validSummary');
+  const ok = cmdBad === 0 && rosBad === 0;
+  el.innerHTML = ok
+    ? `<span class="ok">✔ 검증 통과 — 저장/내보내기 가능</span>`
+    : `<span class="bad">✘ 오류: commanders ${cmdBad} · rosters ${rosBad} — 저장 차단</span>`;
+  const block = !ok;
+  document.getElementById('saveFiles').disabled = block || (!cmdHandle && !rosHandle && supportsFS && false);
+  document.getElementById('exportCmd').disabled = block;
+  document.getElementById('exportRos').disabled = block;
+}
+
+/* ── 행 선택 + 폼 바인딩 ── */
+function selectRow(id) {
+  selId = id;
+  document.getElementById('noselect').style.display = 'none';
+  document.getElementById('form').style.display = 'block';
+  document.getElementById('dupRow').disabled = false;
+  document.getElementById('delRow').disabled = false;
+  fillClassDropdowns();
+  loadFormFrom(id);
+  document.querySelectorAll('#listTable tbody tr').forEach(tr =>
+    tr.classList.toggle('sel', tr.dataset.id === id));
+}
+
+let suppress = false; // 폼 채우는 동안 input 핸들러 무시
+function loadFormFrom(id) {
+  suppress = true;
+  const c = commanders[id] || {};
+  for (const fl of FIELDS.filter(x => x.group === 'commander')) {
+    const el = document.getElementById('fld_' + fl.key);
+    el.value = c[fl.key] != null ? c[fl.key] : '';
+  }
+  const r = rosters[id];
+  document.getElementById('hasRoster').checked = !!r;
+  for (const fl of FIELDS.filter(x => x.group === 'roster')) {
+    const el = document.getElementById('fld_' + fl.key);
+    el.value = r && r[fl.key] != null ? r[fl.key] : '';
+  }
+  document.getElementById('rosterFs').disabled = !r;
+  suppress = false;
+  validateForm();
+}
+
+function onToggleRoster(e) {
+  if (!selId) return;
+  if (e.target.checked) {
+    if (!rosters[selId]) rosters[selId] = { commanderId: selId, classId: '', joinChapter: 1, role: 'melee' };
+    document.getElementById('rosterFs').disabled = false;
+    loadFormFrom(selId);
+  } else {
+    delete rosters[selId];
+    document.getElementById('rosterFs').disabled = true;
+  }
+  markDirty();
+  renderList();
+  validateForm();
+}
+
+function onFieldInput(fl) {
+  if (suppress || !selId) return;
+  const el = document.getElementById('fld_' + fl.key);
+  let v = el.value;
+
+  if (fl.group === 'commander') {
+    if (fl.key === 'id') { renameId(v.trim()); return; }
+    commanders[selId] = commanders[selId] || { id: selId };
+    commanders[selId][fl.key] = fl.type === 'int' ? toIntOrRaw(v) : v;
+  } else {
+    if (!rosters[selId]) return;
+    if (fl.key === 'uniqueSkillId') {
+      if (v.trim() === '') delete rosters[selId].uniqueSkillId;
+      else rosters[selId].uniqueSkillId = v;
+    } else {
+      rosters[selId][fl.key] = fl.type === 'int' ? toIntOrRaw(v) : v;
+    }
+    rosters[selId].commanderId = selId;
+  }
+  markDirty();
+  validateForm();
+  patchListRow(selId);
+}
+function toIntOrRaw(v) { if (v === '' || v == null) return NaN; const n = Number(v); return Number.isFinite(n) ? Math.trunc(n) : v; }
+
+function renameId(newId) {
+  const oldId = selId;
+  if (!newId || newId === oldId) { validateForm(); return; }
+  if (commanders[newId] || rosters[newId]) {
+    setErr('id', `중복 id: ${newId}`);
+    document.getElementById('fld_id').classList.add('invalid');
+    return;
+  }
+  // commander 키 이동
+  if (commanders[oldId]) {
+    const obj = commanders[oldId]; delete commanders[oldId];
+    obj.id = newId; commanders[newId] = obj;
+  }
+  // roster 키 + commanderId 이동
+  if (rosters[oldId]) {
+    const r = rosters[oldId]; delete rosters[oldId];
+    r.commanderId = newId; rosters[newId] = r;
+  }
+  selId = newId;
+  markDirty();
+  renderList();
+  selectRow(newId);
+}
+
+function patchListRow(id) {
+  // 간단히 전체 재렌더(목록 수백행이라도 가볍다). 선택 유지.
+  renderList();
+}
+
+/* ── 폼 검증 표시 ── */
+function setErr(key, msg) { const e = document.getElementById('err_' + key); if (e) e.textContent = msg || ''; }
+function validateForm() {
+  if (!selId) return;
+  const c = commanders[selId] || {};
+  const ce = vCommander(c);
+  for (const fl of FIELDS.filter(x => x.group === 'commander')) {
+    const el = document.getElementById('fld_' + fl.key);
+    const bad = !!ce[fl.key];
+    el.classList.toggle('invalid', bad);
+    if (fl.key !== 'id') setErr(fl.key, ce[fl.key] || '');
+    if (fl.bar) {
+      const b = document.getElementById('bar_' + fl.key);
+      const n = Number(c[fl.key]); b.style.width = (Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : 0) + '%';
+    }
+  }
+  // id 중복 별도 체크(rename 실패 외 일반 표시)
+  if (!ce.id) setErr('id', '');
+
+  const r = rosters[selId];
+  if (r) {
+    const re = vRoster(r, classIds);
+    for (const fl of FIELDS.filter(x => x.group === 'roster')) {
+      const el = document.getElementById('fld_' + fl.key);
+      const bad = !!re[fl.key];
+      el.classList.toggle('invalid', bad);
+      setErr(fl.key, re[fl.key] || '');
+    }
+  } else {
+    for (const fl of FIELDS.filter(x => x.group === 'roster')) {
+      document.getElementById('fld_' + fl.key).classList.remove('invalid');
+      setErr(fl.key, '');
+    }
+  }
+  renderValidSummary();
+}
+
+/* ── 추가 / 복제 / 삭제 ── */
+function uniqueId(base) {
+  let id = base, i = 2;
+  while (commanders[id] || rosters[id]) id = `${base}_${i++}`;
+  return id;
+}
+function addRow() {
+  const id = uniqueId('새장수');
+  commanders[id] = { id, name: '새 장수', leadership: 50, war: 50, intelligence: 50, faceId: 0 };
+  markDirty();
+  renderList();
+  selectRow(id);
+}
+function dupRow() {
+  if (!selId) return;
+  const id = uniqueId(selId);
+  if (commanders[selId]) commanders[id] = { ...commanders[selId], id };
+  if (rosters[selId]) rosters[id] = { ...rosters[selId], commanderId: id };
+  markDirty();
+  renderList();
+  selectRow(id);
+}
+function delRow() {
+  if (!selId) return;
+  if (!confirm(`삭제: ${selId}\ncommanders + rosters 양쪽에서 제거합니다.`)) return;
+  delete commanders[selId];
+  delete rosters[selId];
+  selId = null;
+  document.getElementById('form').style.display = 'none';
+  document.getElementById('noselect').style.display = 'block';
+  document.getElementById('dupRow').disabled = true;
+  document.getElementById('delRow').disabled = true;
+  markDirty();
+  renderList();
+}
+
+/* ── 로드: File System Access ── */
+async function openFiles() {
+  if (!supportsFS) { alert('이 브라우저는 File System Access 미지원 — "JSON 붙여넣기"를 쓰세요 (Chrome/Edge 권장).'); openPaste(); return; }
+  try {
+    const handles = await window.showOpenFilePicker({
+      multiple: true,
+      types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+    });
+    for (const h of handles) {
+      const file = await h.getFile();
+      const data = JSON.parse(await file.text());
+      assignLoaded(file.name, data, h);
+    }
+    finishLoad();
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+    alert('열기 실패: ' + e);
+  }
+}
+function assignLoaded(fname, data, handle) {
+  const n = fname.toLowerCase();
+  if (n.includes('commander')) { commanders = data; cmdHandle = handle || cmdHandle; }
+  else if (n.includes('roster')) { rosters = data; rosHandle = handle || rosHandle; }
+  else if (n.includes('unitclass') || n.includes('class')) { classIds = Object.keys(data); }
+  else {
+    // 이름 모호: 내용으로 추정
+    const first = data && typeof data === 'object' ? Object.values(data)[0] : null;
+    if (first && 'leadership' in first) { commanders = data; cmdHandle = handle || cmdHandle; }
+    else if (first && 'role' in first && 'classId' in first) { rosters = data; rosHandle = handle || rosHandle; }
+    else if (first && 'line' in first) { classIds = Object.keys(data); }
+    else alert(`인식 못 한 파일: ${fname} (commanders/rosters/unitClasses 파일명으로 열어주세요)`);
+  }
+}
+function finishLoad() {
+  // commanders 가 비었는데 rosters만 있는 경우 대비: order 는 rebuildOrder가 처리
+  fillClassDropdowns();
+  buildFilters();
+  renderList();
+  updateFileInfo();
+  dirty = false;
+  toast('불러옴 — commanders ' + Object.keys(commanders).length + ' · rosters ' + Object.keys(rosters).length);
+}
+
+/* ── 붙여넣기 폴백 ── */
+function openPaste() { document.getElementById('pastebox').style.display = 'flex'; document.getElementById('pasteText').focus(); }
+function closePaste() { document.getElementById('pastebox').style.display = 'none'; document.getElementById('pasteText').value = ''; }
+function applyPaste() {
+  const which = document.getElementById('pasteWhich').value;
+  let data;
+  try { data = JSON.parse(document.getElementById('pasteText').value); }
+  catch (e) { alert('JSON 파싱 실패: ' + e); return; }
+  if (!data || typeof data !== 'object' || Array.isArray(data)) { alert('Record<id,{...}> 객체맵이어야 합니다(배열 아님).'); return; }
+  if (which === 'commanders') commanders = data;
+  else if (which === 'rosters') rosters = data;
+  else if (which === 'unitClasses') classIds = Object.keys(data);
+  closePaste();
+  finishLoad();
+}
+
+/* ── 저장 (같은 핸들 덮어쓰기) / 내보내기 ── */
+function serialize(obj) { return JSON.stringify(obj, null, 2) + '\n'; }
+function preflightOrConfirm() {
+  if (Object.keys(commanders).every(id => Object.keys(vCommander(commanders[id])).length === 0) &&
+      Object.keys(rosters).every(id => Object.keys(vRoster(rosters[id], classIds)).length === 0)) return true;
+  return confirm('검증 오류가 있습니다. 그래도 진행하시겠습니까? (권장: 오류 수정 후 저장)');
+}
+async function writeHandle(handle, obj, fallbackName) {
+  if (handle) {
+    const w = await handle.createWritable();
+    await w.write(serialize(obj)); await w.close();
+    return true;
+  }
+  if (supportsFS) {
+    const h = await window.showSaveFilePicker({ suggestedName: fallbackName, types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] });
+    const w = await h.createWritable(); await w.write(serialize(obj)); await w.close();
+    return h; // 새 핸들 반환
+  }
+  downloadBlob(fallbackName, serialize(obj));
+  return false;
+}
+async function saveFiles() {
+  if (!preflightOrConfirm()) return;
+  try {
+    const a = await writeHandle(cmdHandle, commanders, 'commanders.json');
+    if (a && a !== true) cmdHandle = a;
+    const b = await writeHandle(rosHandle, rosters, 'rosters.json');
+    if (b && b !== true) rosHandle = b;
+    dirty = false; updateFileInfo();
+    toast('저장 완료 — commanders.json + rosters.json');
+  } catch (e) { if (e && e.name === 'AbortError') return; alert('저장 실패: ' + e); }
+}
+function downloadBlob(name, text) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+  a.download = name; a.click();
+}
+function exportCmd() { if (!preflightOrConfirm()) return; downloadBlob('commanders.json', serialize(commanders)); toast('commanders.json 내려받음 → packages/data/json/'); }
+function exportRos() { if (!preflightOrConfirm()) return; downloadBlob('rosters.json', serialize(rosters)); toast('rosters.json 내려받음 → packages/data/json/'); }
+
+/* ── 필터 옵션 / 파일 정보 ── */
+function buildFilters() {
+  const rsel = document.getElementById('fRole');
+  rsel.innerHTML = '<option value="">역할 전체</option>' + ROLES.map(r => `<option value="${r}">${r}</option>`).join('');
+  fillClassDropdowns();
+}
+function updateFileInfo() {
+  const parts = [];
+  parts.push(cmdHandle ? 'commanders.json ✔핸들' : (Object.keys(commanders).length ? 'commanders(붙여넣기)' : ''));
+  parts.push(rosHandle ? 'rosters.json ✔핸들' : (Object.keys(rosters).length ? 'rosters(붙여넣기)' : ''));
+  document.getElementById('fileInfo').textContent = parts.filter(Boolean).join(' · ') + (dirty ? ' · ●변경됨' : '');
+}
+function markDirty() { dirty = true; updateFileInfo(); }
+
+/* ── 토스트 ── */
+let toastT = null;
+function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', 2800); }
+
+/* ── 바인딩 ── */
+function bind() {
+  document.getElementById('openFiles').onclick = openFiles;
+  document.getElementById('paste').onclick = openPaste;
+  document.getElementById('addRow').onclick = addRow;
+  document.getElementById('dupRow').onclick = dupRow;
+  document.getElementById('delRow').onclick = delRow;
+  document.getElementById('saveFiles').onclick = saveFiles;
+  document.getElementById('exportCmd').onclick = exportCmd;
+  document.getElementById('exportRos').onclick = exportRos;
+  document.getElementById('pasteCancel').onclick = closePaste;
+  document.getElementById('pasteApply').onclick = applyPaste;
+  ['search', 'fRole', 'fClass', 'fRoster', 'fValid'].forEach(id =>
+    document.getElementById(id).addEventListener('input', () => renderList()));
+  window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+}
+
+/* ── 초기화 ── */
+function init() {
+  buildForm();
+  buildFilters();
+  bind();
+  renderList();
+  updateFileInfo();
+  if (!supportsFS) {
+    document.getElementById('saveFiles').title = 'File System Access 미지원 — 저장 시 다운로드 폴백';
+  }
+}
+init();
+</script>
+</body>
+</html>

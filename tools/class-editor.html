@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>병종 에디터 — 삼국지 SRPG (unitClasses.json 편집)</title>
+<style>
+  /* 수묵/청동 톤 — map-editor.html 팔레트 계승 */
+  :root { --bg:#14161c; --panel:#1d212b; --panel2:#242936; --line:#333a4a; --txt:#e8e6df; --dim:#9aa1b0; --acc:#d4a843; --acc2:#6fae6f; --bad:#d4564b; --badbg:#3a1f1d; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--txt); font-family:'Malgun Gothic','Segoe UI',sans-serif; }
+  body { display:flex; flex-direction:column; }
+  header { background:rgba(20,22,28,.96); border-bottom:1px solid var(--line); padding:8px 14px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  header h1 { font-size:14px; margin:0 10px 0 0; color:var(--acc); white-space:nowrap; }
+  .btn { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:6px 11px; cursor:pointer; font-size:12.5px; }
+  .btn:hover { border-color:var(--acc); }
+  .btn:disabled { opacity:.4; cursor:default; }
+  .btn.go { background:var(--acc2); color:#0c1a0c; border-color:var(--acc2); font-weight:bold; }
+  .btn.danger { color:#e9b6b1; }
+  .btn.danger:hover { border-color:var(--bad); }
+  .sep { width:1px; height:22px; background:var(--line); margin:0 4px; }
+  main { flex:1; display:flex; min-height:0; }
+  /* ── 목록 ── */
+  #list { width:330px; background:var(--panel); border-right:1px solid var(--line); display:flex; flex-direction:column; flex-shrink:0; }
+  #search { margin:8px; padding:6px 9px; background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; font-size:12.5px; }
+  #filters { display:flex; gap:5px; flex-wrap:wrap; padding:0 8px 6px; }
+  #filters select { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:3px 5px; font-size:11.5px; }
+  #rows { flex:1; overflow:auto; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  thead th { position:sticky; top:0; background:var(--panel); color:var(--dim); font-size:10.5px; text-transform:uppercase; letter-spacing:.4px; text-align:left; padding:5px 7px; border-bottom:1px solid var(--line); cursor:pointer; user-select:none; }
+  tbody td { padding:5px 7px; border-bottom:1px solid rgba(51,58,74,.5); white-space:nowrap; }
+  tbody tr { cursor:pointer; }
+  tbody tr:hover { background:var(--panel2); }
+  tbody tr.sel { background:#2c3344; box-shadow:inset 3px 0 0 var(--acc); }
+  tbody tr.invalid td:first-child { color:var(--bad); }
+  .pill { display:inline-block; padding:1px 6px; border-radius:9px; font-size:10.5px; border:1px solid var(--line); color:var(--dim); }
+  #count { padding:6px 10px; font-size:11px; color:var(--dim); border-top:1px solid var(--line); }
+  /* ── 편집 폼 ── */
+  #editor { flex:1; overflow:auto; padding:16px 22px; }
+  #editor.empty { display:flex; align-items:center; justify-content:center; color:var(--dim); font-size:13px; }
+  .form-head { display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+  .form-head h2 { margin:0; font-size:16px; color:var(--acc); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px 16px; max-width:880px; }
+  .field { display:flex; flex-direction:column; gap:3px; }
+  .field label { font-size:11px; color:var(--dim); display:flex; gap:5px; align-items:center; }
+  .field .req { color:var(--acc); }
+  .field input, .field select { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:6px 8px; font-size:13px; }
+  .field input:focus, .field select:focus { outline:none; border-color:var(--acc); }
+  .field.err input, .field.err select { border-color:var(--bad); background:var(--badbg); }
+  .field .msg { font-size:10.5px; color:var(--bad); min-height:12px; }
+  .field .hint { font-size:10.5px; color:var(--dim); }
+  fieldset { border:1px solid var(--line); border-radius:8px; padding:10px 14px 14px; margin:18px 0 0; max-width:880px; }
+  legend { font-size:11px; color:var(--acc); text-transform:uppercase; letter-spacing:.5px; padding:0 6px; }
+  .grades { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+  .grade-c { display:flex; flex-direction:column; gap:3px; align-items:stretch; }
+  .grade-c label { font-size:11px; color:var(--dim); text-align:center; }
+  .grade-c select { text-align:center; font-weight:bold; }
+  .gS{color:#ffd86b} .gA{color:#9ed99e} .gB{color:#9ec3e0} .gC{color:#c9c4b8} .gD{color:#b58c8c}
+  /* strategies 멀티셀렉트 */
+  #strat-area { max-width:880px; }
+  .strat-grid { display:flex; flex-wrap:wrap; gap:7px; margin-top:6px; }
+  .strat-chip { display:flex; align-items:center; gap:6px; padding:4px 9px; border:1px solid var(--line); border-radius:14px; cursor:pointer; font-size:12px; color:var(--dim); user-select:none; }
+  .strat-chip.on { background:var(--acc); color:#1a1407; border-color:var(--acc); font-weight:bold; }
+  .strat-chip.unknown { border-color:var(--bad); color:#e9b6b1; }
+  .strat-fallback { margin-top:8px; }
+  .strat-fallback textarea { width:100%; background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:6px 8px; font-size:12px; resize:vertical; min-height:42px; }
+  .advhint { font-size:11.5px; color:var(--dim); margin:4px 0 0; }
+  .advhint b { color:var(--acc2); }
+  /* 검증 배너 */
+  #vbanner { display:none; margin:0 0 14px; padding:8px 12px; border-radius:7px; font-size:12.5px; background:var(--badbg); border:1px solid var(--bad); color:#f0c4bf; max-width:880px; }
+  #vbanner.ok { display:block; background:#1d2c1d; border-color:var(--acc2); color:#b8e0b8; }
+  #vbanner ul { margin:5px 0 0; padding-left:18px; }
+  #toast { position:fixed; bottom:34px; left:50%; transform:translateX(-50%); background:var(--acc); color:#1a1407; font-weight:bold; padding:7px 18px; border-radius:18px; font-size:13px; display:none; z-index:50; }
+  #toast.err { background:var(--bad); color:#fff; }
+  #fileinfo { font-size:11px; color:var(--dim); margin-left:auto; }
+</style>
+</head>
+<body>
+<header>
+  <h1>병종 에디터</h1>
+  <button class="btn" id="open">파일 열기</button>
+  <button class="btn go" id="save" disabled>저장</button>
+  <button class="btn" id="exportBtn" disabled>JSON 내보내기</button>
+  <div class="sep"></div>
+  <button class="btn" id="openStrat">strategies.json 열기</button>
+  <div class="sep"></div>
+  <button class="btn" id="paste">JSON 붙여넣기</button>
+  <span id="fileinfo">파일 미열림 — “파일 열기” 또는 “JSON 붙여넣기”</span>
+</header>
+<main>
+  <div id="list">
+    <input id="search" type="search" placeholder="검색: id / 이름 / code">
+    <div id="filters">
+      <select id="f-line"><option value="">계열 전체</option></select>
+      <select id="f-tier"><option value="">승급 전체</option><option>1</option><option>2</option><option>3</option></select>
+      <select id="f-move"><option value="">이동 전체</option></select>
+      <button class="btn" id="add" style="font-size:11.5px;padding:3px 8px">+ 추가</button>
+    </div>
+    <div id="rows">
+      <table>
+        <thead><tr>
+          <th data-sort="id">id</th><th data-sort="name">이름</th>
+          <th data-sort="code">code</th><th data-sort="line">계열</th><th data-sort="tier">T</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div id="count"></div>
+  </div>
+  <div id="editor" class="empty">왼쪽에서 병종을 선택하거나 “+ 추가”로 새로 만드세요.</div>
+</main>
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════════════════════════
+   선언적 필드 config — 스키마(packages/data/src/schemas.ts UnitClassSchema)와
+   1:1 동기화. 2탄/스키마 변경 시 이 블록만 고치면 폼·검증이 따라온다.
+   각 필드: type(int|text|enum), 범위/enum, required, hint.
+   ════════════════════════════════════════════════════════════════════ */
+const LINES = ["infantry", "archer", "cavalry", "bandit", "support"];
+const MOVE_CLASSES = ["foot", "cavalry", "bandit", "archerFoot"];
+const GRADE_KEYS = ["atk", "def", "spirit", "agility", "morale"];
+const GRADE_LABEL = { atk:"공", def:"방", spirit:"정", agility:"순", morale:"사" };
+const GRADE_VALUES = ["S", "A", "B", "C", "D"];
+
+const FIELDS = [
+  { key:"id",        type:"text", required:true,  label:"id",      hint:"영문 식별자 · 파일 키 · 중복 금지" },
+  { key:"name",      type:"text", required:true,  label:"이름",     hint:"한글 병종명" },
+  { key:"code",      type:"int",  required:true,  min:0,  max:63,  label:"code",    hint:"0~63 (0x00~0x12=영걸전, 19+=조조전 추가)" },
+  { key:"baseAtk",   type:"int",  required:true,  min:0,  max:200, label:"baseAtk", hint:"병종 공격력 기초치 0~200" },
+  { key:"baseDef",   type:"int",  required:true,  min:0,  max:200, label:"baseDef", hint:"병종 방어력 기초치 0~200" },
+  { key:"move",      type:"int",  required:true,  min:0,  max:10,  label:"move",    hint:"이동력 0~10 (0=비전투)" },
+  { key:"rangeMin",  type:"int",  required:true,  min:1,           label:"rangeMin",hint:">=1, rangeMin<=rangeMax" },
+  { key:"rangeMax",  type:"int",  required:true,  min:1,           label:"rangeMax",hint:">=1" },
+  { key:"line",      type:"enum", required:true,  values:LINES,    label:"line",    hint:"상성: cavalry>infantry>archer>cavalry" },
+  { key:"tier",      type:"int",  required:true,  min:1,  max:3,   label:"tier",    hint:"승급 단계 1~3" },
+  { key:"moveClass", type:"enum", required:true,  values:MOVE_CLASSES, label:"moveClass", hint:"terrains.moveCost 오버라이드 키" },
+];
+
+const DEFAULT_GRADES = { atk:"C", def:"C", spirit:"C", agility:"C", morale:"C" };
+
+/* 새 항목 기본값 */
+function blankEntry() {
+  return {
+    id:"", name:"", code:0, baseAtk:80, baseDef:80, move:4,
+    rangeMin:1, rangeMax:1, line:"infantry", tier:1, moveClass:"foot",
+    strategies:[], grades:{ ...DEFAULT_GRADES },
+  };
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   상태
+   ════════════════════════════════════════════════════════════════════ */
+let data = {};               // Record<id, UnitClass>  (원본 키 = 표시용; 편집 중 id는 entry.id)
+let order = [];              // 내부 row id(원래 키) 순서 보존
+let entries = {};            // rowKey -> entry 객체 (entry.id가 실제 export id)
+let selKey = null;
+let fileHandle = null;       // File System Access write 핸들
+let stratFileHandle = null;
+let knownStrategies = [];    // strategies.json id 목록 (있으면 칩, 없으면 텍스트 폴백)
+let sortKey = null, sortDir = 1;
+let nextRowSeq = 0;
+
+const supportsFS = !!(window.showOpenFilePicker && window.showSaveFilePicker);
+
+/* ── 초기화 ── */
+function init() {
+  // 필터 옵션 채우기
+  const fl = document.getElementById('f-line');
+  LINES.forEach(l => fl.add(new Option(l, l)));
+  const fm = document.getElementById('f-move');
+  MOVE_CLASSES.forEach(m => fm.add(new Option(m, m)));
+
+  document.getElementById('open').onclick = openFile;
+  document.getElementById('save').onclick = saveFile;
+  document.getElementById('exportBtn').onclick = exportDownload;
+  document.getElementById('openStrat').onclick = openStrategies;
+  document.getElementById('paste').onclick = pasteJSON;
+  document.getElementById('add').onclick = addEntry;
+  document.getElementById('search').oninput = renderList;
+  document.getElementById('f-line').onchange = renderList;
+  document.getElementById('f-tier').onchange = renderList;
+  document.getElementById('f-move').onchange = renderList;
+  document.querySelectorAll('thead th[data-sort]').forEach(th => {
+    th.onclick = () => { const k = th.dataset.sort; sortDir = sortKey === k ? -sortDir : 1; sortKey = k; renderList(); };
+  });
+
+  if (!supportsFS) {
+    document.getElementById('open').textContent = '파일 열기 (미지원 — 붙여넣기 사용)';
+    document.getElementById('open').disabled = true;
+    document.getElementById('openStrat').disabled = true;
+  }
+  renderList();
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   로드: File System Access 우선 / 붙여넣기 폴백
+   ════════════════════════════════════════════════════════════════════ */
+async function openFile() {
+  try {
+    const [h] = await window.showOpenFilePicker({
+      types:[{ description:'JSON', accept:{ 'application/json':['.json'] } }],
+    });
+    fileHandle = h;
+    const f = await h.getFile();
+    loadData(JSON.parse(await f.text()), h.name);
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+    toast('열기 실패: ' + (e.message || e), true);
+  }
+}
+
+function pasteJSON() {
+  const txt = prompt('unitClasses.json 내용을 붙여넣으세요 (객체 맵 형태):');
+  if (txt == null) return;
+  try {
+    loadData(JSON.parse(txt), '붙여넣은 데이터');
+    fileHandle = null; // 붙여넣기는 핸들 없음 → 저장 시 다른 이름으로 저장
+  } catch (e) { toast('JSON 파싱 실패: ' + e, true); }
+}
+
+function loadData(obj, label) {
+  if (Array.isArray(obj) || typeof obj !== 'object' || obj === null) {
+    toast('형식 오류: Record<id, {...}> 객체 맵이어야 합니다', true); return;
+  }
+  data = obj;
+  entries = {}; order = []; nextRowSeq = 0;
+  for (const [k, v] of Object.entries(obj)) {
+    const rowKey = 'r' + (nextRowSeq++);
+    entries[rowKey] = normalize(v, k);
+    order.push(rowKey);
+  }
+  selKey = null;
+  document.getElementById('fileinfo').textContent =
+    `${label} — ${order.length}개 병종` + (fileHandle ? '' : ' (저장 시 위치 선택)');
+  document.getElementById('save').disabled = !supportsFS;
+  document.getElementById('exportBtn').disabled = false;
+  renderList();
+  showEmpty();
+}
+
+/* 스키마 누락 필드 보정(읽기 안전) — 검증과 별개로 폼이 깨지지 않게 */
+function normalize(v, fallbackId) {
+  const e = blankEntry();
+  e.id = (v && v.id != null) ? String(v.id) : String(fallbackId);
+  if (v && typeof v === 'object') {
+    for (const f of FIELDS) if (v[f.key] != null) e[f.key] = v[f.key];
+    if (Array.isArray(v.strategies)) e.strategies = v.strategies.map(String);
+    if (v.grades && typeof v.grades === 'object') {
+      e.grades = { ...DEFAULT_GRADES };
+      for (const g of GRADE_KEYS) if (v.grades[g] != null) e.grades[g] = v.grades[g];
+    }
+  }
+  return e;
+}
+
+async function openStrategies() {
+  try {
+    const [h] = await window.showOpenFilePicker({
+      types:[{ description:'JSON', accept:{ 'application/json':['.json'] } }],
+    });
+    stratFileHandle = h;
+    const obj = JSON.parse(await (await h.getFile()).text());
+    knownStrategies = Object.keys(obj);
+    toast(`책략 ${knownStrategies.length}종 로드`);
+    if (selKey) renderEditor();
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+    toast('strategies 열기 실패: ' + (e.message || e), true);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   검증 — schemas.ts UnitClassSchema 규칙을 인라인으로 (zod 미임포트, 규칙 동일)
+   반환: { errors: {fieldKey:msg,...}, list:[msg...] }
+   ════════════════════════════════════════════════════════════════════ */
+function isInt(n) { return typeof n === 'number' && Number.isInteger(n); }
+
+function validateEntry(e, rowKey) {
+  const errors = {}; const list = [];
+  const add = (k, m) => { errors[k] = m; list.push(`${k}: ${m}`); };
+
+  for (const f of FIELDS) {
+    const val = e[f.key];
+    if (f.type === 'text') {
+      if (f.required && (!val || String(val).trim() === '')) add(f.key, '필수');
+    } else if (f.type === 'int') {
+      if (!isInt(val)) { add(f.key, '정수 필요'); continue; }
+      if (f.min != null && val < f.min) add(f.key, `>= ${f.min}`);
+      if (f.max != null && val > f.max) add(f.key, `<= ${f.max}`);
+    } else if (f.type === 'enum') {
+      if (!f.values.includes(val)) add(f.key, `enum [${f.values.join('/')}]`);
+    }
+  }
+  // rangeMin <= rangeMax (refine)
+  if (isInt(e.rangeMin) && isInt(e.rangeMax) && e.rangeMin > e.rangeMax)
+    add('rangeMax', 'rangeMin <= rangeMax 위반');
+
+  // grades 5스탯 enum
+  for (const g of GRADE_KEYS)
+    if (!GRADE_VALUES.includes(e.grades?.[g])) add('grades.' + g, 'S~D');
+
+  // strategies: 문자열 배열
+  if (!Array.isArray(e.strategies) || e.strategies.some(s => typeof s !== 'string'))
+    add('strategies', '문자열 id 배열');
+
+  // id 중복 (다른 row와 동일 id)
+  const id = String(e.id || '').trim();
+  if (id) {
+    for (const ok of order) {
+      if (ok === rowKey) continue;
+      if (String(entries[ok].id || '').trim() === id) { add('id', `중복 id "${id}"`); break; }
+    }
+  }
+  return { errors, list };
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   목록 렌더
+   ════════════════════════════════════════════════════════════════════ */
+function renderList() {
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  const fLine = document.getElementById('f-line').value;
+  const fTier = document.getElementById('f-tier').value;
+  const fMove = document.getElementById('f-move').value;
+
+  let rows = order.slice();
+  if (sortKey) rows.sort((a, b) => {
+    const va = entries[a][sortKey], vb = entries[b][sortKey];
+    return (va < vb ? -1 : va > vb ? 1 : 0) * sortDir;
+  });
+
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  let shown = 0, invalidCount = 0;
+  for (const rk of rows) {
+    const e = entries[rk];
+    if (fLine && e.line !== fLine) continue;
+    if (fTier && String(e.tier) !== fTier) continue;
+    if (fMove && e.moveClass !== fMove) continue;
+    if (q && !(`${e.id} ${e.name} ${e.code}`.toLowerCase().includes(q))) continue;
+
+    const bad = validateEntry(e, rk).list.length > 0;
+    if (bad) invalidCount++;
+    const tr = document.createElement('tr');
+    tr.className = (rk === selKey ? 'sel ' : '') + (bad ? 'invalid' : '');
+    tr.innerHTML =
+      `<td>${bad ? '⚠ ' : ''}${esc(e.id) || '<i style="color:#888">(빈 id)</i>'}</td>` +
+      `<td>${esc(e.name)}</td><td>${e.code}</td>` +
+      `<td><span class="pill">${e.line}</span></td><td>${e.tier}</td>`;
+    tr.onclick = () => selectRow(rk);
+    tbody.appendChild(tr);
+    shown++;
+  }
+  document.getElementById('count').textContent =
+    `${shown} / ${order.length} 표시` + (invalidCount ? ` · ⚠ ${invalidCount} 검증 실패` : ' · 전부 유효');
+}
+
+function esc(s) { return String(s ?? '').replace(/[&<>]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[c])); }
+
+/* ════════════════════════════════════════════════════════════════════
+   편집 폼
+   ════════════════════════════════════════════════════════════════════ */
+function showEmpty() {
+  const ed = document.getElementById('editor');
+  ed.className = 'empty';
+  ed.textContent = order.length ? '왼쪽에서 병종을 선택하거나 “+ 추가”로 새로 만드세요.'
+                                : '“파일 열기” 또는 “JSON 붙여넣기”로 unitClasses.json 을 불러오세요.';
+}
+
+function selectRow(rk) { selKey = rk; renderList(); renderEditor(); }
+
+function renderEditor() {
+  const e = entries[selKey];
+  if (!e) { showEmpty(); return; }
+  const v = validateEntry(e, selKey);
+  const ed = document.getElementById('editor');
+  ed.className = '';
+
+  const fieldHTML = FIELDS.map(f => {
+    const errClass = v.errors[f.key] ? ' err' : '';
+    let input;
+    if (f.type === 'enum') {
+      input = `<select data-k="${f.key}">` +
+        f.values.map(o => `<option value="${o}"${e[f.key] === o ? ' selected' : ''}>${o}</option>`).join('') +
+        `</select>`;
+    } else {
+      const t = f.type === 'int' ? 'number' : 'text';
+      const rng = f.type === 'int' ? `${f.min != null ? `min="${f.min}"` : ''} ${f.max != null ? `max="${f.max}"` : ''} step="1"` : '';
+      input = `<input type="${t}" data-k="${f.key}" ${rng} value="${esc(e[f.key])}">`;
+    }
+    return `<div class="field${errClass}">
+      <label>${f.label}${f.required ? '<span class="req">*</span>' : ''}</label>
+      ${input}
+      <div class="${v.errors[f.key] ? 'msg' : 'hint'}">${v.errors[f.key] || f.hint}</div>
+    </div>`;
+  }).join('');
+
+  const gradesHTML = GRADE_KEYS.map(g => {
+    const cur = e.grades[g];
+    const gErr = v.errors['grades.' + g];
+    return `<div class="grade-c">
+      <label>${GRADE_LABEL[g]} <span style="opacity:.6">${g}</span></label>
+      <select data-grade="${g}" class="g${cur}"${gErr ? ' style="border-color:var(--bad)"' : ''}>
+        ${GRADE_VALUES.map(o => `<option value="${o}"${o === cur ? ' selected' : ''}>${o}</option>`).join('')}
+      </select>
+    </div>`;
+  }).join('');
+
+  // 상성 힌트
+  const advText = { cavalry:'기병 → 보병 유리', infantry:'보병 → 궁병 유리', archer:'궁병 → 기병 유리', bandit:'산적계', support:'보조계(상성 외)' }[e.line] || '';
+
+  // strategies UI
+  let stratHTML;
+  if (knownStrategies.length) {
+    const chips = knownStrategies.map(s =>
+      `<span class="strat-chip${e.strategies.includes(s) ? ' on' : ''}" data-strat="${esc(s)}">${esc(s)}</span>`).join('');
+    const unknown = e.strategies.filter(s => !knownStrategies.includes(s));
+    const unknownChips = unknown.map(s =>
+      `<span class="strat-chip unknown" data-strat="${esc(s)}" title="strategies.json에 없는 id">${esc(s)} ✕</span>`).join('');
+    stratHTML = `<div class="strat-grid">${chips}${unknownChips}</div>`;
+  } else {
+    stratHTML = `<div class="strat-fallback">
+      <div class="hint" style="color:var(--dim);font-size:11px">strategies.json 미열림 — 책략 id를 쉼표/공백/줄바꿈으로 입력 (“strategies.json 열기”로 멀티셀렉트 가능)</div>
+      <textarea id="strat-text" placeholder="예: 초열, 업화, 회복">${esc(e.strategies.join(', '))}</textarea>
+    </div>`;
+  }
+
+  ed.innerHTML = `
+    <div id="vbanner" class="${v.list.length ? '' : 'ok'}">
+      ${v.list.length
+        ? `⚠ 검증 실패 ${v.list.length}건 — 저장/내보내기가 차단됩니다.<ul>${v.list.map(m => `<li>${esc(m)}</li>`).join('')}</ul>`
+        : '✓ 이 병종은 스키마를 만족합니다.'}
+    </div>
+    <div class="form-head">
+      <h2>${esc(e.name) || esc(e.id) || '(새 병종)'}</h2>
+      <span class="pill">${esc(e.id)}</span>
+      <button class="btn" id="dup" style="margin-left:auto">복제</button>
+      <button class="btn danger" id="del">삭제</button>
+    </div>
+    <div class="grid">${fieldHTML}</div>
+    <p class="advhint"><b>${advText}</b> · 방어 보정 유리 0.75 / 불리 1.25 · 간접공격(궁/포)은 무반격</p>
+    <fieldset>
+      <legend>등급 (5스탯 S~D)</legend>
+      <div class="grades">${gradesHTML}</div>
+    </fieldset>
+    <fieldset id="strat-area">
+      <legend>책략 (strategies) — ${e.strategies.length}개 선택</legend>
+      ${stratHTML}
+    </fieldset>
+  `;
+
+  // ── 바인딩 ──
+  ed.querySelectorAll('[data-k]').forEach(inp => {
+    const f = FIELDS.find(x => x.key === inp.dataset.k);
+    inp.oninput = () => {
+      let val = inp.value;
+      if (f.type === 'int') { val = val === '' ? NaN : Number(val); }
+      e[f.key] = val;
+      // id 변경 시 즉시 검증/목록 갱신, 그 외도 라이브 검증
+      liveUpdate();
+    };
+    if (f.type === 'enum') inp.onchange = inp.oninput;
+  });
+  ed.querySelectorAll('[data-grade]').forEach(sel => {
+    sel.onchange = () => { e.grades[sel.dataset.grade] = sel.value; liveUpdate(); };
+  });
+  ed.querySelectorAll('[data-strat]').forEach(chip => {
+    chip.onclick = () => {
+      const s = chip.dataset.strat;
+      const i = e.strategies.indexOf(s);
+      if (i >= 0) e.strategies.splice(i, 1); else e.strategies.push(s);
+      renderEditor();
+    };
+  });
+  const stratText = ed.querySelector('#strat-text');
+  if (stratText) stratText.oninput = () => {
+    e.strategies = stratText.value.split(/[\s,]+/).map(s => s.trim()).filter(Boolean);
+    // 폼 재렌더 없이 배너/목록만 갱신(텍스트 포커스 유지)
+    liveBannerOnly();
+  };
+
+  document.getElementById('dup').onclick = () => dupEntry(selKey);
+  document.getElementById('del').onclick = () => delEntry(selKey);
+}
+
+/* 입력 중 가벼운 갱신: 배너/필드 에러 + 목록(헤더 칩) — 폼 전체 재렌더는 칩/등급 변경 때만 */
+function liveUpdate() {
+  const e = entries[selKey];
+  const v = validateEntry(e, selKey);
+  // 필드 에러 표시 갱신
+  document.querySelectorAll('#editor .field').forEach(fd => {
+    const inp = fd.querySelector('[data-k]'); if (!inp) return;
+    const k = inp.dataset.k;
+    const f = FIELDS.find(x => x.key === k);
+    const msg = fd.querySelector('.msg, .hint');
+    fd.classList.toggle('err', !!v.errors[k]);
+    if (msg) { msg.textContent = v.errors[k] || f.hint; msg.className = v.errors[k] ? 'msg' : 'hint'; }
+  });
+  liveBannerOnly(v);
+  // 폼 헤더 id 칩/제목 갱신
+  const head = document.querySelector('#editor .form-head h2');
+  if (head) head.textContent = e.name || e.id || '(새 병종)';
+  const idPill = document.querySelector('#editor .form-head .pill');
+  if (idPill) idPill.textContent = e.id;
+  renderList();
+}
+
+function liveBannerOnly(v) {
+  const e = entries[selKey];
+  v = v || validateEntry(e, selKey);
+  const b = document.getElementById('vbanner');
+  if (!b) return;
+  b.className = v.list.length ? '' : 'ok';
+  b.innerHTML = v.list.length
+    ? `⚠ 검증 실패 ${v.list.length}건 — 저장/내보내기가 차단됩니다.<ul>${v.list.map(m => `<li>${esc(m)}</li>`).join('')}</ul>`
+    : '✓ 이 병종은 스키마를 만족합니다.';
+  const fs = document.querySelector('#strat-area legend');
+  if (fs) fs.textContent = `책략 (strategies) — ${e.strategies.length}개 선택`;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   추가 / 복제 / 삭제
+   ════════════════════════════════════════════════════════════════════ */
+function freshId(base) {
+  let id = base, n = 2;
+  const exists = x => order.some(rk => entries[rk].id === x);
+  while (exists(id)) id = `${base}_${n++}`;
+  return id;
+}
+function addEntry() {
+  const rk = 'r' + (nextRowSeq++);
+  const e = blankEntry();
+  e.id = freshId('newClass'); e.name = '새 병종';
+  entries[rk] = e; order.push(rk);
+  enableSaveExport();
+  selectRow(rk);
+  document.getElementById('search').value = '';
+  renderList();
+}
+function dupEntry(rk) {
+  const src = entries[rk];
+  const nrk = 'r' + (nextRowSeq++);
+  const e = JSON.parse(JSON.stringify(src));
+  e.id = freshId((src.id || 'class') + '_copy');
+  entries[nrk] = e;
+  const idx = order.indexOf(rk);
+  order.splice(idx + 1, 0, nrk);
+  enableSaveExport();
+  selectRow(nrk);
+}
+function delEntry(rk) {
+  if (!confirm(`"${entries[rk].id}" 병종을 삭제할까요?`)) return;
+  delete entries[rk];
+  order = order.filter(x => x !== rk);
+  selKey = null;
+  renderList(); showEmpty();
+}
+function enableSaveExport() {
+  document.getElementById('save').disabled = !supportsFS;
+  document.getElementById('exportBtn').disabled = false;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   직렬화 + 전체 검증
+   ════════════════════════════════════════════════════════════════════ */
+function buildOutputOrThrow() {
+  const problems = [];
+  const out = {};
+  for (const rk of order) {
+    const e = entries[rk];
+    const v = validateEntry(e, rk);
+    if (v.list.length) problems.push(`[${e.id || '(빈 id)'}] ` + v.list.join('; '));
+    const id = String(e.id).trim();
+    // 스키마 필드 선언 순서대로 직렬화. strategies는 schema에서 .default([]) —
+    // 빈 배열이면 키 생략(원본 JSON 관례: 21종 중 strategist 1종만 strategies 보유).
+    // 키 순서도 원본대로 moveClass → (strategies) → grades 로 유지해 round-trip 보존.
+    const rec = {
+      id, name: e.name,
+      code: e.code, baseAtk: e.baseAtk, baseDef: e.baseDef,
+      move: e.move, rangeMin: e.rangeMin, rangeMax: e.rangeMax,
+      line: e.line, tier: e.tier, moveClass: e.moveClass,
+    };
+    if (e.strategies.length) rec.strategies = e.strategies.slice();
+    rec.grades = { atk:e.grades.atk, def:e.grades.def, spirit:e.grades.spirit, agility:e.grades.agility, morale:e.grades.morale };
+    out[id] = rec;
+  }
+  if (problems.length) {
+    const err = new Error('검증 실패 — 저장 차단:\n' + problems.join('\n'));
+    err.problems = problems;
+    throw err;
+  }
+  return out;
+}
+
+function serialize(out) {
+  // map-editor 스타일: 2-space pretty
+  return JSON.stringify(out, null, 2) + '\n';
+}
+
+async function saveFile() {
+  let out;
+  try { out = buildOutputOrThrow(); }
+  catch (e) { toast(`저장 차단 — 검증 실패 ${e.problems.length}건 (목록의 ⚠ 항목 수정)`, true); return; }
+  try {
+    let h = fileHandle;
+    if (!h) {
+      h = await window.showSaveFilePicker({
+        suggestedName: 'unitClasses.json',
+        types:[{ description:'JSON', accept:{ 'application/json':['.json'] } }],
+      });
+      fileHandle = h;
+    }
+    const w = await h.createWritable();
+    await w.write(serialize(out));
+    await w.close();
+    document.getElementById('fileinfo').textContent = `${h.name} — 저장됨 (${Object.keys(out).length}개)`;
+    toast(`저장 완료 — ${h.name}`);
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+    toast('저장 실패: ' + (e.message || e), true);
+  }
+}
+
+function exportDownload() {
+  let out;
+  try { out = buildOutputOrThrow(); }
+  catch (e) { toast(`내보내기 차단 — 검증 실패 ${e.problems.length}건`, true); return; }
+  const blob = new Blob([serialize(out)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'unitClasses.json'; a.click();
+  toast('unitClasses.json 다운로드 — packages/data/json/ 에 넣으세요');
+}
+
+/* ── toast ── */
+let toastT = null;
+function toast(m, err) {
+  const t = document.getElementById('toast');
+  t.textContent = m; t.className = err ? 'err' : ''; t.style.display = 'block';
+  clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', err ? 4200 : 2600);
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>무기·아이템 에디터 — 삼국지 SRPG (items.json)</title>
+<style>
+  :root { --bg:#14161c; --panel:#1d212b; --panel2:#242936; --line:#333a4a; --txt:#e8e6df; --dim:#9aa1b0; --acc:#d4a843; --acc2:#6fae6f; --bad:#e06a6a; --bronze:#a9763f; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--txt); font-family:'Malgun Gothic','Segoe UI',sans-serif; }
+  body { display:flex; flex-direction:column; }
+  header { background:rgba(20,22,28,.96); border-bottom:1px solid var(--line); padding:8px 14px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  header h1 { font-size:14px; margin:0 10px 0 0; color:var(--acc); white-space:nowrap; }
+  .btn { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:6px 11px; cursor:pointer; font-size:12.5px; }
+  .btn:hover { border-color:var(--acc); }
+  .btn.go { background:var(--acc2); color:#0c1a0c; border-color:var(--acc2); font-weight:bold; }
+  .btn.warn { border-color:var(--bad); color:var(--bad); }
+  .btn.warn:hover { background:var(--bad); color:#1a0707; }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+  header input[type=text],header input[type=search] { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:4px 8px; font-size:12.5px; }
+  .sep { width:1px; height:22px; background:var(--line); margin:0 4px; }
+  main { flex:1; display:flex; min-height:0; }
+  /* 좌: 목록 */
+  #listpane { flex:1; display:flex; flex-direction:column; min-width:0; border-right:1px solid var(--line); }
+  #filters { padding:8px 12px; border-bottom:1px solid var(--line); display:flex; gap:6px; align-items:center; flex-wrap:wrap; background:var(--panel); }
+  #filters .chip { background:var(--panel2); border:1px solid var(--line); color:var(--dim); border-radius:13px; padding:3px 11px; cursor:pointer; font-size:11.5px; }
+  #filters .chip.on { background:var(--acc); color:#1a1407; border-color:var(--acc); font-weight:bold; }
+  #tablewrap { flex:1; overflow:auto; }
+  table { border-collapse:collapse; width:100%; font-size:12.5px; }
+  thead th { position:sticky; top:0; background:var(--panel); color:var(--dim); text-align:left; padding:6px 10px; border-bottom:1px solid var(--line); font-weight:600; cursor:pointer; white-space:nowrap; }
+  thead th:hover { color:var(--acc); }
+  tbody tr { cursor:pointer; border-bottom:1px solid rgba(255,255,255,.04); }
+  tbody tr:hover { background:var(--panel2); }
+  tbody tr.sel { background:rgba(212,168,67,.16); }
+  tbody tr.err td:first-child { box-shadow:inset 3px 0 0 var(--bad); }
+  td { padding:5px 10px; white-space:nowrap; }
+  td.num { text-align:right; font-family:Consolas,monospace; color:var(--dim); }
+  .catpill { display:inline-block; padding:1px 8px; border-radius:10px; font-size:11px; border:1px solid var(--line); }
+  .empty255 { color:#555c6b; }
+  /* 우: 편집 폼 */
+  #editpane { width:330px; background:var(--panel); flex-shrink:0; overflow:auto; padding:12px 14px; }
+  #editpane h2 { font-size:12px; color:var(--acc); margin:0 0 10px; letter-spacing:.5px; }
+  #editpane .none { color:var(--dim); font-size:12.5px; padding:20px 4px; line-height:1.6; }
+  .field { margin-bottom:12px; }
+  .field label { display:block; font-size:11.5px; color:var(--dim); margin-bottom:3px; }
+  .field .hint { font-size:10.5px; color:#6c7588; margin-top:3px; line-height:1.4; }
+  .field input,.field select { width:100%; background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:6px 8px; font-size:12.5px; }
+  .field input:focus,.field select:focus { outline:none; border-color:var(--acc); }
+  .field.invalid input,.field.invalid select { border-color:var(--bad); }
+  .field .msg { color:var(--bad); font-size:10.5px; margin-top:3px; display:none; }
+  .field.invalid .msg { display:block; }
+  .formbtns { display:flex; gap:6px; margin-top:14px; flex-wrap:wrap; }
+  #valbanner { background:rgba(224,106,106,.12); border:1px solid var(--bad); color:var(--bad); border-radius:6px; padding:7px 10px; font-size:11.5px; margin-bottom:10px; display:none; }
+  #valbanner.on { display:block; }
+  /* 붙여넣기 폴백 모달 */
+  #pasteModal { position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:center; justify-content:center; z-index:60; }
+  #pasteModal.on { display:flex; }
+  #pasteBox { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px; width:min(680px,92vw); }
+  #pasteBox h3 { margin:0 0 8px; color:var(--acc); font-size:13px; }
+  #pasteBox p { color:var(--dim); font-size:11.5px; margin:0 0 8px; }
+  #pasteArea { width:100%; height:300px; background:#0e1014; color:var(--txt); border:1px solid var(--line); border-radius:6px; font-family:Consolas,monospace; font-size:12px; padding:8px; }
+  #pasteBox .row { display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
+  #toast { position:fixed; bottom:34px; left:50%; transform:translateX(-50%); background:var(--acc); color:#1a1407; font-weight:bold; padding:7px 18px; border-radius:18px; font-size:13px; display:none; z-index:80; }
+  #toast.bad { background:var(--bad); color:#fff; }
+  #count { color:var(--dim); font-size:12px; }
+  .dirty { color:var(--acc); }
+</style>
+</head>
+<body>
+<header>
+  <h1>무기·아이템 에디터</h1>
+  <button class="btn" id="openFile">파일 열기</button>
+  <button class="btn go" id="saveFile" disabled>저장</button>
+  <button class="btn" id="saveAs">다른 이름 저장</button>
+  <button class="btn" id="pasteIn">JSON 붙여넣기</button>
+  <button class="btn" id="copyOut">JSON 복사</button>
+  <div class="sep"></div>
+  <button class="btn" id="addItem">＋ 추가</button>
+  <button class="btn" id="dupItem" disabled>복제</button>
+  <button class="btn warn" id="delItem" disabled>삭제</button>
+  <div class="sep"></div>
+  <input type="search" id="search" placeholder="검색 (id·이름)" style="width:150px">
+  <span id="count" style="margin-left:auto"></span>
+</header>
+<main>
+  <div id="listpane">
+    <div id="filters"></div>
+    <div id="tablewrap">
+      <table>
+        <thead><tr>
+          <th data-sort="id">id</th>
+          <th data-sort="name">이름</th>
+          <th data-sort="category">분류</th>
+          <th data-sort="power" class="num">power</th>
+          <th data-sort="bonusPercent" class="num">bonus%</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+  <div id="editpane">
+    <h2>항목 편집</h2>
+    <div id="valbanner"></div>
+    <div id="form"><div class="none">왼쪽 목록에서 항목을 선택하거나<br><b>＋ 추가</b>로 새 항목을 만드세요.<br><br>파일이 없으면 <b>JSON 붙여넣기</b>로 시작할 수 있습니다.</div></div>
+  </div>
+</main>
+
+<div id="pasteModal"><div id="pasteBox">
+  <h3>JSON 붙여넣기 / 내보내기</h3>
+  <p>items.json 전체(Record&lt;id, Item&gt;)를 붙여넣고 <b>읽기</b>를 누르세요. 또는 현재 데이터를 복사해 가세요.</p>
+  <textarea id="pasteArea" spellcheck="false"></textarea>
+  <div class="row">
+    <button class="btn" id="pasteCancel">닫기</button>
+    <button class="btn go" id="pasteLoad">읽기</button>
+  </div>
+</div></div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ─────────────────────────────────────────────────────────────────────────
+   선언적 필드 정의 — 스키마(packages/data/src/schemas.ts ItemSchema)와 1:1.
+   2탄/스키마 변경 시 이 블록만 고치면 됨. 검증 규칙도 zod 없이 여기서 인라인 검사.
+   ───────────────────────────────────────────────────────────────────────── */
+const CATEGORIES = [
+  { value: 'weapon',     label: '무기',     color: '#d4a843', hint: 'bonusPercent = 공격 % 가산 (시그니처/상점 무기)' },
+  { value: 'book',       label: '병법서',   color: '#c0a0e0', hint: 'bonusPercent = % 가산 (지력/책략 계열 강화)' },
+  { value: 'horse',      label: '명마',     color: '#cf9a6a', hint: 'bonusPercent = % 보정. power 255=비소모' },
+  { value: 'treasure',   label: '보물',     color: '#6fae6f', hint: '고유 효과 고정. power 255=비소모, 그 외=소모 효과량' },
+  { value: 'attackItem', label: '공격아이템', color: '#e06a6a', hint: 'power = 책략형 소모 공격 효과량(낮을수록 약)' },
+  { value: 'supplyItem', label: '보급품',   color: '#6fa8d4', hint: 'power = 회복/보급 소모 효과량. 255=비소모(칙명서 등)' },
+];
+const CAT_VALUES = CATEGORIES.map(c => c.value);
+const CAT_MAP = Object.fromEntries(CATEGORIES.map(c => [c.value, c]));
+
+const FIELDS = [
+  {
+    key: 'id', label: 'id', type: 'text', required: true,
+    hint: 'Record의 키 = 이 값. 한글 이름 기반. 중복 금지.',
+    validate: (v, item, all) => {
+      if (typeof v !== 'string' || v.trim() === '') return 'id는 비어 있을 수 없습니다.';
+      // 중복: 자기 자신(현재 편집 대상 원래 id)을 제외하고 같은 id가 있으면 위반
+      if (all && Object.prototype.hasOwnProperty.call(all, v) && all[v] !== item) return `id "${v}" 가 이미 존재합니다.`;
+      return null;
+    },
+  },
+  {
+    key: 'name', label: '이름(name)', type: 'text', required: true,
+    hint: '표시 이름. 보통 id와 동일.',
+    validate: (v) => (typeof v === 'string' && v.trim() !== '') ? null : 'name은 비어 있을 수 없습니다.',
+  },
+  {
+    key: 'category', label: '분류(category)', type: 'select', required: true,
+    options: CATEGORIES.map(c => ({ value: c.value, label: `${c.label} (${c.value})` })),
+    hint: (item) => (CAT_MAP[item.category] ? CAT_MAP[item.category].hint : ''),
+    validate: (v) => CAT_VALUES.includes(v) ? null : `category는 ${CAT_VALUES.join('/')} 중 하나여야 합니다.`,
+  },
+  {
+    key: 'power', label: 'power', type: 'int', min: 0, max: 255, required: true,
+    hint: 'b13: 소모 효과량. 255 = 비소모(무기·보물·명마 등 영구 장비). 0~255 정수.',
+    validate: (v) => intRange(v, 0, 255, 'power'),
+  },
+  {
+    key: 'bonusPercent', label: 'bonusPercent', type: 'int', min: 0, max: 100, required: true,
+    hint: 'b14: 무기/병법서 % 가산. 소모품/공격아이템은 보통 0. 0~100 정수.',
+    validate: (v) => intRange(v, 0, 100, 'bonusPercent'),
+  },
+];
+
+function intRange(v, lo, hi, name) {
+  if (typeof v !== 'number' || !Number.isFinite(v)) return `${name}는 숫자여야 합니다.`;
+  if (!Number.isInteger(v)) return `${name}는 정수여야 합니다.`;
+  if (v < lo || v > hi) return `${name}는 ${lo}~${hi} 범위여야 합니다.`;
+  return null;
+}
+
+/* ── 상태 ── */
+let data = {};          // Record<id, Item>  (진실의 원천)
+let order = [];         // id 표시 순서 (삽입 순서 보존)
+let selId = null;       // 현재 선택/편집 중 id
+let fileHandle = null;  // File System Access 핸들
+let dirty = false;
+let activeCats = new Set(CAT_VALUES); // 필터 (전부 켜짐)
+let searchQ = '';
+let sortKey = null, sortDir = 1;
+const hasFS = 'showOpenFilePicker' in window;
+
+/* ── 부팅 ── */
+function init() {
+  buildFilters();
+  bind();
+  render();
+}
+
+/* ── 필터 칩 ── */
+function buildFilters() {
+  const el = document.getElementById('filters');
+  el.innerHTML = '<span style="font-size:11px;color:var(--dim)">분류</span>';
+  const all = document.createElement('span');
+  all.className = 'chip on'; all.textContent = '전체'; all.dataset.cat = '*';
+  all.onclick = () => { activeCats = new Set(CAT_VALUES); syncChips(); render(); };
+  el.appendChild(all);
+  CATEGORIES.forEach(c => {
+    const ch = document.createElement('span');
+    ch.className = 'chip on'; ch.dataset.cat = c.value;
+    ch.style.cssText = `--c:${c.color}`;
+    ch.textContent = `${c.label}`;
+    ch.onclick = () => {
+      if (activeCats.size === CAT_VALUES.length) { activeCats = new Set([c.value]); } // 전체→이것만
+      else if (activeCats.has(c.value)) { activeCats.delete(c.value); if (!activeCats.size) activeCats = new Set(CAT_VALUES); }
+      else { activeCats.add(c.value); }
+      syncChips(); render();
+    };
+    el.appendChild(ch);
+  });
+  syncChips();
+}
+function syncChips() {
+  const full = activeCats.size === CAT_VALUES.length;
+  document.querySelectorAll('#filters .chip').forEach(ch => {
+    if (ch.dataset.cat === '*') ch.classList.toggle('on', full);
+    else ch.classList.toggle('on', activeCats.has(ch.dataset.cat));
+  });
+}
+
+/* ── 목록 렌더 ── */
+function visibleIds() {
+  let ids = order.filter(id => activeCats.has(data[id].category));
+  if (searchQ) {
+    const q = searchQ.toLowerCase();
+    ids = ids.filter(id => id.toLowerCase().includes(q) || (data[id].name || '').toLowerCase().includes(q));
+  }
+  if (sortKey) {
+    ids = ids.slice().sort((a, b) => {
+      let va = data[a][sortKey], vb = data[b][sortKey];
+      if (typeof va === 'string') { va = va.toLowerCase(); vb = (vb || '').toLowerCase(); }
+      return (va < vb ? -1 : va > vb ? 1 : 0) * sortDir;
+    });
+  }
+  return ids;
+}
+function render() {
+  const ids = visibleIds();
+  const tb = document.getElementById('rows');
+  tb.innerHTML = '';
+  ids.forEach(id => {
+    const it = data[id];
+    const c = CAT_MAP[it.category];
+    const tr = document.createElement('tr');
+    tr.dataset.id = id;
+    if (id === selId) tr.className = 'sel';
+    if (validateItem(it, id).length) tr.className += ' err';
+    const pw = it.power === 255 ? '<span class="empty255">255</span>' : it.power;
+    const bp = it.bonusPercent === 0 ? '<span class="empty255">0</span>' : it.bonusPercent;
+    tr.innerHTML =
+      `<td>${esc(id)}</td><td>${esc(it.name)}</td>` +
+      `<td><span class="catpill" style="color:${c ? c.color : '#fff'};border-color:${c ? c.color : 'var(--line)'}">${c ? c.label : it.category}</span></td>` +
+      `<td class="num">${pw}</td><td class="num">${bp}</td>`;
+    tr.onclick = () => select(id);
+    tb.appendChild(tr);
+  });
+  document.getElementById('count').innerHTML =
+    `${ids.length} / ${order.length} 항목` + (dirty ? ' <span class="dirty">●미저장</span>' : '');
+  updateSortHeaders();
+}
+function updateSortHeaders() {
+  document.querySelectorAll('thead th').forEach(th => {
+    const k = th.dataset.sort;
+    th.textContent = th.textContent.replace(/ [▲▼]$/, '');
+    if (k === sortKey) th.textContent += sortDir > 0 ? ' ▲' : ' ▼';
+  });
+}
+
+/* ── 편집 폼 ── */
+function select(id) {
+  selId = id;
+  document.getElementById('dupItem').disabled = !id;
+  document.getElementById('delItem').disabled = !id;
+  document.querySelectorAll('#rows tr').forEach(tr => tr.classList.toggle('sel', tr.dataset.id === id));
+  renderForm();
+}
+function renderForm() {
+  const form = document.getElementById('form');
+  if (!selId || !data[selId]) { form.innerHTML = '<div class="none">항목을 선택하세요.</div>'; return; }
+  const item = data[selId];
+  form.innerHTML = '';
+  FIELDS.forEach(f => {
+    const wrap = document.createElement('div');
+    wrap.className = 'field'; wrap.dataset.key = f.key;
+    const lab = document.createElement('label'); lab.textContent = f.label; wrap.appendChild(lab);
+    let inp;
+    if (f.type === 'select') {
+      inp = document.createElement('select');
+      f.options.forEach(o => { const op = document.createElement('option'); op.value = o.value; op.textContent = o.label; inp.appendChild(op); });
+      inp.value = item[f.key];
+    } else {
+      inp = document.createElement('input');
+      inp.type = f.type === 'int' ? 'number' : 'text';
+      if (f.type === 'int') { if (f.min != null) inp.min = f.min; if (f.max != null) inp.max = f.max; inp.step = 1; }
+      inp.value = item[f.key] ?? '';
+    }
+    inp.oninput = () => onEdit(f, inp);
+    inp.onchange = () => onEdit(f, inp);
+    wrap.appendChild(inp);
+    const hintTxt = typeof f.hint === 'function' ? f.hint(item) : f.hint;
+    if (hintTxt) { const h = document.createElement('div'); h.className = 'hint'; h.textContent = hintTxt; wrap.appendChild(h); }
+    const msg = document.createElement('div'); msg.className = 'msg'; wrap.appendChild(msg);
+    form.appendChild(wrap);
+  });
+  refreshValidation();
+}
+function onEdit(f, inp) {
+  const item = data[selId];
+  let val = inp.value;
+  if (f.type === 'int') val = inp.value === '' ? NaN : Number(inp.value);
+
+  if (f.key === 'id') {
+    // id 변경 = Record 키 변경. 중복 아니면 키를 옮긴다.
+    const newId = String(val).trim();
+    const err = f.validate(newId, item, data);
+    if (!err && newId !== selId) {
+      renameKey(selId, newId);
+      selId = newId;
+      // category 힌트 등 재계산 위해 폼 부분 갱신은 불필요(키만 변경) — 검증/목록만
+    } else {
+      item.id = newId; // 검증 실패해도 값은 반영(빨강 표시), 키 이동은 안 함
+    }
+  } else if (f.key === 'category') {
+    item.category = val;
+    // category 힌트 동적 갱신
+    const wrap = document.querySelector(`.field[data-key="category"]`);
+    if (wrap) { const h = wrap.querySelector('.hint'); if (h) h.textContent = CAT_MAP[val] ? CAT_MAP[val].hint : ''; }
+  } else {
+    item[f.key] = val;
+  }
+  markDirty();
+  refreshValidation();
+  render();
+}
+function renameKey(oldId, newId) {
+  const it = data[oldId];
+  it.id = newId;
+  // 순서 보존하며 키 교체
+  const newData = {}; const newOrder = [];
+  order.forEach(k => {
+    if (k === oldId) { newData[newId] = it; newOrder.push(newId); }
+    else { newData[k] = data[k]; newOrder.push(k); }
+  });
+  data = newData; order = newOrder;
+}
+
+/* ── 검증 ── */
+function validateItem(item, idKey) {
+  // idKey = 이 항목이 들어있는 Record 키 (id 필드와 다를 수 있음 → 일치 검사)
+  const errs = [];
+  FIELDS.forEach(f => {
+    const e = f.validate(item[f.key], item, data);
+    if (e) errs.push({ key: f.key, msg: e });
+  });
+  if (idKey != null && item.id !== idKey) errs.push({ key: 'id', msg: `id 필드("${item.id}")와 Record 키("${idKey}")가 다릅니다.` });
+  return errs;
+}
+function refreshValidation() {
+  if (!selId || !data[selId]) return;
+  const errs = validateItem(data[selId], selId);
+  const byKey = {}; errs.forEach(e => { (byKey[e.key] = byKey[e.key] || []).push(e.msg); });
+  FIELDS.forEach(f => {
+    const wrap = document.querySelector(`.field[data-key="${f.key}"]`);
+    if (!wrap) return;
+    const bad = byKey[f.key];
+    wrap.classList.toggle('invalid', !!bad);
+    const m = wrap.querySelector('.msg'); if (m) m.textContent = bad ? bad.join(' ') : '';
+  });
+}
+/** 전체 데이터 검증 — 저장 차단 판단용. [{id, errs}] */
+function validateAll() {
+  const bad = [];
+  order.forEach(id => { const e = validateItem(data[id], id); if (e.length) bad.push({ id, errs: e }); });
+  return bad;
+}
+function refreshBanner() {
+  const bad = validateAll();
+  const b = document.getElementById('valbanner');
+  const saveBtn = document.getElementById('saveFile');
+  if (bad.length) {
+    b.classList.add('on');
+    b.innerHTML = `⚠ ${bad.length}개 항목에 오류가 있어 저장이 차단됩니다: ` +
+      bad.slice(0, 6).map(x => esc(x.id)).join(', ') + (bad.length > 6 ? ' …' : '');
+  } else {
+    b.classList.remove('on');
+  }
+  saveBtn.disabled = bad.length > 0 || !fileHandle;
+  return bad.length === 0;
+}
+
+/* ── CRUD ── */
+function uniqueId(base) {
+  let id = base, n = 2;
+  while (Object.prototype.hasOwnProperty.call(data, id)) id = `${base}_${n++}`;
+  return id;
+}
+function addItem() {
+  const id = uniqueId('새아이템');
+  data[id] = { id, name: id, category: 'weapon', power: 255, bonusPercent: 0 };
+  order.push(id);
+  markDirty(); select(id); render(); refreshBanner();
+  toast('항목 추가됨 — id/이름을 수정하세요');
+}
+function dupItem() {
+  if (!selId) return;
+  const src = data[selId];
+  const id = uniqueId(selId);
+  data[id] = { ...src, id, name: src.name };
+  // 선택 항목 바로 뒤에 삽입
+  const i = order.indexOf(selId);
+  order.splice(i < 0 ? order.length : i + 1, 0, id);
+  markDirty(); select(id); render(); refreshBanner();
+  toast('복제됨');
+}
+function delItem() {
+  if (!selId) return;
+  if (!confirm(`"${selId}" 항목을 삭제할까요?`)) return;
+  delete data[selId];
+  order = order.filter(k => k !== selId);
+  selId = null;
+  document.getElementById('dupItem').disabled = true;
+  document.getElementById('delItem').disabled = true;
+  markDirty(); renderForm(); render(); refreshBanner();
+  toast('삭제됨');
+}
+
+function markDirty() { dirty = true; refreshBanner(); }
+
+/* ── 직렬화 ── */
+function serialize() {
+  const out = {};
+  order.forEach(id => {
+    const it = data[id];
+    // 스키마 필드 순서로 정규화 출력 (기존 items.json 형태와 동일)
+    out[id] = { id: it.id, name: it.name, category: it.category, power: it.power, bonusPercent: it.bonusPercent };
+  });
+  return JSON.stringify(out, null, 2) + '\n';
+}
+function loadFromObject(obj, label) {
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) { toast('Record<id,Item> 객체가 아닙니다', true); return false; }
+  const nd = {}, no = [];
+  for (const [k, v] of Object.entries(obj)) {
+    if (!v || typeof v !== 'object') continue;
+    nd[k] = {
+      id: v.id != null ? String(v.id) : k,
+      name: v.name != null ? String(v.name) : k,
+      category: v.category,
+      power: typeof v.power === 'number' ? v.power : Number(v.power),
+      bonusPercent: typeof v.bonusPercent === 'number' ? v.bonusPercent : Number(v.bonusPercent),
+    };
+    no.push(k);
+  }
+  data = nd; order = no; selId = null; dirty = false;
+  document.getElementById('dupItem').disabled = true;
+  document.getElementById('delItem').disabled = true;
+  renderForm(); render(); refreshBanner();
+  const bad = validateAll().length;
+  toast(`${label}: ${order.length}개 로드` + (bad ? ` (⚠ ${bad}개 오류)` : ''));
+  return true;
+}
+
+/* ── 파일 I/O (File System Access + 폴백) ── */
+async function openFile() {
+  if (!hasFS) { openPaste(); return; }
+  try {
+    const [h] = await window.showOpenFilePicker({
+      types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+    });
+    fileHandle = h;
+    const file = await h.getFile();
+    const text = await file.text();
+    loadFromObject(JSON.parse(text), h.name);
+    refreshBanner();
+  } catch (e) { if (e.name !== 'AbortError') toast('열기 실패: ' + e.message, true); }
+}
+async function saveFile() {
+  if (!fileHandle) { return saveAs(); }
+  if (!refreshBanner()) { toast('오류가 있어 저장 차단됨', true); return; }
+  try {
+    const w = await fileHandle.createWritable();
+    await w.write(serialize()); await w.close();
+    dirty = false; render(); toast(`저장됨 → ${fileHandle.name}`);
+  } catch (e) { toast('저장 실패: ' + e.message, true); }
+}
+async function saveAs() {
+  if (!refreshBanner()) { toast('오류가 있어 저장 차단됨', true); return; }
+  if (!hasFS) { openPaste(true); return; }
+  try {
+    const h = await window.showSaveFilePicker({
+      suggestedName: 'items.json',
+      types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+    });
+    fileHandle = h;
+    const w = await h.createWritable(); await w.write(serialize()); await w.close();
+    dirty = false; render(); refreshBanner(); toast(`저장됨 → ${h.name}`);
+  } catch (e) { if (e.name !== 'AbortError') toast('저장 실패: ' + e.message, true); }
+}
+
+/* ── 붙여넣기 폴백 ── */
+function openPaste(forExport) {
+  document.getElementById('pasteArea').value = forExport ? serialize() : (order.length ? serialize() : '');
+  document.getElementById('pasteModal').classList.add('on');
+}
+function closePaste() { document.getElementById('pasteModal').classList.remove('on'); }
+
+/* ── 유틸 ── */
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+let toastT = null;
+function toast(m, bad) {
+  const t = document.getElementById('toast');
+  t.textContent = m; t.className = bad ? 'bad' : ''; t.style.display = 'block';
+  clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', 2800);
+}
+
+/* ── 이벤트 바인딩 ── */
+function bind() {
+  document.getElementById('openFile').onclick = openFile;
+  document.getElementById('saveFile').onclick = saveFile;
+  document.getElementById('saveAs').onclick = saveAs;
+  document.getElementById('addItem').onclick = addItem;
+  document.getElementById('dupItem').onclick = dupItem;
+  document.getElementById('delItem').onclick = delItem;
+  document.getElementById('pasteIn').onclick = () => openPaste(false);
+  document.getElementById('copyOut').onclick = async () => {
+    try { await navigator.clipboard.writeText(serialize()); toast('JSON 클립보드 복사됨'); }
+    catch { openPaste(true); }
+  };
+  document.getElementById('search').oninput = e => { searchQ = e.target.value.trim(); render(); };
+  document.querySelectorAll('thead th').forEach(th => th.onclick = () => {
+    const k = th.dataset.sort;
+    if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = 1; }
+    render();
+  });
+  document.getElementById('pasteCancel').onclick = closePaste;
+  document.getElementById('pasteLoad').onclick = () => {
+    const txt = document.getElementById('pasteArea').value.trim();
+    if (!txt) { closePaste(); return; }
+    try { if (loadFromObject(JSON.parse(txt), '붙여넣기')) closePaste(); }
+    catch (e) { toast('JSON 파싱 실패: ' + e.message, true); }
+  };
+  document.getElementById('pasteModal').onclick = e => { if (e.target.id === 'pasteModal') closePaste(); };
+  window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+}
+
+init();
+</script>
+</body>
+</html>

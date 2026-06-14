@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>책략 에디터 — 삼국지 SRPG (strategies.json)</title>
+<style>
+  :root { --bg:#14161c; --panel:#1d212b; --panel2:#242936; --line:#333a4a; --txt:#e8e6df; --dim:#9aa1b0; --acc:#d4a843; --acc2:#6fae6f; --bad:#d46868; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--txt); font-family:'Malgun Gothic','Segoe UI',sans-serif; }
+  body { display:flex; flex-direction:column; }
+  header { background:rgba(20,22,28,.96); border-bottom:1px solid var(--line); padding:8px 14px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  header h1 { font-size:14px; margin:0 10px 0 0; color:var(--acc); white-space:nowrap; }
+  .btn { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:6px 11px; cursor:pointer; font-size:12.5px; }
+  .btn:hover { border-color:var(--acc); }
+  .btn.go { background:var(--acc2); color:#0c1a0c; border-color:var(--acc2); font-weight:bold; }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+  .btn.danger:hover { border-color:var(--bad); }
+  header input[type=text] { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:4px 7px; font-size:12.5px; }
+  .sep { width:1px; height:22px; background:var(--line); margin:0 4px; }
+  main { flex:1; display:flex; min-height:0; }
+  /* 좌: 목록 */
+  #listpane { width:340px; background:var(--panel); border-right:1px solid var(--line); display:flex; flex-direction:column; flex-shrink:0; }
+  #filters { padding:8px; border-bottom:1px solid var(--line); display:flex; flex-wrap:wrap; gap:5px; align-items:center; }
+  #filters input[type=text] { flex:1; min-width:90px; background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:4px 7px; font-size:12px; }
+  .chip { font-size:11px; padding:3px 8px; border-radius:11px; border:1px solid var(--line); background:var(--panel2); color:var(--dim); cursor:pointer; }
+  .chip.on { border-color:var(--acc); color:var(--acc); }
+  #list { flex:1; overflow:auto; }
+  .row { display:flex; align-items:center; gap:8px; padding:7px 10px; border-bottom:1px solid rgba(255,255,255,.04); cursor:pointer; font-size:12.5px; }
+  .row:hover { background:var(--panel2); }
+  .row.sel { background:var(--panel2); border-left:3px solid var(--acc); padding-left:7px; }
+  .row.invalid { color:var(--bad); }
+  .row .nm { flex:1; }
+  .row .cat { font-size:10.5px; padding:1px 7px; border-radius:9px; color:#0c1a0c; }
+  .row .badge { font-size:10px; color:var(--dim); font-family:Consolas,monospace; }
+  .cat-fire { background:#d4794a; } .cat-water { background:#5a9fd4; } .cat-earth { background:#b09a6a; }
+  .cat-wind { background:#7fb88a; } .cat-heal { background:#6fae6f; } .cat-debuff { background:#a87fc8; }
+  #listfoot { padding:6px 10px; border-top:1px solid var(--line); font-size:11.5px; color:var(--dim); display:flex; justify-content:space-between; }
+  /* 우: 편집 */
+  #editpane { flex:1; overflow:auto; padding:16px 22px; }
+  #editpane.empty { display:flex; align-items:center; justify-content:center; color:var(--dim); font-size:13px; }
+  .formgrid { max-width:560px; }
+  .field { margin-bottom:14px; }
+  .field > label { display:block; font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:.4px; margin-bottom:4px; }
+  .field input[type=text], .field input[type=number], .field select { width:100%; background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:7px 9px; font-size:13px; }
+  .field input.err, .field select.err { border-color:var(--bad); background:#2a1c1c; }
+  .field .help { font-size:11px; color:var(--dim); margin-top:4px; }
+  .field .err-msg { font-size:11px; color:var(--bad); margin-top:4px; display:none; }
+  .field .err-msg.show { display:block; }
+  .seg { display:flex; gap:6px; flex-wrap:wrap; }
+  .seg button { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:6px 12px; cursor:pointer; font-size:12.5px; }
+  .seg button.on { background:var(--acc); color:#1a1407; border-color:var(--acc); font-weight:bold; }
+  .editactions { margin-top:18px; display:flex; gap:8px; }
+  #toast { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:var(--acc); color:#1a1407; font-weight:bold; padding:7px 18px; border-radius:18px; font-size:13px; display:none; z-index:50; }
+  #toast.bad { background:var(--bad); color:#fff; }
+  .fileinfo { font-size:12px; color:var(--dim); margin-left:auto; }
+  .pastebox { display:none; padding:14px; }
+  .pastebox textarea { width:100%; height:240px; background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; font-family:Consolas,monospace; font-size:12px; padding:8px; }
+  .derive { font-size:11.5px; color:var(--acc2); margin-top:4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>책략 에디터</h1>
+  <button class="btn" id="open">파일 열기</button>
+  <button class="btn go" id="save" disabled>저장</button>
+  <button class="btn" id="saveas">다른 이름 저장</button>
+  <div class="sep"></div>
+  <button class="btn" id="paste">JSON 붙여넣기</button>
+  <button class="btn" id="copy">JSON 복사</button>
+  <span class="fileinfo" id="fileinfo">파일 없음 — strategies.json 열기</span>
+</header>
+<main>
+  <div id="listpane">
+    <div id="filters">
+      <input type="text" id="search" placeholder="검색 (id/이름)…">
+      <button class="btn" id="add" style="font-size:12px;padding:4px 9px">+ 추가</button>
+    </div>
+    <div id="filters" style="border-top:0;padding-top:0">
+      <span id="catfilters" style="display:flex;gap:5px;flex-wrap:wrap"></span>
+    </div>
+    <div id="list"></div>
+    <div id="listfoot"><span id="count">0개</span><span id="invalidcount"></span></div>
+  </div>
+  <div id="editpane" class="empty"><div id="empty">왼쪽에서 책략을 선택하거나 <b>+ 추가</b></div><div class="formgrid" id="form" style="display:none"></div></div>
+  <div class="pastebox" id="pastebox" style="flex:1">
+    <p style="color:var(--dim);font-size:12px;margin-top:0">파일을 못 여는 환경용 폴백. 여기 strategies.json 내용을 붙여넣고 <b>불러오기</b>. 편집 후 <b>JSON 복사</b>로 가져가세요.</p>
+    <textarea id="pastearea" placeholder='{ "초열": { "id": "초열", ... } }'></textarea>
+    <div style="margin-top:8px;display:flex;gap:8px">
+      <button class="btn go" id="pasteload">불러오기</button>
+      <button class="btn" id="pastecancel">닫기</button>
+    </div>
+  </div>
+</main>
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ──────────────────────────────────────────────────────────────
+   필드 정의 = 선언적 config 블록
+   후속작/스키마 변경 시 이 블록만 고치면 됨 (2탄 재사용성이 핵심 목적).
+   검증 규칙은 packages/data/src/schemas.ts StrategySchema 와 동일하게 유지.
+     { id, name, category: enum, mp:int>=0, power:int>=0,
+       castRange:int>=1, aoe:enum, target:enum }
+   ────────────────────────────────────────────────────────────── */
+const CATEGORIES = ['fire', 'water', 'earth', 'wind', 'heal', 'debuff'];
+const AOE = ['single', 'cross'];
+const TARGET = ['enemy', 'ally'];
+
+const FIELDS = [
+  {
+    key: 'id', label: 'ID', type: 'text', required: true, unique: true,
+    help: '맵 키이자 식별자. 중복 불가. 한글 가능(원작 책략명).',
+    validate: (v) => (typeof v === 'string' && v.trim().length > 0) ? null : 'id는 비어 있을 수 없음',
+  },
+  {
+    key: 'name', label: '이름', type: 'text', required: true,
+    help: '표시 이름.',
+    validate: (v) => (typeof v === 'string' && v.length > 0) ? null : 'name은 비어 있을 수 없음',
+  },
+  {
+    key: 'category', label: '계열', type: 'enum', options: CATEGORIES, required: true,
+    help: 'fire 화계 4종 + water/earth/wind + heal 회복 + debuff. heal은 target=ally, 공격계는 enemy.',
+    validate: (v) => CATEGORIES.includes(v) ? null : 'category는 ' + CATEGORIES.join('/'),
+  },
+  {
+    key: 'mp', label: 'MP 소모', type: 'int', required: true, min: 0,
+    help: '책략치 소모. 0 이상 정수.',
+    validate: (v) => (Number.isInteger(v) && v >= 0) ? null : 'mp는 0 이상 정수',
+  },
+  {
+    key: 'power', label: '위력', type: 'int', required: true, min: 0,
+    help: '데미지 배수 = ×power/10 (예: power 10 = ×1.0). 0 이상 정수.',
+    derive: (v) => Number.isInteger(v) ? ('데미지 ×' + (v / 10).toFixed(1)) : '',
+    validate: (v) => (Number.isInteger(v) && v >= 0) ? null : 'power는 0 이상 정수',
+  },
+  {
+    key: 'castRange', label: '시전 거리', type: 'int', required: true, min: 1,
+    help: '시전자→대상 칸. 1 이상 정수.',
+    validate: (v) => (Number.isInteger(v) && v >= 1) ? null : 'castRange는 1 이상 정수',
+  },
+  {
+    key: 'aoe', label: '범위', type: 'enum', options: AOE, required: true,
+    help: 'single 대상 칸만 / cross 십자(대상+상하좌우).',
+    validate: (v) => AOE.includes(v) ? null : 'aoe는 single/cross',
+  },
+  {
+    key: 'target', label: '대상', type: 'enum', options: TARGET, required: true,
+    help: 'enemy 적 / ally 아군. heal은 ally여야 자연스러움.',
+    validate: (v) => TARGET.includes(v) ? null : 'target은 enemy/ally',
+  },
+];
+
+/* heal↔ally, 공격계↔enemy 정합 힌트 (경고만 — 차단 안 함; 스키마엔 교차규칙 없음) */
+function targetHint(rec) {
+  if (rec.category === 'heal' && rec.target !== 'ally') return 'heal 계열인데 target이 ally가 아님';
+  if (rec.category !== 'heal' && rec.target === 'ally') return '비-회복 계열인데 target이 ally';
+  return null;
+}
+
+/* ── 상태 ── */
+let data = {};            // Record<id, record>
+let order = [];           // 표시 순서 보존용 id 배열
+let selId = null;
+let fileHandle = null;
+let fileName = null;
+let dirty = false;
+let filterCat = null;
+let searchQ = '';
+
+/* ── 초기화 ── */
+function init() {
+  buildCatFilters();
+  bind();
+  render();
+}
+
+function buildCatFilters() {
+  const el = document.getElementById('catfilters');
+  el.innerHTML = '';
+  const all = document.createElement('span'); all.className = 'chip on'; all.textContent = '전체'; all.dataset.cat = '';
+  all.onclick = () => setFilter(null);
+  el.appendChild(all);
+  CATEGORIES.forEach(c => {
+    const s = document.createElement('span'); s.className = 'chip'; s.dataset.cat = c; s.textContent = c;
+    s.onclick = () => setFilter(c);
+    el.appendChild(s);
+  });
+}
+function setFilter(c) {
+  filterCat = c;
+  document.querySelectorAll('#catfilters .chip').forEach(ch => ch.classList.toggle('on', (ch.dataset.cat || null) === c));
+  renderList();
+}
+
+function bind() {
+  document.getElementById('open').onclick = openFile;
+  document.getElementById('save').onclick = () => saveFile(false);
+  document.getElementById('saveas').onclick = () => saveFile(true);
+  document.getElementById('add').onclick = addRecord;
+  document.getElementById('copy').onclick = copyJSON;
+  document.getElementById('search').oninput = e => { searchQ = e.target.value.trim().toLowerCase(); renderList(); };
+  document.getElementById('paste').onclick = () => togglePaste(true);
+  document.getElementById('pastecancel').onclick = () => togglePaste(false);
+  document.getElementById('pasteload').onclick = pasteLoad;
+  window.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveFile(false); }
+  });
+  window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+}
+
+/* ── 검증 ── */
+function validateRecord(rec, idKey) {
+  // idKey = 이 레코드가 차지하는 맵 키(중복검사 제외 대상)
+  const errs = {};
+  for (const f of FIELDS) {
+    const v = rec[f.key];
+    const msg = f.validate(v);
+    if (msg) { errs[f.key] = msg; continue; }
+    if (f.unique) {
+      const dup = Object.keys(data).some(k => k !== idKey && k === String(v).trim());
+      if (dup) errs[f.key] = '중복 id';
+    }
+  }
+  return errs;
+}
+function isValid(rec, idKey) { return Object.keys(validateRecord(rec, idKey)).length === 0; }
+function allValid() { return order.every(k => isValid(data[k], k)); }
+
+/* ── 목록 렌더 ── */
+function render() { renderList(); renderEdit(); updateFileInfo(); }
+
+function renderList() {
+  const el = document.getElementById('list');
+  el.innerHTML = '';
+  let shown = 0, invalid = 0;
+  for (const k of order) {
+    const rec = data[k];
+    if (filterCat && rec.category !== filterCat) continue;
+    if (searchQ && !(k.toLowerCase().includes(searchQ) || String(rec.name || '').toLowerCase().includes(searchQ))) continue;
+    const bad = !isValid(rec, k);
+    if (bad) invalid++;
+    shown++;
+    const d = document.createElement('div');
+    d.className = 'row' + (k === selId ? ' sel' : '') + (bad ? ' invalid' : '');
+    d.onclick = () => selectRow(k);
+    const catCls = 'cat cat-' + (rec.category || '');
+    d.innerHTML = `<span class="nm">${esc(rec.name || '(이름없음)')} ${bad ? '⚠' : ''}</span>`
+      + `<span class="${catCls}">${esc(rec.category || '?')}</span>`
+      + `<span class="badge">${esc(k)}</span>`;
+    el.appendChild(d);
+  }
+  // 전체 무효 개수(필터 무관)
+  let totalInvalid = order.filter(k => !isValid(data[k], k)).length;
+  document.getElementById('count').textContent = `${shown}/${order.length}개 표시`;
+  document.getElementById('invalidcount').textContent = totalInvalid ? `⚠ 오류 ${totalInvalid}` : '';
+  document.getElementById('invalidcount').style.color = totalInvalid ? 'var(--bad)' : 'var(--dim)';
+}
+
+function selectRow(k) { selId = k; renderList(); renderEdit(); }
+
+/* ── 편집 폼 ── */
+function renderEdit() {
+  const pane = document.getElementById('editpane');
+  const form = document.getElementById('form');
+  const empty = document.getElementById('empty');
+  if (selId === null || !data[selId]) {
+    pane.classList.add('empty'); empty.style.display = 'block'; form.style.display = 'none'; return;
+  }
+  pane.classList.remove('empty'); empty.style.display = 'none'; form.style.display = 'block';
+  const rec = data[selId];
+  const errs = validateRecord(rec, selId);
+  form.innerHTML = '';
+
+  for (const f of FIELDS) {
+    const wrap = document.createElement('div'); wrap.className = 'field';
+    const lab = document.createElement('label'); lab.textContent = f.label + (f.required ? ' *' : '');
+    wrap.appendChild(lab);
+    let input;
+    if (f.type === 'enum') {
+      const seg = document.createElement('div'); seg.className = 'seg';
+      f.options.forEach(opt => {
+        const b = document.createElement('button');
+        b.textContent = opt;
+        b.className = (rec[f.key] === opt ? 'on' : '');
+        b.onclick = () => { setVal(f.key, opt); };
+        seg.appendChild(b);
+      });
+      wrap.appendChild(seg);
+      if (errs[f.key]) { seg.querySelectorAll('button').forEach(b => b.classList.add('err')); }
+    } else {
+      input = document.createElement('input');
+      input.type = (f.type === 'int') ? 'number' : 'text';
+      if (f.type === 'int') { input.step = '1'; if (f.min !== undefined) input.min = String(f.min); }
+      input.value = rec[f.key] === undefined ? '' : rec[f.key];
+      if (errs[f.key]) input.classList.add('err');
+      input.oninput = () => {
+        const raw = input.value;
+        setVal(f.key, f.type === 'int' ? toIntOrRaw(raw) : raw, /*norerender*/ true);
+      };
+      input.onblur = () => renderEdit();
+      wrap.appendChild(input);
+    }
+    if (f.help) { const h = document.createElement('div'); h.className = 'help'; h.textContent = f.help; wrap.appendChild(h); }
+    if (f.derive) { const dv = document.createElement('div'); dv.className = 'derive'; dv.textContent = f.derive(rec[f.key]); wrap.appendChild(dv); }
+    const em = document.createElement('div'); em.className = 'err-msg' + (errs[f.key] ? ' show' : '');
+    em.textContent = errs[f.key] || ''; wrap.appendChild(em);
+    form.appendChild(wrap);
+  }
+
+  // 정합 힌트
+  const hint = targetHint(rec);
+  if (hint) {
+    const w = document.createElement('div'); w.className = 'field';
+    w.innerHTML = `<div class="err-msg show" style="color:var(--acc)">힌트: ${esc(hint)}</div>`;
+    form.appendChild(w);
+  }
+
+  // 액션
+  const act = document.createElement('div'); act.className = 'editactions';
+  const dup = document.createElement('button'); dup.className = 'btn'; dup.textContent = '복제';
+  dup.onclick = () => duplicateRecord(selId);
+  const del = document.createElement('button'); del.className = 'btn danger'; del.textContent = '삭제';
+  del.onclick = () => deleteRecord(selId);
+  act.appendChild(dup); act.appendChild(del);
+  form.appendChild(act);
+}
+
+function toIntOrRaw(raw) {
+  if (raw.trim() === '') return NaN;
+  const n = Number(raw);
+  return Number.isInteger(n) ? n : (Number.isFinite(n) ? n : NaN);
+}
+
+function setVal(key, val, norerender) {
+  const rec = data[selId];
+  if (key === 'id') {
+    // id는 맵 키이기도 함 — 키 자체를 바꿔야 함. 단 즉시 변경하면 selId 추적 깨짐.
+    rec.id = val;
+    // 키 재배치는 유효하고 중복 아닐 때만
+    const newKey = String(val).trim();
+    if (newKey && newKey !== selId && !data[newKey]) {
+      const idx = order.indexOf(selId);
+      delete data[selId];
+      data[newKey] = rec;
+      order[idx] = newKey;
+      selId = newKey;
+    }
+  } else {
+    rec[key] = val;
+  }
+  markDirty();
+  if (norerender) { renderList(); }
+  else { renderEdit(); renderList(); }
+}
+
+/* ── CRUD ── */
+function freshId(base) {
+  let n = base; let i = 2;
+  while (data[n]) { n = base + '_' + i; i++; }
+  return n;
+}
+function addRecord() {
+  const id = freshId('책략');
+  data[id] = { id, name: '새 책략', category: 'fire', mp: 0, power: 10, castRange: 1, aoe: 'single', target: 'enemy' };
+  order.push(id);
+  selId = id;
+  markDirty(); render();
+}
+function duplicateRecord(k) {
+  const src = data[k];
+  const nid = freshId(k + '_copy');
+  data[nid] = { ...src, id: nid, name: src.name + ' (복제)' };
+  const idx = order.indexOf(k);
+  order.splice(idx + 1, 0, nid);
+  selId = nid;
+  markDirty(); render();
+}
+function deleteRecord(k) {
+  if (!confirm(`"${k}" 삭제?`)) return;
+  delete data[k];
+  order = order.filter(x => x !== k);
+  if (selId === k) selId = order[0] || null;
+  markDirty(); render();
+}
+
+/* ── 파일 입출력 (File System Access API) ── */
+const FSA = !!(window.showOpenFilePicker && window.showSaveFilePicker);
+
+async function openFile() {
+  if (!FSA) { togglePaste(true); toast('이 브라우저는 파일 API 미지원 — 붙여넣기 사용', true); return; }
+  try {
+    const [h] = await window.showOpenFilePicker({
+      types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+    });
+    fileHandle = h;
+    const file = await h.getFile();
+    fileName = file.name;
+    loadFromText(await file.text());
+    dirty = false; updateSaveBtn();
+    toast(`${fileName} 열림 (${order.length}개)`);
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+    toast('열기 실패: ' + e, true);
+  }
+}
+
+function loadFromText(text) {
+  const obj = JSON.parse(text);
+  if (Array.isArray(obj)) throw new Error('배열이 아니라 Record<id,{...}> 객체 맵이어야 함');
+  data = {}; order = [];
+  for (const [k, v] of Object.entries(obj)) {
+    data[k] = normalizeRecord(k, v);
+    order.push(k);
+  }
+  selId = order[0] || null;
+  render();
+}
+
+function normalizeRecord(k, v) {
+  v = v && typeof v === 'object' ? v : {};
+  return {
+    id: v.id !== undefined ? v.id : k,
+    name: v.name !== undefined ? v.name : '',
+    category: v.category,
+    mp: v.mp,
+    power: v.power,
+    castRange: v.castRange,
+    aoe: v.aoe,
+    target: v.target,
+  };
+}
+
+function serialize() {
+  // 검증 통과 + order 순서로 직렬화. 각 레코드는 FIELDS 키만 (스키마 형태 고정)
+  const out = {};
+  for (const k of order) {
+    const r = data[k];
+    out[k] = {
+      id: r.id, name: r.name, category: r.category,
+      mp: r.mp, power: r.power, castRange: r.castRange,
+      aoe: r.aoe, target: r.target,
+    };
+  }
+  return JSON.stringify(out, null, 2) + '\n';
+}
+
+async function saveFile(asNew) {
+  if (!allValid()) {
+    const bad = order.filter(k => !isValid(data[k], k));
+    if (bad.length) { selId = bad[0]; render(); }
+    toast(`검증 실패 — ${bad.length}개 오류. 저장 차단됨`, true);
+    return;
+  }
+  const text = serialize();
+  if (!FSA) { copyToClipboard(text); toast('파일 API 미지원 — 클립보드에 복사함', true); return; }
+  try {
+    let h = (!asNew && fileHandle) ? fileHandle : null;
+    if (!h) {
+      h = await window.showSaveFilePicker({
+        suggestedName: fileName || 'strategies.json',
+        types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }],
+      });
+      fileHandle = h; fileName = h.name;
+    }
+    const w = await h.createWritable();
+    await w.write(text);
+    await w.close();
+    dirty = false; updateSaveBtn(); updateFileInfo();
+    toast(`${fileName} 저장됨 (${order.length}개)`);
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+    toast('저장 실패: ' + e, true);
+  }
+}
+
+/* ── 붙여넣기 폴백 ── */
+function togglePaste(on) {
+  document.getElementById('pastebox').style.display = on ? 'block' : 'none';
+  document.getElementById('editpane').style.display = on ? 'none' : '';
+  if (on) document.getElementById('pastearea').value = order.length ? serialize() : '';
+}
+function pasteLoad() {
+  try {
+    loadFromText(document.getElementById('pastearea').value);
+    fileHandle = null; fileName = '붙여넣기'; markDirty();
+    togglePaste(false);
+    toast(`붙여넣기 불러옴 (${order.length}개)`);
+  } catch (e) { toast('파싱 실패: ' + e, true); }
+}
+
+function copyJSON() {
+  if (!allValid()) { toast('오류가 있어 검증 통과 후 복사 권장', true); }
+  copyToClipboard(serialize());
+  toast('JSON 클립보드 복사됨');
+}
+function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).catch(() => {});
+  else { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+}
+
+/* ── 잡유틸 ── */
+function markDirty() { dirty = true; updateSaveBtn(); updateFileInfo(); }
+function updateSaveBtn() { document.getElementById('save').disabled = !fileHandle || !dirty; }
+function updateFileInfo() {
+  const el = document.getElementById('fileinfo');
+  if (!fileName) { el.textContent = '파일 없음 — strategies.json 열기'; return; }
+  el.textContent = (fileHandle ? fileName : fileName + ' (핸들 없음)') + (dirty ? ' •수정됨' : '');
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+let toastT = null;
+function toast(m, bad) {
+  const t = document.getElementById('toast'); t.textContent = m;
+  t.className = bad ? 'bad' : ''; t.style.display = 'block';
+  clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', 3000);
+}
+
+init();
+</script>
+</body>
+</html>
