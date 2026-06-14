@@ -6,8 +6,9 @@
  *  - 전투 진입 컷신/오버레이가 "승리조건 / 여포를 퇴각시켜라! / 제한 턴 수 20"을 먼저 깐다(§14, g0227).
  *  - 그 뒤 턴 루프 내내 상태 띠에 스테이지명·턴이 상시 노출(§5) — 목표는 상시 작게 떠 있어야 한다.
  * 우리 복제:
- *  - 전투 시작 + 매 아군 턴 시작에 **잠깐 강조 배너**(중앙, 청동/수묵 띠).
- *  - 그 외엔 좌상단 모서리에 **상시 작은 목표 칩**(승리 명령형 + 제한턴 꼬리표).
+ *  - **전투 진입 시 1회만** 잠깐 강조 배너(중앙, 청동/수묵 띠) — 레퍼런스의 진입 오버레이.
+ *  - 그 뒤로는 좌상단 모서리에 **상시 작은 목표 칩**(승리 명령형 + 제한턴 꼬리표)만 둔다.
+ *    (매 턴 큰 배너를 재노출하면 플레이 중 거슬린다 — 레퍼런스도 진입 1회 + 상시 띠다.)
  * 데이터는 vm(turn/status) + stage(objectives/failConditions/turnLimit)에서만 — 순수 텍스트는
  * objectiveText.ts가 만든다. ⚠️ store/renderer/engine/schemas 의존 없음(소유 경계).
  *
@@ -148,37 +149,21 @@ function ObjectiveStrip({ display }: { display: ObjectiveDisplay }): React.React
 }
 
 /**
- * 강조 배너 트리거: 전투 시작(첫 표시) + 아군 페이즈로 턴이 새로 시작될 때마다 1회.
- * vm.turn.turn 증가 또는 phase가 player로 전환되는 순간을 ref로 감지.
+ * 강조 배너 트리거: **전투 진입 시 1회만**(첫 아군 페이즈). 이후 턴마다 재노출하지 않는다 —
+ * 목표는 상시 칩(ObjectiveStrip)으로 남는다. 레퍼런스(§14 진입 오버레이 + §5 상시 띠) 충실.
  * 종료(status!=ongoing) 시엔 강조 배너를 띄우지 않는다(결산은 ResultSequence 전담).
  */
 function useObjectiveFlash(vm: BattleVM): number | null {
   const [flashKey, setFlashKey] = useState<number | null>(null);
-  const keyRef = useRef(0);
-  const prev = useRef<{ turn: number; phase: BattleVM["turn"]["phase"] } | null>(null);
   const firedFirst = useRef(false);
 
   useEffect(() => {
-    const cur = { turn: vm.turn.turn, phase: vm.turn.phase };
-    const last = prev.current;
-    prev.current = cur;
     if (vm.status !== "ongoing") return;
-
-    let trigger = false;
     if (!firedFirst.current && vm.turn.phase === "player") {
-      firedFirst.current = true; // 전투 시작(첫 아군 페이즈)
-      trigger = true;
-    } else if (last) {
-      // 아군 페이즈로 새 턴이 시작될 때(턴 증가 + player) 다시 강조
-      const newAllyTurn =
-        vm.turn.phase === "player" && (last.turn !== cur.turn || last.phase !== "player");
-      if (newAllyTurn) trigger = true;
+      firedFirst.current = true; // 전투 시작(첫 아군 페이즈) — 단 1회
+      setFlashKey(1);
     }
-    if (trigger) {
-      keyRef.current += 1;
-      setFlashKey(keyRef.current);
-    }
-  }, [vm.turn.turn, vm.turn.phase, vm.status]);
+  }, [vm.turn.phase, vm.status]);
 
   // 자동 소멸
   useEffect(() => {
