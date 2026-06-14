@@ -78,7 +78,7 @@
       "y": 9
     },
     {
-      "commanderId": "진기",
+      "commanderId": "기령",
       "classId": "heavyCavalry",
       "level": 22,
       "troops": 215,
@@ -137,7 +137,7 @@
   "strategyConditions": [
     {
       "id": "duel_zhangfei_jiling_reward",
-      "description": "허자장이 \"기령과 장비의 일기토를 보여주면 [의협교본]을 주겠네\" — 장비를 기령(진기)과 맞붙여 일기토를 발동시키면 노획한다.",
+      "description": "허자장이 \"기령과 장비의 일기토를 보여주면 [의협교본]을 주겠네\" — 장비를 기령과 맞붙여 일기토를 발동시키면 노획한다.",
       "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_jiling" },
       "reward": { "treasures": ["의협교본"], "gold": 300 }
     }
@@ -146,7 +146,7 @@
     {
       "id": "duel_zhangfei_jiling",
       "type": "duel",
-      "trigger": { "kind": "attack", "attackerId": "장비", "defenderId": "진기" },
+      "trigger": { "kind": "attack", "attackerId": "장비", "defenderId": "기령" },
       "outcome": { "winnerId": "장비", "loserRetreats": true },
       "once": true
     }

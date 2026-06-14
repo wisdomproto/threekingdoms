@@ -2830,5 +2830,45 @@
     "war": 40,
     "intelligence": 80,
     "faceId": 203
+  },
+  "장각": {
+    "id": "장각",
+    "name": "장각",
+    "leadership": 70,
+    "war": 50,
+    "intelligence": 80,
+    "faceId": 220
+  },
+  "장보": {
+    "id": "장보",
+    "name": "장보",
+    "leadership": 60,
+    "war": 60,
+    "intelligence": 65,
+    "faceId": 221
+  },
+  "장량": {
+    "id": "장량",
+    "name": "장량",
+    "leadership": 60,
+    "war": 60,
+    "intelligence": 65,
+    "faceId": 222
+  },
+  "기령": {
+    "id": "기령",
+    "name": "기령",
+    "leadership": 75,
+    "war": 86,
+    "intelligence": 55,
+    "faceId": 223
+  },
+  "정원지": {
+    "id": "정원지",
+    "name": "정원지",
+    "leadership": 45,
+    "war": 58,
+    "intelligence": 25,
+    "faceId": 224
   }
 }

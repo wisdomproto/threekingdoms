@@ -87,7 +87,7 @@
       "y": 28
     },
     {
-      "commanderId": "관해",
+      "commanderId": "장각",
       "classId": "sorcerer",
       "level": 6,
       "troops": 150,
@@ -180,7 +180,7 @@
   "objectives": [
     {
       "kind": "defeatUnit",
-      "unitId": "관해"
+      "unitId": "장각"
     }
   ],
   "failConditions": [

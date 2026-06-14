@@ -58,7 +58,7 @@
       "y": 19
     },
     {
-      "commanderId": "관해",
+      "commanderId": "장보",
       "classId": "footman",
       "level": 4,
       "troops": 160,
@@ -108,7 +108,7 @@
       "y": 9
     }
   ],
-  "objectives": [{ "kind": "defeatUnit", "unitId": "관해" }],
+  "objectives": [{ "kind": "defeatUnit", "unitId": "장보" }],
   "failConditions": [{ "kind": "unitRetreated", "unitId": "유비" }],
   "reinforcements": [
     {
