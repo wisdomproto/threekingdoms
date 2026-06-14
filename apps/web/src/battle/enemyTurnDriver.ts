@@ -68,7 +68,26 @@ export async function runGreedyPhase(deps: GreedyPhaseDeps): Promise<void> {
   }
 }
 
-/** 적 페이즈 드라이버 — runGreedyPhase(side="enemy")의 얇은 래퍼 (중단 없음) */
+/** 적 페이즈 드라이버 — runGreedyPhase(side="enemy")의 얇은 래퍼 (중단 없음). 단일 적 페이즈 전용. */
 export async function runEnemyPhase(deps: Omit<GreedyPhaseDeps, "side" | "shouldStop">): Promise<void> {
   return runGreedyPhase({ ...deps, side: "enemy" });
+}
+
+/**
+ * AI 페이즈 드라이버 (Tier 2-1) — player가 아닌 **연속된 모든 페이즈**(우군 ally → 적 enemy)를
+ * 한 번의 기동으로 끝까지 구동한다. 엔진이 ally 페이즈를 끝내며 phaseChanged(enemy)를 내고,
+ * 이 루프가 그 enemy 페이즈도 이어서 그리디로 돌린다 — phase가 player로 돌아오거나 종료되면 멈춘다.
+ * (각 페이즈를 따로 기동하면 ally→enemy 전이에서 ui.kind가 enemyTurn 그대로라 재기동 가드에 막힌다.)
+ *
+ * 드레인 보장: runGreedyPhase 각 호출이 자체적으로 빈 큐 드레인을 보장하므로,
+ * 최소 한 번은 play([])가 흐른다(첫 페이즈에 유닛이 없어 즉시 끝나도 OK).
+ */
+export async function runAiPhases(deps: Omit<GreedyPhaseDeps, "side" | "shouldStop">): Promise<void> {
+  // 안전망: 페이즈는 최대 player·ally·enemy 3종 — 한 라운드에 비플레이어 페이즈는 최대 2개.
+  // 여유를 둬 4회까지. 그 이상이면 페이즈가 player로 복귀하지 않는 엔진 계약 위반.
+  for (let guard = 0; guard < 4; guard++) {
+    const state = deps.getState();
+    if (state.status !== "ongoing" || state.phase === "player") break;
+    await runGreedyPhase({ ...deps, side: state.phase });
+  }
 }

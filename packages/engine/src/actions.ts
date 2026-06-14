@@ -1,4 +1,6 @@
+import type { Side } from "@tk/data";
 import type { Action, ActionResult, BattleContext, BattleEvent, BattleState, UnitState } from "./types";
+import { areFoes, camp } from "./types";
 import { getMovableTiles, unitAt } from "./movement";
 import {
   computeDamage, distance, getAttackableTargets,
@@ -94,7 +96,8 @@ function checkOutcome(ctx: BattleContext, state: BattleState): { state: BattleSt
   if (d.kind === "lordRetreat" && retreated(d.unitId)) {
     return { state: { ...state, status: "defeat" }, events: [{ type: "battleEnded", result: "defeat" }] };
   }
-  const enemiesAlive = state.units.some((u) => u.side === "enemy" && !u.retreated);
+  // 적대 진영(camp=hostile) 생존 여부 — defeatAll 승리 판정. 우군 전멸은 패배 아님(스테이지 미명시 시).
+  const enemiesAlive = state.units.some((u) => camp(u.side) === "hostile" && !u.retreated);
   const victoryMet =
     (v.kind === "defeatAll" && !enemiesAlive) ||
     (v.kind === "defeatUnit" && retreated(v.unitId));
@@ -104,13 +107,40 @@ function checkOutcome(ctx: BattleContext, state: BattleState): { state: BattleSt
   return { state, events: [] };
 }
 
-/** 현재 페이즈 전원이 acted면 페이즈 전환 (+적→아군이면 턴 증가), 다음 페이즈 측 moved/acted 리셋 */
+/** 페이즈 순서 (Tier 2-1): player → ally(우군) → enemy → player. 한 바퀴(→player)에서 턴 증가. */
+const PHASE_ORDER: Side[] = ["player", "ally", "enemy"];
+
+/** 살아있는 유닛이 한 명이라도 있는 진영인가 (빈 페이즈 스킵용) */
+function sideHasLivingUnits(state: BattleState, side: Side): boolean {
+  return state.units.some((u) => u.side === side && !u.retreated);
+}
+
+/**
+ * 현재 페이즈 전원이 acted면 다음 페이즈로 전환. PHASE_ORDER를 순환하되
+ * **살아있는 유닛이 없는 진영(우군 미투입 스테이지의 ally 등)은 건너뛴다** —
+ * 빈 페이즈에 갇히지 않게(그 페이즈를 구동할 유닛이 없으면 maybeAdvancePhase를
+ * 다시 부를 액션도 없으므로 교착). 다음 페이즈 측 moved/acted 리셋.
+ * 한 바퀴 돌아 player로 복귀할 때만 턴 증가 (라운드 = player→ally→enemy 1회).
+ */
 function maybeAdvancePhase(state: BattleState): { state: BattleState; events: BattleEvent[] } {
   if (state.status !== "ongoing") return { state, events: [] };
   const remaining = state.units.some((u) => u.side === state.phase && !u.retreated && !u.acted);
   if (remaining) return { state, events: [] };
-  const nextPhase = state.phase === "player" ? "enemy" : "player";
-  const nextTurn = nextPhase === "player" ? state.turn + 1 : state.turn;
+
+  const startIdx = PHASE_ORDER.indexOf(state.phase);
+  let nextPhase: Side = state.phase;
+  let wrapped = false;
+  // 최대 한 바퀴(3) 돌며 유닛이 있는 다음 진영을 찾는다. 전원 빈 경우(이론상 없음)는 player로.
+  for (let step = 1; step <= PHASE_ORDER.length; step++) {
+    const idx = (startIdx + step) % PHASE_ORDER.length;
+    if (idx <= startIdx) wrapped = true; // player(idx 0)를 지나면 새 라운드
+    const cand = PHASE_ORDER[idx]!;
+    if (sideHasLivingUnits(state, cand)) {
+      nextPhase = cand;
+      break;
+    }
+  }
+  const nextTurn = wrapped ? state.turn + 1 : state.turn;
   const units = state.units.map((u) =>
     u.side === nextPhase ? { ...u, moved: false, acted: false } : u,
   );
@@ -141,7 +171,8 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
     case "attack": {
       assertCanAct(state, unit, false);
       const target = getUnit(state, action.targetId);
-      if (target.retreated || target.side === unit.side) throw new Error("invalid target");
+      // 적대 진영(camp 다름)만 공격 가능 — 우군(같은 camp)은 타깃 불가
+      if (target.retreated || !areFoes(target.side, unit.side)) throw new Error("invalid target");
       const inRange = getAttackableTargets(ctx, state, unit.id).includes(target.id);
       if (!inRange) throw new Error(`${target.id} out of range`);
 
@@ -216,7 +247,8 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
       for (const c of strategyAoeCells(action.target, strat.aoe)) {
         const t = unitAt(next, c.x, c.y);
         if (!t || t.retreated) continue;
-        const isTarget = strat.target === "enemy" ? t.side !== unit.side : t.side === unit.side;
+        // target "enemy" = 적대 진영(camp 다름), "ally" = 같은 진영(우군 포함)
+        const isTarget = strat.target === "enemy" ? areFoes(t.side, unit.side) : !areFoes(t.side, unit.side);
         if (!isTarget) continue;
         const caster = getUnit(next, unit.id);
         if (strat.category === "heal") {
@@ -253,14 +285,14 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
 
       let amount = 0;
       if (item.category === "supplyItem") {
-        // 회복약: 대상 아군 troops를 power만큼 회복 (상한 = maxTroops)
-        if (tgt.side !== unit.side) throw new Error(`supplyItem target must be ally`);
+        // 회복약: 같은 진영(아군·우군) troops를 power만큼 회복 (상한 = maxTroops)
+        if (areFoes(tgt.side, unit.side)) throw new Error(`supplyItem target must be friendly`);
         const res = healTroops(state, tgt, item.power);
         next = res.state;
         amount = res.healed;
       } else {
-        // attackItem: 대상 적 troops를 power 고정 감소 (최소 0, 반격 없음)
-        if (tgt.side === unit.side) throw new Error(`attackItem target must be enemy`);
+        // attackItem: 적대 진영 troops를 power 고정 감소 (최소 0, 반격 없음)
+        if (!areFoes(tgt.side, unit.side)) throw new Error(`attackItem target must be hostile`);
         const hit = dealDamage(state, unit, tgt, item.power, false);
         next = hit.state;
         events.push(...hit.events);

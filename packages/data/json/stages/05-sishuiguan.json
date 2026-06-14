@@ -48,6 +48,16 @@
       "y": 15
     },
     {
+      "commanderId": "공손찬",
+      "classId": "lightCavalry",
+      "level": 3,
+      "troops": 100,
+      "items": [],
+      "side": "ally",
+      "x": 8,
+      "y": 14
+    },
+    {
       "commanderId": "화웅",
       "classId": "lightCavalry",
       "level": 3,

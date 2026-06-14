@@ -1,4 +1,5 @@
 import type { BattleContext, BattleState, Coord, UnitState } from "./types";
+import { areFoes } from "./types";
 import { terrainAt, unitAt } from "./movement";
 import { corpsStat } from "./growth";
 
@@ -114,7 +115,8 @@ export function getStrategyTargets(
       const hit = strategyAoeCells(tile, strat.aoe).some((c) => {
         const t = unitAt(state, c.x, c.y);
         if (!t || t.retreated) return false;
-        return strat.target === "enemy" ? t.side !== u.side : t.side === u.side;
+        // target "enemy" = 적대 진영(camp 다름), "ally" = 같은 진영(우군 포함)
+        return strat.target === "enemy" ? areFoes(t.side, u.side) : !areFoes(t.side, u.side);
       });
       if (hit) out.push(tile);
     }
@@ -122,7 +124,10 @@ export function getStrategyTargets(
   return out;
 }
 
-/** from 위치 기준 사거리 내 적 id 목록. from 생략 시 현재 위치 */
+/**
+ * from 위치 기준 사거리 내 **적대 진영(camp 다름)** 유닛 id 목록. from 생략 시 현재 위치.
+ * 우군(ally)은 player와 같은 camp(friendly)이므로 서로 타깃 후보가 아니다 — 공격 불가.
+ */
 export function getAttackableTargets(
   ctx: BattleContext,
   state: BattleState,
@@ -133,7 +138,7 @@ export function getAttackableTargets(
   if (!unit || unit.retreated) return [];
   const pos = from ?? { x: unit.x, y: unit.y };
   return state.units
-    .filter((t) => t.side !== unit.side && !t.retreated)
+    .filter((t) => areFoes(t.side, unit.side) && !t.retreated)
     .filter((t) => {
       const d = distance(pos, { x: t.x, y: t.y });
       return d >= unit.rangeMin && d <= unit.rangeMax;

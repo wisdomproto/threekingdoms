@@ -5,6 +5,7 @@
  * 표시 대상: selected/postMoveMenu/targetSelect의 unitId, idle의 inspectedId.
  */
 import type { InputState } from "../inputMachine";
+import { rangeGrid } from "../rangeGrid";
 import type { BattleVM, UnitVM } from "../viewmodel";
 import { PANEL_FRAME, PORTRAIT_FRAME } from "./frames";
 
@@ -53,8 +54,8 @@ const PANEL_STYLE: React.CSSProperties = {
   position: "absolute",
   top: 44,
   left: 12,
-  minWidth: 188,
-  maxWidth: 240,
+  minWidth: 200,
+  maxWidth: 268,
   padding: "2px 6px 4px",
   // 청동 프레임(border-image) + 가운데만 어둡게(padding-box) — 프레임 안쪽에 내용
   ...PANEL_FRAME,
@@ -67,9 +68,18 @@ const PANEL_STYLE: React.CSSProperties = {
   userSelect: "none",
 };
 
+/** 진영색 (Tier 2-1): 아군 파랑 / 우군 주황 / 적 빨강 */
+function sideColor(side: UnitVM["side"]): string {
+  return side === "enemy" ? "#ff6b6b" : side === "ally" ? "#ffa53d" : "#4da3ff";
+}
+/** 진영 라벨 */
+function sideLabel(side: UnitVM["side"]): string {
+  return side === "enemy" ? "적군" : side === "ally" ? "우군" : "아군";
+}
+
 function TroopsBar({ unit }: { unit: UnitVM }): React.ReactElement {
   const ratio = unit.maxTroops > 0 ? Math.max(0, unit.troops / unit.maxTroops) : 0;
-  const color = unit.side === "player" ? "#4da3ff" : "#ff6b6b";
+  const color = sideColor(unit.side);
   return (
     <div style={{ marginTop: 6 }}>
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
@@ -123,6 +133,82 @@ function StatBar({
   );
 }
 
+/**
+ * 기본능력(장수 원값) 3종 — 무력/통솔/지력. 파생 스탯의 출처를 한눈에.
+ * 청동 칩 형태로 나란히(모바일 가로폭 절약).
+ */
+function BaseAbilities({ unit }: { unit: UnitVM }): React.ReactElement {
+  const items: { label: string; value: number; color: string }[] = [
+    { label: "무력", value: unit.warStat, color: "#ff8a5c" },
+    { label: "통솔", value: unit.leadershipStat, color: "#7aa7ff" },
+    { label: "지력", value: unit.intelligenceStat, color: "#b890ff" },
+  ];
+  return (
+    <div style={{ display: "flex", gap: 4, marginTop: 2 }}>
+      {items.map((it) => (
+        <div
+          key={it.label}
+          style={{
+            flex: 1,
+            background: "#161310",
+            border: "1px solid #3a352b",
+            borderRadius: 3,
+            padding: "1px 0 2px",
+            textAlign: "center",
+            minWidth: 0,
+          }}
+        >
+          <div style={{ fontSize: 10, color: "#9aa3ad", lineHeight: 1.2 }}>{it.label}</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: it.color, lineHeight: 1.1 }}>{it.value}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * 공격범위 미니 격자 (§8-7) — 병종 rangeMin~rangeMax를 도넛 모양으로.
+ * 중앙=유닛(청동), 도넛=공격 가능 칸(주황 발광), 나머지=빈 칸. 순수 표현(rangeGrid 데이터).
+ */
+function RangeGridMini({ unit }: { unit: UnitVM }): React.ReactElement {
+  const grid = rangeGrid(unit.rangeMin, unit.rangeMax);
+  const cell = 9; // px — 모바일에서도 7×7이 ~70px 이내
+  const gap = 1;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${grid.size}, ${cell}px)`,
+          gap,
+          padding: 3,
+          background: "#13110d",
+          border: "1px solid #3a352b",
+          borderRadius: 3,
+        }}
+      >
+        {grid.cells.map((c) => {
+          const bg =
+            c.kind === "center" ? "#c89b5a" : c.kind === "donut" ? "#e0742a" : "#23201a";
+          return (
+            <div
+              key={`${c.dx},${c.dy}`}
+              style={{
+                width: cell,
+                height: cell,
+                background: bg,
+                borderRadius: 1,
+                boxShadow: c.kind === "donut" ? "0 0 2px #e0742a88" : undefined,
+              }}
+            />
+          );
+        })}
+      </div>
+      <span style={{ fontSize: 10, color: "#9aa3ad" }}>공격범위</span>
+    </div>
+  );
+}
+
 export function UnitPanel({ ui, vm }: { ui: InputState; vm: BattleVM }): React.ReactElement | null {
   const id = activeUnitId(ui);
   const unit = id ? (vm.units.find((u) => u.id === id) ?? null) : null;
@@ -134,8 +220,8 @@ export function UnitPanel({ ui, vm }: { ui: InputState; vm: BattleVM }): React.R
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
             <strong style={{ fontSize: 16 }}>{unit.name}</strong>
-            <span style={{ color: unit.side === "player" ? "#4da3ff" : "#ff6b6b" }}>
-              {unit.side === "player" ? "아군" : "적군"}
+            <span style={{ color: sideColor(unit.side) }}>
+              {sideLabel(unit.side)}
             </span>
           </div>
           <div style={{ color: "#9aa3ad", fontSize: 12 }}>
@@ -152,16 +238,26 @@ export function UnitPanel({ ui, vm }: { ui: InputState; vm: BattleVM }): React.R
           {unit.mp} / {unit.maxMp}
         </span>
       </div>
-      <div style={{ marginTop: 6, borderTop: "1px solid #2a2f36", paddingTop: 6 }}>
-        {/* 부대 능력치(전투 실값) — 괄호는 장수 원값 */}
-        <StatBar label="공격력" value={unit.atk} sub={unit.warStat} color="#ff8a5c" />
-        <StatBar label="방어력" value={unit.def} sub={unit.leadershipStat} color="#7aa7ff" />
-        <StatBar label="정신력" value={unit.spirit} sub={unit.intelligenceStat} color="#b890ff" />
+      {/* ── 1계층: 기본능력(장수 원값) ── */}
+      <div style={{ marginTop: 6, borderTop: "1px solid #2a2f36", paddingTop: 5 }}>
+        <div style={{ fontSize: 10, color: "#7c8088", letterSpacing: 1 }}>기본능력</div>
+        <BaseAbilities unit={unit} />
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginTop: 6, color: "#c7cdd4" }}>
-        <span>
-          이동 <strong>{unit.move}</strong> · 사거리 <strong>{unit.rangeMin === unit.rangeMax ? unit.rangeMax : `${unit.rangeMin}~${unit.rangeMax}`}</strong>
-        </span>
+      {/* ── 2계층: 파생 능력치(전투 실값) + 공격범위 격자. 괄호=장수 원값 ── */}
+      <div style={{ marginTop: 6, display: "flex", gap: 8, alignItems: "flex-start" }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 10, color: "#7c8088", letterSpacing: 1, marginBottom: 1 }}>파생</div>
+          <StatBar label="공격력" value={unit.atk} sub={unit.warStat} color="#ff8a5c" />
+          <StatBar label="방어력" value={unit.def} sub={unit.leadershipStat} color="#7aa7ff" />
+          <StatBar label="정신력" value={unit.spirit} sub={unit.intelligenceStat} color="#b890ff" />
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginTop: 5, color: "#c7cdd4" }}>
+            <span>
+              이동 <strong>{unit.move}</strong> · 사거리{" "}
+              <strong>{unit.rangeMin === unit.rangeMax ? unit.rangeMax : `${unit.rangeMin}~${unit.rangeMax}`}</strong>
+            </span>
+          </div>
+        </div>
+        <RangeGridMini unit={unit} />
       </div>
       <div style={{ fontSize: 12, marginTop: 2, color: "#9aa3ad" }}>
         지형 <span style={{ color: "#c7cdd4" }}>{unit.terrainName}</span>

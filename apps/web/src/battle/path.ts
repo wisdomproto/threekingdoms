@@ -6,8 +6,9 @@
  *
  * 장기 제안(설계 §6): 엔진 unitMoved 이벤트에 path 필드가 추가되면 이 파일은 제거.
  */
-import { moveCostFor, terrainAt, unitAt } from "@tk/engine";
+import { moveCostFor, terrainAt, unitAt, areFoes } from "@tk/engine";
 import type { BattleContext, BattleState, Coord } from "@tk/engine";
+import type { Side } from "@tk/data";
 
 const IMPASSABLE = 99;
 const NEIGHBORS = [
@@ -26,7 +27,7 @@ const key = (x: number, y: number) => `${x},${y}`;
 function buildDistMap(
   ctx: BattleContext,
   state: BattleState,
-  unit: { x: number; y: number; side: string; moveClass: string; move: number },
+  unit: { x: number; y: number; side: Side; moveClass: string; move: number },
 ): Map<string, number> {
   const { width, height } = ctx.map;
   const dist = new Map<string, number>();
@@ -44,7 +45,7 @@ function buildDistMap(
       const ny = cur.y + dy;
       if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
       const occupant = unitAt(state, nx, ny);
-      if (occupant && occupant.side !== unit.side) continue; // 적은 통과 불가
+      if (occupant && areFoes(occupant.side, unit.side)) continue; // 적대 진영은 통과 불가
       const cost = moveCostFor(terrainAt(ctx, nx, ny), unit.moveClass);
       if (cost >= IMPASSABLE) continue;
       const next = cur.cost + cost;

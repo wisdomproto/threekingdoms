@@ -23,7 +23,7 @@ import { applyAction, createBattle } from "@tk/engine";
 import type { Action, BattleContext, BattleEvent, BattleState, Coord } from "@tk/engine";
 import { reduceInput, type InputState, type UiEvent } from "./inputMachine";
 import { EventPlayer, type Presenter } from "./eventPlayer";
-import { runEnemyPhase, runGreedyPhase } from "./enemyTurnDriver";
+import { runAiPhases, runGreedyPhase } from "./enemyTurnDriver";
 import { battleVM, type BattleVM } from "./viewmodel";
 
 export interface BattleStoreOptions {
@@ -55,6 +55,13 @@ export interface StoreSnapshot {
   autoBattle: boolean;
   /** 연출 배속 (1·2·3) — 버튼 라벨 + 렌더러 연동 */
   speed: number;
+  /**
+   * 조회(호버/탭) 중인 유닛 id (Tier 1-2/1-3) — 순수 표현 채널.
+   * inputMachine(idle/selected/targetSelect…)과 **독립**: 진행 중인 턴 상태기계를 오염시키지 않는다.
+   * 데스크톱 호버 또는 모바일 탭-조회가 채우고, 정보 팝업·적 위협범위가 읽는다.
+   * 내 활성 유닛 선택 플로우와 무관 — null이면 미조회.
+   */
+  inspectedId: string | null;
 }
 
 /** 헤드리스 기본 Presenter — 모든 연출을 즉시 완료 (테스트·시뮬레이션용) */
@@ -89,6 +96,8 @@ export class BattleStore {
   private _autoBattle = false;
   /** 연출 배속 (1=기본). 순수 표현 — 게임 상태 불변, 렌더러 TweenRunner에 전달 */
   private _speed = 1;
+  /** 조회(호버/탭) 중인 유닛 id — 순수 표현 채널 (Tier 1-2/1-3). inputMachine 무관 */
+  private _inspectedId: string | null = null;
 
   private listeners = new Set<() => void>();
   private snapshotCache: StoreSnapshot | null = null;
@@ -128,6 +137,21 @@ export class BattleStore {
 
   get previewWalking(): boolean {
     return this._previewWalking;
+  }
+
+  get inspectedId(): string | null {
+    return this._inspectedId;
+  }
+
+  /**
+   * 조회 대상 설정 (Tier 1-2/1-3) — 호버/탭 조회 채널. inputMachine 전이를 일으키지 않는다.
+   * 좌표에 유닛이 없거나 호버가 풀리면 null. 같은 값이면 no-op(불필요 리렌더 방지).
+   * 표현 전용이므로 animating/enemyTurn 등 어떤 ui 상태에서도 자유롭게 갱신 가능.
+   */
+  setInspected(unitId: string | null): void {
+    if (this._inspectedId === unitId) return;
+    this._inspectedId = unitId;
+    this.notify();
   }
 
   /**
@@ -274,6 +298,7 @@ export class BattleStore {
         previewWalking: this._previewWalking,
         autoBattle: this._autoBattle,
         speed: this._speed,
+        inspectedId: this._inspectedId,
       };
     }
     return this.snapshotCache;
@@ -287,8 +312,15 @@ export class BattleStore {
     return r.events;
   }
 
+  /**
+   * AI 페이즈 드라이버 — enemyTurn ui 상태가 덮는 모든 비(非)플레이어 페이즈(우군 ally·적 enemy)를 구동.
+   * 하드코딩 side가 아니라 현재 committed.phase를 읽어 그 진영을 그리디로 돌린다 (Tier 2-1 3진영).
+   */
   private startEnemyPhase(): void {
-    runEnemyPhase({
+    // enemyTurn ui 상태는 비플레이어 페이즈(우군 ally·적 enemy)를 모두 덮는다.
+    // ally→enemy 전이에서 ui.kind가 enemyTurn 그대로라 재기동 가드(prevKind!==enemyTurn)에 막히므로,
+    // 한 번의 기동으로 연속된 모든 AI 페이즈를 끝까지 구동한다 (runAiPhases).
+    runAiPhases({
       ctx: this.ctx,
       getState: () => this.committed,
       commit: (a) => this.commit(a),

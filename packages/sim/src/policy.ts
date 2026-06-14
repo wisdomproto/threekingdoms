@@ -1,13 +1,14 @@
 import {
-  getAttackableTargets, getMovableTiles, distance,
+  getAttackableTargets, getMovableTiles, distance, areFoes,
   type Action, type BattleContext, type BattleState,
 } from "@tk/engine";
 
 /**
- * 그리디 정책 (양 진영 공용):
+ * 그리디 정책 (전 진영 공용 — player·ally·enemy):
  * 1) 현재 위치에서 공격 가능하면 HP가 가장 낮은 적 공격
- * 2) 아직 안 움직였으면 가장 가까운 적과의 거리를 최소화하는 타일로 이동
+ * 2) 아직 안 움직였으면 가장 가까운 적(적대 진영)과의 거리를 최소화하는 타일로 이동
  * 3) 그 외 대기
+ * "적"은 camp가 다른 진영(areFoes) — 우군(ally)은 player를 적으로 보지 않고, enemy는 player·ally 양쪽을 적으로 본다.
  */
 export function chooseAction(ctx: BattleContext, state: BattleState): Action | undefined {
   const unit = state.units.find(
@@ -24,7 +25,7 @@ export function chooseAction(ctx: BattleContext, state: BattleState): Action | u
   }
 
   if (!unit.moved) {
-    const enemies = state.units.filter((u) => u.side !== unit.side && !u.retreated);
+    const enemies = state.units.filter((u) => areFoes(u.side, unit.side) && !u.retreated);
     if (enemies.length > 0) {
       const tiles = getMovableTiles(ctx, state, unit.id);
       const score = (t: { x: number; y: number }) =>

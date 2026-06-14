@@ -77,7 +77,8 @@ export function Minimap({
       const py = (u.y + 0.5) * ch;
       ctx.beginPath();
       ctx.arc(px, py, r, 0, Math.PI * 2);
-      ctx.fillStyle = u.side === "player" ? "#4da3ff" : "#ff6b6b";
+      // 아군 파랑 / 우군(ally) 주황 / 적 빨강 (Tier 2-1 피아식별)
+      ctx.fillStyle = u.side === "player" ? "#4da3ff" : u.side === "ally" ? "#ffa53d" : "#ff6b6b";
       ctx.fill();
       if (u.id === selectedId) {
         ctx.lineWidth = 1.5;

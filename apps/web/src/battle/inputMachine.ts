@@ -171,12 +171,14 @@ export interface ReduceResult {
 const noop = (state: InputState): ReduceResult => ({ next: state, effects: [] });
 
 /**
- * 드레인 직후 공통 분기: 종료 → battleOver / 적 페이즈 → enemyTurn / 그 외 → idle.
+ * 드레인 직후 공통 분기: 종료 → battleOver / AI 구동 페이즈(우군·적) → enemyTurn / 아군 페이즈 → idle.
  * auto=true(자동전투 ON)이고 아군 페이즈면 idle 대신 autoTurn으로 — 드레인마다 자동 구동을 이어간다.
+ * 우군(ally) 페이즈는 플레이어 조종 불가 → enemyTurn처럼 입력을 잠그고 그리디 드라이버가 구동한다
+ * (라벨/연출은 TurnBanner·BattleRenderer가 phase로 구분).
  */
 function afterDrain(battle: BattleState, auto: boolean): InputState {
   if (battle.status !== "ongoing") return { kind: "battleOver", result: battle.status };
-  if (battle.phase === "enemy") return { kind: "enemyTurn" };
+  if (battle.phase !== "player") return { kind: "enemyTurn" }; // ally·enemy = AI 페이즈
   return auto ? { kind: "autoTurn" } : { kind: "idle" };
 }
 

@@ -15,6 +15,7 @@
  * zIndex = depthOf(y) 선확보 — 아이소 전환 시 깊이 정렬 공짜.
  */
 import { Container, Graphics, Sprite, Text, Texture } from "pixi.js";
+import type { Side } from "@tk/data";
 import type { Coord } from "@tk/engine";
 import { depthOf, gridToWorld, TILE_SIZE } from "../projection";
 import { UNIT_BASE_SIZE, type TextureResolver } from "../textures";
@@ -46,7 +47,7 @@ export interface UnitViewInit {
   commanderId: string;
   classId: string;
   name: string;
-  side: "player" | "enemy";
+  side: Side;
   x: number;
   y: number;
   troops: number;

@@ -1,5 +1,6 @@
 import type { MoveClass, Terrain } from "@tk/data";
 import type { BattleContext, BattleState, Coord, UnitState } from "./types";
+import { areFoes } from "./types";
 
 export function terrainAt(ctx: BattleContext, x: number, y: number): Terrain {
   const row = ctx.map.tiles[y];
@@ -24,7 +25,8 @@ export function unitAt(state: BattleState, x: number, y: number): UnitState | un
 const IMPASSABLE = 99;
 
 /**
- * 다익스트라. 적 점유 타일은 통과 불가, 아군 점유 타일은 통과 가능·정지 불가.
+ * 다익스트라. **적대 진영(camp 다름)** 점유 타일은 통과 불가,
+ * 같은 진영(아군·우군) 점유 타일은 통과 가능·정지 불가.
  * moved/acted 가드는 호출자(applyAction)의 책임 — 이 함수는 위치·지형·이동력만 본다.
  */
 export function getMovableTiles(ctx: BattleContext, state: BattleState, unitId: string): Coord[] {
@@ -46,7 +48,7 @@ export function getMovableTiles(ctx: BattleContext, state: BattleState, unitId: 
       const nx = cur.x + dx, ny = cur.y + dy;
       if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
       const occupant = unitAt(state, nx, ny);
-      if (occupant && occupant.side !== unit.side) continue; // 적은 통과 불가
+      if (occupant && areFoes(occupant.side, unit.side)) continue; // 적대 진영은 통과 불가
       const cost = moveCostFor(terrainAt(ctx, nx, ny), unit.moveClass);
       if (cost >= IMPASSABLE) continue;
       const next = cur.cost + cost;

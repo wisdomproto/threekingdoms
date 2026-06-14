@@ -41,10 +41,11 @@ const END_TURN_STYLE: React.CSSProperties = {
 };
 
 function phaseLabel(ui: InputState, vm: BattleVM): string {
-  if (ui.kind === "enemyTurn") return "적군 페이즈 진행 중…";
+  // enemyTurn ui 상태는 우군(ally)·적(enemy) 페이즈를 모두 덮으므로 settled phase로 구분 표시
+  if (ui.kind === "enemyTurn") return vm.turn.phase === "ally" ? "우군 페이즈 진행 중…" : "적군 페이즈 진행 중…";
   if (ui.kind === "autoTurn") return "자동전투 진행 중…";
   if (ui.kind === "animating") return "…";
-  return vm.turn.phase === "player" ? "아군 페이즈" : "적군 페이즈";
+  return vm.turn.phase === "player" ? "아군 페이즈" : vm.turn.phase === "ally" ? "우군 페이즈" : "적군 페이즈";
 }
 
 export function TurnBanner({
@@ -64,7 +65,7 @@ export function TurnBanner({
         <strong>
           {vm.turn.turn}턴 <span style={{ color: "#9aa3ad" }}>/ {vm.turn.turnLimit}</span>
         </strong>
-        <span style={{ color: vm.turn.phase === "player" ? "#4da3ff" : "#ff6b6b" }}>
+        <span style={{ color: vm.turn.phase === "player" ? "#4da3ff" : vm.turn.phase === "ally" ? "#ffa53d" : "#ff6b6b" }}>
           {phaseLabel(ui, vm)}
         </span>
       </div>

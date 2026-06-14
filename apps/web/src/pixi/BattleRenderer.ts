@@ -23,8 +23,10 @@ import { TweenRunner } from "./tweens";
 import { InputAdapter } from "./inputAdapter";
 import { TerrainLayer } from "./layers/TerrainLayer";
 import { HighlightLayer } from "./layers/HighlightLayer";
+import { ThreatLayer } from "./layers/ThreatLayer";
 import { UnitLayer } from "./layers/UnitLayer";
 import { FxLayer } from "./layers/FxLayer";
+import { threatTiles } from "../battle/threatRange";
 
 type Ev<T extends BattleEvent["type"]> = Extract<BattleEvent, { type: T }>;
 
@@ -37,6 +39,10 @@ export interface RendererStore {
   readonly uiState: InputState;
   /** 연출 배속 — mount 시 초기 적용 (이후 toggle은 setSpeed 직접 호출) */
   readonly speed: number;
+  /** 조회(호버/탭) 중인 유닛 id — Tier 1-2/1-3 위협범위·팝업 구동 */
+  readonly inspectedId: string | null;
+  /** 호버/탭 조회 채널 (Tier 1-2). inputMachine 무관 — 좌표에 유닛 없으면 null */
+  setInspected(unitId: string | null): void;
 }
 
 const PHASE_BANNER_MS = 600; // 설계 §6
@@ -58,6 +64,7 @@ interface Scene {
   textures: TextureResolver;
   terrain: TerrainLayer;
   highlights: HighlightLayer;
+  threat: ThreatLayer;
   units: UnitLayer;
   fx: FxLayer;
   camera: CameraController;
@@ -80,6 +87,8 @@ export class BattleRenderer implements Presenter {
   private defaultFocusWorld: { x: number; y: number } = { x: 0, y: 0 };
   /** 연출 배속 — TweenRunner와 카메라 update에 일괄 적용 */
   private speed = 1;
+  /** 위협범위 캐시 키 (inspectedId + committed 식별) — 호버 변경/상태 변화 시에만 재산출 */
+  private threatKey: string | null = null;
 
   constructor(ctx: BattleContext) {
     this.ctx = ctx;
@@ -141,6 +150,10 @@ export class BattleRenderer implements Presenter {
     terrain.zIndex = 0;
     const highlights = new HighlightLayer(textures);
     highlights.zIndex = 1;
+    // 위협범위(Tier 1-3): 하이라이트 위·유닛 아래. sortableChildren으로 채움/외곽선 정렬.
+    const threat = new ThreatLayer(textures);
+    threat.sortableChildren = true;
+    threat.zIndex = 1.5;
     const units = new UnitLayer(this.ctx, store.settledState, textures, tweens);
     units.zIndex = 2;
     // 에셋 로드 완료 → 폴백으로 생성된 기존 UnitView에 스프라이트 적용
@@ -153,7 +166,7 @@ export class BattleRenderer implements Presenter {
       .then(() => terrain.rebake())
       .catch((e) => console.warn("[BattleRenderer] loadTiles 예외 (단색 폴백 유지):", e));
     fx.world.zIndex = 3;
-    world.addChild(terrain, highlights, units, fx.world);
+    world.addChild(terrain, highlights, threat, units, fx.world);
 
     // painted 맵 배경 (있으면 타일 렌더 대체) + 정합 확인용 격자 오버레이.
     const mapW = this.ctx.map.width;
@@ -259,6 +272,8 @@ export class BattleRenderer implements Presenter {
       store,
       mapWidth: this.ctx.map.width,
       mapHeight: this.ctx.map.height,
+      // 호버/탭 조회 (Tier 1-2): 칸→유닛 해석 후 store.setInspected. 내 활성 유닛 선택은 거른다.
+      onInspect: (coord) => this.resolveInspect(coord),
     });
     input.attach();
 
@@ -300,12 +315,14 @@ export class BattleRenderer implements Presenter {
     const unsubscribe = store.subscribe(() => {
       highlights.update(store.uiState, store.committedState);
       units.setSelected(getSelectedUnitId(store.uiState));
+      this.updateThreat(threat); // 조회 변경/상태 변화 시 위협범위 갱신 (캐시로 재산출 최소화)
     });
     highlights.update(store.uiState, store.committedState);
     units.setSelected(getSelectedUnitId(store.uiState));
+    this.updateThreat(threat);
 
     this.scene = {
-      app, world, tweens, textures, terrain, highlights, units, fx, camera, input,
+      app, world, tweens, textures, terrain, highlights, threat, units, fx, camera, input,
       unsubscribe, onWheel, tick, resizeObserver,
     };
 
@@ -344,6 +361,60 @@ export class BattleRenderer implements Presenter {
   setSpeed(speed: number): void {
     this.speed = speed > 0 ? speed : 1;
     this.scene?.tweens.setTimeScale(this.speed);
+  }
+
+  /**
+   * 호버/탭 조회 해석 (Tier 1-2): 칸 → 유닛 → store.setInspected.
+   * **선택 가능한 내 아군**(미행동·아군 페이즈)은 조회에서 제외 — 선택 플로우를 가로채지 않게.
+   * 좌표가 null이거나 유닛이 없으면 조회 해제(null). committed(엔진 진실) 기준으로 해석.
+   */
+  private resolveInspect(coord: Coord | null): void {
+    const store = this.store;
+    if (!store) return;
+    if (!coord) {
+      store.setInspected(null);
+      return;
+    }
+    const battle = store.committedState;
+    const u = battle.units.find((x) => !x.retreated && x.x === coord.x && x.y === coord.y);
+    if (!u) {
+      store.setInspected(null);
+      return;
+    }
+    // 선택 가능한 아군은 선택 흐름 우선 — 조회로 가로채지 않는다(팝업은 적/행동완료 아군에 의미).
+    const selectableAlly =
+      u.side === "player" &&
+      !u.acted &&
+      !u.retreated &&
+      battle.phase === "player" &&
+      battle.status === "ongoing";
+    store.setInspected(selectableAlly ? null : u.id);
+  }
+
+  /**
+   * 위협범위 갱신 (Tier 1-3): 조회 중인 **적** 유닛의 위협 칸을 ThreatLayer에 반영.
+   * 캐시 키(inspectedId + 적 위치·이동력 식별)로 호버/상태 변화 시에만 threatTiles 재산출 —
+   * 다익스트라가 매 프레임 돌지 않게. 아군 조회/미조회면 빈 집합(기본 적만 표시).
+   */
+  private updateThreat(threat: ThreatLayer): void {
+    const store = this.store;
+    if (!store) return;
+    const id = store.inspectedId;
+    const battle = store.committedState;
+    const u = id ? battle.units.find((x) => x.id === id) : undefined;
+    // 적(hostile)만 + 생존만. 아군·우군(friendly)/미조회/퇴각이면 비운다 — 우군은 위협 표시 안 함.
+    if (!u || u.retreated || u.side !== "enemy") {
+      if (this.threatKey !== null) {
+        this.threatKey = null;
+        threat.setTiles([]);
+      }
+      return;
+    }
+    // 캐시 키: id + 위치 + 이동력 + 사거리 (이동/사거리가 바뀌면 위협도 달라진다)
+    const k = `${u.id}@${u.x},${u.y}:${u.move}:${u.rangeMin}-${u.rangeMax}`;
+    if (k === this.threatKey) return;
+    this.threatKey = k;
+    threat.setTiles(threatTiles(this.ctx, battle, u.id));
   }
 
   /**
@@ -498,7 +569,10 @@ export class BattleRenderer implements Presenter {
     const s = this.scene;
     this.phase = e.phase;
     if (!s) return;
-    const label = e.phase === "player" ? `${e.turn}턴 — 아군 페이즈` : "적군 페이즈";
+    const label =
+      e.phase === "player" ? `${e.turn}턴 — 아군 페이즈`
+      : e.phase === "ally" ? "우군 페이즈"
+      : "적군 페이즈";
     // 아군 페이즈 시작 시 미행동 첫 아군 유닛으로 자동 포커스 (scale 유지)
     if (e.phase === "player" && this.store) {
       const firstUnacted = this.store.committedState.units.find(

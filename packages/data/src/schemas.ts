@@ -114,7 +114,15 @@ export const CombatConfigSchema = z.object({
 );
 export type CombatConfig = z.infer<typeof CombatConfigSchema>;
 
-export const SideSchema = z.enum(["player", "enemy"]);
+/**
+ * 진영(Side) — 3종 (Tier 2-1).
+ *  - player: 플레이어가 조종하는 아군.
+ *  - ally: AI가 조종하는 아군측 NPC(우군). 플레이어는 조종/공격 불가.
+ *  - enemy: 적군.
+ * 피아식별은 Side가 아니라 camp(진영군)로 한다 — player·ally = "friendly", enemy = "hostile".
+ * camp 헬퍼는 @tk/engine에 있다(데이터 패키지는 zod 스키마만 보유).
+ */
+export const SideSchema = z.enum(["player", "ally", "enemy"]);
 export type Side = z.infer<typeof SideSchema>;
 
 export const BattleMapSchema = z.object({

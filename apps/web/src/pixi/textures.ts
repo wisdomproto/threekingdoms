@@ -16,6 +16,7 @@
  * 향후 atlas frame 반환 구현으로 교체해도 소비측 호출은 불변 — placeholder→에셋 교체 경로의 핵심.
  */
 import { Assets, Container, Graphics, Rectangle, Sprite, Texture, type Renderer } from "pixi.js";
+import type { Side } from "@tk/data";
 import { TILE_SIZE } from "./projection";
 
 /** 지형 14종 베이스 색 (terrains.json의 id와 1:1) */
@@ -36,9 +37,10 @@ export const TERRAIN_COLORS: Record<string, number> = {
   cliff: 0x5a5048, // 절벽
 };
 
-/** 진영 2색 — 유닛 베이스 */
-export const SIDE_COLORS: Record<"player" | "enemy", number> = {
+/** 진영 3색 — 유닛 베이스 (Tier 2-1: 아군 파랑 / 우군 주황 / 적 빨강) */
+export const SIDE_COLORS: Record<Side, number> = {
   player: 0x2f6fce,
+  ally: 0xe08a2a, // 우군(AI 아군측 NPC) — 아군 파랑과 적 빨강 사이의 주황으로 피아 즉시 구분
   enemy: 0xc23b3b,
 };
 

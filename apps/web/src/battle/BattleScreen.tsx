@@ -21,6 +21,8 @@ import type { UiEvent } from "./inputMachine";
 import { BattleRenderer } from "../pixi/BattleRenderer";
 import { readSortie, applySortieToStage } from "../meta/sortie";
 import { UnitPanel } from "./hud/UnitPanel";
+import { InspectPopup } from "./hud/InspectPopup";
+import { AttackForecast } from "./hud/AttackForecast";
 import { ActionMenu } from "./hud/ActionMenu";
 import { TurnBanner } from "./hud/TurnBanner";
 import { ResultSequence } from "./hud/ResultSequence";
@@ -183,6 +185,8 @@ export default function BattleScreen(): React.ReactElement {
       <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
       <TurnBanner ui={snap.ui} vm={snap.vm} dispatch={dispatch} />
       <UnitPanel ui={snap.ui} vm={snap.vm} />
+      <InspectPopup inspectedId={snap.inspectedId} activeId={selectedId} vm={snap.vm} />
+      <AttackForecast ui={snap.ui} ctx={ctx} committed={store.committedState} />
       <ActionMenu ui={snap.ui} dispatch={dispatch} previewWalking={snap.previewWalking} />
       <div
         style={{

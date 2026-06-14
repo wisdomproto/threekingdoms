@@ -2,6 +2,23 @@ import type { GameData, Stage, BattleMap, Side, Line, MoveClass, ClassGrades } f
 
 export interface Coord { x: number; y: number }
 
+/**
+ * 진영군(camp) — 피아식별의 단위 (Tier 2-1).
+ * player·ally(우군) = "friendly", enemy = "hostile".
+ * 상성·데미지·지형은 camp와 무관(병종 line으로만 판정). foe 판정·타깃 필터·승패만 camp로 본다.
+ */
+export type Camp = "friendly" | "hostile";
+
+/** side → camp. enemy만 hostile, 나머지(player/ally)는 friendly. */
+export function camp(side: Side): Camp {
+  return side === "enemy" ? "hostile" : "friendly";
+}
+
+/** 두 진영이 적대 관계인가 — camp가 다르면 적(foe). 같으면 우군/아군. */
+export function areFoes(a: Side, b: Side): boolean {
+  return camp(a) !== camp(b);
+}
+
 export interface UnitState {
   id: string;            // commanderId
   classId: string;
