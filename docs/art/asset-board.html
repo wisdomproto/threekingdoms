@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>에셋 프롬프트 보드 v1.3 — 수묵담채 확정판</title>
+<title>에셋 프롬프트 보드 v2.0 — 풀 카탈로그 (무기·적네임드·초상·병종·지형·UI·일기토 전수)</title>
 <style>
   :root {
     --bg: #14161c; --panel: #1d212b; --panel2: #242936; --line: #333a4a;
@@ -52,8 +52,8 @@
 </head>
 <body>
 <header>
-  <h1>에셋 프롬프트 보드 v1.3</h1>
-  <span class="sub">사수관·호로관 수직 슬라이스 + 정규 로스터 확장·적 네임드(F) · 시트(한 장 多에셋) 방식 · 잘라 쓰는 건 Claude가 처리</span>
+  <h1>에셋 프롬프트 보드 v2.0</h1>
+  <span class="sub">풀 카탈로그: 무기·적네임드·초상·병종·지형·UI·일기토 전수 · 시트(한 장 多에셋) 방식 · 잘라 쓰는 건 Claude가 처리 · A~F 수직슬라이스+로스터 · G 무기시트(스킨 BM) · H 적 네임드 전수 · I 초상 64×80 크롭표 · J 병종 SD 템플릿 · K 지형 전수 · L UI 결산·커맨드·장식 · M 일기토 키프레임(Seedance) · facing screen-left 고정 · 병종별 탈것 반영</span>
   <span class="stylefixed">화풍: 수묵담채 (확정)</span>
   <button class="btn" id="dirbtn" title="⬇ 저장이 향할 폴더 (docs\art 권장)">저장 폴더: 미연결</button>
   <div id="progress"></div>
@@ -81,6 +81,15 @@ const SHEET_FMT = 'Character reference sheet layout on plain white background, e
 const VFX_PREFIX = 'VFX sprite sheet on pure black background, additive-blending ready (bright elements on black), no characters, no scenery, game effect assets. All elements clearly separated with generous black spacing in a loose grid, each element complete and uncropped.';
 const GRID_NOTE = 'All cells same scale, generous white spacing between cells, no grid lines, no labels, each figure complete and uncropped.';
 
+/* 병종별 탈것(mount) — SD 쿼터뷰 유닛 스프라이트에 주입. 영걸전/조조전 시각 문법: 기병=말 / 군주=전차 / 제갈량=사륜거 / 그 외=도보 */
+const MOUNT_HORSE = 'MOUNT — in EVERY pose the character is mounted on a chibi warhorse (a compact round-bodied horse matching the chibi scale), a cavalry unit; never on foot. The three poses become: (1) idle mounted with the horse standing, (2) the horse at a galloping charge, (3) a mounted attack swinging the signature weapon from horseback.';
+const MOUNT_CHARIOT = 'MOUNT — in EVERY pose the character is a lord riding a small two-wheeled horse-drawn war chariot (a single chibi warhorse pulling a compact chariot, the lord standing in the cart holding the reins and weapon), never on foot. The three poses become: (1) idle with the chariot halted, (2) the chariot rolling forward at speed, (3) a commanding attack/gesture from the moving chariot.';
+const MOUNT_CART = 'MOUNT — in EVERY pose the character is seated calmly on his iconic four-wheeled scholar\'s cart (a small wheeled handcart-throne, no horse, optionally implied to be pushed), the unmistakable strategist silhouette; never standing on foot. The three poses become: (1) seated idle fanning himself, (2) the cart advancing, (3) seated raising the feather-fan to command — the power is in the mind, not in fighting.';
+const MOUNT_FOOT = 'MOUNT — the character is on foot in every pose (no horse, no vehicle), a standard infantry/scholar unit.';
+
+/* facing 고정(canonical facing) — SD 쿼터뷰 유닛 스프라이트 전용. 렌더러가 한 기준 방향(screen-left)으로 그린 스프라이트를 좌우 미러링하므로, 모든 포즈(idle/move/attack)가 반드시 동일한 왼쪽 방향이어야 한다. 레퍼런스 시트(3뷰)·일기토 키프레임·맵·이펙트에는 주입 금지. */
+const FACING_LOCK = 'CRITICAL — facing consistency: the character (and any mount/vehicle) faces SCREEN-LEFT in every single pose; the attacking strike — the weapon and the body — is aimed toward the LEFT edge of the cell; NEVER mirror, flip, or rotate the character horizontally between poses or between the idle/move/attack columns; all six cells share the IDENTICAL left-facing orientation (top row = front-left three-quarter, bottom row = back-left three-quarter, i.e. the same body simply seen from behind, still turned toward screen-left). Any cell facing right, or any mix of left- and right-facing cells, is WRONG output and must not be produced.';
+
 /* ───────────────────────── 카드 데이터 ───────────────────────── */
 
 const SECTIONS = [
@@ -100,7 +109,7 @@ const SECTIONS = [
         ['SD 2.5등신 (기본)', 'Super-deformed chibi proportion: about 2.5 heads tall, big head, small sturdy body, cute but dignified — keep his stern face, long beard and signature weapon clearly recognizable.'],
         ['세미SD 4등신', 'Semi-deformed proportion: about 4 heads tall, compact heroic body, charming but less babyish — keep his stern face, long beard and signature weapon clearly recognizable.']
       ]},
-      prompt: 'Sprite sheet of the SAME character as the attached reference sheet, converted to game-unit form, in ONE image: a 2-row × 3-column grid of full-body isometric quarter-view game sprites (camera elevated ~40 degrees) on plain white background.\n{등신}\nTOP ROW — facing front-left diagonal: (1) idle combat stance weapon ready, (2) mid-stride charging run, (3) wide horizontal slash with weapon trailing a motion arc.\nBOTTOM ROW — facing back-left diagonal (seen from behind): same three poses in the same order.\nKeep exact same costume colors and weapon as the reference. Clean silhouettes, slightly bold outlines, readable at small size. ' + GRID_NOTE },
+      prompt: 'Sprite sheet of the SAME character as the attached reference sheet, converted to game-unit form, in ONE image: a 2-row × 3-column grid of full-body isometric quarter-view game sprites (camera elevated ~40 degrees) on plain white background.\n{등신}\nMOUNT — he is mounted on a chibi warhorse in every pose (a compact round-bodied horse matching the chibi scale), a cavalry unit; never on foot.\nTOP ROW — facing front-left diagonal: (1) idle mounted combat stance, horse standing, weapon ready, (2) horse at a galloping charge, (3) wide horizontal mounted slash with the weapon trailing a motion arc.\nBOTTOM ROW — facing back-left diagonal (seen from behind): same three mounted poses in the same order.\nKeep exact same costume colors and weapon as the reference. Clean silhouettes, slightly bold outlines, readable at small size. ' + FACING_LOCK + ' ' + GRID_NOTE },
     { id: 'A-4', title: '일기토 키프레임 (1컷 1장 예외)', needRef: true,
       note: '⚠ A-1 픽 시트 첨부. Seedance I2V 소스라 해상도 확보를 위해 장당 1컷. 변형 골라 3장. 16:9.',
       vars: { '컷': [
@@ -138,20 +147,31 @@ const SECTIONS = [
         ['SD 2.5등신 (기본)', 'Super-deformed chibi proportion: about 2.5 heads tall, big heads, small sturdy bodies, cute but soldierly. Horses equally chibi — compact and round.'],
         ['세미SD 4등신', 'Semi-deformed proportion: about 4 heads tall, compact bodies, charming but less babyish. Horses proportionally compact.']
       ]},
-      prompt: 'Game unit sprite sheet in ONE image: a 3-row × 2-column grid of full-body isometric quarter-view sprites on plain white background, all facing front-left diagonal. Generic Han dynasty soldiers whose faces are partially hidden by helmets (for palette-swap mass production), cohesive squad-uniform look.\n{등신}\nROW 1 — short-spear infantryman with one-hand spear and large rectangular tower shield, lamellar cuirass, conical helmet: (left) idle stance, (right) thrusting attack with shield braced.\nROW 2 — archer with recurve composite bow, quiver at hip, lighter leather armor, wide-brim helmet: (left) idle bow held low, (right) drawing the bow at full anchor.\nROW 3 — light cavalryman on a sturdy Mongolian-type horse, lance and small round shield, minimal horse armor: (left) horse standing lance upright, (right) lance couched in mid-charge.\n{진영} Clean silhouettes, readable at small size. ' + GRID_NOTE },
-    ...[['B-5a', '유비', 'his twin straight swords and dark-red and white robe'],
-        ['B-5b', '장비', 'his serpent spear, wire-like beard and leopard-pattern accents'],
-        ['B-5c', '여포', 'his sky-piercer halberd, golden pheasant-tail plumes and crimson-gold armor'],
-        ['B-5d', '화웅', 'his heavy dao saber and dark iron armor with bronze accents'],
-        ['B-5e', '장료', 'his long-handled war glaive and practical steel-blue armor']
-       ].map(([id, nm, sig]) => ({
+      prompt: 'Game unit sprite sheet in ONE image: a 3-row × 2-column grid of full-body isometric quarter-view sprites on plain white background, all facing front-left diagonal. Generic Han dynasty soldiers whose faces are partially hidden by helmets (for palette-swap mass production), cohesive squad-uniform look.\n{등신}\nROW 1 — short-spear infantryman with one-hand spear and large rectangular tower shield, lamellar cuirass, conical helmet: (left) idle stance, (right) thrusting attack with shield braced.\nROW 2 — archer with recurve composite bow, quiver at hip, lighter leather armor, wide-brim helmet: (left) idle bow held low, (right) drawing the bow at full anchor.\nROW 3 — light cavalryman on a sturdy Mongolian-type horse, lance and small round shield, minimal horse armor: (left) horse standing lance upright, (right) lance couched in mid-charge.\n{진영} ' + FACING_LOCK + ' Clean silhouettes, readable at small size. ' + GRID_NOTE },
+    { id: 'B-2b', title: '군주 전차 유닛 템플릿 (SD)', multi: '한 장에 2포즈',
+      note: '⭐ 군주(전차) 병종 템플릿 — §6 군주=전차 시각문법. 색교체 양산형(얼굴 투구·면갑으로 가림). 진영색 골라서 2장. 유비·동탁 등 네임드 군주는 B-5/F-5 전용 시트가 있고, 이 카드는 일반 군주격 유닛/색교체용.',
+      vars: { '진영': [
+        ['아군 (녹백)', 'Faction color scheme: green-and-white accents on armor, chariot and cloth.'],
+        ['동탁군 (흑적)', 'Faction color scheme: black-and-crimson accents on armor, chariot and cloth.']
+      ],
+      '등신': [
+        ['SD 2.5등신 (기본)', 'Super-deformed chibi proportion: about 2.5 heads tall, big head, small sturdy body, cute but commanding. Horses equally chibi — compact and round.'],
+        ['세미SD 4등신', 'Semi-deformed proportion: about 4 heads tall, compact body, charming but less babyish. Horses proportionally compact.']
+      ]},
+      prompt: 'Game unit sprite sheet in ONE image: a 1-row × 2-column grid of full-body isometric quarter-view sprites on plain white background, both facing front-left diagonal. A generic Han dynasty WARLORD/LORD unit riding a small two-wheeled horse-drawn war chariot: a single compact chibi warhorse pulling a two-wheeled cart, an armored commander standing in the cart holding the reins, face partially hidden by a helmet with a face-guard (for palette-swap mass production), a tall command banner on the chariot. (left) idle with the chariot halted, banner upright; (right) the chariot rolling forward at a charge, the lord gesturing command, dust at the wheels.\n{등신}\n{진영} ' + FACING_LOCK + ' Clean silhouettes, readable at small size, the chariot reads clearly as a lord/commander unit distinct from the cavalry trooper. ' + GRID_NOTE },
+    ...[['B-5a', '유비', 'his twin straight swords and dark-red and white robe', MOUNT_CHARIOT],
+        ['B-5b', '장비', 'his serpent spear, wire-like beard and leopard-pattern accents', MOUNT_HORSE],
+        ['B-5c', '여포', 'his sky-piercer halberd, golden pheasant-tail plumes and crimson-gold armor', MOUNT_HORSE],
+        ['B-5d', '화웅', 'his heavy dao saber and dark iron armor with bronze accents', MOUNT_HORSE],
+        ['B-5e', '장료', 'his long-handled war glaive and practical steel-blue armor', MOUNT_HORSE]
+       ].map(([id, nm, sig, mount]) => ({
       id, title: nm + ' SD 쿼터뷰 시트', multi: '한 장에 6포즈', needRef: true,
       note: '⚠ ' + nm + ' 레퍼런스 시트(B-1) 픽본 첨부. A-3 관우와 같은 포맷 — 등신은 관우에서 확정한 것과 통일.',
       vars: { '등신': [
         ['SD 2.5등신 (기본)', 'Super-deformed chibi proportion: about 2.5 heads tall, big head, small sturdy body, cute but true to character — keep ' + sig + ' clearly recognizable.'],
         ['세미SD 4등신', 'Semi-deformed proportion: about 4 heads tall, compact heroic body, charming but less babyish — keep ' + sig + ' clearly recognizable.']
       ]},
-      prompt: 'Sprite sheet of the SAME character as the attached reference sheet, converted to game-unit form, in ONE image: a 2-row × 3-column grid of full-body isometric quarter-view game sprites (camera elevated ~40 degrees) on plain white background.\n{등신}\nTOP ROW — facing front-left diagonal: (1) idle combat stance weapon ready, (2) mid-stride charging run, (3) attack pose with the signature weapon in a motion arc.\nBOTTOM ROW — facing back-left diagonal (seen from behind): same three poses in the same order.\nKeep exact same costume colors and weapon as the reference. Clean silhouettes, slightly bold outlines, readable at small size. ' + GRID_NOTE
+      prompt: 'Sprite sheet of the SAME character as the attached reference sheet, converted to game-unit form, in ONE image: a 2-row × 3-column grid of full-body isometric quarter-view game sprites (camera elevated ~40 degrees) on plain white background.\n{등신}\n' + mount + '\nTOP ROW — facing front-left diagonal: (1) idle combat stance weapon ready, (2) mid-stride charging run, (3) attack pose with the signature weapon in a motion arc.\nBOTTOM ROW — facing back-left diagonal (seen from behind): same three poses in the same order.\nKeep exact same costume colors and weapon as the reference. Clean silhouettes, slightly bold outlines, readable at small size. ' + FACING_LOCK + ' ' + GRID_NOTE
     })),
     { id: 'B-3a', title: '사수관 맵 무드보드 (마스터 컷)',
       note: '엔진 아트 기준 잡기용 단독 컷. 시간대 변형으로 호로관(야간)까지 2장.',
@@ -272,25 +292,348 @@ const SECTIONS = [
     { id: 'F-3b', title: '조조 레퍼런스 시트 (후속 — 2장 이후 적측 ★급)', multi: '3뷰+표정',
       note: '※ 후속(2장 이후 본격 등장, 1장 영천에서 첫 조우). 미래 ★급 — 라이벌 군주, 미리 확보용.',
       prompt: 'Character: CAO CAO, the brilliant and ambitious rival warlord in his 30s, sharp piercing intelligent eyes, a cunning confident half-smile, neat trimmed beard, compact commanding presence. Refined dark warlord\'s armor with crimson and black lacquer and gold accents beneath a fine cloak — equal parts general and statesman. Weapon: a pair of fine swords or a single ornate jian. The look of a man always three moves ahead.\n' + SHEET_FMT },
-    ...[['F-5a', '조운', 'his bright leaf-bladed straight spear, silver-white armor and white cloak'],
-        ['F-5b', '제갈량', 'his white crane-feather fan, flowing white robe and dark headband'],
-        ['F-5c', '동탁', 'his bloated frame, black-and-gold opulent armor and brocade silks'],
-        ['F-5d', '간옹', 'his scholar headcloth, loose robe and wine cup / fan'],
-        ['F-5e', '미축', 'his rich silk robes and benevolent merchant-patron look'],
-        ['F-5f', '미방', 'his foot-soldier armor, infantry sword and spear'],
-        ['F-5g', '서서', 'his plain dark scholar robe and sheathed straight sword'],
-        ['F-5h', '관평', 'his muted-green field armor, saber and small shield (restrained dragon motif)'],
-        ['F-5i', '유봉', 'his dark-red scaled armor and broad saber'],
-        ['F-5j', '주창', 'his rough armor and the great guandao glaive he carries for his lord']
-       ].map(([id, nm, sig]) => ({
+    ...[['F-5a', '조운', 'his bright leaf-bladed straight spear, silver-white armor and white cloak', MOUNT_HORSE],
+        ['F-5b', '제갈량', 'his white crane-feather fan, flowing white robe and dark headband', MOUNT_CART],
+        ['F-5c', '동탁', 'his bloated frame, black-and-gold opulent armor and brocade silks', MOUNT_CHARIOT],
+        ['F-5d', '간옹', 'his scholar headcloth, loose robe and wine cup / fan', MOUNT_FOOT],
+        ['F-5e', '미축', 'his rich silk robes and benevolent merchant-patron look', MOUNT_FOOT],
+        ['F-5f', '미방', 'his foot-soldier armor, infantry sword and spear', MOUNT_FOOT],
+        ['F-5g', '서서', 'his plain dark scholar robe and sheathed straight sword', MOUNT_FOOT],
+        ['F-5h', '관평', 'his muted-green field armor, saber and small shield (restrained dragon motif)', MOUNT_FOOT],
+        ['F-5i', '유봉', 'his dark-red scaled armor and broad saber', MOUNT_FOOT],
+        ['F-5j', '주창', 'his rough armor and the great guandao glaive he carries for his lord', MOUNT_FOOT]
+       ].map(([id, nm, sig, mount]) => ({
       id, title: nm + ' SD 쿼터뷰 시트', multi: '한 장에 6포즈', needRef: true,
       note: '⚠ ' + nm + ' 레퍼런스 시트(F) 픽본 첨부. A-3/B-5와 같은 포맷 — 등신은 관우에서 확정한 것과 통일. (조연 적장·게스트는 SD 생략 가능, 병종 템플릿 B-2로 대용.)',
       vars: { '등신': [
         ['SD 2.5등신 (기본)', 'Super-deformed chibi proportion: about 2.5 heads tall, big head, small sturdy body, cute but true to character — keep ' + sig + ' clearly recognizable.'],
         ['세미SD 4등신', 'Semi-deformed proportion: about 4 heads tall, compact heroic body, charming but less babyish — keep ' + sig + ' clearly recognizable.']
       ]},
-      prompt: 'Sprite sheet of the SAME character as the attached reference sheet, converted to game-unit form, in ONE image: a 2-row × 3-column grid of full-body isometric quarter-view game sprites (camera elevated ~40 degrees) on plain white background.\n{등신}\nTOP ROW — facing front-left diagonal: (1) idle combat stance weapon ready, (2) mid-stride charging run, (3) attack pose with the signature weapon in a motion arc.\nBOTTOM ROW — facing back-left diagonal (seen from behind): same three poses in the same order.\nKeep exact same costume colors and weapon as the reference. Clean silhouettes, slightly bold outlines, readable at small size. ' + GRID_NOTE
+      prompt: 'Sprite sheet of the SAME character as the attached reference sheet, converted to game-unit form, in ONE image: a 2-row × 3-column grid of full-body isometric quarter-view game sprites (camera elevated ~40 degrees) on plain white background.\n{등신}\n' + mount + '\nTOP ROW — facing front-left diagonal: (1) idle combat stance weapon ready, (2) mid-stride charging run, (3) attack pose with the signature weapon in a motion arc.\nBOTTOM ROW — facing back-left diagonal (seen from behind): same three poses in the same order.\nKeep exact same costume colors and weapon as the reference. Clean silhouettes, slightly bold outlines, readable at small size. ' + FACING_LOCK + ' ' + GRID_NOTE
     }))
+  ]
+},
+{
+  id: 'G', title: 'G. 무기 시트 (무기 스킨 BM — §13)',
+  desc: '무기 전수 — 전부 인물 없는 무기-only 디자인(white bg, 측면+3/4, Spine 파츠 교체용). G-1 시그니처(정체성 일관 위해 소속별 분할·장당 3~4자루) → G-2 상점/보물 카탈로그(한 장 9자루) → G-3 제네릭 병종 무기 풀(한 장 16종, B-2 짝) → G-4 ★급 스킨 변형(§13 코스메틱, A-2 청룡언월도 패턴 계승). ⚠ 관우 청룡언월도는 A-2가 이미 커버 — G 전체에서 스킵.',
+  items: [
+    { id: 'G-1a', title: '시그니처 무기 — 아군 핵심 (유비·장비·조운)', multi: '한 장에 3자루',
+      note: '⭐ Spine 무기 슬롯 마스터. B-1/F-1 인물 시트의 무기 묘사와 정합(유비=자웅일대검 쌍검 / 장비=장팔사모 / 조운=용담창). 셀별로 깔끔히 분리.',
+      prompt: 'Game weapon design sheet, THREE signature weapons of allied heroes side by side, each shown in a clean side profile plus a slight 3/4 angle, same vertical scale, generous spacing, on plain white background. NO hands, NO character, weapons only. LEFT — a matched PAIR of twin straight swords (jian) for a benevolent warlord: elegant simple double-edged blades, modest dark-red and white cord wrap on the grips, plain brass guards, understated nobility. CENTER — a long serpent spear for a wild tiger of a man: a heavy dark shaft with a wavy snake-like undulating spearhead, a bristling red horsehair tassel below the blade, rugged iron fittings. RIGHT — a long cavalry spear with a bright leaf-shaped polished steel blade and a vivid red tassel at the socket, a clean elegant shaft, the gleaming weapon of a silver-armored rider. Flat even lighting, no dramatic shadows, weapon design sheet for game production.' },
+    { id: 'G-1b', title: '시그니처 무기 — 적측 (여포·동탁·화웅·장료)', multi: '한 장에 4자루',
+      note: '⭐ 적 네임드 시그니처. B-1c/d/e·F-2 무기 묘사 정합(여포=방천화극 / 동탁=호화 대도 / 화웅=중후 대도 / 장료=글레이브). 여포 화극은 가장 화려하게.',
+      prompt: 'Game weapon design sheet, FOUR signature weapons of enemy named generals side by side, each in a clean side profile plus a slight 3/4 angle, same vertical scale, generous spacing, on plain white background. NO hands, NO character, weapons only. (1) a magnificent sky-piercing halberd (ji) — a long shaft topped with a spear point flanked by a crescent axe-blade, lavish gold filigree and pheasant-motif accents, crimson tassel, the most ornate of the four, the weapon of an unrivaled apex warrior. (2) an opulent broad saber too richly decorated for real war — black-and-gold lacquered scabbard and hilt, gaudy jade and gold pommel ornaments, a symbol of usurped tyrant power. (3) a heavy brutal war saber (dao) — thick dark-iron single-edged blade with bronze fittings, war-braid cord on the grip, the plain heavy weapon of a veteran vanguard champion. (4) a long-handled war glaive — a clean unadorned steel blade on a practical dark shaft, disciplined and professional, no excess ornament. Flat even lighting, weapon design sheet for game production.' },
+    { id: 'G-1c', title: '시그니처 무기 — 합류 무장 (관평·주창·유봉·미방)', multi: '한 장에 4자루',
+      note: 'F-1 보병계 합류장 무기. 관평=도+소형방패(청룡 모티프 절제) / 주창=관우의 청룡언월도를 받쳐 든 종자라 본인 무기는 소박한 도 / 유봉=광폭 도 / 미방=보병 검+창.',
+      prompt: 'Game weapon design sheet, FOUR weapons of younger allied officers side by side, each in a clean side profile plus a slight 3/4 angle, same vertical scale, generous spacing, on plain white background. NO hands, NO character, weapons only. (1) a one-hand saber (dao) paired with a small round shield, muted green cord wrap, a restrained understated dragon motif etched faintly near the guard (subtle, not flamboyant). (2) a plain sturdy soldier\'s broad saber (dao) — the simple honest weapon of a loyal rough retainer, dark wood grip, no ornament. (3) a broad confident infantry saber (dao) with a dark-red cord wrap and a slightly heavier blade, an energetic young fighter\'s weapon. (4) a straight infantry sword (jian) shown together with a one-hand spear, both practical field-issue with muted bronze fittings. Flat even lighting, weapon design sheet for game production.' },
+    { id: 'G-1d', title: '시그니처 무기 — 게스트 (주유·황개·손상향)', multi: '한 장에 3자루',
+      note: 'F-1l/n 게스트 + §6 손상향(궁기병계, 인물 시트는 별도 백로그라 여기선 무기만). 주유=가는 직검 / 황개=철편/둔기 / 손상향=궁기병 활+화살통.',
+      prompt: 'Game weapon design sheet, THREE weapons of Wu guest characters side by side, each in a clean side profile plus a slight 3/4 angle, same vertical scale, generous spacing, on plain white background. NO hands, NO character, weapons only. LEFT — a slender refined straight sword (jian) worn with grace, deep teal cord wrap and silver fittings, an elegant scholar-commander\'s blade rather than a brute weapon. CENTER — a heavy iron whip-mace: a segmented or ridged iron rod weapon with a leather-bound grip, battle-worn and blunt, the frontline gear of a grizzled old veteran. RIGHT — a graceful recurve composite bow with an ornate but light build, paired with a quiver of red-fletched arrows, the ranged weapon of a spirited mounted markswoman. Flat even lighting, weapon design sheet for game production.' },
+    { id: 'G-1e', title: '시그니처 무기 — 문관·간접 (제갈량 우선+사륜거 / 책사 부채)', multi: '한 장에 3자루',
+      note: '제갈량 정체성 = 학우선(yushan)+사륜거 실루엣. 간옹·진등·노숙 등 책사 공용 부채/지물도 무기 슬롯에 들어가므로 함께. 무기라기보다 "지물" 디자인.',
+      prompt: 'Game item design sheet, THREE strategist hand-items side by side, each in a clean side profile plus a slight 3/4 angle, same vertical scale, generous spacing, on plain white background. NO hands, NO character, items only. LEFT — a white crane-feather feather-fan (a fan made of layered long white feathers on a slim handle), the unmistakable signature item of a genius strategist, serene and elegant. CENTER — a small four-wheeled scholar\'s cart drawn in profile (a compact wheeled seat-throne, no horse), the strategist\'s iconic vehicle silhouette, shown as a standalone object. RIGHT — a folded paper command fan with a lacquered guard, the everyday item of a civil advisor, plainer than the crane-feather fan. Flat even lighting, item design sheet for game production.' },
+    { id: 'G-1f', title: '시그니처 무기 — 군주 지물 (인덕·군기·인장)', multi: '한 장에 4자루',
+      note: '군주(전차) 병종 연출용 비전투 지물 — 군기·인장·지휘봉·두루마리. B-2b 전차 유닛 손/전차에 얹는 파츠. 무기 아닌 통솔 상징물.',
+      prompt: 'Game prop design sheet, FOUR commander insignia props side by side, each in a clean side profile plus a slight 3/4 angle, same vertical scale, generous spacing, on plain white background. NO hands, NO character, props only. (1) a tall command war-banner on a pole, the cloth blank (no text) with a simple bronze finial, mounts on a chariot or a commander\'s back. (2) a carved jade-and-bronze authority seal/stamp with a coiled-dragon knob, a symbol of legitimate rule. (3) a short lacquered command baton with a horsehair tuft at the tip, used to direct troops. (4) a rolled strategy scroll tied with a cord, the planning tool of a lord. Muted regal tones, flat even lighting, prop design sheet for game production.' },
+    { id: 'G-2', title: '상점·보물 무기 카탈로그 (장비 시스템)', multi: '한 장에 9자루',
+      note: '⭐ items.json category="weapon" 전수 중 청룡언월도(A-2 중복)만 빼고 9자루를 한 장에. 등급 낮은 보급검→고급 보물검 순으로 좌상→우하 배치. 칸마다 분리.',
+      prompt: 'Game weapon catalog sheet, NINE distinct melee weapons arranged in a clean 3-row by 3-column grid on plain white background, each weapon in side profile, same scale, generous spacing, NO hands, NO character, weapons only — an equipment shop catalog. Roughly low-tier to high-tier left-to-right, top-to-bottom: (1) a plain bronze-fitted straight short sword (jian), basic issue. (2) a sturdy iron broadsword (dao) with a simple guard. (3) a balanced steel straight sword (jian) with a tasteful cord wrap. (4) a fine officer\'s straight sword with subtle engraving and a jade pommel. (5) a curved single-edged war saber (dao) with a bright keen edge. (6) a long two-handed great-sword for heavy hitters. (7) a treasure-grade straight sword with a faint cold-blue sheen on the blade and silver fittings, clearly a rare relic. (8) a treasure-grade sword paired as a matched dark-and-light twin blade set (one darker, one lighter), an heirloom pair. (9) a legendary champion\'s sword with gold-inlay patterning and a vivid red tassel, the top-tier reward weapon. All blades clearly different in shape and rank; each weapon complete and uncropped. Flat even lighting, weapon design sheet for game production. ' + GRID_NOTE.replace('white spacing between cells', 'white spacing between weapons').replace('each figure complete', 'each weapon complete') },
+    { id: 'G-3', title: '제네릭 병종 표준무기 풀 (색교체 양산)', multi: '한 장에 16종',
+      note: '⭐ B-2 병종 유닛(보병·궁병·기병) 손에 끼우는 양산형 무기. 색·재질만 바꿔 대량 파생. 한 장 가득 16종 그리드.',
+      prompt: 'Game weapon asset sheet, SIXTEEN generic Han-dynasty foot-and-cavalry weapons in a clean 4-row by 4-column grid on plain white background, each in side profile, same scale, generous spacing, NO hands, NO character, weapons only — palette-swap mass-production base assets. Include a varied spread: (1) one-hand short spear, (2) long pike, (3) cavalry lance, (4) straight infantry sword (jian), (5) curved saber (dao), (6) broad two-hand saber, (7) hand axe, (8) heavy battle-axe, (9) war hammer / mace, (10) halberd (ji) with crescent and point, (11) recurve composite bow, (12) heavier siege crossbow, (13) large rectangular tower shield, (14) small round buckler, (15) iron-tipped war club, (16) twin short blades. Plain functional designs in muted iron and wood tones (so they read clearly when palette-swapped per faction). Each weapon complete and uncropped, clearly separated for cutting into sprites. Flat even lighting, weapon design sheet for game production. ' + GRID_NOTE.replace('white spacing between cells', 'white spacing between weapons').replace('each figure complete', 'each weapon complete') },
+    { id: 'G-4a', title: '스킨 변형 — 장팔사모 (장비)', multi: '한 장에 3종', vars: { '톤': [['표준 3종', '']] },
+      note: '§13 코스메틱 BM. A-2 청룡언월도 스킨 패턴 계승(클래식/메테오/세라믹). 스킨 가챠·판매용 — 일기토 무대에 오르는 ★급 무기.',
+      prompt: 'Game weapon skin sheet: THREE cosmetic variants of the serpent spear (a long spear with a wavy snake-like undulating blade) side by side on plain white background, vertical orientation, slight 3/4 angle, same scale, generous spacing, NO hands, NO character. LEFT — classic version: dark iron wavy blade, red horsehair tassel, dark wooden shaft with iron fittings. CENTER — meteorite version: black meteorite-iron wavy blade with faint serpent-scale gold inlay, black tassel, dark iron shaft. RIGHT — ceremonial jade version: pale jade-and-silver wavy blade, white tassel, silver-chased shaft. Flat even lighting, weapon design sheet for game production.' },
+    { id: 'G-4b', title: '스킨 변형 — 자웅일대검 (유비 쌍검)', multi: '한 장에 3종',
+      note: '§13 코스메틱. 쌍검 한 쌍이 한 변형 = 3변형 × 2자루씩. A-2 패턴 계승.',
+      prompt: 'Game weapon skin sheet: THREE cosmetic variants of a matched twin-sword set (a pair of elegant straight double-edged jian), each variant showing the pair together, side by side on plain white background, slight 3/4 angle, same scale, generous spacing, NO hands, NO character. LEFT — classic version: bright steel blades, dark-red and white cord wraps, plain brass guards. CENTER — meteorite version: dark meteorite-steel blades with gold filigree along the fullers, black cord wraps, dark fittings. RIGHT — ceremonial jade version: pale jade-inlaid blades, white cord wraps, silver guards. Flat even lighting, weapon design sheet for game production.' },
+    { id: 'G-4c', title: '스킨 변형 — 방천화극 (여포)', multi: '한 장에 3종',
+      note: '§13 코스메틱. 적측 ★급 간판 무기 — 가장 화려한 스킨군. A-2 패턴 계승.',
+      prompt: 'Game weapon skin sheet: THREE cosmetic variants of the sky-piercing halberd (a long ji — spear point flanked by a crescent axe-blade) side by side on plain white background, vertical orientation, slight 3/4 angle, same scale, generous spacing, NO hands, NO character. LEFT — classic version: polished steel crescent and point, lavish gold filigree, crimson tassel, dark shaft. CENTER — meteorite version: black meteorite-iron crescent with molten-gold inlay patterns, dark crimson tassel, blackened shaft. RIGHT — ceremonial jade version: pale jade-and-silver crescent and point, white tassel, silver-chased shaft. Flat even lighting, weapon design sheet for game production.' },
+    { id: 'G-4d', title: '스킨 변형 — 용담창 (조운)', multi: '한 장에 3종',
+      note: '§13 코스메틱. 조운 용담창(leaf-bladed qiang). A-2 패턴 계승.',
+      prompt: 'Game weapon skin sheet: THREE cosmetic variants of the leaf-bladed cavalry spear (a long qiang with a bright leaf-shaped blade) side by side on plain white background, vertical orientation, slight 3/4 angle, same scale, generous spacing, NO hands, NO character. LEFT — classic version: polished steel leaf blade, vivid red tassel, clean pale shaft with silver socket. CENTER — meteorite version: dark meteorite-steel leaf blade with gold-inlay dragon-vein patterns, black tassel, dark shaft. RIGHT — ceremonial jade version: pale jade-and-silver leaf blade, white tassel, silver-chased shaft. Flat even lighting, weapon design sheet for game production.' }
+  ]
+},
+{
+  id: 'H', title: 'H. 적 네임드 전수 (27스테이지 적·게스트)',
+  desc: '§5 27스테이지에 등장하는 적 네임드 중 B(화웅·여포·장료)·F(동탁·하후돈·조조)에 이미 있는 인물을 제외한 전원. ★급/거물·재등장만 풀시트(SHEET_FMT, 어른 비율 마스터), 단발 조연 적장은 병종 템플릿(B-2 진영색 교체)으로 대용 — note에 명시. SD 쿼터뷰는 신규 없음(필요 인물은 B-5/F-5에 이미 존재). 적병종 탈것은 시트 단계엔 미주입(SHEET_FMT는 도보 A-pose 마스터), SD 전환 시 MOUNT_* 결정.',
+  items: [
+    { id: 'H-1a', title: '황건 수괴 시트 (장각 3형제 + 정원지)', multi: '한 장에 4인물 반신',
+      note: '★ 1장 보스군. ⚠ commanders.json 미등록(장각/장보/장량/정원지 — 시나리오 등장). 개별 정체성 약한 단발 보스라 한 시트 4인 반신 배칭 허용(풀 3뷰 생략). 병종=황건적/요술사 계열. 투자등급=병종 템플릿 상위(전용 골격 불필요).',
+      prompt: 'Antagonist roster sheet on plain white background, FOUR distinct Yellow-Turban rebel leaders shown as half-body busts (waist-up) in a row, same scale, generous spacing. (1) the supreme sorcerer-leader: a gaunt charismatic Taoist demagogue in his 40s-50s, wild eyes, yellow head-wrap and tattered yellow-brown sorcerer robes, holding a gnarled staff and a paper talisman, an aura of fanatic mysticism. (2) his stern elder-brother lieutenant: broad-shouldered, full beard, yellow turban, layered cloth armor over commoner clothes, a heavy farm-forged blade. (3) his younger fiery brother: lean and hot-tempered, short beard, yellow sash, dual hatchets. (4) a local rebel captain: rough peasant-soldier, plain yellow headband, leather scraps, a wood-hafted spear. All clearly poor-army rebels, not regular military. Flat even lighting, no text. ' + GRID_NOTE.replace('each figure complete and uncropped', 'each bust complete and uncropped') },
+    { id: 'H-1b', title: '관해 레퍼런스 시트 (황건 잔당 두목)', multi: '3뷰+표정',
+      note: '4장 여남 일대 황건 잔당 두목(관해, faceId 197). 단독 적장이지만 일정 비중 — 풀시트. 병종=황건적/적병 계열. 투자등급=병종 템플릿+.',
+      prompt: 'Character: GUAN HAI, a hulking Yellow-Turban remnant warlord in his 30s-40s, fierce bandit-king bearing, shaved scalp under a grimy yellow head-wrap, thick neck and barrel chest, a cruel grin showing a chipped tooth. Patchwork armor looted from many foes over coarse rebel clothes, a heavy two-handed iron-banded mace as his weapon. The look of a brute who rules by force.\n' + SHEET_FMT },
+    { id: 'H-1c', title: '공융 레퍼런스 시트 (1장 우군 명사)', multi: '3뷰+표정',
+      note: '1~4장 우군성 명사(공융, faceId 195). 황건 잔당전에서 구원받는 문관. 병종=참모/도사 계열. 투자등급=병종 템플릿.',
+      prompt: 'Character: KONG RONG, a respected Han scholar-official and provincial governor in his 40s-50s, refined dignified face, well-kept long beard, the bearing of a famous Confucian man of letters. Proper civil-official court robes in muted indigo and grey with a formal cap and jade pendant, a learned and principled administrator rather than a fighter. No weapon, holds a bamboo writing-tablet (hu).\n' + SHEET_FMT },
+    { id: 'H-1d', title: '손견 레퍼런스 시트 (반동탁연합 — 우군→경쟁)', multi: '3뷰+표정',
+      note: '2장 반동탁연합(손견, faceId 77). 강동의 맹호, 우군이자 경쟁자. 5장 오군의 부친 격. 병종=기병 계열. 투자등급=병종 템플릿+(준★, 오군 비주얼 톤 기준점).',
+      prompt: 'Character: SUN JIAN, the Tiger of Jiangdong, a bold vigorous warlord in his 30s, fierce handsome face, short trimmed beard, commanding fearless eyes. Distinctive red headscarf (his iconic mark) over practical scale-and-lamellar armor in earthy red-brown and bronze tones, a southern hero of raw courage. Weapon: an ancient-style broad saber (gu-ding dao) carried with a warrior\'s ease.\n' + SHEET_FMT },
+    { id: 'H-2a', title: '이유 레퍼런스 시트 (동탁군 책사)', multi: '3뷰+표정',
+      note: '2장 동탁군 핵심 책사(이유, faceId 137). 동탁의 두뇌, 음모형 모사. 병종=참모/도사 계열. 투자등급=병종 템플릿+.',
+      prompt: 'Character: LI RU, Dong Zhuo\'s sinister chief strategist in his 30s-40s, sharp calculating face, thin neat beard, a cold scheming half-smile that never reaches the eyes. Dark scholar-official robes in deep charcoal and dull gold (matching Dong Zhuo\'s black-and-gold faction), a folded fan or a sealed scroll in hand, the poisoner-advisor who whispers cruelty. No weapon, all cunning.\n' + SHEET_FMT },
+    { id: 'H-2b', title: '동탁군 맹장 시트 (이각·곽사·서영)', multi: '한 장에 3인물 반신',
+      note: '2장 동탁군 무장 3인(이각 141·곽사 142·서영 143). 개별 정체성 중간 — 흑적 진영색 통일이라 반신 3인 배칭 허용(풀 3뷰 생략, SD는 병종 템플릿 B-2 흑적으로 대용). 병종=서량기병/보병 계열. 투자등급=병종 템플릿.',
+      prompt: 'Antagonist roster sheet on plain white background, THREE Dong-Zhuo / Liangzhou-army generals shown as half-body busts (waist-up) in a row, same scale, generous spacing, cohesive black-and-crimson faction palette. (1) a ruthless veteran commander, scarred hard face, iron-grey stubble, heavy dark lamellar armor, a broad war-saber. (2) a wiry hot-blooded officer, sharp predatory eyes, braided sidelocks of a frontier rider, fur-trimmed dark armor, a cavalry spear. (3) a stoic disciplined field general, square jaw, short beard, practical blackened scale armor with crimson sash, a long-handled glaive. All clearly belong to a brutal western frontier army. Flat even lighting, no text. ' + GRID_NOTE.replace('each figure complete and uncropped', 'each bust complete and uncropped') },
+    { id: 'H-2c', title: '동탁군 조연 적장 — 병종 템플릿 대용 (시트 생략)',
+      note: '⚠ 생성 없음 — 명세 카드. 이숙(139)·호진(140)·조잠(200)은 단발 조연이라 전용 시트 없이 병종 템플릿(B-2 흑적 진영색)으로 충당, 초상만 I에서 크롭. 이숙=책사형(B-2 대신 H-2a 톤 색교체) / 호진·조잠=보병·기병 템플릿. 원작도 단발 적장은 병종 그래픽 공유.',
+      prompt: 'PLACEHOLDER CARD — no image needed. Minor Dong-Zhuo officers (Li Su / Hu Zhen / Zhao Cen) reuse the generic class templates B-2 with the black-and-crimson faction palette; only their 64x80 portraits are produced (cropped in section I). Do not generate a dedicated sheet.' },
+    { id: 'H-3a', title: '서주 진영 시트 (도겸 + 조표)', multi: '한 장에 2인물 3뷰 압축',
+      note: '3장 서주 방어전(도겸 189 — 노쇠한 서주목 / 조표 190 — 가신 무장). 도겸=우군→이탈, 조표=조연 무장. 정체성 중간이라 2인 압축 시트(각 정면+측면 약식). 병종=보병/군주 계열. 투자등급=병종 템플릿.',
+      prompt: 'Two-character design sheet on plain white background, two figures each shown front and side view (4 figures total in a row, same scale, generous spacing). LEFT PAIR — an aged benevolent provincial governor in his 60s, frail kindly face, long white beard, dignified worn court robes in muted earth tones with a soft official\'s cap, leaning slightly as if tired, no weapon, a man near the end of his strength. RIGHT PAIR — a stocky middle-aged retainer general, blunt gruff face, short black beard, plain field lamellar armor in dull bronze, a one-hand spear and shield, a dutiful but unremarkable garrison commander. Flat even lighting, no text. ' + GRID_NOTE },
+    { id: 'H-3b', title: '원술 레퍼런스 시트 (참칭 군벌)', multi: '3뷰+표정',
+      note: '2~3장(반동탁연합~원술 토벌, 원술 144). 거만한 명문가 군벌, 후일 참칭. 병종=군주 계열(전차 가능). 투자등급=병종 템플릿+. ※기영(146)=원술군 무장은 H-3c 조연 템플릿.',
+      prompt: 'Character: YUAN SHU, an arrogant aristocrat warlord in his 30s-40s, haughty soft-jawed face full of entitled pride, oiled thin beard, a sneer of inherited privilege. Lavish over-decorated armor and silk robes in imperial yellow-gold and deep purple (hinting at illegitimate imperial ambition), excessive jade and gold ornaments, a richly bejeweled ceremonial sword too ornate for real battle. The look of vain noble decadence.\n' + SHEET_FMT },
+    { id: 'H-3c', title: '여포군 충신 시트 (고순 + 진궁) + 조연 대용',
+      multi: '한 장에 2인물 3뷰 압축',
+      note: '3장 여포군 핵심 부장(고순 150 — 함진영 맹장 / 진궁 149 — 책사). 14스테이지 하비2차까지 비중. 2인 압축 시트. ⚠ 조연(조표는 H-3a, 기영·진기 등)은 병종 템플릿 대용. 병종=보병(고순)/참모(진궁). 투자등급=병종 템플릿+.',
+      prompt: 'Two-character design sheet on plain white background, two figures each shown front and side view (4 figures total in a row, same scale, generous spacing). LEFT PAIR — a grim elite infantry commander in his 30s, iron-disciplined stern face, short hard beard, heavy dark lamellar armor of a shock-troop captain (the leader of an unbreakable storming corps), a sturdy halberd, all duty and grit. RIGHT PAIR — a principled scholar-strategist in his 30s-40s, intelligent resolute face with a hint of melancholy, neat beard, refined dark blue official\'s robes, a folded fan and a scroll, the loyal advisor who serves a flawed master. Flat even lighting, no text. ' + GRID_NOTE },
+    { id: 'H-4a', title: '원소 레퍼런스 시트 (대군벌 군주)', multi: '3뷰+표정',
+      note: '4장 관도 국면(원소 110). 화북 최대 군벌, 명문가 출신 군주. 병종=군주 계열(전차). 투자등급=병종 템플릿+(거물 군주 위압).',
+      prompt: 'Character: YUAN SHAO, the grand warlord of the north in his 40s, stately handsome but vacillating face, full well-groomed beard, the commanding yet indecisive bearing of a man born to the highest aristocracy. Magnificent armor in lustrous deep-blue and silver with gold filigree beneath a flowing fur-collared mantle, the very image of noble power and pedigree. Weapon: an ornate fine sword worn as a mark of rank.\n' + SHEET_FMT },
+    { id: 'H-4b', title: '원소군 쌍벽 무장 시트 (안량 + 문추)', multi: '한 장에 2인물 3뷰 압축',
+      note: '4장 관도(안량 111·문추 112). 하북 사정주 급 맹장 쌍벽, 관우 무성 발동 상대로 비중 있음 → 2인 압축이되 3뷰 약식 확보. 병종=기병 계열. 투자등급=병종 템플릿+.',
+      prompt: 'Two-character design sheet on plain white background, two powerful generals each shown front and side view (4 figures total in a row, same scale, generous spacing), cohesive deep-blue-and-silver northern-army palette. LEFT PAIR — a towering ferocious champion, fierce broad face, thick black beard, gleaming heavy lamellar armor, a massive long-handled crescent glaive, raw overwhelming power. RIGHT PAIR — a fast aggressive cavalry hero, sharp wolfish face, wind-blown hair, lighter rider\'s armor with a flowing cape, a long cavalry spear, all speed and fury. Two elite northern champions. Flat even lighting, no text. ' + GRID_NOTE },
+    { id: 'H-4c', title: '원소군 책사 시트 (전풍·저수·곽도)', multi: '한 장에 3인물 반신',
+      note: '4장 관도 국면 모사진(전풍 113·저수 114·곽도 115). 책략 운용 적 참모진, 개별 정체성 약함 → 반신 3인 배칭. 병종=참모/도사 계열. 투자등급=병종 템플릿.',
+      prompt: 'Antagonist advisor sheet on plain white background, THREE northern-army strategists shown as half-body busts (waist-up) in a row, same scale, generous spacing, cohesive muted blue-grey scholar palette. (1) an upright stubborn senior counselor, austere lined face, long greying beard, plain dignified robes, a scroll clutched firmly — the loyal blunt remonstrator. (2) a calm far-seeing strategist, composed intelligent face, neat beard, refined dark robes, a fan in hand. (3) a sly ambitious court advisor, narrow scheming eyes, thin pointed beard, finer ornamented robes, a knowing smirk — the rival intriguer. All civil officials, no armor. Flat even lighting, no text. ' + GRID_NOTE.replace('each figure complete and uncropped', 'each bust complete and uncropped') },
+    { id: 'H-4d', title: '관도~장판 조연 적장 — 병종 템플릿 대용 (시트 생략)',
+      note: '⚠ 생성 없음 — 명세 카드. 순우경(127)·장합(117)·고람(125)·봉기(122)·곽도(H-4c수록) 외 원소군 단발 무장, 신야~장판 추격 조조군 별동대(하후연·조인·조홍·악진·이전·우금·서황 등 — 대부분 F/후속 또는 본작 후반 본격등장)는 1부 등장분만 병종 템플릿(B-2 흑적/청은 색교체)으로 충당, 초상은 I에서 크롭. ※장합·서황 등 후일 ★급 후보는 비중 커질 때 별도 시트 승격.',
+      prompt: 'PLACEHOLDER CARD — no image needed. Minor Guandu/Changban-arc enemy officers (Chunyu Qiong / Zhang He / Gao Lan / Feng Ji and Cao-army detachment officers appearing in Part 1) reuse generic class templates B-2 with the appropriate faction palette; only their 64x80 portraits are produced (cropped in section I). Do not generate a dedicated sheet.' },
+    { id: 'H-5a', title: '오군 맹장 시트 (감녕 + 태사자)', multi: '한 장에 2인물 3뷰 압축',
+      note: '5장 적벽 협동 오군(감녕 84·태사자 85). 게스트성 우군 맹장, 일정 비중 → 2인 압축 3뷰 약식. 병종=기병/궁기병 계열. 투자등급=병종 템플릿+. ※주유·노숙·황개는 F-1l~n에 이미 있음(중복 금지).',
+      prompt: 'Two-character design sheet on plain white background, two Wu (southland) heroes each shown front and side view (4 figures total in a row, same scale, generous spacing), cohesive teal-and-bronze southern palette. LEFT PAIR — a flamboyant ex-pirate naval warrior, bold tanned face, a single feather or bell ornament, sleeveless light armor showing muscled arms, twin sabers, an air of reckless bravado. RIGHT PAIR — a noble archer-general, handsome upright face, neat short beard, balanced scale armor with an archer\'s arm-guard, a long recurve bow on his back and a spear in hand, the picture of martial virtue. Flat even lighting, no text. ' + GRID_NOTE },
+    { id: 'H-5b', title: '오군 노장·부장 시트 (정보 + 한당)', multi: '한 장에 2인물 3뷰 압축',
+      note: '5장 적벽 오군 노장(정보 78·한당 88). 손견대 부터의 백전 노장 → 황개(F-1n)와 함께 강동 노병 톤. 2인 압축. 병종=기병/궁병 계열. 투자등급=병종 템플릿.',
+      prompt: 'Two-character design sheet on plain white background, two veteran Wu generals each shown front and side view (4 figures total in a row, same scale, generous spacing), cohesive teal-and-bronze southern palette aged and battle-worn. LEFT PAIR — a seasoned senior commander in his 40s-50s, weathered authoritative face, greying full beard, solid campaign-marked lamellar armor, a long iron spear, the steady old hand of the southern army. RIGHT PAIR — a tough frontline officer in his 40s, hard scarred face, dark beard, practical rider\'s armor, a heavy saber and a bow, a reliable hard-bitten soldier. Flat even lighting, no text. ' + GRID_NOTE },
+    { id: 'H-5c', title: '형주 적측 시트 (유표 + 채모)', multi: '한 장에 2인물 3뷰 압축',
+      note: '4~5장 형주 국면(유표 174 — 형주목 / 채모 176 — 수군 도독·적대 외척). 신야 철수~적벽 전사. 2인 압축. 병종=군주(유표)/수군 무장(채모). 투자등급=병종 템플릿. ※채중·채양 등은 병종 템플릿 대용.',
+      prompt: 'Two-character design sheet on plain white background, two Jing-province figures each shown front and side view (4 figures total in a row, same scale, generous spacing). LEFT PAIR — an aging refined provincial governor in his 50s-60s, mild cultured face gone weary, long thin beard, elegant but faded silk court robes and cap in muted jade-grey, a man of letters losing his grip on power, no weapon. RIGHT PAIR — a sleek self-serving naval commander in his 40s, smooth calculating face, trimmed beard, lacquered marine officer\'s armor with water-blue accents, a saber at his hip, the slippery in-law who commands the river fleet. Flat even lighting, no text. ' + GRID_NOTE },
+    { id: 'H-6', title: '적 네임드 SD 운용 — 신규 SD 시트 없음 (명세)',
+      note: '⚠ 생성 없음 — 운용 명세. 적 네임드 중 SD 쿼터뷰가 이미 있는 인물: 여포·화웅·장료(B-5c/d/e), 동탁(F-5c). 그 외 적 네임드는 (a)군주격=군주 전차 템플릿 B-2b 흑적 색교체, (b)무장=병종 유닛 B-2 흑적 색교체, (c)얼굴 식별은 초상(I)으로 — 원작 방식대로 맵 위 SD는 색교체 양산, 정체성은 초상·일기토에서. 비중이 커지는 적장(장합·서황·안량·문추·감녕·태사자)은 본격 등장 단계에서 B-5식 .map 전용 SD로 승격.',
+      prompt: 'PLACEHOLDER CARD — no image needed. Most enemy named generals use palette-swapped class templates (B-2 / B-2b in the black-and-crimson or rival-faction palette) for their map SD sprites; identity is carried by the 64x80 portrait (section I) and story duels. Promote high-prominence enemies to dedicated B-5-style SD sheets when they take center stage.' },
+    { id: 'H-7a', title: '하후연 레퍼런스 시트 (조조군 — 후속 확보)', multi: '3뷰+표정',
+      note: '※ 후속(1부 후반~2부 본격). 조조군 속공 맹장(하후연 29). 미리 확보. 병종=궁기병/기병 계열. 투자등급=병종 템플릿+. F의 하후돈·조조와 형제 톤 일치.',
+      prompt: 'Character: XIAHOU YUAN, a swift hard-charging general of Cao Cao in his 30s, lean fierce face, short sharp beard, the restless air of a lightning-raid commander. Light fast lamellar armor in iron-grey and deep blue with minimal ornament for speed, a long recurve bow slung across his back (a famed marksman) and a spear in hand. Kinship resemblance to Xiahou Dun but leaner and quicker.\n' + SHEET_FMT },
+    { id: 'H-7b', title: '조조군 수성 무장 시트 (조인 + 조홍)', multi: '한 장에 2인물 3뷰 압축',
+      note: '※ 후속(1부 후반~). 조조군 종친 무장(조인 30 — 수성/조홍 31 — 호위). 2인 압축. 병종=보병/기병 계열. 투자등급=병종 템플릿. 조씨 종친 통일 톤.',
+      prompt: 'Two-character design sheet on plain white background, two Cao-clan generals each shown front and side view (4 figures total in a row, same scale, generous spacing), cohesive crimson-and-black-with-gold faction palette. LEFT PAIR — a solid dependable defensive commander in his 30s, square steady face, short beard, heavy well-made lamellar armor built to hold a wall, a broad saber and a large shield. RIGHT PAIR — a stout loyal bodyguard general in his 30s, blunt earnest face, dark beard, sturdy reinforced armor, a heavy saber, the master\'s shield in human form. Flat even lighting, no text. ' + GRID_NOTE },
+    { id: 'H-7c', title: '조조군 명장 시트 (악진·이전·우금·서황)', multi: '한 장에 4인물 반신',
+      note: '※ 후속(1부 후반~2부 본격). 조조군 외성 명장 4인(악진 40·이전 41·우금 39·서황 38). 1부엔 단발 조우라 반신 4인 배칭, SD는 병종 템플릿 흑금. 병종=보병/궁병/기병 혼합. 투자등급=병종 템플릿+(장합·서황은 후일 승격 후보). ※장료(장요)는 B-1e에 이미 있음.',
+      prompt: 'Antagonist roster sheet on plain white background, FOUR Cao-army field generals shown as half-body busts (waist-up) in a row, same scale, generous spacing, cohesive crimson-black-and-gold faction palette. (1) a relentless small-but-ferocious vanguard officer, intense compact build, short stubble, scarred light armor, dual short blades. (2) a calm reliable veteran, broad honest face, full beard, balanced lamellar armor, a bow and a saber. (3) a stern by-the-rules commander, austere disciplined face, neat beard, regulation heavy armor, a long spear. (4) a powerful axe-wielding general, strong square jaw, thick beard, heavy battle armor, a great long-handled battle-axe. Four hardened professional soldiers. Flat even lighting, no text. ' + GRID_NOTE.replace('each figure complete and uncropped', 'each bust complete and uncropped') },
+    { id: 'H-7d', title: '전위·허저 레퍼런스 시트 (조조 친위 맹장 — 후속 확보)', multi: '한 장에 2인물 3뷰 압축',
+      note: '※ 후속(1부 후반~2부). 조조 친위 쌍벽(전위 — commanders.json 미등록, 시나리오상 존재 / 허저 37). 일기토 비중 큰 ★후보 → 2인 압축이되 3뷰 약식 확보. 병종=보병/무도가 계열. 투자등급=병종 템플릿+(허저는 ★ 승격 후보).',
+      prompt: 'Two-character design sheet on plain white background, two giant bodyguard warriors each shown front and side view (4 figures total in a row, same scale, generous spacing), cohesive crimson-black faction palette. LEFT PAIR — a monstrous ferocious guard captain, huge muscular build, wild fierce face, bare brawny arms, minimal heavy armor, twin enormous iron halberds, raw savage power. RIGHT PAIR — an even more massive stolid strongman, broad blunt honest face, immense build, simple heavy armor over bare shoulders, a giant heavy blade or a great iron club, the unshakable human wall. Two legendary bodyguards of overwhelming physical might. Flat even lighting, no text. ' + GRID_NOTE }
+  ]
+},
+{
+  id: 'I', title: 'I. 초상(64×80) 크롭 가이드 — 전원',
+  desc: '⚠ 생성 카드 아님 — 크롭 명세. 조조전 FACE 규격 64×80(세로형 버스트). 각 인물의 레퍼런스 시트(A/B/F/H)에 포함된 표정 버스트(정면 head close-up: calm 또는 battle fury)를 64×80로 크롭. 관우(A-1)·화웅(B-1d)은 기존 보드(A·B)에 이미 초상 카드가 있으니 여기선 표에만 표기, 카드 신규 생성 금지. 슬라이스는 Claude가 시트 픽본에서 일괄 크롭. 카드는 진영별 3장으로 묶어 밀도 최대화.',
+  items: [
+    { id: 'I-1', title: '아군 초상 크롭표 (정규 로스터 16 + 게스트)',
+      note: 'FACE 64×80(조조전 규격), 각 시트 정면 버스트 크롭. 소스 시트 매핑 — 유비:B-1a / 장비:B-1b / 관우:A-1(기존) / 조운:F-1a / 간옹:F-1b / 미축:F-1c / 손건:F-1d / 미방:F-1e / 진등:F-1f / 서서:F-1g / 제갈량:F-1h / 관평:F-1i / 유봉:F-1j / 주창:F-1k / (게스트)주유:F-1l / 노숙:F-1m / 황개:F-1n. 크롭 규칙: 정면 head close-up(calm 표정 우선, 군주·맹장은 battle fury 선택 가능)을 64:80 비율(가로64:세로80, 어깨 위 버스트)로 잘라 배경 제거. faceId는 commanders.json 참조(유비0·장비2·관우1·조운3·제갈량4·서서5·간옹15·손건12·미축13·미방14·진등17·관평19·유봉18·주창20·주유80·노숙86·황개170).',
+      prompt: 'PLACEHOLDER CARD — no image generation. Crop the front-view calm/fury head bust from each listed allied reference sheet (B-1a, B-1b, A-1, F-1a..F-1n) to a 64x80 vertical FACE portrait (Sosoden spec), background removed. Output one cropped portrait per character; this card only specifies the crop source mapping.' },
+    { id: 'I-2', title: '적 네임드 초상 크롭표 (1~4장 적·우군 명사)',
+      note: 'FACE 64×80, 각 시트 버스트 크롭. 소스 매핑 — 여포:B-1c / 화웅:B-1d(기존) / 장료:B-1e / 동탁:F-2 / 하후돈:F-3a / 조조:F-3b / 장각3형제·정원지:H-1a(4분할) / 관해:H-1b / 공융:H-1c / 손견:H-1d / 이유:H-2a / 이각·곽사·서영:H-2b(3분할) / 이숙·호진·조잠:병종템플릿 대용→해당 faceId 영상소스 없음, 조조전 추출 FACE 직접 또는 H-2a 색교체 크롭 / 도겸·조표:H-3a / 원술:H-3b / 고순·진궁:H-3c / 원소:H-4a / 안량·문추:H-4b(2분할) / 전풍·저수·곽도:H-4c(3분할). 단발 조연(이숙139·호진140·조잠200·기영146·진기156 등)은 전용 버스트 없음 → I-3 조연표 참조. 정면 버스트를 64:80로, 군주·맹장은 fury 표정 우선.',
+      prompt: 'PLACEHOLDER CARD — no image generation. Crop the front-view head bust from each listed enemy/notable reference sheet (B-1c..e, F-2/F-3a/F-3b, H-1*, H-2a/b, H-3*, H-4a/b/c) to a 64x80 vertical FACE portrait, multi-figure sheets split per person, background removed. This card specifies the crop source mapping only.' },
+    { id: 'I-3', title: '게스트·후속·조연 초상 크롭표 (5장 오군 + 후속 확보 + 단발 조연)',
+      note: 'FACE 64×80. 소스 매핑 — (오군)감녕:H-5a / 태사자:H-5a / 정보:H-5b / 한당:H-5b / 유표:H-5c / 채모:H-5c / (후속 확보)하후연:H-7a / 조인·조홍:H-7b / 악진·이전·우금·서황:H-7c(4분할) / 전위·허저:H-7d(2분할). (단발 조연 — 전용 시트 없음, 병종 템플릿 대용 인물) 이숙·호진·조잠·기영·진기·진궁 외 부장·채중·채양·형도영·순우경·장합·고람·봉기 등: 전용 버스트가 없으므로 ①해당 인물 비중이 생기면 H에 시트 승격 후 크롭, ②그 전까지는 병종 대표 초상(보병/궁병/기병/참모 제네릭 버스트 1종씩)을 색교체로 공용. 제네릭 병종 초상 6종(보병·궁병·기병·참모·황건적·수군)은 별도 1장 시트로 뽑아 64×80 크롭 권장 — 단발 조연 전원 커버. faceId는 commanders.json의 각 인물 값을 키로 매핑(중복 faceId 다수 존재 주의).',
+      prompt: 'PLACEHOLDER CARD — no image generation. Crop 64x80 vertical FACE portraits from H-5*, H-7* sheets (multi-figure sheets split per person). For minor template-covered officers without a dedicated sheet, reuse 6 generic class-archetype busts (infantry / archer / cavalry / advisor / Yellow-Turban / marine) palette-swapped; recommend generating those 6 generic busts as one separate sheet for cropping. Specifies crop sources and the generic-portrait fallback only.' }
+  ]
+},
+{
+  id: 'J', title: 'J. 병종 SD 템플릿 전수 (색·얼굴 교체 양산형)',
+  desc: 'unitClasses.json 중 B-2(보병/궁병/기병)·B-2b(군주 전차)에 없는 나머지 병종 + CLAUDE.md §7 조조전 caster(책사/참모·도사/풍수사·기마책사·무용수)를 템플릿화. 전부 투구·복면·두건으로 얼굴 가림 = 색교체 양산형(네임드 아님). A-3/B-2와 등신 통일. 한 장에 여러 병종을 그리드로 — mount·포즈 다양성 때문에 4장으로 분할(도보 술법계 / 말 탄 계열 / 병기·특수 / 적병·맹수). 각 병종 대기·이동·공격 3포즈.',
+  items: [
+    { id: 'J-1', title: '도보 술법·문관 계열 템플릿 (책사·참모·도사·풍수사·주술사·군악/무용)', multi: '한 장에 6병종×3포즈',
+      note: '⭐ 도보 caster 양산형 — strategist(책사)·참모·도사·풍수사(술법사 톤)·sorcerer(주술사)·band/무용수. 얼굴은 두건·면사·삿갓으로 가려 색교체 가능. 술법 발동은 손짓/지물(부적·방울·부채·깃발). 무기 휘두름 없음 — 공격=술법 시전 포즈. 진영색 골라 2장.',
+      vars: { '진영': [
+        ['아군 (녹백)', 'Faction color scheme: green-and-white accents on robes and cloth.'],
+        ['적군 (흑적)', 'Faction color scheme: black-and-crimson accents on robes and cloth.']
+      ],
+      '등신': [
+        ['SD 2.5등신 (기본)', 'Super-deformed chibi proportion: about 2.5 heads tall, big heads, small robed bodies, cute but mystical.'],
+        ['세미SD 4등신', 'Semi-deformed proportion: about 4 heads tall, compact bodies, charming but less babyish.']
+      ]},
+      prompt: 'Game unit sprite sheet in ONE image: a 6-row × 3-column grid of full-body isometric quarter-view sprites (camera elevated ~40 degrees) on plain white background, ALL figures facing front-left diagonal. Generic Han dynasty support/caster units on foot, faces hidden by hoods, veils or wide hats (for palette-swap mass production), no warhorses, no vehicles. Each row is a different unit class; the three columns are (1) idle stance, (2) walking forward mid-stride, (3) casting/command pose.\n{등신}\nROW 1 — STRATEGIST / war-advisor: scholar in layered robe and tall cloth cap, holding a folded paper fan; casting pose = sweeping the fan outward.\nROW 2 — STAFF-OFFICER (counsellor): austere robed official with a bamboo document scroll; casting pose = pointing the scroll forward to issue a stratagem.\nROW 3 — TAOIST PRIEST: flowing Taoist robe and a Taoist crown, holding a horsehair whisk (fuchen); casting pose = raising the whisk with a faint glow.\nROW 4 — GEOMANCER / fengshui adept: hooded mystic in patterned robe holding a luopan compass-disc and a paper talisman; casting pose = flinging the talisman forward.\nROW 5 — SHAMAN SORCERER: feral masked shaman in fur-and-bone trimmed ragged robe shaking a ritual bell-staff; casting pose = both arms raised in an incantation.\nROW 6 — WAR-DANCER / band: lithe figure in flowing layered silk sleeves with a long ribbon and a small hand-drum; casting pose = a mid-spin dance flourish raising morale.\n{진영} ' + FACING_LOCK + ' Clean silhouettes, readable at small size, each class distinct in silhouette. ' + GRID_NOTE },
+    { id: 'J-2', title: '말 탄 계열 템플릿 (기마책사·서량기병·궁기병)', multi: '한 장에 3병종×3포즈',
+      note: '⭐ 기마 양산형 — 기마책사(말+책략, B-2 일반기병과 구분: 말 위 문관)·서량기병(tribesman/이민족 톤, 사나운 변경 기병)·궁기병(말+활). 말은 SD 비율로 둥글게. 얼굴 투구·복면. 진영색 골라 2장.',
+      vars: { '진영': [
+        ['아군 (녹백)', 'Faction color scheme: green-and-white accents on armor, horse tack and cloth.'],
+        ['적군 (흑적)', 'Faction color scheme: black-and-crimson accents on armor, horse tack and cloth.']
+      ],
+      '등신': [
+        ['SD 2.5등신 (기본)', 'Super-deformed chibi proportion: about 2.5 heads tall, big heads, small bodies; horses equally chibi, compact and round.'],
+        ['세미SD 4등신', 'Semi-deformed proportion: about 4 heads tall, compact bodies; horses proportionally compact.']
+      ]},
+      prompt: 'Game unit sprite sheet in ONE image: a 3-row × 3-column grid of full-body isometric quarter-view sprites (camera elevated ~40 degrees) on plain white background, ALL figures facing front-left diagonal, every figure MOUNTED on a chibi warhorse (compact round-bodied horse matching the chibi scale), never on foot. Faces hidden by helmets, hoods or face-wraps for palette-swap mass production. Each row is a different mounted class; columns are (1) idle mounted, horse standing, (2) horse at a galloping charge, (3) the class\'s attack/cast action from horseback.\n{등신}\nROW 1 — MOUNTED STRATEGIST: a robed advisor riding calmly, holding a fan or scroll, lightly armored; column 3 = directing a stratagem from the saddle (no melee weapon).\nROW 2 — BORDER-RAIDER CAVALRY (fierce frontier horsemen): rugged fur-and-leather armor, a long lance and a curved saber, wild and aggressive; column 3 = lance couched in a charging strike.\nROW 3 — HORSE-ARCHER: light armor, recurve composite bow and a hip quiver; column 3 = a Parthian-style shot, drawing the bow at full anchor while mounted.\n{진영} ' + FACING_LOCK + ' Clean silhouettes, readable at small size, each mounted class distinct. ' + GRID_NOTE },
+    { id: 'J-3', title: '병기·중장 계열 템플릿 (발석차·연노병·무도가)', multi: '한 장에 3병종×3포즈',
+      note: '⭐ 병기/특수 양산형 — catapult(발석차, 견인 공성병기)·crossbowman(연노병, 거치형 쇠뇌로 B-2 궁병과 식별)·brawler(무도가대, 맨손/곤 격투). 발석차는 병기 자체가 유닛이라 조작병 1~2명 동반. 얼굴 투구. 진영색 골라 2장.',
+      vars: { '진영': [
+        ['아군 (녹백)', 'Faction color scheme: green-and-white accents on armor, machine fittings and cloth.'],
+        ['적군 (흑적)', 'Faction color scheme: black-and-crimson accents on armor, machine fittings and cloth.']
+      ],
+      '등신': [
+        ['SD 2.5등신 (기본)', 'Super-deformed chibi proportion: about 2.5 heads tall, big heads, small sturdy bodies; siege machine also chunky and toy-like.'],
+        ['세미SD 4등신', 'Semi-deformed proportion: about 4 heads tall, compact bodies; machine proportionally compact.']
+      ]},
+      prompt: 'Game unit sprite sheet in ONE image: a 3-row × 3-column grid of full-body isometric quarter-view sprites (camera elevated ~40 degrees) on plain white background, ALL facing front-left diagonal, on foot. Faces hidden by helmets for palette-swap mass production. Each row a different class; columns are (1) idle, (2) repositioning/moving forward, (3) attack.\n{등신}\nROW 1 — STONE-THROWER CATAPULT: a wheeled traction trebuchet / mangonel war-machine with one or two crew operators beside it, a loaded stone in the sling; column 2 = crew dragging the machine forward, column 3 = the arm released hurling a boulder.\nROW 2 — REPEATING-CROSSBOWMAN: soldier shouldering a bulky repeating crossbow (chu-ko-nu) with a top magazine, clearly distinct from a plain bow archer; column 3 = leveling the crossbow and loosing a volley of bolts.\nROW 3 — MARTIAL-ARTIST BRAWLER: lightly armored bare-armed fighter with hand-wraps and a short staff; column 3 = a dynamic spinning kick / staff strike.\n{진영} ' + FACING_LOCK + ' Clean silhouettes, readable at small size. ' + GRID_NOTE },
+    { id: 'J-4', title: '비정규·야성 계열 템플릿 (산적·흉적·맹수부대·이민족 보병)', multi: '한 장에 4병종×3포즈',
+      note: '⭐ 적병/산적·맹수 양산형 — bandit/brigand/outlaw(산적·흉적·의적, 황건적 톤의 비정규병)·beastUnit(맹수부대, 조련된 호랑이/곰 동반)·tribesman(이민족 보병, 도보 변경병). 헝클어진 차림·복면. 동탁군/황건적 적색 위주라 진영색 단순화(적/중립 2장).',
+      vars: { '진영': [
+        ['황건·산적 (황토·남루)', 'Faction color scheme: ragged earth-brown and faded yellow turbans and rough cloth.'],
+        ['이민족·변경 (흑갈·모피)', 'Faction color scheme: dark brown and fur-trimmed barbarian tones.']
+      ],
+      '등신': [
+        ['SD 2.5등신 (기본)', 'Super-deformed chibi proportion: about 2.5 heads tall, big heads, small wiry bodies; any beasts equally chibi and round.'],
+        ['세미SD 4등신', 'Semi-deformed proportion: about 4 heads tall, compact bodies; beasts proportionally compact.']
+      ]},
+      prompt: 'Game unit sprite sheet in ONE image: a 4-row × 3-column grid of full-body isometric quarter-view sprites (camera elevated ~40 degrees) on plain white background, ALL facing front-left diagonal, on foot. Irregular non-uniform fighters, faces hidden by rag-masks, scarves or unkempt hair / matted fur for palette-swap mass production. Each row a class; columns are (1) idle, (2) moving forward, (3) attack.\n{등신}\nROW 1 — BANDIT: ragged rebel with a cleaver-axe or rusty blade and a small buckler, turban-wrapped head; column 3 = a wild overhead chop.\nROW 2 — BRIGAND (heavier outlaw): tougher bandit in scavenged scraps of armor with a heavy mace or hooked weapon; column 3 = a brutal swing.\nROW 3 — BEAST-HANDLER UNIT: a fur-clad handler leading a trained war-beast (a chibi tiger or bear) on a chain; column 2 = beast loping forward, column 3 = the beast pouncing with claws bared.\nROW 4 — TRIBAL FOOTMAN (frontier barbarian infantry): sturdy fur-and-bone armored warrior with a broad single-edged blade and a hide shield; column 3 = a powerful downward strike.\n{진영} ' + FACING_LOCK + ' Clean silhouettes, readable at small size, each class distinct. ' + GRID_NOTE }
+  ]
+},
+{
+  id: 'K', title: 'K. 지형 전수 (시임리스 바닥 추가분 + 오브젝트 + 동적 VFX)',
+  desc: 'terrains.json 전 지형 중 E(평지/초원/맨땅/숲·E-2 산악바위·E-3 숲캐노피·E-4 강물) 및 B-6 산봉우리·B-7 다리·B-8 회복움막에 없는 나머지를 망라. 시임리스는 1장=1지형(묶음 불가, E와 동일 vars 방식). 오브젝트는 한 장 다조각 그리드. 동적 VFX는 배경 위에 얹는 맵 스프라이트(C 전투 이펙트와 별개 — 지형 상시 연출).',
+  items: [
+    { id: 'K-1', title: '시임리스 바닥 추가분 (황무지·산비탈·길)', multi: '지형 골라 3장',
+      note: '⭐ terrains.json waste(황무지)·mountain 경사면 톤·road 포장길 — E에 없는 베이스. E 규약 동일: 매우 낮은 대비·낮은 채도, 멀리서 거의 단색, 오브젝트 금지, 시임리스.',
+      vars: { '지형': [
+        ['황무지 (waste)', 'barren wasteland ground, cracked dry pale tan earth with sparse withered tufts, desaturated'],
+        ['산비탈 흙 (산지 베이스)', 'mountainside slope soil, muted grey-brown earth with faint scattered scree and dry grass, the walkable base under mountain accents'],
+        ['포장 길 (road)', 'a paved/packed travel road surface, compacted earth with faint cart-rut lines and sparse flat stones, warm muted grey-brown']
+      ]},
+      prompt: 'SEAMLESS TILEABLE texture, strictly top-down view: {지형}. Painted in subtle East Asian ink-wash tones on a textured paper feel. VERY LOW CONTRAST and low detail — must read as almost flat color from a distance, no objects, no rocks or plants sticking out, no directional shadows, no perspective, edges must wrap seamlessly (left matches right, top matches bottom). Square 1:1.' },
+    { id: 'K-2', title: '시임리스 바닥 추가분 (모래·설원·늪)', multi: '지형 골라 3장',
+      note: '⭐ 후반/특수 맵 베이스 — 적벽 모래톱·북방 설원·서주 늪지(river 변형 아닌 진창). E 규약 동일.',
+      vars: { '지형': [
+        ['모래톱 (강변·적벽)', 'riverbank sand flat, soft pale ochre fine sand with gentle ripple marks, very low saturation'],
+        ['설원 (북방)', 'snow-covered field, soft off-white snow with faint blue-grey shadow tones and a few dark exposed earth patches'],
+        ['늪/진창 (marsh)', 'muddy marsh ground, muted murky green-brown wet mire with subtle water sheen and reed stubble, low contrast']
+      ]},
+      prompt: 'SEAMLESS TILEABLE texture, strictly top-down view: {지형}. Painted in subtle East Asian ink-wash tones on a textured paper feel. VERY LOW CONTRAST and low detail — must read as almost flat color from a distance, no objects sticking out, no directional shadows, no perspective, edges must wrap seamlessly (left matches right, top matches bottom). Square 1:1.' },
+    { id: 'K-3', title: '시임리스 바닥 추가분 (성내 석판)', multi: '지형 골라 2장',
+      note: '⭐ gate/성내 region 베이스 — 낙양 시가전·성내 바닥. E 규약 동일, 단 포석은 약한 패턴 허용(그래도 저대비).',
+      vars: { '지형': [
+        ['성내 석판 (포석)', 'a courtyard of fitted stone flagstones / paving slabs, muted grey with faint mortar lines, weathered'],
+        ['성내 전돌 (벽돌 바닥)', 'a packed grey brick paving, subtle regular brick pattern, muted and weathered']
+      ]},
+      prompt: 'SEAMLESS TILEABLE texture, strictly top-down view: {지형}. Painted in subtle East Asian ink-wash tones on a textured paper feel. LOW CONTRAST — the paving pattern is faint and must read as an almost flat surface from a distance, no objects, no directional shadows, no perspective, edges must wrap seamlessly (left matches right, top matches bottom). Square 1:1.' },
+    { id: 'K-4', title: '성곽 오브젝트 시트 (성문·성벽·망루)', multi: '한 장에 12조각',
+      note: '⭐ gate/wall/fort region 액센트 — B-6 산봉우리·B-7 다리와 별개. 성벽 세그먼트(직선/모서리/끊긴 곳)·성문(닫힘/열림/파괴)·망루·성가퀴. 바닥(K-3) 위에 얹어 성을 구성. 투명/흰배경 분리.',
+      prompt: 'Game map object sheet in ONE image on plain white background, top-down oblique view (camera ~50° above) for a tactics map, ink-wash painted style, muted stone-grey and timber tones, soft contact shadow only at the very base, each piece sized to its grid footprint: (1) straight stone wall segment, (2) wall corner segment, (3) ruined/breached wall gap, (4) crenellated battlement wall top, (5) closed fortified gate with timber doors, (6) open gate with doors swung in, (7) shattered/destroyed gate, (8) tall corner watchtower, (9) two-storey gatehouse tower, (10) wooden parapet walkway, (11) stone stair ramp up a wall, (12) a beacon-fire signal platform. Each object complete and clearly separated with generous white spacing, clean croppable edges, NO ground slab attached. No grid, no labels.' },
+    { id: 'K-5', title: '방어·진영 오브젝트 시트 (목책·울타리·군기·천막·녹채)', multi: '한 장에 12조각',
+      note: '⭐ 야전 진영/방어선 액센트 — B-8 회복움막(촌락/병영/창고)과 중복 없는 추가 천막·방어물. 목책·울타리·녹채(가시방어)·군기/깃발 여러 종·모래주머니·전투용 천막 추가분.',
+      prompt: 'Game map object sheet in ONE image on plain white background, top-down oblique view (camera ~50° above) for a tactics map, ink-wash painted style, muted timber-brown and earthy tones with selective banner colors, soft contact shadow only at the very base: (1) straight wooden palisade fence segment, (2) palisade corner, (3) sharpened-stake abatis barricade (chevaux-de-frise), (4) low woven bamboo fence, (5) a closed camp gate in a palisade, (6) tall command banner on a pole, (7) a row of small army pennants, (8) a signal flag standard, (9) stacked sandbag / earthwork rampart, (10) a small open supply-cart, (11) a campfire with cooking pot, (12) a watch-brazier on a stand. Each object complete and clearly separated with generous white spacing, clean croppable edges, NO ground slab attached. No grid, no labels.' },
+    { id: 'K-6', title: '자연·잔해 오브젝트 시트 (바위·고목·잔해·시체)', multi: '한 장에 12조각',
+      note: '⭐ 자연 장식 + 전투 잔해 액센트 — cliff 바위·마른 고목·부서진 수레/병기·전장 시체더미(절제된 수묵 톤). B-6 산봉우리와 구분되는 소형 단품들. 바닥 위 듬성듬성.',
+      prompt: 'Game map object sheet in ONE image on plain white background, top-down oblique view (camera ~50° above) for a tactics map, ink-wash painted style, muted natural tones, soft contact shadow only at the very base: (1) a single large boulder, (2) a cluster of small rocks, (3) a jagged cliff-edge rock outcrop, (4) a bare gnarled dead tree, (5) a leafy deciduous tree, (6) a fallen log, (7) dry shrub / bush, (8) tall reed clump, (9) a broken overturned cart with a snapped wheel, (10) scattered shattered weapons and a cracked shield, (11) a discarded broken siege-machine frame, (12) a somber strewn battlefield debris / fallen-soldier remains pile rendered restrained and non-graphic. Each object complete and clearly separated with generous white spacing, clean croppable edges, NO ground slab attached. No grid, no labels.' },
+    { id: 'K-7', title: '수상전 오브젝트 시트 (배·선착장·부교)', multi: '한 장에 10조각',
+      note: '⭐ 5장 적벽·삼강구 수상전용 — E-4 강물 위에 얹는 배/선착장. 군선 여러 종·작은 배·선착장 잔교·부교·불탄 배(화공). top-down 사선. 물 텍스처와 함께 써야 의미.',
+      prompt: 'Game map object sheet in ONE image on plain white background, top-down oblique view (camera ~50° above) for a tactics water map, ink-wash painted style, muted timber and lacquered-hull tones, soft contact shadow / faint water-line only at the very base, each vessel a complete croppable sprite: (1) a large two-deck war-junk with a sail, (2) a medium battle-junk oriented horizontally, (3) the same battle-junk oriented vertically, (4) a small fast scout boat, (5) a fishing sampan, (6) a flat ferry raft, (7) a wooden pier / jetty extending from shore, (8) a pontoon plank bridge segment over water, (9) ships lashed side-by-side with planks between them (linked-ships formation), (10) a half-burnt smoking war-junk for fire-attack scenes. Each object complete and clearly separated with generous white spacing, clean croppable edges, NO water attached underneath. No grid, no labels.' },
+    { id: 'K-8', title: '동적 지형 VFX 오브젝트 시트 (불·연기·물보라)', multi: '한 장에 8요소', vfx: true,
+      note: '⭐ 배경 위에 얹는 맵 스프라이트(상시·지속 연출) — C-1/C-2 전투 타격 이펙트와 별개. 화공 지형의 불 번짐 타일·기둥 연기·물보라·잔불·먼지바람 등. 격자 칸 위에 깔거나 오브젝트에 붙여 "이 칸 불타는 중"을 표현. additive 검은배경.',
+      prompt: 'Eight separate map-overlay effect elements arranged in a loose grid, for sprites laid ON TOP of a battle map (persistent ambient terrain effects, not a single hit-spark): (1) a patch of ground fire / burning tile flames spreading low and wide, (2) a tall rising column of smoke, orange-lit at the base fading to grey-black, (3) thin drifting smoke wisps for a smoldering tile, (4) a burst of water splash / spray for a vessel impact, (5) a low rolling river mist / fog band, (6) small lingering embers and floating sparks, (7) a swirling dust / sand wind gust, (8) a faint heat-shimmer / scorched glow ring for burnt ground. Each element complete and clearly separated with generous black spacing. ' }
+  ]
+},
+{
+  id: 'L', title: 'L. UI 에셋 (결산·게이지·커맨드·장식)',
+  desc: '청동·수묵 톤 UI 묶음. §12 카지노 결산 + §13 광고 2배 + §10 도감(미획득 힌트). ⚠ D-1(초상 프레임/HP 프레임/사기 프레임/청동 인장 버튼)과 중복 금지 — L은 결산연출·인게임 소형 배지·심볼 글리프·장식·미니맵 변형만. 텍스트는 절대 이미지에 넣지 않기(빈 칸으로).',
+  items: [
+    { id: 'L-1', title: '클리어 결산 시퀀스 시트', multi: '한 장에 12요소', vfx: true,
+      note: '⭐ §12 풀폴리시 결산 구간(별평가→상자→exp→레벨업). 검은 배경 발광 요소라 vfx 처리(코드 합성). 텍스트 없는 빈 리본/빈 바 — 글자는 코드가 올림.',
+      prompt: 'Twelve separate UI reward-sequence elements for a results screen, East Asian ink-wash + bronze game theme: (1) an empty outline star rating star, (2) the same star filled with glowing gold, (3) a closed treasure chest — bronze-banded dark lacquer wood, slight 3/4 angle, (4) the same chest open with warm light spilling out, (5) a burst of treasure-light rays for the chest-open jackpot moment, (6) an experience-bar frame — empty lacquered trough with bronze end-caps (horizontal), (7) the same bar with a glowing jade-gold fill, (8) a large heaped pile of gold coins and ingots, (9) a small loose cluster of a few gold coins, (10) one single shining coin sprite, (11) a radial golden jackpot glow-burst halo, (12) a blank ornate ribbon banner (level-up style) with an empty center panel for text. Each element clearly separated, bright elements readable on dark.' },
+    { id: 'L-2', title: '인게임 게이지·배지 시트', multi: '한 장에 10요소',
+      note: '전투 화면 유닛 위에 얹는 소형 오버레이 — D-1의 대형 게이지 프레임과 용도 분리(소형). 빈 칸/빈 바, 텍스트 금지.',
+      prompt: 'Game UI asset sheet in ONE image on a plain dark background, East Asian ink-wash + bronze theme, small overlay elements that sit above battle units: (1) a slim HP mini-bar — empty trough plus a separate red fill segment, (2) a slim MP mini-bar — empty trough plus a blue-jade fill segment, (3) a slim morale mini-bar — empty trough plus an amber-flame fill segment, (4) a small round troop-strength badge with a blank center for a number, (5) a turn-order token — small bronze medallion with a blank center, (6) an action-point pip (filled) and (7) the same pip empty, (8) a small status-effect chip frame (blank hexagon for an icon), (9) a tiny up-arrow buff marker, (10) a tiny down-arrow debuff marker. Flat presentation, each element clearly separated, no text anywhere. ' + STYLE },
+    { id: 'L-3', title: '커맨드 심볼 글리프 시트', multi: '한 장에 12아이콘',
+      note: '⭐ 청동 인장 *버튼*은 D-1 담당 → 여기선 버튼 위에 얹는 *심볼 글리프*만(중복 아님). 광고 2배(§13 리워드)·기연(§12) 포함. 투명/단색 배경, 흑백+청동 단색 라인 글리프, 텍스트 금지.',
+      prompt: 'Game command icon glyph sheet in ONE image on a plain transparent-style flat background, a loose grid of 12 simple monochrome bronze line-glyph icons (to be placed on top of seal-stamp buttons), East Asian ink-brush styling, consistent stroke weight, each centered in its own cell: (1) ATTACK — a crossed sword/blade mark, (2) STRATAGEM — an unfurled scroll with a swirl, (3) TOOL/ITEM — a small medicine gourd-bottle, (4) WAIT — an hourglass, (5) CANCEL — a clean X mark, (6) MOVE — a pair of footprints, (7) INFO — a single open eye, (8) AD-DOUBLE — a play-triangle combined with a small "x2" doubling motif, (9) SERENDIPITY-DRAW — a lucky drawn-lot stick / fortune token, (10) SHOP — a coin with a square hole, (11) GALLERY/CODEX — an open book, (12) SETTINGS — a gear-like seal cog. Each glyph clearly separated, clean croppable edges, no color fills beyond bronze ink, no text labels. ' + GRID_NOTE.replace('white spacing between cells', 'spacing between cells').replace('each figure complete and uncropped', 'each glyph complete and uncropped') },
+    { id: 'L-4', title: '상점·도감·타이틀 장식 시트', multi: '한 장에 8요소',
+      note: '§10 도감(미획득=힌트만→실루엣 빈 프레임). 리본·패널 코너·구분선 변형. 텍스트 자리는 빈 칸. D-1 초상 프레임과 다른 용도(장식 부속).',
+      prompt: 'Game UI ornament sheet in ONE image on a plain dark background, East Asian ink-wash + bronze-and-lacquer theme, decorative chrome parts for shop / codex / title screens: (1) a decorative banner ribbon variant A with a blank center, (2) a banner ribbon variant B (broader, more ornate) with a blank center, (3) an ornate panel corner-flourish piece (top-left), (4) a matching panel corner-flourish piece variant, (5) a codex "undiscovered" slot frame — a dark recessed frame holding a faint blank silhouette placeholder (mystery item not yet obtained), (6) a small price/tag bronze plaque with an empty center, (7) a horizontal divider rule with a centered medallion (arabesque scrollwork), (8) a title emblem crest with a blank center cartouche. Each element clearly separated, no text anywhere. ' + STYLE },
+    { id: 'L-5', title: '미니맵 프레임 변형 시트', multi: '한 장에 4변형',
+      note: '미니맵 테두리 변형만 — 내부는 빈 채로(맵 데이터가 채움). 투명 배경. 변형 골라 채택.',
+      prompt: 'Four separate empty minimap border frames in a row on a plain transparent-style flat background, East Asian ink-wash + bronze theme, each with a hollow blank interior (the map fills it later): (1) a square frame — bronze-and-lacquer border, (2) a round/circular frame, (3) a hanging-scroll style frame with small roller ends top and bottom, (4) a worn campaign-map parchment frame with a torn deckle edge and bronze corner studs. Each frame complete and clearly separated, hollow center, clean croppable edges, no map content inside, no text, no labels. ' + STYLE }
+  ]
+},
+{
+  id: 'M', title: 'M. 일기토 키프레임 (Seedance I2V 소스)',
+  desc: '§9 스토리 일기토 키프레임 — 1컷 1장 16:9(영상 소스라 해상도 확보). ★ 캐릭터 시트 픽본 첨부(needRef). A-4(관우vs화웅 사수관)는 기존 카드라 여기선 제외. 각 카드 2~3컷(가해/리액션/격돌 와이드) = A-4 vars 패턴. 컷별 1장씩 골라 생성.',
+  items: [
+    { id: 'M-1', title: '삼형제 vs 여포 (호로관, §5-6)', needRef: true,
+      note: '⚠ 유비·관우·장비·여포 시트 픽본 첨부. 삼형제 협공 기믹의 간판 컷신. 여포는 최강 비주얼(B-1c).',
+      vars: { '컷': [
+        ['① 여포 포위 와이드', 'LU BU (as the attached reference) at the center on his warhorse, sky-piercer halberd sweeping a wide arc, golden pheasant-tail plumes streaming, encircled by three converging riders — wide cinematic shot, dust and tattered banners before a fortified mountain-pass gate, dusk torchlight.'],
+        ['② 장비 선공 리액션', 'ZHANG FEI (as the attached reference) roaring as he charges in first, serpent spear thrust forward, fierce round eyes blazing, low dynamic angle, dust kicked up, the gate fortress blurred behind, dusk light.'],
+        ['③ 삼형제 동시 합 격돌', 'Three allied generals striking LU BU simultaneously from three sides, weapons all converging on his halberd in a burst of sparks, the lone champion holding against all three — wide heroic clash, banners, dust, torchlit dusk over a mountain pass.']
+      ]},
+      prompt: 'Cinematic duel keyframe: {컷} Single decisive moment, full bodies in frame, dynamic diagonal composition. 16:9 aspect ratio. ' + NEGATIVE },
+    { id: 'M-2', title: '낙양 시가전 화재 일기토 (§5-7)', needRef: true,
+      note: '⚠ 관우 또는 유비 시트 첨부. 불타는 도성 시가전 — 화재 지형 연출. 적장은 동탁군 병종 톤.',
+      vars: { '컷': [
+        ['① 화염 속 추격', 'An allied named general (as the attached reference) galloping through a burning city street, flames and embers on both sides, weapon raised, collapsing timber gate behind, fierce firelight on the armor. Low dramatic angle.'],
+        ['② 적장 리액션', 'A dark-and-crimson armored enemy officer recoiling amid the burning streets, weapon knocked aside, ash and sparks swirling, panic on his face, collapsing flaming buildings around him.'],
+        ['③ 불바다 와이드', 'Two riders clashing in the middle of a burning capital avenue, sparks of steel against a wall of fire, smoke billowing into a red night sky, wide cinematic shot of the besieged city ablaze.']
+      ]},
+      prompt: 'Cinematic duel keyframe: {컷} Single decisive moment, full body in frame, dynamic diagonal composition, heavy fire and smoke atmosphere. 16:9 aspect ratio. ' + NEGATIVE },
+    { id: 'M-3', title: '하비 여포 최후 (§5-14, 분기점)', needRef: true,
+      note: '⚠ 여포·유비 시트 첨부. 수공으로 함락된 하비, 여포의 최후 — 사실/가상 분기점. 전투 합이 아니라 패배·포박의 비장한 정지컷.',
+      vars: { '컷': [
+        ['① 포박된 여포', 'LU BU (as the attached reference) defeated and bound with ropes, kneeling but still glaring with unbroken arrogance, his halberd lying broken on flooded stone ground, his golden plumes drooping and wet — a fallen apex predator. Cold grey dawn after a flood, ruined fortress.'],
+        ['② 유비 응시 리액션', 'LIU BEI (as the attached reference) standing and looking down at the bound enemy with a conflicted, resolute expression, hand near his twin swords but not drawing, rain-soaked ruined courtyard, heavy mood.'],
+        ['③ 수공 함락 와이드', 'A wide cinematic shot of a fortress city half-submerged by deliberate flooding, broken walls and a collapsed gate, banners falling into muddy water, grey overcast dawn — the climactic fall of a stronghold.']
+      ]},
+      prompt: 'Cinematic story keyframe: {컷} Single decisive dramatic moment, full body in frame, somber composition. 16:9 aspect ratio. ' + NEGATIVE },
+    { id: 'M-4', title: '박망파 제갈량 화공 데뷔 (§5-18)', needRef: true,
+      note: '⚠ 제갈량 시트(F-1h) 첨부. 제갈량 데뷔 화공 — 부채 신호 한 번에 협곡이 불바다. 책략 연출의 간판.',
+      vars: { '컷': [
+        ['① 제갈량 부채 신호', 'ZHUGE LIANG (as the attached reference) on a hill, calmly raising his white crane-feather fan to signal, serene confident face, white robe and dark headband, wind picking up, a wooded valley spread out below at dusk. Composed low-key power.'],
+        ['② 적군 화염 리액션', 'Enemy soldiers in a narrow wooded gorge engulfed in sudden roaring flames, men and horses scattering in panic, fire racing up both slopes, smoke choking the pass — a sprung fire-ambush.'],
+        ['③ 협곡 화공 와이드', 'A wide cinematic shot of a forested mountain gorge turned into a sea of fire, an enemy column trapped between burning slopes, towering smoke against a dusk sky — a devastating fire stratagem unleashed.']
+      ]},
+      prompt: 'Cinematic story keyframe: {컷} Single decisive moment, dynamic composition, dramatic fire-and-smoke atmosphere where applicable. 16:9 aspect ratio. ' + NEGATIVE },
+    { id: 'M-5', title: '여남 관우 재회 (§5-17, 컷신 비중)', needRef: true,
+      note: '⚠ 관우·유비 시트 첨부. 전투보다 해후 드라마 — 형제 재회의 감정 컷신. §6 관우 합류 서사.',
+      vars: { '컷': [
+        ['① 관우 등장', 'GUAN YU (as the attached reference) riding in at dawn, long black beard and green war robe, Green Dragon Crescent Blade resting on his shoulder, a solemn relieved look on his stern face as he returns to his sworn brothers. Soft golden morning light, distant allied camp.'],
+        ['② 유비 재회 리액션', 'LIU BEI (as the attached reference) stepping forward with an overwhelmed, moved expression, reaching out toward his returning brother, eyes glistening, allied banners behind, warm dawn light — a reunion long awaited.'],
+        ['③ 형제 해후 와이드', 'A wide cinematic shot of sworn brothers reuniting before an army at dawn, two figures clasping arms at center, soldiers and banners framing them, golden morning haze over a field camp — an emotional reunion, not a battle.']
+      ]},
+      prompt: 'Cinematic story keyframe: {컷} Single emotional decisive moment, full body in frame, warm cinematic composition. 16:9 aspect ratio. ' + NEGATIVE },
+    { id: 'M-6', title: '조운 장판파 단기필마 (§5-20, 솔로 명물)', needRef: true,
+      note: '⚠ 조운 시트(F-1a) 첨부. 시리즈 명물 단기필마 — 단신으로 적진을 가르는 간판 컷신. ★급 영상 투자.',
+      vars: { '컷': [
+        ['① 조운 적진 돌파', 'ZHAO YUN (as the attached reference) on his white horse at full gallop, bright leaf-bladed spear cutting through a dense enemy formation, white cloak streaming, calm fearless face, a child bundled protectively against his chest. Low heroic angle, dust and chaos.'],
+        ['② 적군 경악 리액션', 'A wall of dark-armored enemy soldiers recoiling and scattering as a single white rider crashes through them, spears knocked aside, shock and awe on their faces, dust and broken banners.'],
+        ['③ 포위망 단신 돌파 와이드', 'A wide cinematic shot of one lone white-cloaked rider carving a path through a vast surrounding army, a thin trail of fallen foes behind him, a sea of enemy banners all around — a single hero against thousands.']
+      ]},
+      prompt: 'Cinematic duel keyframe: {컷} Single decisive heroic moment, full body in frame, dynamic diagonal composition. 16:9 aspect ratio. ' + NEGATIVE },
+    { id: 'M-7', title: '장비 장판교 단신 방어 (§5-21, 초단기)', needRef: true,
+      note: '⚠ 장비 시트(B-1b) 첨부. 단신으로 다리 위에서 추격군을 일갈로 멈춰 세우는 초단기 이벤트 — 기세 연출이 핵심(직접 합보다 위압).',
+      vars: { '컷': [
+        ['① 장비 일갈 클로즈', 'ZHANG FEI (as the attached reference) standing alone on a wooden bridge, serpent spear planted, head thrown back in a thunderous roar, fierce round eyes and bristling beard, veins standing out — a single warrior\'s war-cry that shakes the air. Low intimidating angle, dusk.'],
+        ['② 추격군 멈칫 리액션', 'A massed enemy vanguard reining their horses to a sudden halt before a single roaring figure on a bridge, front riders flinching back, doubt and fear rippling through the ranks, dust settling.'],
+        ['③ 다리 위 단신 대치 와이드', 'A wide cinematic shot of one lone warrior standing at the head of a wooden bridge, spear leveled, facing an entire halted army across the water at dusk — a single man holding back a host.']
+      ]},
+      prompt: 'Cinematic story keyframe: {컷} Single decisive moment of overwhelming presence, full body in frame, dramatic composition. 16:9 aspect ratio. ' + NEGATIVE },
+    { id: 'M-8', title: '한진 관우 구원 합류 (§5-22)', needRef: true,
+      note: '⚠ 관우 시트 첨부. 강을 건너 구원 합류 — 위기의 아군에게 도착하는 구원 컷신.',
+      vars: { '컷': [
+        ['① 관우 강 건너 등장', 'GUAN YU (as the attached reference) arriving by river crossing, leading a relief force on boats and along the bank, Green Dragon Crescent Blade raised as a rallying sign, long beard and green robe, resolute. Misty river dawn, allied banners on the water.'],
+        ['② 포위된 아군 안도 리액션', 'Hard-pressed allied soldiers on a riverbank looking up with relief and renewed hope as reinforcements arrive across the water, raising their weapons, exhaustion turning to morale, morning river mist.'],
+        ['③ 강가 합류 와이드', 'A wide cinematic shot of a relief army linking up with surrounded allies at a misty river crossing, boats and riders converging on the bank, banners raised, dawn light on the water — a timely rescue.']
+      ]},
+      prompt: 'Cinematic story keyframe: {컷} Single decisive moment, full body in frame, cinematic river-crossing composition. 16:9 aspect ratio. ' + NEGATIVE },
+    { id: 'M-9', title: '적벽 화공 → 화용도 관우의 선택 (§5-26·27, 클라이맥스)', needRef: true,
+      note: '⚠ 관우·조조 시트 첨부. 1부 클라이맥스·엔딩 분기. ①적벽 대화공 ②조조 패주 ③화용도에서 관우가 길을 비켜 보내줌(§9 최대 분기). 최고급 영상 투자.',
+      vars: { '컷': [
+        ['① 적벽 화공 함대 와이드', 'A vast night naval battle on a great river, a huge enemy war-fleet engulfed in roaring fire, fire-ships ramming chained warships, towering flames and smoke mirrored on black water, allied banners on the near shore — the climactic fire attack at Red Cliffs. Wide epic cinematic shot.'],
+        ['② 조조 패주 리액션', 'CAO CAO (as the attached reference) fleeing on horseback through a cold muddy forest road at night, his fine armor mud-spattered, a bitter desperate look, the glow of his burning fleet far behind, only a ragged remnant of guards around him.'],
+        ['③ 화용도 관우의 선택', 'GUAN YU (as the attached reference) on horseback blocking a narrow muddy mountain road, Green Dragon Crescent Blade lowered, a long conflicted look on his stern face as he chooses to turn his blade aside and let the defeated rival pass — a moment of honor over duty. Cold misty dawn, the fugitive column waiting. Heavy emotional composition.']
+      ]},
+      prompt: 'Cinematic story keyframe: {컷} Single decisive moment, full body in frame, epic cinematic composition. 16:9 aspect ratio. ' + NEGATIVE }
   ]
 }
 ];
