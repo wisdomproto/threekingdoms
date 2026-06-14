@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>삼국지 SRPG — 개발 도구 대시보드</title>
+<style>
+  :root{
+    --bg:#14110d; --panel:#1d1913; --panel2:#26201826; --ink:#e9e2d2; --dim:#9b8f78;
+    --acc:#d4a843; --acc2:#6fae6f; --bronze:#8a6d3a; --line:#3a3024;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; font-family:"Pretendard","Noto Sans KR",system-ui,sans-serif;
+    color:var(--ink); background:
+      radial-gradient(1200px 600px at 20% -10%, #2a2114 0%, transparent 60%),
+      radial-gradient(900px 500px at 110% 10%, #20180f 0%, transparent 55%),
+      var(--bg);
+  }
+  header{padding:38px 28px 10px; max-width:1080px; margin:0 auto}
+  h1{margin:0 0 4px; font-size:26px; letter-spacing:.5px}
+  h1 .sub{color:var(--acc); font-weight:600}
+  .tag{color:var(--dim); font-size:13px; margin:0}
+  main{max-width:1080px; margin:0 auto; padding:18px 28px 60px}
+  .sec{margin:26px 0 10px; display:flex; align-items:baseline; gap:10px}
+  .sec h2{margin:0; font-size:15px; color:var(--acc); letter-spacing:.5px}
+  .sec .hint{color:var(--dim); font-size:12px}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(232px,1fr)); gap:14px}
+  a.card,div.card{
+    display:block; text-decoration:none; color:inherit; background:linear-gradient(180deg,#221c14,#1a160f);
+    border:1px solid var(--line); border-radius:14px; padding:16px 16px 14px; position:relative;
+    transition:transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+  }
+  a.card:hover{transform:translateY(-2px); border-color:var(--bronze); box-shadow:0 6px 22px #0008}
+  .card .ic{font-size:22px; margin-bottom:8px}
+  .card .nm{font-size:15px; font-weight:700; margin-bottom:3px}
+  .card .ds{font-size:12px; color:var(--dim); line-height:1.45}
+  .card .path{font-size:10.5px; color:#6c5f49; margin-top:8px; font-family:ui-monospace,monospace}
+  .card.disabled{opacity:.5; cursor:not-allowed}
+  .badge{position:absolute; top:12px; right:12px; font-size:10px; padding:2px 7px; border-radius:999px; border:1px solid var(--line); color:var(--dim)}
+  .badge.soon{color:var(--acc); border-color:var(--bronze)}
+  .badge.game{color:var(--acc2); border-color:#3f5a3f}
+  footer{max-width:1080px; margin:0 auto; padding:0 28px 40px; color:#6c5f49; font-size:12px}
+  code{background:#0006; padding:1px 5px; border-radius:5px; color:#bba}
+</style>
+</head>
+<body>
+<header>
+  <h1>삼국지 SRPG <span class="sub">— 개발 도구 대시보드</span></h1>
+  <p class="tag">에셋 프롬프트 · 데이터 에디터 · 맵/스테이지 · 게임 실행. 모든 도구는 브라우저 단독 실행(File System Access로 JSON 열고/저장).</p>
+</header>
+<main>
+
+  <div class="sec"><h2>🎨 에셋 프롬프트 보드</h2><span class="hint">AI 생성용 프롬프트 — 생성 후 폴더 자동 저장</span></div>
+  <div class="grid">
+    <a class="card" href="../docs/art/asset-board.html">
+      <div class="ic">🗂️</div><div class="nm">에셋 프롬프트 보드</div>
+      <div class="ds">캐릭터·무기·적네임드·초상·병종·지형·UI·일기토 — v2.0 풀 카탈로그(104카드)</div>
+      <div class="path">docs/art/asset-board.html</div></a>
+    <a class="card" href="../docs/art/map-chunk-board.html">
+      <div class="ic">🧩</div><div class="nm">맵 청크 보드</div>
+      <div class="ds">스테이지별 painted 배경 청크 생성 → stitch</div>
+      <div class="path">docs/art/map-chunk-board.html</div></a>
+  </div>
+
+  <div class="sec"><h2>🗃️ 데이터 에디터</h2><span class="hint">schemas.ts 정합 · 위반 시 저장 차단 · 2탄 재사용</span></div>
+  <div class="grid">
+    <a class="card" href="item-editor.html">
+      <div class="ic">⚔️</div><div class="nm">무기·아이템 에디터</div>
+      <div class="ds">무기/방어/보조/보물/소모품 — items.json</div>
+      <div class="path">tools/item-editor.html</div></a>
+    <a class="card" href="class-editor.html">
+      <div class="ic">🛡️</div><div class="nm">병종 에디터</div>
+      <div class="ds">병종 스탯·5스탯 등급·책략·탈것 — unitClasses.json</div>
+      <div class="path">tools/class-editor.html</div></a>
+    <a class="card" href="character-editor.html">
+      <div class="ic">🧑‍✈️</div><div class="nm">캐릭터 에디터</div>
+      <div class="ds">장수 능력치 + 로스터 배정 — commanders/rosters.json</div>
+      <div class="path">tools/character-editor.html</div></a>
+    <a class="card" href="strategy-editor.html">
+      <div class="ic">📜</div><div class="nm">책략 에디터</div>
+      <div class="ds">화/수/지/풍/회복/현혹 책략 — strategies.json</div>
+      <div class="path">tools/strategy-editor.html</div></a>
+  </div>
+
+  <div class="sec"><h2>🗺️ 맵 · 스테이지</h2><span class="hint">지형 페인트 + 유닛 배치 + 목표/전략조건/증원</span></div>
+  <div class="grid">
+    <a class="card" href="stage-editor.html">
+      <div class="ic">🎯</div><div class="nm">스테이지 에디터</div>
+      <div class="ds">지형+유닛+목표/패배/증원/전략조건/일기토 → stage+map JSON + 블록아웃</div>
+      <div class="path">tools/stage-editor.html</div></a>
+    <a class="card" href="map-editor.html">
+      <div class="ic">🖌️</div><div class="nm">지형 에디터</div>
+      <div class="ds">지형 칸 칠하기 → map JSON + 블록아웃 PNG</div>
+      <div class="path">tools/map-editor.html</div></a>
+  </div>
+
+  <div class="sec"><h2>🦴 애니메이션</h2><span class="hint">자체 컷아웃 리그(Spine 대체)</span></div>
+  <div class="grid">
+    <div class="card disabled"><span class="badge soon">준비 중</span>
+      <div class="ic">🦴</div><div class="nm">리그 에디터</div>
+      <div class="ds">파트·본·무기슬롯·키프레임 → 스켈레톤 JSON (구현 예정)</div>
+      <div class="path">tools/rig-editor.html</div></div>
+  </div>
+
+  <div class="sec"><h2>▶ 게임 실행</h2><span class="hint">dev 서버 필요 — <code>pnpm --filter @tk/web dev</code></span></div>
+  <div class="grid">
+    <a class="card" href="http://localhost:3000"><span class="badge game">:3000</span>
+      <div class="ic">🏯</div><div class="nm">게임 (타이틀)</div>
+      <div class="ds">타이틀 → 스테이지선택 → 편성/상점 → 출진</div>
+      <div class="path">localhost:3000</div></a>
+    <a class="card" href="http://localhost:3000/battle"><span class="badge game">:3000</span>
+      <div class="ic">⚔️</div><div class="nm">사수관 전투 (바로)</div>
+      <div class="ds">렌더러 직행 — 편성 없이 사수관</div>
+      <div class="path">localhost:3000/battle</div></a>
+  </div>
+
+</main>
+<footer>
+  팁: 에디터는 Chrome/Edge에서 열어야 File System Access(파일 열기/저장)가 동작합니다. 게임 카드는 dev 서버가 떠 있어야 열립니다.
+</footer>
+</body>
+</html>
