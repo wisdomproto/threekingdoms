@@ -6,7 +6,7 @@
  *  - animating/enemyTurn 중 입력 무시, battleOver는 영구 잠금
  */
 import { describe, expect, it } from "vitest";
-import { createBattle, getAttackableTargets, getMovableTiles } from "@tk/engine";
+import { applyAction, createBattle, getAttackableTargets, getMovableTiles } from "@tk/engine";
 import type { BattleState, Coord } from "@tk/engine";
 import { reduceInput, type InputState, type UiEvent } from "../inputMachine";
 import { BattleStore } from "../store";
@@ -32,6 +32,29 @@ function select(battle: BattleState, unitId: string): InputState {
   expect(r.next.kind).toBe("selected");
   return r.next;
 }
+
+describe("이미 이동한 유닛 재선택 (자동전투 중단/부분커밋 회귀)", () => {
+  // 관우를 moved=true·acted=false 로: 자동전투가 유닛 자동 이동 직후 OFF되거나 체인 일부만
+  // 커밋된 경우 발생. 이 유닛을 다시 선택해 이동하면 chain의 move가 "already moved"로 터졌었다.
+  const movedState = withUnit(state0, GUANYU, { moved: true });
+
+  it("moved 유닛 탭 → selected 아닌 postMoveMenu(제자리) — 재이동 금지", () => {
+    const r = reduceInput({ kind: "idle" }, { type: "tapTile", coord: guanyuPos }, ctx, movedState);
+    expect(r.next.kind).toBe("postMoveMenu");
+    if (r.next.kind !== "postMoveMenu") throw new Error("unreachable");
+    expect(r.next.from).toEqual(r.next.preview); // from==preview ⇒ 이동 커밋 생략
+  });
+
+  it("moved 유닛 → 대기 커밋이 [wait]만(이동 액션 없음) → applyAction 'already moved' 미발생", () => {
+    const menu = reduceInput({ kind: "idle" }, { type: "tapTile", coord: guanyuPos }, ctx, movedState).next;
+    const r = reduceInput(menu, { type: "menuWait" }, ctx, movedState);
+    const commit = r.effects.find((e) => e.type === "commit");
+    if (!commit || commit.type !== "commit") throw new Error("commit effect 없음");
+    expect(commit.actions).toHaveLength(1);
+    expect(commit.actions[0]).toMatchObject({ type: "wait", unitId: GUANYU });
+    expect(() => applyAction(ctx, movedState, commit.actions[0]!)).not.toThrow();
+  });
+});
 
 describe("idle", () => {
   it("미행동 아군 탭 → selected + 하이라이트 집합(movable/attackable) 보관 + focus", () => {

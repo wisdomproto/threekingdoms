@@ -217,6 +217,25 @@ export function reduceInput(
           battle.phase === "player" &&
           battle.status === "ongoing";
         if (u && selectable) {
+          const pos = { x: u.x, y: u.y };
+          // 이미 이동한(moved) 유닛은 재이동 금지 — 제자리서 행동만(조조전 문법).
+          // (자동전투를 유닛 이동 직후 끄거나 체인 일부만 커밋된 경우 moved=true·acted=false로
+          //  남을 수 있다. 이때 다시 선택해 이동하면 chain의 move가 assertCanAct에서 터졌다.)
+          if (u.moved) {
+            return {
+              next: {
+                kind: "postMoveMenu",
+                unitId: u.id,
+                from: pos,
+                preview: pos,
+                movable: [pos],
+                attackable: getAttackableTargets(ctx, battle, u.id),
+                strategies: castableStrategies(ctx, battle, u.id, pos),
+                items: usableItems(ctx, battle, u.id),
+              },
+              effects: [{ type: "focus", coord: event.coord }],
+            };
+          }
           return {
             next: {
               kind: "selected",
