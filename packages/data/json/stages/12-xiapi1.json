@@ -1,0 +1,146 @@
+{
+  "id": "12-xiapi1",
+  "name": "하비 1차 (탈출전)",
+  "mapId": "xiapi1",
+  "turnLimit": 18,
+  "camera": { "zoom": 1.6, "focus": [30, 15] },
+  "reward": { "gold": 200, "exp": 0, "treasures": [] },
+  "levelCap": 22,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 18,
+      "troops": 240,
+      "items": [],
+      "side": "player",
+      "x": 31,
+      "y": 15
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 18,
+      "troops": 255,
+      "items": ["청룡언월도"],
+      "side": "player",
+      "x": 33,
+      "y": 14
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 18,
+      "troops": 255,
+      "items": ["사모"],
+      "side": "player",
+      "x": 33,
+      "y": 16
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 16,
+      "troops": 180,
+      "items": ["쌀"],
+      "side": "player",
+      "x": 30,
+      "y": 17
+    },
+    {
+      "commanderId": "여포",
+      "classId": "guardCavalry",
+      "level": 24,
+      "troops": 360,
+      "items": ["방천화극", "적토마"],
+      "side": "enemy",
+      "x": 36,
+      "y": 4
+    },
+    {
+      "commanderId": "장요",
+      "classId": "heavyCavalry",
+      "level": 21,
+      "troops": 280,
+      "items": [],
+      "side": "enemy",
+      "x": 36,
+      "y": 3
+    },
+    {
+      "commanderId": "고순",
+      "classId": "footman",
+      "level": 20,
+      "troops": 240,
+      "items": [],
+      "side": "enemy",
+      "x": 36,
+      "y": 5
+    },
+    {
+      "commanderId": "후성",
+      "classId": "archer",
+      "level": 18,
+      "troops": 200,
+      "items": [],
+      "side": "enemy",
+      "x": 40,
+      "y": 14
+    },
+    {
+      "commanderId": "위속",
+      "classId": "lightCavalry",
+      "level": 18,
+      "troops": 200,
+      "items": [],
+      "side": "enemy",
+      "x": 40,
+      "y": 18
+    }
+  ],
+  "objectives": [
+    { "kind": "reachTile", "unitId": "유비", "x": 0, "y": 15 },
+    { "kind": "reachTile", "unitId": "관우", "x": 0, "y": 14, "optional": true }
+  ],
+  "failConditions": [
+    { "kind": "unitRetreated", "unitId": "유비" }
+  ],
+  "reinforcements": [
+    {
+      "id": "reinf_lubu_pursuit_t4",
+      "side": "enemy",
+      "trigger": { "kind": "turn", "turn": 4 },
+      "units": [
+        {
+          "commanderId": "조성",
+          "classId": "lightCavalry",
+          "level": 18,
+          "troops": 200,
+          "items": [],
+          "side": "enemy",
+          "x": 36,
+          "y": 4
+        },
+        {
+          "commanderId": "학맹",
+          "classId": "heavyCavalry",
+          "level": 19,
+          "troops": 220,
+          "items": [],
+          "side": "enemy",
+          "x": 36,
+          "y": 5
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_zhangfei_zhangliao",
+      "type": "duel",
+      "trigger": { "kind": "attack", "attackerId": "장비", "defenderId": "장요" },
+      "outcome": { "winnerId": "장비", "loserRetreats": false },
+      "once": true
+    }
+  ]
+}

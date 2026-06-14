@@ -1,0 +1,258 @@
+{
+  "id": "06-huluguan",
+  "name": "호로관의 전투",
+  "mapId": "huluguan",
+  "turnLimit": 20,
+  "camera": {
+    "zoom": 1.4,
+    "focus": [
+      15,
+      38
+    ]
+  },
+  "reward": {
+    "gold": 1000,
+    "exp": 0,
+    "treasures": [
+      "방천화극"
+    ]
+  },
+  "levelCap": 14,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 5,
+      "troops": 110,
+      "items": [],
+      "side": "player",
+      "x": 14,
+      "y": 40
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 5,
+      "troops": 120,
+      "items": [
+        "청룡언월도"
+      ],
+      "side": "player",
+      "x": 13,
+      "y": 41
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 5,
+      "troops": 120,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 15,
+      "y": 41
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 5,
+      "troops": 90,
+      "items": [
+        "쌀",
+        "폭탄"
+      ],
+      "side": "player",
+      "x": 14,
+      "y": 42
+    },
+    {
+      "commanderId": "미방",
+      "classId": "footman",
+      "level": 5,
+      "troops": 100,
+      "items": [],
+      "side": "player",
+      "x": 12,
+      "y": 42
+    },
+    {
+      "commanderId": "조잠",
+      "classId": "archer",
+      "level": 5,
+      "troops": 90,
+      "items": [],
+      "side": "player",
+      "x": 16,
+      "y": 42
+    },
+    {
+      "commanderId": "공손찬",
+      "classId": "lightCavalry",
+      "level": 4,
+      "troops": 110,
+      "items": [],
+      "side": "ally",
+      "x": 10,
+      "y": 40
+    },
+    {
+      "commanderId": "여포",
+      "classId": "heavyCavalry",
+      "level": 5,
+      "troops": 125,
+      "items": [
+        "방천화극",
+        "적토마"
+      ],
+      "side": "enemy",
+      "x": 15,
+      "y": 4
+    },
+    {
+      "commanderId": "장요",
+      "classId": "lightCavalry",
+      "level": 3,
+      "troops": 105,
+      "items": [],
+      "side": "enemy",
+      "x": 13,
+      "y": 9
+    },
+    {
+      "commanderId": "송겸",
+      "classId": "archer",
+      "level": 3,
+      "troops": 90,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9
+    },
+    {
+      "commanderId": "이각",
+      "classId": "footman",
+      "level": 3,
+      "troops": 95,
+      "items": [],
+      "side": "enemy",
+      "x": 15,
+      "y": 9
+    },
+    {
+      "commanderId": "곽사",
+      "classId": "footman",
+      "level": 2,
+      "troops": 85,
+      "items": [],
+      "side": "enemy",
+      "x": 9,
+      "y": 11
+    },
+    {
+      "commanderId": "이숙",
+      "classId": "archer",
+      "level": 2,
+      "troops": 80,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 11
+    },
+    {
+      "commanderId": "호진",
+      "classId": "lightCavalry",
+      "level": 2,
+      "troops": 85,
+      "items": [],
+      "side": "enemy",
+      "x": 11,
+      "y": 27
+    },
+    {
+      "commanderId": "서영",
+      "classId": "footman",
+      "level": 2,
+      "troops": 85,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 27
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "defeatUnit",
+      "unitId": "여포"
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    }
+  ],
+  "reinforcements": [
+    {
+      "id": "reinf_lubu_guards_turn5",
+      "side": "enemy",
+      "trigger": {
+        "kind": "turn",
+        "turn": 5
+      },
+      "units": [
+        {
+          "commanderId": "서상",
+          "classId": "footman",
+          "level": 2,
+          "troops": 80,
+          "items": [],
+          "side": "enemy",
+          "x": 14,
+          "y": 9
+        },
+        {
+          "commanderId": "조성",
+          "classId": "archer",
+          "level": 2,
+          "troops": 75,
+          "items": [],
+          "side": "enemy",
+          "x": 16,
+          "y": 9
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_zhangfei_lubu",
+      "description": "장비가 여포와 일기토를 벌이면 군량 [쌀]을 노획한다.",
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhangfei_lubu"
+      },
+      "reward": {
+        "treasures": [
+          "쌀"
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_zhangfei_lubu",
+      "type": "duel",
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "장비",
+        "defenderId": "여포"
+      },
+      "outcome": {
+        "winnerId": "여포",
+        "loserRetreats": false
+      },
+      "once": true
+    }
+  ]
+}

@@ -1,0 +1,235 @@
+{
+  "id": "10-xuzhou",
+  "name": "서주 구원전",
+  "mapId": "xuzhou",
+  "turnLimit": 30,
+  "camera": {
+    "zoom": 1.4,
+    "focus": [
+      40,
+      7
+    ]
+  },
+  "reward": {
+    "gold": 450,
+    "exp": 0,
+    "treasures": [
+      "의협교본"
+    ]
+  },
+  "levelCap": 20,
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 8,
+      "troops": 150,
+      "items": [],
+      "side": "player",
+      "x": 45,
+      "y": 5
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 9,
+      "troops": 160,
+      "items": [
+        "청룡언월도"
+      ],
+      "side": "player",
+      "x": 43,
+      "y": 4
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 9,
+      "troops": 160,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 43,
+      "y": 6
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 8,
+      "troops": 150,
+      "items": [],
+      "side": "player",
+      "x": 42,
+      "y": 5
+    },
+    {
+      "commanderId": "미축",
+      "classId": "strategist",
+      "level": 7,
+      "troops": 110,
+      "items": [
+        "쌀"
+      ],
+      "side": "player",
+      "x": 46,
+      "y": 4
+    },
+    {
+      "commanderId": "손건",
+      "classId": "strategist",
+      "level": 7,
+      "troops": 110,
+      "items": [],
+      "side": "player",
+      "x": 46,
+      "y": 6
+    },
+    {
+      "commanderId": "도겸",
+      "classId": "lord",
+      "level": 6,
+      "troops": 120,
+      "items": [],
+      "side": "ally",
+      "x": 49,
+      "y": 5
+    },
+    {
+      "commanderId": "하후돈",
+      "classId": "heavyCavalry",
+      "level": 9,
+      "troops": 150,
+      "items": [],
+      "side": "enemy",
+      "x": 30,
+      "y": 5
+    },
+    {
+      "commanderId": "우금",
+      "classId": "guardCavalry",
+      "level": 9,
+      "troops": 140,
+      "items": [],
+      "side": "enemy",
+      "x": 30,
+      "y": 9
+    },
+    {
+      "commanderId": "하후연",
+      "classId": "archer",
+      "level": 8,
+      "troops": 120,
+      "items": [],
+      "side": "enemy",
+      "x": 28,
+      "y": 3
+    },
+    {
+      "commanderId": "이전",
+      "classId": "footman",
+      "level": 8,
+      "troops": 120,
+      "items": [],
+      "side": "enemy",
+      "x": 26,
+      "y": 7
+    },
+    {
+      "commanderId": "악진",
+      "classId": "archer",
+      "level": 8,
+      "troops": 110,
+      "items": [],
+      "side": "enemy",
+      "x": 28,
+      "y": 11
+    },
+    {
+      "commanderId": "조인",
+      "classId": "lightCavalry",
+      "level": 8,
+      "troops": 110,
+      "items": [],
+      "side": "enemy",
+      "x": 24,
+      "y": 5
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "surviveTurns",
+      "turns": 15
+    },
+    {
+      "kind": "defeatUnit",
+      "unitId": "하후돈",
+      "optional": true
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    },
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "도겸"
+      ]
+    }
+  ],
+  "reinforcements": [
+    {
+      "id": "reinforce_taishici",
+      "side": "ally",
+      "trigger": {
+        "kind": "turn",
+        "turn": 6
+      },
+      "units": [
+        {
+          "commanderId": "태사자",
+          "classId": "lightCavalry",
+          "level": 10,
+          "troops": 160,
+          "items": [],
+          "side": "ally",
+          "x": 38,
+          "y": 9
+        }
+      ]
+    }
+  ],
+  "strategyConditions": [
+    {
+      "id": "duel_guanyu_yujin_reward",
+      "description": "관우가 우금과 일기토를 벌이면 전리품 [쌀]을 얻는다.",
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_guanyu_yujin"
+      },
+      "reward": {
+        "treasures": [
+          "쌀"
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "id": "duel_guanyu_yujin",
+      "type": "duel",
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "관우",
+        "defenderId": "우금"
+      },
+      "outcome": {
+        "winnerId": "관우",
+        "loserRetreats": true
+      },
+      "once": true
+    }
+  ]
+}

@@ -17,7 +17,13 @@ import initialForcesJson from "../json/initialForces.json";
 import rostersJson from "../json/rosters.json";
 import shopCh1Json from "../json/shops/ch1.json";
 import sishuiguanJson from "../json/maps/sishuiguan.json";
+import huluguanJson from "../json/maps/huluguan.json";
+import xuzhouJson from "../json/maps/xuzhou.json";
+import xiapi1Json from "../json/maps/xiapi1.json";
 import stage05Json from "../json/stages/05-sishuiguan.json";
+import stage06Json from "../json/stages/06-huluguan.json";
+import stage10Json from "../json/stages/10-xuzhou.json";
+import stage12Json from "../json/stages/12-xiapi1.json";
 
 export * from "./schemas";
 
@@ -56,9 +62,15 @@ export const gameData: GameData = {
   },
   maps: {
     sishuiguan: loadJson(BattleMapSchema, sishuiguanJson, "maps/sishuiguan.json"),
+    huluguan: loadJson(BattleMapSchema, huluguanJson, "maps/huluguan.json"),
+    xuzhou: loadJson(BattleMapSchema, xuzhouJson, "maps/xuzhou.json"),
+    xiapi1: loadJson(BattleMapSchema, xiapi1Json, "maps/xiapi1.json"),
   },
   stages: {
     "05-sishuiguan": loadJson(StageSchema, stage05Json, "stages/05-sishuiguan.json"),
+    "06-huluguan": loadJson(StageSchema, stage06Json, "stages/06-huluguan.json"),
+    "10-xuzhou": loadJson(StageSchema, stage10Json, "stages/10-xuzhou.json"),
+    "12-xiapi1": loadJson(StageSchema, stage12Json, "stages/12-xiapi1.json"),
   },
 };
 
