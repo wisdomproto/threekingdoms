@@ -63,21 +63,40 @@ export interface UnitVM {
   strategies?: StrategyVM[];    // 병종 보유 책략 해석 목록 (책략 탭)
 }
 
-/** 도구/장비 효과 요약 문구 — category + power/bonusPercent를 사람이 읽는 한 줄로 */
-function itemEffect(category: string, power: number, bonusPercent: number): string {
+/** §7 장착 효과(말·보물) 요약 — 사람이 읽는 토막들 */
+function effectParts(e?: {
+  move?: number; atkPercent?: number; spiritPercent?: number; defensePercent?: number; doubleStrike?: boolean;
+}): string[] {
+  if (!e) return [];
+  const out: string[] = [];
+  if (e.move) out.push(`기동 +${e.move}`);
+  if (e.atkPercent) out.push(`공격 +${e.atkPercent}%`);
+  if (e.spiritPercent) out.push(`정신 +${e.spiritPercent}%`);
+  if (e.defensePercent) out.push(`받는 피해 −${e.defensePercent}%`);
+  if (e.doubleStrike) out.push("연속공격");
+  return out;
+}
+
+/** 도구/장비 효과 요약 문구 — category + power/bonusPercent + 장착 효과(effects)를 한 줄로 */
+function itemEffect(
+  category: string, power: number, bonusPercent: number,
+  effects?: Parameters<typeof effectParts>[0],
+): string {
+  const extra = effectParts(effects);
+  const join = (base: string): string => [base, ...extra].filter(Boolean).join(" · ");
   switch (category) {
     case "weapon":
-      return bonusPercent > 0 ? `공격 +${bonusPercent}%` : "무기";
+      return join(bonusPercent > 0 ? `공격 +${bonusPercent}%` : "무기");
     case "book":
-      return bonusPercent > 0 ? `정신 +${bonusPercent}%` : "병법서";
+      return join(bonusPercent > 0 ? `정신 +${bonusPercent}%` : "병법서");
     case "horse":
-      return "기동";
+      return extra.length ? extra.join(" · ") : "기동";
     case "supplyItem":
       return power < 255 ? `회복 ${power}` : "회복";
     case "attackItem":
       return power < 255 ? `피해 ${power}` : "공격 도구";
     case "treasure":
-      return "보물";
+      return extra.length ? extra.join(" · ") : "보물";
     default:
       return "기타";
   }
@@ -155,7 +174,7 @@ export function unitVM(ctx: BattleContext, u: UnitState): UnitVM {
       id,
       name: it?.name ?? id,
       category: it?.category ?? "기타",
-      effect: it ? itemEffect(it.category, it.power, it.bonusPercent) : "—",
+      effect: it ? itemEffect(it.category, it.power, it.bonusPercent, it.effects) : "—",
     };
   });
   // 병종 책략 → 책략 탭 행 (strategies.json 해석)

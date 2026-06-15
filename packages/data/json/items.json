@@ -4,21 +4,24 @@
     "name": "둔갑천서",
     "category": "treasure",
     "power": 255,
-    "bonusPercent": 0
+    "bonusPercent": 0,
+    "effects": { "defensePercent": 15 }
   },
   "청랑서": {
     "id": "청랑서",
     "name": "청랑서",
     "category": "treasure",
     "power": 255,
-    "bonusPercent": 0
+    "bonusPercent": 0,
+    "effects": { "spiritPercent": 15 }
   },
   "고취구": {
     "id": "고취구",
     "name": "고취구",
     "category": "treasure",
     "power": 255,
-    "bonusPercent": 0
+    "bonusPercent": 0,
+    "effects": { "atkPercent": 10 }
   },
   "손자의병법서": {
     "id": "손자의병법서",
@@ -39,21 +42,24 @@
     "name": "조황비전",
     "category": "horse",
     "power": 255,
-    "bonusPercent": 1
+    "bonusPercent": 1,
+    "effects": { "move": 1 }
   },
   "적로": {
     "id": "적로",
     "name": "적로",
     "category": "horse",
     "power": 255,
-    "bonusPercent": 2
+    "bonusPercent": 2,
+    "effects": { "move": 1 }
   },
   "적토마": {
     "id": "적토마",
     "name": "적토마",
     "category": "horse",
     "power": 255,
-    "bonusPercent": 3
+    "bonusPercent": 3,
+    "effects": { "move": 1 }
   },
   "옥새": {
     "id": "옥새",
@@ -116,77 +122,88 @@
     "name": "궁술지침서",
     "category": "treasure",
     "power": 255,
-    "bonusPercent": 0
+    "bonusPercent": 0,
+    "effects": { "atkPercent": 12 }
   },
   "마술지침서": {
     "id": "마술지침서",
     "name": "마술지침서",
     "category": "treasure",
     "power": 255,
-    "bonusPercent": 0
+    "bonusPercent": 0,
+    "effects": { "move": 1 }
   },
   "검술지침서": {
     "id": "검술지침서",
     "name": "검술지침서",
     "category": "treasure",
     "power": 255,
-    "bonusPercent": 0
+    "bonusPercent": 0,
+    "effects": { "atkPercent": 12 }
   },
   "장창": {
     "id": "장창",
     "name": "장창",
     "category": "treasure",
     "power": 30,
-    "bonusPercent": 0
+    "bonusPercent": 0,
+    "effects": { "atkPercent": 12 }
   },
   "보병차": {
     "id": "보병차",
     "name": "보병차",
     "category": "treasure",
     "power": 60,
-    "bonusPercent": 0
+    "bonusPercent": 0,
+    "effects": { "defensePercent": 12 }
   },
   "연노": {
     "id": "연노",
     "name": "연노",
     "category": "treasure",
     "power": 35,
-    "bonusPercent": 0
+    "bonusPercent": 0,
+    "effects": { "atkPercent": 12 }
   },
   "투석기": {
     "id": "투석기",
     "name": "투석기",
     "category": "treasure",
     "power": 70,
-    "bonusPercent": 0
+    "bonusPercent": 0,
+    "effects": { "atkPercent": 12 }
   },
   "마개": {
     "id": "마개",
     "name": "마개",
     "category": "treasure",
     "power": 40,
-    "bonusPercent": 0
+    "bonusPercent": 0,
+    "effects": { "defensePercent": 12 }
   },
   "근위개": {
     "id": "근위개",
     "name": "근위개",
     "category": "treasure",
     "power": 80,
-    "bonusPercent": 0
+    "bonusPercent": 0,
+    "effects": { "defensePercent": 15 }
   },
   "무술교본": {
     "id": "무술교본",
     "name": "무술교본",
     "category": "treasure",
     "power": 20,
-    "bonusPercent": 0
+    "bonusPercent": 0,
+    "effects": { "atkPercent": 10 }
   },
   "의협교본": {
     "id": "의협교본",
     "name": "의협교본",
     "category": "treasure",
     "power": 40,
-    "bonusPercent": 0
+    "bonusPercent": 0,
+    "effects": { "spiritPercent": 12 }
   },
   "술": {
     "id": "술",

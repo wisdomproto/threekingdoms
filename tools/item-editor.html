@@ -166,6 +166,30 @@ const FIELDS = [
     hint: 'b14: 무기/병법서 % 가산. 소모품/공격아이템은 보통 0. 0~100 정수.',
     validate: (v) => intRange(v, 0, 100, 'bonusPercent'),
   },
+  {
+    // §7 장착 효과(말·보물). JSON 한 줄로 편집 — 비우면 효과 없음.
+    key: 'effects', label: '장착 효과(effects, JSON)', type: 'json',
+    hint: '말·보물 효과. 예: {"move":1} · {"defensePercent":15} · {"atkPercent":12} · {"spiritPercent":10} · {"doubleStrike":true}. 비우면 없음.',
+    get: (item) => (item.effects && Object.keys(item.effects).length) ? JSON.stringify(item.effects) : '',
+    set: (item, val) => {
+      const s = String(val).trim();
+      delete item._effErr;
+      if (s === '') { delete item.effects; return; }
+      try {
+        const o = JSON.parse(s);
+        if (o && typeof o === 'object' && !Array.isArray(o)) { item.effects = o; }
+        else { item._effErr = '객체여야 합니다'; }
+      } catch { item._effErr = 'JSON 형식 오류'; }
+    },
+    validate: (v, item) => {
+      if (item._effErr) return `effects ${item._effErr} (예: {"move":1})`;
+      const e = item.effects; if (!e) return null;
+      const allowed = ['move', 'atkPercent', 'spiritPercent', 'defensePercent', 'doubleStrike'];
+      const bad = Object.keys(e).filter(k => !allowed.includes(k));
+      if (bad.length) return `알 수 없는 효과 키: ${bad.join(', ')} (허용: ${allowed.join('/')})`;
+      return null;
+    },
+  },
 ];
 
 function intRange(v, lo, hi, name) {
@@ -290,15 +314,20 @@ function renderForm() {
     wrap.className = 'field'; wrap.dataset.key = f.key;
     const lab = document.createElement('label'); lab.textContent = f.label; wrap.appendChild(lab);
     let inp;
+    const curVal = f.get ? f.get(item) : item[f.key];   // 커스텀 접근자(effects 등) 지원
     if (f.type === 'select') {
       inp = document.createElement('select');
       f.options.forEach(o => { const op = document.createElement('option'); op.value = o.value; op.textContent = o.label; inp.appendChild(op); });
-      inp.value = item[f.key];
+      inp.value = curVal;
+    } else if (f.type === 'json') {
+      inp = document.createElement('textarea');
+      inp.rows = 2; inp.spellcheck = false;
+      inp.value = curVal ?? '';
     } else {
       inp = document.createElement('input');
       inp.type = f.type === 'int' ? 'number' : 'text';
       if (f.type === 'int') { if (f.min != null) inp.min = f.min; if (f.max != null) inp.max = f.max; inp.step = 1; }
-      inp.value = item[f.key] ?? '';
+      inp.value = curVal ?? '';
     }
     inp.oninput = () => onEdit(f, inp);
     inp.onchange = () => onEdit(f, inp);
@@ -331,6 +360,8 @@ function onEdit(f, inp) {
     // category 힌트 동적 갱신
     const wrap = document.querySelector(`.field[data-key="category"]`);
     if (wrap) { const h = wrap.querySelector('.hint'); if (h) h.textContent = CAT_MAP[val] ? CAT_MAP[val].hint : ''; }
+  } else if (f.set) {
+    f.set(item, val);   // 커스텀 접근자(effects JSON 등)
   } else {
     item[f.key] = val;
   }
@@ -355,7 +386,7 @@ function validateItem(item, idKey) {
   // idKey = 이 항목이 들어있는 Record 키 (id 필드와 다를 수 있음 → 일치 검사)
   const errs = [];
   FIELDS.forEach(f => {
-    const e = f.validate(item[f.key], item, data);
+    const e = f.validate(f.get ? f.get(item) : item[f.key], item, data);
     if (e) errs.push({ key: f.key, msg: e });
   });
   if (idKey != null && item.id !== idKey) errs.push({ key: 'id', msg: `id 필드("${item.id}")와 Record 키("${idKey}")가 다릅니다.` });
@@ -439,6 +470,8 @@ function serialize() {
     const it = data[id];
     // 스키마 필드 순서로 정규화 출력 (기존 items.json 형태와 동일)
     out[id] = { id: it.id, name: it.name, category: it.category, power: it.power, bonusPercent: it.bonusPercent };
+    // §7 장착 효과(말·보물) — 있으면 보존(에디터가 떨어뜨리지 않게). 비면 생략.
+    if (it.effects && Object.keys(it.effects).length) out[id].effects = it.effects;
   });
   return JSON.stringify(out, null, 2) + '\n';
 }

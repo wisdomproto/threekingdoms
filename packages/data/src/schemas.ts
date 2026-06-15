@@ -91,12 +91,27 @@ export const TerrainSchema = z.object({
 });
 export type Terrain = z.infer<typeof TerrainSchema>;
 
+/**
+ * 아이템 장착 효과(§7 아이템 효과 시스템 / §10 보물 "고유 효과 고정") — 전부 결정론.
+ * 기존 weapon/book의 bonusPercent와 별개의 *추가* 필드. 말·보물이 실제 효과를 갖게 한다.
+ * 미지정(생략) = 효과 없음. 전 효과는 createBattle에서 합산돼 UnitState에 반영된다.
+ */
+export const ItemEffectsSchema = z.object({
+  move: z.number().int().optional(),                       // 이동력 +N (말 등) — 연속공격 사거리도 ↑
+  atkPercent: z.number().min(0).optional(),                // 부대 공격력 +N% (보물 무기류)
+  spiritPercent: z.number().min(0).optional(),             // 부대 정신력 +N% (보물 병서류)
+  defensePercent: z.number().min(0).max(90).optional(),    // 받는 피해 −N% (방어 보물 — 철벽처럼)
+  doubleStrike: z.boolean().optional(),                    // 연속공격 무조건 부여(이동력 무관)
+});
+export type ItemEffects = z.infer<typeof ItemEffectsSchema>;
+
 export const ItemSchema = z.object({
   id: z.string(),
   name: z.string(),
   category: z.enum(["weapon", "treasure", "attackItem", "supplyItem", "horse", "book"]),
   power: z.number().int().min(0).max(255),        // b13: 소모품 효과량, 255=비소모
   bonusPercent: z.number().int().min(0).max(100), // b14: 무기/병법서 % 가산
+  effects: ItemEffectsSchema.optional(),          // §7 장착 효과(말·보물). 생략=없음
 });
 export type Item = z.infer<typeof ItemSchema>;
 

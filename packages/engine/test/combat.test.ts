@@ -172,5 +172,19 @@ describe("병종 패시브 (결정론 게임성 격상, CLAUDE.md §7)", () => {
     it("느린 공격자는 미발동 (보병 → 경기병)", () => {
       expect(doubleStrikes(testCtx, get("유비"), get("관우"))).toBe(false);
     });
+    it("아이템 연속공격 부여: grantsDoubleStrike면 이동력 무관 발동", () => {
+      const slow = { ...get("유비"), grantsDoubleStrike: true }; // 보병(느림)인데 부여
+      expect(doubleStrikes(testCtx, slow, get("관우"))).toBe(true);
+    });
+  });
+
+  describe("아이템 방어 효과 (§7 damageReduction)", () => {
+    it("방어 보물 등의 damageReduction이 받는 피해를 경감", () => {
+      const base = computeDamage(testCtx, get("화웅"), get("관우"));
+      const guarded = { ...get("관우"), damageReduction: 0.3 };
+      const reduced = computeDamage(testCtx, get("화웅"), guarded);
+      expect(reduced).toBeLessThan(base);           // 경감 적용
+      expect(reduced).toBeGreaterThanOrEqual(Math.floor(base * 0.7) - 1); // 대략 −30%
+    });
   });
 });

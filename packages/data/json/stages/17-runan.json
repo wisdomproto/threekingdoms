@@ -11,7 +11,7 @@
       "commanderId": "유비",
       "classId": "lord",
       "level": 24,
-      "troops": 240,
+      "troops": 336,
       "items": ["적로"],
       "side": "player",
       "x": 5,

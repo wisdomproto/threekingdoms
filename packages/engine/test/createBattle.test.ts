@@ -35,4 +35,17 @@ describe("createBattle v2 (원작 모델)", () => {
     const bad = { ...testStage, units: [{ ...testStage.units[0]!, commanderId: "없는장수" }] };
     expect(() => createBattle({ data: gameData, stage: bad, map: testMap }, 1)).toThrow("없는장수");
   });
+
+  it("아이템 효과(§7): 적토마 장착 시 이동력 +2", () => {
+    // 유비(보병 move4)에게 적토마 부여 → move 6, 미장착 유비는 4
+    const stage2 = {
+      ...testStage,
+      units: testStage.units.map((u) => (u.commanderId === "유비" ? { ...u, items: ["적토마"] } : u)),
+    };
+    const s2 = createBattle({ ...testCtx, stage: stage2 }, 42);
+    const yoo = s2.units.find((u) => u.id === "유비")!;
+    expect(yoo.move).toBe(5); // footman 4 + 적토마 1 (이동 범위)
+    expect(yoo.baseMove).toBe(4); // 연속공격 판정은 병종 기본(말 보너스 제외)
+    expect(state.units.find((u) => u.id === "유비")!.move).toBe(4); // 미장착 = 기본
+  });
 });

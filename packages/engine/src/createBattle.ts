@@ -11,15 +11,28 @@ export function spawnUnit(data: GameData, p: StageUnit): UnitState {
   if (!cmd) throw new Error(`unknown commander: ${p.commanderId}`);
   const cls = data.unitClasses[p.classId];
   if (!cls) throw new Error(`unknown class: ${p.classId}`);
-  // 원작 룰: 소지품 중 최고 무기 1개만 공격력 % 보정 / 병법서(book) 1개만 정신력 % 보정
+  // 원작 룰: 소지품 중 최고 무기 1개만 공격력 % 보정 / 병법서(book) 1개만 정신력 % 보정.
+  // + §7 아이템 효과(effects): 말·보물의 이동/공격%/정신%/방어%/연속공격 부여를 합산.
   let weaponBonus = 1.0;
   let bookBonus = 1.0;
+  let moveBonus = 0, atkPct = 0, spiritPct = 0, defPct = 0, grantDouble = false;
   for (const itemId of p.items) {
     const item = data.items[itemId];
     if (!item) throw new Error(`unknown item: ${itemId}`);
     if (item.category === "weapon") weaponBonus = Math.max(weaponBonus, 1 + item.bonusPercent / 100);
     if (item.category === "book") bookBonus = Math.max(bookBonus, 1 + item.bonusPercent / 100);
+    const e = item.effects;
+    if (e) {
+      moveBonus += e.move ?? 0;
+      atkPct += e.atkPercent ?? 0;
+      spiritPct += e.spiritPercent ?? 0;
+      defPct += e.defensePercent ?? 0;
+      if (e.doubleStrike) grantDouble = true;
+    }
   }
+  weaponBonus *= 1 + atkPct / 100;   // 보물 공격% 는 무기 보정 위에 곱연산
+  bookBonus *= 1 + spiritPct / 100;  // 보물 정신% 는 병서 보정 위에 곱연산
+  const damageReduction = Math.min(0.9, defPct / 100); // 받는 피해 경감(철벽과 동일 계열, 합산 캡)
   const maxMp = Math.floor((p.level + 10) * cmd.intelligence / 40);
   return {
     id: cmd.id, classId: cls.id, line: cls.line, moveClass: cls.moveClass,
@@ -28,7 +41,8 @@ export function spawnUnit(data: GameData, p: StageUnit): UnitState {
     mp: maxMp, maxMp,
     war: cmd.war, leadership: cmd.leadership, intelligence: cmd.intelligence,
     baseAtk: cls.baseAtk, baseDef: cls.baseDef, grades: cls.grades, weaponBonus, bookBonus,
-    move: cls.move, rangeMin: cls.rangeMin, rangeMax: cls.rangeMax,
+    move: cls.move + moveBonus, baseMove: cls.move, rangeMin: cls.rangeMin, rangeMax: cls.rangeMax,
+    damageReduction, grantsDoubleStrike: grantDouble,
     items: [...p.items], // 소모품 useItem 시 1개씩 제거 (weapon/book 보정은 위에서 이미 산정)
     moved: false, acted: false, retreated: false,
   };

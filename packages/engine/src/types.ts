@@ -36,10 +36,14 @@ export interface UnitState {
   grades: ClassGrades;                // 병과 5스탯 등급(§1) — corpsStat 성장 입력
   weaponBonus: number;                // 1 + 최고 무기 bonusPercent/100 (소지품 중 최고 1개 — 원작 룰)
   bookBonus: number;                  // 1 + 최고 병법서(book) bonusPercent/100 — 정신력(spiritPower)에 곱
-  move: number;
+  move: number;                   // 이동 범위(병종 + 말 보너스)
+  baseMove?: number;              // 병종 기본 이동력(말 보너스 제외) — 연속공격 판정용(속도 정체성 고정). 미설정=move
   rangeMin: number; rangeMax: number;
   items: string[];       // 소지품 item id 목록 — useItem 시 1개씩 소모. weapon/book 보정은 createBattle에서 미리 산정됨
   moved: boolean; acted: boolean; retreated: boolean;
+  // §7 아이템 효과(말·보물). createBattle에서 산정. 기존 리터럴 무파손 위해 optional(미설정=무효).
+  damageReduction?: number;       // 받는 피해 경감 0~0.9 (방어 보물)
+  grantsDoubleStrike?: boolean;   // 아이템으로 연속공격 무조건 부여
 }
 
 /** 전략조건 보상 적립분 (M3① — §2-1 보물 게이트). 결산에서 지급. */

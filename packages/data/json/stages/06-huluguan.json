@@ -99,7 +99,7 @@
     {
       "commanderId": "여포",
       "classId": "heavyCavalry",
-      "level": 5,
+      "level": 4,
       "troops": 125,
       "items": [
         "방천화극",

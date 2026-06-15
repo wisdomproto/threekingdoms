@@ -69,7 +69,9 @@ export function computeDamage(
   const base = Math.max(0, raw) * (1 - guard) * ratio * flankMult;
   // 보병 철벽(패시브): 방어자가 보병 계열이면 최종 피해를 일부 경감.
   const bulwark = defender.line === "infantry" ? 1 - p.infantryBulwarkPercent / 100 : 1;
-  return Math.max(ctx.data.combat.minDamage, Math.floor(base * bulwark));
+  // 아이템 방어 효과(§7): 방어 보물 등의 피해 경감(철벽과 곱연산).
+  const itemGuard = 1 - (defender.damageReduction ?? 0);
+  return Math.max(ctx.data.combat.minDamage, Math.floor(base * bulwark * itemGuard));
 }
 
 /**
@@ -86,7 +88,12 @@ export function chargeMultiplier(ctx: BattleContext, attacker: UnitState): numbe
  * 원작 조조전의 순발력 기반 연속공격확률을 RNG 없이 이동력 우위로 치환(§7). 개시 공격에만.
  */
 export function doubleStrikes(ctx: BattleContext, attacker: UnitState, defender: UnitState): boolean {
-  return attacker.move - defender.move >= ctx.data.combat.doubleStrike.moveGap;
+  // 아이템으로 연속공격 부여(§7)면 이동력 무관 발동, 아니면 *병종 기본 이동력* 우위로 판정.
+  // (말 보너스는 이동 범위만 — 연속공격 임계를 흔들지 않게 baseMove로 본다.)
+  if (attacker.grantsDoubleStrike) return true;
+  const am = attacker.baseMove ?? attacker.move;
+  const dm = defender.baseMove ?? defender.move;
+  return am - dm >= ctx.data.combat.doubleStrike.moveGap;
 }
 
 /** 대상 4방(상하좌우)에서 공격자 진영 부대가 점유한 칸 수 — 협공 포위도(공격자 포함). 결정론. */
