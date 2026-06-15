@@ -1,10 +1,11 @@
 export { chooseAction, greedyPolicy, naivePolicy, type Policy } from "./policy";
-export { runBattle, withLevelOffset, type RunResult, type RunOpts } from "./runner";
+export { runBattle, runStage, withLevelOffset, type RunResult, type RunOpts } from "./runner";
 export {
   buildReportCard,
   buildRows,
   classify,
   runMatrix,
+  runMatrixOnStage,
   signals,
   type ReportCard,
   type ReportRow,
@@ -12,3 +13,8 @@ export {
   type Cell,
   type Label,
 } from "./reportCard";
+// §11-B 페이싱 생성기 — 신규 스테이지 적 배치 + 자동 조정.
+export { generate, autoTune, type GenSpec, type EnemyTemplate, type TuneResult } from "./gen/generator";
+export { DEFAULT_CURVE, bandBudgets, type PacingCurve, type Band } from "./gen/pacingCurve";
+export { unitForce, totalForce } from "./gen/force";
+export { pathPercentField, tilesNearPercent, type PercentField } from "./gen/placement";

@@ -6,7 +6,8 @@
  * balance.ts와 동일 패턴(순수 산출 → md). report-card-cli가 파일로 굽고, reportCard.test가 게이트.
  */
 import { stages } from "@tk/data";
-import { runBattle, type RunResult } from "./runner";
+import type { Stage } from "@tk/data";
+import { runStage, type RunResult } from "./runner";
 import { greedyPolicy, naivePolicy } from "./policy";
 
 export interface Cell {
@@ -36,15 +37,22 @@ function toCell(r: RunResult): Cell {
   return { result: r.result, turns: r.turns, retreats: r.playerRetreats };
 }
 
-/** 한 스테이지의 6셀 매트릭스를 실행(결정론 — 셀당 1런). */
-export function runMatrix(stageId: string): MatrixResult {
+/** 임의 Stage의 6셀 매트릭스(등록 불필요 — §11-B 생성 스테이지 분류). 결정론(셀당 1런). */
+export function runMatrixOnStage(stage: Stage): MatrixResult {
   const greedy: Record<string, Cell> = {};
   const naive: Record<string, Cell> = {};
   for (const off of LEVEL_OFFSETS) {
-    greedy[String(off)] = toCell(runBattle(stageId, { policy: greedyPolicy, levelOffset: off }));
-    naive[String(off)] = toCell(runBattle(stageId, { policy: naivePolicy, levelOffset: off }));
+    greedy[String(off)] = toCell(runStage(stage, { policy: greedyPolicy, levelOffset: off }));
+    naive[String(off)] = toCell(runStage(stage, { policy: naivePolicy, levelOffset: off }));
   }
   return { greedy, naive };
+}
+
+/** 등록된 stageId의 6셀 매트릭스. */
+export function runMatrix(stageId: string): MatrixResult {
+  const stage = stages[stageId];
+  if (!stage) throw new Error(`unknown stage: ${stageId}`);
+  return runMatrixOnStage(stage);
 }
 
 /**

@@ -1,6 +1,6 @@
 export * from "./types";
 export { nextRandom } from "./rng";
-export { createBattle } from "./createBattle";
+export { createBattle, spawnUnit } from "./createBattle";
 export { getMovableTiles, terrainAt, moveCostFor, unitAt, pathCostField } from "./movement";
 export {
   adjustedStat, attackPower, defensePower, spiritPower, computeDamage, getAttackableTargets, distance,

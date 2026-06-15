@@ -21,3 +21,6 @@ apps/web/public/assets/iso/
 # 재생성: tools/hero-extract/eex_extract.py·eex_events.py. 수치 테이블(generals/weapons/strategies 등)은 추적.
 packages/data/json/sosoden/scripts/
 packages/data/json/sosoden/events/
+
+# 생성기(§11-B) 산출물 — 검수 전 스크래치
+packages/sim/out/

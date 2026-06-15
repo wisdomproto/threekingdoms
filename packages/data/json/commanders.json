@@ -2875,5 +2875,165 @@
     "war": 58,
     "intelligence": 25,
     "faceId": 224
+  },
+  "적병-01": {
+    "id": "적병-01",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-02": {
+    "id": "적병-02",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-03": {
+    "id": "적병-03",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-04": {
+    "id": "적병-04",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-05": {
+    "id": "적병-05",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-06": {
+    "id": "적병-06",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-07": {
+    "id": "적병-07",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-08": {
+    "id": "적병-08",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-09": {
+    "id": "적병-09",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-10": {
+    "id": "적병-10",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-11": {
+    "id": "적병-11",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-12": {
+    "id": "적병-12",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-13": {
+    "id": "적병-13",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-14": {
+    "id": "적병-14",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-15": {
+    "id": "적병-15",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적병-16": {
+    "id": "적병-16",
+    "name": "적병",
+    "leadership": 52,
+    "war": 58,
+    "intelligence": 35,
+    "faceId": 0
+  },
+  "적장-01": {
+    "id": "적장-01",
+    "name": "적장",
+    "leadership": 70,
+    "war": 80,
+    "intelligence": 50,
+    "faceId": 0
+  },
+  "적장-02": {
+    "id": "적장-02",
+    "name": "적장",
+    "leadership": 70,
+    "war": 80,
+    "intelligence": 50,
+    "faceId": 0
+  },
+  "적장-03": {
+    "id": "적장-03",
+    "name": "적장",
+    "leadership": 70,
+    "war": 80,
+    "intelligence": 50,
+    "faceId": 0
+  },
+  "적장-04": {
+    "id": "적장-04",
+    "name": "적장",
+    "leadership": 70,
+    "war": 80,
+    "intelligence": 50,
+    "faceId": 0
   }
 }

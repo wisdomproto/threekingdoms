@@ -8,6 +8,7 @@
     "start": "tsx src/cli.ts",
     "balance": "tsx src/balance-cli.ts",
     "report-card": "tsx src/report-card-cli.ts",
+    "generate-stage": "tsx src/gen/generate-stage-cli.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
