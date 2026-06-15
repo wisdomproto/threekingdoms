@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "name": "guanyu",
+  "bones": [
+    { "name": "root",     "parent": null,       "x": 0,   "y": 0,   "rotation": 0, "scaleX": 1, "scaleY": 1 },
+    { "name": "body",     "parent": "root",     "x": 0,   "y": 0,   "rotation": 0, "scaleX": 1, "scaleY": 1 },
+    { "name": "armBack",  "parent": "body",     "x": -11, "y": -26, "rotation": 0, "scaleX": 1, "scaleY": 1 },
+    { "name": "legs",     "parent": "body",     "x": 0,   "y": -7,  "rotation": 0, "scaleX": 1, "scaleY": 1 },
+    { "name": "torso",    "parent": "body",     "x": 0,   "y": -24, "rotation": 0, "scaleX": 1, "scaleY": 1 },
+    { "name": "armFront", "parent": "body",     "x": 9,   "y": -26, "rotation": 0, "scaleX": 1, "scaleY": 1 },
+    { "name": "qinglong", "parent": "armFront", "x": 3,   "y": -7,  "rotation": 2, "scaleX": 1, "scaleY": 1 },
+    { "name": "head",     "parent": "body",     "x": 0,   "y": -40, "rotation": 0, "scaleX": 1, "scaleY": 1 }
+  ],
+  "slots": [
+    { "name": "armBack",  "bone": "armBack",  "attachment": "armBack.png",  "z": 0 },
+    { "name": "legs",     "bone": "legs",     "attachment": "legs.png",     "z": 1 },
+    { "name": "torso",    "bone": "torso",    "attachment": "torso.png",    "z": 2 },
+    { "name": "armFront", "bone": "armFront", "attachment": "armFront.png", "z": 3 },
+    { "name": "qinglong", "bone": "qinglong", "attachment": "qinglong.png", "z": 4 },
+    { "name": "head",     "bone": "head",     "attachment": "head.png",     "z": 5 }
+  ],
+  "attachments": {
+    "armBack":  { "armBack.png":  { "name": "armBack.png",  "image": "armBack.png",  "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1, "width": 12, "height": 16 } },
+    "legs":     { "legs.png":     { "name": "legs.png",     "image": "legs.png",     "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1, "width": 19, "height": 14 } },
+    "torso":    { "torso.png":    { "name": "torso.png",    "image": "torso.png",    "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1, "width": 26, "height": 24 } },
+    "armFront": { "armFront.png": { "name": "armFront.png", "image": "armFront.png", "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1, "width": 10, "height": 15 } },
+    "qinglong": { "qinglong.png": { "name": "qinglong.png", "image": "qinglong.png", "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1, "width": 11, "height": 46 } },
+    "head":     { "head.png":     { "name": "head.png",     "image": "head.png",     "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1, "width": 29, "height": 26 } }
+  },
+  "clips": {
+    "idle": { "duration": 2, "timelines": { "body": [
+      { "time": 0, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 },
+      { "time": 1, "x": 0, "y": -1.5, "rotation": 0, "scaleX": 1, "scaleY": 1 },
+      { "time": 2, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 } ] } },
+    "move": { "duration": 0.6, "timelines": { "body": [
+      { "time": 0, "x": 0, "y": 0, "rotation": -2, "scaleX": 1, "scaleY": 1 },
+      { "time": 0.3, "x": 0, "y": -2, "rotation": 2, "scaleX": 1, "scaleY": 1 },
+      { "time": 0.6, "x": 0, "y": 0, "rotation": -2, "scaleX": 1, "scaleY": 1 } ] } },
+    "attack": { "duration": 0.5, "timelines": {
+      "armFront": [
+        { "time": 0, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 },
+        { "time": 0.12, "x": 0, "y": 0, "rotation": -40, "scaleX": 1, "scaleY": 1 },
+        { "time": 0.3, "x": 0, "y": 0, "rotation": 55, "scaleX": 1, "scaleY": 1 },
+        { "time": 0.5, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 } ],
+      "body": [
+        { "time": 0, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 },
+        { "time": 0.3, "x": 0, "y": 0, "rotation": 6, "scaleX": 1, "scaleY": 1 },
+        { "time": 0.5, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 } ] } },
+    "hit": { "duration": 0.3, "timelines": { "body": [
+      { "time": 0, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 },
+      { "time": 0.1, "x": -5, "y": 0, "rotation": -7, "scaleX": 1, "scaleY": 1 },
+      { "time": 0.3, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 } ] } }
+  }
+}

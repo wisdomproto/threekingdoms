@@ -206,6 +206,9 @@ export class BattleRenderer implements Presenter {
     spritesReady
       .then(() => units.refreshSprites())
       .catch((e) => console.warn("[BattleRenderer] loadSprites 예외 (폴백 유지):", e));
+    // 자체 컷아웃 리그(§4) — spriteId에 스켈레톤이 있으면 베이크 스프라이트를 리그로 격상.
+    // 비동기·방어적: 리그 없으면 베이크 유지(무회귀). 스프라이트 로드와 독립 진행.
+    units.applySkeletons();
     // 지형 타일 로드 완료 → TerrainLayer 이미지 텍스처로 교체 + 청크 캐시 재생성
     // (terrain은 아래에서 선언되므로, Promise 콜백은 terrain 참조 가능 — JS 클로저)
     tilesReady

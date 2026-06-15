@@ -203,6 +203,11 @@ export class UnitView extends Container {
     return this.skeletonView ? "skeleton" : "sprite";
   }
 
+  /** 이 유닛의 spriteId(리그/스프라이트 조회 키). 매핑 없으면 null(색 사각 폴백). */
+  get spriteKey(): string | null {
+    return this.spriteId;
+  }
+
   /**
    * 자체 컷아웃 리그를 주입해 renderMode='skeleton'로 전환 (§4).
    * 스켈레톤이 있으면 SkeletonView가 베이스를 대체 — 스프라이트/폴백 사각형은 숨긴다.
@@ -230,10 +235,13 @@ export class UnitView extends Container {
     this.repositionUI();
   }
 
-  /** 스켈레톤 좌우 미러 — 컨테이너 scale.x 부호로(스프라이트 미러와 동일 규약). */
+  /**
+   * 스켈레톤 좌우 미러 — 리그 아트는 좌향(left-facing, §7)이라 베이크 idle/move와 동일하게 -facing.
+   * facing=+1(우향, 오른쪽 이동) → scale.x<0 미러 → 오른쪽 바라봄. facing=-1(좌향) → 원본.
+   */
   private applySkeletonFacing(): void {
     if (!this.skeletonView) return;
-    this.skeletonView.scale.x = Math.abs(this.skeletonView.scale.x) * this.facing;
+    this.skeletonView.scale.x = Math.abs(this.skeletonView.scale.x) * -this.facing;
   }
 
   /**

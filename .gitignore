@@ -33,3 +33,10 @@ packages/sim/out/
 .env.*.local
 .env.r2
 apps/web/.env.local
+
+# 브레인스토밍 비주얼 컴패니언 산출물(스크래치)
+.superpowers/
+
+# 리그 작업물 — 원본 시트(소스·재생성 가능, 런타임 미사용)·렌더 프리뷰는 추적 안 함
+apps/web/public/assets/skeletons/*/_source.png
+tools/sprite-pipeline/out/

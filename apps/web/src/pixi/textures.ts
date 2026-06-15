@@ -19,6 +19,7 @@ import { Assets, Container, Graphics, Rectangle, Sprite, Texture, type Renderer 
 import type { Side } from "@tk/data";
 import { TILE_SIZE } from "./projection";
 import { assetUrl } from "../assetUrl";
+import type { Skeleton } from "./skeleton";
 
 /** 지형 14종 베이스 색 (terrains.json의 id와 1:1) */
 export const TERRAIN_COLORS: Record<string, number> = {
@@ -121,6 +122,12 @@ export class TextureResolver {
   private readonly baked = new Map<string, Texture>();
   /** spriteId → pose → Texture. loadSprites() 완료 후에만 채워진다 */
   private readonly sprites = new Map<string, Map<string, Texture>>();
+  /**
+   * spriteId → 리그(스켈레톤 + 파트 텍스처) | null(미보유/부분실패 → 베이크 폴백).
+   * loadSkeleton() 결과 캐시 — 같은 spriteId 유닛이 여럿이어도 1회만 로드. null도 캐시(재시도 안 함).
+   */
+  private readonly skeletons = new Map<string, { skeleton: Skeleton; textures: Map<string, Texture> } | null>();
+  private readonly skeletonPromises = new Map<string, Promise<{ skeleton: Skeleton; textures: Map<string, Texture> } | null>>();
   /**
    * 지형 메타: terrainId → TileManifestEntry.
    * loadTiles() 완료 후에만 채워진다.
@@ -281,6 +288,65 @@ export class TextureResolver {
       }
     }
     return null; // 둘 다 없음 → 타일 렌더 유지
+  }
+
+  /**
+   * 자체 컷아웃 리그 로드 (/assets/skeletons/{spriteId}/{spriteId}.skeleton.json + 파트 PNG).
+   * rig-editor.html이 내보낸 스켈레톤 JSON과 파트 PNG를 읽어 {skeleton, textures}를 반환.
+   * 방어적 폴백: JSON 없음·파싱 실패·파트 이미지 0장이면 null → UnitView는 베이크 스프라이트 유지(무회귀).
+   * 결과(null 포함) 캐시 — 같은 spriteId 유닛이 여럿이어도 1회만 로드.
+   */
+  async loadSkeleton(spriteId: string): Promise<{ skeleton: Skeleton; textures: Map<string, Texture> } | null> {
+    if (this.skeletons.has(spriteId)) return this.skeletons.get(spriteId)!;
+    const pending = this.skeletonPromises.get(spriteId);
+    if (pending) return pending;
+    const p = this.loadSkeletonInner(spriteId);
+    this.skeletonPromises.set(spriteId, p);
+    const result = await p;
+    this.skeletons.set(spriteId, result);
+    return result;
+  }
+
+  private async loadSkeletonInner(
+    spriteId: string,
+  ): Promise<{ skeleton: Skeleton; textures: Map<string, Texture> } | null> {
+    const base = assetUrl(`/assets/skeletons/${spriteId}`);
+    // dev에선 리그를 자주 갈아끼우므로 캐시버스터로 항상 최신 fetch(브라우저 stale 방지). prod은 캐시 유지.
+    const dev = process.env.NODE_ENV !== "production";
+    const bust = dev ? `?t=${Date.now()}` : "";
+    const fetchOpts: RequestInit = dev ? { cache: "no-store" } : {};
+    let skeleton: Skeleton;
+    try {
+      const res = await fetch(`${base}/${spriteId}.skeleton.json${bust}`, fetchOpts);
+      if (!res.ok) return null; // 리그 미보유 — 베이크 폴백
+      skeleton = (await res.json()) as Skeleton;
+    } catch {
+      return null;
+    }
+    if (!skeleton || skeleton.version !== 1 || !Array.isArray(skeleton.bones)) return null;
+
+    // 어태치먼트가 참조하는 모든 파트 이미지 수집 → 개별 로드(하나 실패해도 나머지 유지).
+    const images = new Set<string>();
+    for (const atts of Object.values(skeleton.attachments ?? {})) {
+      for (const att of Object.values(atts)) images.add(att.image);
+    }
+    if (images.size === 0) return null;
+
+    const textures = new Map<string, Texture>();
+    await Promise.all(
+      [...images].map(async (img) => {
+        try {
+          const tex = await Assets.load<Texture>(`${base}/${img}${bust}`);
+          if (tex) textures.set(img, tex);
+        } catch {
+          /* 개별 파트 누락 — 해당 슬롯만 미표시 */
+        }
+      }),
+    );
+    // 파트가 하나도 없으면 리그 미적용(빈 유닛 방지) → 베이크 폴백.
+    if (textures.size === 0) return null;
+    console.info(`[TextureResolver] 리그 로드: ${spriteId} (${textures.size}/${images.size} 파트)`);
+    return { skeleton, textures };
   }
 
   /** 맵 뒤 배경 텍스처 로드. 실패해도 null 반환(배경 없이 진행). */

@@ -201,6 +201,28 @@ function fileToImage(file) {
     rd.readAsDataURL(file);
   });
 }
+/* 스켈레톤의 파트 PNG를 동일 출처(:8080 → 저장소 public)에서 자동 로드 → 회색 프리뷰 대신 실제 파츠 표시. */
+function blobToDataURL(blob) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); }); }
+function loadImgEl(src) { return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; }); }
+async function loadPartsFor(name) {
+  const imgs = new Set();
+  for (const atts of Object.values(model.attachments)) for (const a of Object.values(atts)) imgs.add(a.image);
+  let n = 0;
+  for (const image of imgs) {
+    if (imgCache.has(image)) { n++; continue; }
+    try {
+      const res = await fetch(`/apps/web/public/assets/skeletons/${name}/${image}`);
+      if (!res.ok) continue;
+      const blob = await res.blob();
+      const dataUri = await blobToDataURL(blob);
+      const img = await loadImgEl(dataUri);
+      imgCache.set(image, { img, dataUri, w: img.naturalWidth, h: img.naturalHeight });
+      n++;
+    } catch (e) { /* 해당 파트 없음 — 회색 유지 */ }
+  }
+  draw();
+  if (n) toast(`파트 ${n}장 자동 로드 — 드래그로 위치 조정 후 ⬇ 저장`);
+}
 async function addParts(files) {
   for (const file of files) {
     const { img, dataUri } = await fileToImage(file);
@@ -704,7 +726,8 @@ function loadObject(obj) {
   document.getElementById('rigName').value = model.name;
   selBone = model.bones[0] ? model.bones[0].name : null; selKey = null; playTime = 0;
   setClip('idle');
-  toast(`리그 "${model.name}" 로드 — 파트 PNG는 별도 로드 필요(프리뷰 회색)`);
+  toast(`리그 "${model.name}" 로드 — 파트 자동 로드 중…`);
+  loadPartsFor(model.name); // 동일 출처에서 파트 PNG 자동 로드(실제 파츠 프리뷰)
   return true;
 }
 async function openRig() {

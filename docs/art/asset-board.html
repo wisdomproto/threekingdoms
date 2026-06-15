@@ -54,6 +54,18 @@
   #lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.92); display: none; align-items: center; justify-content: center; z-index: 100; cursor: zoom-out; }
   #lightbox img { max-width: 94vw; max-height: 92vh; }
   #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--acc); color: #1a1407; font-weight: bold; padding: 8px 20px; border-radius: 20px; font-size: 13px; display: none; z-index: 110; }
+  /* 파츠 컷 모달 */
+  #cutModal { position: fixed; inset: 0; background: rgba(8,9,12,.93); display: none; z-index: 120; }
+  #cutModal.on { display: flex; flex-direction: column; }
+  #cutBar { display: flex; gap: 8px; align-items: center; padding: 9px 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  #cutBar .t { font-weight: bold; color: var(--acc); }
+  #cutBar .hint { color: var(--dim); font-size: 11.5px; }
+  #cutStage { flex: 1; position: relative; overflow: auto; display: flex; align-items: center; justify-content: center; padding: 14px; }
+  #cutWrap { position: relative; line-height: 0; }
+  #cutWrap canvas { display: block; background: repeating-conic-gradient(#2a2f3a 0% 25%, #232733 0% 50%) 50%/20px 20px; border: 1px solid var(--line); }
+  .cutbox { position: absolute; border: 2px solid var(--acc); background: rgba(212,168,67,.10); cursor: move; box-sizing: border-box; }
+  .cutbox .lbl { position: absolute; top: -18px; left: -2px; font-size: 11px; color: #1a1407; background: var(--acc); padding: 0 5px; border-radius: 3px 3px 0 0; white-space: nowrap; }
+  .cutbox .hd { position: absolute; right: -6px; bottom: -6px; width: 12px; height: 12px; background: var(--acc); border: 1px solid #1a1407; border-radius: 2px; cursor: nwse-resize; }
 </style>
 </head>
 <body>
@@ -74,6 +86,17 @@
   <div id="board"></div>
 </main>
 <div id="lightbox"><img alt=""></div>
+<div id="cutModal">
+  <div id="cutBar">
+    <span class="t">✂ 파츠 컷</span>
+    <span class="hint">박스를 끌어 각 파츠 영역에 맞추세요 (모서리=크기). 투명 배경이 그대로 보존됩니다.</span>
+    <span style="flex:1"></span>
+    <button class="btn" id="cutSaveSrc" title="원본 시트를 디스크로 보내 Claude가 컷·리그">📤 원본 넘기기(Claude 컷)</button>
+    <button class="btn primary" id="cutApply">게임에 적용</button>
+    <button class="btn" id="cutClose">닫기</button>
+  </div>
+  <div id="cutStage"><div id="cutWrap"><canvas id="cutCanvas"></canvas></div></div>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -873,6 +896,28 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
   });
 })();
 
+/* ───────────────────────── R. 리그 파츠 SD (자체 컷아웃 리그) ───────────────────────── */
+/*
+  맵 위 SD 유닛을 자체 컷아웃 리그(tools/rig-editor.html)로 애니메이션하기 위한 "파츠 분리형" 소스.
+  CLAUDE.md §4(2026-06-16): 움직이는 건 SD뿐 → 파츠 분리 생성, 포즈(대기/이동/공격)는 리그 클립이 생성.
+  생성 → 투명 PNG로 파트별 컷 → rig-editor에 로드 → /assets/skeletons/{spriteId}/ 배치.
+*/
+(function() {
+  const RIG_STYLE = 'Art style: East Asian ink-wash (sumi-e) coloring with crisp readable silhouette, muted earth tones with selective vivid accents. Top-down battle-map chibi (SD) unit for a tactical RPG. Clean even studio lighting, NO baked ground shadow.';
+  const RIG_NEG = 'Avoid: text, watermark, UI, frame, border, ground shadow, multiple figures, busy background, photorealistic, anime-cel, Koei-style.';
+  SECTIONS.push({
+    id: 'R',
+    title: 'R. 리그 파츠 SD (자체 컷아웃 리그용)',
+    desc: '맵 SD 유닛을 리그로 움직이기 위한 파츠 분리형 소스. ①전체 SD를 깔끔히 생성(팔다리·무기 안 겹치게, 투명 배경) → ②포토샵/Gemini로 머리·몸통·앞팔(무기손)·뒷팔·하반신·무기 6파츠로 컷(각 투명 PNG) → ③rig-editor.html에 로드해 본 배치+클립 저작 → ④파트 PNG를 /assets/skeletons/{spriteId}/ 에 두면 게임이 리그로 렌더. 포즈(대기/이동/공격)는 리그 클립이 생성하므로 별도로 안 뽑음.',
+    items: [
+      { id: 'R-guanyu', title: '관우 SD — 파츠 분리 소스 (spriteId: guanyu)', sceneCard: false,
+        rigSpriteId: 'guanyu', rigParts: ['head', 'torso', 'armBack', 'armFront', 'legs', 'qinglong'],
+        note: '⚠ <b>¾ 측면뷰(화면 왼쪽 바라보기)</b>로 생성해야 좌우 이동 방향감이 삽니다(정면뷰는 미러해도 똑같아 구림). 파츠 시트(머리·몸통·앞팔·뒷팔·하반신·무기 따로) 투명배경 → <b>✂ 파츠 컷</b> 6박스 → <code>assets/skeletons/guanyu/*.png</code> 자동저장 → 게임 리그 렌더. 스켈레톤은 내가 렌더 루프로 자동 조립.',
+        prompt: 'A parts sheet for a 2D cutout rig: the SEPARATE body parts of GUAN YU (Three Kingdoms general) laid out individually with gaps, on a transparent background. Parts: (1) head, (2) torso/chest armor, (3) front upper-arm+forearm with fist, (4) back arm, (5) lower body with both legs/boots, (6) the Green Dragon Crescent Blade guandao polearm. CRITICAL ORIENTATION: draw every part as a SIDE / three-quarter view as if the whole character is FACING SCREEN-LEFT (profile turned left, NOT facing the camera) — head in 3/4 left profile (nose/beard pointing left), torso angled left, so that when assembled the unit reads as facing left and can be mirrored to face right. Chibi SD proportions (~2.5 heads). Long black beard, dignified red face, green war-robe over dark lamellar armor. Each part fully separated (no overlap) for clean cutting.\n\n' + RIG_STYLE + '\n\n' + RIG_NEG },
+    ],
+  });
+})();
+
 /* ───────────────────────── 상태/저장 ───────────────────────── */
 
 const varState = JSON.parse(localStorage.getItem('ab_vars') || '{}');
@@ -977,6 +1022,163 @@ async function applyToGame(assetPath, blob) {
   return r.json();
 }
 
+/* ─────────── 리그 파츠 컷 (SD 한 장 → 박스로 파트 크롭 → /save-asset → skeletons/{id}/) ─────────── */
+let cutter = null; // { itemId, spriteId, parts, bmp, scale, boxes:[{part,x,y,w,h}] }
+
+/** 벌어진 SD 가정한 시작 박스(이미지 비율 추정 — 사용자가 끌어 맞춤). */
+function defaultCutBoxes(parts, W, H) {
+  const presets = {
+    head:     [0.40, 0.02, 0.20, 0.20], torso:    [0.36, 0.24, 0.28, 0.30],
+    armBack:  [0.18, 0.26, 0.16, 0.30], armFront: [0.66, 0.26, 0.16, 0.30],
+    legs:     [0.36, 0.56, 0.28, 0.34], qinglong: [0.82, 0.08, 0.14, 0.84],
+  };
+  return parts.map((part, i) => {
+    const p = presets[part] || [0.1 + i * 0.06, 0.1, 0.18, 0.18];
+    return { part, x: Math.round(p[0] * W), y: Math.round(p[1] * H), w: Math.round(p[2] * W), h: Math.round(p[3] * H) };
+  });
+}
+
+async function openCutter(itemId) {
+  const item = findItem(itemId);
+  if (!item || !item.rigParts) return;
+  const all = await dbAll();
+  const recs = all.filter(r => r.card === itemId).sort((a, b) => b.at - a.at);
+  if (!recs.length) { toast('먼저 이 카드에 SD 이미지를 붙여넣으세요', true); return; }
+  const bmp = await createImageBitmap(recs[0].blob);
+  const maxW = Math.min(window.innerWidth - 60, 720), maxH = window.innerHeight - 130;
+  const scale = Math.min(1, maxW / bmp.width, maxH / bmp.height);
+  // 저장된 박스(직전 컷 배치) 복원 — 같은 파트 구성 + 이미지 범위 내일 때만. 없으면 기본 추정.
+  let boxes = defaultCutBoxes(item.rigParts, bmp.width, bmp.height);
+  try {
+    const saved = JSON.parse(localStorage.getItem('tk_cut_' + item.rigSpriteId) || 'null');
+    if (Array.isArray(saved) && saved.length === item.rigParts.length &&
+        saved.every(b => item.rigParts.includes(b.part) && b.x + b.w <= bmp.width + 1 && b.y + b.h <= bmp.height + 1)) {
+      boxes = saved.map(b => ({ part: b.part, x: b.x, y: b.y, w: b.w, h: b.h }));
+    }
+  } catch { /* 기본 박스 사용 */ }
+  cutter = { itemId, spriteId: item.rigSpriteId, parts: item.rigParts, bmp, scale, boxes };
+  const cv = document.getElementById('cutCanvas');
+  cv.width = Math.round(bmp.width * scale); cv.height = Math.round(bmp.height * scale);
+  cv.getContext('2d').drawImage(bmp, 0, 0, cv.width, cv.height);
+  renderCutBoxes();
+  document.getElementById('cutModal').classList.add('on');
+}
+
+function renderCutBoxes() {
+  const wrap = document.getElementById('cutWrap');
+  wrap.querySelectorAll('.cutbox').forEach(b => b.remove());
+  const s = cutter.scale;
+  for (const b of cutter.boxes) {
+    const el = document.createElement('div'); el.className = 'cutbox';
+    el.style.left = (b.x * s) + 'px'; el.style.top = (b.y * s) + 'px';
+    el.style.width = (b.w * s) + 'px'; el.style.height = (b.h * s) + 'px';
+    el.innerHTML = `<span class="lbl">${b.part}</span><span class="hd"></span>`;
+    bindCutBox(el, b);
+    wrap.appendChild(el);
+  }
+}
+
+function bindCutBox(el, box) {
+  const sc = () => cutter.scale;
+  el.addEventListener('pointerdown', (e) => {
+    if (e.target.classList.contains('hd')) return;
+    e.preventDefault(); el.setPointerCapture(e.pointerId);
+    const sx = e.clientX, sy = e.clientY, ox = box.x, oy = box.y;
+    const mv = (ev) => { box.x = Math.max(0, ox + (ev.clientX - sx) / sc()); box.y = Math.max(0, oy + (ev.clientY - sy) / sc()); el.style.left = (box.x * sc()) + 'px'; el.style.top = (box.y * sc()) + 'px'; };
+    const up = () => { el.removeEventListener('pointermove', mv); el.removeEventListener('pointerup', up); };
+    el.addEventListener('pointermove', mv); el.addEventListener('pointerup', up);
+  });
+  const hd = el.querySelector('.hd');
+  hd.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); e.stopPropagation(); hd.setPointerCapture(e.pointerId);
+    const sx = e.clientX, sy = e.clientY, ow = box.w, oh = box.h;
+    const mv = (ev) => { box.w = Math.max(8, ow + (ev.clientX - sx) / sc()); box.h = Math.max(8, oh + (ev.clientY - sy) / sc()); el.style.width = (box.w * sc()) + 'px'; el.style.height = (box.h * sc()) + 'px'; };
+    const up = () => { hd.removeEventListener('pointermove', mv); hd.removeEventListener('pointerup', up); };
+    hd.addEventListener('pointermove', mv); hd.addEventListener('pointerup', up);
+  });
+}
+
+/**
+ * 스켈레톤 JSON 생성 — 조립 위치는 **인체 템플릿**(고정), 박스는 **비율(aspect)만** 제공한다.
+ * 생성 SD가 "파츠 시트"(각 파트가 따로 배열)라 박스의 시트상 위치는 몸 위치와 무관하기 때문.
+ * 발 원점(0,0)=발, y는 위로 음수. 무기(qinglong)는 armFront 자식(공격 시 함께 휘둘림).
+ * 파트별 렌더 높이는 템플릿 고정, 폭 = 높이 × (박스 가로/세로)로 원본 비율 보존.
+ */
+function buildSkeletonFromBoxes(spriteId, boxes, W, H) {
+  // 표준 휴머노이드 템플릿(units, 발 기준). h=렌더 높이, x/y=본 중심(절대), parent, z.
+  const TPL = {
+    head:     { h: 28, x: 0,   y: -44, parent: 'body',     z: 5 },
+    torso:    { h: 24, x: 0,   y: -22, parent: 'body',     z: 2 },
+    legs:     { h: 11, x: 0,   y: -5.5, parent: 'body',    z: 1 },
+    armBack:  { h: 18, x: -13, y: -24, parent: 'body',     z: 0 },
+    armFront: { h: 16, x: 13,  y: -24, parent: 'body',     z: 3 },
+    qinglong: { h: 46, x: 17,  y: -34, parent: 'armFront', z: 4 },
+  };
+  const r = n => Math.round(n * 100) / 100;
+  const byPart = {}; for (const b of boxes) byPart[b.part] = b;
+  const bones = [
+    { name: 'root', parent: null, x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+    { name: 'body', parent: 'root', x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
+  ];
+  const slots = [], attachments = {};
+  const order = boxes.slice().sort((a, b) => ((TPL[a.part]?.z) ?? 9) - ((TPL[b.part]?.z) ?? 9));
+  for (const b of order) {
+    const t = TPL[b.part] || { h: 18, x: 0, y: -20, parent: 'body', z: 9 };
+    let parent = t.parent;
+    if (parent !== 'body' && parent !== 'root' && !byPart[parent]) parent = 'body'; // 부모 파트 없으면 강등
+    const pt = parent === 'body' || parent === 'root' ? { x: 0, y: 0 } : TPL[parent];
+    bones.push({ name: b.part, parent, x: r(t.x - pt.x), y: r(t.y - pt.y), rotation: 0, scaleX: 1, scaleY: 1 });
+    slots.push({ name: b.part, bone: b.part, attachment: b.part + '.png', z: t.z });
+    const aspect = b.h > 0 ? b.w / b.h : 1;
+    attachments[b.part] = { [b.part + '.png']: { name: b.part + '.png', image: b.part + '.png', x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1, width: Math.max(1, Math.round(t.h * aspect)), height: t.h } };
+  }
+  const clips = {
+    idle:   { duration: 2,   timelines: { body: [{ time: 0, x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 }, { time: 1, x: 0, y: -1.5, rotation: 0, scaleX: 1, scaleY: 1 }, { time: 2, x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 }] } },
+    move:   { duration: 0.6, timelines: { body: [{ time: 0, x: 0, y: 0, rotation: -2, scaleX: 1, scaleY: 1 }, { time: 0.3, x: 0, y: -2, rotation: 2, scaleX: 1, scaleY: 1 }, { time: 0.6, x: 0, y: 0, rotation: -2, scaleX: 1, scaleY: 1 }] } },
+    attack: { duration: 0.5, timelines: { armFront: [{ time: 0, x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 }, { time: 0.12, x: 0, y: 0, rotation: -40, scaleX: 1, scaleY: 1 }, { time: 0.3, x: 0, y: 0, rotation: 55, scaleX: 1, scaleY: 1 }, { time: 0.5, x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 }], body: [{ time: 0, x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 }, { time: 0.3, x: 0, y: 0, rotation: 6, scaleX: 1, scaleY: 1 }, { time: 0.5, x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 }] } },
+    hit:    { duration: 0.3, timelines: { body: [{ time: 0, x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 }, { time: 0.1, x: -5, y: 0, rotation: -7, scaleX: 1, scaleY: 1 }, { time: 0.3, x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 }] } },
+  };
+  return { version: 1, name: spriteId, bones, slots, attachments, clips };
+}
+
+async function applyCut() {
+  if (!cutter) return;
+  const { bmp, spriteId, boxes } = cutter;
+  let ok = 0;
+  for (const b of boxes) {
+    const w = Math.round(b.w), h = Math.round(b.h);
+    if (w < 2 || h < 2) continue;
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    c.getContext('2d').drawImage(bmp, Math.round(b.x), Math.round(b.y), w, h, 0, 0, w, h);
+    const blob = await new Promise(res => c.toBlob(res, 'image/png')); // PNG = 알파(투명) 보존
+    if (!blob) continue;
+    try { await applyToGame(`assets/skeletons/${spriteId}/${b.part}.png`, blob); ok++; }
+    catch (e) { toast(`${b.part} 적용 실패: ${e.message}`, true); }
+  }
+  // 박스 배치로 스켈레톤 자동 생성·저장(자른 자리=조립 위치) + 박스 기억(다음 컷 미세조정용)
+  try {
+    const skel = buildSkeletonFromBoxes(spriteId, boxes, bmp.width, bmp.height);
+    const skelBlob = new Blob([JSON.stringify(skel, null, 2)], { type: 'application/json' });
+    await applyToGame(`assets/skeletons/${spriteId}/${spriteId}.skeleton.json`, skelBlob);
+    localStorage.setItem('tk_cut_' + spriteId, JSON.stringify(boxes.map(b => ({ part: b.part, x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.w), h: Math.round(b.h) }))));
+  } catch (e) { toast('스켈레톤 생성 실패: ' + e.message, true); }
+  toast(`${ok}/${boxes.length} 파츠 + 스켈레톤 → 게임 적용. 새로고침하면 반영`);
+}
+
+document.getElementById('cutClose').addEventListener('click', () => document.getElementById('cutModal').classList.remove('on'));
+document.getElementById('cutApply').addEventListener('click', applyCut);
+// 원본 시트째로 디스크에 저장 → Claude가 PIL로 정밀 컷 + 리그(박스 직접 안 쳐도 됨)
+document.getElementById('cutSaveSrc').addEventListener('click', async () => {
+  if (!cutter) return;
+  const c = document.createElement('canvas'); c.width = cutter.bmp.width; c.height = cutter.bmp.height;
+  c.getContext('2d').drawImage(cutter.bmp, 0, 0);
+  const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+  try {
+    await applyToGame(`assets/skeletons/${cutter.spriteId}/_source.png`, blob);
+    toast(`원본 시트 저장됨 (${cutter.bmp.width}×${cutter.bmp.height}) → Claude가 컷합니다`);
+  } catch (e) { toast('원본 저장 실패: ' + e.message + ' (:8080 확인)', true); }
+});
+
 function buildPrompt(item) {
   let body = item.prompt;
   if (item.vars) {
@@ -1018,6 +1220,7 @@ const TAB_DEFS = [
   { id: 'effect', label: '이펙트',        secs: ['C'] },
   { id: 'duel',   label: '일기토 키프레임', secs: ['M'] },
   { id: 'scene',  label: '시나리오 씬',   secs: ['N'] },
+  { id: 'rig',    label: '리그 파츠',     secs: ['R'] },
 ];
 
 /* 탭당 섹션 목록을 빠르게 찾는 맵 */
@@ -1073,6 +1276,7 @@ function renderBoard() {
         <div class="btnrow">
           <button class="btn primary" data-copy="${it.id}">프롬프트 복사</button>
           <button class="btn" data-file="${it.id}">파일 선택…</button>
+          ${it.rigParts ? `<button class="btn" data-rigcut="${it.id}">✂ 파츠 컷 → 게임</button>` : ''}
         </div>
         <div class="drop" tabindex="0" data-drop="${it.id}">
           <span class="hint">클릭 후 Ctrl+V 로 생성 결과 붙여넣기 (드래그&드롭 가능)</span>
@@ -1227,6 +1431,8 @@ board.addEventListener('click', async e => {
     inp.click();
     return;
   }
+  const rc = e.target.closest('button[data-rigcut]');
+  if (rc) { openCutter(rc.dataset.rigcut); return; }
   const th = e.target.closest('.thumb');
   if (th) {
     const id = +th.dataset.imgid;
