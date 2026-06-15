@@ -230,6 +230,31 @@
       "reward": { "treasures": ["적로"], "gold": 400 }
     }
   ],
+  "dialogue": [
+    {
+      "id": "23-jiangxia_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "강하를 사수한다! 주유 도독이 올 때까지 버텨라." }
+      ]
+    },
+    {
+      "id": "duel_zhangfei_chensun_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_chensun" },
+      "lines": [
+      { "speaker": "진손", "side": "enemy", "portraitId": "진손", "text": "강하는 못 넘는다!" },
+      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "물 위에서도 내 사모는 무뎌지지 않는다!" }
+      ]
+    },
+    {
+      "id": "duel_zhaoyun_zhangwu_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_zhangwu" },
+      "lines": [
+      { "speaker": "장무", "side": "enemy", "portraitId": "장무", "text": "선봉을 꺾어주마!" },
+      { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "선봉이 꺾이면, 본대도 무너진다." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_zhangfei_chensun",

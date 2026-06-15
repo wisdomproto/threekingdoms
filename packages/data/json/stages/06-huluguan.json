@@ -258,6 +258,23 @@
       }
     }
   ],
+  "dialogue": [
+    {
+      "id": "06-huluguan_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "삼형제, 흩어지지 마라! 여포를 에워싼다!" }
+      ]
+    },
+    {
+      "id": "duel_zhangfei_lubu_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_lubu" },
+      "lines": [
+      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "여포! 이 장익덕과 한판 붙자!" },
+      { "speaker": "여포", "side": "enemy", "portraitId": "여포", "text": "하룻강아지로군. 물러서라, 죽기 전에." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_zhangfei_lubu",

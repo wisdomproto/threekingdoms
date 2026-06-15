@@ -294,6 +294,23 @@
       }
     }
   ],
+  "dialogue": [
+    {
+      "id": "16-guandu-escape_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "관도를 가로질러 북으로! 흩어지면 끝이다." }
+      ]
+    },
+    {
+      "id": "duel_zhaoyun_xuchu_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_xuchu" },
+      "lines": [
+      { "speaker": "허저", "side": "enemy", "portraitId": "허저", "text": "어딜 달아나느냐!" },
+      { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "달아나는 게 아니라 — 길을 여는 것이다." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_zhaoyun_xuchu",

@@ -238,6 +238,23 @@
       }
     }
   ],
+  "dialogue": [
+    {
+      "id": "21-changbanqiao_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "장판교는 이 장익덕이 막는다! 한 발짝도 못 넘는다!" }
+      ]
+    },
+    {
+      "id": "duel_zhangfei_xuchu_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_xuchu" },
+      "lines": [
+      { "speaker": "허저", "side": "enemy", "portraitId": "허저", "text": "다리 위 외톨이 하나!" },
+      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "외톨이? 으하하! 연인 장익덕의 고함을 들어봤느냐!" }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_zhangfei_xuchu",

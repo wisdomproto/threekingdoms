@@ -347,6 +347,23 @@
       }
     }
   ],
+  "dialogue": [
+    {
+      "id": "24-sanjiangkou_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "주유", "side": "ally", "portraitId": "주유", "text": "채모의 수군을 시험한다! 발을 맞춰라." }
+      ]
+    },
+    {
+      "id": "duel_huanggai_caimao_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_huanggai_caimao" },
+      "lines": [
+      { "speaker": "채모", "side": "enemy", "portraitId": "채모", "text": "동오의 늙은이가 감히!" },
+      { "speaker": "황개", "side": "ally", "portraitId": "황개", "text": "늙은 몸이라도, 강물의 이치는 안다." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_huanggai_caimao",

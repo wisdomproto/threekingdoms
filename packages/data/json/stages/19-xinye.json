@@ -257,6 +257,23 @@
       "reward": { "treasures": ["육도"], "gold": 300 }
     }
   ],
+  "dialogue": [
+    {
+      "id": "19-xinye_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "백성을 지켜라! 한 사람도 버리지 않는다." }
+      ]
+    },
+    {
+      "id": "duel_zhaoyun_caoren_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_caoren" },
+      "lines": [
+      { "speaker": "조인", "side": "enemy", "portraitId": "조인", "text": "이 느림보 행렬, 짓밟아주마!" },
+      { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "백성 앞을 지나려면 — 나를 먼저 넘어라." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_zhaoyun_caoren",

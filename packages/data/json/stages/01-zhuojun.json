@@ -99,5 +99,15 @@
   ],
   "objectives": [{ "kind": "defeatAll" }],
   "failConditions": [{ "kind": "unitRetreated", "unitId": "유비" }],
+  "dialogue": [
+    {
+      "id": "01-zhuojun_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "의병들이여, 황건을 몰아낸다! 정원지의 깃발을 꺾어라!" },
+      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "와아아! 한 놈도 남기지 말고 쓸어버리자!" }
+      ]
+    }
+  ],
   "events": []
 }

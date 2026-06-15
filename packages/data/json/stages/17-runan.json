@@ -222,6 +222,23 @@
       "reward": { "treasures": ["근위개"], "gold": 400 }
     }
   ],
+  "dialogue": [
+    {
+      "id": "17-runan_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "운장이 오관을 넘어 온다! 길에서 만나야 한다 — 전진!" }
+      ]
+    },
+    {
+      "id": "duel_zhaoyun_xuchu_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_xuchu" },
+      "lines": [
+      { "speaker": "허저", "side": "enemy", "portraitId": "허저", "text": "또 너냐, 상산의 조자룡!" },
+      { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "주공께 가는 길, 누구도 못 막는다." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_zhaoyun_xuchu",

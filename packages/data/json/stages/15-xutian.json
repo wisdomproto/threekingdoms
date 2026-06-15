@@ -200,6 +200,23 @@
       "reward": { "treasures": ["무술교본"], "gold": 250 }
     }
   ],
+  "dialogue": [
+    {
+      "id": "15-xutian_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "천자의 사냥터다. 경거망동 마라 — 허저를 막는 데 그쳐라." }
+      ]
+    },
+    {
+      "id": "duel_guanyu_xuchu_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_xuchu" },
+      "lines": [
+      { "speaker": "허저", "side": "enemy", "portraitId": "허저", "text": "조조공께 손대는 자는 이 허저가 막는다!" },
+      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "주인을 지키는 그 충심만은 인정하마." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_guanyu_xuchu",

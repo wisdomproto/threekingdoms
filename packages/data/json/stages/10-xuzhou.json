@@ -233,6 +233,23 @@
       }
     }
   ],
+  "dialogue": [
+    {
+      "id": "10-xuzhou_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "성을 지킨다! 원군이 올 때까지 버텨라." }
+      ]
+    },
+    {
+      "id": "duel_guanyu_yujin_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_yujin" },
+      "lines": [
+      { "speaker": "우금", "side": "enemy", "portraitId": "우금", "text": "서주는 조조공의 복수가 닿는 땅!" },
+      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "복수에 백성을 끌어들이는 건 대장부가 아니다." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_guanyu_yujin",

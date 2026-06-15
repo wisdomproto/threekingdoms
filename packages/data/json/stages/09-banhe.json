@@ -200,6 +200,23 @@
       "reward": { "treasures": ["마술지침서"], "gold": 200 }
     }
   ],
+  "dialogue": [
+    {
+      "id": "09-banhe_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "반하를 건넌다! 백규 형님을 돕자." }
+      ]
+    },
+    {
+      "id": "duel_zhaoyun_juyi_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_juyi" },
+      "lines": [
+      { "speaker": "국의", "side": "enemy", "portraitId": "국의", "text": "원소군의 선등사석을 뚫겠다고?" },
+      { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "사석진도, 한 점을 뚫으면 무너진다." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_zhaoyun_juyi",

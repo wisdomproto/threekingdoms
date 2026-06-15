@@ -253,6 +253,23 @@
       "reward": { "treasures": [], "gold": 300 }
     }
   ],
+  "dialogue": [
+    {
+      "id": "22-hanjin_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "강을 건넌다! 운장이 강하에서 마중 나왔다." }
+      ]
+    },
+    {
+      "id": "duel_zhaoyun_xiahouen_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_xiahouen" },
+      "lines": [
+      { "speaker": "하후은", "side": "enemy", "portraitId": "하후은", "text": "나루를 막아라!" },
+      { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "주공을 건너게 하라 — 후미는 내가 맡는다." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_zhaoyun_xiahouen",

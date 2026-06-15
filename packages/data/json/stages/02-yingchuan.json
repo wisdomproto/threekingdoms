@@ -172,6 +172,23 @@
       "reward": { "treasures": ["의협교본"], "gold": 150 }
     }
   ],
+  "dialogue": [
+    {
+      "id": "02-yingchuan_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "조조의 화공에 휘말리지 마라 — 관해의 본대만 친다!" }
+      ]
+    },
+    {
+      "id": "duel_guanyu_guanhai_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_guanhai" },
+      "lines": [
+      { "speaker": "관해", "side": "enemy", "portraitId": "관해", "text": "한실의 졸개 따위가 감히!" },
+      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "졸개의 칼맛이 어떤지, 똑똑히 새겨라." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_guanyu_guanhai",

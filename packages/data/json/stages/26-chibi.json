@@ -382,6 +382,32 @@
       }
     }
   ],
+  "dialogue": [
+    {
+      "id": "26-chibi_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "동남풍이 분다! 황개, 화선을 띄워라!" },
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "적벽의 결전이다 — 전군, 돌격!" }
+      ]
+    },
+    {
+      "id": "duel_guanyu_caoren_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_caoren" },
+      "lines": [
+      { "speaker": "조인", "side": "enemy", "portraitId": "조인", "text": "불바다 속에서도 길을 연다!" },
+      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "그 길의 끝은 패주뿐이다." }
+      ]
+    },
+    {
+      "id": "duel_zhangfei_xuchu_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_xuchu" },
+      "lines": [
+      { "speaker": "허저", "side": "enemy", "portraitId": "허저", "text": "또 너냐!" },
+      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "이번엔 불까지 내 편이다!" }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_guanyu_caoren",

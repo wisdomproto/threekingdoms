@@ -165,5 +165,15 @@
       "reward": { "treasures": ["콩"], "gold": 100 }
     }
   ],
+  "dialogue": [
+    {
+      "id": "03-guangzong_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "공손찬", "side": "ally", "portraitId": "공손찬", "text": "성문을 부숴라! 장보를 끌어내!" },
+      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "요술에 흔들리지 마라. 진을 굳게!" }
+      ]
+    }
+  ],
   "events": []
 }

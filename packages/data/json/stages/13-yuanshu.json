@@ -160,6 +160,23 @@
       "reward": { "treasures": ["의협교본"], "gold": 300 }
     }
   ],
+  "dialogue": [
+    {
+      "id": "13-yuanshu_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "참칭한 원술을 그 옥좌에서 끌어내려라!" }
+      ]
+    },
+    {
+      "id": "duel_zhangfei_jiling_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_jiling" },
+      "lines": [
+      { "speaker": "기령", "side": "enemy", "portraitId": "기령", "text": "삼첨도의 무게를 보여주마!" },
+      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "가짜 황제의 개로군. 덤벼라!" }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_zhangfei_jiling",

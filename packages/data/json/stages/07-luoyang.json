@@ -198,6 +198,23 @@
       "reward": { "treasures": ["궁술지침서"], "gold": 200 }
     }
   ],
+  "dialogue": [
+    {
+      "id": "07-luoyang_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "불길을 헤치고 동탁을 막아라! 백성을 먼저 구하라." }
+      ]
+    },
+    {
+      "id": "duel_guanyu_xurong_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_xurong" },
+      "lines": [
+      { "speaker": "서영", "side": "enemy", "portraitId": "서영", "text": "낙양은 동탁공의 것이다!" },
+      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "잿더미를 두고 무슨 소유를 논하느냐." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_guanyu_xurong",

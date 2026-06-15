@@ -250,6 +250,23 @@
       }
     }
   ],
+  "dialogue": [
+    {
+      "id": "20-changbanpo_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "아두 공자, 감부인... 반드시 찾아낸다! 단기필마, 돌격!" }
+      ]
+    },
+    {
+      "id": "duel_zhaoyun_xiahouen_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_xiahouen" },
+      "lines": [
+      { "speaker": "하후은", "side": "enemy", "portraitId": "하후은", "text": "혼자서 무얼 하겠다고!" },
+      { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "공자를 품에 안고도, 네놈들 백을 벤다. 그 검, 내가 받아가마." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_zhaoyun_xiahouen",

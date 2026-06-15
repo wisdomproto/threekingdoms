@@ -338,6 +338,23 @@
       }
     }
   ],
+  "dialogue": [
+    {
+      "id": "14-xiapi2_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "여포를 사로잡는다! 물이 차오른다, 서둘러라." }
+      ]
+    },
+    {
+      "id": "duel_guanyu_zhangliao_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_zhangliao" },
+      "lines": [
+      { "speaker": "장요", "side": "enemy", "portraitId": "장요", "text": "여포공이 무너지는구나..." },
+      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "신의 없는 주인을 따른 죄다. 그대는 다르길 바라네." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_guanyu_zhangliao",

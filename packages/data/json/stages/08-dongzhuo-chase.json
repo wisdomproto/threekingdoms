@@ -236,6 +236,23 @@
       "reward": { "treasures": ["검술지침서"], "gold": 200 }
     }
   ],
+  "dialogue": [
+    {
+      "id": "08-dongzhuo-chase_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "관문을 점령해 퇴로를 끊는다! 기병은 나를 따르라." }
+      ]
+    },
+    {
+      "id": "duel_zhangfei_lijue_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_lijue" },
+      "lines": [
+      { "speaker": "이각", "side": "enemy", "portraitId": "이각", "text": "동탁공을 쫓는 자, 누구냐!" },
+      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "장익덕이다! 길을 비켜라!" }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_zhangfei_lijue",

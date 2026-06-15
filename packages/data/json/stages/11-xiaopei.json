@@ -303,6 +303,23 @@
       }
     }
   ],
+  "dialogue": [
+    {
+      "id": "11-xiaopei_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "소패를 사수한다! 여포를 끌어내라." }
+      ]
+    },
+    {
+      "id": "duel_guanyu_zhangliao_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_zhangliao" },
+      "lines": [
+      { "speaker": "장요", "side": "enemy", "portraitId": "장요", "text": "관운장... 그대와는 겨루고 싶지 않으나." },
+      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "장문원, 훗날 같은 깃발 아래 서기를 바라네." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_guanyu_zhangliao",

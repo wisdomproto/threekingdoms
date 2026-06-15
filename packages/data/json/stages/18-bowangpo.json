@@ -208,6 +208,23 @@
       "reward": { "treasures": ["근위개"], "gold": 300 }
     }
   ],
+  "dialogue": [
+    {
+      "id": "18-bowangpo_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "하후돈을 마른 골짜기로 유인하라. 불을 기다린다." }
+      ]
+    },
+    {
+      "id": "duel_guanyu_lidian_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_lidian" },
+      "lines": [
+      { "speaker": "이전", "side": "enemy", "portraitId": "이전", "text": "복병이다! 물러서면 안 된다!" },
+      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "이미 늦었다. 골짜기가 곧 불바다가 되리라." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_guanyu_lidian",

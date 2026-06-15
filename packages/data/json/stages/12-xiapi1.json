@@ -152,6 +152,23 @@
       ]
     }
   ],
+  "dialogue": [
+    {
+      "id": "12-xiapi1_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "흩어지지 마라! 하비로 빠져나간다!" }
+      ]
+    },
+    {
+      "id": "duel_zhangfei_zhangliao_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_zhangliao" },
+      "lines": [
+      { "speaker": "장요", "side": "enemy", "portraitId": "장요", "text": "퇴로를 끊어라!" },
+      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "내 사모가 길을 연다! 형님, 먼저 가시오!" }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_zhangfei_zhangliao",

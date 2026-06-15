@@ -89,6 +89,23 @@
       "reward": { "treasures": ["화룡서"], "gold": 400 }
     }
   ],
+  "dialogue": [
+    {
+      "id": "25-wulin_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "황개 노장군의 화선이 닿을 때까지 — 조조의 시선을 끌어라!" }
+      ]
+    },
+    {
+      "id": "duel_huanggai_caimao_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_huanggai_caimao" },
+      "lines": [
+      { "speaker": "채모", "side": "enemy", "portraitId": "채모", "text": "또 너냐, 황공복!" },
+      { "speaker": "황개", "side": "ally", "portraitId": "황개", "text": "이번엔 불을 안고 왔다." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_huanggai_caimao",

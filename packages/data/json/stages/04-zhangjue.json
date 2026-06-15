@@ -262,6 +262,23 @@
       }
     }
   ],
+  "dialogue": [
+    {
+      "id": "04-zhangjue_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "장각을 향해 곧장 친다! 환술은 무시하라." }
+      ]
+    },
+    {
+      "id": "duel_guanyu_youbi_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_youbi" },
+      "lines": [
+      { "speaker": "유벽", "side": "enemy", "portraitId": "유벽", "text": "태평도의 분노를 받아라!" },
+      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "분노로는 청룡언월도를 못 이긴다." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_guanyu_youbi",

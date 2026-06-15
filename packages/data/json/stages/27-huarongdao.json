@@ -212,6 +212,23 @@
       "reward": { "treasures": ["의협교본"], "gold": 800 }
     }
   ],
+  "dialogue": [
+    {
+      "id": "27-huarongdao_battle_start",
+      "trigger": { "kind": "battleStart" },
+      "lines": [
+      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "화용도... 군령장을 썼습니다, 형님. 물러섬은 없습니다." }
+      ]
+    },
+    {
+      "id": "duel_guanyu_caocao_dialogue",
+      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_caocao" },
+      "lines": [
+      { "speaker": "조조", "side": "enemy", "portraitId": "조조", "text": "운장... 옛 정을 기억하는가. 다섯 관문의 일을." },
+      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "...기억하오. 그래서 더 괴롭소. 길을, 비키리다." }
+      ]
+    }
+  ],
   "events": [
     {
       "id": "duel_guanyu_caocao",
