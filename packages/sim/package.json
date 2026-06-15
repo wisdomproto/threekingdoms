@@ -7,6 +7,7 @@
   "scripts": {
     "start": "tsx src/cli.ts",
     "balance": "tsx src/balance-cli.ts",
+    "report-card": "tsx src/report-card-cli.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

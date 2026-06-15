@@ -5,6 +5,12 @@ import {
 } from "@tk/engine";
 
 /**
+ * 정책 인터페이스 (§11-A 리포트 카드 — 실력 티어 교체 가능). 행동할 유닛이 없으면 undefined
+ * (applyAction이 페이즈를 자동 전환). 전 진영 공용(player·ally·enemy).
+ */
+export type Policy = (ctx: BattleContext, state: BattleState) => Action | undefined;
+
+/**
  * 그리디 정책 (전 진영 공용 — player·ally·enemy) + **목표 인식**(M3②).
  *
  * 기본 행동 (순수 그리디):
@@ -173,6 +179,44 @@ export function chooseAction(ctx: BattleContext, state: BattleState): Action | u
 
   return { type: "wait", unitId: unit.id };
 }
+
+/** 숙련 플레이어 하한 = 기존 그리디(협공/돌격/목표 인식). 정책 티어 별칭. */
+export const greedyPolicy: Policy = chooseAction;
+
+/**
+ * 나이브 정책 (§11-A — 캐주얼 플레이어 근사). 의도적으로 단순:
+ *  1) 제자리 사거리 내 적이 있으면 HP 최저 적 공격
+ *  2) 안 움직였으면 가장 가까운 적으로 한 걸음(맨해튼 최소화) — 다음 호출에서 사거리 들면 공격
+ *  3) 그 외 대기
+ *
+ * greedy와 달리 **이동 후 최적 위치(협공/돌격) 탐색·목표 인식(탈출/호위/보호)이 없다.** 그래서
+ * 분류에서 "naive가 이기면 trivial(EASY)"의 신호로만 쓴다 — 목표 미인식이 오히려 올바른 하한.
+ */
+export const naivePolicy: Policy = (ctx, state) => {
+  const unit = state.units.find((u) => u.side === state.phase && !u.retreated && !u.acted);
+  if (!unit) return undefined;
+
+  const targets = getAttackableTargets(ctx, state, unit.id);
+  if (targets.length > 0) {
+    const weakest = targets
+      .map((id) => state.units.find((u) => u.id === id)!)
+      .sort((a, b) => a.troops - b.troops)[0]!;
+    return { type: "attack", unitId: unit.id, targetId: weakest.id };
+  }
+
+  if (!unit.moved) {
+    const enemies = state.units.filter((u) => areFoes(u.side, unit.side) && !u.retreated);
+    if (enemies.length > 0) {
+      const tiles = getMovableTiles(ctx, state, unit.id);
+      const nearest = (t: Coord) => Math.min(...enemies.map((e) => distance(t, { x: e.x, y: e.y })));
+      const best = [...tiles].sort((a, b) => nearest(a) - nearest(b))[0];
+      if (best && !(best.x === unit.x && best.y === unit.y)) {
+        return { type: "move", unitId: unit.id, to: best };
+      }
+    }
+  }
+  return { type: "wait", unitId: unit.id };
+};
 
 /**
  * pos(이동 후 칸)에서 target을 칠 때의 실제 피해 — 엔진 attack 처리와 동일하게
