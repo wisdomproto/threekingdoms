@@ -11,15 +11,18 @@
  * 얼마나 센가"의 텍스트 짝이다. pointerEvents:none — 맵 입력을 가리지 않는다.
  */
 import type { BattleVM, UnitVM } from "../viewmodel";
+import type { MenuAnchor } from "../store";
 import { PANEL_FRAME } from "./frames";
 
-const PANEL_STYLE: React.CSSProperties = {
+const POPUP_W = 220; // maxWidth와 동치
+const POPUP_H = 180; // 대략 높이(세로 클램프용 — 측정 없이 안전값)
+const PAD = 12;
+const EDGE = 8;
+
+const PANEL_BASE: React.CSSProperties = {
   position: "absolute",
-  // 우하단 — 좌상단 UnitPanel·우상단 미니맵·좌중단 AttackForecast·하단중앙 ActionMenu를 모두 피한다
-  right: 12,
-  bottom: "calc(96px + env(safe-area-inset-bottom))",
   minWidth: 168,
-  maxWidth: 220,
+  maxWidth: POPUP_W,
   padding: "2px 8px 6px",
   ...PANEL_FRAME,
   background: "rgba(16, 14, 10, 0.9)",
@@ -30,6 +33,23 @@ const PANEL_STYLE: React.CSSProperties = {
   pointerEvents: "none", // 정보 전용 — 맵 탭/호버를 가리지 않는다
   userSelect: "none",
   zIndex: 5,
+};
+
+/** 조회 유닛 옆 좌/우 플립 배치(§7-A "커서 위치에 따라 좌/우 자동 전환"). 화면 안 클램프. */
+function placeInspect(anchor: MenuAnchor, viewport: { width: number; height: number }): { left: number; top: number } {
+  const offset = anchor.half + PAD;
+  let left = anchor.x + offset; // 기본 우측
+  if (left + POPUP_W + EDGE > viewport.width) left = anchor.x - offset - POPUP_W; // 우측 초과 → 좌측
+  left = Math.max(EDGE, Math.min(left, viewport.width - POPUP_W - EDGE));
+  let top = anchor.y - POPUP_H / 2;
+  top = Math.max(EDGE, Math.min(top, viewport.height - POPUP_H - EDGE));
+  return { left, top };
+}
+
+/** 앵커 미수신 시 폴백 — 우하단 고정(종전 동작) */
+const FIXED_CORNER: React.CSSProperties = {
+  right: 12,
+  bottom: "calc(96px + env(safe-area-inset-bottom))",
 };
 
 function MiniBar({
@@ -59,11 +79,17 @@ export function InspectPopup({
   inspectedId,
   activeId,
   vm,
+  anchor,
+  viewport,
 }: {
   inspectedId: string | null;
   /** UnitPanel이 이미 보여주는 유닛(선택/탭). 같으면 중복이라 팝업을 숨긴다. */
   activeId: string | null;
   vm: BattleVM;
+  /** 조회 유닛 스크린 앵커 — 있으면 커서 옆 좌/우 플립 배치(§7-A). 없으면 우하단 고정 */
+  anchor?: MenuAnchor | null;
+  /** BattleScreen 컨테이너 크기 — 플립·클램프 기준 */
+  viewport?: { width: number; height: number };
 }): React.ReactElement | null {
   // UnitPanel과 같은 대상이면 중복 표시 회피 — 그 정보는 좌상단에 이미 있다.
   if (inspectedId && inspectedId === activeId) return null;
@@ -81,8 +107,12 @@ export function InspectPopup({
   const spReady = unit.maxSp > 0 && unit.sp >= unit.maxSp;
   const guardPct = Math.round(unit.terrainGuard * 100);
 
+  // 앵커+뷰포트 있으면 커서 옆 좌/우 플립 배치, 없으면 우하단 고정 폴백.
+  const pos: React.CSSProperties =
+    anchor && viewport ? placeInspect(anchor, viewport) : FIXED_CORNER;
+
   return (
-    <div style={PANEL_STYLE}>
+    <div style={{ ...PANEL_BASE, ...pos }}>
       {/* §7-A "[미니초상] 이름 병종 Lv N" — 초상 미보유 시 진영색+이니셜 폴백 */}
       <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
         <div

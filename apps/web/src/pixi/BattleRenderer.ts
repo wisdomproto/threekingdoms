@@ -67,6 +67,8 @@ export interface RendererStore {
    * 메뉴 비표시 상태면 null. ε 이내 변화는 store가 무시(불필요 리렌더 방지).
    */
   setMenuAnchor(anchor: { x: number; y: number; half: number } | null): void;
+  /** 조회(호버/탭) 유닛 스크린 앵커 — InspectPopup 커서 옆 배치용. 매 틱 push */
+  setInspectAnchor(anchor: { x: number; y: number; half: number } | null): void;
   /** 미니맵 뷰포트 박스(§6) — 카메라 가시영역을 타일 좌표로 매 틱 push */
   setViewport(rect: { x: number; y: number; w: number; h: number } | null): void;
 }
@@ -509,6 +511,21 @@ export class BattleRenderer implements Presenter {
     // 셀의 화면상 반폭 = (타일/2) × 현재 줌. 좌/우 자동 전환 시 유닛을 가리지 않을 거리.
     const half = (TILE_SIZE / 2) * camera.current.scale;
     store.setMenuAnchor({ x: center.x, y: center.y, half });
+    this.updateInspectAnchor(camera, units);
+  }
+
+  /** 조회(호버/탭) 유닛 스크린 앵커를 push — InspectPopup이 커서 옆 좌/우 플립 배치(§7-A). */
+  private updateInspectAnchor(camera: CameraController, units: UnitLayer): void {
+    const store = this.store;
+    if (!store) return;
+    const insId = store.inspectedId;
+    const iv = insId ? units.tryView(insId) : null;
+    if (!iv) {
+      store.setInspectAnchor(null);
+      return;
+    }
+    const c = camera.worldToScreen(gridToWorld({ x: iv.gridX, y: iv.gridY }));
+    store.setInspectAnchor({ x: c.x, y: c.y, half: (TILE_SIZE / 2) * camera.current.scale });
   }
 
   /**

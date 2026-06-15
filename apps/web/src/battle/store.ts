@@ -79,6 +79,8 @@ export interface StoreSnapshot {
    * 렌더러가 setMenuAnchor로 갱신(매 틱). ActionMenu가 읽어 absolute 위치 산출.
    */
   menuAnchor: MenuAnchor | null;
+  /** 조회(호버/탭) 유닛 스크린 앵커 — InspectPopup 커서 옆 배치. 비조회면 null */
+  inspectAnchor: MenuAnchor | null;
   /** 미니맵 카메라 뷰포트 박스(타일 좌표) — 렌더러가 매 틱 갱신. 미설정이면 null */
   viewport: MinimapViewport | null;
   /** 자동전투 ON 여부 — 컨트롤 버튼 표시 상태 */
@@ -130,6 +132,8 @@ export class BattleStore {
   private _inspectedId: string | null = null;
   /** 커맨드 메뉴 앵커 — 렌더러가 매 틱 활성 유닛 스크린좌표를 push. 메뉴 비표시면 null */
   private _menuAnchor: MenuAnchor | null = null;
+  /** 조회(호버/탭) 유닛 앵커 — InspectPopup 커서 옆 배치용. 비조회면 null */
+  private _inspectAnchor: MenuAnchor | null = null;
   /** 미니맵 뷰포트 박스(타일) — 렌더러가 매 틱 push */
   private _viewport: MinimapViewport | null = null;
 
@@ -179,6 +183,27 @@ export class BattleStore {
 
   get menuAnchor(): MenuAnchor | null {
     return this._menuAnchor;
+  }
+
+  get inspectAnchor(): MenuAnchor | null {
+    return this._inspectAnchor;
+  }
+
+  /** 호버/조회 유닛 스크린좌표 — 렌더러가 매 틱 push. InspectPopup이 커서 옆 좌/우 플립 배치. */
+  setInspectAnchor(anchor: MenuAnchor | null): void {
+    const prev = this._inspectAnchor;
+    if (prev === anchor) return;
+    if (prev && anchor) {
+      if (
+        Math.abs(prev.x - anchor.x) < 0.5 &&
+        Math.abs(prev.y - anchor.y) < 0.5 &&
+        Math.abs(prev.half - anchor.half) < 0.5
+      ) {
+        return;
+      }
+    }
+    this._inspectAnchor = anchor;
+    this.notify();
   }
 
   /**
@@ -384,6 +409,7 @@ export class BattleStore {
         speed: this._speed,
         inspectedId: this._inspectedId,
         menuAnchor: this._menuAnchor,
+        inspectAnchor: this._inspectAnchor,
         viewport: this._viewport,
       };
     }

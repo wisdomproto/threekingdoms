@@ -25,7 +25,7 @@ import type { InputState } from "../inputMachine";
 import type { BattleVM } from "../viewmodel";
 import { PANEL_FRAME, BUTTON_FRAME } from "./frames";
 import { buildResultSummary } from "./resultSummary";
-import { addGold, markCleared } from "../../meta/metaStore";
+import { addGold, markCleared, addItem } from "../../meta/metaStore";
 import { clearSortie } from "../../meta/sortie";
 import { RewardedAdButton } from "../../meta/RewardedAdButton";
 
@@ -268,6 +268,8 @@ export function ResultSequence({
       metaCommitted.current = true;
       addGold(summary.gold); // metaStore가 legacy tk.meta.gold에도 mirror — 결산 경로 일원화
       if (stageId) markCleared(stageId); // 다음 전장 해금
+      // 획득 보물을 인벤토리에 적립 (편성 장착 + §10 보물 도감 수집 반영). 종전 누락 보완.
+      for (const t of summary.treasures) addItem(t.id);
       clearSortie(); // 1회성 출진 페이로드 소비(새로고침 시 stale 편성 방지)
     }
 

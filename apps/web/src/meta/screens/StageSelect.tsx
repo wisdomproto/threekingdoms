@@ -112,8 +112,13 @@ export function StageSelect(): React.ReactElement {
         <h1 style={{ margin: 0, fontSize: 18, letterSpacing: "0.2em", color: BRONZE_GOLD }}>
           출진할 전장
         </h1>
-        <span style={{ fontSize: 14, color: BRONZE_GOLD, whiteSpace: "nowrap" }}>
-          자금 {gold.toLocaleString()}<span style={{ color: BRONZE_DIM }}> 金</span>
+        <span style={{ display: "flex", alignItems: "center", gap: 14, whiteSpace: "nowrap" }}>
+          <Link href="/codex" style={{ color: BRONZE_DIM, fontSize: 14, textDecoration: "none" }}>
+            보물 도감
+          </Link>
+          <span style={{ fontSize: 14, color: BRONZE_GOLD }}>
+            자금 {gold.toLocaleString()}<span style={{ color: BRONZE_DIM }}> 金</span>
+          </span>
         </span>
       </header>
 

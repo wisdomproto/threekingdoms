@@ -210,7 +210,7 @@ export default function BattleScreen(): React.ReactElement {
         nameOf={(id) => ctx.data.commanders[id]?.name ?? id}
       />
       <UnitPanel ui={snap.ui} vm={snap.vm} />
-      <InspectPopup inspectedId={snap.inspectedId} activeId={selectedId} vm={snap.vm} />
+      <InspectPopup inspectedId={snap.inspectedId} activeId={selectedId} vm={snap.vm} anchor={snap.inspectAnchor} viewport={viewport} />
       <AttackForecast ui={snap.ui} ctx={ctx} committed={store.committedState} />
       <ActionMenu
         ui={snap.ui}
