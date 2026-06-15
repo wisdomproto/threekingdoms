@@ -39,6 +39,8 @@ export interface Presenter {
   duelTriggered(e: Ev<"duelTriggered">): Promise<void>;
   /** 협공 발동 연출 — 미구현(옵셔널)이면 default로 흘러도 무방. */
   flank?(e: Ev<"flank">): Promise<void>;
+  /** 필살 발동 연출(배너·이펙트) — 옵셔널. */
+  ultimate?(e: Ev<"ultimate">): Promise<void>;
   phaseChanged(e: Ev<"phaseChanged">): Promise<void>;
   battleEnded(e: Ev<"battleEnded">): Promise<void>;
   /** 드레인 시 committed로 강제 정합 — 연출 결과가 어긋났어도 진실로 덮는다 */
@@ -148,6 +150,8 @@ export class EventPlayer {
         return p.duelTriggered(e);
       case "flank":
         return p.flank?.(e) ?? Promise.resolve();
+      case "ultimate":
+        return p.ultimate?.(e) ?? Promise.resolve();
       case "phaseChanged":
         return p.phaseChanged(e);
       case "battleEnded":

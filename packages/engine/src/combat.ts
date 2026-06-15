@@ -87,6 +87,11 @@ export function chargeMultiplier(ctx: BattleContext, attacker: UnitState): numbe
  * 연속공격(2중공격) 발동 여부 — 공격자 이동력이 대상보다 moveGap 이상 높으면 true(결정론).
  * 원작 조조전의 순발력 기반 연속공격확률을 RNG 없이 이동력 우위로 치환(§7). 개시 공격에만.
  */
+/** 필살 발동 가능 — SP가 가득 찼는가(§9). 결정론. */
+export function canUltimate(unit: UnitState): boolean {
+  return (unit.sp ?? 0) >= (unit.maxSp ?? Infinity);
+}
+
 export function doubleStrikes(ctx: BattleContext, attacker: UnitState, defender: UnitState): boolean {
   // 아이템으로 연속공격 부여(§7)면 이동력 무관 발동, 아니면 *병종 기본 이동력* 우위로 판정.
   // (말 보너스는 이동 범위만 — 연속공격 임계를 흔들지 않게 baseMove로 본다.)

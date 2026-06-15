@@ -69,6 +69,7 @@ export function AttackForecast({
       ui.unitId,
       { x: target.x, y: target.y },
       ui.preview, // 이동 후 칸 기준 (제자리면 from=preview=현위치)
+      ui.ultimate, // 필살 조준이면 필살 피해
     );
     if (!preview) continue;
     rows.push({
@@ -109,6 +110,11 @@ export function AttackForecast({
             {r.preview.doubleStrike ? (
               <span style={{ marginLeft: 6, fontSize: 12, fontWeight: 700, color: DOUBLE_COLOR }}>
                 2연타
+              </span>
+            ) : null}
+            {r.preview.ultimate ? (
+              <span style={{ marginLeft: 6, fontSize: 12, fontWeight: 800, color: "#5ad7ff" }}>
+                필살
               </span>
             ) : null}
             {r.preview.flank ? (

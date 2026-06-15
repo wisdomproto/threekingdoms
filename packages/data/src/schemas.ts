@@ -162,7 +162,8 @@ export const CombatConfigSchema = z.object({
     onAttack: z.number().int().min(0),  // 공격 1회 시 공격자 SP +
     onHitTaken: z.number().int().min(0),// 피격 1회 시 피격자 SP +
     onKill: z.number().int().min(0),    // 격파 시 공격자 SP +
-  }).default({ max: 255, onAttack: 25, onHitTaken: 20, onKill: 60 }),
+    ultimatePercent: z.number().min(0), // 필살 추가 피해 %(2단계 — 발동 시 ×(1+%/100))
+  }).default({ max: 255, onAttack: 25, onHitTaken: 20, onKill: 60, ultimatePercent: 150 }),
 }).refine(
   (c) => Object.entries(c.lineAdvantage).every(([k, v]) => k !== v),
   { message: "lineAdvantage must not be self-referential" },

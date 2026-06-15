@@ -41,6 +41,8 @@ export interface AttackPreview {
   charge?: { bonusPercent: number };
   /** 연속공격(2중공격) 발동 시 — 2타 피해. 미발동이면 생략 (damage엔 2타 합산 포함) */
   doubleStrike?: { secondDamage: number };
+  /** 필살 조준 — 대형 확정 일격(무반격). damage는 필살 피해 */
+  ultimate?: boolean;
 }
 
 /**
@@ -54,6 +56,7 @@ export function buildAttackPreview(
   attackerId: string,
   defenderCoord: Coord,
   from?: Coord,
+  ultimate = false,
 ): AttackPreview | null {
   const rawAttacker = state.units.find((u) => u.id === attackerId);
   const defender = state.units.find(
@@ -62,6 +65,13 @@ export function buildAttackPreview(
   if (!rawAttacker || rawAttacker.retreated || !defender) return null;
   // 적대 진영(camp 다름)만 타깃 — 우군(같은 camp)은 피해 예측 대상이 아니다
   if (!areFoes(defender.side, rawAttacker.side)) return null;
+
+  // 필살: 대형 확정 일격(무반격·협공/돌격/연속 무관). 엔진 ultimate 케이스와 동일.
+  if (ultimate) {
+    const ultMult = 1 + ctx.data.combat.sp.ultimatePercent / 100;
+    const dmg = computeDamage(ctx, rawAttacker, defender, 1, ultMult);
+    return { damage: dmg, willRetreat: defender.troops - dmg <= 0, ultimate: true };
+  }
 
   // 엔진은 move→attack 순으로 처리하므로, 이동 예정이면 공격자를 from에 두고 moved=true로 맞춘다
   // (협공 포위도·기병 돌격 판정 모두 '공격 시점' 상태와 일치시키기 위함).

@@ -1,6 +1,6 @@
 import {
   getAttackableTargets, getMovableTiles, distance, areFoes, pathCostField,
-  computeDamage, flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes,
+  computeDamage, flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes, canUltimate,
   type Action, type BattleContext, type BattleState, type UnitState, type Coord,
 } from "@tk/engine";
 
@@ -61,7 +61,13 @@ export function chooseAction(ctx: BattleContext, state: BattleState): Action | u
     // 섬멸은 물론 *탈출(reachTile)* 스테이지에서도 호위 유닛은 전진해 적을 쳐 길을 열어야 한다 —
     // 묶어두면 탈출 유닛이 단신으로 적진에 갇혀 목표에 도달 못 한다(여남).
     const plan = bestAttackPlan(ctx, state, unit, !isHoldPosture(ctx));
-    if (plan) return plan;
+    if (plan) {
+      // SP 가득 + 제자리 공격 가능이면 필살로 전환(대형 일격). 이동 계획이면 먼저 이동 후 다음 호출에서.
+      if (plan.type === "attack" && canUltimate(unit)) {
+        return { type: "ultimate", unitId: unit.id, targetId: plan.targetId };
+      }
+      return plan;
+    }
   }
 
   // 공격 가능하면 가장 약한 적 격파 우선 (특수역 폴백 — 제자리 사거리 내)

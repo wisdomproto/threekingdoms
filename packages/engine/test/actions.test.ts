@@ -33,6 +33,25 @@ describe("필살 게이지(SP) 누적 (§9)", () => {
   });
 });
 
+describe("applyAction: ultimate (필살)", () => {
+  it("SP 가득 시 필살 — 일반보다 큰 피해 + SP 소진 + ultimate 이벤트", () => {
+    const sp = testCtx.data.combat.sp;
+    let s = patchUnit(fresh(), "이숙", { x: 1, y: 3 }); // 관우 인접
+    s = patchUnit(s, "관우", { sp: sp.max });
+    const normal = computeDamage(testCtx, get(s, "관우"), get(s, "이숙"));
+    const { state, events } = applyAction(testCtx, s, { type: "ultimate", unitId: "관우", targetId: "이숙" });
+    const ult = events.find((e) => e.type === "ultimate");
+    expect(ult && ult.type === "ultimate").toBe(true);
+    if (ult && ult.type === "ultimate") expect(ult.damage).toBeGreaterThan(normal); // 필살 > 일반
+    expect(get(state, "관우").sp).toBe(0); // SP 소진
+    expect(get(state, "관우").acted).toBe(true);
+  });
+  it("SP 미충전이면 필살 불가(throw)", () => {
+    const s = patchUnit(fresh(), "이숙", { x: 1, y: 3 }); // 관우 sp=0
+    expect(() => applyAction(testCtx, s, { type: "ultimate", unitId: "관우", targetId: "이숙" })).toThrow();
+  });
+});
+
 describe("applyAction: move", () => {
   it("이동하면 위치가 바뀌고 unitMoved 이벤트, moved=true", () => {
     const s0 = fresh();

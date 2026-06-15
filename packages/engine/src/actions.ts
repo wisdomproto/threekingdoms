@@ -5,7 +5,7 @@ import { getMovableTiles, unitAt } from "./movement";
 import {
   computeDamage, distance, getAttackableTargets,
   strategyDamage, strategyAoeCells, getStrategyTargets, expForNextLevel,
-  spiritPower, flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes,
+  spiritPower, flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes, canUltimate,
 } from "./combat";
 import { findDuelTrigger } from "./events";
 import { spawnUnit } from "./createBattle";
@@ -414,6 +414,28 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
       }
       // 반격으로 공격자가 퇴각했어도 acted=true로 통일 — maybeAdvancePhase의 retreated 필터가 가드
       next = replaceUnit(next, { ...getUnit(next, unit.id), acted: true });
+      break;
+    }
+
+    case "ultimate": {
+      assertCanAct(state, unit, false);
+      const target = getUnit(state, action.targetId);
+      if (target.retreated || !areFoes(target.side, unit.side)) throw new Error("invalid target");
+      if (!getAttackableTargets(ctx, state, unit.id).includes(target.id)) throw new Error(`${target.id} out of range`);
+      if (!canUltimate(unit)) throw new Error(`${unit.id} SP not full`);
+      // 필살 = SP 소진 대형 확정 일격. 협공/돌격/연속과 무관한 단타·무반격(결정론).
+      const ultMult = 1 + ctx.data.combat.sp.ultimatePercent / 100;
+      const dmg = computeDamage(ctx, unit, target, 1, ultMult);
+      events.push({ type: "ultimate", attackerId: unit.id, defenderId: target.id, damage: dmg });
+      const tLvl = getUnit(next, target.id).level;
+      const hit = dealDamage(next, unit, getUnit(next, target.id), dmg, false);
+      next = hit.state;
+      events.push(...hit.events);
+      const ultExp = grantExp(ctx, next, unit.id, dmg, getUnit(next, target.id).retreated, tLvl);
+      next = ultExp.state;
+      events.push(...ultExp.events);
+      // SP 소진 + acted (무반격)
+      next = replaceUnit(next, { ...getUnit(next, unit.id), sp: 0, acted: true });
       break;
     }
 

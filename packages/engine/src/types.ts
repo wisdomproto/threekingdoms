@@ -78,6 +78,7 @@ export interface BattleState {
 export type Action =
   | { type: "move"; unitId: string; to: Coord }
   | { type: "attack"; unitId: string; targetId: string }
+  | { type: "ultimate"; unitId: string; targetId: string }   // 필살(SP 가득 시) — 대형 확정피해
   | { type: "strategy"; unitId: string; strategyId: string; target: Coord }
   // 도구(아이템) 사용 — 소모품 2종: supplyItem(회복약)/attackItem(공격아이템).
   // target은 효과 대상 유닛의 좌표(supplyItem=아군, attackItem=적). 생략 시 시전자 자신.
@@ -92,6 +93,8 @@ export type BattleEvent =
   | { type: "flank"; attackerId: string; defenderId: string; surround: number; bonusPercent: number }
   // 연속공격(2중공격) 발동 — 이동력 우위로 개시 공격이 2회 타격. 연출용.
   | { type: "doubleStrike"; attackerId: string; defenderId: string }
+  // 필살 발동 — SP 소진하며 대형 확정피해. 연출용(배너·이펙트).
+  | { type: "ultimate"; attackerId: string; defenderId: string; damage: number }
   | { type: "strategyCast"; casterId: string; strategyId: string; target: Coord }
   // 도구 사용 결과 — amount = 실제 회복/피해량(상한·하한 클램프 후). target = 효과 대상 좌표.
   | { type: "itemUsed"; unitId: string; itemId: string; target?: Coord; amount: number }

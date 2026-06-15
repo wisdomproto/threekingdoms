@@ -9,7 +9,7 @@
  */
 import {
   getAttackableTargets, getMovableTiles, getStrategyTargets, unitAt,
-  flankingCount, flankMultiplier,
+  flankingCount, flankMultiplier, canUltimate,
 } from "@tk/engine";
 import type { Action, BattleContext, BattleState, Coord } from "@tk/engine";
 
@@ -37,6 +37,13 @@ export function usableItems(ctx: BattleContext, battle: BattleState, unitId: str
     if (item && (item.category === "supplyItem" || item.category === "attackItem")) out.push(id);
   }
   return out;
+}
+
+/** SP 가득 + 공격 가능 대상 1기 이상 (필살 버튼 점등 조건). */
+function ultimateReady(battle: BattleState, unitId: string, attackable: string[]): boolean {
+  if (attackable.length === 0) return false;
+  const u = battle.units.find((x) => x.id === unitId);
+  return u !== undefined && canUltimate(u);
 }
 
 /**
@@ -98,6 +105,8 @@ export type InputState =
       items: string[];
       /** preview 위치에서 협공 가능한 적이 1기 이상 (협공 버튼 점등 조건) */
       canFlank: boolean;
+      /** SP 가득 + 공격 가능 대상 있음 (필살 버튼 점등 조건) */
+      canUltimate: boolean;
     }
   | {
       kind: "targetSelect";
@@ -108,6 +117,8 @@ export type InputState =
       attackable: string[];
       strategies: string[];
       items: string[];
+      /** 필살 조준 중이면 true — 대상 확정 시 attack 대신 ultimate 커밋 */
+      ultimate?: boolean;
     }
   /** 계략: 책략 목록에서 선택 */
   | {
@@ -174,6 +185,7 @@ export type UiEvent =
   | { type: "tapTile"; coord: Coord }
   | { type: "cancel" }
   | { type: "menuAttack" }
+  | { type: "menuUltimate" }
   | { type: "menuStrategy" }
   | { type: "selectStrategy"; strategyId: string }
   | { type: "menuItem" }
@@ -263,6 +275,7 @@ export function reduceInput(
                 strategies: castableStrategies(ctx, battle, u.id, pos),
                 items: usableItems(ctx, battle, u.id),
                 canFlank: flankOpportunity(ctx, battle, u.id, pos, getAttackableTargets(ctx, battle, u.id)),
+                canUltimate: ultimateReady(battle, u.id, getAttackableTargets(ctx, battle, u.id)),
               },
               effects: [{ type: "focus", coord: event.coord }],
             };
@@ -337,6 +350,7 @@ export function reduceInput(
             strategies: castableStrategies(ctx, battle, state.unitId, pos),
             items: usableItems(ctx, battle, state.unitId),
             canFlank: flankOpportunity(ctx, battle, state.unitId, pos, state.attackable),
+            canUltimate: ultimateReady(battle, state.unitId, state.attackable),
           },
           effects: [],
         };
@@ -372,6 +386,9 @@ export function reduceInput(
               ctx, battle, state.unitId, event.coord,
               getAttackableTargets(ctx, battle, state.unitId, event.coord),
             ),
+            canUltimate: ultimateReady(
+              battle, state.unitId, getAttackableTargets(ctx, battle, state.unitId, event.coord),
+            ),
           },
           effects: [{ type: "focus", coord: event.coord }],
         };
@@ -384,7 +401,11 @@ export function reduceInput(
     case "postMoveMenu": {
       if (event.type === "menuAttack") {
         if (state.attackable.length === 0) return noop(state); // 대상 없음 — 버튼 비활성과 동일
-        return { next: { ...state, kind: "targetSelect" }, effects: [] };
+        return { next: { ...state, kind: "targetSelect", ultimate: false }, effects: [] };
+      }
+      if (event.type === "menuUltimate") {
+        if (!state.canUltimate) return noop(state); // SP 미충전 또는 대상 없음 — 버튼 dim
+        return { next: { ...state, kind: "targetSelect", ultimate: true }, effects: [] };
       }
       if (event.type === "menuStrategy") {
         if (state.strategies.length === 0) return noop(state); // 시전 가능 책략 없음
@@ -430,6 +451,7 @@ export function reduceInput(
             ...state,
             kind: "postMoveMenu",
             canFlank: flankOpportunity(ctx, battle, state.unitId, state.preview, state.attackable),
+            canUltimate: ultimateReady(battle, state.unitId, state.attackable),
           },
           effects: [],
         };
@@ -437,18 +459,13 @@ export function reduceInput(
       if (event.type === "tapTile") {
         const target = unitAt(battle, event.coord.x, event.coord.y);
         if (!target || !state.attackable.includes(target.id)) return noop(state);
+        // 필살 조준이면 ultimate, 아니면 일반 attack 커밋.
+        const final: Action = state.ultimate
+          ? { type: "ultimate", unitId: state.unitId, targetId: target.id }
+          : { type: "attack", unitId: state.unitId, targetId: target.id };
         return {
           next: { kind: "animating" },
-          effects: [
-            {
-              type: "commit",
-              actions: chainActions(state.unitId, state.from, state.preview, {
-                type: "attack",
-                unitId: state.unitId,
-                targetId: target.id,
-              }),
-            },
-          ],
+          effects: [{ type: "commit", actions: chainActions(state.unitId, state.from, state.preview, final) }],
         };
       }
       return noop(state);
@@ -467,6 +484,7 @@ export function reduceInput(
             ...state,
             kind: "postMoveMenu",
             canFlank: flankOpportunity(ctx, battle, state.unitId, state.preview, state.attackable),
+            canUltimate: ultimateReady(battle, state.unitId, state.attackable),
           },
           effects: [],
         };
@@ -524,6 +542,7 @@ export function reduceInput(
             ...state,
             kind: "postMoveMenu",
             canFlank: flankOpportunity(ctx, battle, state.unitId, state.preview, state.attackable),
+            canUltimate: ultimateReady(battle, state.unitId, state.attackable),
           },
           effects: [],
         };

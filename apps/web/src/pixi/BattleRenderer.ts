@@ -706,6 +706,18 @@ export class BattleRenderer implements Presenter {
     await s.fx.banner(`협공! +${e.bonusPercent}%`, FLANK_BANNER_MS);
   }
 
+  async ultimate(e: Ev<"ultimate">): Promise<void> {
+    const s = this.scene;
+    if (!s) return;
+    // 필살 발동(데미지 직전) — 큰 흔들림 + 대상 플래시 + 「필살!」 배너(일기토급 무게).
+    const attacker = this.ctx.data.commanders[e.attackerId]?.name ?? e.attackerId;
+    const defender = s.units.view(e.defenderId);
+    const at = gridToWorld({ x: defender.gridX, y: defender.gridY });
+    this.triggerShake(SHAKE_PX_BIG);
+    void s.fx.impactFlash(at);
+    await s.fx.banner(`필살! ${attacker}`, DUEL_BANNER_MS);
+  }
+
   async phaseChanged(e: Ev<"phaseChanged">): Promise<void> {
     const s = this.scene;
     this.phase = e.phase;

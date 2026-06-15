@@ -158,8 +158,14 @@ function itemsFor(ui: InputState, dispatch: (e: UiEvent) => void): Item[] {
         disabled: !ui.canFlank,
         onPress: () => dispatch({ type: "menuAttack" }),
       },
-      // ── 필살: 미구현(차별화 백로그) — 자리표시 dim ──
-      { key: "ultimate", label: "필살", placeholder: true }, // 네임드 특수기
+      // 필살: SP 가득 + 대상 있으면 점등(시안) → 필살 타깃팅(대형 확정피해). 아니면 dim.
+      {
+        key: "ultimate",
+        label: "필살",
+        accent: "#5ad7ff",
+        disabled: !ui.canUltimate,
+        onPress: () => dispatch({ type: "menuUltimate" }),
+      },
       // ──────────────────────────────────────
       {
         key: "wait",
