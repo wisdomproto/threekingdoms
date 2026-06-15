@@ -9,7 +9,7 @@
  * id로 유닛을 구분하므로 중복 불가. 생성물은 신규 콘텐츠(챌린지/2회차/what-if)용이며 사람 검수 후 채택.
  */
 import { gameData } from "@tk/data";
-import type { Stage, StageUnit } from "@tk/data";
+import type { Stage, StageUnit, BattleMap } from "@tk/data";
 import type { Coord } from "@tk/engine";
 import { DEFAULT_CURVE, bandBudgets, type PacingCurve } from "./pacingCurve";
 import { unitForce, totalForce } from "./force";
@@ -25,6 +25,7 @@ export interface EnemyTemplate {
 
 export interface GenSpec {
   mapId: string;
+  map?: BattleMap; // §11-C 합성 — 미등록 생성 맵(있으면 mapId 룩업 대신 사용)
   spawn: Coord; // 플레이어 시작(경로% 정규화 기준)
   goal: Coord; // 목표/보스 위치
   playerUnits: StageUnit[]; // 참조 편성(밸런스 측정 + 기본). 실제 플레이는 sortie가 덮음
@@ -59,7 +60,7 @@ function enemyUnit(tpl: EnemyTemplate, commanderId: string, at: Coord): StageUni
  * 보스는 goal에, mook은 밴드별 전력 예산을 채울 때까지 밴드 중심 근처 빈 타일에 배치.
  */
 export function generate(spec: GenSpec, knob: number): Stage {
-  const map = gameData.maps[spec.mapId];
+  const map = spec.map ?? gameData.maps[spec.mapId];
   if (!map) throw new Error(`unknown map: ${spec.mapId}`);
   const ctx = { data: gameData, stage: { units: [] } as unknown as Stage, map };
   const field = pathPercentField(ctx, spec.goal, spec.spawn, spec.moveClass ?? "foot");
@@ -100,7 +101,7 @@ export function generate(spec: GenSpec, knob: number): Stage {
   const stage: Stage = {
     id: spec.id ?? "gen-stage",
     name: spec.name ?? "생성 스테이지",
-    mapId: spec.mapId,
+    mapId: map.id, // spec.map 주입 시 그 맵 id로 정합(미주입이면 spec.mapId == map.id)
     turnLimit: spec.turnLimit ?? 30,
     camera: { zoom: 1.5, focus: [spec.goal.x, spec.goal.y] },
     reward: { gold: 0, exp: 0, treasures: [] },
@@ -139,7 +140,7 @@ export function autoTune(spec: GenSpec, target: Label = "HEALTHY", knobs: number
   let best: { stage: Stage; knob: number; label: Label } | null = null;
   for (const knob of knobs) {
     const stage = generate(spec, knob);
-    const label = classify(runMatrixOnStage(stage));
+    const label = classify(runMatrixOnStage(stage, spec.map));
     trace.push({ knob, label });
     if (label === target) return { stage, knob, label, converged: true, trace };
     if (!best || RANK[label] > RANK[best.label]) best = { stage, knob, label };

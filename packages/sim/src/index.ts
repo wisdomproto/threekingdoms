@@ -18,3 +18,9 @@ export { generate, autoTune, type GenSpec, type EnemyTemplate, type TuneResult }
 export { DEFAULT_CURVE, bandBudgets, type PacingCurve, type Band } from "./gen/pacingCurve";
 export { unitForce, totalForce } from "./gen/force";
 export { pathPercentField, tilesNearPercent, type PercentField } from "./gen/placement";
+// §11-C 지형 문법 — 아키타입 → BattleMap 격자 + 연결성 검증.
+export { generateMap, renderAscii, STANDARD_LEGEND, type Archetype, type GeneratedMap } from "./gen/terrain/mapGen";
+export { gateBreakthrough, pincerDefense, escapeCorridor, type ArchParams, type ArchOutput } from "./gen/terrain/archetypes";
+export {
+  createGrid, fillRect, vWall, hRiver, scatter, carvePath, mulberry32, toBattleMap, type TileGrid,
+} from "./gen/terrain/grid";

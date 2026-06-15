@@ -1,5 +1,5 @@
 import { gameData, stages } from "@tk/data";
-import type { Stage } from "@tk/data";
+import type { Stage, BattleMap } from "@tk/data";
 import { applyAction, createBattle, type BattleContext } from "@tk/engine";
 import { chooseAction, type Policy } from "./policy";
 
@@ -16,6 +16,8 @@ export interface RunOpts {
   policy?: Policy;
   levelOffset?: number;
   maxTurns?: number;
+  /** §11-C 합성 — 미등록 생성 맵을 직접 주입(없으면 gameData.maps[mapId] 룩업). */
+  mapOverride?: BattleMap;
 }
 
 /**
@@ -44,7 +46,7 @@ export function runStage(stage: Stage, opts: RunOpts = {}): RunResult {
   const seed = opts.seed ?? 42;
   const policy = opts.policy ?? chooseAction;
   const s = withLevelOffset(stage, opts.levelOffset ?? 0);
-  const map = gameData.maps[s.mapId];
+  const map = opts.mapOverride ?? gameData.maps[s.mapId];
   if (!map) throw new Error(`unknown map: ${s.mapId}`);
   const ctx: BattleContext = { data: gameData, stage: s, map };
   let state = createBattle(ctx, seed);

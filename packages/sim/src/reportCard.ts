@@ -6,7 +6,7 @@
  * balance.ts와 동일 패턴(순수 산출 → md). report-card-cli가 파일로 굽고, reportCard.test가 게이트.
  */
 import { stages } from "@tk/data";
-import type { Stage } from "@tk/data";
+import type { Stage, BattleMap } from "@tk/data";
 import { runStage, type RunResult } from "./runner";
 import { greedyPolicy, naivePolicy } from "./policy";
 
@@ -37,13 +37,16 @@ function toCell(r: RunResult): Cell {
   return { result: r.result, turns: r.turns, retreats: r.playerRetreats };
 }
 
-/** 임의 Stage의 6셀 매트릭스(등록 불필요 — §11-B 생성 스테이지 분류). 결정론(셀당 1런). */
-export function runMatrixOnStage(stage: Stage): MatrixResult {
+/**
+ * 임의 Stage의 6셀 매트릭스(등록 불필요 — §11-B 생성 스테이지 분류). 결정론(셀당 1런).
+ * mapOverride 지정 시 미등록 생성 맵으로 측정(§11-C 합성).
+ */
+export function runMatrixOnStage(stage: Stage, mapOverride?: BattleMap): MatrixResult {
   const greedy: Record<string, Cell> = {};
   const naive: Record<string, Cell> = {};
   for (const off of LEVEL_OFFSETS) {
-    greedy[String(off)] = toCell(runStage(stage, { policy: greedyPolicy, levelOffset: off }));
-    naive[String(off)] = toCell(runStage(stage, { policy: naivePolicy, levelOffset: off }));
+    greedy[String(off)] = toCell(runStage(stage, { policy: greedyPolicy, levelOffset: off, mapOverride }));
+    naive[String(off)] = toCell(runStage(stage, { policy: naivePolicy, levelOffset: off, mapOverride }));
   }
   return { greedy, naive };
 }
