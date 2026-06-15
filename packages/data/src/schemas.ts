@@ -129,6 +129,15 @@ export const CombatConfigSchema = z.object({
     infantryBulwarkPercent: z.number().min(0).max(100),
     archerSnipePiercePercent: z.number().min(0).max(100),
   }).default({ cavalryChargePercent: 20, infantryBulwarkPercent: 15, archerSnipePiercePercent: 50 }),
+  /**
+   * 연속공격(2중공격, 결정론 게임성 격상 §7) — 원작 조조전의 순발력 기반 연속공격확률을
+   * RNG 없이 *이동력 우위*로 치환. 공격자 이동력이 대상보다 moveGap 이상 높으면 개시 공격이
+   * 2회 타격(2타는 secondHitPercent 비율). 빠른 병종(경기병 등)이 느린 적에게 추가타.
+   */
+  doubleStrike: z.object({
+    moveGap: z.number().int().min(1),       // 발동 최소 이동력 차
+    secondHitPercent: z.number().min(0).max(100), // 2타 피해 비율
+  }).default({ moveGap: 2, secondHitPercent: 50 }),
 }).refine(
   (c) => Object.entries(c.lineAdvantage).every(([k, v]) => k !== v),
   { message: "lineAdvantage must not be self-referential" },

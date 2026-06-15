@@ -17,7 +17,9 @@
  *
  * 전부 읽기 전용 — 상태를 커밋하지 않는다. computeDamage/distance는 엔진 export.
  */
-import { computeDamage, distance, areFoes, flankingCount, flankMultiplier, chargeMultiplier } from "@tk/engine";
+import {
+  computeDamage, distance, areFoes, flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes,
+} from "@tk/engine";
 import type { BattleContext, BattleState, Coord, UnitState } from "@tk/engine";
 
 export interface CounterPreview {
@@ -37,6 +39,8 @@ export interface AttackPreview {
   flank?: { surround: number; bonusPercent: number };
   /** 기병 돌격 발동 시(이동 후 공격) — 추가피해%. 미발동이면 생략 */
   charge?: { bonusPercent: number };
+  /** 연속공격(2중공격) 발동 시 — 2타 피해. 미발동이면 생략 (damage엔 2타 합산 포함) */
+  doubleStrike?: { secondDamage: number };
 }
 
 /**
@@ -80,7 +84,16 @@ export function buildAttackPreview(
   const charge =
     chargeMult > 1 ? { bonusPercent: Math.round((chargeMult - 1) * 100) } : undefined;
 
-  const damage = computeDamage(ctx, attacker, defender, 1, flankMult * chargeMult);
+  const mult = flankMult * chargeMult;
+  const dmg1 = computeDamage(ctx, attacker, defender, 1, mult);
+  // 연속공격: 1타로 격파 안 되고 이동력 우위면 2타(secondHitPercent). 엔진과 동일 순서.
+  const lethal1 = defender.troops - dmg1 <= 0;
+  const doubles = !lethal1 && doubleStrikes(ctx, attacker, defender);
+  const dmg2 = doubles
+    ? computeDamage(ctx, attacker, defender, ctx.data.combat.doubleStrike.secondHitPercent / 100, mult)
+    : 0;
+  const doubleStrike = doubles ? { secondDamage: dmg2 } : undefined;
+  const damage = dmg1 + dmg2;
   const willRetreat = defender.troops - damage <= 0;
 
   // 반격: 방어자 생존 + 공격자가 방어자 사거리 안 (actions.ts:178-182). 반격엔 협공 미적용(엔진과 일치).
@@ -94,8 +107,9 @@ export function buildAttackPreview(
         counter: { damage: counterDamage, willRetreat: attacker.troops - counterDamage <= 0 },
         flank,
         charge,
+        doubleStrike,
       };
     }
   }
-  return { damage, willRetreat, flank, charge };
+  return { damage, willRetreat, flank, charge, doubleStrike };
 }

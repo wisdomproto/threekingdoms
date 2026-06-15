@@ -58,6 +58,7 @@ export interface UnitVM {
   grades?: ClassGrades;         // 병종 5스탯 등급 [공·방·정·순·사] (특성 탭 뱃지)
   traitText?: string;           // 병종 상성/약점 설명문 (§8 부대특성 — lineAdvantage 파생)
   passiveText?: string;         // 병종 패시브 설명문 (§7 — combat.passives 파생, 없으면 미설정)
+  doubleStrikeText?: string;    // 연속공격 표기 (§7 — 이동력 우위 시. 빠른 병종만 설정)
   equipment?: ItemVM[];         // 소지품(장비/소모품) 해석 목록 (장비 탭)
   strategies?: StrategyVM[];    // 병종 보유 책략 해석 목록 (책략 탭)
 }
@@ -198,6 +199,10 @@ export function unitVM(ctx: BattleContext, u: UnitState): UnitVM {
     grades: cls?.grades,
     traitText: cls ? classTraitText(cls.line, ctx.data.combat.lineAdvantage, u.rangeMax) : undefined,
     passiveText: cls ? classPassiveText(cls.line, ctx.data.combat.passives) || undefined : undefined,
+    doubleStrikeText:
+      u.move - ctx.data.combat.doubleStrike.moveGap >= 3
+        ? `연속공격 — 이동력 ${u.move}, 더 느린 적(이동력 ≤${u.move - ctx.data.combat.doubleStrike.moveGap})에게 2회 타격`
+        : undefined,
     equipment,
     strategies,
   };

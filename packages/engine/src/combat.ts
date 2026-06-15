@@ -81,6 +81,14 @@ export function chargeMultiplier(ctx: BattleContext, attacker: UnitState): numbe
   return 1 + ctx.data.combat.passives.cavalryChargePercent / 100;
 }
 
+/**
+ * 연속공격(2중공격) 발동 여부 — 공격자 이동력이 대상보다 moveGap 이상 높으면 true(결정론).
+ * 원작 조조전의 순발력 기반 연속공격확률을 RNG 없이 이동력 우위로 치환(§7). 개시 공격에만.
+ */
+export function doubleStrikes(ctx: BattleContext, attacker: UnitState, defender: UnitState): boolean {
+  return attacker.move - defender.move >= ctx.data.combat.doubleStrike.moveGap;
+}
+
 /** 대상 4방(상하좌우)에서 공격자 진영 부대가 점유한 칸 수 — 협공 포위도(공격자 포함). 결정론. */
 export function flankingCount(state: BattleState, attacker: UnitState, defender: UnitState): number {
   const dirs: Coord[] = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];

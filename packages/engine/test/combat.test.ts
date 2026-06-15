@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { createBattle } from "../src/createBattle";
 import {
   adjustedStat, attackPower, defensePower, computeDamage, getAttackableTargets,
-  flankingCount, flankMultiplier, chargeMultiplier,
+  flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes,
 } from "../src/combat";
 import { testCtx } from "./fixtures";
 import type { BattleState, UnitState } from "../src/types";
@@ -159,5 +159,18 @@ describe("병종 패시브 (결정론 게임성 격상, CLAUDE.md §7)", () => {
     expect(chargeMultiplier(testCtx, cavMoved)).toBeCloseTo(1.2); // 이동 기병 = +20%
     expect(chargeMultiplier(testCtx, cavStill)).toBe(1); // 제자리 기병 = 무
     expect(chargeMultiplier(testCtx, footMoved)).toBe(1); // 비기병 = 무
+  });
+
+  describe("연속공격(2중공격) — 이동력 우위", () => {
+    it("이동력 차 ≥ moveGap(2)면 발동 (경기병6 → 보병4)", () => {
+      expect(get("관우").move - get("유비").move).toBeGreaterThanOrEqual(2);
+      expect(doubleStrikes(testCtx, get("관우"), get("유비"))).toBe(true);
+    });
+    it("동급 이동력은 미발동 (경기병 ↔ 경기병)", () => {
+      expect(doubleStrikes(testCtx, get("관우"), get("화웅"))).toBe(false);
+    });
+    it("느린 공격자는 미발동 (보병 → 경기병)", () => {
+      expect(doubleStrikes(testCtx, get("유비"), get("관우"))).toBe(false);
+    });
   });
 });

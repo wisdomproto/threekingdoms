@@ -376,9 +376,16 @@ function TraitTab({ unit }: { unit: UnitVM }): React.ReactElement {
       ) : null}
       {/* §7 병종 패시브 (돌격/철벽/저격) — combat.passives 파생 */}
       {unit.passiveText ? (
-        <div style={{ fontSize: 11, color: "#7bd3ff", lineHeight: 1.5, marginBottom: 8 }}>
+        <div style={{ fontSize: 11, color: "#7bd3ff", lineHeight: 1.5, marginBottom: unit.doubleStrikeText ? 3 : 8 }}>
           <span style={{ color: "#5a9ec4", fontWeight: 700 }}>패시브 </span>
           {unit.passiveText}
+        </div>
+      ) : null}
+      {/* §7 연속공격 (이동력 우위) — combat.doubleStrike 파생 */}
+      {unit.doubleStrikeText ? (
+        <div style={{ fontSize: 11, color: "#d8a6ff", lineHeight: 1.5, marginBottom: 8 }}>
+          <span style={{ color: "#b07fd0", fontWeight: 700 }}>연타 </span>
+          {unit.doubleStrikeText}
         </div>
       ) : null}
       {g ? (

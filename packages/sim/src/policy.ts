@@ -1,6 +1,6 @@
 import {
   getAttackableTargets, getMovableTiles, distance, areFoes, pathCostField,
-  computeDamage, flankingCount, flankMultiplier, chargeMultiplier,
+  computeDamage, flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes,
   type Action, type BattleContext, type BattleState, type UnitState, type Coord,
 } from "@tk/engine";
 
@@ -181,7 +181,12 @@ function attackDamageFrom(
     ? { ...state, units: state.units.map((u) => (u.id === unit.id ? atkAt : u)) }
     : state;
   const mult = flankMultiplier(ctx, flankingCount(st, atkAt, target)) * chargeMultiplier(ctx, atkAt);
-  return computeDamage(ctx, atkAt, target, 1, mult);
+  const dmg1 = computeDamage(ctx, atkAt, target, 1, mult);
+  // 연속공격: 1타로 격파 안 되고 이동력 우위면 2타 합산(정책이 빠른 병종 공격을 제대로 평가).
+  if (target.troops - dmg1 > 0 && doubleStrikes(ctx, atkAt, target)) {
+    return dmg1 + computeDamage(ctx, atkAt, target, ctx.data.combat.doubleStrike.secondHitPercent / 100, mult);
+  }
+  return dmg1;
 }
 
 /**

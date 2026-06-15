@@ -54,10 +54,11 @@ describe("buildAttackPreview", () => {
 
     const res = applyAction(ctx, s, { type: "attack", unitId: "장비", targetId: "조잠" });
     const dmgs = damageEvents(res.events);
-    const hit = dmgs.find((d) => !d.counter && d.defenderId === "조잠");
+    // 장비(경기병6)→조잠(보병4)은 이동력 차 2 → 연속공격(2타). preview.damage는 2타 합산.
+    const hits = dmgs.filter((d) => !d.counter && d.defenderId === "조잠");
     const ctr = dmgs.find((d) => d.counter);
 
-    expect(preview!.damage).toBe(hit!.damage);
+    expect(preview!.damage).toBe(hits.reduce((s2, h) => s2 + h.damage, 0));
     // 거리1 ≤ 조잠 사거리 → 반격 성립, 수치 일치
     expect(distance({ x: zf.x, y: zf.y }, { x: cao.x, y: cao.y })).toBe(1);
     expect(preview!.counter).toBeDefined();
@@ -125,8 +126,8 @@ describe("buildAttackPreview", () => {
 
     // 엔진 교차검증: applyAction 피해가 예측과 정확히 일치 + flank 이벤트 emit
     const res = applyAction(ctx, s, { type: "attack", unitId: "장비", targetId: "조잠" });
-    const hit = damageEvents(res.events).find((d) => !d.counter && d.defenderId === "조잠");
-    expect(withFlank.damage).toBe(hit!.damage);
+    const hits = damageEvents(res.events).filter((d) => !d.counter && d.defenderId === "조잠");
+    expect(withFlank.damage).toBe(hits.reduce((a, h) => a + h.damage, 0)); // 연속공격이면 2타 합산
     expect(res.events.some((e) => e.type === "flank" && e.defenderId === "조잠")).toBe(true);
   });
 
@@ -149,6 +150,19 @@ describe("buildAttackPreview", () => {
     expect(stillPrev.charge).toBeUndefined();
   });
 
+  it("연속공격: 빠른 병종(장비 경기병)이 느린 적(조잠 보병)에게 2타 — 총피해 엔진과 일치", () => {
+    const s = meleeState(); // 장비(경기병 move6) zf, 조잠(보병 move4) zf.x-1, 둘 다 9999
+    const cao = findUnit(s, "조잠");
+    const preview = buildAttackPreview(ctx, s, "장비", { x: cao.x, y: cao.y })!;
+    expect(preview.doubleStrike).toBeDefined(); // 이동력 차 2 → 발동
+
+    const res = applyAction(ctx, s, { type: "attack", unitId: "장비", targetId: "조잠" });
+    const hits = damageEvents(res.events).filter((d) => !d.counter && d.defenderId === "조잠");
+    expect(hits.length).toBe(2); // 2회 타격
+    expect(hits[0]!.damage + hits[1]!.damage).toBe(preview.damage); // 합 = 예측 총피해
+    expect(res.events.some((e) => e.type === "doubleStrike")).toBe(true);
+  });
+
   it("이동 후 공격: from(preview) 기준으로 평가 — move→attack 엔진 결과와 일치", () => {
     const s0 = createBattle(ctx, SEED);
     const zf = findUnit(s0, "장비");
@@ -165,7 +179,7 @@ describe("buildAttackPreview", () => {
       unitId: "장비",
       targetId: "조잠",
     });
-    const hit = damageEvents(attacked.events).find((dd) => !dd.counter && dd.defenderId === "조잠");
-    expect(fromPreview.damage).toBe(hit!.damage);
+    const hits = damageEvents(attacked.events).filter((dd) => !dd.counter && dd.defenderId === "조잠");
+    expect(fromPreview.damage).toBe(hits.reduce((a, h) => a + h.damage, 0)); // 연속공격이면 2타 합산
   });
 });

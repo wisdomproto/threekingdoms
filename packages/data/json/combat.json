@@ -6,5 +6,6 @@
   "maxTurns": 30,
   "lineAdvantage": { "cavalry": "infantry", "infantry": "archer", "archer": "cavalry" },
   "flank": { "threshold": 2, "stepPercent": 20, "maxStacks": 3 },
-  "passives": { "cavalryChargePercent": 20, "infantryBulwarkPercent": 15, "archerSnipePiercePercent": 50 }
+  "passives": { "cavalryChargePercent": 20, "infantryBulwarkPercent": 15, "archerSnipePiercePercent": 50 },
+  "doubleStrike": { "moveGap": 2, "secondHitPercent": 50 }
 }

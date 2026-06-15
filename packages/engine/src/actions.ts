@@ -5,7 +5,7 @@ import { getMovableTiles, unitAt } from "./movement";
 import {
   computeDamage, distance, getAttackableTargets,
   strategyDamage, strategyAoeCells, getStrategyTargets, expForNextLevel,
-  spiritPower, flankingCount, flankMultiplier, chargeMultiplier,
+  spiritPower, flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes,
 } from "./combat";
 import { findDuelTrigger } from "./events";
 import { spawnUnit } from "./createBattle";
@@ -367,6 +367,21 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
       const atkExp = grantExp(ctx, next, unit.id, dmg, getUnit(next, target.id).retreated, targetLevelAtHit);
       next = atkExp.state;
       events.push(...atkExp.events);
+
+      // 연속공격(2중공격): 이동력 우위면 1타로 대상 생존 시 추가타 1회(반격 전). 협공·돌격 동일 배율.
+      const afterHit1 = getUnit(next, target.id);
+      if (!afterHit1.retreated && doubleStrikes(ctx, unit, target)) {
+        const ratio2 = ctx.data.combat.doubleStrike.secondHitPercent / 100;
+        const dmg2 = computeDamage(ctx, unit, afterHit1, ratio2, flankMult * chargeMult);
+        const lvl2 = afterHit1.level;
+        events.push({ type: "doubleStrike", attackerId: unit.id, defenderId: target.id });
+        const hit2 = dealDamage(next, unit, afterHit1, dmg2, false);
+        next = hit2.state;
+        events.push(...hit2.events);
+        const atkExp2 = grantExp(ctx, next, unit.id, dmg2, getUnit(next, target.id).retreated, lvl2);
+        next = atkExp2.state;
+        events.push(...atkExp2.events);
+      }
 
       // 반격: 방어측 생존 + 공격측이 방어측 사거리 안
       const defender = getUnit(next, target.id);

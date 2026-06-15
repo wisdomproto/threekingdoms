@@ -20,6 +20,7 @@ const DAMAGE_COLOR = "#ffd27a"; // 일반 피해 (청동 호박색)
 const COUNTER_COLOR = "#c7cdd4"; // 반격 (회색조 — 우리가 받는 피해)
 const FLANK_COLOR = "#ff9a3d"; // 협공 (§10 대상군과 같은 주황)
 const CHARGE_COLOR = "#7bd3ff"; // 기병 돌격 (질주 — 하늘색)
+const DOUBLE_COLOR = "#d8a6ff"; // 연속공격 2연타 (보라)
 
 const PANEL_STYLE: React.CSSProperties = {
   position: "absolute",
@@ -103,6 +104,11 @@ export function AttackForecast({
             {r.preview.charge ? (
               <span style={{ marginLeft: 6, fontSize: 12, fontWeight: 700, color: CHARGE_COLOR }}>
                 돌격+{r.preview.charge.bonusPercent}%
+              </span>
+            ) : null}
+            {r.preview.doubleStrike ? (
+              <span style={{ marginLeft: 6, fontSize: 12, fontWeight: 700, color: DOUBLE_COLOR }}>
+                2연타
               </span>
             ) : null}
             {r.preview.flank ? (
