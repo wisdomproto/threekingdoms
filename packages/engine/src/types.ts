@@ -61,7 +61,7 @@ export interface BattleState {
   phase: Side;
   status: "ongoing" | "victory" | "defeat";
   units: UnitState[];
-  /** mulberry32 내부 상태. signed int32라 음수 가능. 원작 공식은 분산이 없어 전투 중 갱신되지 않음 — 기연/일반 일기토 확률 등 미래 RNG 용도로 보존 */
+  /** mulberry32 내부 상태(signed int32, 음수 가능). 시드 고정 전투 RNG의 스트림(2026-06-16 §2-1). 롤마다 nextRandom으로 전진 — Phase A는 소비처 0이라 불변, Phase B(명중/분산)부터 갱신. rng.ts 소비 계약 참조. */
   rngState: number;
   firedEvents: string[]; // once 이벤트 중복 발동 방지
   // ── M3① 목표 시스템 추적 필드 ──────────────────────────────────────────
