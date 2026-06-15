@@ -9,6 +9,7 @@ export const CommanderSchema = z.object({
   leadership: Stat,          // 통솔 → 방어 공식
   war: Stat,                 // 무력 → 공격 공식
   intelligence: Stat,        // 지력 → 책략치(MP)
+  agility: Stat.optional(),  // 민첩 → 순발력(명중/회피, §2-1 시드확률). 미지정 시 spawnUnit 기본 50
   faceId: z.number().int().min(0).max(255),
   /**
    * 네임드 시그니처 궁극기(§8 고유 스킬) — 필살 발동 시 이 장수만의 이름·위력. 미지정=일반 필살.
@@ -179,6 +180,14 @@ export const CombatConfigSchema = z.object({
   combo: z.object({
     goldPerStack: z.number().int().min(0),
   }).default({ goldPerStack: 15 }),
+  /**
+   * 명중/회피 (시드 고정 확률, §2-1 2026-06-16). 명중% = clamp(100 − missSlope×max(0, defAgi−atkAgi), floorPercent, 100).
+   * 동급 100%·완만 미스(하한 floorPercent). 전부 데이터 노브. 롤은 actions.ts에서 rngState로.
+   */
+  accuracy: z.object({
+    missSlope: z.number().min(0),
+    floorPercent: z.number().min(0).max(100),
+  }).default({ missSlope: 0.5, floorPercent: 80 }),
 }).refine(
   (c) => Object.entries(c.lineAdvantage).every(([k, v]) => k !== v),
   { message: "lineAdvantage must not be self-referential" },

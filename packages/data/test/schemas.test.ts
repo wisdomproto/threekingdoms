@@ -245,4 +245,19 @@ describe("스키마 v2 (원작 모델)", () => {
       tileLegend: { "": "plain" }, tiles: ["."],
     })).toThrow();
   });
+
+  it("CombatConfig.accuracy 기본값 (미지정 JSON 무파손)", () => {
+    const cfg = CombatConfigSchema.parse({
+      advantageDefFactor: 0.75, disadvantageDefFactor: 1.25, counterRatio: 0.5,
+      minDamage: 1, maxTurns: 30, lineAdvantage: { cavalry: "infantry" },
+    });
+    expect(cfg.accuracy).toEqual({ missSlope: 0.5, floorPercent: 80 });
+  });
+
+  it("Commander.agility는 optional (기존 3스탯 JSON 통과)", () => {
+    const c = CommanderSchema.parse({ id: "x", name: "x", leadership: 50, war: 50, intelligence: 50, faceId: 0 });
+    expect(c.agility).toBeUndefined();
+    const c2 = CommanderSchema.parse({ id: "y", name: "y", leadership: 50, war: 50, intelligence: 50, faceId: 0, agility: 68 });
+    expect(c2.agility).toBe(68);
+  });
 });
