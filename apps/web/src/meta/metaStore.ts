@@ -207,8 +207,12 @@ export function reduceSetEquipped(s: MetaState, commanderId: string, items: stri
 export function selectRoster(
   s: MetaState,
   rosters: Record<string, RosterEntry>,
+  maxChapter?: number,
 ): RosterUnit[] {
-  const unlockedChapter = 1 + s.clearedStages.length;
+  // maxChapter 지정(편성 화면이 *그 스테이지의 챕터*를 넘김) 시 그 챕터로 게이팅 —
+  // 후반 장수(제갈량 등)가 클리어 누적만으로 1장 스테이지에 등장하던 버그 방지.
+  // 미지정 시 종전 휴리스틱(1 + 클리어 수) — 전역 로스터 조회 등 챕터 맥락이 없는 호출용.
+  const unlockedChapter = maxChapter ?? 1 + s.clearedStages.length;
   const out: RosterUnit[] = [];
   for (const entry of Object.values(rosters)) {
     if (entry.joinChapter > unlockedChapter) continue;
@@ -399,8 +403,11 @@ export function setEquipped(commanderId: string, items: string[]): void {
  * 보유/합류 장수 목록 + 메타 진행 합본. 인자 없으면 gameData.rosters 사용.
  * 편성 화면이 출진 후보를 그리는 1차 소스.
  */
-export function getRoster(rosters: Record<string, RosterEntry> = gameData.rosters): RosterUnit[] {
-  return selectRoster(loadFromStorage(), rosters);
+export function getRoster(
+  maxChapter?: number,
+  rosters: Record<string, RosterEntry> = gameData.rosters,
+): RosterUnit[] {
+  return selectRoster(loadFromStorage(), rosters, maxChapter);
 }
 
 /** 신규 게임 초기화 — v1 + legacy gold 키 모두 정리. adFree는 보존하지 않음(초기값 false). */

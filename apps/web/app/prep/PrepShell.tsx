@@ -19,7 +19,7 @@ import { gameData, stages } from "@tk/data";
 import { Formation } from "../../src/meta/screens/Formation";
 import { Shop } from "../../src/meta/screens/Shop";
 import { LoadingTransition } from "../../src/meta/screens/LoadingTransition";
-import { getMeta, getRoster } from "../../src/meta/metaStore";
+import { getMeta, getRoster, type RosterUnit } from "../../src/meta/metaStore";
 import { writeSortie, type SortieMember } from "../../src/meta/sortie";
 import { shouldShowInterstitial } from "../../src/meta/interstitialPolicy";
 
@@ -53,13 +53,16 @@ export function PrepShell(): React.ReactElement {
   // meta는 SSR에서 비어있고 클라 마운트 후 채워진다(하이드레이션 일치). 구매/장착 후엔
   // refreshKey를 올려 gold/roster를 재로드 — Shop이 onPurchase로 알려준다.
   const [refreshKey, setRefreshKey] = useState(0);
-  const [roster, setRoster] = useState(() => getRoster());
+  // SSR·클라 첫 렌더는 빈 후보(하이드레이션 일치) — getRoster()는 localStorage 의존이라
+  // 초기화에서 호출하면 SSR(빈 메타)≠클라(진행 메타) 불일치가 난다. 마운트 후 useEffect로 채운다.
+  const [roster, setRoster] = useState<RosterUnit[]>([]);
   const [gold, setGold] = useState(0);
 
   useEffect(() => {
-    setRoster(getRoster());
+    // 이 스테이지의 챕터로 후보 게이팅 — 후반 합류 장수가 조기 등장하지 않게(§6 합류 시점).
+    setRoster(getRoster(chapter));
     setGold(getMeta().gold);
-  }, [refreshKey]);
+  }, [refreshKey, chapter]);
 
   const [selected, setSelected] = useState<SortieMember[]>([]);
 

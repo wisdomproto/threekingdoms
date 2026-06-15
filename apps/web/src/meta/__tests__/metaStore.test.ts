@@ -198,6 +198,19 @@ describe("selectRoster 해금 게이팅", () => {
     const [yubi] = selectRoster(initialMeta(), rosters);
     expect(yubi).toMatchObject({ level: 1, exp: 0, equipped: [] });
   });
+
+  it("maxChapter 지정 시 그 챕터로 게이팅(클리어 수 무관) — 후반 장수 조기 등장 방지", () => {
+    // 13스테이지 클리어해도, 1장 스테이지 편성엔 1장 장수만(조운 joinChapter 3 제외).
+    const cleared = { ...initialMeta(), clearedStages: Array.from({ length: 13 }, (_, i) => `s${i}`) };
+    const ch1 = selectRoster(cleared, rosters, 1);
+    expect(ch1.map((r) => r.commanderId)).toEqual(["유비"]);
+    // maxChapter 3이면 조운 포함.
+    const ch3 = selectRoster(cleared, rosters, 3);
+    expect(ch3.map((r) => r.commanderId).sort()).toEqual(["유비", "조운"]);
+    // maxChapter 미지정이면 종전대로 1+clearedStages.length(=14) 게이팅.
+    const legacy = selectRoster(cleared, rosters);
+    expect(legacy.map((r) => r.commanderId).sort()).toEqual(["유비", "조운"]);
+  });
 });
 
 describe("공개 API (node 비브라우저 — 메모리 캐시 폴백)", () => {
