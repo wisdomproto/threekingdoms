@@ -6,6 +6,24 @@
   "camera": { "zoom": 1.4, "focus": [22, 17] },
   "reward": { "gold": 650, "exp": 0, "treasures": [] },
   "levelCap": 17,
+  "scenario": {
+    "intro": {
+      "bg": "09-banhe-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "반동탁연합이 깨졌소. 이제 제후들끼리 땅을 다투는 난세요." },
+        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "원소의 군세가 공손찬 공을 압박합니다. 반하에서 막아야 합니다." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "국의의 진이 까다롭습니다. 궁병을 앞세워 진을 흩트립시다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "백규 형님을 위해서다. 반하를 건너 적을 친다." }
+      ]
+    },
+    "outro": {
+      "bg": "09-banhe-outro",
+      "lines": [
+        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "...주공. 제 이름은 조운, 자는 자룡입니다. 공손찬 공 밑에 있으나, 주공의 인덕을 보았습니다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "자룡... 언젠가 그대와 한 깃발 아래 서고 싶구나." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

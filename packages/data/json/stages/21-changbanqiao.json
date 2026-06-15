@@ -18,6 +18,22 @@
     ]
   },
   "levelCap": 30,
+  "scenario": {
+    "intro": {
+      "bg": "21-changbanqiao-intro",
+      "lines": [
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "형님은 먼저 가시오! 이 장판교는 — 이 장익덕이 막는다!" },
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "스무 기로 수만을 막는다고? 흥, 다리 하나면 충분하다. 조조 놈들, 한 발짝도 못 넘는다!" }
+      ]
+    },
+    "outro": {
+      "bg": "21-changbanqiao-outro",
+      "lines": [
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "연인 장익덕이 여기 있다! 누가 감히 죽기를 각오하고 덤비겠느냐!" },
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "...하후걸이 낙마했다? 으하하! 내 고함 한 방에 조조 대군이 물러가는구나!" }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "장비",

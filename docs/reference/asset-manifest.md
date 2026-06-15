@@ -3,7 +3,7 @@
 캠페인 루프에 필요한 이미지 목록. ⬜ = 미보유(placeholder 표시 중) · ✅ = 보유. 파일을 경로에 넣으면 자동 반영.
 경로 규약: 초상 `apps/web/public/assets/ui/portraits/{id}.webp` · 씬 배경 `.../assets/scenes/{bgId}.webp` · 맵 `.../assets/maps/{stageId}.webp`.
 
-요약: 초상 2/110 · 씬 배경 0/2 · 맵 0/27
+요약: 초상 2/110 · 씬 배경 0/54 · 맵 0/27
 
 ## 1. 초상 (portraits)
 
@@ -128,8 +128,60 @@
 
 | 보유 | bgId | 스테이지 | 유형 | 장면 맥락(힌트) |
 |--|--|--|--|--|
+| ⬜ | 01-zhuojun-intro | 01-zhuojun | intro | 황건의 무리가 탁군까지 들이닥쳤소. 의병을 모아 고향을 지킬 때요. |
+| ⬜ | 01-zhuojun-outro | 01-zhuojun | outro | 크하하! 황건 따위, 별것 아니구려! |
+| ⬜ | 02-yingchuan-intro | 02-yingchuan | intro | 영천이 황건에 포위됐다 하오. 관군과 합세해 포위를 풀어야 하오. |
+| ⬜ | 02-yingchuan-outro | 02-yingchuan | outro | 쓸 만하군, 짚신 장수치고는. ...언젠가 다시 보세, 유비. |
+| ⬜ | 03-guangzong-intro | 03-guangzong | intro | 현덕! 오랜만일세. 노식 장군을 도와 광종의 장보를 치러 왔네. |
+| ⬜ | 03-guangzong-outro | 03-guangzong | outro | 역시 자네들이군. 노식 장군께 자네 공을 전하겠네. |
+| ⬜ | 04-zhangjue-intro | 04-zhangjue | intro | 태평도의 괴수 장각. 이 자만 쓰러뜨리면 황건의 난도 끝이오. |
+| ⬜ | 04-zhangjue-outro | 04-zhangjue | outro | 장각이 쓰러졌다... 황건의 난이 끝났구나. |
 | ⬜ | 05-sishuiguan-intro | 05-sishuiguan | intro | 사수관이라... 적장 화웅이 연합군의 장수들을 연이어 베었다 들었소. |
 | ⬜ | 05-sishuiguan-outro | 05-sishuiguan | outro | 화웅의 목, 여기 가져왔습니다. 술이 식기 전에 말입니다. |
+| ⬜ | 06-huluguan-intro | 06-huluguan | intro | 동탁이 호로관에 여포를 세웠소. 천하의 맹장이라더니, 제후들이 줄줄이 꺾… |
+| ⬜ | 06-huluguan-outro | 06-huluguan | outro | 헉헉... 과연 여포, 사람이 아니구려. 셋이서 겨우 물렸소. |
+| ⬜ | 07-luoyang-intro | 07-luoyang | intro | 낙양이 불타고 있소. 동탁이 천도를 핑계로 도성을 약탈하는구나. |
+| ⬜ | 07-luoyang-outro | 07-luoyang | outro | 동탁은 달아났고, 낙양은 잿더미가 됐다... 우리가 한발 늦었구나. |
+| ⬜ | 08-dongzhuo-chase-intro | 08-dongzhuo-chase | intro | 동탁이 장안으로 달아납니다. 추격대가 길목을 끊으면 잡을 수 있습니다. |
+| ⬜ | 08-dongzhuo-chase-outro | 08-dongzhuo-chase | outro | 관문은 우리 손에 들어왔으나, 동탁의 본대는 빠져나갔다. |
+| ⬜ | 09-banhe-intro | 09-banhe | intro | 반동탁연합이 깨졌소. 이제 제후들끼리 땅을 다투는 난세요. |
+| ⬜ | 09-banhe-outro | 09-banhe | outro | ...주공. 제 이름은 조운, 자는 자룡입니다. 공손찬 공 밑에 있으나,… |
+| ⬜ | 10-xuzhou-intro | 10-xuzhou | intro | 서주의 도겸 공이 조조에게 포위됐소. 부친의 원수를 갚는다며 서주를 도륙… |
+| ⬜ | 10-xuzhou-outro | 10-xuzhou | outro | 현덕... 이 늙은이가 부탁하오. 서주를, 이 백성들을 그대에게 맡기고 … |
+| ⬜ | 11-xiaopei-intro | 11-xiaopei | intro | 여포가 서주를 빼앗고, 나를 소패로 내몰았소. 은혜를 원수로 갚는 자로구… |
+| ⬜ | 11-xiaopei-outro | 11-xiaopei | outro | 겨우 막아냈으나, 소패도 위태롭다. |
+| ⬜ | 12-xiapi1-intro | 12-xiapi1 | intro | 소패가 떨어졌다. 여포의 추격이 코앞이다 — 흩어지지 말고 하비로 빠져나… |
+| ⬜ | 12-xiapi1-outro | 12-xiapi1 | outro | ...겨우 빠져나왔구나. 흩어진 식솔들은 어찌 됐을까. |
+| ⬜ | 13-yuanshu-intro | 13-yuanshu | intro | 원술이 황제를 참칭했소. 옥새를 손에 넣고 망령이 든 게지. |
+| ⬜ | 13-yuanshu-outro | 13-yuanshu | outro | 원술의 망상도 끝이로구나. 옥새가 또 누구의 손에 피를 묻힐지. |
+| ⬜ | 14-xiapi2-intro | 14-xiapi2 | intro | 조조와 손잡고 하비를 친다. 여포를 끝낼 마지막 기회요. |
+| ⬜ | 14-xiapi2-outro | 14-xiapi2 | outro | 여포가 사로잡혔다... 조조가 그를 살려둘까. |
+| ⬜ | 15-xutian-intro | 15-xutian | intro | 허전에서 천자를 모신 사냥이 열렸소. ...헌데 조조의 위세가 천자를 능… |
+| ⬜ | 15-xutian-outro | 15-xutian | outro | ...의대조의 밀명을 받았다. 천자께서 조조를 치라 하셨다. |
+| ⬜ | 16-guandu-escape-intro | 16-guandu-escape | intro | 의대조가 발각됐소. 조조가 우리를 잡으러 온다 — 원소에게로 몸을 피한다… |
+| ⬜ | 16-guandu-escape-outro | 16-guandu-escape | outro | 또 쫓기는 신세로구나... 운장과 익덕은 무사할까. |
+| ⬜ | 17-runan-intro | 17-runan | intro | 여남에서 황건 잔당과 손잡고 조조의 후방을 친다. ...헌데 운장의 소식… |
+| ⬜ | 17-runan-outro | 17-runan | outro | 형님! 운장 형님! 으하하, 다시 뭉쳤구려! |
+| ⬜ | 18-bowangpo-intro | 18-bowangpo | intro | 와룡 선생을 삼고초려 끝에 모셨소. 군사, 첫 싸움이오. 박망파에서 하후… |
+| ⬜ | 18-bowangpo-outro | 18-bowangpo | outro | ...불바다가 됐구려. 하후돈의 대군이 통째로! 와룡 선생, 내가 잘못 … |
+| ⬜ | 19-xinye-intro | 19-xinye | intro | 조조가 대군을 이끌고 내려오오. 신야를 버리고 강릉으로 물러난다. |
+| ⬜ | 19-xinye-outro | 19-xinye | outro | 백성과 함께 강을 건넜다. 더디지만... 한 사람도 버리지 않았다. |
+| ⬜ | 20-changbanpo-intro | 20-changbanpo | intro | ...주공과 흩어졌다. 아두 공자가, 감부인이 이 난군 속에 계신다. |
+| ⬜ | 20-changbanpo-outro | 20-changbanpo | outro | 주공! 아두 공자, 무사히 모셨습니다! |
+| ⬜ | 21-changbanqiao-intro | 21-changbanqiao | intro | 형님은 먼저 가시오! 이 장판교는 — 이 장익덕이 막는다! |
+| ⬜ | 21-changbanqiao-outro | 21-changbanqiao | outro | 연인 장익덕이 여기 있다! 누가 감히 죽기를 각오하고 덤비겠느냐! |
+| ⬜ | 22-hanjin-intro | 22-hanjin | intro | 한진 나루다. 강을 건너면 강하의 유기에게 닿는다. |
+| ⬜ | 22-hanjin-outro | 22-hanjin | outro | 겨우 한숨 돌리는구나. 군사, 정말 손권과 손잡을 수 있겠소? |
+| ⬜ | 23-jiangxia-intro | 23-jiangxia | intro | 손권을 설득했습니다. 조조의 백만 대군에 맞서 손유연합이 섰습니다. |
+| ⬜ | 23-jiangxia-outro | 23-jiangxia | outro | 과연 제갈공명의 군세로군. ...허나 이 적벽의 주인은 나, 주유요. |
+| ⬜ | 24-sanjiangkou-intro | 24-sanjiangkou | intro | 삼강구에서 조조의 수군을 시험해 보겠소. 채모와 장윤이 수군을 조련했다지… |
+| ⬜ | 24-sanjiangkou-outro | 24-sanjiangkou | outro | ...공명, 그대의 재주가 두렵소. 동오를 위해서라도, 그대는 살려둘 수… |
+| ⬜ | 25-wulin-intro | 25-wulin | intro | 황개 노장군이 고육계를 자청했소. 매를 맞고 거짓 항복해 조조의 선단에 … |
+| ⬜ | 25-wulin-outro | 25-wulin | outro | 이 늙은 몸의 매질이 헛되지 않았소. 불길이 강을 삼키는구려! |
+| ⬜ | 26-chibi-intro | 26-chibi | intro | 때가 왔습니다. 칠성단에 올라 — 동남풍을 부르겠습니다. |
+| ⬜ | 26-chibi-outro | 26-chibi | outro | 이겼다! 백만 대군이 적벽에 잠겼다! |
+| ⬜ | 27-huarongdao-intro | 27-huarongdao | intro | 화용도의 매복은... 제가 청했습니다, 형님. 군사, 군령장까지 썼습니다… |
+| ⬜ | 27-huarongdao-outro | 27-huarongdao | outro | 형님, 군령을 어겼습니다. 조조를 놓아주었습니다. 군법대로 — 제 목을 … |
 
 ## 3. 맵 배경 (maps)
 

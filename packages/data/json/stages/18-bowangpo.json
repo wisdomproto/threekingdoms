@@ -6,6 +6,25 @@
   "camera": { "zoom": 1.2, "focus": [22, 14] },
   "reward": { "gold": 1400, "exp": 0, "treasures": [] },
   "levelCap": 32,
+  "scenario": {
+    "intro": {
+      "bg": "18-bowangpo-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "와룡 선생을 삼고초려 끝에 모셨소. 군사, 첫 싸움이오. 박망파에서 하후돈을 막아야 하오." },
+        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "걱정 마십시오. 좁은 길과 마른 숲 — 화공에 더없이 좋은 자리입니다. 하후돈을 끌어들이지요." },
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "흥, 책상물림 서생이 뭘 안다고. 정말 이길 수 있겠소?" },
+        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "장군, 보고 나서 말씀하셔도 늦지 않습니다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "군사의 말을 따른다. 적을 골짜기로 유인하라." }
+      ]
+    },
+    "outro": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "...불바다가 됐구려. 하후돈의 대군이 통째로! 와룡 선생, 내가 잘못 봤소." },
+        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "과찬이십니다. 이제 시작일 뿐입니다 — 조조의 본대가 곧 남하합니다." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

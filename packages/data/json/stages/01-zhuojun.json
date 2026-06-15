@@ -6,6 +6,25 @@
   "camera": { "zoom": 1.6, "focus": [8, 12] },
   "reward": { "gold": 120, "exp": 0, "treasures": [] },
   "levelCap": 6,
+  "scenario": {
+    "intro": {
+      "bg": "01-zhuojun-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "황건의 무리가 탁군까지 들이닥쳤소. 의병을 모아 고향을 지킬 때요." },
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "방금 도원에서 의를 맺지 않았소! 첫 싸움부터 시원하게 쓸어버립시다, 형님!" },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "정원지가 이끄는 선봉이라 들었다. 수는 많으나 오합지졸, 진을 흩트리면 무너진다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "가자. 우리의 이름이 오늘 여기서 시작된다." }
+      ]
+    },
+    "outro": {
+      "bg": "01-zhuojun-outro",
+      "lines": [
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "크하하! 황건 따위, 별것 아니구려!" },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "교만은 금물이다, 아우. 큰 싸움은 이제부터다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "그래도... 첫 승이다. 백성들이 웃는구나. 이거면 됐다." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

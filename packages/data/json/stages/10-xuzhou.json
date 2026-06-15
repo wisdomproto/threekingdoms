@@ -18,6 +18,23 @@
     ]
   },
   "levelCap": 20,
+  "scenario": {
+    "intro": {
+      "bg": "10-xuzhou-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "서주의 도겸 공이 조조에게 포위됐소. 부친의 원수를 갚는다며 서주를 도륙하고 있다지." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "조조의 복수전입니다. 성을 지키며 원군을 기다리면, 조조도 군량 탓에 물러갈 겁니다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "열닷새를 버틴다. 하후돈을 막아내면 도겸 공을 구할 수 있다 — 수성이다!" }
+      ]
+    },
+    "outro": {
+      "bg": "10-xuzhou-outro",
+      "lines": [
+        { "speaker": "도겸", "side": "ally", "portraitId": "도겸", "text": "현덕... 이 늙은이가 부탁하오. 서주를, 이 백성들을 그대에게 맡기고 싶소." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "당치 않습니다. 허나... 백성을 버릴 수는 없지요." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

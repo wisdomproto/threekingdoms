@@ -18,6 +18,25 @@
     ]
   },
   "levelCap": 45,
+  "scenario": {
+    "intro": {
+      "bg": "26-chibi-intro",
+      "lines": [
+        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "때가 왔습니다. 칠성단에 올라 — 동남풍을 부르겠습니다." },
+        { "speaker": "주유", "side": "ally", "portraitId": "주유", "text": "바람만 불면 조조의 백만 선단은 한 줌의 재가 된다! 황개, 화선을 띄워라!" },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "적벽의 결전이오. 불바다 속에서 조조를 끝낸다 — 전군, 돌격!" },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "형님, 조조의 운이 다했습니다. 이 한 판에 천하의 향배가 갈립니다." }
+      ]
+    },
+    "outro": {
+      "bg": "26-chibi-outro",
+      "lines": [
+        { "speaker": "주유", "side": "ally", "portraitId": "주유", "text": "이겼다! 백만 대군이 적벽에 잠겼다!" },
+        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "조조가 화용도로 달아납니다. ...허나 그 길에는, 이미 사람을 두었지요." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "천하가 셋으로 갈라지는 순간이로구나." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

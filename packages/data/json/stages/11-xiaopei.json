@@ -18,6 +18,24 @@
     ]
   },
   "levelCap": 18,
+  "scenario": {
+    "intro": {
+      "bg": "11-xiaopei-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "여포가 서주를 빼앗고, 나를 소패로 내몰았소. 은혜를 원수로 갚는 자로구나." },
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "내 그놈을 믿지 말랬지! 이번엔 기필코 그 목을!" },
+        { "speaker": "진등", "side": "player", "portraitId": "진등", "text": "주공, 고순의 함진영이 매섭습니다. 성에 의지해 버티며 틈을 노리시지요." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "열이틀을 버틴다. 여포를 끌어내 친다 — 거점을 사수하라." }
+      ]
+    },
+    "outro": {
+      "bg": "11-xiaopei-outro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "겨우 막아냈으나, 소패도 위태롭다." },
+        { "speaker": "진등", "side": "player", "portraitId": "진등", "text": "주공, 일단 조조에게 의탁함이 어떻습니까. 여포를 치려면 힘을 빌려야 합니다." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

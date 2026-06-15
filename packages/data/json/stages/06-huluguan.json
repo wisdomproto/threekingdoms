@@ -18,6 +18,25 @@
     ]
   },
   "levelCap": 14,
+  "scenario": {
+    "intro": {
+      "bg": "06-huluguan-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "동탁이 호로관에 여포를 세웠소. 천하의 맹장이라더니, 제후들이 줄줄이 꺾였다지." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "여포라... 인중여포 마중적토. 셋이 함께라야 승산이 있겠습니다, 형님." },
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "흥, 잘난 척하는 그 여포 놈! 내가 먼저 맛을 보여주리다!" },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "삼형제가 한 몸으로 움직인다. 여포를 에워싸 빈틈을 친다 — 협공이다." }
+      ]
+    },
+    "outro": {
+      "bg": "06-huluguan-outro",
+      "lines": [
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "헉헉... 과연 여포, 사람이 아니구려. 셋이서 겨우 물렸소." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "놓쳤으나 기세는 꺾었다. 동탁이 낙양을 불태우고 달아날 것이다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "...천하가 무너지는 소리가 들리는구나. 쫓자." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

@@ -6,6 +6,24 @@
   "camera": { "zoom": 1.3, "focus": [30, 28] },
   "reward": { "gold": 1400, "exp": 0, "treasures": [] },
   "levelCap": 38,
+  "scenario": {
+    "intro": {
+      "bg": "22-hanjin-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "한진 나루다. 강을 건너면 강하의 유기에게 닿는다." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "형님! 제가 강하에서 수군을 이끌고 마중 나왔습니다. 강을 건너십시오." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "운장...! 또 한 번 네 덕에 산다. 백성들을 먼저 태워라." },
+        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "조조의 추격은 여기까지입니다. 이제 동오와 손잡을 차례지요." }
+      ]
+    },
+    "outro": {
+      "bg": "22-hanjin-outro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "겨우 한숨 돌리는구나. 군사, 정말 손권과 손잡을 수 있겠소?" },
+        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "맡겨 주십시오. 제가 직접 강동으로 건너가 — 천하를 셋으로 나눌 판을 짜겠습니다." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

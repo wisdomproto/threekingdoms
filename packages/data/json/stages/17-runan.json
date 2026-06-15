@@ -6,6 +6,26 @@
   "camera": { "zoom": 1.2, "focus": [10, 28] },
   "reward": { "gold": 1600, "exp": 0, "treasures": [] },
   "levelCap": 35,
+  "scenario": {
+    "intro": {
+      "bg": "17-runan-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "여남에서 황건 잔당과 손잡고 조조의 후방을 친다. ...헌데 운장의 소식이 끊긴 지 오래다." },
+        { "speaker": "관평", "side": "player", "portraitId": "관평", "text": "아버님께서... 관우 장군께서 조조 진영을 떠나 주공을 찾아 오신다는 소문이!" },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "운장이...! 정말이냐. 오관을 뚫고 온다면, 반드시 길에서 만나야 한다." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "...형님! 천 리를 달려, 다섯 관문을 넘어 — 돌아왔습니다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "운장...! 살아 있었구나. 살아 있었어!" }
+      ]
+    },
+    "outro": {
+      "bg": "17-runan-outro",
+      "lines": [
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "형님! 운장 형님! 으하하, 다시 뭉쳤구려!" },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "한실의 녹을 먹었으나 마음은 늘 형님께 있었습니다. 이제 다시는 떨어지지 않겠습니다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "삼형제가 다시 한자리에. ...이거면 천하가 두렵지 않다." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

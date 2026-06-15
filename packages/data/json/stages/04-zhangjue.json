@@ -18,6 +18,26 @@
     ]
   },
   "levelCap": 8,
+  "scenario": {
+    "intro": {
+      "bg": "04-zhangjue-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "태평도의 괴수 장각. 이 자만 쓰러뜨리면 황건의 난도 끝이오." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "요술사들이 장각을 호위하고 있습니다. 환술에 군세가 흔들릴 수 있으니 진을 굳게." },
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "환술이고 뭐고, 내 장팔사모 앞에선 다 헛것이오!" },
+        { "speaker": "미축", "side": "player", "portraitId": "미축", "text": "주공, 무리는 금물입니다. 병사들의 사기를 살피며 나아가시지요." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "장각을 향해 곧장 친다. 난세의 첫 매듭을 우리 손으로 짓자." }
+      ]
+    },
+    "outro": {
+      "bg": "04-zhangjue-outro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "장각이 쓰러졌다... 황건의 난이 끝났구나." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "허나 천하는 더 어지러워질 것입니다, 형님. 조정엔 십상시가, 변방엔 야심가들이..." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "알고 있다. 허나 오늘만큼은 — 백성의 짐을 하나 덜었다. 그걸로 족하다." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

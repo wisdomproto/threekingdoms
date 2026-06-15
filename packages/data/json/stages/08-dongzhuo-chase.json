@@ -6,6 +6,23 @@
   "camera": { "zoom": 1.4, "focus": [18, 16] },
   "reward": { "gold": 600, "exp": 0, "treasures": [] },
   "levelCap": 16,
+  "scenario": {
+    "intro": {
+      "bg": "08-dongzhuo-chase-intro",
+      "lines": [
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "동탁이 장안으로 달아납니다. 추격대가 길목을 끊으면 잡을 수 있습니다." },
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "복병이 있을지 모르니 조심하라더니, 흥! 내가 앞장서겠소." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "관문을 점령해 퇴로를 막는다. 기병은 나를 따르라 — 속전속결이다." }
+      ]
+    },
+    "outro": {
+      "bg": "08-dongzhuo-chase-outro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "관문은 우리 손에 들어왔으나, 동탁의 본대는 빠져나갔다." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "연합은 곧 흩어질 겁니다, 형님. 제후들의 동상이몽이 끝났습니다." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

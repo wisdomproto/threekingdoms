@@ -6,6 +6,24 @@
   "camera": { "zoom": 1.6, "focus": [30, 20] },
   "reward": { "gold": 1400, "exp": 0, "treasures": [] },
   "levelCap": 44,
+  "scenario": {
+    "intro": {
+      "bg": "23-jiangxia-intro",
+      "lines": [
+        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "손권을 설득했습니다. 조조의 백만 대군에 맞서 손유연합이 섰습니다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "허나 조조의 선봉이 벌써 강하를 노리오. 주유 도독의 본대가 올 때까지 버텨야 하오." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "수상전입니다. 배를 묶어 진을 치고, 장무의 선봉을 꺾읍시다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "적벽의 결전까지, 이 강하를 사수하라!" }
+      ]
+    },
+    "outro": {
+      "bg": "23-jiangxia-outro",
+      "lines": [
+        { "speaker": "주유", "side": "ally", "portraitId": "주유", "text": "과연 제갈공명의 군세로군. ...허나 이 적벽의 주인은 나, 주유요." },
+        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "도독의 화공, 이 제갈량이 동남풍으로 돕지요." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

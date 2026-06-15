@@ -18,6 +18,24 @@
     ]
   },
   "levelCap": 26,
+  "scenario": {
+    "intro": {
+      "bg": "14-xiapi2-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "조조와 손잡고 하비를 친다. 여포를 끝낼 마지막 기회요." },
+        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "...아직 제가 합류하기 전 일이나, 기록을 보니 수공입니다. 사수와 기수를 터 하비를 잠근다지요." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "진궁의 계략이 여포를 묶고 있습니다. 물이 차오르면 여포의 기병도 무용지물." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "여포를 사로잡는다. 은혜를 원수로 갚은 값을 치르게 하라." }
+      ]
+    },
+    "outro": {
+      "bg": "14-xiapi2-outro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "여포가 사로잡혔다... 조조가 그를 살려둘까." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "살려둘 리 없습니다. 한때 천하제일의 맹장도, 신의 없는 자의 최후는 저러하군요." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

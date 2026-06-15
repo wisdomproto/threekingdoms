@@ -16,6 +16,23 @@
     "treasures": []
   },
   "levelCap": 27,
+  "scenario": {
+    "intro": {
+      "bg": "16-guandu-escape-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "의대조가 발각됐소. 조조가 우리를 잡으러 온다 — 원소에게로 몸을 피한다!" },
+        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "주공, 조인의 추격이 빠릅니다. 제가 길을 열겠습니다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "관도를 가로질러 북으로 간다. 흩어지면 끝이다 — 나를 따르라!" }
+      ]
+    },
+    "outro": {
+      "bg": "16-guandu-escape-outro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "또 쫓기는 신세로구나... 운장과 익덕은 무사할까." },
+        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "반드시 다시 만날 겁니다. 살아만 계시면." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

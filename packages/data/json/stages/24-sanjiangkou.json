@@ -18,6 +18,23 @@
     ]
   },
   "levelCap": 23,
+  "scenario": {
+    "intro": {
+      "bg": "24-sanjiangkou-intro",
+      "lines": [
+        { "speaker": "주유", "side": "ally", "portraitId": "주유", "text": "삼강구에서 조조의 수군을 시험해 보겠소. 채모와 장윤이 수군을 조련했다지." },
+        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "북방의 군사는 물에 약합니다. 한 번 흔들어 두면, 적벽에서 무너집니다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "동오의 수군과 발을 맞춘다. 채모의 선단을 친다 — 수상전이다." }
+      ]
+    },
+    "outro": {
+      "bg": "24-sanjiangkou-outro",
+      "lines": [
+        { "speaker": "주유", "side": "ally", "portraitId": "주유", "text": "...공명, 그대의 재주가 두렵소. 동오를 위해서라도, 그대는 살려둘 수 없겠군." },
+        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "도독, 지금은 조조가 먼저입니다. 우리 일은 그 뒤에 논하시지요." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

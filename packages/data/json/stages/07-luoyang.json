@@ -6,6 +6,24 @@
   "camera": { "zoom": 1.5, "focus": [10, 8] },
   "reward": { "gold": 500, "exp": 0, "treasures": [] },
   "levelCap": 14,
+  "scenario": {
+    "intro": {
+      "bg": "07-luoyang-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "낙양이 불타고 있소. 동탁이 천도를 핑계로 도성을 약탈하는구나." },
+        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "주공, 백성들이 길에 쓰러져 있습니다. 한시가 급합니다." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "동탁의 본대가 아직 성안에 있습니다. 불길을 헤치고 들이칩시다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "한 명이라도 더 구한다. 동탁을 막아라!" }
+      ]
+    },
+    "outro": {
+      "bg": "07-luoyang-outro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "동탁은 달아났고, 낙양은 잿더미가 됐다... 우리가 한발 늦었구나." },
+        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "주공의 잘못이 아닙니다. 살릴 수 있는 이들을 살렸습니다." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

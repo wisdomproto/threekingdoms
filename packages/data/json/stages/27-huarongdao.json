@@ -6,6 +6,25 @@
   "camera": { "zoom": 1.3, "focus": [16, 22] },
   "reward": { "gold": 2500, "exp": 0, "treasures": ["의천검"] },
   "levelCap": 46,
+  "scenario": {
+    "intro": {
+      "bg": "27-huarongdao-intro",
+      "lines": [
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "화용도의 매복은... 제가 청했습니다, 형님. 군사, 군령장까지 썼습니다." },
+        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "운장, 그대는 옛 은혜를 갚을 사람. ...그것까지 헤아려 보냈습니다." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "...조공. 천 리를 보내준 옛 은혜, 오늘 갚겠소. 길을 비키리다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "운장의 선택이다. 의리를 아는 자만이 할 수 있는." }
+      ]
+    },
+    "outro": {
+      "bg": "27-huarongdao-outro",
+      "lines": [
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "형님, 군령을 어겼습니다. 조조를 놓아주었습니다. 군법대로 — 제 목을 치십시오." },
+        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "됐습니다. 조조의 명운은 아직 하늘에 있고, 운장의 의리는 천하에 남았으니." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "삼형제가 함께 여기까지 왔다. ...이것이 우리 첫 장의 끝이로구나. 천하는, 이제부터다." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "관우",

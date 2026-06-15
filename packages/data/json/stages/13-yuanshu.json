@@ -6,6 +6,24 @@
   "camera": { "zoom": 1.4, "focus": [22, 12] },
   "reward": { "gold": 700, "exp": 0, "treasures": [] },
   "levelCap": 24,
+  "scenario": {
+    "intro": {
+      "bg": "13-yuanshu-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "원술이 황제를 참칭했소. 옥새를 손에 넣고 망령이 든 게지." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "기령이 선봉입니다. 명분 없는 군세라 사기가 낮으니, 본진을 무너뜨리면 흩어집니다." },
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "가짜 황제 놈! 내 사모로 그 옥좌를 부숴주마!" },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "참칭한 자를 친다. 원술을 끌어내려라." }
+      ]
+    },
+    "outro": {
+      "bg": "13-yuanshu-outro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "원술의 망상도 끝이로구나. 옥새가 또 누구의 손에 피를 묻힐지." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "난세입니다, 형님. 옥새보다 민심을 얻는 자가 천하를 얻겠지요." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

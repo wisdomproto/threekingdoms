@@ -6,6 +6,24 @@
   "camera": { "zoom": 1.6, "focus": [30, 15] },
   "reward": { "gold": 200, "exp": 0, "treasures": [] },
   "levelCap": 22,
+  "scenario": {
+    "intro": {
+      "bg": "12-xiapi1-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "소패가 떨어졌다. 여포의 추격이 코앞이다 — 흩어지지 말고 하비로 빠져나간다!" },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "형님, 제가 후미를 맡겠습니다. 먼저 가십시오." },
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "젠장, 이렇게 쫓기다니! ...형님, 살아서 다시 봅시다!" },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "반드시 살아남는다. 가족도, 아우들도 — 한 명도 잃지 않는다. 하비로!" }
+      ]
+    },
+    "outro": {
+      "bg": "12-xiapi1-outro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "...겨우 빠져나왔구나. 흩어진 식솔들은 어찌 됐을까." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "반드시 다시 모일 겁니다, 형님. 살아 있는 한." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

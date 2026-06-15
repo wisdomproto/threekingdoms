@@ -18,6 +18,23 @@
     ]
   },
   "levelCap": 30,
+  "scenario": {
+    "intro": {
+      "bg": "20-changbanpo-intro",
+      "lines": [
+        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "...주공과 흩어졌다. 아두 공자가, 감부인이 이 난군 속에 계신다." },
+        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "조자룡, 단기필마로 적진을 뚫는다. 공자를 반드시 주공께 돌려드린다 — 목숨을 걸고!" }
+      ]
+    },
+    "outro": {
+      "bg": "20-changbanpo-outro",
+      "lines": [
+        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "주공! 아두 공자, 무사히 모셨습니다!" },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "이 핏덩이 하나 때문에 하마터면 명장을 잃을 뻔했다!" },
+        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "주공...! 이 한 몸, 주공을 위해 백 번이라도 바치겠습니다." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "조운",

@@ -6,6 +6,24 @@
   "camera": { "zoom": 1.5, "focus": [40, 16] },
   "reward": { "gold": 250, "exp": 0, "treasures": ["무술교본"] },
   "levelCap": 8,
+  "scenario": {
+    "intro": {
+      "bg": "03-guangzong-intro",
+      "lines": [
+        { "speaker": "공손찬", "side": "ally", "portraitId": "공손찬", "text": "현덕! 오랜만일세. 노식 장군을 도와 광종의 장보를 치러 왔네." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "백규 형님! 함께라면 든든하오." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "장보는 요술을 부린다 합니다. 성벽에 의지해 농성 중이니 단숨에 몰아쳐야 합니다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "성문을 열어젖히고 장보를 잡는다. 요술에 현혹되지 마라." }
+      ]
+    },
+    "outro": {
+      "bg": "03-guangzong-outro",
+      "lines": [
+        { "speaker": "공손찬", "side": "ally", "portraitId": "공손찬", "text": "역시 자네들이군. 노식 장군께 자네 공을 전하겠네." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "황건의 머리가 하나 떨어졌소. 이제 장각만 남았구려." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

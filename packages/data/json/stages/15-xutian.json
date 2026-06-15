@@ -6,6 +6,24 @@
   "camera": { "zoom": 1.5, "focus": [20, 13] },
   "reward": { "gold": 700, "exp": 0, "treasures": [] },
   "levelCap": 22,
+  "scenario": {
+    "intro": {
+      "bg": "15-xutian-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "허전에서 천자를 모신 사냥이 열렸소. ...헌데 조조의 위세가 천자를 능멸하는구나." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "형님, 저 자를 지금 베면! 한실의 화근을 끊을 수 있습니다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "참아라, 운장. 지금은 때가 아니다. 천자가 위험해진다." },
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "분하구려! 저 허저 놈이라도 한 대 갈겨야..." }
+      ]
+    },
+    "outro": {
+      "bg": "15-xutian-outro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "...의대조의 밀명을 받았다. 천자께서 조조를 치라 하셨다." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "형님, 이제 길이 갈립니다. 조조와는 더 이상 한 하늘 아래 설 수 없겠군요." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

@@ -6,6 +6,25 @@
   "camera": { "zoom": 1.5, "focus": [22, 22] },
   "reward": { "gold": 200, "exp": 0, "treasures": ["무술교본"] },
   "levelCap": 8,
+  "scenario": {
+    "intro": {
+      "bg": "02-yingchuan-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "영천이 황건에 포위됐다 하오. 관군과 합세해 포위를 풀어야 하오." },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "저 붉은 깃발... 패국초의 조조 맹덕. 화공으로 적진을 태울 셈인 듯합니다." },
+        { "speaker": "조조", "side": "ally", "portraitId": "조조", "text": "그대들이 탁군의 의병인가? 황건은 불로 다스리겠네. 그대들은 퇴로를 끊어라." },
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "흥, 잘난 척은. 우리가 먼저 적장의 목을 따겠소!" },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "(범상치 않은 인물이군.) 관해의 본대를 친다 — 화공에 휘말리지 않게 측면으로." }
+      ]
+    },
+    "outro": {
+      "bg": "02-yingchuan-outro",
+      "lines": [
+        { "speaker": "조조", "side": "ally", "portraitId": "조조", "text": "쓸 만하군, 짚신 장수치고는. ...언젠가 다시 보세, 유비." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "(저 자의 눈빛... 야심이 깊다.) 가자, 아우들아." }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",
