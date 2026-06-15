@@ -5,8 +5,9 @@
  * 소스: docs/reference/sosoden-battle-ux-analysis.md §1 (원작 UI 크롬 = 청동기 문양 패널).
  */
 import type { CSSProperties } from "react";
+import { assetUrl } from "../../assetUrl";
 
-const BASE = "/assets/ui/frames";
+const BASE = assetUrl("/assets/ui/frames");
 
 /** 정보 패널 등 큰 창 — 측정 인셋 T/R/B/L = 60/71/46/70 */
 export const PANEL_FRAME: CSSProperties = {

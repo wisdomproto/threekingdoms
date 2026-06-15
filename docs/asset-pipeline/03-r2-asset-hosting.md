@@ -76,3 +76,24 @@ git rm -r --cached apps/web/public/assets   # 워킹트리는 유지, 추적만 
 ```
 
 그 전까지는 git(로컬 폴백)과 R2(prod 서빙)가 공존한다 — dev는 NEXT_PUBLIC_ASSET_BASE 없이 public에서 그대로 본다.
+
+## 6. 에디터에서 게임 바로 적용 (`serve.py` `POST /save-asset`)
+
+에디터에서 만든 이미지를 손으로 옮기지 않고 **즉시 게임에 반영**한다. `tools/serve.py`(:8080)에
+업로드 엔드포인트가 있고, R2 시크릿은 이 서버에만 둔다(에디터엔 노출 안 됨).
+
+```
+에디터(브라우저)  ──POST /save-asset (이미지 base64)──►  serve.py(:8080)
+                                                         ├─► apps/web/public/assets/<path>  (dev 즉시)
+                                                         └─► R2 버킷 key=<path>             (배포본 동기화)
+```
+
+- 요청: `{ path: "assets/scenes/05-sishuiguan-intro.webp", b64, contentType }` — `path`는 `assets/` 하위만 허용(상위 탈출 차단).
+- 한 번의 적용으로 **로컬 public + R2 양쪽**에 기록 → dev는 새로고침 즉시, 배포본은 R2로 자동 동기화.
+- R2 캐시는 짧게(max-age 300s) — 드롭-인 교체가 빨리 보이도록.
+
+연결된 에디터:
+- **에셋 보드 → 시나리오 씬 탭**: 카드에 이미지 붙여넣기/드롭 → `assets/scenes/{bgId}.webp` **자동 적용**.
+- **맵 청크 보드**: 전체 미리보기 → **🎮 게임에 적용** → `assets/maps/{mapId}.webp` 적용(🧵는 다운로드).
+
+전제: 보드를 `:8080`(serve.py)에서 열 것(대시보드 기본). 서버가 꺼져 있으면 적용 실패 토스트 → 다운로드로 폴백.
