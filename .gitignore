@@ -16,6 +16,8 @@ docs/art/*.png
 docs/art/chunks/
 # 폐기된 아이소메트릭 렌더러 에셋
 apps/web/public/assets/iso/
+# 생성 유닛 스프라이트(슬라이스 PNG, 대용량·재생성 가능) — 미보유 시 렌더러가 placeholder 폴백
+apps/web/public/assets/sprites/
 
 # 조조전 대사·이벤트 원문 추출 — 코에이 저작 텍스트(IP). 로컬 레퍼런스만, 커밋 금지.
 # 재생성: tools/hero-extract/eex_extract.py·eex_events.py. 수치 테이블(generals/weapons/strategies 등)은 추적.

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>삼국지 SRPG — 통합 대시보드</title>
+<style>
+  :root{
+    --bg:#14110d; --panel:#1d1913; --ink:#e9e2d2; --dim:#9b8f78;
+    --acc:#d4a843; --acc2:#6fae6f; --bronze:#8a6d3a; --line:#3a3024;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; display:flex; height:100vh; overflow:hidden;
+    font-family:"Pretendard","Noto Sans KR",system-ui,sans-serif;
+    color:var(--ink); background:var(--bg);
+  }
+
+  /* ── 사이드바 ── */
+  aside{
+    width:248px; flex:0 0 248px; height:100%; overflow-y:auto;
+    background:linear-gradient(180deg,#1d1813,#161109);
+    border-right:1px solid var(--line); padding:16px 12px 30px;
+  }
+  .brand{padding:6px 8px 14px}
+  .brand .t{font-size:16px; font-weight:800; letter-spacing:.3px}
+  .brand .t .s{color:var(--acc)}
+  .brand .d{font-size:11px; color:var(--dim); margin-top:3px}
+  .grp{margin-top:16px}
+  .grp .h{font-size:11px; color:var(--acc); letter-spacing:.6px; padding:0 8px 6px; font-weight:700}
+  .nav{
+    display:flex; align-items:center; gap:9px; width:100%; text-align:left;
+    background:transparent; border:1px solid transparent; border-radius:9px;
+    color:var(--ink); padding:8px 9px; font-size:13px; cursor:pointer;
+    transition:background .1s, border-color .1s;
+  }
+  .nav:hover{background:#ffffff0a; border-color:var(--line)}
+  .nav.active{background:#d4a8431a; border-color:var(--bronze)}
+  .nav .ic{font-size:15px; width:18px; text-align:center}
+  .nav .nm{flex:1}
+  .nav .ext{font-size:11px; color:var(--dim); opacity:0; transition:opacity .1s}
+  .nav:hover .ext{opacity:1}
+  .nav.disabled{opacity:.4; cursor:not-allowed}
+  .nav.disabled:hover{background:transparent; border-color:transparent}
+
+  /* ── 메인 ── */
+  main{flex:1; display:flex; flex-direction:column; height:100%; min-width:0}
+  .bar{
+    flex:0 0 auto; display:flex; align-items:center; gap:12px;
+    padding:9px 14px; background:var(--panel); border-bottom:1px solid var(--line);
+  }
+  .bar .cur{font-size:14px; font-weight:700}
+  .bar .url{font-size:11px; color:var(--dim); font-family:ui-monospace,monospace}
+  .bar .sp{flex:1}
+  .btn{
+    background:#ffffff0d; border:1px solid var(--line); color:var(--ink);
+    border-radius:8px; padding:6px 11px; font-size:12px; cursor:pointer;
+    text-decoration:none; display:inline-flex; align-items:center; gap:5px;
+  }
+  .btn:hover{border-color:var(--bronze)}
+  .dot{width:8px; height:8px; border-radius:50%; background:#6c5f49; display:inline-block}
+  .dot.up{background:var(--acc2); box-shadow:0 0 6px #6fae6f}
+  .dot.down{background:#b65a4a}
+  .status{font-size:11px; color:var(--dim); display:flex; align-items:center; gap:6px}
+  .frmwrap{flex:1; position:relative; background:#0b0906; min-height:0}
+  iframe{position:absolute; inset:0; width:100%; height:100%; border:0; background:#0b0906}
+  .home{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:10px; color:var(--dim); text-align:center; padding:24px;
+  }
+  .home .big{font-size:40px}
+  .home .ttl{font-size:18px; color:var(--ink); font-weight:700}
+  .home .sub{font-size:13px; max-width:420px; line-height:1.6}
+</style>
+</head>
+<body>
+<aside>
+  <div class="brand">
+    <div class="t">삼국지 SRPG <span class="s">통합 대시보드</span></div>
+    <div class="d">왼쪽에서 고르면 오른쪽에 바로 뜹니다</div>
+  </div>
+  <div id="nav"></div>
+</aside>
+
+<main>
+  <div class="bar">
+    <span class="cur" id="curName">대시보드</span>
+    <span class="url" id="curUrl"></span>
+    <span class="sp"></span>
+    <span class="status"><span class="dot" id="gameDot"></span><span id="gameTxt">게임 서버 확인 중…</span></span>
+    <button class="btn" id="reloadBtn" title="현재 화면 새로고침">↻</button>
+    <a class="btn" id="openBtn" target="_blank" rel="noopener">새 탭 ↗</a>
+  </div>
+  <div class="frmwrap">
+    <div class="home" id="home">
+      <div class="big">🏯</div>
+      <div class="ttl">왼쪽 메뉴에서 도구를 선택하세요</div>
+      <div class="sub">에디터는 이 화면 안에서 파일 열기·저장이 그대로 됩니다(Chrome/Edge). 게임은 우측에 임베드되어 바로 플레이할 수 있습니다.</div>
+    </div>
+    <iframe id="frame" style="display:none"
+      allow="cross-origin-isolated; fullscreen"></iframe>
+  </div>
+</main>
+
+<script>
+// 도구 카탈로그 — dashboard.html은 tools/ 에 있으므로 에디터=상대경로, docs=../docs, 게임=절대 :3000
+const GAME = "http://localhost:3000";
+const GROUPS = [
+  { h:"▶ 게임", items:[
+    { ic:"⚔️", nm:"사수관 전투", url:GAME+"/battle", game:true },
+    { ic:"🏯", nm:"타이틀 화면", url:GAME+"/", game:true },
+  ]},
+  { h:"🗃️ 데이터 에디터", items:[
+    { ic:"⚔️", nm:"무기·아이템", url:"item-editor.html" },
+    { ic:"🛡️", nm:"병종", url:"class-editor.html" },
+    { ic:"🧑‍✈️", nm:"캐릭터", url:"character-editor.html" },
+    { ic:"📜", nm:"책략", url:"strategy-editor.html" },
+  ]},
+  { h:"🗺️ 맵 · 스테이지", items:[
+    { ic:"🎯", nm:"맵·스테이지 에디터", url:"stage-editor.html" },
+  ]},
+  { h:"🎨 에셋 보드", items:[
+    { ic:"🗂️", nm:"프롬프트 보드", url:"../docs/art/asset-board.html" },
+    { ic:"🧩", nm:"맵 청크 보드", url:"../docs/art/map-chunk-board.html" },
+  ]},
+  { h:"🦴 애니메이션", items:[
+    { ic:"🦴", nm:"리그 에디터", url:"rig-editor.html" },
+  ]},
+];
+
+const frame = document.getElementById("frame");
+const home = document.getElementById("home");
+const curName = document.getElementById("curName");
+const curUrl = document.getElementById("curUrl");
+const openBtn = document.getElementById("openBtn");
+const navEl = document.getElementById("nav");
+let active = null;
+
+function select(item, btn){
+  if (active) active.classList.remove("active");
+  active = btn; btn.classList.add("active");
+  home.style.display = "none";
+  frame.style.display = "block";
+  // 정적 도구(에디터·보드)는 캐시버스터로 항상 최신 로드 — 정적 HTML이 옛 버전으로 캐시되는 문제 방지.
+  // 게임(:3000)은 dev 서버 HMR이라 제외.
+  const dest = item.game ? item.url : item.url + (item.url.includes("?") ? "&" : "?") + "v=" + Date.now();
+  frame.src = dest;
+  curName.textContent = item.nm;
+  curUrl.textContent = item.url.replace("http://localhost:3000","localhost:3000");
+  openBtn.href = dest;
+  try { localStorage.setItem("tk-dash-last", item.url); } catch(e){}
+}
+
+// 사이드바 렌더
+const byUrl = {};
+for (const g of GROUPS){
+  const h = document.createElement("div"); h.className="grp";
+  const hh = document.createElement("div"); hh.className="h"; hh.textContent=g.h;
+  h.appendChild(hh);
+  for (const it of g.items){
+    const b = document.createElement("button"); b.className="nav";
+    b.innerHTML = `<span class="ic">${it.ic}</span><span class="nm">${it.nm}</span><span class="ext">${it.game?":3000":":8080"}</span>`;
+    b.onclick = () => select(it, b);
+    h.appendChild(b); byUrl[it.url] = b;
+  }
+  navEl.appendChild(h);
+}
+
+document.getElementById("reloadBtn").onclick = () => { if (frame.style.display!=="none") frame.src = frame.src; };
+
+// 게임 서버 핑 (no-cors — 도달 가능 여부만)
+const gameDot = document.getElementById("gameDot");
+const gameTxt = document.getElementById("gameTxt");
+async function ping(){
+  try {
+    await fetch(GAME+"/battle", { mode:"no-cors", cache:"no-store" });
+    gameDot.className="dot up"; gameTxt.textContent="게임 서버 :3000 작동 중";
+  } catch(e){
+    gameDot.className="dot down"; gameTxt.textContent="게임 서버 :3000 꺼짐 (pnpm --filter @tk/web dev)";
+  }
+}
+ping(); setInterval(ping, 8000);
+
+// 마지막 선택 복원
+try {
+  const last = localStorage.getItem("tk-dash-last");
+  if (last && byUrl[last]) byUrl[last].click();
+} catch(e){}
+</script>
+</body>
+</html>

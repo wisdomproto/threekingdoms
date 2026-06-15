@@ -582,6 +582,22 @@ function bind() {
 }
 
 init();
+
+/* ── 자동 로드: 서버 기동 중이면 기본 데이터를 바로 표시 ── */
+(async function autoLoadDefault() {
+  try {
+    const res = await fetch('/packages/data/json/items.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error(res.status);
+    const obj = await res.json();
+    loadFromObject(obj, 'items.json (기본 데이터)');
+    // 자동 로드 = 깨끗한 상태 (dirty 리셋)
+    dirty = false;
+    document.getElementById('saveFile').disabled = true;
+    render();
+  } catch (e) {
+    console.info('기본 데이터 자동 로드 건너뜀:', e.message);
+  }
+})();
 </script>
 </body>
 </html>

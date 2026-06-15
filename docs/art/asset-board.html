@@ -15,6 +15,12 @@
   header .sub { color: var(--dim); font-size: 12px; }
   .stylefixed { font-size: 12.5px; color: #1a1407; background: var(--acc); border-radius: 14px; padding: 3px 12px; font-weight: bold; }
   #progress { margin-left: auto; font-size: 12px; color: var(--dim); }
+  #tabbar { position: sticky; top: 49px; z-index: 49; background: rgba(20,22,28,.97); border-bottom: 1px solid var(--line); padding: 6px 22px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .tab { background: var(--panel); color: var(--dim); border: 1px solid var(--line); border-radius: 8px 8px 0 0; padding: 6px 14px; cursor: pointer; font-size: 13px; white-space: nowrap; }
+  .tab:hover { color: var(--txt); border-color: var(--acc); }
+  .tab.active { background: var(--panel2); color: var(--acc); border-color: var(--acc); border-bottom-color: var(--panel2); }
+  .tab .cnt { font-size: 11px; color: var(--acc2); margin-left: 5px; }
+  .tab.haspick .cnt { color: var(--acc); }
   main { max-width: 1280px; margin: 0 auto; padding: 18px 22px 80px; }
   .info { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--acc); border-radius: 8px; padding: 12px 16px; font-size: 13px; color: var(--dim); margin: 14px 0; }
   .info b { color: var(--txt); }
@@ -58,6 +64,7 @@
   <button class="btn" id="dirbtn" title="⬇ 저장이 향할 폴더 (docs\art 권장)">저장 폴더: 미연결</button>
   <div id="progress"></div>
 </header>
+<div id="tabbar"></div>
 <main>
   <div class="info">
     <b>사용법</b> ① 카드의 <b>[프롬프트 복사]</b> → 생성기에 붙여넣어 생성 ② 결과 이미지를 복사한 뒤 <b>카드의 점선 영역 클릭 + Ctrl+V</b> (드래그&드롭/파일선택 가능) ③ 잘 나온 장은 ★픽.
@@ -738,13 +745,55 @@ function buildPrompt(item) {
   return parts.join('\n\n');
 }
 
+/* ───────────────────────── 탭 정의 ───────────────────────── */
+
+/* 섹션 id → 탭 id 매핑. 여러 섹션을 한 탭으로 묶을 수 있음. */
+const TAB_DEFS = [
+  { id: 'char',   label: '캐릭터 시트',  secs: ['A','B','F'] },
+  { id: 'weapon', label: '무기',          secs: ['G'] },
+  { id: 'enemy',  label: '적 네임드',     secs: ['H'] },
+  { id: 'unit',   label: '병종 SD',       secs: ['J'] },
+  { id: 'portrait',label: '초상 크롭',    secs: ['I'] },
+  { id: 'terrain',label: '지형·바닥',     secs: ['E','K'] },
+  { id: 'ui',     label: 'UI',            secs: ['D','L'] },
+  { id: 'effect', label: '이펙트',        secs: ['C'] },
+  { id: 'duel',   label: '일기토 키프레임', secs: ['M'] },
+];
+
+/* 탭당 섹션 목록을 빠르게 찾는 맵 */
+const SECID_TO_TAB = {};
+for (const tab of TAB_DEFS) for (const sid of tab.secs) SECID_TO_TAB[sid] = tab.id;
+
+let activeTab = localStorage.getItem('ab_tab') || TAB_DEFS[0].id;
+
+function renderTabs() {
+  const tabbar = document.getElementById('tabbar');
+  tabbar.innerHTML = TAB_DEFS.map(tab => {
+    const secsInTab = SECTIONS.filter(s => tab.secs.includes(s.id));
+    const total = secsInTab.reduce((a, s) => a + s.items.length, 0);
+    return `<button class="tab ${tab.id === activeTab ? 'active' : ''}" data-tab="${tab.id}">${tab.label}<span class="cnt">${total}</span></button>`;
+  }).join('');
+}
+
+document.getElementById('tabbar').addEventListener('click', e => {
+  const t = e.target.closest('.tab');
+  if (!t) return;
+  activeTab = t.dataset.tab;
+  localStorage.setItem('ab_tab', activeTab);
+  renderTabs();
+  renderBoard();
+  loadImagesForCurrentTab();
+  window.scrollTo(0, 0);
+});
+
 /* ───────────────────────── 렌더 ───────────────────────── */
 
 const board = document.getElementById('board');
 
-function render() {
+function renderBoard() {
+  const visibleSecs = SECTIONS.filter(s => SECID_TO_TAB[s.id] === activeTab);
   let html = '';
-  for (const sec of SECTIONS) {
+  for (const sec of visibleSecs) {
     html += `<h2 class="sec">${sec.title}</h2><p class="secdesc">${sec.desc}</p><div class="grid">`;
     for (const it of sec.items) {
       html += `<div class="card" id="card-${it.id}">
@@ -773,7 +822,12 @@ function render() {
     html += '</div>';
   }
   board.innerHTML = html;
-  for (const sec of SECTIONS) for (const it of sec.items) refreshPrompt(it.id);
+  for (const sec of visibleSecs) for (const it of sec.items) refreshPrompt(it.id);
+}
+
+function render() {
+  renderTabs();
+  renderBoard();
 }
 
 function refreshPrompt(id) {
@@ -807,28 +861,50 @@ async function addImageToCard(cardId, blob) {
   const rec = { card: cardId, blob, name, pick: 0, at: Date.now() };
   rec.id = await dbAdd(rec);
   document.querySelector(`#card-${CSS.escape(cardId)} .drop`).appendChild(thumbNode(rec));
-  updateProgress();
+  await updateProgress();
   toast(`${name} 저장됨`);
 }
 
 async function loadImages() {
   const all = await dbAll();
   all.sort((a, b) => a.at - b.at);
-  let orphans = 0;
   for (const rec of all) {
     const drop = document.querySelector(`#card-${CSS.escape(rec.card)} .drop`);
     if (drop) drop.appendChild(thumbNode(rec));
-    else orphans++;
+    /* non-visible cards (other tabs) are expected to not be in DOM — not orphans */
   }
-  if (orphans) console.warn(orphans + ' images belong to old card ids (kept in DB, not shown)');
   updateProgress();
 }
 
-function updateProgress() {
+/* 탭 전환 후 현재 탭 카드에 DB 이미지 다시 붙이기 */
+async function loadImagesForCurrentTab() {
+  const all = await dbAll();
+  all.sort((a, b) => a.at - b.at);
+  for (const rec of all) {
+    const drop = document.querySelector(`#card-${CSS.escape(rec.card)} .drop`);
+    if (drop && !drop.querySelector(`[data-imgid="${rec.id}"]`)) drop.appendChild(thumbNode(rec));
+  }
+  updateProgress();
+}
+
+async function updateProgress() {
   const total = SECTIONS.reduce((a, s) => a + s.items.length, 0);
-  const done = new Set([...document.querySelectorAll('.thumb')].map(t => t.closest('.card').id)).size;
+  const all = await dbAll();
+  const doneCards = new Set(all.map(r => r.card));
+  const done = doneCards.size;
   document.getElementById('progress').textContent = `이미지 있는 카드: ${done}/${total}`;
-  document.querySelectorAll('.card').forEach(c => c.classList.toggle('haspick', !!c.querySelector('.thumb.picked')));
+  document.querySelectorAll('.card').forEach(c => {
+    const hasPick = all.some(r => r.card === c.id.replace('card-', '') && r.pick);
+    c.classList.toggle('haspick', hasPick);
+  });
+  /* 탭 뱃지에 픽 표시 */
+  for (const tab of TAB_DEFS) {
+    const secsInTab = SECTIONS.filter(s => tab.secs.includes(s.id));
+    const idsInTab = secsInTab.flatMap(s => s.items.map(it => it.id));
+    const hasPick = all.some(r => idsInTab.includes(r.card) && r.pick);
+    const btn = document.querySelector(`.tab[data-tab="${tab.id}"]`);
+    if (btn) btn.classList.toggle('haspick', hasPick);
+  }
 }
 
 /* ───────────────────────── 이벤트 ───────────────────────── */
@@ -927,7 +1003,7 @@ document.getElementById('dirbtn').addEventListener('click', async () => {
 
 (async () => {
   render();
-  try { db = await openDB(); await loadImages(); await restoreDir(); }
+  try { db = await openDB(); await loadImagesForCurrentTab(); await restoreDir(); }
   catch (err) {
     document.querySelector('.info').insertAdjacentHTML('beforeend',
       '<br><b style="color:var(--red)">⚠ 이 브라우저에서 IndexedDB를 열 수 없어 이미지 저장이 비활성화됩니다.</b> (' + err + ')');

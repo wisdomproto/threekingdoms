@@ -517,6 +517,24 @@ function toast(m, bad) {
 }
 
 init();
+
+/* ── 자동 로드: 서버 기동 중이면 strategies.json 을 바로 표시 ── */
+(async function autoLoadDefault() {
+  try {
+    const res = await fetch('/packages/data/json/strategies.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error(res.status);
+    const text = await res.text();
+    loadFromText(text);
+    // 자동 로드 = 깨끗한 상태, 핸들 없음
+    fileHandle = null;
+    fileName = 'strategies.json (기본 데이터)';
+    dirty = false;
+    updateSaveBtn();
+    updateFileInfo();
+  } catch (e) {
+    console.info('기본 데이터 자동 로드 건너뜀:', e.message);
+  }
+})();
 </script>
 </body>
 </html>

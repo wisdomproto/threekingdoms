@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>스테이지 에디터 — 삼국지 SRPG (stage + map + 블록아웃)</title>
+<title>맵·스테이지 통합 에디터 — 삼국지 SRPG</title>
 <style>
   :root { --bg:#14161c; --panel:#1d212b; --panel2:#242936; --line:#333a4a; --txt:#e8e6df; --dim:#9aa1b0; --acc:#d4a843; --acc2:#6fae6f; --bad:#e06a6a;
           --player:#4f8fe0; --ally:#e0954f; --enemy:#e05a5a; }
@@ -89,7 +89,68 @@
 </head>
 <body>
 <header>
-  <h1>스테이지 에디터</h1>
+  <h1>맵·스테이지 에디터</h1>
+  <select id="mapOnlySelect" style="background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:5px;padding:3px 7px;font-size:12px" title="맵 단독 편집 — 스테이지 없이 지형만">
+    <option value="">— 맵 단독 선택 —</option>
+    <option value="zhuojun">01 탁군 (zhuojun)</option>
+    <option value="yingchuan">02 영천 (yingchuan)</option>
+    <option value="guangzong">03 광종 (guangzong)</option>
+    <option value="zhangjue">04 장각 (zhangjue)</option>
+    <option value="sishuiguan">05 사수관 (sishuiguan)</option>
+    <option value="huluguan">06 호로관 (huluguan)</option>
+    <option value="luoyang">07 낙양 (luoyang)</option>
+    <option value="dongzhuo-chase">08 동탁추격 (dongzhuo-chase)</option>
+    <option value="banhe">09 반하 (banhe)</option>
+    <option value="xuzhou">10 서주 (xuzhou)</option>
+    <option value="xiaopei">11 소패 (xiaopei)</option>
+    <option value="xiapi1">12 하비1 (xiapi1)</option>
+    <option value="yuanshu">13 원술 (yuanshu)</option>
+    <option value="xiapi2">14 하비2 (xiapi2)</option>
+    <option value="xutian">15 허전 (xutian)</option>
+    <option value="guandu-escape">16 관도탈출 (guandu-escape)</option>
+    <option value="runan">17 여남 (runan)</option>
+    <option value="bowangpo">18 박망파 (bowangpo)</option>
+    <option value="xinye">19 신야 (xinye)</option>
+    <option value="changbanpo">20 장판파 (changbanpo)</option>
+    <option value="changbanqiao">21 장판교 (changbanqiao)</option>
+    <option value="hanjin">22 한진 (hanjin)</option>
+    <option value="jiangxia">23 강하 (jiangxia)</option>
+    <option value="sanjiangkou">24 삼강구 (sanjiangkou)</option>
+    <option value="wulin">25 오림 (wulin)</option>
+    <option value="chibi">26 적벽 (chibi)</option>
+    <option value="huarongdao">27 화용도 (huarongdao)</option>
+  </select>
+  <span style="font-size:11px;color:var(--dim);padding:0 2px">또는</span>
+  <select id="stageSelect" style="background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:5px;padding:3px 7px;font-size:12px" title="스테이지 선택 — 지형+유닛 모두 로드">
+    <option value="">— 스테이지 선택 —</option>
+    <option value="01-zhuojun">01 탁군 (zhuojun)</option>
+    <option value="02-yingchuan">02 영천 (yingchuan)</option>
+    <option value="03-guangzong">03 광종 (guangzong)</option>
+    <option value="04-zhangjue">04 장각 (zhangjue)</option>
+    <option value="05-sishuiguan">05 사수관 (sishuiguan)</option>
+    <option value="06-huluguan">06 호로관 (huluguan)</option>
+    <option value="07-luoyang">07 낙양 (luoyang)</option>
+    <option value="08-dongzhuo-chase">08 동탁추격 (dongzhuo-chase)</option>
+    <option value="09-banhe">09 반하 (banhe)</option>
+    <option value="10-xuzhou">10 서주 (xuzhou)</option>
+    <option value="11-xiaopei">11 소패 (xiaopei)</option>
+    <option value="12-xiapi1">12 하비1 (xiapi1)</option>
+    <option value="13-yuanshu">13 원술 (yuanshu)</option>
+    <option value="14-xiapi2">14 하비2 (xiapi2)</option>
+    <option value="15-xutian">15 허전 (xutian)</option>
+    <option value="16-guandu-escape">16 관도탈출 (guandu-escape)</option>
+    <option value="17-runan">17 여남 (runan)</option>
+    <option value="18-bowangpo">18 박망파 (bowangpo)</option>
+    <option value="19-xinye">19 신야 (xinye)</option>
+    <option value="20-changbanpo">20 장판파 (changbanpo)</option>
+    <option value="21-changbanqiao">21 장판교 (changbanqiao)</option>
+    <option value="22-hanjin">22 한진 (hanjin)</option>
+    <option value="23-jiangxia">23 강하 (jiangxia)</option>
+    <option value="24-sanjiangkou">24 삼강구 (sanjiangkou)</option>
+    <option value="25-wulin">25 오림 (wulin)</option>
+    <option value="26-chibi">26 적벽 (chibi)</option>
+    <option value="27-huarongdao">27 화용도 (huarongdao)</option>
+  </select>
   <button class="btn" id="newStage">새로</button>
   <button class="btn" id="openStage">스테이지 열기</button>
   <button class="btn" id="openMap">맵 열기</button>
@@ -472,6 +533,21 @@ function bind() {
   document.getElementById('newStage').onclick = doNew;
   document.getElementById('openStage').onclick = () => openFile('stage');
   document.getElementById('openMap').onclick = () => openFile('map');
+  document.getElementById('stageSelect').onchange = async function() {
+    const val = this.value;
+    if (!val) return;
+    // 스테이지 선택 시 맵 단독 드롭다운 리셋, 맵 단독 모드 해제
+    setMapOnlyMode(false);
+    document.getElementById('mapOnlySelect').value = '';
+    await loadStageFromServer(val);
+  };
+  document.getElementById('mapOnlySelect').onchange = async function() {
+    const val = this.value;
+    if (!val) { setMapOnlyMode(false); return; }
+    // 스테이지 드롭다운 리셋
+    document.getElementById('stageSelect').value = '';
+    await loadMapOnlyFromServer(val);
+  };
   document.getElementById('saveStage').onclick = () => saveStageFile();
   document.getElementById('saveMap').onclick = () => saveMapFile();
   document.getElementById('expBlock').onclick = exportBlockout;
@@ -1178,6 +1254,10 @@ function doNew() {
   tiles = blankTiles(W, H);
   stage = newStageMeta(); stage.id = nid; stage.name = nid; stage.mapId = nid;
   selUnit = null; undoStack.length = 0; stageHandle = null; mapHandle = null;
+  // 맵 단독 모드 해제 및 드롭다운 리셋
+  document.getElementById('stageSelect').value = '';
+  document.getElementById('mapOnlySelect').value = '';
+  setMapOnlyMode(false);
   resizeCanvas(); renderAll(); renderTab(); refreshUnitList(); refreshValidation();
   toast('새 스테이지');
 }
@@ -1188,7 +1268,98 @@ let toastT = null;
 function toast(m, bad) { const t = document.getElementById('toast'); t.textContent = m; t.className = bad ? 'bad' : ''; t.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', 2600); }
 window.addEventListener('beforeunload', e => { if (stage.units.length || tiles.some(r => r.some(ch => ch !== '.'))) { e.preventDefault(); e.returnValue = ''; } });
 
+/* ═══════════════════════ 맵 단독 모드 ═══════════════════════
+   맵 드롭다운에서 맵만 선택하면: 지형 편집 가능, 유닛/스테이지 패널 비활성.
+   스테이지 선택 또는 새로 버튼으로 해제.
+   ══════════════════════════════════════════════════════════ */
+let mapOnlyMode = false;
+
+function setMapOnlyMode(on) {
+  mapOnlyMode = on;
+  // 우측 패널 탭: 유닛/목표/일기토/증원·전략 탭 비활성화 (지형+메타만 활성)
+  if (on && activeTab !== 'meta') switchTab('meta');
+  document.querySelectorAll('.tab').forEach(t => {
+    const disable = on && t.dataset.tab !== 'meta';
+    t.style.opacity = disable ? '0.35' : '';
+    t.style.pointerEvents = disable ? 'none' : '';
+  });
+  // 좌측: 유닛 모드 버튼 비활성
+  const mUnit = document.getElementById('m-unit');
+  if (mUnit) {
+    mUnit.disabled = on;
+    mUnit.style.opacity = on ? '0.35' : '';
+    if (on && mode === 'unit') {
+      mode = 'terrain';
+      document.querySelectorAll('[data-mode]').forEach(x => x.classList.toggle('on', x.dataset.mode === 'terrain'));
+      document.getElementById('terrainPanel').style.display = '';
+      document.getElementById('unitPanel').style.display = 'none';
+      gridC.style.cursor = 'crosshair';
+    }
+  }
+  // 저장 버튼: 맵 단독 모드에서 stage 저장 비활성 (맵만 저장 가능)
+  document.getElementById('saveStage').disabled = on || validate().length > 0;
+  // 배너 갱신
+  if (on) {
+    const b = document.getElementById('valbanner');
+    b.className = 'on ok';
+    b.innerHTML = '🗺 맵 단독 모드 — 지형 편집 후 [⬇ map JSON] 으로 저장. 스테이지를 선택하거나 [새로]를 눌러 해제.';
+  } else {
+    refreshValidation();
+  }
+}
+
+async function loadMapOnlyFromServer(mapId_) {
+  try {
+    const res = await fetch(`/packages/data/json/maps/${mapId_}.json`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(res.status);
+    const m = await res.json();
+    loadMapObject(m);
+    // 스테이지 메타를 최소화 (mapId 동기화만)
+    stage.mapId = m.id || mapId_;
+    setMapOnlyMode(true);
+    // 드롭다운 동기화
+    const sel = document.getElementById('mapOnlySelect');
+    if (sel && sel.value !== mapId_) sel.value = mapId_;
+    toast(`맵 "${mapId_}" 단독 로드 (${W}×${H}) — 맵 단독 모드`);
+  } catch (e) {
+    console.info('맵 fetch 실패:', e.message);
+    toast('맵 로드 실패: ' + e.message, true);
+  }
+}
+
+/* ── 서버에서 스테이지(+연결 맵) fetch 로드 ── */
+async function loadStageFromServer(stageId_) {
+  const tryFetch = async (url) => {
+    try {
+      const r = await fetch(url, { cache: 'no-store' });
+      if (!r.ok) throw new Error(r.status);
+      return await r.json();
+    } catch { return null; }
+  };
+  const stageObj = await tryFetch(`/packages/data/json/stages/${stageId_}.json`);
+  if (!stageObj) { console.info('스테이지 fetch 실패:', stageId_); return; }
+  // 연결된 mapId로 맵도 fetch
+  const mapId_ = stageObj.mapId;
+  if (mapId_) {
+    const mapObj = await tryFetch(`/packages/data/json/maps/${mapId_}.json`);
+    if (mapObj) loadMapObject(mapObj);
+  }
+  loadStageObject(stageObj);
+  // 드롭다운 동기화
+  const sel = document.getElementById('stageSelect');
+  if (sel && sel.value !== stageId_) sel.value = stageId_;
+  stageHandle = null; mapHandle = null;
+}
+
 init();
+
+/* ── 자동 로드: 기본 스테이지 05-sishuiguan (사수관) ── */
+(async function autoLoadDefault() {
+  const defaultStage = '05-sishuiguan';
+  await loadStageFromServer(defaultStage);
+  const sel = document.getElementById('stageSelect');
+  if (sel) sel.value = defaultStage;
+})();
 </script>
 </body>
 </html>

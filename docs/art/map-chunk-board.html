@@ -139,11 +139,23 @@ function extOf(blob){ return (blob.type.split('/')[1]||'png').replace('jpeg','jp
 const blobUrls = new Map();
 function urlFor(card, blob){ if(blobUrls.has(card)) URL.revokeObjectURL(blobUrls.get(card)); const u=URL.createObjectURL(blob); blobUrls.set(card,u); return u; }
 
+// 스테이지 번호 순서 (지형/스테이지 에디터와 동일) — mapId → 01~27
+const ORDER = ["zhuojun","yingchuan","guangzong","zhangjue","sishuiguan","huluguan","luoyang","dongzhuo-chase","banhe","xuzhou","xiaopei","xiapi1","yuanshu","xiapi2","xutian","guandu-escape","runan","bowangpo","xinye","changbanpo","changbanqiao","hanjin","jiangxia","sanjiangkou","wulin","chibi","huarongdao"];
+function orderedKeys() {
+  const present = Object.keys(STAGES);
+  return [...ORDER.filter(k => present.includes(k)), ...present.filter(k => !ORDER.includes(k))];
+}
+function num(k) { const i = ORDER.indexOf(k); return i >= 0 ? String(i + 1).padStart(2, '0') : '··'; }
+
 function renderTabs() {
-  const keys = Object.keys(STAGES);
-  document.getElementById('tabs').innerHTML = keys.map(k =>
-    `<button class="tab ${k===activeStage?'active':''}" data-tab="${k}">${STAGES[k].name||k} <span class="cnt" id="cnt-${k}"></span></button>`
-  ).join('') || '<span class="sub" style="color:var(--red)">chunks/index.js 없음 — export_chunks.py 먼저 실행</span>';
+  const keys = orderedKeys();
+  const el = document.getElementById('tabs');
+  if (!keys.length) { el.innerHTML = '<span class="sub" style="color:var(--red)">chunks/index.js 없음 — export_chunks.py 먼저 실행</span>'; return; }
+  if (!STAGES[activeStage]) activeStage = keys[0];
+  el.innerHTML = '<label style="font-size:13px;color:var(--dim);margin-right:8px">맵 선택</label>'
+    + '<select id="stageSelect" style="background:var(--panel2);color:var(--acc);border:1px solid var(--acc);border-radius:8px;padding:6px 12px;font-size:14px;font-weight:600;min-width:220px">'
+    + keys.map(k => `<option value="${k}" id="opt-${k}"${k===activeStage?' selected':''}>${num(k)} ${STAGES[k].name||k}</option>`).join('')
+    + '</select>';
 }
 
 function render() {
@@ -186,6 +198,7 @@ async function loadStageImages() {
     const card = `${st.mapId}_r${ch.row}_c${ch.col}`;
     const rec = byCard.get(card);
     if (rec) setDropImage(card, rec.blob);
+    else tryDiskPainted(card);
   }
   updateProgress();
 }
@@ -204,6 +217,30 @@ function clearDrop(card) {
   drop.closest('.card').classList.remove('done');
 }
 
+// IndexedDB에 없을 때 디스크에 저장된 painted(painted_*.png/jpg/webp)를 fallback으로 표시.
+// 브라우저/origin이 달라 IndexedDB가 비어도 디스크 작업물이 보이게 한다.
+const diskPainted = new Set();
+function tryDiskPainted(card) {
+  const drop = document.querySelector(`.drop[data-drop="${CSS.escape(card)}"]`);
+  if (!drop) return;
+  const exts = ['png', 'jpg', 'webp'];
+  let i = 0;
+  const img = new Image();
+  img.onload = () => {
+    drop.innerHTML = '';
+    img.style.maxWidth = '100%'; img.style.display = 'block';
+    drop.appendChild(img);
+    const tag = document.createElement('div'); tag.className = 'ops';
+    tag.innerHTML = '<span style="font-size:10px;color:var(--dim);padding:2px 6px;background:rgba(0,0,0,.5);border-radius:4px">디스크 저장본</span>';
+    drop.appendChild(tag);
+    drop.closest('.card').classList.add('done');
+    diskPainted.add(card);
+    updateProgress();
+  };
+  img.onerror = () => { i++; if (i < exts.length) img.src = `chunks/painted_${card}.${exts[i]}`; };
+  img.src = `chunks/painted_${card}.${exts[0]}`;
+}
+
 async function saveChunk(card, blob) {
   const name = `painted_${card}.${extOf(blob)}`;
   await dbPut({ card, blob, name, at: Date.now() });
@@ -216,11 +253,11 @@ async function saveChunk(card, blob) {
 function updateProgress() {
   for (const k of Object.keys(STAGES)) {
     dbAll().then(all => {
-      const set = new Set(all.map(r => r.card));
+      const set = new Set([...all.map(r => r.card), ...diskPainted]);
       const have = STAGES[k].chunks.filter(ch => set.has(`${k}_r${ch.row}_c${ch.col}`)).length;
       const total = STAGES[k].chunks.length;
-      const cnt = document.getElementById('cnt-' + k);
-      if (cnt) cnt.textContent = `${have}/${total}`;
+      const opt = document.getElementById('opt-' + k);
+      if (opt) opt.textContent = `${num(k)} ${STAGES[k].name||k} · ${have}/${total}`;
       if (k === activeStage) {
         document.getElementById('progress').textContent = `${STAGES[k].name}: painted ${have}/${total}`;
         const hint = document.getElementById('stitchhint');
@@ -233,9 +270,9 @@ function updateProgress() {
 }
 
 /* ───── 이벤트 ───── */
-document.getElementById('tabs').addEventListener('click', e => {
-  const t = e.target.closest('.tab'); if (!t) return;
-  activeStage = t.dataset.tab; localStorage.setItem('mcb_stage', activeStage); render();
+document.getElementById('tabs').addEventListener('change', e => {
+  if (e.target.id !== 'stageSelect') return;
+  activeStage = e.target.value; localStorage.setItem('mcb_stage', activeStage); render();
 });
 document.getElementById('copyprompt').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(CHUNK_PROMPT); } catch { const ta=document.createElement('textarea'); ta.value=CHUNK_PROMPT; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }

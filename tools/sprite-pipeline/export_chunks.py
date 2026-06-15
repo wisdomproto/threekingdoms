@@ -27,6 +27,22 @@ TILE = 48  # 런타임 월드 픽셀/타일 (projection.TILE_SIZE) — 스티처
 
 ROOT = r"C:\project\threekingdoms"
 mapId = sys.argv[1] if len(sys.argv) > 1 else "sishuiguan"
+
+# "all" → 전체 맵 일괄: 크기 기반 cols/rows = ceil(W/20)×ceil(H/18) (사수관 56×32 → 3×2와 일치)로 self 호출.
+# 각 자식 실행이 끝에서 모든 *_manifest.json을 취합해 index.js를 재생성하므로 보드에 전 맵 탭이 뜬다.
+if mapId == "all":
+    import math, subprocess
+    maps = sorted(glob.glob(rf"{ROOT}\packages\data\json\maps\*.json"))
+    for f in maps:
+        m = json.load(open(f, encoding="utf-8"))
+        mid = os.path.splitext(os.path.basename(f))[0]
+        cols = max(1, math.ceil(m["width"] / 20))
+        rows = max(1, math.ceil(m["height"] / 18))
+        print(f"[all] {mid}  {m['width']}×{m['height']} -> {cols}×{rows}")
+        subprocess.run([sys.executable, os.path.abspath(__file__), mid, str(cols), str(rows)], check=True)
+    print(f"\n전체 {len(maps)}개 맵 청크 생성 완료 → docs/art/chunks/index.js")
+    sys.exit(0)
+
 COLS = int(sys.argv[2]) if len(sys.argv) > 2 else 3
 ROWS = int(sys.argv[3]) if len(sys.argv) > 3 else 2
 OV = int(sys.argv[4]) if len(sys.argv) > 4 else 3      # 겹침 타일 수

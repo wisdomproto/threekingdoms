@@ -664,6 +664,36 @@ function init() {
   }
 }
 init();
+
+/* ── 자동 로드: 서버 기동 중이면 commanders + rosters + unitClasses 를 바로 표시 ── */
+(async function autoLoadDefault() {
+  const tryFetch = async (path) => {
+    try {
+      const res = await fetch(path, { cache: 'no-store' });
+      if (!res.ok) throw new Error(res.status);
+      return await res.json();
+    } catch { return null; }
+  };
+  try {
+    const [cmd, ros, cls] = await Promise.all([
+      tryFetch('/packages/data/json/commanders.json'),
+      tryFetch('/packages/data/json/rosters.json'),
+      tryFetch('/packages/data/json/unitClasses.json'),
+    ]);
+    if (!cmd && !ros) { console.info('기본 데이터 자동 로드 건너뜀: commanders.json 없음'); return; }
+    if (cmd) assignLoaded('commanders.json', cmd, null);
+    if (ros) assignLoaded('rosters.json', ros, null);
+    if (cls) assignLoaded('unitClasses.json', cls, null);
+    finishLoad();
+    // 자동 로드 = 깨끗한 상태
+    dirty = false;
+    updateFileInfo();
+    document.getElementById('fileInfo').textContent =
+      'commanders + rosters + unitClasses (기본 데이터) — 저장 시 위치 선택';
+  } catch (e) {
+    console.info('기본 데이터 자동 로드 건너뜀:', e.message);
+  }
+})();
 </script>
 </body>
 </html>

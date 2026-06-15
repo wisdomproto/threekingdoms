@@ -642,6 +642,20 @@ function toast(m, err) {
 }
 
 init();
+
+/* ── 자동 로드: 서버 기동 중이면 unitClasses.json 을 바로 표시 ── */
+(async function autoLoadDefault() {
+  try {
+    const res = await fetch('/packages/data/json/unitClasses.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error(res.status);
+    const obj = await res.json();
+    loadData(obj, 'unitClasses.json (기본 데이터)');
+    // 자동 로드 = 깨끗한 상태 (fileHandle은 없어도 됨 — 저장 시 다른 이름으로 저장 유도)
+    document.getElementById('fileinfo').textContent = 'unitClasses.json (기본 데이터) — 저장 시 위치 선택';
+  } catch (e) {
+    console.info('기본 데이터 자동 로드 건너뜀:', e.message);
+  }
+})();
 </script>
 </body>
 </html>

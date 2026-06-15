@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@tk/web", "dev"],
+      "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "tools",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["C:\\project\\threekingdoms\\tools\\serve.py"],
+      "port": 8080,
+      "autoPort": false
+    }
+  ]
+}
