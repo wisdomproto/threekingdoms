@@ -32,6 +32,7 @@ export interface UnitState {
   morale: number;                     // 사기 — 공/방 직접 가산. 변동 규칙 미해독으로 당분간 고정 100
   mp: number; maxMp: number;          // 책략치 = (레벨+10)×지력÷40
   war: number; leadership: number; intelligence: number;
+  agility: number;       // 민첩(장수 원값) → agilityPower(순발력) 입력. 미보유 장수=기본 50
   baseAtk: number; baseDef: number;
   grades: ClassGrades;                // 병과 5스탯 등급(§1) — corpsStat 성장 입력
   weaponBonus: number;                // 1 + 최고 무기 bonusPercent/100 (소지품 중 최고 1개 — 원작 룰)

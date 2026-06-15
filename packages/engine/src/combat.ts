@@ -27,6 +27,22 @@ export function defensePower(u: UnitState): number {
 export function spiritPower(u: UnitState): number {
   return Math.floor(corpsStat(u.intelligence, u.grades.spirit, u.level) * u.bookBonus);
 }
+/** 부대 순발력 = floor(민첩/2) + 등급계수 누적성장 (← 민첩, grades.agility). 명중/회피 입력. */
+export function agilityPower(u: UnitState): number {
+  return corpsStat(u.agility, u.grades.agility, u.level);
+}
+
+/**
+ * 명중률(%) — 시드 고정 확률(§2-1 2026-06-16). 동급 100%·완만 미스, 하한 floorPercent.
+ *   명중% = clamp(100 − missSlope × max(0, defAgi − atkAgi), floorPercent, 100)
+ * 순수·결정론(롤은 actions.ts에서 이 %를 시드로 굴림). 사거리/지형 무관(피해는 computeDamage).
+ */
+export function hitChance(
+  atkAgi: number, defAgi: number, cfg: { missSlope: number; floorPercent: number },
+): number {
+  const raw = 100 - cfg.missSlope * Math.max(0, defAgi - atkAgi);
+  return Math.max(cfg.floorPercent, Math.min(100, raw));
+}
 
 /** 다음 레벨까지 필요 경험치 = level × 50 (§10 행동 기반 성장). */
 export function expForNextLevel(level: number): number {

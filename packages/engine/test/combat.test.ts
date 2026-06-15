@@ -2,13 +2,31 @@ import { describe, it, expect } from "vitest";
 import { createBattle } from "../src/createBattle";
 import {
   adjustedStat, attackPower, defensePower, computeDamage, getAttackableTargets,
-  flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes,
+  flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes, agilityPower, hitChance,
 } from "../src/combat";
+import { corpsStat } from "../src/growth";
 import { testCtx } from "./fixtures";
 import type { BattleState, UnitState } from "../src/types";
 
 const state = createBattle(testCtx, 42);
 const get = (id: string) => state.units.find((u) => u.id === id)!;
+
+describe("agilityPower (순발력 ← 민첩)", () => {
+  it("agilityPower = corpsStat(민첩, agility등급, Lv); spawnUnit이 agility 주입", () => {
+    const u = get("관우");
+    expect(u.agility).toBeGreaterThan(0);
+    expect(agilityPower(u)).toBe(corpsStat(u.agility, u.grades.agility, u.level));
+  });
+});
+
+describe("hitChance (명중/회피 — 완만)", () => {
+  const cfg = { missSlope: 0.5, floorPercent: 80 };
+  it("동급 → 100%", () => expect(hitChance(60, 60, cfg)).toBe(100));
+  it("공격자 더 빠름 → 100%", () => expect(hitChance(80, 60, cfg)).toBe(100));
+  it("방어자 10 빠름 → 95%", () => expect(hitChance(60, 70, cfg)).toBe(95));
+  it("방어자 40 빠름 → 하한 80%", () => expect(hitChance(40, 80, cfg)).toBe(80));
+  it("방어자 100 빠름 → floor 클램프 80%", () => expect(hitChance(0, 100, cfg)).toBe(80));
+});
 
 describe("조조전 공식 (docs/reference/sosoden-combat-formula.md)", () => {
   it("보정능력치(영걸전 레거시, 미사용) = 4000÷(140−x)", () => {

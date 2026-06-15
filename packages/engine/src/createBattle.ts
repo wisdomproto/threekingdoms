@@ -40,6 +40,8 @@ export function spawnUnit(data: GameData, p: StageUnit): UnitState {
     troops: p.troops, maxTroops: p.troops, morale: 100,
     mp: maxMp, maxMp,
     war: cmd.war, leadership: cmd.leadership, intelligence: cmd.intelligence,
+    agility: cmd.agility ?? 50,
+
     baseAtk: cls.baseAtk, baseDef: cls.baseDef, grades: cls.grades, weaponBonus, bookBonus,
     move: cls.move + moveBonus, baseMove: cls.move, rangeMin: cls.rangeMin, rangeMax: cls.rangeMax,
     damageReduction, grantsDoubleStrike: grantDouble,
