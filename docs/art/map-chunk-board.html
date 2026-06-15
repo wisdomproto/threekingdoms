@@ -55,6 +55,7 @@
   <h1>맵 청크 보드</h1>
   <span class="sub">스테이지별 배경 = 블록아웃 조각 → img2img → painted 채우기 → Claude가 stitch</span>
   <button id="dirbtn" title="painted 저장 폴더 — docs\art\chunks 선택 권장">저장 폴더: 미연결</button>
+  <button id="previewBtn" title="painted 조각을 합친 전체 맵 미리보기">🖼 전체 미리보기</button>
   <div id="progress"></div>
 </header>
 <div id="tabs"></div>
@@ -72,6 +73,17 @@
   <div id="board"></div>
 </main>
 <div id="lightbox"><img alt=""></div>
+<div id="preview" style="display:none;position:fixed;inset:0;z-index:100;background:rgba(8,9,12,.93);flex-direction:column;align-items:center;justify-content:center;padding:18px;gap:8px">
+  <div id="previewTitle" style="color:var(--ink);font-size:15px;font-weight:600"></div>
+  <div id="previewMeta" style="color:var(--dim);font-size:12px"></div>
+  <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;width:100%;overflow:auto">
+    <canvas id="previewCanvas" style="max-width:92vw;max-height:72vh;object-fit:contain;border:1px solid var(--line);background:#0b0906"></canvas>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="btn" id="stitchSaveBtn" title="겹침 페더 블렌딩으로 합쳐 webp로 저장 (게임 배경)">🧵 Stitch → webp 저장</button>
+    <button class="btn" id="previewClose">닫기 (Esc)</button>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script src="chunks/index.js" onerror="window.__noindex=1"></script>
@@ -269,7 +281,115 @@ function updateProgress() {
   }
 }
 
+/* ───── 전체 미리보기 (청크 stitch) ───── */
+// 우선순위 src를 차례로 시도해 첫 성공 이미지를 반환 (IndexedDB blob → 디스크 painted → 블록아웃)
+function loadImgWithFallback(srcs) {
+  return new Promise(resolve => {
+    let i = 0; const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => { if (++i < srcs.length) img.src = srcs[i]; else resolve(null); };
+    img.src = srcs[0];
+  });
+}
+// stitch_chunks.py 와 동일한 선형 램프: 왼쪽 lo·오른쪽 hi px 를 0→1 / 1→0, 가운데 1
+function ramp(n, lo, hi) {
+  const v = new Float32Array(n).fill(1);
+  lo = Math.min(lo, n); hi = Math.min(hi, n);
+  for (let i = 0; i < lo; i++) v[i] = i / lo;
+  for (let i = 0; i < hi; i++) v[n - hi + i] = 1 - i / hi;
+  return v;
+}
+// stitch_chunks.py 의 오버랩 페더 가중평균(acc/wsum)을 브라우저에서 재현 — seam 없이 합친다.
+// pv = px/타일 밀도. 결과 canvas + painted 채움 수 반환. 미리보기/저장 공용.
+async function compositeStitch(st, pv) {
+  const W = st.width * pv, H = st.height * pv, N = W * H;
+  const acc = new Float32Array(N * 3), wsum = new Float32Array(N);
+  const off = document.createElement('canvas');
+  const octx = off.getContext('2d', { willReadFrequently: true });
+  const all = await dbAll();
+  const byCard = new Map(all.map(r => [r.card, r]));
+  const feather = st.overlap * pv;
+  let filled = 0;
+  for (const ch of st.chunks) {
+    const card = `${st.mapId}_r${ch.row}_c${ch.col}`;
+    const rec = byCard.get(card);
+    const srcs = [];
+    if (rec) srcs.push(URL.createObjectURL(rec.blob));
+    srcs.push(`chunks/painted_${card}.png`, `chunks/painted_${card}.jpg`, `chunks/painted_${card}.webp`, `chunks/${ch.name}`);
+    const img = await loadImgWithFallback(srcs);
+    if (!img) continue;
+    if (!img.src.endsWith('/' + ch.name)) filled++;
+    const tw = (ch.x1 - ch.x0) * pv, th = (ch.y1 - ch.y0) * pv;
+    off.width = tw; off.height = th;
+    octx.drawImage(img, 0, 0, tw, th);
+    const d = octx.getImageData(0, 0, tw, th).data;
+    const wx = ramp(tw, ch.col > 0 ? feather : 0, ch.col < st.cols - 1 ? feather : 0);
+    const wy = ramp(th, ch.row > 0 ? feather : 0, ch.row < st.rows - 1 ? feather : 0);
+    const px0 = ch.x0 * pv, py0 = ch.y0 * pv;
+    for (let y = 0; y < th; y++) {
+      const wyy = wy[y], rowOut = (py0 + y) * W + px0, rowIn = y * tw;
+      for (let x = 0; x < tw; x++) {
+        const w = wyy * wx[x]; if (w === 0) continue;
+        const o = rowOut + x, s = (rowIn + x) * 4;
+        acc[o * 3] += d[s] * w; acc[o * 3 + 1] += d[s + 1] * w; acc[o * 3 + 2] += d[s + 2] * w;
+        wsum[o] += w;
+      }
+    }
+  }
+  const outImg = new ImageData(W, H);
+  for (let i = 0; i < N; i++) {
+    const w = wsum[i] || 1;
+    outImg.data[i * 4] = acc[i * 3] / w;
+    outImg.data[i * 4 + 1] = acc[i * 3 + 1] / w;
+    outImg.data[i * 4 + 2] = acc[i * 3 + 2] / w;
+    outImg.data[i * 4 + 3] = 255;
+  }
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  canvas.getContext('2d').putImageData(outImg, 0, 0);
+  return { canvas, filled, total: st.chunks.length };
+}
+// 미리보기 (저밀도 24px/타일 — 빠른 확인)
+async function buildPreview() {
+  const st = STAGES[activeStage]; if (!st) return;
+  document.getElementById('preview').style.display = 'flex';
+  document.getElementById('previewTitle').textContent = `${num(st.mapId)} ${st.name} · ${st.width}×${st.height}`;
+  document.getElementById('previewMeta').textContent = '합치는 중…';
+  const { canvas, filled, total } = await compositeStitch(st, 24);
+  const pc = document.getElementById('previewCanvas');
+  pc.width = canvas.width; pc.height = canvas.height;
+  pc.getContext('2d').drawImage(canvas, 0, 0);
+  document.getElementById('previewMeta').textContent =
+    `painted ${filled}/${total} 조각 · 오버랩 페더 블렌딩 · 빈 조각은 블록아웃`;
+}
+// Stitch → webp 저장 (48px/타일 = projection.TILE_SIZE 1:1, 게임 배경 교체용).
+// 고해상(96px) 최종본이 필요하면 안내 문구의 python stitch_chunks.py 사용.
+async function saveStitch() {
+  const st = STAGES[activeStage]; if (!st) return;
+  const meta = document.getElementById('previewMeta');
+  document.getElementById('preview').style.display = 'flex';
+  document.getElementById('previewTitle').textContent = `${num(st.mapId)} ${st.name} · Stitch 합성 중…`;
+  meta.textContent = '합성 중… (48px/타일)';
+  const { canvas, filled, total } = await compositeStitch(st, 48);
+  const pc = document.getElementById('previewCanvas');
+  pc.width = canvas.width; pc.height = canvas.height; pc.getContext('2d').drawImage(canvas, 0, 0);
+  if (filled < total && !confirm(`painted ${filled}/${total} 조각만 채워졌습니다. 빈 곳은 블록아웃이 들어갑니다. 그래도 저장할까요?`)) { meta.textContent = '저장 취소됨'; return; }
+  canvas.toBlob(blob => {
+    if (!blob) { toast('webp 변환 실패'); return; }
+    const u = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = u; a.download = `${st.mapId}.webp`; a.click();
+    setTimeout(() => URL.revokeObjectURL(u), 1000);
+    meta.textContent = `✅ ${st.mapId}.webp (${canvas.width}×${canvas.height} · ${(blob.size / 1024 | 0)}KB) 저장됨 — apps/web/public/assets/maps/ 에 넣으면 게임 배경 적용. 고해상 최종은 python tools/sprite-pipeline/stitch_chunks.py ${st.mapId}`;
+    toast(`${st.mapId}.webp 저장 — apps/web/public/assets/maps/ 로 이동`);
+  }, 'image/webp', 0.9);
+}
+function closePreview() { document.getElementById('preview').style.display = 'none'; }
+
 /* ───── 이벤트 ───── */
+document.getElementById('previewBtn').addEventListener('click', buildPreview);
+document.getElementById('stitchSaveBtn').addEventListener('click', saveStitch);
+document.getElementById('preview').addEventListener('click', e => { if (e.target.id === 'preview' || e.target.id === 'previewClose') closePreview(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.getElementById('preview').style.display === 'flex') closePreview(); });
 document.getElementById('tabs').addEventListener('change', e => {
   if (e.target.id !== 'stageSelect') return;
   activeStage = e.target.value; localStorage.setItem('mcb_stage', activeStage); render();

@@ -645,6 +645,234 @@ const SECTIONS = [
 }
 ];
 
+/* ───────────────────────── N. 시나리오 씬 배경 (54장) ───────────────────────── */
+/*
+  스테이지별 intro/outro 막간 씬 풀스크린 배경 (16:9 webp).
+  게임 ScenePlayer → /assets/scenes/{bgId}.webp 로 로드.
+  saveName 필드로 최종 저장 파일명 고정 (webp 변환 적용).
+  프롬프트: 인물 없는 풍경/분위기 배경 위주 (초상·대사가 위에 얹히므로).
+*/
+const SCENE_STYLE = 'Art style: East Asian ink-wash painting (sumi-e) fused with evocative atmospheric landscape illustration. Sweeping brushwork, layered mist and negative space, muted earth tones with selective vivid accents (vermilion, jade, gold). Cinematic mood for a historical tactical RPG interlude scene. 16:9 aspect ratio. NO characters, NO people, NO portrait faces, NO text, NO watermark, NO UI elements, NO grid lines.';
+const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, text, watermark, UI elements, grid, photorealistic, anime-cel, Koei-style illustration, modern objects, border frame.';
+
+(function() {
+  const stageList = [
+    { num: '01', id: 'zhuojun',       name: '탁군',
+      intro: { bg: '01-zhuojun-intro',
+        en: 'A rural plain in Zhuo Commandery at golden dawn — dirt roads, thatched farmhouses, militia banners just raised, sparse pine trees on gentle hills. A mood of determined beginning.',
+        kr: '황건의 무리가 탁군까지 들이닥쳤소. 의병을 모아 고향을 지킬 때요. ... 가자. 우리의 이름이 오늘 여기서 시작된다.' },
+      outro: { bg: '01-zhuojun-outro',
+        en: 'The same Zhuo plain at late afternoon, smoke fading from a small battlefield, scattered yellow turban cloth on the ground, villagers watching from a distance. Relief and cautious hope.',
+        kr: '첫 승이다. 백성들이 웃는구나. 이거면 됐다.' } },
+    { num: '02', id: 'yingchuan',     name: '영천',
+      intro: { bg: '02-yingchuan-intro',
+        en: 'The Yingchuan region at dawn — open plains with dry grass, a distant encircled walled town wreathed in thin smoke, rebel banners surrounding it. Tension of a besieged settlement.',
+        kr: '영천이 황건에 포위됐다 하오. 관군과 합세해 포위를 풀어야 하오.' },
+      outro: { bg: '02-yingchuan-outro',
+        en: 'Yingchuan plains just after a fire-attack — scorched earth and dying embers, distant city walls intact, a column of smoke curling into a clear morning sky. Victory tinged with unease.',
+        kr: '짚신 장수치고는 쓸 만하군. ...언젠가 다시 보세, 유비.' } },
+    { num: '03', id: 'guangzong',     name: '광종',
+      intro: { bg: '03-guangzong-intro',
+        en: 'The Guangzong fortress at overcast midday — heavy stone walls with rebel yellow banners, a gated town on a low rise, grey clouds pressing down. A sense of grim siege.',
+        kr: '성벽에 의지해 농성 중이니 단숨에 몰아쳐야 합니다.' },
+      outro: { bg: '03-guangzong-outro',
+        en: 'Guangzong walls at dusk after the assault — gate fallen, rebel banners torn down, evening light washing over battered stone. One enemy general vanquished, two remain.',
+        kr: '황건의 머리가 하나 떨어졌소. 이제 장각만 남았구려.' } },
+    { num: '04', id: 'zhangjue',      name: '장각',
+      intro: { bg: '04-zhangjue-intro',
+        en: 'The Yellow Turban sorcerer\'s stronghold at an eerie twilight — paper talismans flutter in the wind, ritual smoke rises from fire-pits, dark hills surround a fortress wrapped in unnatural mist.',
+        kr: '요술사들이 장각을 호위하고 있습니다. 환술에 군세가 흔들릴 수 있으니 진을 굳게.' },
+      outro: { bg: '04-zhangjue-outro',
+        en: 'The Yellow Turban stronghold at quiet dawn after battle — torn yellow banners lie on the ground, the mist gone, sunlight breaking through clouds. The rebellion\'s first chapter ends.',
+        kr: '장각이 쓰러졌다... 황건의 난이 끝났구나. 허나 천하는 더 어지러워질 것입니다.' } },
+    { num: '05', id: 'sishuiguan',    name: '사수관',
+      intro: { bg: '05-sishuiguan-intro',
+        en: 'Sishui Pass at pale dawn — a massive gatehouse fortress straddling a mountain defile, its twin towers silhouetted against a cold pink-gold sky, allied camp fires visible in the valley below.',
+        kr: '제후들은 술잔만 기울일 뿐 누구도 나서지 못하는구나. ...우리가 길을 트자.' },
+      outro: { bg: '05-sishuiguan-outro',
+        en: 'Sishui Pass gate at morning, the heavy gate doors standing open and unguarded, a single warm cup of wine left on a stone ledge — the famous cup still warm after Guan Yu\'s swift return.',
+        kr: '화웅의 목, 여기 가져왔습니다. 술이 식기 전에 말입니다.' } },
+    { num: '06', id: 'huluguan',      name: '호로관',
+      intro: { bg: '06-huluguan-intro',
+        en: 'Hulao Pass at dusk with torchlit walls — a grand fortress gate flanked by steep rocky ridges, enemy torches burning on the battlements, deep blue shadows in the valley, a dramatic strongpoint.',
+        kr: '삼형제가 한 몸으로 움직인다. 여포를 에워싸 빈틈을 친다 — 협공이다.' },
+      outro: { bg: '06-huluguan-outro',
+        en: 'Hulao Pass battlements after the fight — scorch marks on stone, a toppled battle standard, distant orange glow on the horizon from Luoyang burning. The enemy retreated but the capital falls.',
+        kr: '동탁이 낙양을 불태우고 달아날 것이다. ...천하가 무너지는 소리가 들리는구나.' } },
+    { num: '07', id: 'luoyang',       name: '낙양',
+      intro: { bg: '07-luoyang-intro',
+        en: 'Luoyang city at night engulfed in fire — broad palace avenues with burning timber halls, cinders swirling upward, smoke blotting the stars, a great capital dying by the hand of its own tyrant.',
+        kr: '낙양이 불타고 있소. 동탁이 천도를 핑계로 도성을 약탈하는구나.' },
+      outro: { bg: '07-luoyang-outro',
+        en: 'Luoyang at grey dawn after the fire — charred ruins and collapsed roof beams, ash drifting in the still air, a once-great city reduced to rubble and silence.',
+        kr: '동탁은 달아났고, 낙양은 잿더미가 됐다... 우리가 한발 늦었구나.' } },
+    { num: '08', id: 'dongzhuo-chase', name: '동탁추격',
+      intro: { bg: '08-dongzhuo-chase-intro',
+        en: 'A mountain road at noon, dust rising from a retreating column — rocky cliffs on both sides, a narrow pass ahead, an enemy army\'s supply wagons abandoning goods as they flee west.',
+        kr: '동탁이 장안으로 달아납니다. 추격대가 길목을 끊으면 잡을 수 있습니다.' },
+      outro: { bg: '08-dongzhuo-chase-outro',
+        en: 'A captured mountain gate at late afternoon — the gate now bearing allied banners, dust settling on the empty road beyond. The quarry escaped; the coalition fractures.',
+        kr: '관문은 우리 손에 들어왔으나, 동탁의 본대는 빠져나갔다. 연합은 곧 흩어질 겁니다.' } },
+    { num: '09', id: 'banhe',         name: '반하',
+      intro: { bg: '09-banhe-intro',
+        en: 'The Banhe River crossing at early morning — a wide shallow ford with rocky banks, opposing military camps on each shore, mist on the water, the silence before a river battle.',
+        kr: '반동탁연합이 깨졌다. 이제 제후들끼리 땅을 다투는 난세요.' },
+      outro: { bg: '09-banhe-outro',
+        en: 'The Banhe ford at quiet dusk — water calm again, a single white horse standing at the bank, evening light turning the river silver. A first meeting that will matter.',
+        kr: '주공의 인덕을 보았습니다. ...언젠가 그대와 한 깃발 아래 서고 싶구나.' } },
+    { num: '10', id: 'xuzhou',        name: '서주',
+      intro: { bg: '10-xuzhou-intro',
+        en: 'Xuzhou city walls at overcast noon — tall grey stone ramparts, the city gate barred, Cao Cao\'s siege camp fires visible on the surrounding plains, threatening banners in all directions.',
+        kr: '조조에게 포위됐소. 열닷새를 버틴다 — 수성이다!' },
+      outro: { bg: '10-xuzhou-outro',
+        en: 'Xuzhou gates opening at dusk — warm light spilling out, relieved townsfolk visible just inside, the siege lifted, an old governor\'s lantern hanging by the gate in farewell.',
+        kr: '이 백성들을 그대에게 맡기고 싶소. 백성을 버릴 수는 없지요.' } },
+    { num: '11', id: 'xiaopei',       name: '소패',
+      intro: { bg: '11-xiaopei-intro',
+        en: 'Xiaopei\'s small fortress at overcast dusk — modest walls with a few allied banners, enemy campfires ringing the perimeter, a defensive encirclement beginning to tighten.',
+        kr: '여포가 서주를 빼앗고, 나를 소패로 내몰았소.' },
+      outro: { bg: '11-xiaopei-outro',
+        en: 'Xiaopei walls at night — defenders still holding but the outer stakes damaged, torchlight on tired stones, a precarious calm. The city lives but for how long?',
+        kr: '겨우 막아냈으나, 소패도 위태롭다. 조조에게 의탁함이 어떻습니까.' } },
+    { num: '12', id: 'xiapi1',        name: '하비1',
+      intro: { bg: '12-xiapi1-intro',
+        en: 'A chaotic battlefield road at dusk — scattered equipment and abandoned banners, fleeing soldiers\' footprints in mud, the looming walls of Xiapi city ahead, urgency and desperation in every shadow.',
+        kr: '소패가 떨어졌다. 하비로 빠져나간다 — 한 명도 잃지 않는다!' },
+      outro: { bg: '12-xiapi1-outro',
+        en: 'A quiet forest road at night after the retreat — the sounds of pursuit faded, fireflies in the dark, an uncertain peace among scattered survivors.',
+        kr: '겨우 빠져나왔구나. 반드시 다시 모일 겁니다, 형님.' } },
+    { num: '13', id: 'yuanshu',       name: '원술',
+      intro: { bg: '13-yuanshu-intro',
+        en: 'Yuan Shu\'s opulent camp at noon — lavish yellow-and-purple imperial tent pavilions incongruous against a dusty battlefield plain, a pretender\'s gaudy excess on campaign.',
+        kr: '원술이 황제를 참칭했소. 명분 없는 군세라 사기가 낮으니, 본진을 무너뜨리면 흩어집니다.' },
+      outro: { bg: '13-yuanshu-outro',
+        en: 'The pretender\'s camp in ruins at afternoon — toppled yellow imperial tents, a jade seal impression in spilled ink on the ground, the absurd dream of a false emperor ended.',
+        kr: '원술의 망상도 끝이로구나. 옥새보다 민심을 얻는 자가 천하를 얻겠지요.' } },
+    { num: '14', id: 'xiapi2',        name: '하비2',
+      intro: { bg: '14-xiapi2-intro',
+        en: 'Xiapi under flood at grey dawn — city walls half-submerged, floodwater filling the streets and outer trenches, siege works of two great armies converging on a drowning fortress.',
+        kr: '수공으로 사수와 기수를 터 하비를 잠근다.' },
+      outro: { bg: '14-xiapi2-outro',
+        en: 'Xiapi at cold morning after the flood recedes — waterlogged courtyards, broken gates, a great warlord\'s dream sunk with the floodwaters. The mightiest is defeated.',
+        kr: '여포가 사로잡혔다... 한때 천하제일의 맹장도, 신의 없는 자의 최후는 저러하군요.' } },
+    { num: '15', id: 'xutian',        name: '허전',
+      intro: { bg: '15-xutian-intro',
+        en: 'The imperial hunting ground at Xutian under blue autumn sky — manicured hunting paddocks and open grassland, imperial banners flying, an ostentatious display of power masquerading as ceremony.',
+        kr: '허전에서 천자를 모신 사냥이 열렸소. 조조의 위세가 천자를 능멸하는구나.' },
+      outro: { bg: '15-xutian-outro',
+        en: 'The hunting ground at dusk, the pageant over — a folded imperial decree on a stone, the Emperor\'s hunting pavilion emptied, the weight of a hidden mandate pressing on the silence.',
+        kr: '의대조의 밀명을 받았다. 천자께서 조조를 치라 하셨다.' } },
+    { num: '16', id: 'guandu-escape', name: '관도탈출',
+      intro: { bg: '16-guandu-escape-intro',
+        en: 'The Guandu plain at tense dawn — Cao Cao\'s camp fires in the distance, a narrow escape road winding north through dry fields, dust rising from a pursuit about to begin.',
+        kr: '의대조가 발각됐소. 원소에게로 몸을 피한다!' },
+      outro: { bg: '16-guandu-escape-outro',
+        en: 'A northern road at night, the pursuit left behind — moonlight on a broad empty plain, the Guandu battlefield receding, exhausted relief and loneliness of yet another exile.',
+        kr: '또 쫓기는 신세로구나... 살아만 계시면, 반드시 다시 만날 겁니다.' } },
+    { num: '17', id: 'runan',         name: '여남',
+      intro: { bg: '17-runan-intro',
+        en: 'The Runan countryside at dawn — rolling hills with remnant Yellow Turban encampments, a dirt road stretching toward a distant allied rendezvous point, morning mist over grassland.',
+        kr: '여남에서 황건 잔당과 손잡고 조조의 후방을 친다.' },
+      outro: { bg: '17-runan-outro',
+        en: 'A meeting point on the Runan plain at golden morning — two columns of men converging, allied banners merging, the warmth of reunion filling the wide open field.',
+        kr: '천 리를 달려, 다섯 관문을 넘어 — 돌아왔습니다. 삼형제가 다시 한자리에.' } },
+    { num: '18', id: 'bowangpo',      name: '박망파',
+      intro: { bg: '18-bowangpo-intro',
+        en: 'Bowang Slope at dusk — a narrow forested gorge, tall dry pines lining steep hillsides, a single dirt road winding into shadow below, the perfect funnel for a fire ambush.',
+        kr: '좁은 길과 마른 숲 — 화공에 더없이 좋은 자리입니다. 하후돈을 끌어들이지요.' },
+      outro: { bg: '18-bowangpo-outro',
+        en: 'Bowang Slope after the fire attack — pine trunks charred, smoke still rising from the gorge, the narrow road carpeted in ash and embers. A brilliant debut of strategic fire.',
+        kr: '불바다가 됐구려. 와룡 선생, 내가 잘못 봤소. 이제 시작일 뿐입니다.' } },
+    { num: '19', id: 'xinye',         name: '신야',
+      intro: { bg: '19-xinye-intro',
+        en: 'The road south from Xinye at overcast noon — a vast column of civilians streaming along a country road, fields abandoned, ox carts and bundles, the great retreat of a people following their lord.',
+        kr: '백성들이 주공을 따라나섰습니다. 십만이 넘습니다. ...버릴 수 없다.' },
+      outro: { bg: '19-xinye-outro',
+        en: 'A river ford at dusk — the last refugees crossing the water, allied soldiers helping the elderly and children, torches reflected in the shallows. No one left behind.',
+        kr: '백성과 함께 강을 건넜다. 더디지만... 한 사람도 버리지 않았다.' } },
+    { num: '20', id: 'changbanpo',    name: '장판파',
+      intro: { bg: '20-changbanpo-intro',
+        en: 'Changban field at chaotic dawn — a vast plain torn by a routing army, enemy banners everywhere, dust and scattered equipment, a lone white horse visible far in the distance riding against the tide.',
+        kr: '조운, 단기필마로 적진을 뚫는다. 공자를 반드시 주공께 돌려드린다 — 목숨을 걸고!' },
+      outro: { bg: '20-changbanpo-outro',
+        en: 'Changban field at late afternoon after the charge — the enemy wave broken and receding, a single trail cut through fallen foes, the setting sun gilding a path of impossible courage.',
+        kr: '이 한 몸, 주공을 위해 백 번이라도 바치겠습니다.' } },
+    { num: '21', id: 'changbanqiao',  name: '장판교',
+      intro: { bg: '21-changbanqiao-intro',
+        en: 'Changban Bridge at dusk — a wooden bridge over a rushing river, the far bank empty, a single warrior\'s position at the bridge head, enemy dust rising on the horizon. One man, one bridge.',
+        kr: '이 장판교는 — 이 장익덕이 막는다!' },
+      outro: { bg: '21-changbanqiao-outro',
+        en: 'Changban Bridge at twilight — the enemy host halted on the far bank, a toppled cavalry standard in the road, the river flowing calmly under the bridge. A war-cry that stopped an army.',
+        kr: '연인 장익덕이 여기 있다! 내 고함 한 방에 조조 대군이 물러가는구나!' } },
+    { num: '22', id: 'hanjin',        name: '한진',
+      intro: { bg: '22-hanjin-intro',
+        en: 'The Han River ferry crossing at dawn — a wide river with reed banks, boats and rafts being readied, morning mist on the water, allied soldiers and refugees crowding the shore.',
+        kr: '한진 나루다. 강을 건너면 강하의 유기에게 닿는다.' },
+      outro: { bg: '22-hanjin-outro',
+        en: 'The Han River crossing at bright morning — the last boats pulling away from the north bank, the Cao army\'s pursuit halted at the water\'s edge, the south shore receiving the survivors.',
+        kr: '겨우 한숨 돌리는구나. 제가 직접 강동으로 건너가 — 천하를 셋으로 나눌 판을 짜겠습니다.' } },
+    { num: '23', id: 'jiangxia',      name: '강하',
+      intro: { bg: '23-jiangxia-intro',
+        en: 'Jiangxia on the Yangtze at cloudy noon — a river-town with defensive walls, warships moored at the docks, the broad muddy river stretching south, Wu banners approaching from downstream.',
+        kr: '주유 도독의 본대가 올 때까지 버텨야 하오. 적벽의 결전까지, 이 강하를 사수하라!' },
+      outro: { bg: '23-jiangxia-outro',
+        en: 'Jiangxia harbor at dusk — Wu and Liu Bei warships side by side at anchor, allied pennants flying together for the first time, the great river calm, the alliance sealed.',
+        kr: '손유연합이 섰습니다. 제갈공명의 군사, 이 제갈량이 동남풍으로 돕지요.' } },
+    { num: '24', id: 'sanjiangkou',   name: '삼강구',
+      intro: { bg: '24-sanjiangkou-intro',
+        en: 'The Three-River Mouth at overcast morning — three waterways converging, Cao Cao\'s northern fleet vast on the far bank, war-junks lined up in formation, the first test of river battle.',
+        kr: '삼강구에서 조조의 수군을 시험해 보겠소. 채모의 선단을 친다 — 수상전이다.' },
+      outro: { bg: '24-sanjiangkou-outro',
+        en: 'The Three-River Mouth after the naval skirmish — northern warships retreating upstream, smoke and floating debris on the water, the allied fleet steady. First blood in the river war.',
+        kr: '공명, 그대의 재주가 두렵소. 지금은 조조가 먼저입니다.' } },
+    { num: '25', id: 'wulin',         name: '오림',
+      intro: { bg: '25-wulin-intro',
+        en: 'Wulin shore at night — Cao Cao\'s enormous chained fleet massed in the darkness, distant cooking fires reflecting on the water, an unsuspecting camp on the eve of fire-ship disaster.',
+        kr: '황개의 화선이 닿기 전, 적의 시선을 끌어야 합니다. 황개의 길을 연다.' },
+      outro: { bg: '25-wulin-outro',
+        en: 'Wulin shore as fire-ships close in — the first flames touching the chained fleet, a wall of fire rising from the water, the night turning orange. History\'s great fire attack begins.',
+        kr: '이 늙은 몸의 매질이 헛되지 않았소. 불길이 강을 삼키는구려!' } },
+    { num: '26', id: 'chibi',         name: '적벽',
+      intro: { bg: '26-chibi-intro',
+        en: 'Red Cliffs at dramatic dusk — the great river broad and dark, an enormous fleet of northern warships massed on one bank, allied camp fires on the other, the pivot of the age.',
+        kr: '때가 왔습니다. 칠성단에 올라 — 동남풍을 부르겠습니다. 전군, 돌격!' },
+      outro: { bg: '26-chibi-outro',
+        en: 'Red Cliffs after the fire attack — the Yangtze illuminated by burning wreckage, columns of smoke towering into a night sky, the northern fleet consumed, the battle of the age decided.',
+        kr: '이겼다! 백만 대군이 적벽에 잠겼다! 천하가 셋으로 갈라지는 순간이로구나.' } },
+    { num: '27', id: 'huarongdao',    name: '화용도',
+      intro: { bg: '27-huarongdao-intro',
+        en: 'Huarong Trail at cold dawn — a narrow muddy mountain path hemmed by cliff and forest, wisps of morning mist, a single road that leads to an ambush and a choice of honor.',
+        kr: '화용도의 매복은... 제가 청했습니다. ...그것까지 헤아려 보냈습니다.' },
+      outro: { bg: '27-huarongdao-outro',
+        en: 'Huarong Trail at pale morning after the encounter — the narrow path quiet again, a single great halberd resting against a rock, fog lifting over the mountains. An ending and a beginning.',
+        kr: '삼형제가 함께 여기까지 왔다. ...이것이 우리 첫 장의 끝이로구나. 천하는, 이제부터다.' } },
+  ];
+
+  const sceneItems = [];
+  for (const st of stageList) {
+    for (const type of ['intro', 'outro']) {
+      const d = st[type];
+      const saveName = `${st.num}-${st.id}-${type}.webp`;
+      sceneItems.push({
+        id: `N-${st.num}${type === 'intro' ? 'i' : 'o'}`,
+        title: `${st.num} ${st.name} · ${type}`,
+        saveName,
+        sceneCard: true,
+        note: `저장: <code>apps/web/public/assets/scenes/${saveName}</code> · bgId: <code>${d.bg}</code>`,
+        prompt: `Fullscreen interlude scene background for a historical tactics RPG. ${type === 'intro' ? 'Pre-battle establishing mood' : 'Post-battle emotional resolution'}. Location/mood: ${d.en}\n\nTone reference (Korean dialogue, do NOT include in image): "${d.kr}"\n\n${SCENE_STYLE}`,
+        _neg: SCENE_NEGATIVE,
+      });
+    }
+  }
+
+  SECTIONS.push({
+    id: 'N',
+    title: 'N. 시나리오 씬 배경 (54장 — 27스테이지 × intro/outro)',
+    desc: '각 스테이지 막간 씬의 풀스크린 배경 이미지. 인물·텍스트 없는 풍경/분위기 위주(ScenePlayer가 초상·대사를 위에 얹음). 생성 후 ⬇ 저장 → apps/web/public/assets/scenes/ 에 배치하면 게임 막간 씬에 즉시 반영. 16:9 webp 변환 적용.',
+    items: sceneItems,
+  });
+})();
+
 /* ───────────────────────── 상태/저장 ───────────────────────── */
 
 const varState = JSON.parse(localStorage.getItem('ab_vars') || '{}');
@@ -738,10 +966,20 @@ function buildPrompt(item) {
     }
   }
   const parts = [];
-  if (item.vfx) parts.push(VFX_PREFIX);
-  else { parts.push(STYLE); parts.push(COMMON); }
-  parts.push(body);
-  parts.push(NEGATIVE);
+  if (item.sceneCard) {
+    /* 씬 카드: 프롬프트 안에 SCENE_STYLE 이미 포함됨 — 앞에 prefix 추가 없이 body만, 마지막에 네거티브 */
+    parts.push(body);
+    parts.push(item._neg || SCENE_NEGATIVE);
+  } else if (item.vfx) {
+    parts.push(VFX_PREFIX);
+    parts.push(body);
+    parts.push(NEGATIVE);
+  } else {
+    parts.push(STYLE);
+    parts.push(COMMON);
+    parts.push(body);
+    parts.push(NEGATIVE);
+  }
   return parts.join('\n\n');
 }
 
@@ -758,6 +996,7 @@ const TAB_DEFS = [
   { id: 'ui',     label: 'UI',            secs: ['D','L'] },
   { id: 'effect', label: '이펙트',        secs: ['C'] },
   { id: 'duel',   label: '일기토 키프레임', secs: ['M'] },
+  { id: 'scene',  label: '시나리오 씬',   secs: ['N'] },
 ];
 
 /* 탭당 섹션 목록을 빠르게 찾는 맵 */
@@ -855,14 +1094,40 @@ function thumbNode(rec) {
 }
 
 async function addImageToCard(cardId, blob) {
-  const n = document.querySelectorAll(`#card-${CSS.escape(cardId)} .thumb`).length + 1;
-  const ext = (blob.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
-  const name = `${cardId}_ink_${String(n).padStart(2, '0')}.${ext}`;
-  const rec = { card: cardId, blob, name, pick: 0, at: Date.now() };
+  const item = findItem(cardId);
+  let finalBlob = blob;
+  let name;
+
+  if (item && item.sceneCard && item.saveName) {
+    /* 시나리오 씬 카드: webp 변환 + 고정 파일명 ({stageId}-intro/outro.webp) */
+    name = item.saveName;
+    try {
+      const bmp = await createImageBitmap(blob);
+      const canvas = document.createElement('canvas');
+      canvas.width = bmp.width; canvas.height = bmp.height;
+      canvas.getContext('2d').drawImage(bmp, 0, 0);
+      finalBlob = await new Promise((res, rej) =>
+        canvas.toBlob(b => b ? res(b) : rej(new Error('toBlob failed')), 'image/webp', 0.92)
+      );
+    } catch (e) {
+      /* webp 변환 실패 시 원본 유지, 이름만 변경 */
+      console.warn('webp 변환 실패, 원본 사용:', e);
+    }
+  } else {
+    const n = document.querySelectorAll(`#card-${CSS.escape(cardId)} .thumb`).length + 1;
+    const ext = (blob.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
+    name = `${cardId}_ink_${String(n).padStart(2, '0')}.${ext}`;
+  }
+
+  const rec = { card: cardId, blob: finalBlob, name, pick: 0, at: Date.now() };
   rec.id = await dbAdd(rec);
   document.querySelector(`#card-${CSS.escape(cardId)} .drop`).appendChild(thumbNode(rec));
   await updateProgress();
-  toast(`${name} 저장됨`);
+  if (item && item.sceneCard) {
+    toast(`${name} 저장됨 → apps/web/public/assets/scenes/ 에 배치하면 게임 씬에 반영됩니다`);
+  } else {
+    toast(`${name} 저장됨`);
+  }
 }
 
 async function loadImages() {
