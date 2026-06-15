@@ -70,7 +70,7 @@
     {
       "commanderId": "허저",
       "classId": "heavyCavalry",
-      "level": 22,
+      "level": 21,
       "troops": 240,
       "items": [],
       "side": "enemy",
@@ -80,7 +80,7 @@
     {
       "commanderId": "왕충",
       "classId": "footman",
-      "level": 18,
+      "level": 17,
       "troops": 130,
       "items": [],
       "side": "enemy",
@@ -90,7 +90,7 @@
     {
       "commanderId": "유대",
       "classId": "footman",
-      "level": 18,
+      "level": 17,
       "troops": 130,
       "items": [],
       "side": "enemy",
@@ -100,7 +100,7 @@
     {
       "commanderId": "채양",
       "classId": "archer",
-      "level": 18,
+      "level": 17,
       "troops": 115,
       "items": [],
       "side": "enemy",
@@ -110,7 +110,7 @@
     {
       "commanderId": "하후걸",
       "classId": "archer",
-      "level": 17,
+      "level": 16,
       "troops": 110,
       "items": [],
       "side": "enemy",
@@ -120,7 +120,7 @@
     {
       "commanderId": "하후란",
       "classId": "lightCavalry",
-      "level": 17,
+      "level": 16,
       "troops": 120,
       "items": [],
       "side": "enemy",
@@ -130,7 +130,7 @@
     {
       "commanderId": "하후상",
       "classId": "lightCavalry",
-      "level": 17,
+      "level": 16,
       "troops": 120,
       "items": [],
       "side": "enemy",

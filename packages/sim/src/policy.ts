@@ -1,5 +1,6 @@
 import {
   getAttackableTargets, getMovableTiles, distance, areFoes, pathCostField,
+  computeDamage, flankingCount, flankMultiplier, chargeMultiplier,
   type Action, type BattleContext, type BattleState, type UnitState, type Coord,
 } from "@tk/engine";
 
@@ -47,7 +48,23 @@ export function chooseAction(ctx: BattleContext, state: BattleState): Action | u
     return { type: "wait", unitId: unit.id };
   }
 
-  // 공격 가능하면 가장 약한 적 격파 우선 (비탈출 유닛)
+  // ── 이동+공격 탐색 (협공/돌격 활용) ──────────────────────────────────────────
+  // 일반 전투 유닛은 제자리 공격뿐 아니라 *이동 후 공격*까지 실제 피해(협공·돌격 포함)로
+  // 평가해 격파 > 최대피해 위치를 고른다. 그래야 결정론 보너스(협공/돌격)를 정책이 실제로 살린다.
+  // 특수역(호위/보호/점령 지명)은 자기 분기(생존·라우팅)가 우선이므로 제외 — 기존 동작 보존.
+  const special =
+    isEscort(ctx, unit) ||
+    isProtected(ctx, unit) ||
+    (!unit.moved && captureGoalFor(ctx, state, unit) !== undefined);
+  if (!special) {
+    // 전진(이동 후 공격) 허용 여부: *생존(surviveTurns) 스테이지에서만* 금지(제자리 공격만).
+    // 섬멸은 물론 *탈출(reachTile)* 스테이지에서도 호위 유닛은 전진해 적을 쳐 길을 열어야 한다 —
+    // 묶어두면 탈출 유닛이 단신으로 적진에 갇혀 목표에 도달 못 한다(여남).
+    const plan = bestAttackPlan(ctx, state, unit, !isHoldPosture(ctx));
+    if (plan) return plan;
+  }
+
+  // 공격 가능하면 가장 약한 적 격파 우선 (특수역 폴백 — 제자리 사거리 내)
   const targets = getAttackableTargets(ctx, state, unit.id);
   if (targets.length > 0) {
     const weakest = targets
@@ -126,7 +143,21 @@ export function chooseAction(ctx: BattleContext, state: BattleState): Action | u
         return { type: "wait", unitId: unit.id };
       }
 
-      // 순수 그리디: 가장 가까운 적과의 *맨해튼* 거리 최소화 (기존 동작 그대로 보존).
+      // *생존(surviveTurns)* 스테이지만: 일반 유닛도 돌진 금지 — 안전하면 hold, 위험하면
+      // 적에서 멀어지는 칸으로만 후퇴(스크린 유지). 탈출/섬멸은 전진(아래)으로 길을 연다.
+      if (isHoldPosture(ctx)) {
+        const SAFE = 2;
+        const curDist = nearestEnemyDist({ x: unit.x, y: unit.y });
+        if (curDist < SAFE) {
+          const away = [...tiles].sort((a, b) => nearestEnemyDist(b) - nearestEnemyDist(a))[0];
+          if (away && nearestEnemyDist(away) > curDist) {
+            return { type: "move", unitId: unit.id, to: away };
+          }
+        }
+        return { type: "wait", unitId: unit.id };
+      }
+
+      // 섬멸 자세: 가장 가까운 적과의 *맨해튼* 거리 최소화로 전진 (기존 동작 보존).
       const best = [...tiles].sort((a, b) => nearestEnemyDist(a) - nearestEnemyDist(b))[0];
       if (best && !(best.x === unit.x && best.y === unit.y)) {
         return { type: "move", unitId: unit.id, to: best };
@@ -135,6 +166,62 @@ export function chooseAction(ctx: BattleContext, state: BattleState): Action | u
   }
 
   return { type: "wait", unitId: unit.id };
+}
+
+/**
+ * pos(이동 후 칸)에서 target을 칠 때의 실제 피해 — 엔진 attack 처리와 동일하게
+ * 협공(포위도) × 돌격(기병 이동공격)을 반영한다. 이동이면 공격자를 pos에 moved=true로 가상 배치.
+ */
+function attackDamageFrom(
+  ctx: BattleContext, state: BattleState, unit: UnitState, pos: Coord, target: UnitState,
+): number {
+  const moving = pos.x !== unit.x || pos.y !== unit.y;
+  const atkAt: UnitState = moving ? { ...unit, x: pos.x, y: pos.y, moved: true } : unit;
+  const st: BattleState = moving
+    ? { ...state, units: state.units.map((u) => (u.id === unit.id ? atkAt : u)) }
+    : state;
+  const mult = flankMultiplier(ctx, flankingCount(st, atkAt, target)) * chargeMultiplier(ctx, atkAt);
+  return computeDamage(ctx, atkAt, target, 1, mult);
+}
+
+/**
+ * 일반 전투 유닛의 최적 공격 계획 — 제자리 ∪ 이동가능 칸 각각에서 사거리 내 대상별 실제 피해를
+ * 평가해 **격파 > 최대피해** 위치를 고른다. 이동이 필요하면 그 이동을 반환(다음 호출에서 공격).
+ * 협공/돌격이 피해에 반영되므로 정책이 자연히 포위·돌격 위치를 선호하게 된다. 대상이 없으면 undefined.
+ * 동률은 제자리(불필요 이동 방지)를 우선한다.
+ */
+function bestAttackPlan(
+  ctx: BattleContext, state: BattleState, unit: UnitState, mayAdvance: boolean,
+): Action | undefined {
+  const positions: Array<{ pos: Coord; moving: boolean }> = [
+    { pos: { x: unit.x, y: unit.y }, moving: false },
+  ];
+  if (mayAdvance && !unit.moved) {
+    for (const t of getMovableTiles(ctx, state, unit.id)) {
+      if (t.x === unit.x && t.y === unit.y) continue;
+      positions.push({ pos: t, moving: true });
+    }
+  }
+  let best: { action: Action; score: number } | undefined;
+  for (const { pos, moving } of positions) {
+    for (const tid of getAttackableTargets(ctx, state, unit.id, pos)) {
+      const target = state.units.find((u) => u.id === tid);
+      if (!target) continue;
+      const dmg = attackDamageFrom(ctx, state, unit, pos, target);
+      const kill = target.troops - dmg <= 0;
+      // 격파 최우선(+1e6), 그다음 피해. 제자리는 +0.5 가산해 동률·근소차에서 이동을 억제.
+      const score = (kill ? 1_000_000 : 0) + dmg + (moving ? 0 : 0.5);
+      if (!best || score > best.score) {
+        best = {
+          action: moving
+            ? { type: "move", unitId: unit.id, to: pos }
+            : { type: "attack", unitId: unit.id, targetId: tid },
+          score,
+        };
+      }
+    }
+  }
+  return best?.action;
 }
 
 /** 이 유닛이 non-optional reachTile 목표의 대상이면 그 목표 칸. 아니면 undefined. */
@@ -193,6 +280,17 @@ function isOffensivePosture(ctx: BattleContext): boolean {
   if (required.length === 0) return true;
   // 필수 목표가 전부 defeat 계열이어야 섬멸 자세. 하나라도 방어/탈출/점령이면 비섬멸.
   return required.every((o) => o.kind === "defeatAll" || o.kind === "defeatUnit");
+}
+
+/**
+ * *수성(hold) 자세* — 필수 목표에 surviveTurns가 있으면 true(장판교 5턴 방어 등).
+ * 이때만 일반 유닛도 전진/돌진을 멈추고 스크린·생존을 우선한다. 탈출(reachTile)은 hold가 아니다 —
+ * 호위 유닛이 전진해 적을 쳐 길을 열어야 탈출 유닛이 목표에 닿는다.
+ */
+function isHoldPosture(ctx: BattleContext): boolean {
+  const objs = ctx.stage.objectives;
+  if (!objs) return false;
+  return objs.some((o) => !o.optional && o.kind === "surviveTurns");
 }
 
 /** 이 유닛이 unitRetreated 패배조건(보호 대상 군주)이면 true — 단신 돌격 금지. */

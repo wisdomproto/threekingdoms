@@ -11,7 +11,7 @@
       "commanderId": "관우",
       "classId": "lightCavalry",
       "level": 40,
-      "troops": 220,
+      "troops": 286,
       "items": ["청룡언월도", "적토마"],
       "side": "player",
       "x": 15,
@@ -21,7 +21,7 @@
       "commanderId": "유비",
       "classId": "lord",
       "level": 40,
-      "troops": 210,
+      "troops": 273,
       "items": ["의천검"],
       "side": "player",
       "x": 13,
@@ -90,7 +90,7 @@
     {
       "commanderId": "조조",
       "classId": "lord",
-      "level": 42,
+      "level": 39,
       "troops": 160,
       "items": ["맹덕신서"],
       "side": "enemy",
@@ -100,7 +100,7 @@
     {
       "commanderId": "허저",
       "classId": "heavyCavalry",
-      "level": 41,
+      "level": 38,
       "troops": 205,
       "items": [],
       "side": "enemy",
@@ -110,7 +110,7 @@
     {
       "commanderId": "장요",
       "classId": "lightCavalry",
-      "level": 41,
+      "level": 38,
       "troops": 200,
       "items": [],
       "side": "enemy",
@@ -120,7 +120,7 @@
     {
       "commanderId": "서황",
       "classId": "footman",
-      "level": 40,
+      "level": 37,
       "troops": 195,
       "items": [],
       "side": "enemy",
@@ -130,7 +130,7 @@
     {
       "commanderId": "문빙",
       "classId": "archer",
-      "level": 39,
+      "level": 36,
       "troops": 175,
       "items": [],
       "side": "enemy",
@@ -140,7 +140,7 @@
     {
       "commanderId": "악진",
       "classId": "footman",
-      "level": 39,
+      "level": 36,
       "troops": 170,
       "items": [],
       "side": "enemy",
