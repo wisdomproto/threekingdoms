@@ -6,6 +6,7 @@
     "war": 78,
     "intelligence": 76,
     "faceId": 0,
+    "agility": 74,
     "ultimate": { "name": "인덕의 결의", "percent": 150 }
   },
   "관우": {
@@ -15,6 +16,7 @@
     "war": 96,
     "intelligence": 90,
     "faceId": 1,
+    "agility": 68,
     "ultimate": { "name": "청룡언월", "percent": 180 }
   },
   "장비": {
@@ -24,6 +26,7 @@
     "war": 100,
     "intelligence": 46,
     "faceId": 2,
+    "agility": 72,
     "ultimate": { "name": "장팔사모", "percent": 170 }
   },
   "동탁": {
@@ -32,7 +35,8 @@
     "leadership": 92,
     "war": 88,
     "intelligence": 46,
-    "faceId": 136
+    "faceId": 136,
+    "agility": 52
   },
   "여포": {
     "id": "여포",
@@ -40,7 +44,8 @@
     "leadership": 100,
     "war": 100,
     "intelligence": 12,
-    "faceId": 148
+    "faceId": 148,
+    "agility": 94
   },
   "화웅": {
     "id": "화웅",
@@ -48,7 +53,8 @@
     "leadership": 82,
     "war": 90,
     "intelligence": 38,
-    "faceId": 138
+    "faceId": 138,
+    "agility": 56
   },
   "이유": {
     "id": "이유",
@@ -56,7 +62,8 @@
     "leadership": 66,
     "war": 50,
     "intelligence": 92,
-    "faceId": 137
+    "faceId": 137,
+    "agility": 58
   },
   "공융": {
     "id": "공융",
@@ -72,7 +79,8 @@
     "leadership": 98,
     "war": 82,
     "intelligence": 92,
-    "faceId": 27
+    "faceId": 27,
+    "agility": 80
   },
   "원소": {
     "id": "원소",
@@ -80,7 +88,8 @@
     "leadership": 76,
     "war": 70,
     "intelligence": 74,
-    "faceId": 110
+    "faceId": 110,
+    "agility": 80
   },
   "손견": {
     "id": "손견",
@@ -88,7 +97,8 @@
     "leadership": 80,
     "war": 92,
     "intelligence": 72,
-    "faceId": 77
+    "faceId": 77,
+    "agility": 76
   },
   "원술": {
     "id": "원술",
@@ -96,7 +106,8 @@
     "leadership": 58,
     "war": 64,
     "intelligence": 62,
-    "faceId": 144
+    "faceId": 144,
+    "agility": 60
   },
   "공손찬": {
     "id": "공손찬",
@@ -104,7 +115,8 @@
     "leadership": 60,
     "war": 60,
     "intelligence": 60,
-    "faceId": 107
+    "faceId": 107,
+    "agility": 60
   },
   "정보": {
     "id": "정보",
@@ -112,7 +124,8 @@
     "leadership": 84,
     "war": 90,
     "intelligence": 68,
-    "faceId": 78
+    "faceId": 78,
+    "agility": 58
   },
   "황개": {
     "id": "황개",
@@ -120,7 +133,8 @@
     "leadership": 78,
     "war": 90,
     "intelligence": 58,
-    "faceId": 170
+    "faceId": 170,
+    "agility": 52
   },
   "도겸": {
     "id": "도겸",
@@ -128,7 +142,8 @@
     "leadership": 64,
     "war": 74,
     "intelligence": 72,
-    "faceId": 189
+    "faceId": 189,
+    "agility": 58
   },
   "하후돈": {
     "id": "하후돈",
@@ -136,7 +151,8 @@
     "leadership": 82,
     "war": 98,
     "intelligence": 64,
-    "faceId": 28
+    "faceId": 28,
+    "agility": 90
   },
   "하후연": {
     "id": "하후연",
@@ -144,7 +160,8 @@
     "leadership": 80,
     "war": 92,
     "intelligence": 62,
-    "faceId": 29
+    "faceId": 29,
+    "agility": 66
   },
   "조인": {
     "id": "조인",
@@ -152,7 +169,8 @@
     "leadership": 76,
     "war": 88,
     "intelligence": 66,
-    "faceId": 30
+    "faceId": 30,
+    "agility": 70
   },
   "조홍": {
     "id": "조홍",
@@ -160,7 +178,8 @@
     "leadership": 78,
     "war": 64,
     "intelligence": 82,
-    "faceId": 31
+    "faceId": 31,
+    "agility": 66
   },
   "이숙": {
     "id": "이숙",
@@ -168,7 +187,8 @@
     "leadership": 38,
     "war": 34,
     "intelligence": 82,
-    "faceId": 139
+    "faceId": 139,
+    "agility": 72
   },
   "호진": {
     "id": "호진",
@@ -200,7 +220,8 @@
     "leadership": 56,
     "war": 48,
     "intelligence": 84,
-    "faceId": 200
+    "faceId": 200,
+    "agility": 62
   },
   "공손월": {
     "id": "공손월",
@@ -248,7 +269,8 @@
     "leadership": 58,
     "war": 74,
     "intelligence": 88,
-    "faceId": 26
+    "faceId": 26,
+    "agility": 74
   },
   "이풍": {
     "id": "이풍",
@@ -272,7 +294,8 @@
     "leadership": 64,
     "war": 80,
     "intelligence": 34,
-    "faceId": 16
+    "faceId": 16,
+    "agility": 68
   },
   "사마가": {
     "id": "사마가",
@@ -280,7 +303,8 @@
     "leadership": 52,
     "war": 88,
     "intelligence": 28,
-    "faceId": 216
+    "faceId": 216,
+    "agility": 64
   },
   "순상": {
     "id": "순상",
@@ -304,7 +328,8 @@
     "leadership": 76,
     "war": 58,
     "intelligence": 78,
-    "faceId": 63
+    "faceId": 63,
+    "agility": 54
   },
   "조루": {
     "id": "조루",
@@ -352,7 +377,8 @@
     "leadership": 78,
     "war": 92,
     "intelligence": 52,
-    "faceId": 211
+    "faceId": 211,
+    "agility": 60
   },
   "한당": {
     "id": "한당",
@@ -360,7 +386,8 @@
     "leadership": 76,
     "war": 84,
     "intelligence": 60,
-    "faceId": 88
+    "faceId": 88,
+    "agility": 64
   },
   "주연": {
     "id": "주연",
@@ -376,7 +403,8 @@
     "leadership": 76,
     "war": 76,
     "intelligence": 60,
-    "faceId": 141
+    "faceId": 141,
+    "agility": 62
   },
   "곽사": {
     "id": "곽사",
@@ -384,7 +412,8 @@
     "leadership": 78,
     "war": 74,
     "intelligence": 62,
-    "faceId": 142
+    "faceId": 142,
+    "agility": 58
   },
   "서영": {
     "id": "서영",
@@ -392,7 +421,8 @@
     "leadership": 74,
     "war": 84,
     "intelligence": 50,
-    "faceId": 143
+    "faceId": 143,
+    "agility": 52
   },
   "전풍": {
     "id": "전풍",
@@ -400,7 +430,8 @@
     "leadership": 68,
     "war": 54,
     "intelligence": 96,
-    "faceId": 113
+    "faceId": 113,
+    "agility": 56
   },
   "저수": {
     "id": "저수",
@@ -408,7 +439,8 @@
     "leadership": 68,
     "war": 52,
     "intelligence": 94,
-    "faceId": 114
+    "faceId": 114,
+    "agility": 60
   },
   "안량": {
     "id": "안량",
@@ -416,7 +448,8 @@
     "leadership": 70,
     "war": 94,
     "intelligence": 42,
-    "faceId": 111
+    "faceId": 111,
+    "agility": 64
   },
   "문추": {
     "id": "문추",
@@ -424,7 +457,8 @@
     "leadership": 74,
     "war": 94,
     "intelligence": 36,
-    "faceId": 112
+    "faceId": 112,
+    "agility": 66
   },
   "조운": {
     "id": "조운",
@@ -433,6 +467,7 @@
     "war": 96,
     "intelligence": 68,
     "faceId": 3,
+    "agility": 66,
     "ultimate": { "name": "단기필마", "percent": 170 }
   },
   "봉기": {
@@ -441,7 +476,8 @@
     "leadership": 66,
     "war": 48,
     "intelligence": 84,
-    "faceId": 122
+    "faceId": 122,
+    "agility": 74
   },
   "허유": {
     "id": "허유",
@@ -449,7 +485,8 @@
     "leadership": 30,
     "war": 46,
     "intelligence": 82,
-    "faceId": 123
+    "faceId": 123,
+    "agility": 72
   },
   "진진": {
     "id": "진진",
@@ -497,7 +534,8 @@
     "leadership": 64,
     "war": 22,
     "intelligence": 98,
-    "faceId": 34
+    "faceId": 34,
+    "agility": 82
   },
   "우금": {
     "id": "우금",
@@ -505,7 +543,8 @@
     "leadership": 76,
     "war": 78,
     "intelligence": 60,
-    "faceId": 39
+    "faceId": 39,
+    "agility": 92
   },
   "손건": {
     "id": "손건",
@@ -513,7 +552,8 @@
     "leadership": 58,
     "war": 76,
     "intelligence": 66,
-    "faceId": 12
+    "faceId": 12,
+    "agility": 62
   },
   "미축": {
     "id": "미축",
@@ -521,7 +561,8 @@
     "leadership": 68,
     "war": 72,
     "intelligence": 68,
-    "faceId": 13
+    "faceId": 13,
+    "agility": 62
   },
   "진등": {
     "id": "진등",
@@ -545,7 +586,8 @@
     "leadership": 90,
     "war": 98,
     "intelligence": 36,
-    "faceId": 37
+    "faceId": 37,
+    "agility": 68
   },
   "순욱": {
     "id": "순욱",
@@ -553,7 +595,8 @@
     "leadership": 82,
     "war": 54,
     "intelligence": 98,
-    "faceId": 32
+    "faceId": 32,
+    "agility": 56
   },
   "기영": {
     "id": "기영",
@@ -561,7 +604,8 @@
     "leadership": 84,
     "war": 80,
     "intelligence": 66,
-    "faceId": 146
+    "faceId": 146,
+    "agility": 68
   },
   "동소": {
     "id": "동소",
@@ -585,7 +629,8 @@
     "leadership": 90,
     "war": 88,
     "intelligence": 48,
-    "faceId": 150
+    "faceId": 150,
+    "agility": 62
   },
   "위속": {
     "id": "위속",
@@ -593,7 +638,8 @@
     "leadership": 76,
     "war": 78,
     "intelligence": 42,
-    "faceId": 151
+    "faceId": 151,
+    "agility": 58
   },
   "송겸": {
     "id": "송겸",
@@ -609,7 +655,8 @@
     "leadership": 76,
     "war": 68,
     "intelligence": 90,
-    "faceId": 149
+    "faceId": 149,
+    "agility": 62
   },
   "순유": {
     "id": "순유",
@@ -617,7 +664,8 @@
     "leadership": 80,
     "war": 34,
     "intelligence": 94,
-    "faceId": 33
+    "faceId": 33,
+    "agility": 76
   },
   "정욱": {
     "id": "정욱",
@@ -625,7 +673,8 @@
     "leadership": 62,
     "war": 58,
     "intelligence": 92,
-    "faceId": 35
+    "faceId": 35,
+    "agility": 64
   },
   "서황": {
     "id": "서황",
@@ -633,7 +682,8 @@
     "leadership": 90,
     "war": 92,
     "intelligence": 56,
-    "faceId": 38
+    "faceId": 38,
+    "agility": 78
   },
   "장요": {
     "id": "장요",
@@ -649,7 +699,8 @@
     "leadership": 70,
     "war": 76,
     "intelligence": 54,
-    "faceId": 153
+    "faceId": 153,
+    "agility": 52
   },
   "미방": {
     "id": "미방",
@@ -657,7 +708,8 @@
     "leadership": 56,
     "war": 78,
     "intelligence": 52,
-    "faceId": 14
+    "faceId": 14,
+    "agility": 66
   },
   "간옹": {
     "id": "간옹",
@@ -665,7 +717,8 @@
     "leadership": 72,
     "war": 54,
     "intelligence": 68,
-    "faceId": 15
+    "faceId": 15,
+    "agility": 50
   },
   "만총": {
     "id": "만총",
@@ -673,7 +726,8 @@
     "leadership": 68,
     "war": 54,
     "intelligence": 90,
-    "faceId": 100
+    "faceId": 100,
+    "agility": 78
   },
   "허사": {
     "id": "허사",
@@ -705,7 +759,8 @@
     "leadership": 74,
     "war": 72,
     "intelligence": 50,
-    "faceId": 157
+    "faceId": 157,
+    "agility": 64
   },
   "손관": {
     "id": "손관",
@@ -737,7 +792,8 @@
     "leadership": 64,
     "war": 50,
     "intelligence": 90,
-    "faceId": 116
+    "faceId": 116,
+    "agility": 66
   },
   "곽도": {
     "id": "곽도",
@@ -745,7 +801,8 @@
     "leadership": 56,
     "war": 40,
     "intelligence": 92,
-    "faceId": 115
+    "faceId": 115,
+    "agility": 74
   },
   "가후": {
     "id": "가후",
@@ -753,7 +810,8 @@
     "leadership": 68,
     "war": 52,
     "intelligence": 96,
-    "faceId": 42
+    "faceId": 42,
+    "agility": 80
   },
   "유표": {
     "id": "유표",
@@ -785,7 +843,8 @@
     "leadership": 94,
     "war": 90,
     "intelligence": 52,
-    "faceId": 185
+    "faceId": 185,
+    "agility": 66
   },
   "진림": {
     "id": "진림",
@@ -809,7 +868,8 @@
     "leadership": 78,
     "war": 72,
     "intelligence": 84,
-    "faceId": 57
+    "faceId": 57,
+    "agility": 52
   },
   "장수": {
     "id": "장수",
@@ -817,7 +877,8 @@
     "leadership": 76,
     "war": 80,
     "intelligence": 62,
-    "faceId": 155
+    "faceId": 155,
+    "agility": 58
   },
   "장합": {
     "id": "장합",
@@ -825,7 +886,8 @@
     "leadership": 68,
     "war": 90,
     "intelligence": 66,
-    "faceId": 117
+    "faceId": 117,
+    "agility": 74
   },
   "고람": {
     "id": "고람",
@@ -833,7 +895,8 @@
     "leadership": 68,
     "war": 80,
     "intelligence": 54,
-    "faceId": 125
+    "faceId": 125,
+    "agility": 62
   },
   "한맹": {
     "id": "한맹",
@@ -849,7 +912,8 @@
     "leadership": 56,
     "war": 72,
     "intelligence": 40,
-    "faceId": 127
+    "faceId": 127,
+    "agility": 68
   },
   "장기": {
     "id": "장기",
@@ -897,7 +961,8 @@
     "leadership": 60,
     "war": 60,
     "intelligence": 60,
-    "faceId": 5
+    "faceId": 5,
+    "agility": 60
   },
   "채모": {
     "id": "채모",
@@ -913,7 +978,8 @@
     "leadership": 42,
     "war": 38,
     "intelligence": 80,
-    "faceId": 11
+    "faceId": 11,
+    "agility": 72
   },
   "유기": {
     "id": "유기",
@@ -921,7 +987,8 @@
     "leadership": 50,
     "war": 62,
     "intelligence": 68,
-    "faceId": 177
+    "faceId": 177,
+    "agility": 66
   },
   "이전": {
     "id": "이전",
@@ -929,7 +996,8 @@
     "leadership": 90,
     "war": 82,
     "intelligence": 68,
-    "faceId": 41
+    "faceId": 41,
+    "agility": 74
   },
   "유봉": {
     "id": "유봉",
@@ -937,7 +1005,8 @@
     "leadership": 78,
     "war": 64,
     "intelligence": 74,
-    "faceId": 18
+    "faceId": 18,
+    "agility": 68
   },
   "장무": {
     "id": "장무",
@@ -977,7 +1046,8 @@
     "leadership": 82,
     "war": 86,
     "intelligence": 64,
-    "faceId": 179
+    "faceId": 179,
+    "agility": 66
   },
   "왕위": {
     "id": "왕위",
@@ -1018,7 +1088,8 @@
     "leadership": 58,
     "war": 94,
     "intelligence": 54,
-    "faceId": 7
+    "faceId": 7,
+    "agility": 74
   },
   "관평": {
     "id": "관평",
@@ -1026,7 +1097,8 @@
     "leadership": 74,
     "war": 90,
     "intelligence": 68,
-    "faceId": 19
+    "faceId": 19,
+    "agility": 66
   },
   "하후란": {
     "id": "하후란",
@@ -1066,7 +1138,8 @@
     "leadership": 68,
     "war": 64,
     "intelligence": 98,
-    "faceId": 8
+    "faceId": 8,
+    "agility": 68
   },
   "왕찬": {
     "id": "왕찬",
@@ -1090,7 +1163,8 @@
     "leadership": 74,
     "war": 76,
     "intelligence": 58,
-    "faceId": 58
+    "faceId": 58,
+    "agility": 60
   },
   "안명": {
     "id": "안명",
@@ -1130,7 +1204,8 @@
     "leadership": 86,
     "war": 92,
     "intelligence": 50,
-    "faceId": 59
+    "faceId": 59,
+    "agility": 68
   },
   "손권": {
     "id": "손권",
@@ -1138,7 +1213,8 @@
     "leadership": 80,
     "war": 74,
     "intelligence": 82,
-    "faceId": 79
+    "faceId": 79,
+    "agility": 78
   },
   "주유": {
     "id": "주유",
@@ -1146,7 +1222,8 @@
     "leadership": 80,
     "war": 78,
     "intelligence": 98,
-    "faceId": 80
+    "faceId": 80,
+    "agility": 62
   },
   "노숙": {
     "id": "노숙",
@@ -1154,7 +1231,8 @@
     "leadership": 64,
     "war": 52,
     "intelligence": 94,
-    "faceId": 86
+    "faceId": 86,
+    "agility": 52
   },
   "장소": {
     "id": "장소",
@@ -1162,7 +1240,8 @@
     "leadership": 46,
     "war": 24,
     "intelligence": 92,
-    "faceId": 81
+    "faceId": 81,
+    "agility": 50
   },
   "제갈근": {
     "id": "제갈근",
@@ -1170,7 +1249,8 @@
     "leadership": 48,
     "war": 36,
     "intelligence": 92,
-    "faceId": 82
+    "faceId": 82,
+    "agility": 70
   },
   "감택": {
     "id": "감택",
@@ -1194,7 +1274,8 @@
     "leadership": 76,
     "war": 80,
     "intelligence": 88,
-    "faceId": 83
+    "faceId": 83,
+    "agility": 52
   },
   "태사자": {
     "id": "태사자",
@@ -1202,7 +1283,8 @@
     "leadership": 88,
     "war": 94,
     "intelligence": 68,
-    "faceId": 85
+    "faceId": 85,
+    "agility": 64
   },
   "육손": {
     "id": "육손",
@@ -1210,7 +1292,8 @@
     "leadership": 82,
     "war": 76,
     "intelligence": 96,
-    "faceId": 87
+    "faceId": 87,
+    "agility": 54
   },
   "포용": {
     "id": "포용",
@@ -1242,7 +1325,8 @@
     "leadership": 62,
     "war": 92,
     "intelligence": 42,
-    "faceId": 20
+    "faceId": 20,
+    "agility": 68
   },
   "고옹": {
     "id": "고옹",
@@ -1306,7 +1390,8 @@
     "leadership": 68,
     "war": 94,
     "intelligence": 52,
-    "faceId": 102
+    "faceId": 102,
+    "agility": 80
   },
   "채훈": {
     "id": "채훈",
@@ -1322,7 +1407,8 @@
     "leadership": 74,
     "war": 76,
     "intelligence": 46,
-    "faceId": 90
+    "faceId": 90,
+    "agility": 90
   },
   "서성": {
     "id": "서성",
@@ -1330,7 +1416,8 @@
     "leadership": 72,
     "war": 70,
     "intelligence": 74,
-    "faceId": 91
+    "faceId": 91,
+    "agility": 64
   },
   "능통": {
     "id": "능통",
@@ -1338,7 +1425,8 @@
     "leadership": 76,
     "war": 90,
     "intelligence": 56,
-    "faceId": 92
+    "faceId": 92,
+    "agility": 68
   },
   "진무": {
     "id": "진무",
@@ -1346,7 +1434,8 @@
     "leadership": 68,
     "war": 72,
     "intelligence": 50,
-    "faceId": 93
+    "faceId": 93,
+    "agility": 64
   },
   "모개": {
     "id": "모개",
@@ -1362,7 +1451,8 @@
     "leadership": 68,
     "war": 92,
     "intelligence": 62,
-    "faceId": 6
+    "faceId": 6,
+    "agility": 56
   },
   "우금_2": {
     "id": "우금_2",
@@ -1370,7 +1460,8 @@
     "leadership": 76,
     "war": 78,
     "intelligence": 60,
-    "faceId": 49
+    "faceId": 49,
+    "agility": 92
   },
   "진교": {
     "id": "진교",
@@ -1394,7 +1485,8 @@
     "leadership": 78,
     "war": 60,
     "intelligence": 62,
-    "faceId": 94
+    "faceId": 94,
+    "agility": 62
   },
   "마량": {
     "id": "마량",
@@ -1506,7 +1598,8 @@
     "leadership": 48,
     "war": 46,
     "intelligence": 86,
-    "faceId": 9
+    "faceId": 9,
+    "agility": 62
   },
   "유장": {
     "id": "유장",
@@ -1514,7 +1607,8 @@
     "leadership": 60,
     "war": 60,
     "intelligence": 60,
-    "faceId": 159
+    "faceId": 159,
+    "agility": 60
   },
   "마초": {
     "id": "마초",
@@ -1522,7 +1616,8 @@
     "leadership": 86,
     "war": 94,
     "intelligence": 40,
-    "faceId": 186
+    "faceId": 186,
+    "agility": 66
   },
   "맹달": {
     "id": "맹달",
@@ -1530,7 +1625,8 @@
     "leadership": 82,
     "war": 74,
     "intelligence": 72,
-    "faceId": 61
+    "faceId": 61,
+    "agility": 50
   },
   "왕누": {
     "id": "왕누",
@@ -1602,7 +1698,8 @@
     "leadership": 82,
     "war": 80,
     "intelligence": 46,
-    "faceId": 171
+    "faceId": 171,
+    "agility": 90
   },
   "오란": {
     "id": "오란",
@@ -1610,7 +1707,8 @@
     "leadership": 80,
     "war": 82,
     "intelligence": 72,
-    "faceId": 172
+    "faceId": 172,
+    "agility": 68
   },
   "뇌동": {
     "id": "뇌동",
@@ -1618,7 +1716,8 @@
     "leadership": 78,
     "war": 84,
     "intelligence": 42,
-    "faceId": 173
+    "faceId": 173,
+    "agility": 92
   },
   "엄안": {
     "id": "엄안",
@@ -1626,7 +1725,8 @@
     "leadership": 68,
     "war": 84,
     "intelligence": 62,
-    "faceId": 23
+    "faceId": 23,
+    "agility": 54
   },
   "마대": {
     "id": "마대",
@@ -1634,7 +1734,8 @@
     "leadership": 90,
     "war": 86,
     "intelligence": 48,
-    "faceId": 187
+    "faceId": 187,
+    "agility": 50
   },
   "장노": {
     "id": "장노",
@@ -1642,7 +1743,8 @@
     "leadership": 60,
     "war": 44,
     "intelligence": 88,
-    "faceId": 191
+    "faceId": 191,
+    "agility": 52
   },
   "장위": {
     "id": "장위",
@@ -1650,7 +1752,8 @@
     "leadership": 70,
     "war": 74,
     "intelligence": 56,
-    "faceId": 192
+    "faceId": 192,
+    "agility": 58
   },
   "양임": {
     "id": "양임",
@@ -1698,7 +1801,8 @@
     "leadership": 76,
     "war": 92,
     "intelligence": 58,
-    "faceId": 53
+    "faceId": 53,
+    "agility": 64
   },
   "조비": {
     "id": "조비",
@@ -1706,7 +1810,8 @@
     "leadership": 92,
     "war": 70,
     "intelligence": 68,
-    "faceId": 67
+    "faceId": 67,
+    "agility": 58
   },
   "사마의": {
     "id": "사마의",
@@ -1714,7 +1819,8 @@
     "leadership": 68,
     "war": 78,
     "intelligence": 100,
-    "faceId": 66
+    "faceId": 66,
+    "agility": 46
   },
   "조휴": {
     "id": "조휴",
@@ -1730,7 +1836,8 @@
     "leadership": 96,
     "war": 90,
     "intelligence": 78,
-    "faceId": 188
+    "faceId": 188,
+    "agility": 62
   },
   "관해": {
     "id": "관해",
@@ -1746,7 +1853,8 @@
     "leadership": 92,
     "war": 78,
     "intelligence": 76,
-    "faceId": 40
+    "faceId": 40,
+    "agility": 54
   },
   "왕철": {
     "id": "왕철",
@@ -1914,7 +2022,8 @@
     "leadership": 60,
     "war": 60,
     "intelligence": 60,
-    "faceId": 204
+    "faceId": 204,
+    "agility": 60
   },
   "사마사": {
     "id": "사마사",
@@ -1954,7 +2063,8 @@
     "leadership": 88,
     "war": 84,
     "intelligence": 92,
-    "faceId": 21
+    "faceId": 21,
+    "agility": 70
   },
   "한영": {
     "id": "한영",
@@ -1986,7 +2096,8 @@
     "leadership": 68,
     "war": 70,
     "intelligence": 54,
-    "faceId": 129
+    "faceId": 129,
+    "agility": 52
   },
   "유순": {
     "id": "유순",
@@ -2010,7 +2121,8 @@
     "leadership": 60,
     "war": 60,
     "intelligence": 60,
-    "faceId": 43
+    "faceId": 43,
+    "agility": 60
   },
   "왕평": {
     "id": "왕평",
@@ -2018,7 +2130,8 @@
     "leadership": 84,
     "war": 78,
     "intelligence": 68,
-    "faceId": 119
+    "faceId": 119,
+    "agility": 52
   },
   "유선": {
     "id": "유선",
@@ -2026,7 +2139,8 @@
     "leadership": 54,
     "war": 40,
     "intelligence": 56,
-    "faceId": 196
+    "faceId": 196,
+    "agility": 52
   },
   "이엄": {
     "id": "이엄",
@@ -2034,7 +2148,8 @@
     "leadership": 80,
     "war": 68,
     "intelligence": 74,
-    "faceId": 106
+    "faceId": 106,
+    "agility": 64
   },
   "비관": {
     "id": "비관",
@@ -2818,7 +2933,8 @@
     "leadership": 70,
     "war": 84,
     "intelligence": 30,
-    "faceId": 231
+    "faceId": 231,
+    "agility": 98
   },
   "장완": {
     "id": "장완",
@@ -2826,7 +2942,8 @@
     "leadership": 60,
     "war": 42,
     "intelligence": 82,
-    "faceId": 207
+    "faceId": 207,
+    "agility": 58
   },
   "비위": {
     "id": "비위",
@@ -2834,7 +2951,8 @@
     "leadership": 48,
     "war": 40,
     "intelligence": 80,
-    "faceId": 203
+    "faceId": 203,
+    "agility": 70
   },
   "장각": {
     "id": "장각",
@@ -2850,7 +2968,8 @@
     "leadership": 60,
     "war": 60,
     "intelligence": 65,
-    "faceId": 221
+    "faceId": 221,
+    "agility": 72
   },
   "장량": {
     "id": "장량",
@@ -2858,7 +2977,8 @@
     "leadership": 60,
     "war": 60,
     "intelligence": 65,
-    "faceId": 222
+    "faceId": 222,
+    "agility": 74
   },
   "기령": {
     "id": "기령",
