@@ -44,6 +44,9 @@ export interface UnitState {
   // §7 아이템 효과(말·보물). createBattle에서 산정. 기존 리터럴 무파손 위해 optional(미설정=무효).
   damageReduction?: number;       // 받는 피해 경감 0~0.9 (방어 보물)
   grantsDoubleStrike?: boolean;   // 아이템으로 연속공격 무조건 부여
+  // §7/§9 필살 게이지(레퍼런스 ⚔0/255). 전투 참여로 누적, max에서 필살 발동 가능(2단계).
+  sp?: number;                    // 현재 SP (미설정=0)
+  maxSp?: number;                 // SP 상한 (미설정=combat.sp.max)
 }
 
 /** 전략조건 보상 적립분 (M3① — §2-1 보물 게이트). 결산에서 지급. */

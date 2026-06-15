@@ -43,6 +43,7 @@ export function spawnUnit(data: GameData, p: StageUnit): UnitState {
     baseAtk: cls.baseAtk, baseDef: cls.baseDef, grades: cls.grades, weaponBonus, bookBonus,
     move: cls.move + moveBonus, baseMove: cls.move, rangeMin: cls.rangeMin, rangeMax: cls.rangeMax,
     damageReduction, grantsDoubleStrike: grantDouble,
+    sp: 0, maxSp: data.combat.sp.max,
     items: [...p.items], // 소모품 useItem 시 1개씩 제거 (weapon/book 보정은 위에서 이미 산정)
     moved: false, acted: false, retreated: false,
   };

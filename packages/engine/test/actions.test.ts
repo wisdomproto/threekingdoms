@@ -13,6 +13,26 @@ function patchUnit(s: BattleState, id: string, patch: Partial<UnitState>): Battl
   return { ...s, units: s.units.map((u) => (u.id === id ? { ...u, ...patch } : u)) };
 }
 
+describe("필살 게이지(SP) 누적 (§9)", () => {
+  it("공격 시 공격자 +onAttack, 피격자 생존 시 +onHitTaken (결정론)", () => {
+    const sp = testCtx.data.combat.sp;
+    // 이숙(궁병)을 관우(1,4) 인접 (1,3)에 두고 관우가 공격 — 일기토 없음, 이숙 사거리(2)라 인접 반격 없음
+    const s0 = patchUnit(fresh(), "이숙", { x: 1, y: 3 });
+    expect(get(s0, "관우").sp).toBe(0);
+    const { state } = applyAction(testCtx, s0, { type: "attack", unitId: "관우", targetId: "이숙" });
+    expect(get(state, "이숙").retreated).toBe(false); // 생존
+    expect(get(state, "관우").sp).toBe(sp.onAttack);   // 공격자 누적
+    expect(get(state, "이숙").sp).toBe(sp.onHitTaken);  // 피격자 누적
+  });
+
+  it("SP는 maxSp로 클램프된다", () => {
+    const sp = testCtx.data.combat.sp;
+    const s0 = patchUnit(patchUnit(fresh(), "이숙", { x: 1, y: 3 }), "관우", { sp: sp.max - 5 });
+    const { state } = applyAction(testCtx, s0, { type: "attack", unitId: "관우", targetId: "이숙" });
+    expect(get(state, "관우").sp).toBe(sp.max); // max-5 + onAttack(25) → max 클램프
+  });
+});
+
 describe("applyAction: move", () => {
   it("이동하면 위치가 바뀌고 unitMoved 이벤트, moved=true", () => {
     const s0 = fresh();

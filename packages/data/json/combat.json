@@ -7,5 +7,6 @@
   "lineAdvantage": { "cavalry": "infantry", "infantry": "archer", "archer": "cavalry" },
   "flank": { "threshold": 2, "stepPercent": 20, "maxStacks": 3 },
   "passives": { "cavalryChargePercent": 20, "infantryBulwarkPercent": 15, "archerSnipePiercePercent": 50 },
-  "doubleStrike": { "moveGap": 2, "secondHitPercent": 50 }
+  "doubleStrike": { "moveGap": 2, "secondHitPercent": 50 },
+  "sp": { "max": 255, "onAttack": 25, "onHitTaken": 20, "onKill": 60 }
 }

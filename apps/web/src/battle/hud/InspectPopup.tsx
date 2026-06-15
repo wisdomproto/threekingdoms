@@ -77,6 +77,8 @@ export function InspectPopup({
   const sideLabel = unit.side === "enemy" ? "적군" : unit.side === "ally" ? "우군" : "아군";
   const sideColor = unit.side === "enemy" ? "#ff6b6b" : unit.side === "ally" ? "#ffa53d" : "#4da3ff";
   const mpRatio = unit.maxMp > 0 ? Math.max(0, Math.min(1, unit.mp / unit.maxMp)) : 0;
+  const spRatio = unit.maxSp > 0 ? Math.max(0, Math.min(1, unit.sp / unit.maxSp)) : 0;
+  const spReady = unit.maxSp > 0 && unit.sp >= unit.maxSp;
   const guardPct = Math.round(unit.terrainGuard * 100);
 
   return (
@@ -149,6 +151,28 @@ export function InspectPopup({
           <div style={{ height: 5, borderRadius: 3, background: "#2a2f36", marginTop: 2 }}>
             <div
               style={{ width: `${Math.round(mpRatio * 100)}%`, height: "100%", borderRadius: 3, background: "#e8c84a" }}
+            />
+          </div>
+        </div>
+      )}
+      {/* 필살 게이지 SP (§9 — 레퍼런스 ⚔0/255 파랑 바). 가득 차면 「필살 준비」 강조 */}
+      {unit.maxSp > 0 && (
+        <div style={{ marginTop: 4 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11 }}>
+            <span>필살 {spReady ? <span style={{ color: "#5ad7ff", fontWeight: 700 }}>준비!</span> : null}</span>
+            <span style={{ fontVariantNumeric: "tabular-nums" }}>
+              {unit.sp} / {unit.maxSp}
+            </span>
+          </div>
+          <div style={{ height: 5, borderRadius: 3, background: "#2a2f36", marginTop: 2 }}>
+            <div
+              style={{
+                width: `${Math.round(spRatio * 100)}%`,
+                height: "100%",
+                borderRadius: 3,
+                background: spReady ? "#5ad7ff" : "#3a7bd5",
+                boxShadow: spReady ? "0 0 6px #5ad7ff" : "none",
+              }}
             />
           </div>
         </div>

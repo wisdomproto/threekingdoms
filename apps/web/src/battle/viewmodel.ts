@@ -37,6 +37,8 @@ export interface UnitVM {
   maxTroops: number;
   mp: number;
   maxMp: number;
+  sp: number;       // 필살 게이지(현재) — §9
+  maxSp: number;    // 필살 게이지 상한(레퍼런스 255)
   moved: boolean;
   acted: boolean;
   retreated: boolean;
@@ -200,6 +202,8 @@ export function unitVM(ctx: BattleContext, u: UnitState): UnitVM {
     maxTroops: u.maxTroops,
     mp: u.mp,
     maxMp: u.maxMp,
+    sp: u.sp ?? 0,
+    maxSp: u.maxSp ?? ctx.data.combat.sp.max,
     moved: u.moved,
     acted: u.acted,
     retreated: u.retreated,

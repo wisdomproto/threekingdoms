@@ -22,6 +22,8 @@ function unit(partial: Partial<UnitVM>): UnitVM {
     maxTroops: 10,
     mp: 0,
     maxMp: 0,
+    sp: 0,
+    maxSp: 255,
     moved: false,
     acted: false,
     retreated: false,

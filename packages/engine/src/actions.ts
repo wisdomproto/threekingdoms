@@ -20,6 +20,11 @@ function replaceUnit(state: BattleState, unit: UnitState): BattleState {
   return { ...state, units: state.units.map((u) => (u.id === unit.id ? unit : u)) };
 }
 
+/** SP(필살 게이지)를 amount만큼 더해 maxSp로 클램프한 유닛 사본. 결정론. */
+function addSp(u: UnitState, amount: number): UnitState {
+  return { ...u, sp: Math.min(u.maxSp ?? Infinity, (u.sp ?? 0) + amount) };
+}
+
 function assertCanAct(state: BattleState, unit: UnitState, forMove: boolean): void {
   if (state.status !== "ongoing") throw new Error("battle already ended");
   if (unit.retreated) throw new Error(`${unit.id} already retreated`);
@@ -398,6 +403,14 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
           next = ctrExp.state;
           events.push(...ctrExp.events);
         }
+      }
+      // 필살 게이지(SP) 누적 — 결정론. 공격자=onAttack(+격파 시 onKill), 피격자 생존 시 onHitTaken.
+      {
+        const spCfg = ctx.data.combat.sp;
+        const killed = getUnit(next, target.id).retreated;
+        next = replaceUnit(next, addSp(getUnit(next, unit.id), spCfg.onAttack + (killed ? spCfg.onKill : 0)));
+        const def2 = getUnit(next, target.id);
+        if (!def2.retreated) next = replaceUnit(next, addSp(def2, spCfg.onHitTaken));
       }
       // 반격으로 공격자가 퇴각했어도 acted=true로 통일 — maybeAdvancePhase의 retreated 필터가 가드
       next = replaceUnit(next, { ...getUnit(next, unit.id), acted: true });

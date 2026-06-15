@@ -153,6 +153,16 @@ export const CombatConfigSchema = z.object({
     moveGap: z.number().int().min(1),       // 발동 최소 이동력 차
     secondHitPercent: z.number().min(0).max(100), // 2타 피해 비율
   }).default({ moveGap: 2, secondHitPercent: 50 }),
+  /**
+   * 필살 게이지(SP, §7/§9 — 레퍼런스 ⚔0/255 누적 게이지의 결정론 구현). 전투 참여로 SP 누적,
+   * max 도달 시 필살 발동 가능(2단계). 누적은 전부 결정론(난수 없음).
+   */
+  sp: z.object({
+    max: z.number().int().min(1),       // 게이지 상한(레퍼런스 255)
+    onAttack: z.number().int().min(0),  // 공격 1회 시 공격자 SP +
+    onHitTaken: z.number().int().min(0),// 피격 1회 시 피격자 SP +
+    onKill: z.number().int().min(0),    // 격파 시 공격자 SP +
+  }).default({ max: 255, onAttack: 25, onHitTaken: 20, onKill: 60 }),
 }).refine(
   (c) => Object.entries(c.lineAdvantage).every(([k, v]) => k !== v),
   { message: "lineAdvantage must not be self-referential" },
