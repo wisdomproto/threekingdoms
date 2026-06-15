@@ -670,8 +670,9 @@ export function ResultSequence({
             <button type="button" style={BUTTON_STYLE} onClick={() => window.location.reload()}>
               다시 도전
             </button>
-            <a href="/stages" style={BUTTON_STYLE}>
-              전장 선택
+            {/* 캠페인 진행: outro 씬 → 다음 스테이지 intro(없으면 전장 선택). 씬 라우트가 빈 씬 가드. */}
+            <a href={stageId ? `/scene?stage=${stageId}&type=outro` : "/stages"} style={BUTTON_STYLE}>
+              다음으로 ▶
             </a>
           </div>
         </div>

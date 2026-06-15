@@ -6,6 +6,25 @@
   "camera": { "zoom": 1.7, "focus": [50, 15] },
   "reward": { "gold": 300, "exp": 0, "treasures": ["무술교본"] },
   "levelCap": 12,
+  "scenario": {
+    "intro": {
+      "bg": "05-sishuiguan-intro",
+      "lines": [
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "사수관이라... 적장 화웅이 연합군의 장수들을 연이어 베었다 들었소." },
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "형님! 그깟 화웅 따위, 이 장비가 단숨에 목을 따오리다!" },
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "아우, 고정하게. 적장의 무위가 만만치 않다 하니 가벼이 볼 일이 아니다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "제후들은 술잔만 기울일 뿐 누구도 나서지 못하는구나. ...우리가 길을 트자." }
+      ]
+    },
+    "outro": {
+      "bg": "05-sishuiguan-outro",
+      "lines": [
+        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "화웅의 목, 여기 가져왔습니다. 술이 식기 전에 말입니다." },
+        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "천하가 오늘 이 이름을 기억하게 될 것이다 — 관운장." },
+        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "크하하! 다음 관문은 이 장비에게 맡기시오, 형님!" }
+      ]
+    }
+  },
   "units": [
     {
       "commanderId": "유비",

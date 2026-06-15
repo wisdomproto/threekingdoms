@@ -396,6 +396,26 @@ export const StageDialogueSchema = z.object({
 });
 export type StageDialogue = z.infer<typeof StageDialogueSchema>;
 
+/**
+ * 막간 시나리오 씬 (전투 밖 컷신 — §5 스토리). 풀스크린 배경 + 화자 초상 대사.
+ *  - bg: 씬 배경 이미지 키(선택, /assets/scenes/{bg}.webp). 미지정 시 수묵 placeholder.
+ *  - lines: DialogueLine 재사용(화자·진영·초상·본문). 최소 1줄.
+ * 전투 내 dialogue(트리거 구동)와 별개 — intro(전투 전)·outro(전투 후) 스토리.
+ */
+export const ScenarioSceneSchema = z.object({
+  bg: z.string().optional(),
+  lines: z.array(DialogueLineSchema).min(1),
+});
+export type ScenarioScene = z.infer<typeof ScenarioSceneSchema>;
+
+/** 스테이지 막간 시나리오 — intro(전투 전)·outro(승리 후)·outroDefeat(패배 후, 선택). 전부 optional. */
+export const StageScenarioSchema = z.object({
+  intro: ScenarioSceneSchema.optional(),
+  outro: ScenarioSceneSchema.optional(),
+  outroDefeat: ScenarioSceneSchema.optional(),
+});
+export type StageScenario = z.infer<typeof StageScenarioSchema>;
+
 export const StageSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -404,6 +424,8 @@ export const StageSchema = z.object({
   camera: StageCameraSchema.optional(),
   // 대사/스토리 (C — §344 말풍선). 순수 표현·하위호환(미지정 = 대사 없음). 디렉터가 read-only 구독.
   dialogue: z.array(StageDialogueSchema).optional(),
+  // 막간 시나리오 씬 (§5 — 전투 밖 컷신). intro→상점→전투→outro 캠페인 루프. 하위호환(미지정 = 씬 없음).
+  scenario: StageScenarioSchema.optional(),
   // 결산 보상 (선택 — 미지정 스테이지는 보상 없음으로 취급)
   reward: StageRewardSchema.optional(),
   // 이 스테이지에서의 레벨캡 (§10 — 스테이지 진행 연동). 미지정 시 엔진 기본 99.

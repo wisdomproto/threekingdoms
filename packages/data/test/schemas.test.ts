@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   CommanderSchema, UnitClassSchema, TerrainSchema, ItemSchema,
   CombatConfigSchema, BattleMapSchema, StageSchema, StageEventSchema,
-  StageDialogueSchema,
+  StageDialogueSchema, ScenarioSceneSchema,
 } from "../src/schemas";
 
 describe("스키마 v2 (원작 모델)", () => {
@@ -130,6 +130,33 @@ describe("스키마 v2 (원작 모델)", () => {
     expect(() => StageDialogueSchema.parse({
       id: "empty", trigger: { kind: "battleStart" }, lines: [],
     })).toThrow();
+  });
+
+  it("시나리오 씬: 배경+대사 파싱, Stage.scenario optional 하위호환", () => {
+    // ScenarioScene 단독 — bg 선택, lines 최소 1
+    expect(() => ScenarioSceneSchema.parse({
+      bg: "05-sishuiguan-intro",
+      lines: [{ speaker: "유비", side: "player", portraitId: "유비", text: "관문을 넘는다." }],
+    })).not.toThrow();
+    expect(() => ScenarioSceneSchema.parse({ lines: [{ speaker: "x", text: "y" }] })).not.toThrow(); // bg 생략 가능
+    expect(() => ScenarioSceneSchema.parse({ bg: "x", lines: [] })).toThrow(); // 빈 lines 거부
+
+    // Stage.scenario(intro/outro) 통합
+    expect(() => StageSchema.parse({
+      id: "s", name: "s", mapId: "m", turnLimit: 30,
+      units: [{ commanderId: "관우", classId: "lightCavalry", level: 1, troops: 100, items: [], side: "player", x: 0, y: 0 }],
+      objectives: [{ kind: "defeatAll" }],
+      scenario: {
+        intro: { bg: "s-intro", lines: [{ speaker: "유비", text: "출진 전." }] },
+        outro: { lines: [{ speaker: "관우", text: "승리 후." }] },
+      },
+      events: [],
+    })).not.toThrow();
+    // scenario 미지정 — 기존 스테이지 무파손
+    expect(() => StageSchema.parse({
+      id: "s2", name: "s2", mapId: "m", turnLimit: 30,
+      units: [], victory: { kind: "defeatAll" }, events: [],
+    })).not.toThrow();
   });
 
   it("C 대사: StageSchema에 dialogue 통합 + 하위호환(미지정 허용)", () => {

@@ -252,7 +252,7 @@ function StageCard({
     <li>
       {unlocked ? (
         <Link
-          href={{ pathname: "/prep", query: { stage: stage.id } }}
+          href={{ pathname: "/scene", query: { stage: stage.id, type: "intro" } }}
           style={{ textDecoration: "none", display: "block" }}
         >
           {body}
