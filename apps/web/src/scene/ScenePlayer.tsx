@@ -8,6 +8,7 @@
  */
 import type { ScenarioScene } from "@tk/data";
 import { AssetImage } from "../ui/AssetImage";
+import { assetUrl } from "../assetUrl";
 import { useTypewriter } from "./useTypewriter";
 import { useState } from "react";
 
@@ -49,7 +50,7 @@ export function ScenePlayer({
 
   const side = line.side ?? "player";
   const nameColor = SIDE_COLOR[side] ?? PARCHMENT;
-  const portraitSrc = line.portraitId ? `/assets/ui/portraits/${line.portraitId}.webp` : undefined;
+  const portraitSrc = line.portraitId ? assetUrl(`/assets/ui/portraits/${line.portraitId}.webp`) : undefined;
 
   return (
     <div
@@ -72,9 +73,12 @@ export function ScenePlayer({
     >
       {/* 배경 */}
       <div style={{ position: "absolute", inset: 0 }}>
-        <AssetImage src={scene.bg ? `/assets/scenes/${scene.bg}.webp` : undefined} kind="bg" label={title ?? "막간"} />
+        <AssetImage src={scene.bg ? assetUrl(`/assets/scenes/${scene.bg}.webp`) : undefined} kind="bg" label={title ?? "막간"} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0.55) 80%)" }} />
       </div>
+
+      {/* 오프닝 페이드-인 — 검정에서 장면이 밝아온다(시네마틱 진입). 1회, 입력 비차단. */}
+      <div aria-hidden style={{ position: "absolute", inset: 0, background: "#000", pointerEvents: "none", animation: "tkSceneIn 420ms ease-out both" }} />
 
       {/* 상단 타이틀 + 스킵 */}
       <div style={{ position: "absolute", top: "calc(12px + env(safe-area-inset-top))", left: 0, right: 0, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 16px" }}>
@@ -121,7 +125,7 @@ export function ScenePlayer({
           </div>
         </div>
       </div>
-      <style>{`@keyframes tkBlink { 0%,100% { opacity: 0.3 } 50% { opacity: 1 } }`}</style>
+      <style>{`@keyframes tkBlink { 0%,100% { opacity: 0.3 } 50% { opacity: 1 } } @keyframes tkSceneIn { from { opacity: 1 } to { opacity: 0 } }`}</style>
     </div>
   );
 }

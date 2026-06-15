@@ -29,6 +29,7 @@ import { addGold, markCleared, addItem, getMeta, addSerendipity } from "../../me
 import { clearReward } from "../../meta/serendipity";
 import { clearSortie } from "../../meta/sortie";
 import { RewardedAdButton } from "../../meta/RewardedAdButton";
+import { useFadeNav } from "../../ui/useFadeNav";
 
 const OVERLAY_STYLE: React.CSSProperties = {
   position: "absolute",
@@ -233,6 +234,9 @@ export function ResultSequence({
     [victory, vm, reward, items],
   );
 
+  // 캠페인 전환 — 결산→outro / 패배→outroDefeat 를 페이드-투-블랙 + SPA 라우팅으로(흰 깜빡 제거).
+  const { fadeTo, overlay: fadeOverlay } = useFadeNav(stageId);
+
   // 순차 연출 단계.
   const [step, setStep] = useState<number>(STEP.HIDDEN);
   // 별 펀치-인 진행 칸수(0..stars). STEP.STARS 진입 후 STAR_STAGGER 간격.
@@ -376,22 +380,28 @@ export function ResultSequence({
 
   if (!isOver) return null;
 
-  // ── 패배: 기존 패배 화면 유지 ──────────────────────────────────────────
+  // ── 패배: 캠페인 톤(수묵) + outroDefeat 씬으로 페이드 ──────────────────────
   if (!victory || !summary) {
     return (
-      <div style={OVERLAY_STYLE}>
-        <h1 style={{ fontSize: 44, margin: 0, color: "#ff6b6b" }}>패배</h1>
-        <p style={{ margin: 0, color: "#9aa3ad" }}>
+      <div style={{ ...OVERLAY_STYLE, background: "radial-gradient(120% 90% at 50% 30%, #2a1416 0%, #0d0b09 85%)" }}>
+        <h1 style={{ fontSize: 40, margin: 0, color: "#d9707a", letterSpacing: 4, fontFamily: '"Noto Serif KR", serif' }}>패 배</h1>
+        <p style={{ margin: 0, color: "#8a7350", fontFamily: '"Noto Serif KR", serif' }}>
           {vm.turn.turn}턴 · {vm.turn.turnLimit}턴 제한
         </p>
         <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
           <button type="button" style={BUTTON_STYLE} onClick={() => window.location.reload()}>
             다시 도전
           </button>
-          <a href="/stages" style={BUTTON_STYLE}>
-            전장 선택
-          </a>
+          {/* outroDefeat 씬으로(없으면 씬 가드가 전장 선택으로). 페이드 전환. */}
+          <button
+            type="button"
+            style={BUTTON_STYLE}
+            onClick={() => fadeTo(stageId ? `/scene?stage=${stageId}&type=outroDefeat` : "/stages")}
+          >
+            이야기 계속 ▶
+          </button>
         </div>
+        {fadeOverlay}
       </div>
     );
   }
@@ -670,15 +680,20 @@ export function ResultSequence({
             <button type="button" style={BUTTON_STYLE} onClick={() => window.location.reload()}>
               다시 도전
             </button>
-            {/* 캠페인 진행: outro 씬 → 다음 스테이지 intro(없으면 전장 선택). 씬 라우트가 빈 씬 가드. */}
-            <a href={stageId ? `/scene?stage=${stageId}&type=outro` : "/stages"} style={BUTTON_STYLE}>
+            {/* 캠페인 진행: outro 씬 → 다음 스테이지 intro(없으면 전장 선택). 페이드 전환 + 빈 씬 가드. */}
+            <button
+              type="button"
+              style={BUTTON_STYLE}
+              onClick={() => fadeTo(stageId ? `/scene?stage=${stageId}&type=outro` : "/stages")}
+            >
               다음으로 ▶
-            </a>
+            </button>
           </div>
         </div>
       ) : (
         <div style={{ fontSize: 12, color: "#7a828c", marginTop: 4 }}>탭하여 건너뛰기</div>
       )}
+      {fadeOverlay}
     </div>
   );
 }

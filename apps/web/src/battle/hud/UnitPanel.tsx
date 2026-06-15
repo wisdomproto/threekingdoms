@@ -10,6 +10,7 @@ import type { InputState } from "../inputMachine";
 import { rangeGrid } from "../rangeGrid";
 import type { BattleVM, ItemVM, StrategyVM, UnitVM } from "../viewmodel";
 import { PANEL_FRAME, PORTRAIT_FRAME } from "./frames";
+import { assetUrl } from "../../assetUrl";
 
 /** 초상 보유 장수 (apps/web/public/assets/ui/portraits/{name}.webp). 생기는 대로 추가 */
 const PORTRAIT_IDS = new Set(["관우", "화웅"]);
@@ -29,7 +30,7 @@ function PortraitBox({ name }: { name: string }): React.ReactElement {
       }}
     >
       <img
-        src={`/assets/ui/portraits/${encodeURIComponent(name)}.webp`}
+        src={assetUrl(`/assets/ui/portraits/${encodeURIComponent(name)}.webp`)}
         alt={name}
         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
       />

@@ -26,3 +26,10 @@ packages/data/json/sosoden/events/
 
 # 생성기(§11-B) 산출물 — 검수 전 스크래치
 packages/sim/out/
+
+# 로컬 환경변수·R2 업로드 자격증명 — *.example 만 추적(tools/.env.r2.example, apps/web/.env.local.example)
+.env
+.env.local
+.env.*.local
+.env.r2
+apps/web/.env.local

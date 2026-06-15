@@ -22,6 +22,7 @@ import type { RosterUnit } from "../metaStore";
 import { getMeta, setEquipped } from "../metaStore";
 import type { SortieMember } from "../sortie";
 import { PANEL_FRAME, PORTRAIT_FRAME, BUTTON_FRAME } from "../../battle/hud/frames";
+import { assetUrl } from "../../assetUrl";
 
 export interface FormationProps {
   /** 출진 후보(보유/합류 장수 + 메타 진행). metaStore.getRoster() 결과. */
@@ -96,7 +97,7 @@ function Portrait({ commanderId, size = 52 }: { commanderId: string; size?: numb
     >
       {PORTRAIT_IDS.has(commanderId) ? (
         <img
-          src={`/assets/ui/portraits/${encodeURIComponent(commanderId)}.webp`}
+          src={assetUrl(`/assets/ui/portraits/${encodeURIComponent(commanderId)}.webp`)}
           alt={name}
           style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
         />

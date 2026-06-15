@@ -18,6 +18,7 @@
 import { Assets, Container, Graphics, Rectangle, Sprite, Texture, type Renderer } from "pixi.js";
 import type { Side } from "@tk/data";
 import { TILE_SIZE } from "./projection";
+import { assetUrl } from "../assetUrl";
 
 /** 지형 14종 베이스 색 (terrains.json의 id와 1:1) */
 export const TERRAIN_COLORS: Record<string, number> = {
@@ -102,8 +103,9 @@ const GROUND_SIZE = 576; // 48 × 12 — 서브렉트가 깔끔히 wrap
 /** 스프라이트 포즈 키: "{view}_{pose}" */
 export type SpritePose = "front_idle" | "front_move" | "front_attack" | "back_idle" | "back_move" | "back_attack";
 
-const SPRITE_BASE = "/assets/sprites";
-const TILE_BASE = "/assets/tiles";
+// assetUrl로 베이스를 한 번만 해석 → 이하 `${SPRITE_BASE}/...` 조합이 자동으로 R2/CDN을 탄다.
+const SPRITE_BASE = assetUrl("/assets/sprites");
+const TILE_BASE = assetUrl("/assets/tiles");
 
 function darken(color: number, factor: number): number {
   const r = Math.floor(((color >> 16) & 0xff) * factor);
@@ -265,7 +267,7 @@ export class TextureResolver {
    */
   async loadMapBackground(stageId: string): Promise<Texture | null> {
     for (const ext of ["webp", "png"]) {
-      const url = `/assets/maps/${stageId}.${ext}`;
+      const url = assetUrl(`/assets/maps/${stageId}.${ext}`);
       try {
         const head = await fetch(url, { method: "HEAD" });
         if (!head.ok) continue;
@@ -284,7 +286,7 @@ export class TextureResolver {
   /** 맵 뒤 배경 텍스처 로드. 실패해도 null 반환(배경 없이 진행). */
   async loadBackground(): Promise<Texture | null> {
     try {
-      const tex = await Assets.load<Texture>("/assets/bg/battle_dawn.png");
+      const tex = await Assets.load<Texture>(assetUrl("/assets/bg/battle_dawn.png"));
       this.bgTex = tex ?? null;
       if (tex) console.info("[TextureResolver] 전투 배경 로드 완료");
       return this.bgTex;

@@ -59,7 +59,7 @@
 | 일기토 연출 | 하이브리드: 일반=Spine 합 연출, 스토리=Seedance 영상 컷신 (+결정타 순간 영상 컷인 테스트) | |
 | 프론트 | Next.js / React, 모바일 웹 우선 | 세션 10~15분/스테이지 목표 (v1은 원작 맵 기준 — 측정 후 조정, §11) |
 | 백엔드 | Supabase (계정, 클라우드 세이브, 리더보드, 리플레이) | 전투 연산은 100% 클라이언트 |
-| 배포/CDN | Vercel + Cloudflare R2(영상, 이그레스 무료) | 영상 트래픽 비용 방지 |
+| 배포/CDN | Vercel + Cloudflare R2(생성 에셋 전부, 이그레스 무료) | 영상+이미지 트래픽 비용·git 비대화 방지. 코드는 `apps/web/src/assetUrl.ts`(`NEXT_PUBLIC_ASSET_BASE`)로 호스트 한 겹 전환 — 미설정 시 로컬 `/public`, 설정 시 R2/CDN. 업로드 `tools/upload-assets.py`, 설정 docs/asset-pipeline/03-r2-asset-hosting.md (2026-06-15) |
 | 일러스트 | Gemini 2.5 Flash Image (nano banana) | 레퍼런스 시트 기반 일관성 |
 | 영상 | Seedance I2V | 일기토/이벤트 컷신 |
 | 음성 | ElevenLabs | 네임드 일기토 대사 + 내레이션 |
