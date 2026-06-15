@@ -69,6 +69,9 @@ class PresenterDelegate implements Presenter {
   phaseChanged(e: Ev<"phaseChanged">): Promise<void> {
     return this.target?.phaseChanged(e) ?? Promise.resolve();
   }
+  reinforcementArrived(e: Ev<"reinforcementArrived">): Promise<void> {
+    return this.target?.reinforcementArrived(e) ?? Promise.resolve();
+  }
   battleEnded(e: Ev<"battleEnded">): Promise<void> {
     return this.target?.battleEnded(e) ?? Promise.resolve();
   }

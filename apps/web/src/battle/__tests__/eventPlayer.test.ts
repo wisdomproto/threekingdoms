@@ -6,10 +6,10 @@
  *  - dev 계약: battleEnded 최후 재생, 종료 후 enqueue 금지, presented ≡ committed 단언
  */
 import { describe, expect, it } from "vitest";
-import { createBattle } from "@tk/engine";
+import { createBattle, spawnUnit } from "@tk/engine";
 import type { BattleEvent, BattleState } from "@tk/engine";
 import { EventPlayer, type PresentedSnapshot } from "../eventPlayer";
-import { FakePresenter } from "./fakePresenter";
+import { FakePresenter, TrackingPresenter } from "./fakePresenter";
 import { sishuiCtx } from "./fixtures";
 
 const state0 = createBattle(sishuiCtx, 42);
@@ -193,5 +193,32 @@ describe("dev 계약 — 드레인 정합 단언 (presented ≡ committed)", () 
     presenter.snapshot = () => null;
     await player.enqueue([moved]);
     expect(violations).toEqual([]);
+  });
+});
+
+describe("증원 도착 — 중도 스폰 유닛 투영 (회귀: 03 광종 보병대 '투영 누락')", () => {
+  it("reinforcementArrived가 투영에 유닛을 추가해 드레인 단언을 통과한다", async () => {
+    // 증원 유닛(초기 배치에 없음)을 committed에 추가하고, 그 이벤트를 재생한다.
+    const reinf = spawnUnit(sishuiCtx.data, {
+      commanderId: "보병대", classId: "footman", level: 3, troops: 90, items: [], side: "enemy", x: 5, y: 5,
+    });
+    const committed: BattleState = { ...state0, units: [...state0.units, reinf] };
+    const tp = new TrackingPresenter();
+    tp.prime(state0); // 렌더러 부팅 = 초기 유닛만 (보병대 없음)
+    const violations: string[] = [];
+    const player = new EventPlayer({
+      presenter: tp, getCommitted: () => committed, dev: true,
+      onDrained: () => {}, onDevViolation: (m) => violations.push(m),
+    });
+
+    const event: BattleEvent = {
+      type: "reinforcementArrived", reinforcementId: "r1", side: "enemy",
+      units: [{ id: "보병대", classId: "footman", x: 5, y: 5, troops: 90, maxTroops: 90 }],
+    };
+    await player.enqueue([event]);
+
+    // 수정 전: dispatch 케이스 없음 → 투영에 보병대 없음 → "유닛 보병대 투영 누락" 위반.
+    expect(violations).toEqual([]);
+    expect(tp.snapshot!()!.units.some((u) => u.id === "보병대")).toBe(true);
   });
 });

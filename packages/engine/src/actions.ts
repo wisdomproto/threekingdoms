@@ -272,7 +272,10 @@ function applyReinforcements(ctx: BattleContext, state: BattleState): { state: B
     };
     events.push({
       type: "reinforcementArrived", reinforcementId: r.id, side: r.side,
-      unitIds: spawned.map((u) => u.id),
+      // 렌더 데이터 동봉 — 렌더러가 committed 조회 없이 스프라이트 생성(자기서술 계약).
+      units: spawned.map((u) => ({
+        id: u.id, classId: u.classId, x: u.x, y: u.y, troops: u.troops, maxTroops: u.maxTroops,
+      })),
     });
   }
   return { state: next, events };

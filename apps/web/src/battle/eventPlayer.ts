@@ -44,6 +44,8 @@ export interface Presenter {
   /** 콤보(연속 격파) 연출 — 옵셔널. */
   combo?(e: Ev<"combo">): Promise<void>;
   phaseChanged(e: Ev<"phaseChanged">): Promise<void>;
+  /** 증원 도착 — 중도 스폰 유닛의 스프라이트 생성(이벤트 데이터로). 미구현이면 sync가 폴백 생성. */
+  reinforcementArrived?(e: Ev<"reinforcementArrived">): Promise<void>;
   battleEnded(e: Ev<"battleEnded">): Promise<void>;
   /** 드레인 시 committed로 강제 정합 — 연출 결과가 어긋났어도 진실로 덮는다 */
   sync(state: BattleState): void;
@@ -158,6 +160,8 @@ export class EventPlayer {
         return p.combo?.(e) ?? Promise.resolve();
       case "phaseChanged":
         return p.phaseChanged(e);
+      case "reinforcementArrived":
+        return p.reinforcementArrived?.(e) ?? Promise.resolve();
       case "battleEnded":
         return p.battleEnded(e);
       default:

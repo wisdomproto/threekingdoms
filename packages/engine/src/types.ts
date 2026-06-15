@@ -88,6 +88,16 @@ export type Action =
   | { type: "useItem"; unitId: string; itemId: string; target?: Coord }
   | { type: "wait"; unitId: string };
 
+/** 증원 도착 이벤트가 싣는 유닛 렌더 데이터 — 렌더러가 스프라이트를 생성하기에 충분한 최소 집합. */
+export interface ReinforcedUnit {
+  id: string;
+  classId: string;
+  x: number;
+  y: number;
+  troops: number;
+  maxTroops: number;
+}
+
 export type BattleEvent =
   | { type: "unitMoved"; unitId: string; from: Coord; to: Coord }
   | { type: "damageDealt"; attackerId: string; defenderId: string; damage: number; counter: boolean }
@@ -106,8 +116,9 @@ export type BattleEvent =
   | { type: "levelUp"; unitId: string; newLevel: number }
   | { type: "duelTriggered"; eventId: string; attackerId: string; defenderId: string; winnerId: string }
   | { type: "phaseChanged"; phase: Side; turn: number }
-  // M3① 증원 도착 — units = 새로 투입된 유닛 id 목록 (BattleState.units에 추가된 직후)
-  | { type: "reinforcementArrived"; reinforcementId: string; side: Side; unitIds: string[] }
+  // M3① 증원 도착 — units = 새로 투입된 유닛의 렌더 데이터(BattleState.units에 추가된 직후).
+  // 렌더러가 이벤트만으로 스프라이트를 생성할 수 있게 자기서술적("이벤트가 상태 변화를 전부 서술" 계약).
+  | { type: "reinforcementArrived"; reinforcementId: string; side: Side; units: ReinforcedUnit[] }
   // M3① 전략조건 충족 — reward = 적립된 보물/자금 (결산 지급 대기). 승패 무관
   | { type: "strategyConditionMet"; id: string; treasures: string[]; gold: number }
   | { type: "battleEnded"; result: "victory" | "defeat" };

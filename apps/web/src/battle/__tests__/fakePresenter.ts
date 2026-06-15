@@ -64,6 +64,9 @@ export class FakePresenter implements Presenter {
   phaseChanged(e: Ev<"phaseChanged">): Promise<void> {
     return this.handle(e);
   }
+  reinforcementArrived(e: Ev<"reinforcementArrived">): Promise<void> {
+    return this.handle(e);
+  }
   battleEnded(e: Ev<"battleEnded">): Promise<void> {
     return this.handle(e);
   }
@@ -123,6 +126,11 @@ export class TrackingPresenter extends FakePresenter {
       }
       case "phaseChanged":
         this.phase = e.phase;
+        break;
+      case "reinforcementArrived": // 중도 스폰 — 이벤트 데이터로 투영에 유닛 추가(자기서술 계약)
+        for (const u of e.units) {
+          this.units.set(u.id, { id: u.id, x: u.x, y: u.y, troops: u.troops, retreated: false });
+        }
         break;
       case "strategyCast": // 시전 알림만 — 실제 피해는 후속 damageDealt가 투영 반영
       case "duelTriggered":

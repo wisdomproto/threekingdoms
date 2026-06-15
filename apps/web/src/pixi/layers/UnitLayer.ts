@@ -5,7 +5,7 @@
  * snapshot()은 dev 단언용 화면 투영 상태를 반환한다.
  */
 import { Container } from "pixi.js";
-import type { BattleContext, BattleState } from "@tk/engine";
+import type { BattleContext, BattleState, UnitState, ReinforcedUnit } from "@tk/engine";
 import type { PresentedUnit } from "../../battle/eventPlayer";
 import type { TextureResolver } from "../textures";
 import type { TweenRunner } from "../tweens";
@@ -13,6 +13,10 @@ import { UnitView } from "./UnitView";
 
 export class UnitLayer extends Container {
   private readonly views = new Map<string, UnitView>();
+  // 중도 스폰(증원) 뷰를 생성하려면 생성 의존물을 보관해야 한다(종전 생성자 지역변수 → 필드).
+  private readonly ctx: BattleContext;
+  private readonly textures: TextureResolver;
+  private readonly tweens: TweenRunner;
 
   constructor(
     ctx: BattleContext,
@@ -21,26 +25,46 @@ export class UnitLayer extends Container {
     tweens: TweenRunner,
   ) {
     super();
+    this.ctx = ctx;
+    this.textures = textures;
+    this.tweens = tweens;
     this.sortableChildren = true;
-    for (const u of state.units) {
-      const view = new UnitView(
-        {
-          id: u.id,
-          commanderId: u.id,        // 스테이지 JSON의 commanderId = unit.id
-          classId: u.classId,
-          name: ctx.data.commanders[u.id]?.name ?? u.id,
-          side: u.side,
-          x: u.x,
-          y: u.y,
-          troops: u.troops,
-          maxTroops: u.maxTroops,
-          retreated: u.retreated,
-        },
-        textures,
-        tweens,
-      );
-      this.views.set(u.id, view);
-      this.addChild(view);
+    for (const u of state.units) this.createView(u);
+  }
+
+  /** UnitState(또는 동형 데이터)로 뷰 1개 생성·등록. 초기 배치·증원 스폰·sync 폴백이 공유. */
+  private createView(u: {
+    id: string; classId: string; side: UnitState["side"]; x: number; y: number; troops: number; maxTroops: number; retreated?: boolean;
+  }): UnitView {
+    const view = new UnitView(
+      {
+        id: u.id,
+        commanderId: u.id, // 스테이지 JSON의 commanderId = unit.id
+        classId: u.classId,
+        name: this.ctx.data.commanders[u.id]?.name ?? u.id,
+        side: u.side,
+        x: u.x,
+        y: u.y,
+        troops: u.troops,
+        maxTroops: u.maxTroops,
+        retreated: u.retreated ?? false,
+      },
+      this.textures,
+      this.tweens,
+    );
+    this.views.set(u.id, view);
+    this.addChild(view);
+    return view;
+  }
+
+  /**
+   * 증원 도착 — 새 유닛 뷰 생성(이미 있으면 무시, 멱등). reinforcementArrived 이벤트가 호출하므로
+   * 드레인 snapshot 캡처 *전*에 뷰가 생겨 "투영 누락" 단언을 통과한다. 생성 직후 텍스처 적용.
+   */
+  spawn(units: readonly ReinforcedUnit[], side: UnitState["side"]): void {
+    for (const u of units) {
+      if (this.views.has(u.id)) continue;
+      this.createView({ ...u, side, retreated: false }).refreshSprite();
     }
   }
 
@@ -79,8 +103,9 @@ export class UnitLayer extends Container {
   /** committed로 강제 정합 — 연출 결과가 어긋났어도 진실로 덮는다 */
   sync(state: BattleState): void {
     for (const u of state.units) {
-      const v = this.views.get(u.id);
-      if (!v) continue; // v0에선 중도 스폰 없음
+      // 뷰가 없으면 생성(증원 등 중도 스폰 폴백 — reinforcementArrived가 놓친 경우 안전망).
+      let v = this.views.get(u.id);
+      if (!v) { v = this.createView(u); v.refreshSprite(); }
       v.snapTo(u.x, u.y);
       v.setTroops(u.troops);
       v.setRetreated(u.retreated);

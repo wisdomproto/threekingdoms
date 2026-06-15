@@ -154,9 +154,6 @@ export class UnitView extends Container {
     this.spriteBase.visible = false;
     this.addChild(this.spriteBase);
 
-    // 스프라이트가 있으면 즉시 초기 포즈 적용 (loadSprites 완료 후 호출된 경우)
-    this.applySpriteTexture("front", "idle");
-
     // ── 병력 바 (배경 + 채움) ──
     this.barBg = new Graphics();
     this.barBg.rect(0, 0, BAR_WIDTH, BAR_HEIGHT).fill(0x222222);
@@ -177,6 +174,11 @@ export class UnitView extends Container {
     this.nameLabel.anchor.set(0.5, 1);
     this.nameLabel.visible = false; // setSelected(true) 시에만 표시
     this.addChild(this.nameLabel);
+
+    // 스프라이트가 있으면 즉시 초기 포즈 적용 (loadSprites 완료 후 = 증원 스폰 시).
+    // ⚠️ 반드시 bar/label 생성 *뒤*에 — applySpriteTexture가 repositionUI를 호출하므로
+    //    UI 필드가 먼저 존재해야 한다(부팅 후 생성 시 barBg 미정의 크래시 방지).
+    this.applySpriteTexture("front", "idle");
 
     this.redrawBar();
     this.repositionUI();

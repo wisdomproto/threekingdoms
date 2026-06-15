@@ -762,6 +762,15 @@ export class BattleRenderer implements Presenter {
     await s.fx.banner(label, PHASE_BANNER_MS);
   }
 
+  /** 증원 도착 — 새 유닛 스프라이트를 *드레인 전*에 생성(투영 누락 단언 방지) + 증원 배너. */
+  async reinforcementArrived(e: Ev<"reinforcementArrived">): Promise<void> {
+    const s = this.scene;
+    if (!s) return;
+    s.units.spawn(e.units, e.side);
+    const label = e.side === "enemy" ? "적 증원 도착!" : e.side === "ally" ? "우군 증원!" : "증원 도착!";
+    await s.fx.banner(label, PHASE_BANNER_MS);
+  }
+
   async battleEnded(e: Ev<"battleEnded">): Promise<void> {
     const s = this.scene;
     if (!s) return;
