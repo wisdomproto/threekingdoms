@@ -113,6 +113,9 @@ export function StageSelect(): React.ReactElement {
           출진할 전장
         </h1>
         <span style={{ display: "flex", alignItems: "center", gap: 14, whiteSpace: "nowrap" }}>
+          <Link href="/serendipity" style={{ color: BRONZE_DIM, fontSize: 14, textDecoration: "none" }}>
+            기연
+          </Link>
           <Link href="/codex" style={{ color: BRONZE_DIM, fontSize: 14, textDecoration: "none" }}>
             보물 도감
           </Link>

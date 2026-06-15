@@ -25,7 +25,8 @@ import type { InputState } from "../inputMachine";
 import type { BattleVM } from "../viewmodel";
 import { PANEL_FRAME, BUTTON_FRAME } from "./frames";
 import { buildResultSummary } from "./resultSummary";
-import { addGold, markCleared, addItem } from "../../meta/metaStore";
+import { addGold, markCleared, addItem, getMeta, addSerendipity } from "../../meta/metaStore";
+import { clearReward } from "../../meta/serendipity";
 import { clearSortie } from "../../meta/sortie";
 import { RewardedAdButton } from "../../meta/RewardedAdButton";
 
@@ -244,6 +245,10 @@ export function ResultSequence({
   const [flash, setFlash] = useState(false);
   // 스킵되면 즉시 최종 상태로 고정.
   const [skipped, setSkipped] = useState(false);
+  // 기연 포인트 적립(§12) — 클리어 1회 산정값(표시용). 2배 시 갱신.
+  const [serendipityPts, setSerendipityPts] = useState(0);
+  // 2배 재연출에 쓸 기연 적립 베이스(원래 적립량). doubled 시 같은 양을 1회 더 적립.
+  const serendipityBaseRef = useRef(0);
   // 결산 보상 2배(§12/§13 result_double) — 광고 완주 시 1회만. 표시 자금을 2배로 재연출.
   const [doubled, setDoubled] = useState(false);
   // 2배 재연출용 자금 카운트업 rAF 핸들(언마운트/스킵 시 취소).
@@ -262,11 +267,19 @@ export function ResultSequence({
       setFlash(false);
       setSkipped(false);
       setDoubled(false);
+      setSerendipityPts(0);
+      serendipityBaseRef.current = 0;
       return;
     }
     if (!metaCommitted.current) {
       metaCommitted.current = true;
       addGold(summary.gold); // metaStore가 legacy tk.meta.gold에도 mirror — 결산 경로 일원화
+      // 기연 포인트 적립(§12). 첫 클리어=등급 기반, 재도전=소액(파밍 방지) — markCleared 전에 판정.
+      const firstClear = stageId ? !getMeta().clearedStages.includes(stageId) : true;
+      const pts = clearReward(summary.grade, firstClear);
+      serendipityBaseRef.current = pts;
+      setSerendipityPts(pts);
+      addSerendipity(pts);
       if (stageId) markCleared(stageId); // 다음 전장 해금
       // 획득 보물을 인벤토리에 적립 (편성 장착 + §10 보물 도감 수집 반영). 종전 누락 보완.
       for (const t of summary.treasures) addItem(t.id);
@@ -339,6 +352,11 @@ export function ResultSequence({
         if (t < 1) doubleRafRef.current = requestAnimationFrame(tick);
       };
       doubleRafRef.current = requestAnimationFrame(tick);
+    }
+    // 기연 포인트도 2배(§12/§13 "골드·기연P 2배") — 베이스만큼 1회 더 적립.
+    if (serendipityBaseRef.current > 0) {
+      addSerendipity(serendipityBaseRef.current);
+      setSerendipityPts(serendipityBaseRef.current * 2);
     }
     // 잭팟 플래시 1회(2배 잭팟 강조).
     setFlash(true);
@@ -580,6 +598,16 @@ export function ResultSequence({
               +{(doubled ? goldShown : skipped ? summary.gold : goldShown).toLocaleString()}
             </span>
           </div>
+          {/* 기연 포인트 적립(§12) — 막간 기연 뽑기 자원. 자금 줄 아래 한 줄. */}
+          {serendipityPts > 0 && (
+            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, marginTop: 2 }}>
+              <span style={{ color: "#9aa3ad", fontSize: 13 }}>기연</span>
+              <span style={{ color: "#b890ff", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
+                +{serendipityPts}
+              </span>
+              <span style={{ color: "#6f6688", fontSize: 11 }}>奇緣</span>
+            </div>
+          )}
         </Reveal>
 
         {/* 4. 경험치 바 (+레벨업 팝) */}

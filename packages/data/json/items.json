@@ -1,4 +1,28 @@
 {
+  "qiyuan-charm": {
+    "id": "qiyuan-charm",
+    "name": "기연의 부적",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": { "defensePercent": 5 }
+  },
+  "qiyuan-token": {
+    "id": "qiyuan-token",
+    "name": "여정의 호패",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": { "move": 1 }
+  },
+  "qiyuan-relic": {
+    "id": "qiyuan-relic",
+    "name": "노승의 염주",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": { "spiritPercent": 5 }
+  },
   "둔갑천서": {
     "id": "둔갑천서",
     "name": "둔갑천서",

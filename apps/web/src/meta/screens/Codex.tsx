@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { gameData, stages } from "@tk/data";
 import { getMeta } from "../metaStore";
+import { isSerendipityTreasure } from "../serendipity";
 import { PANEL_FRAME } from "../../battle/hud/frames";
 
 const INK = "#1a1714";
@@ -40,8 +41,12 @@ export function Codex(): React.ReactElement {
     setOwned(new Set(getMeta().inventory));
   }, []);
 
+  // 도감 = 스테이지 고유 보물만. 기연 전용 보물(qiyuan-*)은 §10 도감 동력 보존 위해 제외.
   const treasures = useMemo(
-    () => Object.values(gameData.items).filter((i) => i.category === "treasure"),
+    () =>
+      Object.values(gameData.items).filter(
+        (i) => i.category === "treasure" && !isSerendipityTreasure(i.id),
+      ),
     [],
   );
   // 보물 id → 획득처(스테이지명) 힌트. reward.treasures + strategyConditions 노획분.

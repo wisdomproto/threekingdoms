@@ -30,7 +30,14 @@ import {
   setAdFree,
   canWatchGoldAd,
   recordAdGold,
+  reduceAddSerendipity,
+  reduceApplyPull,
+  addSerendipity,
+  getSerendipity,
+  getSerendipityPity,
+  pullSerendipity,
 } from "../metaStore";
+import { PULL_COST } from "../serendipity";
 
 describe("순수 reducer", () => {
   it("addGold는 floor·clamp 누적, 0/음수는 불변 참조", () => {
@@ -70,6 +77,36 @@ describe("순수 reducer", () => {
     expect(s.rosterProgress["관우"]).toEqual({ level: 1, exp: 0, equipped: ["청룡언월도"] });
     s = reduceSetEquipped(s, "관우", ["사모"]);
     expect(s.rosterProgress["관우"]!.equipped).toEqual(["사모"]);
+  });
+});
+
+describe("기연 reducer (§12 — 포인트·천장·뽑기)", () => {
+  it("addSerendipity는 floor·clamp 누적, 0/음수는 불변 참조", () => {
+    const s = initialMeta();
+    expect(reduceAddSerendipity(s, 4.9).serendipity).toBe(4);
+    expect(reduceAddSerendipity(s, -3)).toBe(s);
+    expect(reduceAddSerendipity(s, 0)).toBe(s);
+  });
+
+  it("applyPull은 포인트 부족 시 null", () => {
+    const s = { ...initialMeta(), serendipity: PULL_COST - 1 };
+    expect(reduceApplyPull(s, { reward: { kind: "gold", amount: 30 }, nextPity: 1, wasRare: false })).toBeNull();
+  });
+
+  it("applyPull(common gold)은 비용 차감 + pity 갱신 + 자금 적립", () => {
+    const s = { ...initialMeta(), serendipity: 10, serendipityPity: 2 };
+    const next = reduceApplyPull(s, { reward: { kind: "gold", amount: 80 }, nextPity: 3, wasRare: false })!;
+    expect(next.serendipity).toBe(10 - PULL_COST);
+    expect(next.serendipityPity).toBe(3);
+    expect(next.gold).toBe(80);
+  });
+
+  it("applyPull(rare item)은 인벤토리 적립 + pity 리셋", () => {
+    const s = { ...initialMeta(), serendipity: 5, serendipityPity: 9 };
+    const next = reduceApplyPull(s, { reward: { kind: "item", itemId: "qiyuan-charm" }, nextPity: 0, wasRare: true })!;
+    expect(next.serendipity).toBe(5 - PULL_COST);
+    expect(next.serendipityPity).toBe(0);
+    expect(next.inventory).toEqual(["qiyuan-charm"]);
   });
 });
 
@@ -168,7 +205,31 @@ describe("공개 API (node 비브라우저 — 메모리 캐시 폴백)", () => 
 
   it("getMeta 초기값은 빈 상태", () => {
     const m = getMeta();
-    expect(m).toEqual({ gold: 0, inventory: [], clearedStages: [], rosterProgress: {}, adFree: false });
+    expect(m).toEqual({
+      gold: 0,
+      inventory: [],
+      clearedStages: [],
+      rosterProgress: {},
+      adFree: false,
+      serendipity: 0,
+      serendipityPity: 0,
+    });
+  });
+
+  it("addSerendipity→pullSerendipity 흐름이 메모리 캐시로 일관", () => {
+    expect(addSerendipity(PULL_COST * 2)).toBe(PULL_COST * 2);
+    expect(getSerendipity()).toBe(PULL_COST * 2);
+    // rng 주입: 첫 rng 높게(common) → gold/item 1회. 포인트 차감 확인.
+    const out = pullSerendipity(() => 0.99);
+    expect(out).not.toBeNull();
+    expect(getSerendipity()).toBe(PULL_COST);
+    expect(getSerendipityPity()).toBe(1);
+  });
+
+  it("pullSerendipity는 포인트 부족 시 null(상태 불변)", () => {
+    addSerendipity(PULL_COST - 1);
+    expect(pullSerendipity(() => 0.5)).toBeNull();
+    expect(getSerendipity()).toBe(PULL_COST - 1);
   });
 
   it("addGold→spendGold 흐름이 메모리 캐시로 일관", () => {
