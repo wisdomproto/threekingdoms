@@ -68,7 +68,8 @@ export function buildAttackPreview(
 
   // 필살: 대형 확정 일격(무반격·협공/돌격/연속 무관). 엔진 ultimate 케이스와 동일.
   if (ultimate) {
-    const ultMult = 1 + ctx.data.combat.sp.ultimatePercent / 100;
+    const sig = ctx.data.commanders[rawAttacker.id]?.ultimate;
+    const ultMult = 1 + (sig?.percent ?? ctx.data.combat.sp.ultimatePercent) / 100;
     const dmg = computeDamage(ctx, rawAttacker, defender, 1, ultMult);
     return { damage: dmg, willRetreat: defender.troops - dmg <= 0, ultimate: true };
   }

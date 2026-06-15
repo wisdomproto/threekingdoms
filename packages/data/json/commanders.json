@@ -5,7 +5,8 @@
     "leadership": 72,
     "war": 78,
     "intelligence": 76,
-    "faceId": 0
+    "faceId": 0,
+    "ultimate": { "name": "인덕의 결의", "percent": 150 }
   },
   "관우": {
     "id": "관우",
@@ -13,7 +14,8 @@
     "leadership": 98,
     "war": 96,
     "intelligence": 90,
-    "faceId": 1
+    "faceId": 1,
+    "ultimate": { "name": "청룡언월", "percent": 180 }
   },
   "장비": {
     "id": "장비",
@@ -21,7 +23,8 @@
     "leadership": 74,
     "war": 100,
     "intelligence": 46,
-    "faceId": 2
+    "faceId": 2,
+    "ultimate": { "name": "장팔사모", "percent": 170 }
   },
   "동탁": {
     "id": "동탁",
@@ -429,7 +432,8 @@
     "leadership": 82,
     "war": 96,
     "intelligence": 68,
-    "faceId": 3
+    "faceId": 3,
+    "ultimate": { "name": "단기필마", "percent": 170 }
   },
   "봉기": {
     "id": "봉기",
@@ -1005,7 +1009,8 @@
     "leadership": 94,
     "war": 44,
     "intelligence": 100,
-    "faceId": 4
+    "faceId": 4,
+    "ultimate": { "name": "동남풍", "percent": 160 }
   },
   "위연": {
     "id": "위연",

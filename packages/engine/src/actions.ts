@@ -25,6 +25,22 @@ function addSp(u: UnitState, amount: number): UnitState {
   return { ...u, sp: Math.min(u.maxSp ?? Infinity, (u.sp ?? 0) + amount) };
 }
 
+/**
+ * 아군이 적을 격파(retreat)했을 때 콤보 +1 + 보너스 자금 적립(§7/§12). 전투력 아님(밸런스 중립).
+ * 비격파·비아군이면 무변. 콤보는 아군 페이즈 시작 시 리셋(maybeAdvancePhase).
+ */
+function registerComboKill(
+  ctx: BattleContext, state: BattleState, attackerSide: Side, killed: boolean,
+): { state: BattleState; events: BattleEvent[] } {
+  if (!killed || attackerSide !== "player") return { state, events: [] };
+  const combo = (state.combo ?? 0) + 1;
+  const gold = ctx.data.combat.combo.goldPerStack * combo;
+  return {
+    state: { ...state, combo, pendingRewards: [...state.pendingRewards, { conditionId: "combo", treasures: [], gold }] },
+    events: [{ type: "combo", count: combo, gold }],
+  };
+}
+
 function assertCanAct(state: BattleState, unit: UnitState, forMove: boolean): void {
   if (state.status !== "ongoing") throw new Error("battle already ended");
   if (unit.retreated) throw new Error(`${unit.id} already retreated`);
@@ -223,8 +239,10 @@ function maybeAdvancePhase(state: BattleState): { state: BattleState; events: Ba
   const units = state.units.map((u) =>
     u.side === nextPhase ? { ...u, moved: false, acted: false } : u,
   );
+  // 콤보는 아군 페이즈 시작 시 0으로 리셋 (연속 격파 단위 = 한 아군 페이즈)
+  const combo = nextPhase === "player" ? 0 : state.combo;
   return {
-    state: { ...state, phase: nextPhase, turn: nextTurn, units },
+    state: { ...state, phase: nextPhase, turn: nextTurn, units, combo },
     events: [{ type: "phaseChanged", phase: nextPhase, turn: nextTurn }],
   };
 }
@@ -412,6 +430,12 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
         const def2 = getUnit(next, target.id);
         if (!def2.retreated) next = replaceUnit(next, addSp(def2, spCfg.onHitTaken));
       }
+      // 콤보(연속 격파) — 아군이 이 공격으로 격파했으면 +1 + 보너스 자금.
+      {
+        const combo = registerComboKill(ctx, next, unit.side, getUnit(next, target.id).retreated);
+        next = combo.state;
+        events.push(...combo.events);
+      }
       // 반격으로 공격자가 퇴각했어도 acted=true로 통일 — maybeAdvancePhase의 retreated 필터가 가드
       next = replaceUnit(next, { ...getUnit(next, unit.id), acted: true });
       break;
@@ -424,9 +448,11 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
       if (!getAttackableTargets(ctx, state, unit.id).includes(target.id)) throw new Error(`${target.id} out of range`);
       if (!canUltimate(unit)) throw new Error(`${unit.id} SP not full`);
       // 필살 = SP 소진 대형 확정 일격. 협공/돌격/연속과 무관한 단타·무반격(결정론).
-      const ultMult = 1 + ctx.data.combat.sp.ultimatePercent / 100;
+      // 네임드 시그니처(§8 고유 스킬)가 있으면 그 위력·이름 사용, 없으면 기본 필살치.
+      const sig = ctx.data.commanders[unit.id]?.ultimate;
+      const ultMult = 1 + (sig?.percent ?? ctx.data.combat.sp.ultimatePercent) / 100;
       const dmg = computeDamage(ctx, unit, target, 1, ultMult);
-      events.push({ type: "ultimate", attackerId: unit.id, defenderId: target.id, damage: dmg });
+      events.push({ type: "ultimate", attackerId: unit.id, defenderId: target.id, damage: dmg, name: sig?.name });
       const tLvl = getUnit(next, target.id).level;
       const hit = dealDamage(next, unit, getUnit(next, target.id), dmg, false);
       next = hit.state;
@@ -434,6 +460,12 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
       const ultExp = grantExp(ctx, next, unit.id, dmg, getUnit(next, target.id).retreated, tLvl);
       next = ultExp.state;
       events.push(...ultExp.events);
+      // 콤보 — 필살로 격파했으면 +1
+      {
+        const combo = registerComboKill(ctx, next, unit.side, getUnit(next, target.id).retreated);
+        next = combo.state;
+        events.push(...combo.events);
+      }
       // SP 소진 + acted (무반격)
       next = replaceUnit(next, { ...getUnit(next, unit.id), sp: 0, acted: true });
       break;

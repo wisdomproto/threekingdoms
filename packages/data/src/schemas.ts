@@ -10,6 +10,14 @@ export const CommanderSchema = z.object({
   war: Stat,                 // 무력 → 공격 공식
   intelligence: Stat,        // 지력 → 책략치(MP)
   faceId: z.number().int().min(0).max(255),
+  /**
+   * 네임드 시그니처 궁극기(§8 고유 스킬) — 필살 발동 시 이 장수만의 이름·위력. 미지정=일반 필살.
+   * percent 미지정 시 combat.sp.ultimatePercent 사용. 효과는 결정론(추가 피해 %).
+   */
+  ultimate: z.object({
+    name: z.string(),              // 「청룡언월」 등 — 발동 배너
+    percent: z.number().min(0).optional(), // 추가 피해 %(미지정=기본 필살치)
+  }).optional(),
 });
 export type Commander = z.infer<typeof CommanderSchema>;
 
@@ -164,6 +172,13 @@ export const CombatConfigSchema = z.object({
     onKill: z.number().int().min(0),    // 격파 시 공격자 SP +
     ultimatePercent: z.number().min(0), // 필살 추가 피해 %(2단계 — 발동 시 ×(1+%/100))
   }).default({ max: 255, onAttack: 25, onHitTaken: 20, onKill: 60, ultimatePercent: 150 }),
+  /**
+   * 콤보(§7/§12 도파민) — 아군 페이즈 연속 격파 시 확정 보너스 자금(전투력 아님 → 밸런스 중립).
+   * 격파마다 goldPerStack × 현재콤보수 적립. 결산에서 「콤보!」 연출.
+   */
+  combo: z.object({
+    goldPerStack: z.number().int().min(0),
+  }).default({ goldPerStack: 15 }),
 }).refine(
   (c) => Object.entries(c.lineAdvantage).every(([k, v]) => k !== v),
   { message: "lineAdvantage must not be self-referential" },

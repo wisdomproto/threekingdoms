@@ -73,6 +73,8 @@ export interface BattleState {
   spawnedReinforcements: string[];
   /** 전략조건으로 적립된 보상 (결산 지급 대기). 결정론적 누적 */
   pendingRewards: PendingReward[];
+  /** 콤보(§7/§12) — 현재 아군 페이즈의 연속 격파 수. 아군 페이즈 시작 시 0으로 리셋. 미설정=0 */
+  combo?: number;
 }
 
 export type Action =
@@ -93,8 +95,10 @@ export type BattleEvent =
   | { type: "flank"; attackerId: string; defenderId: string; surround: number; bonusPercent: number }
   // 연속공격(2중공격) 발동 — 이동력 우위로 개시 공격이 2회 타격. 연출용.
   | { type: "doubleStrike"; attackerId: string; defenderId: string }
-  // 필살 발동 — SP 소진하며 대형 확정피해. 연출용(배너·이펙트).
-  | { type: "ultimate"; attackerId: string; defenderId: string; damage: number }
+  // 필살 발동 — SP 소진하며 대형 확정피해. name=네임드 시그니처명(있으면). 연출용.
+  | { type: "ultimate"; attackerId: string; defenderId: string; damage: number; name?: string }
+  // 콤보(연속 격파) — count=현재 콤보 수, gold=이번 격파로 적립된 보너스 자금. 연출·도파민용.
+  | { type: "combo"; count: number; gold: number }
   | { type: "strategyCast"; casterId: string; strategyId: string; target: Coord }
   // 도구 사용 결과 — amount = 실제 회복/피해량(상한·하한 클램프 후). target = 효과 대상 좌표.
   | { type: "itemUsed"; unitId: string; itemId: string; target?: Coord; amount: number }

@@ -8,7 +8,7 @@ import type { BattleContext } from "../src/types";
  */
 const refCommanders: Record<string, Commander> = {
   유비: { id: "유비", name: "유비", war: 75, leadership: 91, intelligence: 64, faceId: 0 },
-  관우: { id: "관우", name: "관우", war: 98, leadership: 100, intelligence: 80, faceId: 1 },
+  관우: { id: "관우", name: "관우", war: 98, leadership: 100, intelligence: 80, faceId: 1, ultimate: { name: "청룡언월", percent: 180 } },
   화웅: { id: "화웅", name: "화웅", war: 90, leadership: 88, intelligence: 29, faceId: 138 },
   이숙: { id: "이숙", name: "이숙", war: 54, leadership: 50, intelligence: 68, faceId: 139 },
 };

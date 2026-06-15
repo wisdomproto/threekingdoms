@@ -54,6 +54,6 @@ export function createBattle(ctx: BattleContext, seed: number): BattleState {
   const units: UnitState[] = stage.units.map((p) => spawnUnit(data, p));
   return {
     turn: 1, phase: "player", status: "ongoing", units, rngState: seed, firedEvents: [],
-    duelHistory: [], metStrategyConditions: [], spawnedReinforcements: [], pendingRewards: [],
+    duelHistory: [], metStrategyConditions: [], spawnedReinforcements: [], pendingRewards: [], combo: 0,
   };
 }

@@ -41,6 +41,8 @@ export interface Presenter {
   flank?(e: Ev<"flank">): Promise<void>;
   /** 필살 발동 연출(배너·이펙트) — 옵셔널. */
   ultimate?(e: Ev<"ultimate">): Promise<void>;
+  /** 콤보(연속 격파) 연출 — 옵셔널. */
+  combo?(e: Ev<"combo">): Promise<void>;
   phaseChanged(e: Ev<"phaseChanged">): Promise<void>;
   battleEnded(e: Ev<"battleEnded">): Promise<void>;
   /** 드레인 시 committed로 강제 정합 — 연출 결과가 어긋났어도 진실로 덮는다 */
@@ -152,6 +154,8 @@ export class EventPlayer {
         return p.flank?.(e) ?? Promise.resolve();
       case "ultimate":
         return p.ultimate?.(e) ?? Promise.resolve();
+      case "combo":
+        return p.combo?.(e) ?? Promise.resolve();
       case "phaseChanged":
         return p.phaseChanged(e);
       case "battleEnded":

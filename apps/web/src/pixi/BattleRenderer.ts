@@ -706,6 +706,12 @@ export class BattleRenderer implements Presenter {
     await s.fx.banner(`협공! +${e.bonusPercent}%`, FLANK_BANNER_MS);
   }
 
+  async combo(e: Ev<"combo">): Promise<void> {
+    const s = this.scene;
+    if (!s || e.count < 2) return; // 단일 격파는 연출 생략, 2연속부터 「콤보」
+    await s.fx.banner(`콤보 ×${e.count}!  +${e.gold}G`, FLANK_BANNER_MS);
+  }
+
   async ultimate(e: Ev<"ultimate">): Promise<void> {
     const s = this.scene;
     if (!s) return;
@@ -715,7 +721,8 @@ export class BattleRenderer implements Presenter {
     const at = gridToWorld({ x: defender.gridX, y: defender.gridY });
     this.triggerShake(SHAKE_PX_BIG);
     void s.fx.impactFlash(at);
-    await s.fx.banner(`필살! ${attacker}`, DUEL_BANNER_MS);
+    // 네임드 시그니처면 그 이름(「청룡언월!」), 아니면 일반 「필살! 장수」
+    await s.fx.banner(e.name ? `${e.name}!  ${attacker}` : `필살! ${attacker}`, DUEL_BANNER_MS);
   }
 
   async phaseChanged(e: Ev<"phaseChanged">): Promise<void> {

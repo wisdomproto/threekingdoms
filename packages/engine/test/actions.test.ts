@@ -42,13 +42,34 @@ describe("applyAction: ultimate (필살)", () => {
     const { state, events } = applyAction(testCtx, s, { type: "ultimate", unitId: "관우", targetId: "이숙" });
     const ult = events.find((e) => e.type === "ultimate");
     expect(ult && ult.type === "ultimate").toBe(true);
-    if (ult && ult.type === "ultimate") expect(ult.damage).toBeGreaterThan(normal); // 필살 > 일반
+    if (ult && ult.type === "ultimate") {
+      expect(ult.damage).toBeGreaterThan(normal); // 필살 > 일반
+      expect(ult.name).toBe("청룡언월"); // 관우 네임드 시그니처(§8 고유 스킬)
+    }
     expect(get(state, "관우").sp).toBe(0); // SP 소진
     expect(get(state, "관우").acted).toBe(true);
   });
   it("SP 미충전이면 필살 불가(throw)", () => {
     const s = patchUnit(fresh(), "이숙", { x: 1, y: 3 }); // 관우 sp=0
     expect(() => applyAction(testCtx, s, { type: "ultimate", unitId: "관우", targetId: "이숙" })).toThrow();
+  });
+});
+
+describe("콤보(연속 격파) (§7/§12)", () => {
+  it("아군 연속 격파 → combo 증가 + 보너스 자금 적립(결정론)", () => {
+    const gp = testCtx.data.combat.combo.goldPerStack;
+    let s = patchUnit(fresh(), "이숙", { x: 1, y: 3, troops: 1 }); // 관우 인접, 한 방 격파
+    s = patchUnit(s, "화웅", { x: 2, y: 4, troops: 1 });           // 유비 인접, 한 방 격파
+    expect(s.combo).toBe(0);
+    s = applyAction(testCtx, s, { type: "attack", unitId: "관우", targetId: "이숙" }).state;
+    expect(s.combo).toBe(1); // 1격파
+    const r = applyAction(testCtx, s, { type: "attack", unitId: "유비", targetId: "화웅" }); // 유비=일기토 없음
+    expect(r.state.combo).toBe(2); // 연속 격파
+    expect(r.events.some((e) => e.type === "combo" && e.count === 2)).toBe(true);
+    const comboGold = r.state.pendingRewards
+      .filter((p) => p.conditionId === "combo")
+      .reduce((a, p) => a + p.gold, 0);
+    expect(comboGold).toBe(gp * 1 + gp * 2); // 1콤보 + 2콤보 = 15 + 30
   });
 });
 
