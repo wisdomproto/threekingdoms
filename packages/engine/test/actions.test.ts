@@ -100,6 +100,55 @@ describe("전투 특성 (Phase C)", () => {
   });
 });
 
+describe("상태이상 (Phase D)", () => {
+  const base = () => {
+    let s = patchUnit(fresh(), "이숙", { x: 1, y: 3, agility: 1, rangeMin: 1, rangeMax: 1, troops: 9999, maxTroops: 9999 });
+    s = patchUnit(s, "관우", { agility: 100, baseMove: 2 });
+    return s;
+  };
+
+  it("부여: chance=100이면 적중 시 statusApplied + 방어자 statuses", () => {
+    const s = patchUnit(base(), "관우", { agility: 100, baseMove: 2, inflictStatuses: [{ kind: "poison", chance: 100, turns: 3 }] });
+    const { state, events } = applyAction(testCtx, s, { type: "attack", unitId: "관우", targetId: "이숙" });
+    expect(events.some((e) => e.type === "statusApplied" && e.kind === "poison")).toBe(true);
+    expect(get(state, "이숙").statuses).toEqual([{ kind: "poison", turns: 3 }]);
+  });
+
+  it("부여 chance=0: 상태 없음", () => {
+    const s = patchUnit(base(), "관우", { agility: 100, baseMove: 2, inflictStatuses: [{ kind: "poison", chance: 0, turns: 3 }] });
+    const { state, events } = applyAction(testCtx, s, { type: "attack", unitId: "관우", targetId: "이숙" });
+    expect(events.some((e) => e.type === "statusApplied")).toBe(false);
+    expect(get(state, "이숙").statuses ?? []).toEqual([]);
+  });
+
+  it("중독 틱: enemy 페이즈 진입 시 중독 피해 이벤트", () => {
+    let s = patchUnit(base(), "이숙", { x: 1, y: 3, troops: 9999, maxTroops: 9999, statuses: [{ kind: "poison", turns: 2 }] });
+    // 유비만 미행동(마지막 player 행동), 나머지 player는 acted, ally는 retreated로 스킵 → 다음=enemy.
+    s = { ...s, units: s.units.map((u) =>
+      u.side === "ally" ? { ...u, retreated: true }
+        : (u.side === "player" && u.id !== "유비") ? { ...u, acted: true } : u) };
+    const { events } = applyAction(testCtx, s, { type: "wait", unitId: "유비" });
+    expect(events.some((e) => e.type === "statusTick" && e.unitId === "이숙" && e.kind === "poison")).toBe(true);
+  });
+
+  it("부동: immobilize면 move throw, attack은 가능", () => {
+    const s = patchUnit(base(), "관우", { statuses: [{ kind: "immobilize", turns: 2 }] });
+    const dest = { x: get(s, "관우").x, y: get(s, "관우").y - 1 };
+    expect(() => applyAction(testCtx, s, { type: "move", unitId: "관우", to: dest })).toThrow("부동");
+    const s2 = patchUnit(s, "관우", { agility: 100, statuses: [{ kind: "immobilize", turns: 2 }] });
+    expect(() => applyAction(testCtx, s2, { type: "attack", unitId: "관우", targetId: "이숙" })).not.toThrow();
+  });
+
+  it("금책: seal이면 strategy throw", () => {
+    const caster = fresh().units.find((u) => u.side === "player" && u.mp > 0);
+    if (!caster) return;
+    const sid = testCtx.data.unitClasses[caster.classId]?.strategies[0];
+    if (!sid) return;
+    const s = patchUnit(fresh(), caster.id, { statuses: [{ kind: "seal", turns: 2 }] });
+    expect(() => applyAction(testCtx, s, { type: "strategy", unitId: caster.id, strategyId: sid, target: { x: caster.x, y: caster.y } })).toThrow("금책");
+  });
+});
+
 describe("필살 게이지(SP) 누적 (§9)", () => {
   it("공격 시 공격자 +onAttack, 피격자 생존 시 +onHitTaken (결정론)", () => {
     const sp = testCtx.data.combat.sp;

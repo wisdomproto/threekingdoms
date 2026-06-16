@@ -9,6 +9,7 @@ import {
   hitChance, agilityPower,
 } from "./combat";
 import { nextRandom } from "./rng";
+import { hasStatus, applyStatus, tickStatuses } from "./status";
 import { findDuelTrigger } from "./events";
 import { spawnUnit } from "./createBattle";
 
@@ -49,6 +50,7 @@ function assertCanAct(state: BattleState, unit: UnitState, forMove: boolean): vo
   if (unit.side !== state.phase) throw new Error(`not ${unit.side} phase`);
   if (unit.acted) throw new Error(`${unit.id} already acted`);
   if (forMove && unit.moved) throw new Error(`${unit.id} already moved`);
+  if (forMove && hasStatus(unit, "immobilize")) throw new Error(`${unit.id} 부동 상태 — 이동 불가`);
 }
 
 /** 병력 차감 → 0이면 퇴각. 새 상태와 이벤트를 반환. hit=false(미스)는 호출측이 따로 emit하므로 기본 true. */
@@ -107,6 +109,17 @@ function resolveStrike(
   const exp = grantExp(ctx, next, attackerId, dmg, getUnit(next, defenderId).retreated, defLvl);
   next = exp.state;
   events.push(...exp.events);
+  // 상태이상 부여(Phase D) — 공격자 inflictStatuses 각각 chance 시드 롤 → 발동 시 방어자에 부여.
+  // (미보유 유닛은 루프 0회 → rngState 불변 → 시드 시퀀스/밸런스 보존.)
+  for (const inf of attacker.inflictStatuses ?? []) {
+    const [v, ns] = nextRandom(next.rngState);
+    next = { ...next, rngState: ns };
+    const tgt = getUnit(next, defenderId);
+    if (!tgt.retreated && v * 100 < inf.chance) {
+      next = replaceUnit(next, { ...tgt, statuses: applyStatus(tgt.statuses, inf.kind, inf.turns) });
+      events.push({ type: "statusApplied", unitId: defenderId, kind: inf.kind, turns: inf.turns });
+    }
+  }
   return { state: next, events, hit: true };
 }
 
@@ -265,7 +278,7 @@ function sideHasLivingUnits(state: BattleState, side: Side): boolean {
  * 다시 부를 액션도 없으므로 교착). 다음 페이즈 측 moved/acted 리셋.
  * 한 바퀴 돌아 player로 복귀할 때만 턴 증가 (라운드 = player→ally→enemy 1회).
  */
-function maybeAdvancePhase(state: BattleState): { state: BattleState; events: BattleEvent[] } {
+function maybeAdvancePhase(ctx: BattleContext, state: BattleState): { state: BattleState; events: BattleEvent[] } {
   if (state.status !== "ongoing") return { state, events: [] };
   const remaining = state.units.some((u) => u.side === state.phase && !u.retreated && !u.acted);
   if (remaining) return { state, events: [] };
@@ -289,9 +302,12 @@ function maybeAdvancePhase(state: BattleState): { state: BattleState; events: Ba
   );
   // 콤보는 아군 페이즈 시작 시 0으로 리셋 (연속 격파 단위 = 한 아군 페이즈)
   const combo = nextPhase === "player" ? 0 : state.combo;
+  // 상태이상 틱(Phase D) — 새 페이즈 진영 유닛에 중독 피해 + 만료 처리(페이즈 시작 1회).
+  const advanced: BattleState = { ...state, phase: nextPhase, turn: nextTurn, units, combo };
+  const ticked = tickStatuses(ctx, advanced, nextPhase);
   return {
-    state: { ...state, phase: nextPhase, turn: nextTurn, units, combo },
-    events: [{ type: "phaseChanged", phase: nextPhase, turn: nextTurn }],
+    state: ticked.state,
+    events: [{ type: "phaseChanged", phase: nextPhase, turn: nextTurn }, ...ticked.events],
   };
 }
 
@@ -531,6 +547,7 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
 
     case "strategy": {
       assertCanAct(state, unit, false);
+      if (hasStatus(unit, "seal")) throw new Error(`${unit.id} 금책 상태 — 책략 불가`);
       const strat = ctx.data.strategies[action.strategyId];
       if (!strat) throw new Error(`unknown strategy: ${action.strategyId}`);
       const cls = ctx.data.unitClasses[unit.classId];
@@ -635,7 +652,7 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
   next = outcome.state;
   events.push(...outcome.events);
 
-  const phase = maybeAdvancePhase(next);
+  const phase = maybeAdvancePhase(ctx, next);
   next = phase.state;
   events.push(...phase.events);
 
