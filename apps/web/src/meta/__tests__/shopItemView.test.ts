@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from "vitest";
 import type { Item, Shop } from "@tk/data";
-import { buildShopRows, type ShopRow } from "../screens/shopItemView";
+import { buildShopRows, effectText, type ShopRow } from "../screens/shopItemView";
 
 /** rows에서 itemId로 한 행을 꺼낸다(없으면 테스트 실패 — undefined 전파 방지). */
 function row(rows: ShopRow[], itemId: string): ShopRow {
@@ -66,5 +66,23 @@ describe("buildShopRows", () => {
     const rows = buildShopRows(shop, items, 1000, 1);
     expect(row(rows, "칠성검").categoryLabel).toBe("무기");
     expect(row(rows, "상약").categoryLabel).toBe("소모품");
+  });
+});
+
+describe("effectText 전 효과(Phase F)", () => {
+  const wpn = (effects: Item["effects"]): Item =>
+    ({ id: "x", name: "x", category: "weapon", power: 255, bonusPercent: 0, effects });
+  it("무반격·관통·재반격·고정뎀·필중", () => {
+    expect(effectText(wpn({ noCounter: true }))).toBe("무반격");
+    expect(effectText(wpn({ multiHit: 3 }))).toBe("관통 3격");
+    expect(effectText(wpn({ counterStrikes: 2 }))).toBe("재반격 2회");
+    expect(effectText(wpn({ flatDamagePerLevel: 15 }))).toBe("고정 피해(방어무시)");
+    expect(effectText(wpn({ alwaysHit: true }))).toBe("필중");
+  });
+  it("흡혈·사거리·상태이상·복합", () => {
+    expect(effectText(wpn({ lifestealPercent: 50 }))).toBe("흡혈 50%");
+    expect(effectText(wpn({ rangeBonus: 1 }))).toBe("사거리 +1");
+    expect(effectText(wpn({ inflictStatus: { kind: "poison", chance: 75, turns: 3 } }))).toBe("중독 부여 75%");
+    expect(effectText(wpn({ move: 1, atkPercent: 10, noCounter: true }))).toBe("이동 +1 · 공격 +10% · 무반격");
   });
 });

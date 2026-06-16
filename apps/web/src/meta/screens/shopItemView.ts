@@ -21,14 +21,38 @@ function isConsumable(item: Item): boolean {
   return (item.category === "supplyItem" || item.category === "attackItem") && item.power !== 255;
 }
 
-/** 효과 한 줄 — 무기/병법서/탈것은 % 가산, 소모품은 효과량(회복/피해). */
-function effectText(item: Item): string {
+const STATUS_LABEL: Record<"poison" | "seal" | "immobilize", string> = {
+  poison: "중독", seal: "금책", immobilize: "부동",
+};
+
+/**
+ * 효과 한 줄 — 소모품은 회복/피해, 그 외는 effects(전 전투 특성) + 레거시 bonusPercent를 ' · '로 연결.
+ * 표시 전용 순수 함수(전투 행동 특성도 문구화 — 전력 숫자가 못 잡는 가치를 보여줌). Phase F.
+ */
+export function effectText(item: Item): string {
   if (isConsumable(item)) {
     const verb = item.category === "supplyItem" ? "회복" : "피해";
     return `${verb} ${item.power}`;
   }
-  if (item.bonusPercent > 0) return `+${item.bonusPercent}%`;
-  return "고유 효과";
+  const parts: string[] = [];
+  const e = item.effects;
+  if (e) {
+    if (e.move) parts.push(`이동 +${e.move}`);
+    if (e.atkPercent) parts.push(`공격 +${e.atkPercent}%`);
+    if (e.spiritPercent) parts.push(`정신 +${e.spiritPercent}%`);
+    if (e.defensePercent) parts.push(`받는 피해 −${e.defensePercent}%`);
+    if (e.rangeBonus) parts.push(`사거리 +${e.rangeBonus}`);
+    if (e.multiHit) parts.push(`관통 ${e.multiHit}격`);
+    if (e.counterStrikes && e.counterStrikes > 1) parts.push(`재반격 ${e.counterStrikes}회`);
+    if (e.noCounter) parts.push("무반격");
+    if (e.doubleStrike) parts.push("연속공격");
+    if (e.flatDamagePerLevel) parts.push("고정 피해(방어무시)");
+    if (e.alwaysHit) parts.push("필중");
+    if (e.lifestealPercent) parts.push(`흡혈 ${e.lifestealPercent}%`);
+    if (e.inflictStatus) parts.push(`${STATUS_LABEL[e.inflictStatus.kind]} 부여 ${e.inflictStatus.chance}%`);
+  }
+  if (item.bonusPercent > 0) parts.push(`+${item.bonusPercent}%`);
+  return parts.length ? parts.join(" · ") : "고유 효과";
 }
 
 /** 진열 1줄의 표시 모델(렌더 전 확정). 누락 itemId는 제외된다. */
