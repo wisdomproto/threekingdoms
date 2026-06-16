@@ -10,4 +10,5 @@ export {
 export { evaluateStage } from "./grade";
 export { corpsStat, growthCoeff } from "./growth";
 export { findDuelTrigger } from "./events";
+export { hasStatus, applyStatus, tickStatuses } from "./status";
 export { applyAction } from "./actions";
