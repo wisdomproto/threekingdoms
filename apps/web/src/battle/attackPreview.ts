@@ -19,6 +19,7 @@
  */
 import {
   computeDamage, distance, areFoes, flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes,
+  hitChance, agilityPower,
 } from "@tk/engine";
 import type { BattleContext, BattleState, Coord, UnitState } from "@tk/engine";
 
@@ -26,6 +27,8 @@ export interface CounterPreview {
   damage: number;
   /** 반격으로 공격자가 퇴각하는가 */
   willRetreat: boolean;
+  /** 반격 명중률(%) — 시드확률(§2-1). 100이면 표시 생략 */
+  hitPercent: number;
 }
 
 export interface AttackPreview {
@@ -33,6 +36,8 @@ export interface AttackPreview {
   damage: number;
   /** 이 피해로 방어자가 퇴각(병력 0)하는가 — 강조색 트리거 */
   willRetreat: boolean;
+  /** 명중률(%) — 시드확률(§2-1). 100이면 표시 생략. 필살=100(항상 명중) */
+  hitPercent: number;
   /** 반격이 발생하면 그 추정치. 미발생(방어자 퇴각/사거리 밖) 시 생략 */
   counter?: CounterPreview;
   /** 협공 발동 시 — 대상 포위도(공격자 포함)와 추가피해%. 미발동이면 생략 */
@@ -71,7 +76,7 @@ export function buildAttackPreview(
     const sig = ctx.data.commanders[rawAttacker.id]?.ultimate;
     const ultMult = 1 + (sig?.percent ?? ctx.data.combat.sp.ultimatePercent) / 100;
     const dmg = computeDamage(ctx, rawAttacker, defender, 1, ultMult);
-    return { damage: dmg, willRetreat: defender.troops - dmg <= 0, ultimate: true };
+    return { damage: dmg, willRetreat: defender.troops - dmg <= 0, hitPercent: 100, ultimate: true };
   }
 
   // 엔진은 move→attack 순으로 처리하므로, 이동 예정이면 공격자를 from에 두고 moved=true로 맞춘다
@@ -95,6 +100,9 @@ export function buildAttackPreview(
   const charge =
     chargeMult > 1 ? { bonusPercent: Math.round((chargeMult - 1) * 100) } : undefined;
 
+  // 명중률(시드확률 §2-1) — 엔진 hitChance와 동일 입력(순발력). 공격 1타·연속2타 공통.
+  const hitPercent = hitChance(agilityPower(attacker), agilityPower(defender), ctx.data.combat.accuracy);
+
   const mult = flankMult * chargeMult;
   const dmg1 = computeDamage(ctx, attacker, defender, 1, mult);
   // 연속공격: 1타로 격파 안 되고 이동력 우위면 2타(secondHitPercent). 엔진과 동일 순서.
@@ -112,15 +120,17 @@ export function buildAttackPreview(
     const d = distance({ x: attacker.x, y: attacker.y }, { x: defender.x, y: defender.y });
     if (d >= defender.rangeMin && d <= defender.rangeMax) {
       const counterDamage = computeDamage(ctx, defender, attacker, ctx.data.combat.counterRatio);
+      const counterHitPercent = hitChance(agilityPower(defender), agilityPower(attacker), ctx.data.combat.accuracy);
       return {
         damage,
         willRetreat,
-        counter: { damage: counterDamage, willRetreat: attacker.troops - counterDamage <= 0 },
+        hitPercent,
+        counter: { damage: counterDamage, willRetreat: attacker.troops - counterDamage <= 0, hitPercent: counterHitPercent },
         flank,
         charge,
         doubleStrike,
       };
     }
   }
-  return { damage, willRetreat, flank, charge, doubleStrike };
+  return { damage, willRetreat, hitPercent, flank, charge, doubleStrike };
 }

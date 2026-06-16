@@ -19,7 +19,7 @@ const moved: BattleEvent = {
   type: "unitMoved", unitId: "관우", from: { x: 50, y: 15 }, to: { x: 49, y: 15 },
 };
 const damaged: BattleEvent = {
-  type: "damageDealt", attackerId: "관우", defenderId: "화웅", damage: 100, counter: false,
+  type: "damageDealt", attackerId: "관우", defenderId: "화웅", damage: 100, counter: false, hit: true,
 };
 const retreated: BattleEvent = { type: "unitRetreated", unitId: "화웅" };
 const dueled: BattleEvent = {

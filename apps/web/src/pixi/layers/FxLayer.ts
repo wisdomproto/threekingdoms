@@ -87,6 +87,38 @@ export class FxLayer {
       });
   }
 
+  /** 빗나감 팝업 — 명중 실패(§2-1 시드확률). damagePopup 동형, "빗나감" 회색. */
+  missPopup(at: WorldPoint): Promise<void> {
+    let text = this.popupPool.find((t) => !t.visible);
+    if (!text) {
+      text = new Text({
+        text: "",
+        style: {
+          fontFamily: "sans-serif", fontSize: 16, fontWeight: "bold",
+          fill: 0xffffff, stroke: { color: 0x000000, width: 4 },
+        },
+      });
+      text.anchor.set(0.5);
+      this.popupPool.push(text);
+      this.world.addChild(text);
+    }
+    text.text = "빗나감";
+    text.tint = 0xaab2bd;
+    text.visible = true;
+    text.alpha = 1;
+    const startY = at.y - 18;
+    text.position.set(at.x, startY);
+    const captured = text;
+    return this.tweens
+      .run(POPUP_MS, (t) => {
+        captured.position.y = startY - POPUP_RISE_PX * t;
+        captured.alpha = t < 0.6 ? 1 : 1 - (t - 0.6) / 0.4;
+      })
+      .then(() => {
+        captured.visible = false;
+      });
+  }
+
   /** 회복 팝업 — damagePopup과 동형이나 "+N" 초록. 회복 책략/회복약 공용 */
   healPopup(at: WorldPoint, amount: number): Promise<void> {
     let text = this.popupPool.find((t) => !t.visible);

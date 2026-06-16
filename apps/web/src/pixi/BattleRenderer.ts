@@ -621,6 +621,12 @@ export class BattleRenderer implements Presenter {
     const aPos = gridToWorld({ x: attacker.gridX, y: attacker.gridY });
     const popupAt = gridToWorld({ x: defender.gridX, y: defender.gridY });
 
+    // 빗나감(시드확률 §2-1): 피해 0 — 공격 모션 + "빗나감" 텍스트만, 슬래시/플래시/넉백/병력변동 없음.
+    if (e.hit === false) {
+      await Promise.all([attacker.play("attack"), s.fx.missPopup(popupAt)]);
+      return;
+    }
+
     // ── 타격 주스 파라미터 산출 (§4, 순수 표현) ──
     // 간접(궁/포): 공격자-방어자 그리드 거리>1 → 베기 대신 관통 톤.
     const dist = Math.abs(attacker.gridX - defender.gridX) + Math.abs(attacker.gridY - defender.gridY);

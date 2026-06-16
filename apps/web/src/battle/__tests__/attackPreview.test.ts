@@ -8,7 +8,7 @@
  *  - 이숙(궁병, enemy) → 간접공격(사거리 밖) 반격 없음
  */
 import { describe, expect, it } from "vitest";
-import { applyAction, createBattle, distance } from "@tk/engine";
+import { applyAction, createBattle, distance, hitChance, agilityPower } from "@tk/engine";
 import type { BattleEvent, BattleState } from "@tk/engine";
 import { buildAttackPreview } from "../attackPreview";
 import { findUnit, sishuiCtx, withUnit } from "./fixtures";
@@ -63,6 +63,16 @@ describe("buildAttackPreview", () => {
     expect(distance({ x: zf.x, y: zf.y }, { x: cao.x, y: cao.y })).toBe(1);
     expect(preview!.counter).toBeDefined();
     expect(preview!.counter!.damage).toBe(ctr!.damage);
+  });
+
+  it("hitPercent가 엔진 hitChance와 일치 (공격·반격, §2-1 시드확률)", () => {
+    const s = meleeState();
+    const zf = findUnit(s, "장비");
+    const cao = findUnit(s, "조잠");
+    const pv = buildAttackPreview(ctx, s, "장비", { x: cao.x, y: cao.y })!;
+    const acc = ctx.data.combat.accuracy;
+    expect(pv.hitPercent).toBe(hitChance(agilityPower(zf), agilityPower(cao), acc));
+    expect(pv.counter?.hitPercent).toBe(hitChance(agilityPower(cao), agilityPower(zf), acc));
   });
 
   it("격파: 방어자 병력이 피해 미만이면 willRetreat=true, 반격 없음", () => {
