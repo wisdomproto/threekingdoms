@@ -111,6 +111,12 @@ export const ItemEffectsSchema = z.object({
   spiritPercent: z.number().min(0).optional(),             // 부대 정신력 +N% (보물 병서류)
   defensePercent: z.number().min(0).max(90).optional(),    // 받는 피해 −N% (방어 보물 — 철벽처럼)
   doubleStrike: z.boolean().optional(),                    // 연속공격 무조건 부여(이동력 무관)
+  // Phase C 전투 특성(결정론) — 미지정=무효. spawnUnit에서 UnitState로 집약.
+  noCounter: z.boolean().optional(),                       // 무반격(공격 시 상대 반격 안 받음)
+  multiHit: z.number().int().min(2).optional(),            // 관통: 개시 공격 N회 전타격(레거시 doubleStrike 대체)
+  counterStrikes: z.number().int().min(1).optional(),      // 재반격/연환: 이 유닛이 반격 시 치는 횟수(기본 1)
+  flatDamagePerLevel: z.number().int().min(0).optional(),  // 고정 피해 = 값×(레벨+1), 방어/지형/협공 무시
+  alwaysHit: z.boolean().optional(),                       // 필중(명중 롤 생략)
 });
 export type ItemEffects = z.infer<typeof ItemEffectsSchema>;
 

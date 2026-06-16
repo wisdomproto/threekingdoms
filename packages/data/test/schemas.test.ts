@@ -260,4 +260,14 @@ describe("스키마 v2 (원작 모델)", () => {
     const c2 = CommanderSchema.parse({ id: "y", name: "y", leadership: 50, war: 50, intelligence: 50, faceId: 0, agility: 68 });
     expect(c2.agility).toBe(68);
   });
+
+  it("ItemEffects 전투 특성(Phase C) 파싱 + 미지정 무파손", () => {
+    const e = ItemSchema.parse({
+      id: "t", name: "t", category: "weapon", power: 255, bonusPercent: 0,
+      effects: { noCounter: true, multiHit: 3, counterStrikes: 2, flatDamagePerLevel: 15, alwaysHit: true },
+    });
+    expect(e.effects).toMatchObject({ noCounter: true, multiHit: 3, counterStrikes: 2, flatDamagePerLevel: 15, alwaysHit: true });
+    // 기존 effects(말) 무파손
+    expect(ItemSchema.parse({ id: "m", name: "말", category: "horse", power: 255, bonusPercent: 0, effects: { move: 1 } }).effects?.multiHit).toBeUndefined();
+  });
 });
