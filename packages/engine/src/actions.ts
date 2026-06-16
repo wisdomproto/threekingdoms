@@ -109,6 +109,15 @@ function resolveStrike(
   const exp = grantExp(ctx, next, attackerId, dmg, getUnit(next, defenderId).retreated, defLvl);
   next = exp.state;
   events.push(...exp.events);
+  // 흡혈(Phase E) — 입힌 피해 비례 자가 회복 + troopsHealed 이벤트(회복도 이벤트로 서술).
+  if (attacker.lifestealPercent && dmg > 0) {
+    const heal = Math.floor((dmg * attacker.lifestealPercent) / 100);
+    if (heal > 0) {
+      const h = healTroops(next, getUnit(next, attackerId), heal);
+      next = h.state;
+      if (h.healed > 0) events.push({ type: "troopsHealed", unitId: attackerId, amount: h.healed });
+    }
+  }
   // 상태이상 부여(Phase D) — 공격자 inflictStatuses 각각 chance 시드 롤 → 발동 시 방어자에 부여.
   // (미보유 유닛은 루프 0회 → rngState 불변 → 시드 시퀀스/밸런스 보존.)
   for (const inf of attacker.inflictStatuses ?? []) {

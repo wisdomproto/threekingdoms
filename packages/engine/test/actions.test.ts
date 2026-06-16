@@ -149,6 +149,28 @@ describe("상태이상 (Phase D)", () => {
   });
 });
 
+describe("흡혈 (Phase E)", () => {
+  it("lifestealPercent: 입힌 피해 비례 자가 회복 + troopsHealed", () => {
+    let s = patchUnit(fresh(), "이숙", { x: 1, y: 3, agility: 1, rangeMin: 1, rangeMax: 1, troops: 9999, maxTroops: 9999 });
+    s = patchUnit(s, "관우", { agility: 100, baseMove: 2, troops: 100, maxTroops: 9999, lifestealPercent: 50, noCounter: true });
+    const { state, events } = applyAction(testCtx, s, { type: "attack", unitId: "관우", targetId: "이숙" });
+    const dmg = events.filter((e) => e.type === "damageDealt" && e.counter === false && e.hit)[0];
+    const heal = events.find((e) => e.type === "troopsHealed" && e.unitId === "관우");
+    expect(heal).toBeTruthy();
+    if (heal && heal.type === "troopsHealed" && dmg && dmg.type === "damageDealt") {
+      expect(heal.amount).toBe(Math.floor(dmg.damage * 0.5));
+      expect(get(state, "관우").troops).toBe(100 + heal.amount);
+    }
+  });
+
+  it("흡혈 회복은 maxTroops 상한", () => {
+    let s = patchUnit(fresh(), "이숙", { x: 1, y: 3, agility: 1, rangeMin: 1, rangeMax: 1, troops: 9999, maxTroops: 9999 });
+    s = patchUnit(s, "관우", { agility: 100, baseMove: 2, troops: 95, maxTroops: 100, lifestealPercent: 100, noCounter: true });
+    const { state } = applyAction(testCtx, s, { type: "attack", unitId: "관우", targetId: "이숙" });
+    expect(get(state, "관우").troops).toBe(100); // 상한 클램프
+  });
+});
+
 describe("필살 게이지(SP) 누적 (§9)", () => {
   it("공격 시 공격자 +onAttack, 피격자 생존 시 +onHitTaken (결정론)", () => {
     const sp = testCtx.data.combat.sp;
