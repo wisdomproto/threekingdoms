@@ -1,4 +1,4 @@
-import type { GameData, Stage, BattleMap, Side, Line, MoveClass, ClassGrades } from "@tk/data";
+import type { GameData, Stage, BattleMap, Side, Line, MoveClass, ClassGrades, StatusEffect, StatusKind } from "@tk/data";
 
 export interface Coord { x: number; y: number }
 
@@ -51,6 +51,9 @@ export interface UnitState {
   counterStrikes?: number;       // 재반격/연환: 반격 시 치는 횟수(미설정=1)
   flatDamagePerLevel?: number;   // 고정 피해 = 값×(레벨+1), 방어/지형/협공 무시
   alwaysHit?: boolean;           // 필중(명중 롤 생략)
+  // Phase D 상태이상. statuses=런타임 부여(미설정=없음), inflictStatuses=적중 시 부여 능력(아이템 집약).
+  statuses?: StatusEffect[];
+  inflictStatuses?: { kind: StatusKind; chance: number; turns: number }[];
   // §7/§9 필살 게이지(레퍼런스 ⚔0/255). 전투 참여로 누적, max에서 필살 발동 가능(2단계).
   sp?: number;                    // 현재 SP (미설정=0)
   maxSp?: number;                 // SP 상한 (미설정=combat.sp.max)
@@ -108,6 +111,9 @@ export interface ReinforcedUnit {
 export type BattleEvent =
   | { type: "unitMoved"; unitId: string; from: Coord; to: Coord }
   | { type: "damageDealt"; attackerId: string; defenderId: string; damage: number; counter: boolean; hit: boolean }
+  | { type: "statusApplied"; unitId: string; kind: StatusKind; turns: number }
+  | { type: "statusTick"; unitId: string; kind: StatusKind; damage: number }
+  | { type: "statusExpired"; unitId: string; kind: StatusKind }
   // 협공 발동(결정론) — surround = 대상 포위도(공격자 포함), bonusPercent = 추가피해%. 연출용.
   | { type: "flank"; attackerId: string; defenderId: string; surround: number; bonusPercent: number }
   // 연속공격(2중공격) 발동 — 이동력 우위로 개시 공격이 2회 타격. 연출용.

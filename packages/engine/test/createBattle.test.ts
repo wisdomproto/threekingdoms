@@ -63,4 +63,14 @@ describe("createBattle v2 (원작 모델)", () => {
     expect(plain.multiHit).toBeUndefined();
     expect(plain.noCounter).toBeUndefined();
   });
+
+  it("상태이상(Phase D): inflictStatus가 UnitState.inflictStatuses로 집약", () => {
+    const item = { id: "독검", name: "독검", category: "weapon" as const, power: 255, bonusPercent: 0,
+      effects: { inflictStatus: { kind: "poison" as const, chance: 75, turns: 3 } } };
+    const data = { ...gameData, items: { ...gameData.items, 독검: item } };
+    const stage = { ...testStage, units: testStage.units.map((u) => (u.commanderId === "관우" ? { ...u, items: ["독검"] } : u)) };
+    const u = createBattle({ data, stage, map: testMap }, 1).units.find((x) => x.id === "관우")!;
+    expect(u.inflictStatuses).toEqual([{ kind: "poison", chance: 75, turns: 3 }]);
+    expect(createBattle(testCtx, 1).units.find((x) => x.id === "유비")!.inflictStatuses).toBeUndefined();
+  });
 });
