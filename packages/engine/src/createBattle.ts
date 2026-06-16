@@ -19,6 +19,7 @@ export function spawnUnit(data: GameData, p: StageUnit): UnitState {
   let noCounter = false, alwaysHit = false;
   let multiHit: number | undefined, counterStrikes: number | undefined, flatDamagePerLevel: number | undefined;
   const inflictStatuses: NonNullable<UnitState["inflictStatuses"]> = [];
+  let rangeBonus = 0, lifestealPercent = 0;
   for (const itemId of p.items) {
     const item = data.items[itemId];
     if (!item) throw new Error(`unknown item: ${itemId}`);
@@ -37,6 +38,8 @@ export function spawnUnit(data: GameData, p: StageUnit): UnitState {
       if (e.counterStrikes != null) counterStrikes = Math.max(counterStrikes ?? 1, e.counterStrikes);
       if (e.flatDamagePerLevel != null) flatDamagePerLevel = Math.max(flatDamagePerLevel ?? 0, e.flatDamagePerLevel);
       if (e.inflictStatus) inflictStatuses.push(e.inflictStatus);
+      rangeBonus += e.rangeBonus ?? 0;
+      lifestealPercent = Math.min(100, lifestealPercent + (e.lifestealPercent ?? 0));
     }
   }
   weaponBonus *= 1 + atkPct / 100;   // 보물 공격% 는 무기 보정 위에 곱연산
@@ -52,10 +55,11 @@ export function spawnUnit(data: GameData, p: StageUnit): UnitState {
     agility: cmd.agility ?? 50,
 
     baseAtk: cls.baseAtk, baseDef: cls.baseDef, grades: cls.grades, weaponBonus, bookBonus,
-    move: cls.move + moveBonus, baseMove: cls.move, rangeMin: cls.rangeMin, rangeMax: cls.rangeMax,
+    move: cls.move + moveBonus, baseMove: cls.move, rangeMin: cls.rangeMin, rangeMax: cls.rangeMax + rangeBonus,
     damageReduction, grantsDoubleStrike: grantDouble,
     noCounter: noCounter || undefined, multiHit, counterStrikes, flatDamagePerLevel, alwaysHit: alwaysHit || undefined,
     inflictStatuses: inflictStatuses.length ? inflictStatuses : undefined,
+    lifestealPercent: lifestealPercent || undefined,
     sp: 0, maxSp: data.combat.sp.max,
     items: [...p.items], // 소모품 useItem 시 1개씩 제거 (weapon/book 보정은 위에서 이미 산정)
     moved: false, acted: false, retreated: false,

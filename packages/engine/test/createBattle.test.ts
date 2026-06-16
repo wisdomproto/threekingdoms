@@ -73,4 +73,17 @@ describe("createBattle v2 (원작 모델)", () => {
     expect(u.inflictStatuses).toEqual([{ kind: "poison", chance: 75, turns: 3 }]);
     expect(createBattle(testCtx, 1).units.find((x) => x.id === "유비")!.inflictStatuses).toBeUndefined();
   });
+
+  it("시그니처 효과(Phase E): rangeBonus는 rangeMax에 흡수, lifesteal 집약", () => {
+    const items = {
+      용담창x: { id: "용담창x", name: "용담창x", category: "weapon" as const, power: 255, bonusPercent: 0, effects: { rangeBonus: 1 } },
+      방천x: { id: "방천x", name: "방천x", category: "weapon" as const, power: 255, bonusPercent: 0, effects: { lifestealPercent: 50 } },
+    };
+    const data = { ...gameData, items: { ...gameData.items, ...items } };
+    const stage = { ...testStage, units: testStage.units.map((u) => (u.commanderId === "관우" ? { ...u, items: ["용담창x", "방천x"] } : u)) };
+    const u = createBattle({ data, stage, map: testMap }, 1).units.find((x) => x.id === "관우")!;
+    const baseMax = gameData.unitClasses[u.classId]!.rangeMax;
+    expect(u.rangeMax).toBe(baseMax + 1);
+    expect(u.lifestealPercent).toBe(50);
+  });
 });

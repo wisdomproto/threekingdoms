@@ -54,6 +54,7 @@ export interface UnitState {
   // Phase D 상태이상. statuses=런타임 부여(미설정=없음), inflictStatuses=적중 시 부여 능력(아이템 집약).
   statuses?: StatusEffect[];
   inflictStatuses?: { kind: StatusKind; chance: number; turns: number }[];
+  lifestealPercent?: number;     // Phase E 흡혈 — 입힌 피해 × % 자가 회복(아이템 집약)
   // §7/§9 필살 게이지(레퍼런스 ⚔0/255). 전투 참여로 누적, max에서 필살 발동 가능(2단계).
   sp?: number;                    // 현재 SP (미설정=0)
   maxSp?: number;                 // SP 상한 (미설정=combat.sp.max)
@@ -114,6 +115,7 @@ export type BattleEvent =
   | { type: "statusApplied"; unitId: string; kind: StatusKind; turns: number }
   | { type: "statusTick"; unitId: string; kind: StatusKind; damage: number }
   | { type: "statusExpired"; unitId: string; kind: StatusKind }
+  | { type: "troopsHealed"; unitId: string; amount: number }
   // 협공 발동(결정론) — surround = 대상 포위도(공격자 포함), bonusPercent = 추가피해%. 연출용.
   | { type: "flank"; attackerId: string; defenderId: string; surround: number; bonusPercent: number }
   // 연속공격(2중공격) 발동 — 이동력 우위로 개시 공격이 2회 타격. 연출용.
