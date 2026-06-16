@@ -85,6 +85,39 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _asset_status(self):
+        """게임에 실제로 들어가 있는 에셋 목록 — 보드 드롭다운의 ✓/⬜ 표시용.
+          sprites:  assets/sprites/<id>/ 중 front_*.png 또는 manifest.json 보유한 id
+          portraits: assets/ui/portraits/<id>.webp 의 id
+          scenes:   assets/scenes/<bgId>.webp 의 bgId
+        """
+        sprites, portraits, scenes = [], [], []
+        sp_dir = os.path.join(PUBLIC, "assets", "sprites")
+        if os.path.isdir(sp_dir):
+            for name in os.listdir(sp_dir):
+                d = os.path.join(sp_dir, name)
+                if not os.path.isdir(d):
+                    continue
+                files = os.listdir(d)
+                if any(f.startswith("front_") and f.endswith(".png") for f in files) \
+                        or "manifest.json" in files:
+                    sprites.append(name)
+        po_dir = os.path.join(PUBLIC, "assets", "ui", "portraits")
+        if os.path.isdir(po_dir):
+            portraits = [os.path.splitext(f)[0] for f in os.listdir(po_dir)
+                         if f.lower().endswith(".webp")]
+        sc_dir = os.path.join(PUBLIC, "assets", "scenes")
+        if os.path.isdir(sc_dir):
+            scenes = [os.path.splitext(f)[0] for f in os.listdir(sc_dir)
+                      if f.lower().endswith(".webp")]
+        return {"sprites": sorted(sprites), "portraits": sorted(portraits), "scenes": sorted(scenes)}
+
+    def do_GET(self):  # noqa: N802
+        if self.path.split("?")[0] == "/asset-status":
+            self._json(200, self._asset_status())
+            return
+        super().do_GET()
+
     def do_OPTIONS(self):  # noqa: N802 — CORS 프리플라이트
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")

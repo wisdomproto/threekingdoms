@@ -39,7 +39,7 @@ for (const p of req.portraits) {
 }
 
 s += "\n## 2. 씬 배경 (scenes)\n\n";
-s += "막간 시나리오 풀스크린 배경(가로, 수묵 풍경). 장면 맥락은 프롬프트 힌트.\n\n";
+s += "막간 시나리오 풀스크린 배경(가로, 수묵 채색). 전투 establishing은 야외 풍경, 군략 회의·궁정·밀담은 실내(군막/궁정/밀실 — 원작 다양성). 실내/야외 구분과 생성 프롬프트는 docs/art/asset-board.html ③ 시나리오 씬 탭(setting 필드)이 SSOT. 장면 맥락은 프롬프트 힌트.\n\n";
 s += "| 보유 | bgId | 스테이지 | 유형 | 장면 맥락(힌트) |\n|--|--|--|--|--|\n";
 for (const sc of req.scenes) {
   const hint = sc.firstLine.length > 40 ? sc.firstLine.slice(0, 40) + "…" : sc.firstLine;

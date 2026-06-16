@@ -44,6 +44,20 @@
   .drop:focus, .drop.armed { border-color: var(--acc); background: rgba(212,168,67,.05); outline: none; }
   .drop.dragover { border-color: var(--acc2); background: rgba(111,174,111,.08); }
   .drop .hint { color: #5a6172; font-size: 11.5px; width: 100%; text-align: center; align-self: center; pointer-events: none; }
+  .existing { margin: 6px 0 4px; }
+  .existing .exnote { font-size: 11.5px; color: var(--acc2); margin-bottom: 5px; }
+  .existing .exnote.dim { color: var(--dim); }
+  .existing .exnote code { background: var(--panel2); padding: 0 4px; border-radius: 3px; }
+  .existing .exrow { display: flex; gap: 8px; flex-wrap: wrap; }
+  .existing .exfig { margin: 0; text-align: center; }
+  .existing .exbox { width: 84px; height: 84px; border: 1px solid var(--line); border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    background: repeating-conic-gradient(#2a2a30 0% 25%, #23232a 0% 50%) 50% / 14px 14px; }
+  .existing .exbox img { max-width: 80px; max-height: 80px; object-fit: contain; }
+  .existing figcaption { color: var(--dim); font-size: 10.5px; margin-top: 2px; }
+  .pmembers { margin: 6px 0 4px; }
+  .pmembers .pchips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .pmembers .pchip { font-size: 11px; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--line); color: var(--dim); background: var(--panel2); white-space: nowrap; cursor: help; }
+  .pmembers .pchip.on { color: var(--acc2); border-color: var(--acc2); }
   .thumb { position: relative; width: 96px; }
   .thumb img { width: 96px; height: 96px; object-fit: cover; border-radius: 6px; border: 2px solid var(--line); display: block; cursor: zoom-in; }
   .thumb.picked img { border-color: var(--acc); box-shadow: 0 0 6px rgba(212,168,67,.5); }
@@ -458,21 +472,7 @@ const SECTIONS = [
       prompt: 'Two-character design sheet on plain white background, two giant bodyguard warriors each shown front and side view (4 figures total in a row, same scale, generous spacing), cohesive crimson-black faction palette. LEFT PAIR — a monstrous ferocious guard captain, huge muscular build, wild fierce face, bare brawny arms, minimal heavy armor, twin enormous iron halberds, raw savage power. RIGHT PAIR — an even more massive stolid strongman, broad blunt honest face, immense build, simple heavy armor over bare shoulders, a giant heavy blade or a great iron club, the unshakable human wall. Two legendary bodyguards of overwhelming physical might. Flat even lighting, no text. ' + GRID_NOTE }
   ]
 },
-{
-  id: 'I', title: 'I. 초상 배치 시트 (한 장에 여러 명 → Claude 슬라이스)',
-  desc: 'v1 초상 방식. 정면 흉상을 그룹별 **한 장(그리드)**으로 생성 → 카드에 붙여넣기 → **📤 초상시트 넘기기** → Claude가 인물별로 잘라 <code>/assets/ui/portraits/{이름}.webp</code> 저장(전투 패널·씬 화자 즉시 반영). 조조전 FACE 톤(세로 버스트), 인물 정체성·스타일 일관. 이름은 commanders.json 한국어(관우·유비…).',
-  items: [
-    { id: 'I-allyA', title: '아군 초상시트 A (유비·관우·장비·조운)', portraitSheet: true, portraitGroup: 'allyA',
-      note: '4명 정면 흉상 한 장(2×2 권장, 간격) → 붙여넣기 → 📤. Claude가 잘라 유비/관우/장비/조운.webp 저장.',
-      prompt: 'A portrait sheet: front-facing bust portraits (head and shoulders) of four Three Kingdoms heroes in a clean 2x2 grid, evenly spaced with clear gaps, transparent background, each a distinct finished bust. The four, clearly different and recognizable: LIU BEI (benevolent Han lord, kind face, thin mustache, imperial robe), GUAN YU (long flowing black beard, dignified red face, green robe), ZHANG FEI (fierce bristling beard, leopard eyes, dark armor), ZHAO YUN (handsome resolute young general, silver armor).' },
-    { id: 'I-allyB', title: '아군 초상시트 B (간옹·미축·손건·미방·서서·제갈량)', portraitSheet: true, portraitGroup: 'allyB',
-      note: '6명 정면 흉상 한 장(3×2, 간격) → 📤.',
-      prompt: 'A portrait sheet: front-facing bust portraits of six Three Kingdoms civil officers/strategists in a 3x2 grid, clear gaps, transparent background, each a distinct finished bust. The six: JIAN YONG (witty advisor), MI ZHU (merchant-noble official), SUN QIAN (calm diplomat), MI FANG (younger officer), XU SHU (sharp young strategist), ZHUGE LIANG (serene genius strategist with feather fan, Taoist robe). Distinct recognizable faces.' },
-    { id: 'I-enemy', title: '적·게스트 초상시트 (여포·화웅·동탁·장료·조조·하후돈)', portraitSheet: true, portraitGroup: 'enemy',
-      note: '6명 정면 흉상 한 장(3×2, 간격) → 📤.',
-      prompt: 'A portrait sheet: front-facing bust portraits of six Three Kingdoms figures in a 3x2 grid, clear gaps, transparent background, each a distinct finished bust. The six: LU BU (peerless warrior, pheasant-feather headdress, fierce handsome face), HUA XIONG (hulking brutish enemy general, thick beard), DONG ZHUO (corpulent cruel tyrant), ZHANG LIAO (calm disciplined veteran), CAO CAO (shrewd ambitious warlord, sharp narrow eyes, fine beard), XIAHOU DUN (one-eyed fierce general with an eyepatch). Distinct recognizable faces.' }
-  ]
-},
+/* id:'I' 초상 시트 — 캐릭터를 진영·챕터별로 묶은 그룹 카드들. 아래 IIFE가 SECTIONS.push로 채운다. */
 {
   id: 'J', title: 'J. 병종 SD 템플릿 전수 (색·얼굴 교체 양산형)',
   desc: 'unitClasses.json 중 B-2(보병/궁병/기병)·B-2b(군주 전차)에 없는 나머지 병종 + CLAUDE.md §7 조조전 caster(책사/참모·도사/풍수사·기마책사·무용수)를 템플릿화. 전부 투구·복면·두건으로 얼굴 가림 = 색교체 양산형(네임드 아님). A-3/B-2와 등신 통일. 한 장에 여러 병종을 그리드로 — mount·포즈 다양성 때문에 4장으로 분할(도보 술법계 / 말 탄 계열 / 병기·특수 / 적병·맹수). 각 병종 대기·이동·공격 3포즈.',
@@ -673,9 +673,14 @@ const SECTIONS = [
   스테이지별 intro/outro 막간 씬 풀스크린 배경 (16:9 webp).
   게임 ScenePlayer → /assets/scenes/{bgId}.webp 로 로드.
   saveName 필드로 최종 저장 파일명 고정 (webp 변환 적용).
-  프롬프트: 인물 없는 풍경/분위기 배경 위주 (초상·대사가 위에 얹히므로).
+  프롬프트: 인물 없는 배경 (초상·대사가 위에 얹히므로).
+  setting:'int' = 실내 막간(군막 작전회의·궁정·밀실 — 원작 "낙양궁전/진류막사/회의장" 다양성).
+  미지정 = 야외 풍경(전장 establishing). 전투 establishing은 야외, 군략/조정/밀담은 실내.
 */
 const SCENE_STYLE = 'Art style: East Asian ink-wash painting (sumi-e) fused with evocative atmospheric landscape illustration. Sweeping brushwork, layered mist and negative space, muted earth tones with selective vivid accents (vermilion, jade, gold). Cinematic mood for a historical tactical RPG interlude scene. 16:9 aspect ratio. NO characters, NO people, NO portrait faces, NO text, NO watermark, NO UI elements, NO grid lines.';
+/* 실내 막간 씬(군막 작전회의·궁정·밀실 등) — 원작 "낙양궁전/진류막사/회의장" 다양성 반영(2026-06-16).
+   인물은 여전히 없음(ScenePlayer가 초상·대사를 위에 얹음) — 빈 공간 자체가 배경. */
+const SCENE_STYLE_INTERIOR = 'Art style: East Asian ink-wash painting (sumi-e) rendering a Han-dynasty architectural INTERIOR. Timber columns and beams, hanging silk banners and paper lanterns, low lacquered tables with maps and bamboo scrolls, folding screens, soft brazier/lamp glow. Layered ink shading and atmospheric depth, muted earth tones with selective vivid accents (vermilion, jade, gold). An EMPTY room with no people (characters and dialogue overlay on top). Cinematic mood for a historical tactical RPG interlude scene. 16:9 aspect ratio. NO characters, NO people, NO portrait faces, NO text, NO watermark, NO UI elements, NO grid lines.';
 const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, text, watermark, UI elements, grid, photorealistic, anime-cel, Koei-style illustration, modern objects, border frame.';
 
 (function() {
@@ -695,8 +700,8 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
         en: 'Yingchuan plains just after a fire-attack — scorched earth and dying embers, distant city walls intact, a column of smoke curling into a clear morning sky. Victory tinged with unease.',
         kr: '짚신 장수치고는 쓸 만하군. ...언젠가 다시 보세, 유비.' } },
     { num: '03', id: 'guangzong',     name: '광종',
-      intro: { bg: '03-guangzong-intro',
-        en: 'The Guangzong fortress at overcast midday — heavy stone walls with rebel yellow banners, a gated town on a low rise, grey clouds pressing down. A sense of grim siege.',
+      intro: { bg: '03-guangzong-intro', setting: 'int',
+        en: 'Interior of an allied military command tent before Guangzong, lit by braziers and hanging lanterns — a low lacquered table spread with a battle map and bamboo scrolls, folding screens and war banners along the walls, an empty commander\'s seat. The hush of a war council before the assault.',
         kr: '성벽에 의지해 농성 중이니 단숨에 몰아쳐야 합니다.' },
       outro: { bg: '03-guangzong-outro',
         en: 'Guangzong walls at dusk after the assault — gate fallen, rebel banners torn down, evening light washing over battered stone. One enemy general vanquished, two remain.',
@@ -709,11 +714,11 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
         en: 'The Yellow Turban stronghold at quiet dawn after battle — torn yellow banners lie on the ground, the mist gone, sunlight breaking through clouds. The rebellion\'s first chapter ends.',
         kr: '장각이 쓰러졌다... 황건의 난이 끝났구나. 허나 천하는 더 어지러워질 것입니다.' } },
     { num: '05', id: 'sishuiguan',    name: '사수관',
-      intro: { bg: '05-sishuiguan-intro',
-        en: 'Sishui Pass at pale dawn — a massive gatehouse fortress straddling a mountain defile, its twin towers silhouetted against a cold pink-gold sky, allied camp fires visible in the valley below.',
+      intro: { bg: '05-sishuiguan-intro', setting: 'int',
+        en: 'Interior of the grand coalition council tent before Sishui Pass — rows of empty seats for the assembled lords, a central low table set with bronze wine cups, the tall standards of many warlords lining the walls, lantern light on silk hangings. The tense air of a council where no champion dares step forward.',
         kr: '제후들은 술잔만 기울일 뿐 누구도 나서지 못하는구나. ...우리가 길을 트자.' },
-      outro: { bg: '05-sishuiguan-outro',
-        en: 'Sishui Pass gate at morning, the heavy gate doors standing open and unguarded, a single warm cup of wine left on a stone ledge — the famous cup still warm after Guan Yu\'s swift return.',
+      outro: { bg: '05-sishuiguan-outro', setting: 'int',
+        en: 'The same coalition council tent at morning — a single bronze cup of wine still gently steaming on the central table, the assembled warlord standards behind it, warm lantern light. The famous cup of wine still warm after a champion\'s swift return.',
         kr: '화웅의 목, 여기 가져왔습니다. 술이 식기 전에 말입니다.' } },
     { num: '06', id: 'huluguan',      name: '호로관',
       intro: { bg: '06-huluguan-intro',
@@ -747,8 +752,8 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
       intro: { bg: '10-xuzhou-intro',
         en: 'Xuzhou city walls at overcast noon — tall grey stone ramparts, the city gate barred, Cao Cao\'s siege camp fires visible on the surrounding plains, threatening banners in all directions.',
         kr: '조조에게 포위됐소. 열닷새를 버틴다 — 수성이다!' },
-      outro: { bg: '10-xuzhou-outro',
-        en: 'Xuzhou gates opening at dusk — warm light spilling out, relieved townsfolk visible just inside, the siege lifted, an old governor\'s lantern hanging by the gate in farewell.',
+      outro: { bg: '10-xuzhou-outro', setting: 'int',
+        en: 'Interior of the governor\'s residence in Xuzhou at dusk — a sickbed chamber with silk drapes, a low table bearing the bronze seal of office, soft lamplight, an empty seat drawn up beside the bed. The solemn quiet of a dying man entrusting his city.',
         kr: '이 백성들을 그대에게 맡기고 싶소. 백성을 버릴 수는 없지요.' } },
     { num: '11', id: 'xiaopei',       name: '소패',
       intro: { bg: '11-xiaopei-intro',
@@ -765,15 +770,15 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
         en: 'A quiet forest road at night after the retreat — the sounds of pursuit faded, fireflies in the dark, an uncertain peace among scattered survivors.',
         kr: '겨우 빠져나왔구나. 반드시 다시 모일 겁니다, 형님.' } },
     { num: '13', id: 'yuanshu',       name: '원술',
-      intro: { bg: '13-yuanshu-intro',
-        en: 'Yuan Shu\'s opulent camp at noon — lavish yellow-and-purple imperial tent pavilions incongruous against a dusty battlefield plain, a pretender\'s gaudy excess on campaign.',
+      intro: { bg: '13-yuanshu-intro', setting: 'int',
+        en: 'Interior of Yuan Shu\'s usurped throne tent — a gaudy gilded dais with dragon motifs, yellow-and-purple imperial drapes hung in excess, the imperial seal displayed on a cushion, incense smoke curling. The hollow pomp of a false emperor\'s court.',
         kr: '원술이 황제를 참칭했소. 명분 없는 군세라 사기가 낮으니, 본진을 무너뜨리면 흩어집니다.' },
       outro: { bg: '13-yuanshu-outro',
         en: 'The pretender\'s camp in ruins at afternoon — toppled yellow imperial tents, a jade seal impression in spilled ink on the ground, the absurd dream of a false emperor ended.',
         kr: '원술의 망상도 끝이로구나. 옥새보다 민심을 얻는 자가 천하를 얻겠지요.' } },
     { num: '14', id: 'xiapi2',        name: '하비2',
-      intro: { bg: '14-xiapi2-intro',
-        en: 'Xiapi under flood at grey dawn — city walls half-submerged, floodwater filling the streets and outer trenches, siege works of two great armies converging on a drowning fortress.',
+      intro: { bg: '14-xiapi2-intro', setting: 'int',
+        en: 'Interior of a joint war-council tent before Xiapi — the banners of two armies flanking a central map table marked with a flood-diversion plan, brushes and water-channel sketches, brazier light. Uneasy allies plotting a great warlord\'s end.',
         kr: '수공으로 사수와 기수를 터 하비를 잠근다.' },
       outro: { bg: '14-xiapi2-outro',
         en: 'Xiapi at cold morning after the flood recedes — waterlogged courtyards, broken gates, a great warlord\'s dream sunk with the floodwaters. The mightiest is defeated.',
@@ -782,8 +787,8 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
       intro: { bg: '15-xutian-intro',
         en: 'The imperial hunting ground at Xutian under blue autumn sky — manicured hunting paddocks and open grassland, imperial banners flying, an ostentatious display of power masquerading as ceremony.',
         kr: '허전에서 천자를 모신 사냥이 열렸소. 조조의 위세가 천자를 능멸하는구나.' },
-      outro: { bg: '15-xutian-outro',
-        en: 'The hunting ground at dusk, the pageant over — a folded imperial decree on a stone, the Emperor\'s hunting pavilion emptied, the weight of a hidden mandate pressing on the silence.',
+      outro: { bg: '15-xutian-outro', setting: 'int',
+        en: 'A dim secret inner chamber after the imperial hunt — a single imperial decree (the girdle-edict) resting on a low table, a guttering lamp, heavy drawn curtains, the emperor\'s empty seat in shadow. The dangerous hush of a covert mandate.',
         kr: '의대조의 밀명을 받았다. 천자께서 조조를 치라 하셨다.' } },
     { num: '16', id: 'guandu-escape', name: '관도탈출',
       intro: { bg: '16-guandu-escape-intro',
@@ -800,8 +805,8 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
         en: 'A meeting point on the Runan plain at golden morning — two columns of men converging, allied banners merging, the warmth of reunion filling the wide open field.',
         kr: '천 리를 달려, 다섯 관문을 넘어 — 돌아왔습니다. 삼형제가 다시 한자리에.' } },
     { num: '18', id: 'bowangpo',      name: '박망파',
-      intro: { bg: '18-bowangpo-intro',
-        en: 'Bowang Slope at dusk — a narrow forested gorge, tall dry pines lining steep hillsides, a single dirt road winding into shadow below, the perfect funnel for a fire ambush.',
+      intro: { bg: '18-bowangpo-intro', setting: 'int',
+        en: 'Interior of Liu Bei\'s command tent after the third visit — a fresh war council around a low table laid with a campaign map of Bowang, a strategist\'s feather fan resting on a scroll, neat banners, calm lamplight. The first plan of a legendary partnership.',
         kr: '좁은 길과 마른 숲 — 화공에 더없이 좋은 자리입니다. 하후돈을 끌어들이지요.' },
       outro: { bg: '18-bowangpo-outro',
         en: 'Bowang Slope after the fire attack — pine trunks charred, smoke still rising from the gorge, the narrow road carpeted in ash and embers. A brilliant debut of strategic fire.',
@@ -838,8 +843,8 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
       intro: { bg: '23-jiangxia-intro',
         en: 'Jiangxia on the Yangtze at cloudy noon — a river-town with defensive walls, warships moored at the docks, the broad muddy river stretching south, Wu banners approaching from downstream.',
         kr: '주유 도독의 본대가 올 때까지 버텨야 하오. 적벽의 결전까지, 이 강하를 사수하라!' },
-      outro: { bg: '23-jiangxia-outro',
-        en: 'Jiangxia harbor at dusk — Wu and Liu Bei warships side by side at anchor, allied pennants flying together for the first time, the great river calm, the alliance sealed.',
+      outro: { bg: '23-jiangxia-outro', setting: 'int',
+        en: 'Interior of the Wu grand admiral\'s command cabin — a lacquered war-junk interior with a river chart of the Red Cliffs spread on the table, twin allied pennants (Sun and Liu) newly hung side by side, lantern light on dark timber. The sealing of a fragile alliance.',
         kr: '손유연합이 섰습니다. 제갈공명의 군사, 이 제갈량이 동남풍으로 돕지요.' } },
     { num: '24', id: 'sanjiangkou',   name: '삼강구',
       intro: { bg: '24-sanjiangkou-intro',
@@ -882,7 +887,7 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
         saveName,
         sceneCard: true,
         note: `저장: <code>apps/web/public/assets/scenes/${saveName}</code> · bgId: <code>${d.bg}</code>`,
-        prompt: `Fullscreen interlude scene background for a historical tactics RPG. ${type === 'intro' ? 'Pre-battle establishing mood' : 'Post-battle emotional resolution'}. Location/mood: ${d.en}\n\nTone reference (Korean dialogue, do NOT include in image): "${d.kr}"\n\n${SCENE_STYLE}`,
+        prompt: `Fullscreen interlude scene background for a historical tactics RPG. ${type === 'intro' ? 'Pre-battle establishing mood' : 'Post-battle emotional resolution'}. Location/mood: ${d.en}\n\nTone reference (Korean dialogue, do NOT include in image): "${d.kr}"\n\n${d.setting === 'int' ? SCENE_STYLE_INTERIOR : SCENE_STYLE}`,
         _neg: SCENE_NEGATIVE,
       });
     }
@@ -891,7 +896,7 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
   SECTIONS.push({
     id: 'N',
     title: 'N. 시나리오 씬 배경 (54장 — 27스테이지 × intro/outro)',
-    desc: '각 스테이지 막간 씬의 풀스크린 배경 이미지. 인물·텍스트 없는 풍경/분위기 위주(ScenePlayer가 초상·대사를 위에 얹음). 생성 후 ⬇ 저장 → apps/web/public/assets/scenes/ 에 배치하면 게임 막간 씬에 즉시 반영. 16:9 webp 변환 적용.',
+    desc: '각 스테이지 막간 씬의 풀스크린 배경 이미지. 인물·텍스트 없음(ScenePlayer가 초상·대사를 위에 얹음). 전투 establishing은 <b>야외 풍경</b>, 군략 회의·궁정·밀담은 <b>실내</b>(군막/궁정/밀실 — 원작 다양성, 현재 9씬). 생성 후 ⬇ 저장 → apps/web/public/assets/scenes/ 에 배치하면 게임 막간 씬에 즉시 반영. 16:9 webp 변환 적용.',
     items: sceneItems,
   });
 })();
@@ -925,42 +930,209 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
   ¾ 측면·화면왼쪽 바라보기(좌우 미러), 투명배경. 컷·리그 없음.
 */
 (function() {
-  const POSE_STYLE = 'Art style: detailed painterly chibi (SD, ~2.5 heads) battle-map unit for a top-down tactical RPG, East Asian ink-wash + soft cel shading, crisp readable silhouette, muted earth tones with gold/jade accents. Clean even lighting, NO baked ground shadow.';
-  const POSE_NEG = 'Avoid: text, labels, watermark, UI, frame, border, ground shadow, busy background, photorealistic, anime-cel, Koei-style. Keep the SAME character identity/colors across all poses.';
-  const sheetPrompt = (desc) =>
-    `A single horizontal POSE SHEET of ${desc}, the SAME character repeated in 3 distinct full-body poses evenly spaced LEFT TO RIGHT with clear empty (transparent) gaps between them: (1) IDLE — relaxed standing battle stance; (2) MOVE — mid-stride walking/advancing; (3) ATTACK — dynamic weapon swing with a sweeping motion arc. Draw every pose in 3/4 SIDE view FACING SCREEN-LEFT (profile turned left, NOT facing camera). Each pose a complete finished illustration on a fully transparent background, no overlap between poses.\n\n` + POSE_STYLE + '\n\n' + POSE_NEG;
-  // ★ 풀제작(개별 SD) + 주요 네임드. 그 외 장수(간옹·미축·손건·미방·진등·관평·유봉·주창·손상향 등)는
-  // 개별 SD 없이 §4대로 병종 제네릭(아래)을 공용한다(spriteMap 미매핑 → classId+side 폴백).
-  const CHARS = [
-    // ── 아군 ★ 풀제작 ──
-    { sid: 'liubei',   name: '유비', desc: 'LIU BEI — benevolent Han lord, kind dignified face with a thin mustache, imperial robe with subtle dragon motifs, a pair of slender swords' },
-    { sid: 'guanyu',   name: '관우', desc: 'GUAN YU — long flowing black beard, dignified red face, green war-robe over dark lamellar armor, wielding the Green Dragon Crescent Blade (a long guandao polearm)' },
-    { sid: 'zhangfei',  name: '장비', desc: 'ZHANG FEI — fierce burly warrior, bristling beard, leopard-eyed glare, dark plate armor, the Serpent Spear (a long spear with a snake-curved blade)' },
-    { sid: 'zhaoyun',  name: '조운', desc: 'ZHAO YUN — handsome valiant young general, gleaming silver-white armor, a straight spear, calm fearless face' },
-    { sid: 'zhugeliang', name: '제갈량', desc: 'ZHUGE LIANG — serene genius strategist, Taoist crane-feather robe, holding a white feather fan, scholar headband, slender' },
-    // ── 적 ★ / 주요 네임드 ──
-    { sid: 'lvbu',     name: '여포', desc: 'LU BU — peerless warrior, ornate pheasant-feather headdress, flowing red cape, fearsome handsome face, the Sky Piercer halberd (ji)' },
-    { sid: 'caocao',   name: '조조', desc: 'CAO CAO — shrewd ambitious warlord, dark ornate lacquered armor, sharp narrow eyes, fine beard, a jian sword' },
-    { sid: 'xiahoudun', name: '하후돈', desc: 'XIAHOU DUN — one-eyed fierce general with a leather eyepatch over the left eye, heavy dark armor, a spear' },
-    { sid: 'dongzhuo', name: '동탁', desc: 'DONG ZHUO — corpulent cruel tyrant warlord, lavish dark robes over armor, jowly bearded face, a heavy broadsword' },
-    { sid: 'huaxiong',  name: '화웅', desc: 'HUA XIONG — hulking enemy general (Dong Zhuo army), heavy dark armor, brutish fierce face with a thick beard, a large broadsword' },
-    { sid: 'zhangliao', name: '장료', desc: 'ZHANG LIAO — disciplined veteran general, practical lamellar armor, calm sharp face, a halberd' },
-    // ── 병종 제네릭(얼굴 가림·색교체 양산형 — 무명 장수 공용) ──
-    { sid: 'footman_player',      name: '보병(아군)', desc: 'a generic FOOTMAN soldier — closed helmet hiding the face, blue-accented lamellar armor, a spear and shield (anonymous reskinnable trooper)' },
-    { sid: 'archer_player',       name: '궁병(아군)', desc: 'a generic ARCHER soldier — light helmet, blue-accented light armor, a bow and quiver (anonymous reskinnable trooper)' },
-    { sid: 'lightCavalry_player', name: '기병(아군)', desc: 'a generic LIGHT CAVALRY rider on a horse — helmet, blue-accented armor, a lance (anonymous reskinnable trooper, mounted)' },
-    { sid: 'footman_enemy',       name: '보병(적)',   desc: 'a generic enemy FOOTMAN soldier — closed helmet, red/black-accented armor, spear and shield (anonymous trooper)' },
-    { sid: 'archer_enemy',        name: '궁병(적)',   desc: 'a generic enemy ARCHER — light helmet, red/black light armor, bow and quiver (anonymous trooper)' },
-    { sid: 'lightCavalry_enemy',  name: '기병(적)',   desc: 'a generic enemy LIGHT CAVALRY rider on a horse — helmet, red/black armor, a lance (anonymous trooper, mounted)' },
+  // 전체 시나리오(27스테이지) 등장 네임드 전원 + 병종 제네릭. 구분 없이 한 드롭다운에.
+  // s = spriteId: 6종만 영문 폴더(기존 SD), 나머진 commanderId(한국어)=폴더명. 병종 제네릭은 classId_side.
+  const ROSTER = [
+    {n:"유비",s:"liubei"},{n:"관우",s:"guanyu"},{n:"장비",s:"zhangfei"},
+    {n:"간옹",s:"간옹"},{n:"감녕",s:"감녕"},{n:"경무",s:"경무"},{n:"고순",s:"고순"},{n:"공손찬",s:"공손찬"},{n:"공융",s:"공융"},{n:"공지",s:"공지"},{n:"곽사",s:"곽사"},{n:"곽적",s:"곽적"},{n:"관순",s:"관순"},{n:"관평",s:"관평"},{n:"관해",s:"관해"},{n:"국의",s:"국의"},{n:"기령",s:"기령"},{n:"노숙",s:"노숙"},{n:"능통",s:"능통"},{n:"도겸",s:"도겸"},{n:"동탁",s:"동탁"},{n:"두습",s:"두습"},{n:"문빙",s:"문빙"},{n:"미방",s:"미방"},{n:"미축",s:"미축"},{n:"반장",s:"반장"},{n:"봉기",s:"봉기"},{n:"서영",s:"서영"},{n:"서황",s:"서황"},{n:"손건",s:"손건"},{n:"손권",s:"손권"},{n:"송겸",s:"송겸"},{n:"악진",s:"악진"},{n:"악취",s:"악취"},{n:"양앙",s:"양앙"},{n:"엄강",s:"엄강"},{n:"여건",s:"여건"},{n:"여포",s:"lvbu"},{n:"왕개",s:"왕개"},{n:"왕보",s:"왕보"},{n:"왕충",s:"왕충"},{n:"요술사",s:"요술사"},{n:"요화",s:"요화"},{n:"우금",s:"우금"},{n:"원술",s:"원술"},{n:"원윤",s:"원윤"},{n:"위속",s:"위속"},{n:"유대",s:"유대"},{n:"유벽",s:"유벽"},{n:"유봉",s:"유봉"},{n:"유선",s:"유선"},{n:"이각",s:"이각"},{n:"이숙",s:"이숙"},{n:"이유",s:"이유"},{n:"이적",s:"이적"},{n:"이전",s:"이전"},{n:"이풍",s:"이풍"},{n:"장각",s:"장각"},{n:"장무",s:"장무"},{n:"장보",s:"장보"},{n:"조운",s:"조운"},{n:"장연",s:"장연"},{n:"장요",s:"zhangliao"},{n:"장윤",s:"장윤"},{n:"장합",s:"장합"},{n:"정덕",s:"정덕"},{n:"정보",s:"정보"},{n:"정봉",s:"정봉"},{n:"정원지",s:"정원지"},{n:"제갈량",s:"제갈량"},{n:"조루",s:"조루"},{n:"조성",s:"조성"},{n:"조순",s:"조순"},{n:"조인",s:"조인"},{n:"조잠",s:"조잠"},{n:"조조",s:"조조"},{n:"조홍",s:"조홍"},{n:"주유",s:"주유"},{n:"주창",s:"주창"},{n:"진궁",s:"진궁"},{n:"진등",s:"진등"},{n:"진무",s:"진무"},{n:"진손",s:"진손"},{n:"진응",s:"진응"},{n:"진진",s:"진진"},{n:"채모",s:"채모"},{n:"채양",s:"채양"},{n:"채중",s:"채중"},{n:"하후걸",s:"하후걸"},{n:"하후돈",s:"하후돈"},{n:"하후란",s:"하후란"},{n:"하후상",s:"하후상"},{n:"하후연",s:"하후연"},{n:"하후은",s:"하후은"},{n:"학맹",s:"학맹"},{n:"한당",s:"한당"},{n:"한맹",s:"한맹"},{n:"한섬",s:"한섬"},{n:"허저",s:"허저"},{n:"호진",s:"호진"},{n:"화웅",s:"huaxiong"},{n:"황개",s:"황개"},{n:"후성",s:"후성"},
+    // 병종 제네릭(무명 장수 공용)
+    {n:"[제네릭] 보병·아군",s:"footman_player"},{n:"[제네릭] 궁병·아군",s:"archer_player"},{n:"[제네릭] 기병·아군",s:"lightCavalry_player"},
+    {n:"[제네릭] 보병·적",s:"footman_enemy"},{n:"[제네릭] 궁병·적",s:"archer_enemy"},{n:"[제네릭] 기병·적",s:"lightCavalry_enemy"},
   ];
   SECTIONS.push({
     id: 'S',
-    title: 'S. 베이크 포즈 시트 (한 장 → Claude가 오려서 프레임으로)',
-    desc: 'v1 비주얼 방식. 한 캐릭터의 idle/move/attack을 **한 장 시트**(좌→우, ¾ 좌향, 투명배경)로 생성 → 카드에 붙여넣고 **📤 시트 넘기기** → Claude가 오려서 <code>/assets/sprites/{spriteId}/front_idle·move·attack.png</code> + manifest 등록 → 게임 즉시 반영. 컷·리그 직접 안 함. (뒤 모습은 선택 — 없으면 front 폴백)',
-    items: CHARS.map((c) => ({
-      id: 'S-' + c.sid, title: `${c.name} 포즈 시트 (spriteId: ${c.sid})`, poseSheet: true, poseSpriteId: c.sid,
-      note: `붙여넣기 → <b>📤 시트 넘기기</b> → <code>assets/sprites/${c.sid}/front_{idle,move,attack}.png</code>로 Claude가 컷·저장.`,
-      prompt: sheetPrompt(c.desc),
+    title: 'S. 캐릭터 SD 포즈시트 (전체 로스터 — 한 장 → Claude 컷)',
+    desc: '캐릭터 드롭다운에서 선택 → 프롬프트 복사 → idle/move/attack **한 장 시트**(좌→우, ¾ 좌향, 투명배경) 생성 → 붙여넣기 → **📤 시트 넘기기** → Claude가 front_idle/move/attack로 컷 + manifest 등록. **이미지 없으면 게임은 병종 제네릭 SD로 표시, 생기면 자동으로 이걸 씀.** 아군/적/병종 구분 없이 전원 한 탭.',
+    items: [
+      { id: 'S-pose', title: '캐릭터 선택 → 포즈 시트', poseSheet: true, roster: ROSTER,
+        vars: { '캐릭터': ROSTER.map((r) => [r.n, r.n]) },
+        note: '드롭다운에서 캐릭터 선택 → 프롬프트 복사 → 생성 → 붙여넣기 → 📤 시트 넘기기. 무명 장수는 안 만들어도 병종 제네릭으로 표시됨.',
+        prompt: 'A single horizontal POSE SHEET of {캐릭터} (a Three Kingdoms warrior/officer), the SAME character repeated in 3 distinct full-body poses evenly spaced LEFT TO RIGHT with clear empty transparent gaps: (1) IDLE relaxed battle stance, (2) MOVE mid-stride advancing, (3) ATTACK dynamic weapon swing with a sweeping motion arc. Every pose in 3/4 SIDE view FACING SCREEN-LEFT (profile turned left, NOT facing camera). Each a complete finished chibi (SD, ~2.5 heads) illustration, fully transparent background, no overlap between poses.' },
+    ],
+  });
+})();
+
+/* ───────────────────────── I. 초상 시트 (진영·챕터별 그룹) ─────────────────────────
+   캐릭터를 Claude가 진영/챕터로 묶어 "그룹 한 장 생성" 카드로 제공. 그리드 좌→우·위→아래
+   순서가 멤버 순서와 1:1 → 📤 넘기면 그 순서대로 슬라이스해 /assets/ui/portraits/{이름}.webp.
+   멤버 id = 게임이 참조하는 초상 id(asset-manifest.md §1)와 1:1. 마퀴 캐릭터는 인상 묘사를 붙여
+   얼굴이 또렷이 구분되게, 군소 장수는 이름만(진영 톤 힌트 공유). */
+(function() {
+  const GROUPS = [
+    { gid: 'shu-core', title: '촉 — 주역', hint: "Faction: Liu Bei's camp — heroic, dignified, green/blue tones.",
+      members: [
+        ['유비', 'benevolent warlord, kind face, long thin mustache, large earlobes, calm and dignified'],
+        ['관우', 'long flowing black beard to the chest, ruddy red face, narrow phoenix eyes, green robe, proud'],
+        ['장비', 'short bristling black beard, round glaring leopard eyes, fierce broad dark face'],
+        ['조운', 'handsome youthful general, clean-shaven, gleaming silver-white armor, valiant bright eyes'],
+        ['제갈량', 'serene young strategist, holding a feather fan, crane-feather robe, Taoist headband, wise'],
+        ['간옹', 'witty scholar-diplomat, light beard, relaxed robe, sly easy smile'],
+        ['미축', 'refined wealthy merchant-official, neat beard, gentle and prudent'],
+        ['손건', 'earnest middle-aged diplomat, plain official cap, mild expression'],
+      ] },
+    { gid: 'shu-ret', title: '촉 — 가신·소장', hint: "Faction: Liu Bei's retainers and younger officers.",
+      members: [
+        ['관평', "valiant young general (Guan Yu's adopted son), clean-shaven, resembling a youthful Guan Yu"],
+        ['유봉', 'sturdy determined young adopted-son general'],
+        ['주창', 'dark-skinned burly fierce halberd-bearer, wild beard, devoted retainer'],
+        ['미방', 'younger official-officer, neat, faintly anxious'],
+        ['진등', 'clever refined scholar-official of Xu province, cunning'],
+        ['요화', 'rugged former Yellow-Turban turned loyal veteran, head wrap'],
+        ['유선', 'an infant noble heir (a baby), round soft baby face, swaddled — NOT an adult'],
+        ['여건', 'stout plain officer'],
+      ] },
+    { gid: 'dongzhuo', title: '동탁군', hint: "Faction: Dong Zhuo's tyranny — menacing, crimson and black.",
+      members: [
+        ['동탁', 'obese cruel tyrant, heavy jowls, thin greedy mustache, opulent menacing'],
+        ['여포', 'peerless handsome warrior, pheasant-tail plumed golden headdress, arrogant, magnificent armor'],
+        ['이유', 'sinister thin advisor, calculating cold eyes, wispy beard'],
+        ['이각', 'brutish scarred frontier general, rough'],
+        ['곽사', 'coarse violent general, unkempt'],
+        ['화웅', 'huge brutish enemy champion, fierce snarl, heavy armor'],
+        ['호진', 'gruff veteran officer'],
+        ['서영', 'competent stern frontier commander'],
+      ] },
+    { gid: 'enemy-early', title: '초반 적장 (황건 잔당·부장)', hint: 'Early-campaign enemy officers — bandit chiefs and lieutenants, coarse.',
+      members: [
+        ['장요', "noble young cavalry officer (Lü Bu's lieutenant), handsome and resolute"],
+        ['이숙', 'smooth-talking envoy-officer, sly'],
+        ['송겸', 'plain officer'],
+        ['정원지', 'early Yellow-Turban boss, wild bandit chief, head wrap, coarse'],
+        ['정덕', 'bandit-officer, rough'],
+        ['조성', 'minor officer'],
+        ['조잠', 'minor officer'],
+        ['곽적', 'bandit officer'],
+      ] },
+    { gid: 'caocao-core', title: '조조군 — 핵심', hint: "Faction: Cao Cao's army — disciplined, dark and crimson.",
+      members: [
+        ['조조', 'shrewd ambitious warlord, narrow piercing eyes, short trimmed beard, commanding sardonic smile'],
+        ['하후돈', 'fierce one-eyed general, black eyepatch over the left eye, rugged'],
+        ['하후연', 'lean swift veteran general, sharp featured'],
+        ['조인', 'stalwart solid general, square reliable face'],
+        ['조홍', 'sturdy loyal general'],
+        ['허저', 'massive hulking brute bodyguard, simple honest broad face, immense'],
+        ['서황', 'disciplined axe-wielding general, square jaw, calm'],
+        ['장합', 'refined skilled general, elegant and composed'],
+      ] },
+    { gid: 'caocao-2', title: '조조군 — 장수', hint: "Cao Cao's officers and Han generals, crimson-black tones.",
+      members: [
+        ['우금', 'stern strict veteran general'],
+        ['악진', 'short fierce vanguard fighter, intense'],
+        ['이전', 'calm scholarly young general'],
+        ['채양', 'hot-tempered general, thick beard'],
+        ['왕충', 'ordinary officer'],
+        ['유대', 'middling commander, official cap'],
+        ['조순', 'minor officer'],
+        ['하후걸', 'young clan officer'],
+      ] },
+    { gid: 'misc-han', title: '한실 관군·군소 (초반)', hint: 'Han-court officers and minor officials of the early chapters.',
+      members: [
+        ['공융', 'refined elder scholar-governor, long grey beard, learned'],
+        ['관해', 'burly Yellow-Turban chieftain, rough'],
+        ['두습', 'minor official'],
+        ['왕보', 'minor official'],
+        ['조루', 'minor officer'],
+        ['학맹', 'minor officer'],
+        ['하후란', 'young clan officer'],
+        ['하후상', 'young clan officer'],
+      ] },
+    { gid: 'turban', title: '황건·재야 군벌', hint: 'Yellow-Turban leaders, mystics, and rival warlords.',
+      members: [
+        ['장각', 'Yellow-Turban grand sorcerer, wild-haired robed mystic, fanatic burning eyes, holding a staff'],
+        ['장보', 'Yellow-Turban sorcerer brother, robed, intense'],
+        ['장연', 'Black-Mountain bandit-army chieftain, rugged'],
+        ['요술사', 'masked Taoist sorcerer, eerie ritual mask, talismans'],
+        ['유벽', 'Yellow-Turban turned ally, rough head wrap'],
+        ['공손찬', 'proud northern warlord, white-horse commander, handsome and stern'],
+        ['도겸', 'frail kindly old governor, white beard, weary and gentle'],
+        ['하후은', 'young clan officer'],
+      ] },
+    { gid: 'banhe', title: '북방 군벌 부장 (반하)', hint: 'Northern warlord officers (Gongsun Zan / Yuan Shao camps).',
+      members: [
+        ['경무', 'plain general'],
+        ['관순', 'plain officer'],
+        ['국의', 'disciplined elite commander'],
+        ['봉기', 'scholarly advisor'],
+        ['엄강', 'plain officer'],
+        ['한맹', 'plain officer'],
+      ] },
+    { gid: 'yuanshu', title: '원술군', hint: 'Faction: Yuan Shu the pretender — gaudy yellow and purple.',
+      members: [
+        ['원술', 'arrogant self-styled emperor, plump, gaudy imperial robes, haughty'],
+        ['기령', 'big strong general with a three-pronged blade, fierce'],
+        ['악취', 'rough officer'],
+        ['원윤', 'official, a clan relative'],
+        ['이풍', 'officer'],
+        ['한섬', 'officer'],
+      ] },
+    { gid: 'lvbu-lt', title: '여포군 부장 (하비)', hint: "Lü Bu's officers at Xiapi.",
+      members: [
+        ['고순', 'grim disciplined elite commander, stern'],
+        ['위속', 'wavering officer'],
+        ['진궁', 'principled scholar-strategist, dignified, conflicted'],
+        ['후성', 'burly officer'],
+      ] },
+    { gid: 'wu-core', title: '오 — 핵심', hint: 'Faction: Sun Wu of the riverlands — red and teal.',
+      members: [
+        ['손권', 'young vigorous lord, square jaw, distinctive purple-tinged beard, green eyes, regal'],
+        ['주유', 'elegant brilliant young commander, refined and handsome, calm confidence'],
+        ['노숙', 'earnest stout strategist, kindly broad face'],
+        ['황개', 'grizzled old veteran general, white beard, weathered and scarred, loyal'],
+        ['정보', 'senior veteran general, grey beard, dignified'],
+        ['한당', 'sturdy veteran cavalry general'],
+        ['감녕', 'flamboyant ex-pirate general, bells and feathers, wild and bold'],
+        ['능통', 'fierce young loyal general, intense'],
+      ] },
+    { gid: 'wu-navy', title: '오·형주 수군', hint: 'Wu and Jing-province naval officers.',
+      members: [
+        ['정봉', 'hardy archer-general'],
+        ['반장', 'rough opportunist general'],
+        ['진무', 'strong loyal general'],
+        ['채모', 'sly Jing-province admiral, neat and treacherous'],
+        ['채중', 'minor naval officer'],
+        ['장윤', 'naval co-commander'],
+        ['양앙', 'officer'],
+        ['왕개', 'officer'],
+        ['장무', 'officer'],
+        ['진손', 'officer'],
+      ] },
+    { gid: 'jing-misc', title: '형주·군소', hint: 'Jing-province officers and minor characters.',
+      members: [
+        ['문빙', 'stalwart loyal Jing-province general, dependable'],
+        ['이적', 'clever scholar-official, persuasive'],
+        ['진응', 'officer'],
+        ['진진', 'envoy-official'],
+        ['공지', 'official messenger'],
+      ] },
+    { gid: 'generic', title: '병종 제네릭 (무명 공용)', hint: 'GENERIC nameless unit-type portraits for palette-swap — faces partly hidden by helmet or cloth, not individuals.',
+      members: [
+        ['보병대', 'generic infantry soldier bust, plain helmet, common ally-tone soldier'],
+        ['궁병대', 'generic archer bust, light cloth cap, common soldier'],
+        ['기병대', 'generic mounted trooper bust, cavalry helmet'],
+        ['적병', 'generic enemy soldier bust, dark crimson tone'],
+      ] },
+  ];
+
+  function buildPortraitPrompt(g) {
+    const N = g.members.length;
+    const cols = N <= 4 ? N : Math.ceil(N / 2);
+    const rows = Math.ceil(N / cols);
+    const list = g.members.map((m, i) => `${i + 1}) ${m[0]}${m[1] ? ' — ' + m[1] : ''}`).join('; ');
+    return `A character PORTRAIT SHEET: front-facing bust portraits (head and shoulders) of ${N} distinct Three Kingdoms figures, arranged in a ${cols}-column × ${rows}-row grid in ROW-MAJOR order (left to right, then the next row down), with clear empty gaps between busts, on a fully transparent background. ${g.hint} Each bust a complete finished illustration with a clearly DIFFERENT, recognizable face — vary age, build, facial hair and expression so no two look alike. Consistent art style and lighting across all busts. The busts in THIS EXACT ORDER: ${list}.`;
+  }
+
+  SECTIONS.push({
+    id: 'I',
+    title: 'I. 초상 시트 (진영·챕터별 그룹 → 한 장 → Claude 슬라이스)',
+    desc: '캐릭터를 진영·챕터로 묶어둔 그룹 카드. 카드의 프롬프트 복사 → 한 장 생성 → 붙여넣기 → <b>📤 초상시트 넘기기</b> → Claude가 <b>그리드 좌→우·위→아래 순서대로</b> 잘라 <code>/assets/ui/portraits/{이름}.webp</code> 저장(전투 패널·씬 화자 즉시 반영). 멤버 칩의 ✓=이미 보유, ⬜=미보유. 일부 칸만 깨지면 그 칸만 다시 만들어 따로 넘겨도 됨. 조조전 FACE 톤(세로 버스트)·스타일 일관.',
+    items: GROUPS.map((g) => ({
+      id: `I-${g.gid}`,
+      title: `${g.title} (${g.members.length}명)`,
+      portraitSheet: true,
+      portraitGroup: g.gid,
+      members: g.members,
+      note: `그리드 순서 = 멤버 순서. 📤 넘기면 그 순서대로 슬라이스됩니다.${g.gid === 'generic' ? ' (제네릭은 _2 중복 id도 같은 그림 복사 적용.)' : ''}`,
+      prompt: buildPortraitPrompt(g),
     })),
   });
 })();
@@ -968,6 +1140,21 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
 /* ───────────────────────── 상태/저장 ───────────────────────── */
 
 const varState = JSON.parse(localStorage.getItem('ab_vars') || '{}');
+
+/* 게임에 실제로 들어가 있는 에셋(서버 /asset-status). 드롭다운 ✓/⬜ 표시용. */
+const assetStatus = { sprites: new Set(), portraits: new Set(), scenes: new Set() };
+let assetStatusStamp = 0; // 미리보기 이미지 캐시버스트(상태 갱신 시점)
+async function loadAssetStatus() {
+  try {
+    const r = await fetch('/asset-status', { cache: 'no-store' });
+    if (!r.ok) return;
+    const j = await r.json();
+    assetStatus.sprites = new Set(j.sprites || []);
+    assetStatus.portraits = new Set(j.portraits || []);
+    assetStatus.scenes = new Set(j.scenes || []);
+    assetStatusStamp = Date.now();
+  } catch (_) { /* 서버 직빌드 아닌 file:// 등 — 표시 생략 */ }
+}
 
 let db = null;
 function openDB() {
@@ -1236,7 +1423,12 @@ function buildPrompt(item) {
     }
   }
   const parts = [];
-  if (item.portraitSheet) {
+  if (item.poseSheet) {
+    /* 포즈 시트: SD 유닛 스타일(탈것·전장). COMMON(정면 등) 래퍼 회피. */
+    parts.push(body);
+    parts.push('Art style: detailed painterly chibi (SD, ~2.5 heads) battle-map unit for a top-down tactical RPG, East Asian ink-wash + soft cel shading, crisp readable silhouette, muted earth tones with gold/jade accents, clean even lighting, NO baked ground shadow.');
+    parts.push('Avoid: text, labels, watermark, UI, frame, ground shadow, busy background, photorealistic, anime-cel, Koei-style. Keep the SAME character identity/colors across all 3 poses.');
+  } else if (item.portraitSheet) {
     /* 초상 시트: 정면 흉상 — SD/탈것 문법 빼고 초상 전용 스타일. */
     parts.push(body);
     parts.push('Art style: East Asian ink-wash + soft cel shading character portrait (Sosoden FACE tone), vertical bust framing, clean even lighting, consistent style across all faces.');
@@ -1270,12 +1462,7 @@ const TAB_DEFS = [
   { id: 'ui',      label: 'UI',             secs: ['D','L'] },
   { id: 'effect',  label: '이펙트',         secs: ['C'] },
   { id: 'terrain', label: '지형·바닥',      secs: ['E','K'] },
-  { id: 'char',    label: '⏸ 전신레퍼',    secs: ['A','B','F'] },
-  { id: 'enemy',   label: '⏸ 적 전신',     secs: ['H'] },
-  { id: 'unit',    label: '⏸ 병종SD(구)',  secs: ['J'] },
-  { id: 'weapon',  label: '⏸ 무기스킨',    secs: ['G'] },
-  { id: 'duel',    label: '⏸ 일기토',      secs: ['M'] },
-  { id: 'rig',     label: '⏸ 리그파츠',    secs: ['R'] },
+  // 전신레퍼·적전신·병종SD(구)·무기스킨·일기토키프레임·리그파츠 탭은 v1 불필요라 제거(섹션 정의는 코드에 남김).
 ];
 
 /* 탭당 섹션 목록을 빠르게 찾는 맵 */
@@ -1316,14 +1503,23 @@ function renderBoard() {
     for (const it of sec.items) {
       html += `<div class="card" id="card-${it.id}">
         <h3><span class="pid">${it.id}</span> ${it.title} ${it.multi ? `<span class="multi">${it.multi}</span>` : ''}</h3>
-        ${it.note ? `<div class="note">${it.note}</div>` : ''}`;
+        ${it.note ? `<div class="note">${it.note}</div>` : ''}
+        ${portraitMembersHtml(it)}`;
       if (it.vars) {
         html += '<div class="vrow">';
         for (const [vn, opts] of Object.entries(it.vars)) {
           const cur = (varState[it.id] || {})[vn] || 0;
+          /* 포즈시트 캐릭터 드롭다운: 게임에 스프라이트가 들어가 있으면 ✓, 없으면 ⬜ */
+          const mark = (it.poseSheet && it.roster && vn === '캐릭터')
+            ? (i) => (assetStatus.sprites.has(it.roster[i].s) ? '✓ ' : '⬜ ')
+            : null;
           html += `<label>${vn} <select data-card="${it.id}" data-var="${vn}">` +
-            opts.map((o, i) => `<option value="${i}" ${i === cur ? 'selected' : ''}>${o[0]}</option>`).join('') +
+            opts.map((o, i) => `<option value="${i}" ${i === cur ? 'selected' : ''}>${mark ? mark(i) : ''}${o[0]}</option>`).join('') +
             '</select></label>';
+        }
+        if (it.poseSheet && it.roster) {
+          const have = it.roster.filter((r) => assetStatus.sprites.has(r.s)).length;
+          html += `<span class="multi">스프라이트 보유 ${have}/${it.roster.length}</span>`;
         }
         html += '</div>';
       }
@@ -1335,6 +1531,7 @@ function renderBoard() {
           ${it.poseSheet ? `<button class="btn" data-posesheet="${it.id}">📤 시트 넘기기(Claude 컷)</button>` : ''}
           ${it.portraitSheet ? `<button class="btn" data-portraitsheet="${it.id}">📤 초상시트 넘기기(Claude 슬라이스)</button>` : ''}
         </div>
+        ${it.poseSheet && it.roster ? `<div class="existing" data-existing="${it.id}"></div>` : ''}
         <div class="drop" tabindex="0" data-drop="${it.id}">
           <span class="hint">클릭 후 Ctrl+V 로 생성 결과 붙여넣기 (드래그&드롭 가능)</span>
         </div>
@@ -1343,7 +1540,39 @@ function renderBoard() {
     html += '</div>';
   }
   board.innerHTML = html;
-  for (const sec of visibleSecs) for (const it of sec.items) refreshPrompt(it.id);
+  for (const sec of visibleSecs) for (const it of sec.items) { refreshPrompt(it.id); if (it.poseSheet && it.roster) renderExisting(it.id); }
+}
+
+/* 초상 그룹 카드: 멤버 칩(✓ 보유 / ⬜ 미보유) + 보유 카운트. 그리드 순서 = 칩 순서 = 슬라이스 순서. */
+function portraitMembersHtml(it) {
+  if (!it || !it.portraitSheet || !it.members) return '';
+  const have = it.members.filter((m) => assetStatus.portraits.has(m[0])).length;
+  const chips = it.members.map((m, i) => {
+    const ok = assetStatus.portraits.has(m[0]);
+    return `<span class="pchip${ok ? ' on' : ''}" title="${m[1] ? m[1].replace(/"/g, '&quot;') : ''}">${i + 1}. ${ok ? '✓' : '⬜'} ${m[0]}</span>`;
+  }).join('');
+  return `<div class="pmembers"><div class="exnote${have ? '' : ' dim'}">초상 보유 ${have}/${it.members.length} · 그리드 순서대로 슬라이스:</div><div class="pchips">${chips}</div></div>`;
+}
+
+/* 포즈시트 카드: 선택된 캐릭터가 게임에 이미 들어가 있으면 현재 스프라이트(front 대기/이동/공격) 미리보기.
+   없으면 "병종 제네릭으로 표시 중" 안내. 드롭다운 바꿀 때마다 갱신. */
+function renderExisting(cardId) {
+  const host = document.querySelector(`[data-existing="${CSS.escape(cardId)}"]`);
+  if (!host) return;
+  const item = findItem(cardId);
+  if (!item || !item.roster) { host.innerHTML = ''; return; }
+  const sel = item.roster[(varState[cardId] || {})['캐릭터'] || 0];
+  if (!sel) { host.innerHTML = ''; return; }
+  if (!assetStatus.sprites.has(sel.s)) {
+    host.innerHTML = `<div class="exnote dim">⬜ <b>${sel.n}</b> — 아직 게임에 이미지 없음. 생성 후 📤 넘기면 여기 표시됩니다(지금은 병종 제네릭 SD로 게임 표시 중).</div>`;
+    return;
+  }
+  const base = `/apps/web/public/assets/sprites/${encodeURIComponent(sel.s)}`;
+  const poses = [['front_idle', '대기'], ['front_move', '이동'], ['front_attack', '공격']];
+  host.innerHTML = `<div class="exnote">✓ 게임에 들어간 현재 스프라이트 — <b>${sel.n}</b> (<code>${sel.s}</code>):</div>
+    <div class="exrow">` +
+    poses.map(([p, label]) => `<figure class="exfig"><div class="exbox"><img src="${base}/${p}.png?t=${assetStatusStamp}" alt="${label}" loading="lazy"></div><figcaption>${label}</figcaption></figure>`).join('') +
+    `</div>`;
 }
 
 function render() {
@@ -1469,6 +1698,7 @@ board.addEventListener('change', e => {
   varState[card][vn] = +sel.value;
   localStorage.setItem('ab_vars', JSON.stringify(varState));
   refreshPrompt(card);
+  renderExisting(card);
 });
 
 board.addEventListener('click', async e => {
@@ -1493,15 +1723,18 @@ board.addEventListener('click', async e => {
   const ps = e.target.closest('button[data-posesheet]');
   if (ps) {
     const item = findItem(ps.dataset.posesheet);
+    const idx = (varState[item.id] || {})['캐릭터'] || 0;
+    const sel = (item.roster || [])[idx];
+    if (!sel) { toast('캐릭터를 선택하세요', true); return; }
     const all = await dbAll();
     const recs = all.filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
     if (!recs.length) { toast('먼저 이 카드에 포즈 시트를 붙여넣으세요', true); return; }
     try {
       const b64 = await blobToB64(recs[0].blob);
       const r = await fetch(SAVE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: `assets/sprites/${item.poseSpriteId}/_posesheet.png`, b64, contentType: recs[0].blob.type || 'image/png' }) });
+        body: JSON.stringify({ path: `assets/sprites/${sel.s}/_posesheet.png`, b64, contentType: recs[0].blob.type || 'image/png' }) });
       if (!r.ok) throw new Error('HTTP ' + r.status);
-      toast(`${item.poseSpriteId} 포즈 시트 넘김 → Claude가 컷·저장합니다`);
+      toast(`${sel.n}(${sel.s}) 포즈 시트 넘김 → Claude가 컷·저장합니다`);
     } catch (e2) { toast('넘기기 실패: ' + e2.message + ' (:8080 확인)', true); }
     return;
   }
@@ -1586,6 +1819,7 @@ document.getElementById('dirbtn').addEventListener('click', async () => {
 });
 
 (async () => {
+  await loadAssetStatus();
   render();
   try { db = await openDB(); await loadImagesForCurrentTab(); await restoreDir(); }
   catch (err) {

@@ -20,7 +20,7 @@ import type { Coord } from "@tk/engine";
 import { depthOf, gridToWorld, TILE_SIZE } from "../projection";
 import { UNIT_BASE_SIZE, type TextureResolver } from "../textures";
 import { easeInOut, easeOut, easeOutBack, type TweenRunner } from "../tweens";
-import { resolveSpriteId } from "../spriteMap";
+import { resolveSpriteId, spriteCandidates } from "../spriteMap";
 import { SkeletonView, type AttachmentTextureResolver } from "./SkeletonView";
 import type { ClipName, Skeleton } from "../skeleton";
 
@@ -84,6 +84,8 @@ export class UnitView extends Container {
   private readonly tweens: TweenRunner;
   private readonly textures: TextureResolver;
   private readonly spriteId: string | null;
+  /** 텍스처 후보(전용→병종 제네릭). applySpriteTexture가 순서대로 시도 — 전용 없으면 제네릭. */
+  private readonly spriteCands: string[];
 
   /** "front" | "back" — 현재 뷰 방향 */
   private view: "front" | "back" = "front";
@@ -131,6 +133,7 @@ export class UnitView extends Container {
     this.retreatedFlag = init.retreated;
     this.tweens = tweens;
     this.textures = textures;
+    this.spriteCands = spriteCandidates(init.commanderId, init.classId, init.side);
     this.spriteId = resolveSpriteId(init.commanderId, init.classId, init.side);
 
     // 유닛 id 해시로 호흡 위상 분산 (전원이 같은 박자로 숨쉬지 않게)
@@ -251,10 +254,15 @@ export class UnitView extends Container {
   private applySpriteTexture(view: "front" | "back", pose: "idle" | "move" | "attack"): void {
     if (this.skeletonView) return; // 스켈레톤 경로 — 스프라이트 포즈 텍스처 미사용
     this.pose = pose; // 미러 부호는 포즈에 따라 다름 (applyScale) — 폴백 경로에서도 추적
-    if (!this.spriteId) return; // 매핑 없음 → 항상 폴백
+    if (this.spriteCands.length === 0) return; // 후보 없음 → 항상 색사각 폴백
 
-    const tex = this.textures.getSprite(this.spriteId, view, pose);
-    if (!tex) return; // 에셋 미로드 → 폴백 유지
+    // 후보 순서대로: 캐릭터 전용 → 병종 제네릭. 첫 로드된 텍스처 사용(이미지 없으면 제네릭).
+    let tex = null;
+    for (const sid of this.spriteCands) {
+      tex = this.textures.getSprite(sid, view, pose);
+      if (tex) break;
+    }
+    if (!tex) return; // 전부 미로드 → 폴백 유지
 
     // 텍스처 높이를 SPRITE_DISPLAY_H에 맞게 스케일
     const src = tex.source;

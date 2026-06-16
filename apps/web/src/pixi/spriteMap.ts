@@ -11,22 +11,20 @@
  */
 import type { Side } from "@tk/data";
 
-/** commanderId(원작 한국어) → spriteId(영문 ASCII) */
+/**
+ * commanderId(한국어) → spriteId **override**. 기본 규칙은 "commanderId가 곧 spriteId"라
+ * 여기엔 *영문 폴더로 이미 만들어둔 스프라이트*만 매핑한다. 나머지 모든 장수는 commanderId(한국어)를
+ * 그대로 spriteId로 써서 `/assets/sprites/{한국어}/`를 찾고, 없으면 병종 제네릭으로 폴백(spriteCandidates).
+ * 즉 포즈시트를 만들어 `sprites/{이름}/`에 넣으면 매핑 없이 자동 사용, 없으면 제네릭.
+ */
 export const COMMANDER_SPRITE_MAP: Record<string, string> = {
-  관우:   "guanyu",
-  유비:   "liubei",
-  장비:   "zhangfei",
-  조운:   "zhaoyun",
-  제갈량: "zhugeliang",
-  여포:   "lvbu",
-  화웅:   "huaxiong",
-  장료:   "zhangliao",
-  동탁:   "dongzhuo",
-  조조:   "caocao",
-  하후돈: "xiahoudun",
-  // 그 외 무명·조연 장수(간옹·미축·손건·미방·진등·관평·유봉·주창 등)는 개별 SD 없이
-  // classId+side 병종 제네릭으로 폴백(§4 양산형). 비중 생기면 여기 매핑 + 포즈시트 추가.
-  // 유비는 군주(lord) 병종이지만 전용 SD 스프라이트가 있으므로 commanderId 직매핑으로 처리.
+  관우: "guanyu",
+  유비: "liubei",
+  장비: "zhangfei",
+  여포: "lvbu",
+  화웅: "huaxiong",
+  장료: "zhangliao",
+  장요: "zhangliao", // 데이터 표기 변형(장요/장료) 동일 스프라이트
 };
 
 /**
@@ -53,23 +51,27 @@ export const CLASS_SIDE_SPRITE_MAP: Record<string, string> = {
 };
 
 /**
- * 유닛의 spriteId를 결정.
- * @returns spriteId 문자열, 또는 폴백(색 사각형) 시 null.
+ * 유닛의 spriteId 후보를 우선순위대로 반환.
+ *  ① 캐릭터 전용: COMMANDER_SPRITE_MAP override || commanderId(한국어) — `sprites/{이름}/`이 있으면 사용
+ *  ② 병종 제네릭: classId+side — ①이 미로드(이미지 없음)면 폴백
+ * UnitView가 순서대로 getSprite를 시도해 첫 로드된 텍스처를 쓴다(있으면 전용, 없으면 제네릭).
+ */
+export function spriteCandidates(commanderId: string, classId: string, side: Side): string[] {
+  const out: string[] = [];
+  if (commanderId) out.push(COMMANDER_SPRITE_MAP[commanderId] || commanderId);
+  const template = CLASS_SIDE_SPRITE_MAP[`${classId}_${side}`];
+  if (template) out.push(template);
+  return [...new Set(out)];
+}
+
+/**
+ * 유닛의 대표 spriteId(첫 후보) — 리그 키 등 단일 값이 필요한 곳용. 후보가 없으면 null.
+ * (텍스처 폴백은 spriteCandidates로 UnitView가 처리한다.)
  */
 export function resolveSpriteId(
   commanderId: string,
   classId: string,
   side: Side,
 ): string | null {
-  // 1. 네임드 우선
-  const named = COMMANDER_SPRITE_MAP[commanderId];
-  if (named) return named;
-
-  // 2. 병종+진영 템플릿
-  const key = `${classId}_${side}`;
-  const template = CLASS_SIDE_SPRITE_MAP[key];
-  if (template) return template;
-
-  // 3. 폴백
-  return null;
+  return spriteCandidates(commanderId, classId, side)[0] ?? null;
 }
