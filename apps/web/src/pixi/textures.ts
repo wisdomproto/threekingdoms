@@ -576,14 +576,19 @@ export class TextureResolver {
   /**
    * 스프라이트 텍스처 조회. 미보유 시 null (폴백: 색 사각형 — 설계 §필수).
    * view: "front"|"back", pose: "idle"|"move"|"attack"
+   * 폴백 순서: 정확한 키 → 같은 뷰 idle → **front 동일 포즈 → front idle** → null.
+   * 즉 **back 프레임은 선택**(없으면 front로 대체) — 위로 이동해도 깨지지 않고 정면을 유지한다.
    */
   getSprite(spriteId: string, view: "front" | "back", pose: "idle" | "move" | "attack"): Texture | null {
-    const poseKey = `${view}_${pose}`;
     const poseMap = this.sprites.get(spriteId);
     if (!poseMap) return null;
-
-    // 정확한 포즈 키 우선, 없으면 같은 뷰의 idle로 그레이스풀 폴백
-    return poseMap.get(poseKey) ?? poseMap.get(`${view}_idle`) ?? null;
+    return (
+      poseMap.get(`${view}_${pose}`) ??
+      poseMap.get(`${view}_idle`) ??
+      poseMap.get(`front_${pose}`) ??
+      poseMap.get("front_idle") ??
+      null
+    );
   }
 
   destroy(): void {

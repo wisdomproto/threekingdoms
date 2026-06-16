@@ -16,10 +16,16 @@ export const COMMANDER_SPRITE_MAP: Record<string, string> = {
   관우:   "guanyu",
   유비:   "liubei",
   장비:   "zhangfei",
+  조운:   "zhaoyun",
+  제갈량: "zhugeliang",
   여포:   "lvbu",
   화웅:   "huaxiong",
   장료:   "zhangliao",
-  // 미생성분: 이숙, 호진, 조잠, 간옹, 조운, 제갈량 등 → 폴백(색 사각형)
+  동탁:   "dongzhuo",
+  조조:   "caocao",
+  하후돈: "xiahoudun",
+  // 그 외 무명·조연 장수(간옹·미축·손건·미방·진등·관평·유봉·주창 등)는 개별 SD 없이
+  // classId+side 병종 제네릭으로 폴백(§4 양산형). 비중 생기면 여기 매핑 + 포즈시트 추가.
   // 유비는 군주(lord) 병종이지만 전용 SD 스프라이트가 있으므로 commanderId 직매핑으로 처리.
 };
 

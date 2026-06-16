@@ -71,7 +71,7 @@
 <body>
 <header>
   <h1>에셋 프롬프트 보드 v2.0</h1>
-  <span class="sub">풀 카탈로그: 무기·적네임드·초상·병종·지형·UI·일기토 전수 · 시트(한 장 多에셋) 방식 · 잘라 쓰는 건 Claude가 처리 · A~F 수직슬라이스+로스터 · G 무기시트(스킨 BM) · H 적 네임드 전수 · I 초상 64×80 크롭표 · J 병종 SD 템플릿 · K 지형 전수 · L UI 결산·커맨드·장식 · M 일기토 키프레임(Seedance) · facing screen-left 고정 · 병종별 탈것 반영</span>
+  <span class="sub">v1 캐릭터 비주얼 = <b>① SD 포즈시트</b>(idle/move/attack 한 장 → 📤 넘기기 → Claude 컷 → sprites/{id}) + <b>② 초상시트</b>(여러 명 한 장 → 📤 넘기기 → Claude 슬라이스 → ui/portraits/{이름}) + <b>③ 시나리오 씬</b>. ¾ 좌향·투명배경, 뒤모습 선택(front 폴백). 보조: UI·이펙트·지형. ⏸ 보류(v1.5+/막바지): 전신레퍼·무기스킨·일기토키프레임·리그. 컷·슬라이스는 Claude가 처리.</span>
   <span class="stylefixed">화풍: 수묵담채 (확정)</span>
   <button class="btn" id="dirbtn" title="⬇ 저장이 향할 폴더 (docs\art 권장)">저장 폴더: 미연결</button>
   <div id="progress"></div>
@@ -459,18 +459,18 @@ const SECTIONS = [
   ]
 },
 {
-  id: 'I', title: 'I. 초상(64×80) 크롭 가이드 — 전원',
-  desc: '⚠ 생성 카드 아님 — 크롭 명세. 조조전 FACE 규격 64×80(세로형 버스트). 각 인물의 레퍼런스 시트(A/B/F/H)에 포함된 표정 버스트(정면 head close-up: calm 또는 battle fury)를 64×80로 크롭. 관우(A-1)·화웅(B-1d)은 기존 보드(A·B)에 이미 초상 카드가 있으니 여기선 표에만 표기, 카드 신규 생성 금지. 슬라이스는 Claude가 시트 픽본에서 일괄 크롭. 카드는 진영별 3장으로 묶어 밀도 최대화.',
+  id: 'I', title: 'I. 초상 배치 시트 (한 장에 여러 명 → Claude 슬라이스)',
+  desc: 'v1 초상 방식. 정면 흉상을 그룹별 **한 장(그리드)**으로 생성 → 카드에 붙여넣기 → **📤 초상시트 넘기기** → Claude가 인물별로 잘라 <code>/assets/ui/portraits/{이름}.webp</code> 저장(전투 패널·씬 화자 즉시 반영). 조조전 FACE 톤(세로 버스트), 인물 정체성·스타일 일관. 이름은 commanders.json 한국어(관우·유비…).',
   items: [
-    { id: 'I-1', title: '아군 초상 크롭표 (정규 로스터 16 + 게스트)',
-      note: 'FACE 64×80(조조전 규격), 각 시트 정면 버스트 크롭. 소스 시트 매핑 — 유비:B-1a / 장비:B-1b / 관우:A-1(기존) / 조운:F-1a / 간옹:F-1b / 미축:F-1c / 손건:F-1d / 미방:F-1e / 진등:F-1f / 서서:F-1g / 제갈량:F-1h / 관평:F-1i / 유봉:F-1j / 주창:F-1k / (게스트)주유:F-1l / 노숙:F-1m / 황개:F-1n. 크롭 규칙: 정면 head close-up(calm 표정 우선, 군주·맹장은 battle fury 선택 가능)을 64:80 비율(가로64:세로80, 어깨 위 버스트)로 잘라 배경 제거. faceId는 commanders.json 참조(유비0·장비2·관우1·조운3·제갈량4·서서5·간옹15·손건12·미축13·미방14·진등17·관평19·유봉18·주창20·주유80·노숙86·황개170).',
-      prompt: 'PLACEHOLDER CARD — no image generation. Crop the front-view calm/fury head bust from each listed allied reference sheet (B-1a, B-1b, A-1, F-1a..F-1n) to a 64x80 vertical FACE portrait (Sosoden spec), background removed. Output one cropped portrait per character; this card only specifies the crop source mapping.' },
-    { id: 'I-2', title: '적 네임드 초상 크롭표 (1~4장 적·우군 명사)',
-      note: 'FACE 64×80, 각 시트 버스트 크롭. 소스 매핑 — 여포:B-1c / 화웅:B-1d(기존) / 장료:B-1e / 동탁:F-2 / 하후돈:F-3a / 조조:F-3b / 장각3형제·정원지:H-1a(4분할) / 관해:H-1b / 공융:H-1c / 손견:H-1d / 이유:H-2a / 이각·곽사·서영:H-2b(3분할) / 이숙·호진·조잠:병종템플릿 대용→해당 faceId 영상소스 없음, 조조전 추출 FACE 직접 또는 H-2a 색교체 크롭 / 도겸·조표:H-3a / 원술:H-3b / 고순·진궁:H-3c / 원소:H-4a / 안량·문추:H-4b(2분할) / 전풍·저수·곽도:H-4c(3분할). 단발 조연(이숙139·호진140·조잠200·기영146·진기156 등)은 전용 버스트 없음 → I-3 조연표 참조. 정면 버스트를 64:80로, 군주·맹장은 fury 표정 우선.',
-      prompt: 'PLACEHOLDER CARD — no image generation. Crop the front-view head bust from each listed enemy/notable reference sheet (B-1c..e, F-2/F-3a/F-3b, H-1*, H-2a/b, H-3*, H-4a/b/c) to a 64x80 vertical FACE portrait, multi-figure sheets split per person, background removed. This card specifies the crop source mapping only.' },
-    { id: 'I-3', title: '게스트·후속·조연 초상 크롭표 (5장 오군 + 후속 확보 + 단발 조연)',
-      note: 'FACE 64×80. 소스 매핑 — (오군)감녕:H-5a / 태사자:H-5a / 정보:H-5b / 한당:H-5b / 유표:H-5c / 채모:H-5c / (후속 확보)하후연:H-7a / 조인·조홍:H-7b / 악진·이전·우금·서황:H-7c(4분할) / 전위·허저:H-7d(2분할). (단발 조연 — 전용 시트 없음, 병종 템플릿 대용 인물) 이숙·호진·조잠·기영·진기·진궁 외 부장·채중·채양·형도영·순우경·장합·고람·봉기 등: 전용 버스트가 없으므로 ①해당 인물 비중이 생기면 H에 시트 승격 후 크롭, ②그 전까지는 병종 대표 초상(보병/궁병/기병/참모 제네릭 버스트 1종씩)을 색교체로 공용. 제네릭 병종 초상 6종(보병·궁병·기병·참모·황건적·수군)은 별도 1장 시트로 뽑아 64×80 크롭 권장 — 단발 조연 전원 커버. faceId는 commanders.json의 각 인물 값을 키로 매핑(중복 faceId 다수 존재 주의).',
-      prompt: 'PLACEHOLDER CARD — no image generation. Crop 64x80 vertical FACE portraits from H-5*, H-7* sheets (multi-figure sheets split per person). For minor template-covered officers without a dedicated sheet, reuse 6 generic class-archetype busts (infantry / archer / cavalry / advisor / Yellow-Turban / marine) palette-swapped; recommend generating those 6 generic busts as one separate sheet for cropping. Specifies crop sources and the generic-portrait fallback only.' }
+    { id: 'I-allyA', title: '아군 초상시트 A (유비·관우·장비·조운)', portraitSheet: true, portraitGroup: 'allyA',
+      note: '4명 정면 흉상 한 장(2×2 권장, 간격) → 붙여넣기 → 📤. Claude가 잘라 유비/관우/장비/조운.webp 저장.',
+      prompt: 'A portrait sheet: front-facing bust portraits (head and shoulders) of four Three Kingdoms heroes in a clean 2x2 grid, evenly spaced with clear gaps, transparent background, each a distinct finished bust. The four, clearly different and recognizable: LIU BEI (benevolent Han lord, kind face, thin mustache, imperial robe), GUAN YU (long flowing black beard, dignified red face, green robe), ZHANG FEI (fierce bristling beard, leopard eyes, dark armor), ZHAO YUN (handsome resolute young general, silver armor).' },
+    { id: 'I-allyB', title: '아군 초상시트 B (간옹·미축·손건·미방·서서·제갈량)', portraitSheet: true, portraitGroup: 'allyB',
+      note: '6명 정면 흉상 한 장(3×2, 간격) → 📤.',
+      prompt: 'A portrait sheet: front-facing bust portraits of six Three Kingdoms civil officers/strategists in a 3x2 grid, clear gaps, transparent background, each a distinct finished bust. The six: JIAN YONG (witty advisor), MI ZHU (merchant-noble official), SUN QIAN (calm diplomat), MI FANG (younger officer), XU SHU (sharp young strategist), ZHUGE LIANG (serene genius strategist with feather fan, Taoist robe). Distinct recognizable faces.' },
+    { id: 'I-enemy', title: '적·게스트 초상시트 (여포·화웅·동탁·장료·조조·하후돈)', portraitSheet: true, portraitGroup: 'enemy',
+      note: '6명 정면 흉상 한 장(3×2, 간격) → 📤.',
+      prompt: 'A portrait sheet: front-facing bust portraits of six Three Kingdoms figures in a 3x2 grid, clear gaps, transparent background, each a distinct finished bust. The six: LU BU (peerless warrior, pheasant-feather headdress, fierce handsome face), HUA XIONG (hulking brutish enemy general, thick beard), DONG ZHUO (corpulent cruel tyrant), ZHANG LIAO (calm disciplined veteran), CAO CAO (shrewd ambitious warlord, sharp narrow eyes, fine beard), XIAHOU DUN (one-eyed fierce general with an eyepatch). Distinct recognizable faces.' }
   ]
 },
 {
@@ -918,6 +918,53 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
   });
 })();
 
+/* ───────────────────────── S. 베이크 포즈 시트 (한 장에 여러 포즈 → Claude가 컷) ───────────────────────── */
+/*
+  CLAUDE.md §4(2026-06-16): v1 비주얼 = 완성형 베이크 포즈 프레임. 한 캐릭터의 여러 포즈(idle/move/attack)를
+  한 장 시트로 생성 → 📤 시트 넘기기 → Claude가 오려서 /assets/sprites/{spriteId}/front_{pose}.png + manifest.
+  ¾ 측면·화면왼쪽 바라보기(좌우 미러), 투명배경. 컷·리그 없음.
+*/
+(function() {
+  const POSE_STYLE = 'Art style: detailed painterly chibi (SD, ~2.5 heads) battle-map unit for a top-down tactical RPG, East Asian ink-wash + soft cel shading, crisp readable silhouette, muted earth tones with gold/jade accents. Clean even lighting, NO baked ground shadow.';
+  const POSE_NEG = 'Avoid: text, labels, watermark, UI, frame, border, ground shadow, busy background, photorealistic, anime-cel, Koei-style. Keep the SAME character identity/colors across all poses.';
+  const sheetPrompt = (desc) =>
+    `A single horizontal POSE SHEET of ${desc}, the SAME character repeated in 3 distinct full-body poses evenly spaced LEFT TO RIGHT with clear empty (transparent) gaps between them: (1) IDLE — relaxed standing battle stance; (2) MOVE — mid-stride walking/advancing; (3) ATTACK — dynamic weapon swing with a sweeping motion arc. Draw every pose in 3/4 SIDE view FACING SCREEN-LEFT (profile turned left, NOT facing camera). Each pose a complete finished illustration on a fully transparent background, no overlap between poses.\n\n` + POSE_STYLE + '\n\n' + POSE_NEG;
+  // ★ 풀제작(개별 SD) + 주요 네임드. 그 외 장수(간옹·미축·손건·미방·진등·관평·유봉·주창·손상향 등)는
+  // 개별 SD 없이 §4대로 병종 제네릭(아래)을 공용한다(spriteMap 미매핑 → classId+side 폴백).
+  const CHARS = [
+    // ── 아군 ★ 풀제작 ──
+    { sid: 'liubei',   name: '유비', desc: 'LIU BEI — benevolent Han lord, kind dignified face with a thin mustache, imperial robe with subtle dragon motifs, a pair of slender swords' },
+    { sid: 'guanyu',   name: '관우', desc: 'GUAN YU — long flowing black beard, dignified red face, green war-robe over dark lamellar armor, wielding the Green Dragon Crescent Blade (a long guandao polearm)' },
+    { sid: 'zhangfei',  name: '장비', desc: 'ZHANG FEI — fierce burly warrior, bristling beard, leopard-eyed glare, dark plate armor, the Serpent Spear (a long spear with a snake-curved blade)' },
+    { sid: 'zhaoyun',  name: '조운', desc: 'ZHAO YUN — handsome valiant young general, gleaming silver-white armor, a straight spear, calm fearless face' },
+    { sid: 'zhugeliang', name: '제갈량', desc: 'ZHUGE LIANG — serene genius strategist, Taoist crane-feather robe, holding a white feather fan, scholar headband, slender' },
+    // ── 적 ★ / 주요 네임드 ──
+    { sid: 'lvbu',     name: '여포', desc: 'LU BU — peerless warrior, ornate pheasant-feather headdress, flowing red cape, fearsome handsome face, the Sky Piercer halberd (ji)' },
+    { sid: 'caocao',   name: '조조', desc: 'CAO CAO — shrewd ambitious warlord, dark ornate lacquered armor, sharp narrow eyes, fine beard, a jian sword' },
+    { sid: 'xiahoudun', name: '하후돈', desc: 'XIAHOU DUN — one-eyed fierce general with a leather eyepatch over the left eye, heavy dark armor, a spear' },
+    { sid: 'dongzhuo', name: '동탁', desc: 'DONG ZHUO — corpulent cruel tyrant warlord, lavish dark robes over armor, jowly bearded face, a heavy broadsword' },
+    { sid: 'huaxiong',  name: '화웅', desc: 'HUA XIONG — hulking enemy general (Dong Zhuo army), heavy dark armor, brutish fierce face with a thick beard, a large broadsword' },
+    { sid: 'zhangliao', name: '장료', desc: 'ZHANG LIAO — disciplined veteran general, practical lamellar armor, calm sharp face, a halberd' },
+    // ── 병종 제네릭(얼굴 가림·색교체 양산형 — 무명 장수 공용) ──
+    { sid: 'footman_player',      name: '보병(아군)', desc: 'a generic FOOTMAN soldier — closed helmet hiding the face, blue-accented lamellar armor, a spear and shield (anonymous reskinnable trooper)' },
+    { sid: 'archer_player',       name: '궁병(아군)', desc: 'a generic ARCHER soldier — light helmet, blue-accented light armor, a bow and quiver (anonymous reskinnable trooper)' },
+    { sid: 'lightCavalry_player', name: '기병(아군)', desc: 'a generic LIGHT CAVALRY rider on a horse — helmet, blue-accented armor, a lance (anonymous reskinnable trooper, mounted)' },
+    { sid: 'footman_enemy',       name: '보병(적)',   desc: 'a generic enemy FOOTMAN soldier — closed helmet, red/black-accented armor, spear and shield (anonymous trooper)' },
+    { sid: 'archer_enemy',        name: '궁병(적)',   desc: 'a generic enemy ARCHER — light helmet, red/black light armor, bow and quiver (anonymous trooper)' },
+    { sid: 'lightCavalry_enemy',  name: '기병(적)',   desc: 'a generic enemy LIGHT CAVALRY rider on a horse — helmet, red/black armor, a lance (anonymous trooper, mounted)' },
+  ];
+  SECTIONS.push({
+    id: 'S',
+    title: 'S. 베이크 포즈 시트 (한 장 → Claude가 오려서 프레임으로)',
+    desc: 'v1 비주얼 방식. 한 캐릭터의 idle/move/attack을 **한 장 시트**(좌→우, ¾ 좌향, 투명배경)로 생성 → 카드에 붙여넣고 **📤 시트 넘기기** → Claude가 오려서 <code>/assets/sprites/{spriteId}/front_idle·move·attack.png</code> + manifest 등록 → 게임 즉시 반영. 컷·리그 직접 안 함. (뒤 모습은 선택 — 없으면 front 폴백)',
+    items: CHARS.map((c) => ({
+      id: 'S-' + c.sid, title: `${c.name} 포즈 시트 (spriteId: ${c.sid})`, poseSheet: true, poseSpriteId: c.sid,
+      note: `붙여넣기 → <b>📤 시트 넘기기</b> → <code>assets/sprites/${c.sid}/front_{idle,move,attack}.png</code>로 Claude가 컷·저장.`,
+      prompt: sheetPrompt(c.desc),
+    })),
+  });
+})();
+
 /* ───────────────────────── 상태/저장 ───────────────────────── */
 
 const varState = JSON.parse(localStorage.getItem('ab_vars') || '{}');
@@ -1189,7 +1236,12 @@ function buildPrompt(item) {
     }
   }
   const parts = [];
-  if (item.sceneCard) {
+  if (item.portraitSheet) {
+    /* 초상 시트: 정면 흉상 — SD/탈것 문법 빼고 초상 전용 스타일. */
+    parts.push(body);
+    parts.push('Art style: East Asian ink-wash + soft cel shading character portrait (Sosoden FACE tone), vertical bust framing, clean even lighting, consistent style across all faces.');
+    parts.push('Avoid: full body, weapons dominating, text, watermark, UI, frame, busy background, photorealistic, anime-cel, Koei-style, inconsistent art styles between faces.');
+  } else if (item.sceneCard) {
     /* 씬 카드: 프롬프트 안에 SCENE_STYLE 이미 포함됨 — 앞에 prefix 추가 없이 body만, 마지막에 네거티브 */
     parts.push(body);
     parts.push(item._neg || SCENE_NEGATIVE);
@@ -1209,18 +1261,21 @@ function buildPrompt(item) {
 /* ───────────────────────── 탭 정의 ───────────────────────── */
 
 /* 섹션 id → 탭 id 매핑. 여러 섹션을 한 탭으로 묶을 수 있음. */
+// v1 기준 정렬(2026-06-16): ① SD 포즈시트 ② 초상시트 ③ 씬 = 캐릭터 비주얼 핵심.
+// 그 뒤 보조(UI·이펙트·지형). ⏸ 보류 = v1.5+/막바지(전신레퍼·무기스킨·일기토키프레임·리그·구병종SD).
 const TAB_DEFS = [
-  { id: 'char',   label: '캐릭터 시트',  secs: ['A','B','F'] },
-  { id: 'weapon', label: '무기',          secs: ['G'] },
-  { id: 'enemy',  label: '적 네임드',     secs: ['H'] },
-  { id: 'unit',   label: '병종 SD',       secs: ['J'] },
-  { id: 'portrait',label: '초상 크롭',    secs: ['I'] },
-  { id: 'terrain',label: '지형·바닥',     secs: ['E','K'] },
-  { id: 'ui',     label: 'UI',            secs: ['D','L'] },
-  { id: 'effect', label: '이펙트',        secs: ['C'] },
-  { id: 'duel',   label: '일기토 키프레임', secs: ['M'] },
-  { id: 'scene',  label: '시나리오 씬',   secs: ['N'] },
-  { id: 'rig',    label: '리그 파츠',     secs: ['R'] },
+  { id: 'pose',    label: '① SD 포즈시트',  secs: ['S'] },
+  { id: 'portrait',label: '② 초상시트',     secs: ['I'] },
+  { id: 'scene',   label: '③ 시나리오 씬',  secs: ['N'] },
+  { id: 'ui',      label: 'UI',             secs: ['D','L'] },
+  { id: 'effect',  label: '이펙트',         secs: ['C'] },
+  { id: 'terrain', label: '지형·바닥',      secs: ['E','K'] },
+  { id: 'char',    label: '⏸ 전신레퍼',    secs: ['A','B','F'] },
+  { id: 'enemy',   label: '⏸ 적 전신',     secs: ['H'] },
+  { id: 'unit',    label: '⏸ 병종SD(구)',  secs: ['J'] },
+  { id: 'weapon',  label: '⏸ 무기스킨',    secs: ['G'] },
+  { id: 'duel',    label: '⏸ 일기토',      secs: ['M'] },
+  { id: 'rig',     label: '⏸ 리그파츠',    secs: ['R'] },
 ];
 
 /* 탭당 섹션 목록을 빠르게 찾는 맵 */
@@ -1277,6 +1332,8 @@ function renderBoard() {
           <button class="btn primary" data-copy="${it.id}">프롬프트 복사</button>
           <button class="btn" data-file="${it.id}">파일 선택…</button>
           ${it.rigParts ? `<button class="btn" data-rigcut="${it.id}">✂ 파츠 컷 → 게임</button>` : ''}
+          ${it.poseSheet ? `<button class="btn" data-posesheet="${it.id}">📤 시트 넘기기(Claude 컷)</button>` : ''}
+          ${it.portraitSheet ? `<button class="btn" data-portraitsheet="${it.id}">📤 초상시트 넘기기(Claude 슬라이스)</button>` : ''}
         </div>
         <div class="drop" tabindex="0" data-drop="${it.id}">
           <span class="hint">클릭 후 Ctrl+V 로 생성 결과 붙여넣기 (드래그&드롭 가능)</span>
@@ -1433,6 +1490,36 @@ board.addEventListener('click', async e => {
   }
   const rc = e.target.closest('button[data-rigcut]');
   if (rc) { openCutter(rc.dataset.rigcut); return; }
+  const ps = e.target.closest('button[data-posesheet]');
+  if (ps) {
+    const item = findItem(ps.dataset.posesheet);
+    const all = await dbAll();
+    const recs = all.filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
+    if (!recs.length) { toast('먼저 이 카드에 포즈 시트를 붙여넣으세요', true); return; }
+    try {
+      const b64 = await blobToB64(recs[0].blob);
+      const r = await fetch(SAVE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: `assets/sprites/${item.poseSpriteId}/_posesheet.png`, b64, contentType: recs[0].blob.type || 'image/png' }) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      toast(`${item.poseSpriteId} 포즈 시트 넘김 → Claude가 컷·저장합니다`);
+    } catch (e2) { toast('넘기기 실패: ' + e2.message + ' (:8080 확인)', true); }
+    return;
+  }
+  const pt = e.target.closest('button[data-portraitsheet]');
+  if (pt) {
+    const item = findItem(pt.dataset.portraitsheet);
+    const all = await dbAll();
+    const recs = all.filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
+    if (!recs.length) { toast('먼저 이 카드에 초상 시트를 붙여넣으세요', true); return; }
+    try {
+      const b64 = await blobToB64(recs[0].blob);
+      const r = await fetch(SAVE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: `assets/ui/portraits/_sheet_${item.portraitGroup}.png`, b64, contentType: recs[0].blob.type || 'image/png' }) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      toast(`초상시트 ${item.portraitGroup} 넘김 → Claude가 슬라이스합니다`);
+    } catch (e2) { toast('넘기기 실패: ' + e2.message + ' (:8080 확인)', true); }
+    return;
+  }
   const th = e.target.closest('.thumb');
   if (th) {
     const id = +th.dataset.imgid;
