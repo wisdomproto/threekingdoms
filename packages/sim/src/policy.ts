@@ -1,6 +1,7 @@
 import {
   getAttackableTargets, getMovableTiles, distance, areFoes, pathCostField,
   computeDamage, flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes, canUltimate,
+  hitChance, agilityPower,
   type Action, type BattleContext, type BattleState, type UnitState, type Coord,
 } from "@tk/engine";
 
@@ -264,8 +265,10 @@ function bestAttackPlan(
       if (!target) continue;
       const dmg = attackDamageFrom(ctx, state, unit, pos, target);
       const kill = target.troops - dmg <= 0;
-      // 격파 최우선(+1e6), 그다음 피해. 제자리는 +0.5 가산해 동률·근소차에서 이동을 억제.
-      const score = (kill ? 1_000_000 : 0) + dmg + (moving ? 0 : 0.5);
+      // 기댓값(§2-1 시드확률): 명중%(순발력 기반·위치 무관)로 피해·격파 가치를 가중 — 빗나갈 행동 과대평가 방지.
+      const hp = hitChance(agilityPower(unit), agilityPower(target), ctx.data.combat.accuracy) / 100;
+      // 격파 최우선(+1e6, 명중확률 가중), 그다음 기대피해. 제자리는 +0.5 가산해 동률·근소차에서 이동을 억제.
+      const score = (kill ? 1_000_000 * hp : 0) + dmg * hp + (moving ? 0 : 0.5);
       if (!best || score > best.score) {
         best = {
           action: moving

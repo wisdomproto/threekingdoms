@@ -56,12 +56,13 @@ describe("balance reports", () => {
     }
   });
 
-  it("(c) 스커미시 sweep — 결정론(엔진 무분산): 같은 시나리오 min=max 턴", () => {
+  it("(c) 스커미시 sweep — 시드확률(§2-1): min ≤ max 턴, 시드 스윕이 분포를 만든다", () => {
     const { stats } = skirmishSweep(4);
     expect(stats.length).toBe(5);
     for (const s of stats) {
-      // 엔진 공식은 분산이 없어 시드 스윕 전체가 동일 결과 → 턴 폭이 0
-      expect(s.minTurns).toBe(s.maxTurns);
+      // 시드확률 전환(2026-06-16): 명중/회피로 시드별 결과가 갈릴 수 있다 → 턴 폭 ≥ 0(분포 복원).
+      // 각 시드는 결정론(재현)이며, 시드 스윕이 승률 분포를 만든다(종전 "무분산 min=max"를 대체).
+      expect(s.minTurns).toBeLessThanOrEqual(s.maxTurns);
       expect(s.winRate).toBeGreaterThanOrEqual(0);
       expect(s.winRate).toBeLessThanOrEqual(100);
     }
