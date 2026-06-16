@@ -55,6 +55,19 @@ export function effectText(item: Item): string {
   return parts.length ? parts.join(" · ") : "고유 효과";
 }
 
+const CATEGORY_ORDER: Item["category"][] = ["weapon", "treasure", "horse", "book", "supplyItem", "attackItem"];
+
+/** 카테고리 그룹(상점 헤더용). */
+export interface ShopGroup { category: Item["category"]; label: string; rows: ShopRow[]; }
+
+/** 진열 행을 카테고리별로 그룹(정의 순서, 빈 그룹 제외). 순수. Phase F. */
+export function buildShopGroups(rows: ShopRow[]): ShopGroup[] {
+  return CATEGORY_ORDER.flatMap((cat) => {
+    const rs = rows.filter((r) => r.category === cat);
+    return rs.length ? [{ category: cat, label: rs[0]!.categoryLabel, rows: rs }] : [];
+  });
+}
+
 /** 진열 1줄의 표시 모델(렌더 전 확정). 누락 itemId는 제외된다. */
 export interface ShopRow {
   itemId: string;

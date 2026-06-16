@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from "vitest";
 import type { Item, Shop } from "@tk/data";
-import { buildShopRows, effectText, type ShopRow } from "../screens/shopItemView";
+import { buildShopRows, effectText, buildShopGroups, type ShopRow } from "../screens/shopItemView";
 
 /** rows에서 itemId로 한 행을 꺼낸다(없으면 테스트 실패 — undefined 전파 방지). */
 function row(rows: ShopRow[], itemId: string): ShopRow {
@@ -84,5 +84,16 @@ describe("effectText 전 효과(Phase F)", () => {
     expect(effectText(wpn({ rangeBonus: 1 }))).toBe("사거리 +1");
     expect(effectText(wpn({ inflictStatus: { kind: "poison", chance: 75, turns: 3 } }))).toBe("중독 부여 75%");
     expect(effectText(wpn({ move: 1, atkPercent: 10, noCounter: true }))).toBe("이동 +1 · 공격 +10% · 무반격");
+  });
+});
+
+describe("buildShopGroups (Phase F)", () => {
+  const mk = (itemId: string, category: ShopRow["category"], label: string): ShopRow =>
+    ({ itemId, name: itemId, category, categoryLabel: label, effect: "", consumable: false, price: 1, affordable: true, owned: 0 });
+  it("카테고리 정의 순서대로 그룹, 빈 그룹 제외", () => {
+    const g = buildShopGroups([mk("a", "weapon", "무기"), mk("b", "supplyItem", "소모품"), mk("c", "horse", "탈것")]);
+    expect(g.map((x) => x.category)).toEqual(["weapon", "horse", "supplyItem"]);
+    expect(g[0]!.rows.map((r) => r.itemId)).toEqual(["a"]);
+    expect(g[0]!.label).toBe("무기");
   });
 });
