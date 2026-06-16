@@ -100,6 +100,17 @@ export const TerrainSchema = z.object({
 });
 export type Terrain = z.infer<typeof TerrainSchema>;
 
+/** 상태이상 종류 (Phase D: 부동·금책·중독. 확장: confuse/debuff 후속). */
+export const StatusKindSchema = z.enum(["poison", "seal", "immobilize"]);
+export type StatusKind = z.infer<typeof StatusKindSchema>;
+
+/** 활성 상태이상 1건 (런타임 부여분). turns = 남은 지속 턴. */
+export const StatusEffectSchema = z.object({
+  kind: StatusKindSchema,
+  turns: z.number().int().min(1),
+});
+export type StatusEffect = z.infer<typeof StatusEffectSchema>;
+
 /**
  * 아이템 장착 효과(§7 아이템 효과 시스템 / §10 보물 "고유 효과 고정") — 전부 결정론.
  * 기존 weapon/book의 bonusPercent와 별개의 *추가* 필드. 말·보물이 실제 효과를 갖게 한다.
@@ -117,6 +128,11 @@ export const ItemEffectsSchema = z.object({
   counterStrikes: z.number().int().min(1).optional(),      // 재반격/연환: 이 유닛이 반격 시 치는 횟수(기본 1)
   flatDamagePerLevel: z.number().int().min(0).optional(),  // 고정 피해 = 값×(레벨+1), 방어/지형/협공 무시
   alwaysHit: z.boolean().optional(),                       // 필중(명중 롤 생략)
+  inflictStatus: z.object({                                // 적중 시 상태이상 부여(시드 chance%, Phase D)
+    kind: StatusKindSchema,
+    chance: z.number().int().min(0).max(100),
+    turns: z.number().int().min(1),
+  }).optional(),
 });
 export type ItemEffects = z.infer<typeof ItemEffectsSchema>;
 
@@ -194,6 +210,10 @@ export const CombatConfigSchema = z.object({
     missSlope: z.number().min(0),
     floorPercent: z.number().min(0).max(100),
   }).default({ missSlope: 0.5, floorPercent: 80 }),
+  /** 상태이상(Phase D). poisonDamage = 중독 1틱 확정 피해(데이터 노브). */
+  status: z.object({
+    poisonDamage: z.number().int().min(0),
+  }).default({ poisonDamage: 20 }),
 }).refine(
   (c) => Object.entries(c.lineAdvantage).every(([k, v]) => k !== v),
   { message: "lineAdvantage must not be self-referential" },

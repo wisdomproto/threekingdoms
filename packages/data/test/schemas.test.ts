@@ -270,4 +270,20 @@ describe("스키마 v2 (원작 모델)", () => {
     // 기존 effects(말) 무파손
     expect(ItemSchema.parse({ id: "m", name: "말", category: "horse", power: 255, bonusPercent: 0, effects: { move: 1 } }).effects?.multiHit).toBeUndefined();
   });
+
+  it("상태이상(Phase D): StatusEffect·inflictStatus·status config 파싱", () => {
+    const e = ItemSchema.parse({
+      id: "독검", name: "독검", category: "weapon", power: 255, bonusPercent: 0,
+      effects: { inflictStatus: { kind: "poison", chance: 75, turns: 3 } },
+    });
+    expect(e.effects?.inflictStatus).toEqual({ kind: "poison", chance: 75, turns: 3 });
+    const cfg = CombatConfigSchema.parse({
+      advantageDefFactor: 0.75, disadvantageDefFactor: 1.25, counterRatio: 0.5,
+      minDamage: 1, maxTurns: 30, lineAdvantage: { cavalry: "infantry" },
+    });
+    expect(cfg.status).toEqual({ poisonDamage: 20 });
+    // 잘못된 kind 거부
+    expect(() => ItemSchema.parse({ id: "x", name: "x", category: "weapon", power: 0, bonusPercent: 0,
+      effects: { inflictStatus: { kind: "nope", chance: 50, turns: 1 } } })).toThrow();
+  });
 });

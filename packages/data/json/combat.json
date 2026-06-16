@@ -10,5 +10,6 @@
   "doubleStrike": { "moveGap": 2, "secondHitPercent": 50 },
   "sp": { "max": 255, "onAttack": 25, "onHitTaken": 20, "onKill": 60, "ultimatePercent": 150 },
   "combo": { "goldPerStack": 15 },
-  "accuracy": { "missSlope": 0.5, "floorPercent": 80 }
+  "accuracy": { "missSlope": 0.5, "floorPercent": 80 },
+  "status": { "poisonDamage": 20 }
 }
