@@ -658,6 +658,26 @@ export class BattleRenderer implements Presenter {
     defender.setTroops(defender.troops - e.damage);
   }
 
+  // 상태이상(Phase D). statusTick은 troops 차감 필수(엔진 정합), 부여/만료는 표시 전용(diffSnapshot 미비교).
+  async statusTick(e: Ev<"statusTick">): Promise<void> {
+    const s = this.scene;
+    if (!s) return;
+    const u = s.units.view(e.unitId);
+    const at = gridToWorld({ x: u.gridX, y: u.gridY });
+    await Promise.all([u.flash(), s.fx.damagePopup(at, e.damage, false)]);
+    u.setTroops(u.troops - e.damage);
+  }
+
+  async statusApplied(e: Ev<"statusApplied">): Promise<void> {
+    const s = this.scene;
+    if (!s) return;
+    await s.units.view(e.unitId).flash(); // 부여 순간 깜빡임(상태 아이콘 표시는 후속)
+  }
+
+  async statusExpired(_e: Ev<"statusExpired">): Promise<void> {
+    // 만료 — 표시 전용, 현재 no-op(아이콘 제거는 후속).
+  }
+
   async strategyCast(e: Ev<"strategyCast">): Promise<void> {
     const s = this.scene;
     if (!s) return;

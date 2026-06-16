@@ -217,4 +217,13 @@ describe("buildAttackPreview", () => {
     expect(pv.damage).toBe(hits.reduce((a, h) => a + h.damage, 0));
     expect(hits[0]!.damage).toBe(12 * (findUnit(s, "장비").level + 1)); // 방어 무시 고정
   });
+
+  it("상태이상(Phase D): 공격자 inflictStatuses → 예측 inflicts", () => {
+    const s = withUnit(meleeState(), "장비", { inflictStatuses: [{ kind: "poison", chance: 75, turns: 3 }], agility: 100 });
+    const cao = findUnit(s, "조잠");
+    const pv = buildAttackPreview(ctx, s, "장비", { x: cao.x, y: cao.y })!;
+    expect(pv.inflicts).toEqual([{ kind: "poison", chance: 75 }]);
+    // 미보유면 생략
+    expect(buildAttackPreview(ctx, meleeState(), "장비", { x: cao.x, y: cao.y })!.inflicts).toBeUndefined();
+  });
 });

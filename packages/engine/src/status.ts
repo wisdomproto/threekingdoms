@@ -1,5 +1,5 @@
-import type { StatusEffect, StatusKind } from "@tk/data";
-import type { BattleContext, BattleState, BattleEvent, Side, UnitState } from "./types";
+import type { StatusEffect, StatusKind, Side } from "@tk/data";
+import type { BattleContext, BattleState, BattleEvent, UnitState } from "./types";
 
 /** 활성 상태이상 보유 여부. */
 export function hasStatus(u: UnitState, kind: StatusKind): boolean {
@@ -29,7 +29,7 @@ export function tickStatuses(
   for (const u of state.units) {
     if (u.side !== side || u.retreated || !u.statuses || u.statuses.length === 0) continue;
     let troops = u.troops;
-    let retreated = u.retreated;
+    let retreated: boolean = u.retreated;
     for (const s of u.statuses) {
       if (s.kind === "poison" && !retreated) {
         const dmg = ctx.data.combat.status.poisonDamage;

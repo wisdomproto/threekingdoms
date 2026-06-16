@@ -48,6 +48,8 @@ export interface AttackPreview {
   doubleStrike?: { secondDamage: number };
   /** 필살 조준 — 대형 확정 일격(무반격). damage는 필살 피해 */
   ultimate?: boolean;
+  /** 상태이상 부여 능력(Phase D) — 적중 시 chance%로 부여. 미보유면 생략. */
+  inflicts?: { kind: string; chance: number }[];
 }
 
 /**
@@ -102,6 +104,9 @@ export function buildAttackPreview(
 
   // 명중률(시드확률 §2-1) — 엔진 hitChance와 동일 입력(순발력). 공격 1타·연속2타 공통.
   const hitPercent = hitChance(agilityPower(attacker), agilityPower(defender), ctx.data.combat.accuracy);
+  // 상태이상 부여 능력(Phase D) — 엔진 resolveStrike와 동일(일반 공격에만, 필살 제외).
+  const inflictArr = (attacker.inflictStatuses ?? []).map((s) => ({ kind: s.kind, chance: s.chance }));
+  const inflicts = inflictArr.length ? inflictArr : undefined;
 
   const mult = flankMult * chargeMult;
   // 타당 피해 — 고정뎀(flatDamagePerLevel)이면 방어/지형/협공 무시, 아니면 computeDamage. (Phase C)
@@ -143,8 +148,9 @@ export function buildAttackPreview(
         flank,
         charge,
         doubleStrike,
+        inflicts,
       };
     }
   }
-  return { damage, willRetreat, hitPercent, flank, charge, doubleStrike };
+  return { damage, willRetreat, hitPercent, flank, charge, doubleStrike, inflicts };
 }
