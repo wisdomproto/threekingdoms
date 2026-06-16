@@ -133,6 +133,8 @@ export const ItemEffectsSchema = z.object({
     chance: z.number().int().min(0).max(100),
     turns: z.number().int().min(1),
   }).optional(),
+  rangeBonus: z.number().int().min(1).optional(),          // 사거리 +N (용담창 — 원거리 타격, 자연 무반격)
+  lifestealPercent: z.number().int().min(0).max(100).optional(), // 흡혈: 입힌 피해 × % 자가 회복(Phase E)
 });
 export type ItemEffects = z.infer<typeof ItemEffectsSchema>;
 

@@ -286,4 +286,12 @@ describe("스키마 v2 (원작 모델)", () => {
     expect(() => ItemSchema.parse({ id: "x", name: "x", category: "weapon", power: 0, bonusPercent: 0,
       effects: { inflictStatus: { kind: "nope", chance: 50, turns: 1 } } })).toThrow();
   });
+
+  it("시그니처 효과(Phase E): rangeBonus·lifestealPercent 파싱", () => {
+    const e = ItemSchema.parse({ id: "용담창", name: "용담창", category: "weapon", power: 255, bonusPercent: 0,
+      effects: { rangeBonus: 1, lifestealPercent: 50 } });
+    expect(e.effects).toMatchObject({ rangeBonus: 1, lifestealPercent: 50 });
+    expect(() => ItemSchema.parse({ id: "x", name: "x", category: "weapon", power: 0, bonusPercent: 0,
+      effects: { lifestealPercent: 150 } })).toThrow(); // 0~100 초과 거부
+  });
 });
