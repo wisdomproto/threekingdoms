@@ -48,4 +48,19 @@ describe("createBattle v2 (원작 모델)", () => {
     expect(yoo.baseMove).toBe(4); // 연속공격 판정은 병종 기본(말 보너스 제외)
     expect(state.units.find((u) => u.id === "유비")!.move).toBe(4); // 미장착 = 기본
   });
+
+  it("전투 특성(Phase C): 아이템 effects가 UnitState에 집약된다", () => {
+    const item = {
+      id: "관통검", name: "관통검", category: "weapon" as const, power: 255, bonusPercent: 0,
+      effects: { noCounter: true, multiHit: 3, counterStrikes: 2, flatDamagePerLevel: 15, alwaysHit: true },
+    };
+    const data = { ...gameData, items: { ...gameData.items, 관통검: item } };
+    const stage = { ...testStage, units: testStage.units.map((u) => (u.commanderId === "관우" ? { ...u, items: ["관통검"] } : u)) };
+    const u = createBattle({ data, stage, map: testMap }, 1).units.find((x) => x.id === "관우")!;
+    expect(u).toMatchObject({ noCounter: true, multiHit: 3, counterStrikes: 2, flatDamagePerLevel: 15, alwaysHit: true });
+    // 미보유 유닛은 트레잇 미설정(기본 동작)
+    const plain = createBattle(testCtx, 1).units.find((x) => x.id === "유비")!;
+    expect(plain.multiHit).toBeUndefined();
+    expect(plain.noCounter).toBeUndefined();
+  });
 });
