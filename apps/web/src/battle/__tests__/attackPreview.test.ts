@@ -192,4 +192,29 @@ describe("buildAttackPreview", () => {
     const hits = damageEvents(attacked.events).filter((dd) => !dd.counter && dd.defenderId === "조잠");
     expect(fromPreview.damage).toBe(hits.reduce((a, h) => a + h.damage, 0)); // 연속공격이면 2타 합산
   });
+
+  it("전투 특성(Phase C): 관통 multiHit + 무반격 예측이 엔진과 일치", () => {
+    const s0 = meleeState();
+    const s = withUnit(s0, "장비", { multiHit: 3, noCounter: true, agility: 100 }); // 순발 우위=항상 명중
+    const cao = findUnit(s, "조잠");
+    const pv = buildAttackPreview(ctx, s, "장비", { x: cao.x, y: cao.y })!;
+    const res = applyAction(ctx, s, { type: "attack", unitId: "장비", targetId: "조잠" });
+    const hits = damageEvents(res.events).filter((d) => !d.counter && d.defenderId === "조잠");
+    expect(hits.length).toBe(3); // 관통 3타
+    expect(pv.damage).toBe(hits.reduce((a, h) => a + h.damage, 0)); // 합산 일치
+    expect(pv.counter).toBeUndefined(); // 무반격
+    expect(damageEvents(res.events).some((d) => d.counter)).toBe(false); // 엔진도 반격 없음
+  });
+
+  it("전투 특성(Phase C): 고정 피해 flat 예측이 엔진과 일치(방어 무시)", () => {
+    const s0 = meleeState();
+    const s = withUnit(s0, "장비", { flatDamagePerLevel: 12, noCounter: true, agility: 100, baseMove: 2 });
+    const cao = findUnit(s, "조잠");
+    const pv = buildAttackPreview(ctx, s, "장비", { x: cao.x, y: cao.y })!;
+    const res = applyAction(ctx, s, { type: "attack", unitId: "장비", targetId: "조잠" });
+    const hits = damageEvents(res.events).filter((d) => !d.counter && d.defenderId === "조잠");
+    expect(hits.length).toBe(1); // baseMove2 → 레거시 2타 비활성, 단타
+    expect(pv.damage).toBe(hits.reduce((a, h) => a + h.damage, 0));
+    expect(hits[0]!.damage).toBe(12 * (findUnit(s, "장비").level + 1)); // 방어 무시 고정
+  });
 });

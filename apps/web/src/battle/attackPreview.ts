@@ -104,22 +104,36 @@ export function buildAttackPreview(
   const hitPercent = hitChance(agilityPower(attacker), agilityPower(defender), ctx.data.combat.accuracy);
 
   const mult = flankMult * chargeMult;
-  const dmg1 = computeDamage(ctx, attacker, defender, 1, mult);
-  // 연속공격: 1타로 격파 안 되고 이동력 우위면 2타(secondHitPercent). 엔진과 동일 순서.
-  const lethal1 = defender.troops - dmg1 <= 0;
-  const doubles = !lethal1 && doubleStrikes(ctx, attacker, defender);
-  const dmg2 = doubles
-    ? computeDamage(ctx, attacker, defender, ctx.data.combat.doubleStrike.secondHitPercent / 100, mult)
-    : 0;
-  const doubleStrike = doubles ? { secondDamage: dmg2 } : undefined;
-  const damage = dmg1 + dmg2;
+  // 타당 피해 — 고정뎀(flatDamagePerLevel)이면 방어/지형/협공 무시, 아니면 computeDamage. (Phase C)
+  const strikeDamage = (ratio: number): number =>
+    attacker.flatDamagePerLevel != null
+      ? Math.max(ctx.data.combat.minDamage, attacker.flatDamagePerLevel * (attacker.level + 1))
+      : computeDamage(ctx, attacker, defender, ratio, mult);
+  const dmg1 = strikeDamage(1);
+
+  let damage: number;
+  let doubleStrike: { secondDamage: number } | undefined;
+  if (attacker.multiHit != null) {
+    // 관통(Phase C): N회 전타격(각 dmg1 동일). 레거시 2타 미적용.
+    damage = dmg1 * attacker.multiHit;
+    doubleStrike = undefined;
+  } else {
+    // 레거시 연속공격: 1타로 격파 안 되고 이동력 우위면 2타(secondHitPercent). 엔진과 동일 순서.
+    const lethal1 = defender.troops - dmg1 <= 0;
+    const doubles = !lethal1 && doubleStrikes(ctx, attacker, defender);
+    const dmg2 = doubles ? strikeDamage(ctx.data.combat.doubleStrike.secondHitPercent / 100) : 0;
+    doubleStrike = doubles ? { secondDamage: dmg2 } : undefined;
+    damage = dmg1 + dmg2;
+  }
   const willRetreat = defender.troops - damage <= 0;
 
-  // 반격: 방어자 생존 + 공격자가 방어자 사거리 안 (actions.ts:178-182). 반격엔 협공 미적용(엔진과 일치).
-  if (!willRetreat) {
+  // 반격: 공격자 noCounter(Phase C)면 생략. 아니면 방어자 생존 + 공격자가 방어자 사거리 안.
+  if (!attacker.noCounter && !willRetreat) {
     const d = distance({ x: attacker.x, y: attacker.y }, { x: defender.x, y: defender.y });
     if (d >= defender.rangeMin && d <= defender.rangeMax) {
-      const counterDamage = computeDamage(ctx, defender, attacker, ctx.data.combat.counterRatio);
+      const counterDamage = defender.flatDamagePerLevel != null
+        ? Math.max(ctx.data.combat.minDamage, defender.flatDamagePerLevel * (defender.level + 1))
+        : computeDamage(ctx, defender, attacker, ctx.data.combat.counterRatio);
       const counterHitPercent = hitChance(agilityPower(defender), agilityPower(attacker), ctx.data.combat.accuracy);
       return {
         damage,
