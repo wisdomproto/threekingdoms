@@ -49,6 +49,8 @@ export interface Presenter {
   statusExpired?(e: Ev<"statusExpired">): Promise<void>;
   /** 중독 1틱 피해 — troops 차감 투영 필수(diffSnapshot 정합). */
   statusTick?(e: Ev<"statusTick">): Promise<void>;
+  /** 회복(흡혈 등) — troops 증가 투영 필수(diffSnapshot 정합). */
+  troopsHealed?(e: Ev<"troopsHealed">): Promise<void>;
   /** 증원 도착 — 중도 스폰 유닛의 스프라이트 생성(이벤트 데이터로). 미구현이면 sync가 폴백 생성. */
   reinforcementArrived?(e: Ev<"reinforcementArrived">): Promise<void>;
   battleEnded(e: Ev<"battleEnded">): Promise<void>;
@@ -171,6 +173,8 @@ export class EventPlayer {
         return p.statusTick?.(e) ?? Promise.resolve();
       case "statusExpired":
         return p.statusExpired?.(e) ?? Promise.resolve();
+      case "troopsHealed":
+        return p.troopsHealed?.(e) ?? Promise.resolve();
       case "reinforcementArrived":
         return p.reinforcementArrived?.(e) ?? Promise.resolve();
       case "battleEnded":

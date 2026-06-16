@@ -231,4 +231,12 @@ describe("상태이상 statusTick 투영 (Phase D)", () => {
     await tp.statusTick!({ type: "statusTick", unitId: u.id, kind: "poison", damage: 30 });
     expect(tp.snapshot!()!.units.find((x) => x.id === u.id)!.troops).toBe(u.troops - 30);
   });
+
+  it("troopsHealed는 TrackingPresenter troops를 증가(흡혈 자기서술)", async () => {
+    const tp = new TrackingPresenter();
+    tp.prime(state0);
+    const u = state0.units.find((x) => x.troops > 0)!;
+    await tp.troopsHealed!({ type: "troopsHealed", unitId: u.id, amount: 25 });
+    expect(tp.snapshot!()!.units.find((x) => x.id === u.id)!.troops).toBe(u.troops + 25);
+  });
 });

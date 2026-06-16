@@ -678,6 +678,15 @@ export class BattleRenderer implements Presenter {
     // 만료 — 표시 전용, 현재 no-op(아이콘 제거는 후속).
   }
 
+  // 회복(흡혈·회복책략) — 초록 "+amount" 팝업 + 막대 증가(엔진 정합).
+  async troopsHealed(e: Ev<"troopsHealed">): Promise<void> {
+    const s = this.scene;
+    if (!s) return;
+    const u = s.units.view(e.unitId);
+    await s.fx.healPopup(gridToWorld({ x: u.gridX, y: u.gridY }), e.amount);
+    u.setTroops(u.troops + e.amount);
+  }
+
   async strategyCast(e: Ev<"strategyCast">): Promise<void> {
     const s = this.scene;
     if (!s) return;

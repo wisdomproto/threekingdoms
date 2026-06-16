@@ -73,6 +73,9 @@ export class FakePresenter implements Presenter {
   statusExpired(e: Ev<"statusExpired">): Promise<void> {
     return this.handle(e);
   }
+  troopsHealed(e: Ev<"troopsHealed">): Promise<void> {
+    return this.handle(e);
+  }
   reinforcementArrived(e: Ev<"reinforcementArrived">): Promise<void> {
     return this.handle(e);
   }
@@ -128,6 +131,11 @@ export class TrackingPresenter extends FakePresenter {
       case "statusTick": { // 중독 1틱 — troops 차감(damageDealt와 동형 자기서술)
         const d = this.units.get(e.unitId);
         if (d) d.troops = Math.max(0, d.troops - e.damage);
+        break;
+      }
+      case "troopsHealed": { // 흡혈·회복 — troops 증가(damageDealt의 역)
+        const u = this.units.get(e.unitId);
+        if (u) u.troops += e.amount;
         break;
       }
       case "statusApplied": // 표시 전용 — diffSnapshot은 statuses 미비교(투영 불필요)
