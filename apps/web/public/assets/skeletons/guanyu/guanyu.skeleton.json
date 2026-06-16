@@ -39,12 +39,22 @@
     "attack": { "duration": 0.5, "timelines": {
       "armFront": [
         { "time": 0, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 },
-        { "time": 0.12, "x": 0, "y": 0, "rotation": -40, "scaleX": 1, "scaleY": 1 },
-        { "time": 0.3, "x": 0, "y": 0, "rotation": 55, "scaleX": 1, "scaleY": 1 },
+        { "time": 0.14, "x": 0, "y": 0, "rotation": -55, "scaleX": 1, "scaleY": 1 },
+        { "time": 0.32, "x": 0, "y": 0, "rotation": 62, "scaleX": 1, "scaleY": 1 },
+        { "time": 0.5, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 } ],
+      "armBack": [
+        { "time": 0, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 },
+        { "time": 0.14, "x": 0, "y": 0, "rotation": 18, "scaleX": 1, "scaleY": 1 },
+        { "time": 0.32, "x": 0, "y": 0, "rotation": -18, "scaleX": 1, "scaleY": 1 },
         { "time": 0.5, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 } ],
       "body": [
         { "time": 0, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 },
-        { "time": 0.3, "x": 0, "y": 0, "rotation": 6, "scaleX": 1, "scaleY": 1 },
+        { "time": 0.12, "x": 0, "y": 0, "rotation": -6, "scaleX": 1, "scaleY": 1 },
+        { "time": 0.3, "x": 0, "y": 0, "rotation": 14, "scaleX": 1, "scaleY": 1 },
+        { "time": 0.5, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 } ],
+      "head": [
+        { "time": 0, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 },
+        { "time": 0.3, "x": 0, "y": 0, "rotation": 8, "scaleX": 1, "scaleY": 1 },
         { "time": 0.5, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 } ] } },
     "hit": { "duration": 0.3, "timelines": { "body": [
       { "time": 0, "x": 0, "y": 0, "rotation": 0, "scaleX": 1, "scaleY": 1 },

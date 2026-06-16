@@ -6,7 +6,9 @@ import {
   computeDamage, distance, getAttackableTargets,
   strategyDamage, strategyAoeCells, getStrategyTargets, expForNextLevel,
   spiritPower, flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes, canUltimate,
+  hitChance, agilityPower,
 } from "./combat";
+import { nextRandom } from "./rng";
 import { findDuelTrigger } from "./events";
 import { spawnUnit } from "./createBattle";
 
@@ -49,17 +51,29 @@ function assertCanAct(state: BattleState, unit: UnitState, forMove: boolean): vo
   if (forMove && unit.moved) throw new Error(`${unit.id} already moved`);
 }
 
-/** 병력 차감 → 0이면 퇴각. 새 상태와 이벤트를 반환 */
+/** 병력 차감 → 0이면 퇴각. 새 상태와 이벤트를 반환. hit=false(미스)는 호출측이 따로 emit하므로 기본 true. */
 function dealDamage(
-  state: BattleState, attacker: UnitState, defender: UnitState, damage: number, counter: boolean,
+  state: BattleState, attacker: UnitState, defender: UnitState, damage: number, counter: boolean, hit = true,
 ): { state: BattleState; events: BattleEvent[] } {
   const troops = Math.max(0, defender.troops - damage);
   const retreated = troops === 0;
   const events: BattleEvent[] = [
-    { type: "damageDealt", attackerId: attacker.id, defenderId: defender.id, damage, counter },
+    { type: "damageDealt", attackerId: attacker.id, defenderId: defender.id, damage, counter, hit },
   ];
   if (retreated) events.push({ type: "unitRetreated", unitId: defender.id });
   return { state: replaceUnit(state, { ...defender, troops, retreated }), events };
+}
+
+/**
+ * 명중 롤(시드 고정, §2-1 2026-06-16) — rngState를 전진시킨다. value×100 < 명중% 이면 명중.
+ * 명중% = hitChance(공격자 순발, 방어자 순발, accuracy). 필살/책략/아이템은 호출 안 함(항상 명중).
+ */
+function rollHit(
+  ctx: BattleContext, state: BattleState, attacker: UnitState, defender: UnitState,
+): { hit: boolean; state: BattleState } {
+  const pct = hitChance(agilityPower(attacker), agilityPower(defender), ctx.data.combat.accuracy);
+  const [v, nextState] = nextRandom(state.rngState);
+  return { hit: v * 100 < pct, state: { ...state, rngState: nextState } };
 }
 
 /** 병력 회복 → maxTroops 상한. 실제 회복량(클램프 후)과 갱신된 상태를 반환. 결정론. */
@@ -376,64 +390,89 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
         break;
       }
 
-      // 일반 공격 — 원작 룰: 명중 100%, 분산 없음.
+      // 일반 공격 — 명중/회피는 시드 고정 확률(§2-1 2026-06-16), 피해 크기는 결정론(computeDamage).
       // 결정론 보정: 협공(포위도) × 돌격(기병 이동공격). 철벽·저격은 computeDamage 내부(병종 자동).
       const flankN = flankingCount(state, unit, target);
       const flankMult = flankMultiplier(ctx, flankN);
       const chargeMult = chargeMultiplier(ctx, unit);
-      const dmg = computeDamage(ctx, unit, target, 1, flankMult * chargeMult);
-      if (flankMult > 1) {
-        events.push({ type: "flank", attackerId: unit.id, defenderId: target.id, surround: flankN, bonusPercent: Math.round((flankMult - 1) * 100) });
-      }
-      const targetLevelAtHit = getUnit(next, target.id).level;
-      const hit = dealDamage(next, unit, getUnit(next, target.id), dmg, false);
-      next = hit.state;
-      events.push(...hit.events);
-      // 경험치: 데미지 절반 + 격파(퇴각) 보너스
-      const atkExp = grantExp(ctx, next, unit.id, dmg, getUnit(next, target.id).retreated, targetLevelAtHit);
-      next = atkExp.state;
-      events.push(...atkExp.events);
+      let attackerHit = false; // 공격자 타격이 한 번이라도 명중했나(참여 SP 판정)
+      let defenderHit = false; // 방어자가 피해를 입었나(피격 SP 판정)
 
-      // 연속공격(2중공격): 이동력 우위면 1타로 대상 생존 시 추가타 1회(반격 전). 협공·돌격 동일 배율.
+      // 1타 명중 롤(시드). 미스면 0뎀·hit:false만 — 피해/경험치/협공연출 없음.
+      const roll1 = rollHit(ctx, next, unit, target);
+      next = roll1.state;
+      if (roll1.hit) {
+        if (flankMult > 1) {
+          events.push({ type: "flank", attackerId: unit.id, defenderId: target.id, surround: flankN, bonusPercent: Math.round((flankMult - 1) * 100) });
+        }
+        const dmg = computeDamage(ctx, unit, target, 1, flankMult * chargeMult);
+        const targetLevelAtHit = getUnit(next, target.id).level;
+        const hit = dealDamage(next, unit, getUnit(next, target.id), dmg, false);
+        next = hit.state;
+        events.push(...hit.events);
+        const atkExp = grantExp(ctx, next, unit.id, dmg, getUnit(next, target.id).retreated, targetLevelAtHit);
+        next = atkExp.state;
+        events.push(...atkExp.events);
+        attackerHit = true; defenderHit = true;
+      } else {
+        events.push({ type: "damageDealt", attackerId: unit.id, defenderId: target.id, damage: 0, counter: false, hit: false });
+      }
+
+      // 연속공격(2중공격): 대상 생존 + 이동력 우위. 각 타 독립 명중 롤. 협공·돌격 동일 배율.
       const afterHit1 = getUnit(next, target.id);
       if (!afterHit1.retreated && doubleStrikes(ctx, unit, target)) {
-        const ratio2 = ctx.data.combat.doubleStrike.secondHitPercent / 100;
-        const dmg2 = computeDamage(ctx, unit, afterHit1, ratio2, flankMult * chargeMult);
-        const lvl2 = afterHit1.level;
-        events.push({ type: "doubleStrike", attackerId: unit.id, defenderId: target.id });
-        const hit2 = dealDamage(next, unit, afterHit1, dmg2, false);
-        next = hit2.state;
-        events.push(...hit2.events);
-        const atkExp2 = grantExp(ctx, next, unit.id, dmg2, getUnit(next, target.id).retreated, lvl2);
-        next = atkExp2.state;
-        events.push(...atkExp2.events);
+        const roll2 = rollHit(ctx, next, unit, afterHit1);
+        next = roll2.state;
+        if (roll2.hit) {
+          const ratio2 = ctx.data.combat.doubleStrike.secondHitPercent / 100;
+          const dmg2 = computeDamage(ctx, unit, afterHit1, ratio2, flankMult * chargeMult);
+          const lvl2 = afterHit1.level;
+          events.push({ type: "doubleStrike", attackerId: unit.id, defenderId: target.id });
+          const hit2 = dealDamage(next, unit, afterHit1, dmg2, false);
+          next = hit2.state;
+          events.push(...hit2.events);
+          const atkExp2 = grantExp(ctx, next, unit.id, dmg2, getUnit(next, target.id).retreated, lvl2);
+          next = atkExp2.state;
+          events.push(...atkExp2.events);
+          attackerHit = true; defenderHit = true;
+        } else {
+          events.push({ type: "damageDealt", attackerId: unit.id, defenderId: afterHit1.id, damage: 0, counter: false, hit: false });
+        }
       }
 
-      // 반격: 방어측 생존 + 공격측이 방어측 사거리 안
+      // 반격: 방어측 생존 + 공격측이 방어측 사거리 안. 반격도 독립 명중 롤.
       const defender = getUnit(next, target.id);
       if (!defender.retreated) {
         const d = distance({ x: unit.x, y: unit.y }, { x: defender.x, y: defender.y });
         if (d >= defender.rangeMin && d <= defender.rangeMax) {
-          const ctrDmg = computeDamage(ctx, defender, getUnit(next, unit.id), ctx.data.combat.counterRatio);
-          const attackerLevelAtHit = getUnit(next, unit.id).level;
-          const ctr = dealDamage(next, defender, getUnit(next, unit.id), ctrDmg, true);
-          next = ctr.state;
-          events.push(...ctr.events);
-          // 반격 경험치는 반격자(방어측)에게
-          const ctrExp = grantExp(ctx, next, defender.id, ctrDmg, getUnit(next, unit.id).retreated, attackerLevelAtHit);
-          next = ctrExp.state;
-          events.push(...ctrExp.events);
+          const rollC = rollHit(ctx, next, defender, getUnit(next, unit.id));
+          next = rollC.state;
+          if (rollC.hit) {
+            const ctrDmg = computeDamage(ctx, defender, getUnit(next, unit.id), ctx.data.combat.counterRatio);
+            const attackerLevelAtHit = getUnit(next, unit.id).level;
+            const ctr = dealDamage(next, defender, getUnit(next, unit.id), ctrDmg, true);
+            next = ctr.state;
+            events.push(...ctr.events);
+            // 반격 경험치는 반격자(방어측)에게
+            const ctrExp = grantExp(ctx, next, defender.id, ctrDmg, getUnit(next, unit.id).retreated, attackerLevelAtHit);
+            next = ctrExp.state;
+            events.push(...ctrExp.events);
+          } else {
+            events.push({ type: "damageDealt", attackerId: defender.id, defenderId: getUnit(next, unit.id).id, damage: 0, counter: true, hit: false });
+          }
         }
       }
-      // 필살 게이지(SP) 누적 — 결정론. 공격자=onAttack(+격파 시 onKill), 피격자 생존 시 onHitTaken.
+      // 필살 게이지(SP) 누적 — 명중한 타격에만(미스=참여 SP 없음). 공격자=onAttack(+격파 시 onKill), 피격자 생존 시 onHitTaken.
       {
         const spCfg = ctx.data.combat.sp;
         const killed = getUnit(next, target.id).retreated;
-        next = replaceUnit(next, addSp(getUnit(next, unit.id), spCfg.onAttack + (killed ? spCfg.onKill : 0)));
+        if (attackerHit) {
+          next = replaceUnit(next, addSp(getUnit(next, unit.id), spCfg.onAttack + (killed ? spCfg.onKill : 0)));
+        }
         const def2 = getUnit(next, target.id);
-        if (!def2.retreated) next = replaceUnit(next, addSp(def2, spCfg.onHitTaken));
+        if (!def2.retreated && defenderHit) next = replaceUnit(next, addSp(def2, spCfg.onHitTaken));
       }
-      // 콤보(연속 격파) — 아군이 이 공격으로 격파했으면 +1 + 보너스 자금.
+      // 콤보(연속 격파) — 격파는 명중으로만 일어나므로 자연 게이트.
       {
         const combo = registerComboKill(ctx, next, unit.side, getUnit(next, target.id).retreated);
         next = combo.state;

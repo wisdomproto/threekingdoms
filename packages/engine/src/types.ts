@@ -101,7 +101,7 @@ export interface ReinforcedUnit {
 
 export type BattleEvent =
   | { type: "unitMoved"; unitId: string; from: Coord; to: Coord }
-  | { type: "damageDealt"; attackerId: string; defenderId: string; damage: number; counter: boolean }
+  | { type: "damageDealt"; attackerId: string; defenderId: string; damage: number; counter: boolean; hit: boolean }
   // 협공 발동(결정론) — surround = 대상 포위도(공격자 포함), bonusPercent = 추가피해%. 연출용.
   | { type: "flank"; attackerId: string; defenderId: string; surround: number; bonusPercent: number }
   // 연속공격(2중공격) 발동 — 이동력 우위로 개시 공격이 2회 타격. 연출용.

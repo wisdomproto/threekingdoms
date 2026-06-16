@@ -13,6 +13,50 @@ function patchUnit(s: BattleState, id: string, patch: Partial<UnitState>): Battl
   return { ...s, units: s.units.map((u) => (u.id === id ? { ...u, ...patch } : u)) };
 }
 
+describe("명중/회피 롤 (시드 고정 §2-1)", () => {
+  it("같은 시드 → 같은 명중 결과·rngState (재현)", () => {
+    const s = patchUnit(fresh(), "이숙", { x: 1, y: 3 }); // 관우(1,4) 인접
+    const r1 = applyAction(testCtx, s, { type: "attack", unitId: "관우", targetId: "이숙" });
+    const r2 = applyAction(testCtx, s, { type: "attack", unitId: "관우", targetId: "이숙" });
+    expect(r1.events).toEqual(r2.events);
+    expect(r1.state.rngState).toBe(r2.state.rngState);
+  });
+
+  it("공격은 rngState를 전진시킨다", () => {
+    const s = patchUnit(fresh(), "이숙", { x: 1, y: 3 });
+    const { state } = applyAction(testCtx, s, { type: "attack", unitId: "관우", targetId: "이숙" });
+    expect(state.rngState).not.toBe(s.rngState);
+  });
+
+  it("순발 우위면 1타 항상 명중(hit=true)", () => {
+    let st = patchUnit(fresh(), "이숙", { x: 1, y: 3, agility: 1 });
+    st = patchUnit(st, "관우", { agility: 100 });
+    const { events } = applyAction(testCtx, st, { type: "attack", unitId: "관우", targetId: "이숙" });
+    const dd = events.find((e) => e.type === "damageDealt" && !e.counter);
+    expect(dd && dd.type === "damageDealt" && dd.hit).toBe(true);
+  });
+
+  it("미스면 damageDealt.hit=false·피해0, 방어자 병력 불변·공격자 SP 0", () => {
+    // 순발 열세 → 하한 80% 명중(20% 미스). 시드 스윕으로 미스 1건 확보.
+    // doubleStrike 비활성(관우 baseMove 낮춤) + 이숙 인접 반격 없음(사거리 2) → 1타만 → 미스 시 참여 SP 0.
+    let missed = false;
+    for (let seed = 0; seed < 60 && !missed; seed++) {
+      let st = patchUnit(createBattle(testCtx, seed), "이숙", { x: 1, y: 3, agility: 100 });
+      st = patchUnit(st, "관우", { agility: 1, baseMove: 2 });
+      const before = get(st, "이숙").troops;
+      const { events, state } = applyAction(testCtx, st, { type: "attack", unitId: "관우", targetId: "이숙" });
+      const dd = events.find((e) => e.type === "damageDealt");
+      if (dd && dd.type === "damageDealt" && dd.hit === false) {
+        missed = true;
+        expect(dd.damage).toBe(0);
+        expect(get(state, "이숙").troops).toBe(before);
+        expect(get(state, "관우").sp ?? 0).toBe(0);
+      }
+    }
+    expect(missed).toBe(true);
+  });
+});
+
 describe("필살 게이지(SP) 누적 (§9)", () => {
   it("공격 시 공격자 +onAttack, 피격자 생존 시 +onHitTaken (결정론)", () => {
     const sp = testCtx.data.combat.sp;
