@@ -76,6 +76,40 @@ function rollHit(
   return { hit: v * 100 < pct, state: { ...state, rngState: nextState } };
 }
 
+/**
+ * 단일 물리 타격(Phase C) — 명중 롤(attacker.alwaysHit면 생략) → 피해(flat or computeDamage) →
+ * dealDamage(hit) + 경험치. counter=true면 반격(경험치는 타격자). 미스면 damageDealt{0,hit:false}만.
+ * ratio = computeDamage 배율(개시=1·반격=counterRatio·레거시2타=secondHitPercent). flat은 ratio 무시.
+ */
+function resolveStrike(
+  ctx: BattleContext, state: BattleState, attackerId: string, defenderId: string,
+  opts: { counter: boolean; mult: number; ratio: number },
+): { state: BattleState; events: BattleEvent[]; hit: boolean } {
+  let next = state;
+  const events: BattleEvent[] = [];
+  const attacker = getUnit(next, attackerId);
+  const defender = getUnit(next, defenderId);
+  if (!attacker.alwaysHit) {
+    const r = rollHit(ctx, next, attacker, defender);
+    next = r.state;
+    if (!r.hit) {
+      events.push({ type: "damageDealt", attackerId, defenderId, damage: 0, counter: opts.counter, hit: false });
+      return { state: next, events, hit: false };
+    }
+  }
+  const dmg = attacker.flatDamagePerLevel != null
+    ? Math.max(ctx.data.combat.minDamage, attacker.flatDamagePerLevel * (attacker.level + 1))
+    : computeDamage(ctx, attacker, defender, opts.ratio, opts.mult);
+  const defLvl = defender.level;
+  const dd = dealDamage(next, attacker, defender, dmg, opts.counter);
+  next = dd.state;
+  events.push(...dd.events);
+  const exp = grantExp(ctx, next, attackerId, dmg, getUnit(next, defenderId).retreated, defLvl);
+  next = exp.state;
+  events.push(...exp.events);
+  return { state: next, events, hit: true };
+}
+
 /** 병력 회복 → maxTroops 상한. 실제 회복량(클램프 후)과 갱신된 상태를 반환. 결정론. */
 function healTroops(
   state: BattleState, target: UnitState, amount: number,
@@ -390,75 +424,57 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
         break;
       }
 
-      // 일반 공격 — 명중/회피는 시드 고정 확률(§2-1 2026-06-16), 피해 크기는 결정론(computeDamage).
+      // 일반 공격 — 명중/회피 시드(§2-1) + 전투 특성(Phase C: 무반격·관통·재반격·고정뎀·필중).
       // 결정론 보정: 협공(포위도) × 돌격(기병 이동공격). 철벽·저격은 computeDamage 내부(병종 자동).
       const flankN = flankingCount(state, unit, target);
       const flankMult = flankMultiplier(ctx, flankN);
       const chargeMult = chargeMultiplier(ctx, unit);
-      let attackerHit = false; // 공격자 타격이 한 번이라도 명중했나(참여 SP 판정)
-      let defenderHit = false; // 방어자가 피해를 입었나(피격 SP 판정)
+      const mult = flankMult * chargeMult;
+      let attackerHit = false; // 개시 타격이 한 번이라도 명중했나(참여 SP)
+      let defenderHit = false; // 방어자가 피해를 입었나(피격 SP)
+      let flankShown = false;
 
-      // 1타 명중 롤(시드). 미스면 0뎀·hit:false만 — 피해/경험치/협공연출 없음.
-      const roll1 = rollHit(ctx, next, unit, target);
-      next = roll1.state;
-      if (roll1.hit) {
-        if (flankMult > 1) {
+      // 개시 타수: multiHit(관통) 지정이면 그 수(전타격), 아니면 1타.
+      const primaryStrikes = unit.multiHit ?? 1;
+      for (let i = 0; i < primaryStrikes; i++) {
+        if (getUnit(next, target.id).retreated) break;
+        const r = resolveStrike(ctx, next, unit.id, target.id, { counter: false, mult, ratio: 1 });
+        next = r.state;
+        if (r.hit && !flankShown && flankMult > 1) {
           events.push({ type: "flank", attackerId: unit.id, defenderId: target.id, surround: flankN, bonusPercent: Math.round((flankMult - 1) * 100) });
+          flankShown = true;
         }
-        const dmg = computeDamage(ctx, unit, target, 1, flankMult * chargeMult);
-        const targetLevelAtHit = getUnit(next, target.id).level;
-        const hit = dealDamage(next, unit, getUnit(next, target.id), dmg, false);
-        next = hit.state;
-        events.push(...hit.events);
-        const atkExp = grantExp(ctx, next, unit.id, dmg, getUnit(next, target.id).retreated, targetLevelAtHit);
-        next = atkExp.state;
-        events.push(...atkExp.events);
-        attackerHit = true; defenderHit = true;
-      } else {
-        events.push({ type: "damageDealt", attackerId: unit.id, defenderId: target.id, damage: 0, counter: false, hit: false });
+        events.push(...r.events);
+        if (r.hit) { attackerHit = true; defenderHit = true; }
       }
 
-      // 연속공격(2중공격): 대상 생존 + 이동력 우위. 각 타 독립 명중 롤. 협공·돌격 동일 배율.
-      const afterHit1 = getUnit(next, target.id);
-      if (!afterHit1.retreated && doubleStrikes(ctx, unit, target)) {
-        const roll2 = rollHit(ctx, next, unit, afterHit1);
-        next = roll2.state;
-        if (roll2.hit) {
-          const ratio2 = ctx.data.combat.doubleStrike.secondHitPercent / 100;
-          const dmg2 = computeDamage(ctx, unit, afterHit1, ratio2, flankMult * chargeMult);
-          const lvl2 = afterHit1.level;
-          events.push({ type: "doubleStrike", attackerId: unit.id, defenderId: target.id });
-          const hit2 = dealDamage(next, unit, afterHit1, dmg2, false);
-          next = hit2.state;
-          events.push(...hit2.events);
-          const atkExp2 = grantExp(ctx, next, unit.id, dmg2, getUnit(next, target.id).retreated, lvl2);
-          next = atkExp2.state;
-          events.push(...atkExp2.events);
-          attackerHit = true; defenderHit = true;
-        } else {
-          events.push({ type: "damageDealt", attackerId: unit.id, defenderId: afterHit1.id, damage: 0, counter: false, hit: false });
+      // 레거시 연속공격(2중공격) — multiHit 미지정 시에만. 이동력 우위 + 대상 생존이면 2타(부분피해).
+      if (unit.multiHit == null) {
+        const afterHit1 = getUnit(next, target.id);
+        if (!afterHit1.retreated && doubleStrikes(ctx, unit, target)) {
+          const r2 = resolveStrike(ctx, next, unit.id, target.id, { counter: false, mult, ratio: ctx.data.combat.doubleStrike.secondHitPercent / 100 });
+          next = r2.state;
+          if (r2.hit) {
+            events.push({ type: "doubleStrike", attackerId: unit.id, defenderId: target.id });
+            attackerHit = true; defenderHit = true;
+          }
+          events.push(...r2.events);
         }
       }
 
-      // 반격: 방어측 생존 + 공격측이 방어측 사거리 안. 반격도 독립 명중 롤.
-      const defender = getUnit(next, target.id);
-      if (!defender.retreated) {
-        const d = distance({ x: unit.x, y: unit.y }, { x: defender.x, y: defender.y });
-        if (d >= defender.rangeMin && d <= defender.rangeMax) {
-          const rollC = rollHit(ctx, next, defender, getUnit(next, unit.id));
-          next = rollC.state;
-          if (rollC.hit) {
-            const ctrDmg = computeDamage(ctx, defender, getUnit(next, unit.id), ctx.data.combat.counterRatio);
-            const attackerLevelAtHit = getUnit(next, unit.id).level;
-            const ctr = dealDamage(next, defender, getUnit(next, unit.id), ctrDmg, true);
-            next = ctr.state;
-            events.push(...ctr.events);
-            // 반격 경험치는 반격자(방어측)에게
-            const ctrExp = grantExp(ctx, next, defender.id, ctrDmg, getUnit(next, unit.id).retreated, attackerLevelAtHit);
-            next = ctrExp.state;
-            events.push(...ctrExp.events);
-          } else {
-            events.push({ type: "damageDealt", attackerId: defender.id, defenderId: getUnit(next, unit.id).id, damage: 0, counter: true, hit: false });
+      // 반격: 공격자 noCounter면 생략. 아니면 방어측 생존 + 공격측이 방어측 사거리 안 → counterStrikes회.
+      if (!unit.noCounter) {
+        const defender = getUnit(next, target.id);
+        if (!defender.retreated) {
+          const d = distance({ x: unit.x, y: unit.y }, { x: defender.x, y: defender.y });
+          if (d >= defender.rangeMin && d <= defender.rangeMax) {
+            const counterStrikes = defender.counterStrikes ?? 1;
+            for (let i = 0; i < counterStrikes; i++) {
+              if (getUnit(next, unit.id).retreated) break;
+              const rc = resolveStrike(ctx, next, target.id, unit.id, { counter: true, mult: 1, ratio: ctx.data.combat.counterRatio });
+              next = rc.state;
+              events.push(...rc.events);
+            }
           }
         }
       }

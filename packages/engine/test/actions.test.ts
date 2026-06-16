@@ -57,6 +57,49 @@ describe("명중/회피 롤 (시드 고정 §2-1)", () => {
   });
 });
 
+describe("전투 특성 (Phase C)", () => {
+  // 관우(공격자, 순발 우위로 항상 명중)가 이숙을 친다. 이숙=사거리1·고병력(반격 가능·다단 생존).
+  const base = () => {
+    let s = patchUnit(fresh(), "이숙", { x: 1, y: 3, agility: 1, rangeMin: 1, rangeMax: 1, troops: 9999, maxTroops: 9999 });
+    s = patchUnit(s, "관우", { agility: 100, baseMove: 2 }); // baseMove2 = 레거시 doubleStrike 비활성
+    return s;
+  };
+  const atk = (s: BattleState) => applyAction(testCtx, s, { type: "attack", unitId: "관우", targetId: "이숙" });
+
+  it("무반격: 공격자 noCounter면 반격 damageDealt 없음(대조: 평소 1회)", () => {
+    const ctr = atk(patchUnit(base(), "관우", { agility: 100, baseMove: 2, noCounter: true }))
+      .events.filter((e) => e.type === "damageDealt" && e.counter === true);
+    expect(ctr.length).toBe(0);
+    const ctr2 = atk(base()).events.filter((e) => e.type === "damageDealt" && e.counter === true);
+    expect(ctr2.length).toBe(1);
+  });
+
+  it("관통 multiHit=3: 개시 비반격 damageDealt 3개(레거시 2타 미적용)", () => {
+    const non = atk(patchUnit(base(), "관우", { agility: 100, baseMove: 2, multiHit: 3 }))
+      .events.filter((e) => e.type === "damageDealt" && e.counter === false);
+    expect(non.length).toBe(3);
+  });
+
+  it("재반격 counterStrikes=2: 반격 damageDealt 2개", () => {
+    const s = patchUnit(base(), "이숙", { x: 1, y: 3, agility: 1, rangeMin: 1, rangeMax: 1, troops: 9999, maxTroops: 9999, counterStrikes: 2 });
+    const ctr = atk(s).events.filter((e) => e.type === "damageDealt" && e.counter === true);
+    expect(ctr.length).toBe(2);
+  });
+
+  it("고정 피해 flatDamagePerLevel: 방어/상성 무관 = 값×(lv+1)", () => {
+    const ev = atk(patchUnit(base(), "관우", { agility: 100, baseMove: 2, flatDamagePerLevel: 10, level: 1 }))
+      .events.find((e) => e.type === "damageDealt" && e.counter === false);
+    expect(ev && ev.type === "damageDealt" && ev.damage).toBe(20);
+  });
+
+  it("필중 alwaysHit: 순발 열세여도 항상 명중", () => {
+    let s = patchUnit(fresh(), "이숙", { x: 1, y: 3, agility: 100, troops: 9999, maxTroops: 9999 });
+    s = patchUnit(s, "관우", { agility: 1, baseMove: 2, alwaysHit: true });
+    const ev = atk(s).events.find((e) => e.type === "damageDealt" && e.counter === false);
+    expect(ev && ev.type === "damageDealt" && ev.hit).toBe(true);
+  });
+});
+
 describe("필살 게이지(SP) 누적 (§9)", () => {
   it("공격 시 공격자 +onAttack, 피격자 생존 시 +onHitTaken (결정론)", () => {
     const sp = testCtx.data.combat.sp;
