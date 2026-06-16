@@ -64,6 +64,15 @@ export class FakePresenter implements Presenter {
   phaseChanged(e: Ev<"phaseChanged">): Promise<void> {
     return this.handle(e);
   }
+  statusApplied(e: Ev<"statusApplied">): Promise<void> {
+    return this.handle(e);
+  }
+  statusTick(e: Ev<"statusTick">): Promise<void> {
+    return this.handle(e);
+  }
+  statusExpired(e: Ev<"statusExpired">): Promise<void> {
+    return this.handle(e);
+  }
   reinforcementArrived(e: Ev<"reinforcementArrived">): Promise<void> {
     return this.handle(e);
   }
@@ -116,6 +125,14 @@ export class TrackingPresenter extends FakePresenter {
         if (d) d.troops = Math.max(0, d.troops - e.damage);
         break;
       }
+      case "statusTick": { // 중독 1틱 — troops 차감(damageDealt와 동형 자기서술)
+        const d = this.units.get(e.unitId);
+        if (d) d.troops = Math.max(0, d.troops - e.damage);
+        break;
+      }
+      case "statusApplied": // 표시 전용 — diffSnapshot은 statuses 미비교(투영 불필요)
+      case "statusExpired":
+        break;
       case "unitRetreated": {
         const u = this.units.get(e.unitId);
         if (u) {

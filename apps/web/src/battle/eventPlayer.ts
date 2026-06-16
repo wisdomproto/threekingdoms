@@ -44,6 +44,11 @@ export interface Presenter {
   /** 콤보(연속 격파) 연출 — 옵셔널. */
   combo?(e: Ev<"combo">): Promise<void>;
   phaseChanged(e: Ev<"phaseChanged">): Promise<void>;
+  /** 상태이상 부여/만료 — 표시 전용(diffSnapshot은 statuses 미비교). 옵셔널. */
+  statusApplied?(e: Ev<"statusApplied">): Promise<void>;
+  statusExpired?(e: Ev<"statusExpired">): Promise<void>;
+  /** 중독 1틱 피해 — troops 차감 투영 필수(diffSnapshot 정합). */
+  statusTick?(e: Ev<"statusTick">): Promise<void>;
   /** 증원 도착 — 중도 스폰 유닛의 스프라이트 생성(이벤트 데이터로). 미구현이면 sync가 폴백 생성. */
   reinforcementArrived?(e: Ev<"reinforcementArrived">): Promise<void>;
   battleEnded(e: Ev<"battleEnded">): Promise<void>;
@@ -160,6 +165,12 @@ export class EventPlayer {
         return p.combo?.(e) ?? Promise.resolve();
       case "phaseChanged":
         return p.phaseChanged(e);
+      case "statusApplied":
+        return p.statusApplied?.(e) ?? Promise.resolve();
+      case "statusTick":
+        return p.statusTick?.(e) ?? Promise.resolve();
+      case "statusExpired":
+        return p.statusExpired?.(e) ?? Promise.resolve();
       case "reinforcementArrived":
         return p.reinforcementArrived?.(e) ?? Promise.resolve();
       case "battleEnded":
