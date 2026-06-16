@@ -225,7 +225,7 @@ export function selectRoster(
       uniqueSkillId: entry.uniqueSkillId,
       level: p?.level ?? DEFAULT_LEVEL,
       exp: p?.exp ?? 0,
-      equipped: p?.equipped ?? [],
+      equipped: p?.equipped ?? entry.startItems ?? [], // ★ 시작 장비(Phase F) — 진행 저장 없으면 startItems(없으면 [])
     });
   }
   return out;

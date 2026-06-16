@@ -507,6 +507,7 @@ export const RosterEntrySchema = z.object({
   joinChapter: z.number().int().min(1).max(5),
   role: RosterRoleSchema,
   uniqueSkillId: z.string().optional(),
+  startItems: z.array(z.string()).default([]),  // ★ 시작 장비(Phase F) — selectRoster equipped 기본값
 });
 export type RosterEntry = z.infer<typeof RosterEntrySchema>;
 

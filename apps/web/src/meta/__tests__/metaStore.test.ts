@@ -4,6 +4,7 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import type { RosterEntry } from "@tk/data";
+import { gameData } from "@tk/data";
 import {
   initialMeta,
   reduceAddGold,
@@ -267,5 +268,14 @@ describe("공개 API (node 비브라우저 — 메모리 캐시 폴백)", () => 
     expect(roster.some((r) => r.commanderId === "유비")).toBe(true);
     // 클리어 없으면 3장 합류 조운은 제외
     expect(roster.some((r) => r.commanderId === "조운")).toBe(false);
+  });
+
+  it("selectRoster: 진행 없는 ★는 equipped=startItems, 진행 있으면 진행 우선 (Phase F)", () => {
+    const fresh = initialMeta();
+    const r = selectRoster(fresh, gameData.rosters, 1);
+    expect(r.find((u) => u.commanderId === "유비")!.equipped).toEqual(["쌍고검"]);
+    expect(r.find((u) => u.commanderId === "관우")!.equipped).toEqual(["청룡언월도"]);
+    const withProg = { ...fresh, rosterProgress: { 유비: { level: 1, exp: 0, equipped: ["청강검"] } } };
+    expect(selectRoster(withProg, gameData.rosters, 1).find((u) => u.commanderId === "유비")!.equipped).toEqual(["청강검"]);
   });
 });
