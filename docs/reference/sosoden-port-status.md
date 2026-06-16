@@ -47,6 +47,7 @@
 4. **④ 정밀 라벨** — growthProfiles `statGain`, 책략 `effectMatrix`, rangeShape `head`. (성장은 등급계수 모델로 대체될 수 있음.)
 5. **그래픽 미해독** — HM00~57.E5(전투맵 추정)·MCALL00~08·IMSG.E5 컨테이너 포맷.
 6. **엔진 잠재버그** — testMap에서 `getMovableTiles` ↔ applyAction 이동검증 불일치(시뮬 AI가 일부 맵서 불법 이동 제안 가능). 사수관선 미발현.
+7. ~~명중률(순발)·전투 RNG~~ ✅ **완료(2026-06-16 — 시드 고정 확률 전환)**: 전투 모델을 결정론→**시드 고정 확률**로 전환(CLAUDE.md §2-1/§15). **Phase A** 시드RNG 기반(rng.ts `nextRandom`·`BattleState.rngState`, 세이브스컴 불가·리플레이/밸런스 sim 보존), **Phase B** 명중/회피(순발력←민첩, commanders.json 민첩 주입 + `agilityPower`/`hitChance`), **Phase C** 전투 특성(무반격·관통·재반격/연환·고정뎀·필중, `resolveStrike` 루프). 남은 것: **상태이상(D)·시그니처무기/흡혈(E)·회심·선제/분전/이동특성**. 설계=docs/superpowers/specs/2026-06-16-{seeded-rng-foundation,phaseB-hit-dodge,phaseC-combat-traits}-design.md, 카탈로그=yeonggeoljeon-rifine-combat.md.
 
 ---
 
