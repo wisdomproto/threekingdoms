@@ -118,7 +118,8 @@
     "name": "청룡언월도",
     "category": "weapon",
     "power": 255,
-    "bonusPercent": 12
+    "bonusPercent": 12,
+    "effects": { "noCounter": true }
   },
   "삼첨도": {
     "id": "삼첨도",
@@ -132,14 +133,16 @@
     "name": "방천화극",
     "category": "weapon",
     "power": 255,
-    "bonusPercent": 18
+    "bonusPercent": 18,
+    "effects": { "lifestealPercent": 50, "inflictStatus": { "kind": "immobilize", "chance": 100, "turns": 1 } }
   },
   "사모": {
     "id": "사모",
     "name": "사모",
     "category": "weapon",
     "power": 255,
-    "bonusPercent": 10
+    "bonusPercent": 10,
+    "effects": { "multiHit": 2 }
   },
   "궁술지침서": {
     "id": "궁술지침서",
@@ -480,5 +483,21 @@
     "category": "book",
     "power": 255,
     "bonusPercent": 20
+  },
+  "쌍고검": {
+    "id": "쌍고검",
+    "name": "쌍고검",
+    "category": "weapon",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": { "counterStrikes": 2 }
+  },
+  "용담창": {
+    "id": "용담창",
+    "name": "용담창",
+    "category": "weapon",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": { "rangeBonus": 1 }
   }
 }

@@ -86,4 +86,13 @@ describe("createBattle v2 (원작 모델)", () => {
     expect(u.rangeMax).toBe(baseMax + 1);
     expect(u.lifestealPercent).toBe(50);
   });
+
+  it("Phase E 배선: 시그니처 무기 효과가 아이템에 박혀 적용된다", () => {
+    // 관우=청룡언월도 장착(testStage) → 무반격 적용. 사모/방천화극 효과는 아이템 데이터로 확인.
+    // (관우·장비는 전 스테이지에 무기 장착 → 효과 편집이 sim까지 전파. 유비/조운 로드아웃은 Phase F.)
+    const s = createBattle(testCtx, 1);
+    expect(s.units.find((u) => u.id === "관우")?.noCounter).toBe(true);    // 청룡언월도 무반격
+    expect(gameData.items["사모"]?.effects?.multiHit).toBe(2);            // 사모 관통(장비)
+    expect(gameData.items["방천화극"]?.effects?.lifestealPercent).toBe(50); // 흡혈
+  });
 });

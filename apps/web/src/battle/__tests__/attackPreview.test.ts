@@ -161,7 +161,8 @@ describe("buildAttackPreview", () => {
   });
 
   it("연속공격: 빠른 병종(장비 경기병)이 느린 적(조잠 보병)에게 2타 — 총피해 엔진과 일치", () => {
-    const s = meleeState(); // 장비(경기병 move6) zf, 조잠(보병 move4) zf.x-1, 둘 다 9999
+    // 장비 사모(관통, Phase E)는 multiHit를 줘 레거시 doubleStrike를 덮으므로, 레거시 검증 위해 중화.
+    const s = withUnit(meleeState(), "장비", { multiHit: undefined });
     const cao = findUnit(s, "조잠");
     const preview = buildAttackPreview(ctx, s, "장비", { x: cao.x, y: cao.y })!;
     expect(preview.doubleStrike).toBeDefined(); // 이동력 차 2 → 발동
@@ -208,7 +209,7 @@ describe("buildAttackPreview", () => {
 
   it("전투 특성(Phase C): 고정 피해 flat 예측이 엔진과 일치(방어 무시)", () => {
     const s0 = meleeState();
-    const s = withUnit(s0, "장비", { flatDamagePerLevel: 12, noCounter: true, agility: 100, baseMove: 2 });
+    const s = withUnit(s0, "장비", { flatDamagePerLevel: 12, noCounter: true, agility: 100, baseMove: 2, multiHit: undefined });
     const cao = findUnit(s, "조잠");
     const pv = buildAttackPreview(ctx, s, "장비", { x: cao.x, y: cao.y })!;
     const res = applyAction(ctx, s, { type: "attack", unitId: "장비", targetId: "조잠" });

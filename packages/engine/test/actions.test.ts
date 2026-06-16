@@ -61,7 +61,8 @@ describe("전투 특성 (Phase C)", () => {
   // 관우(공격자, 순발 우위로 항상 명중)가 이숙을 친다. 이숙=사거리1·고병력(반격 가능·다단 생존).
   const base = () => {
     let s = patchUnit(fresh(), "이숙", { x: 1, y: 3, agility: 1, rangeMin: 1, rangeMax: 1, troops: 9999, maxTroops: 9999 });
-    s = patchUnit(s, "관우", { agility: 100, baseMove: 2 }); // baseMove2 = 레거시 doubleStrike 비활성
+    // baseMove2 = 레거시 doubleStrike 비활성. noCounter:undefined = 관우 청룡언월도(무반격, Phase E 배선) 중화 → 통제 변수.
+    s = patchUnit(s, "관우", { agility: 100, baseMove: 2, noCounter: undefined });
     return s;
   };
   const atk = (s: BattleState) => applyAction(testCtx, s, { type: "attack", unitId: "관우", targetId: "이숙" });
