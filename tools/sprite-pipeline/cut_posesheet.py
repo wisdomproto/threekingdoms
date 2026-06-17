@@ -165,7 +165,10 @@ def main():
 
     # manifest 등록 — tier1(루트) 포즈만
     man_path = os.path.join(SPRITES, "manifest.json")
-    man = json.load(open(man_path, encoding="utf-8")) if os.path.exists(man_path) else {}
+    man = {}
+    if os.path.exists(man_path):
+        with open(man_path, encoding="utf-8") as f:
+            man = json.load(f)
     entry = man.get(sid, {})
     existing = set(entry.get("poses", []))
     existing.update(tier1_poses)

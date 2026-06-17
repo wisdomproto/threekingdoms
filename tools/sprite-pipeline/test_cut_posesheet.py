@@ -41,7 +41,8 @@ class TestCut(unittest.TestCase):
                 self.assertTrue(os.path.exists(os.path.join(d, f"front_{pose}.png")))
                 self.assertTrue(os.path.exists(os.path.join(d, "t2", f"front_{pose}.png")))
                 self.assertTrue(os.path.exists(os.path.join(d, "t3", f"front_{pose}.png")))
-            man = json.load(open(os.path.join(tmp, "manifest.json"), encoding="utf-8"))
+            with open(os.path.join(tmp, "manifest.json"), encoding="utf-8") as f:
+                man = json.load(f)
             self.assertEqual(sorted(man["_tiertest"]["poses"]), ["front_attack", "front_idle", "front_move"])
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
