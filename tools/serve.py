@@ -11,7 +11,7 @@
 """
 import sys, os, json, base64, mimetypes
 
-ROOT = r"C:\project\threekingdoms"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUBLIC = os.path.join(ROOT, "apps", "web", "public")
 PORT = 8080
 
