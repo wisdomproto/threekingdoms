@@ -143,41 +143,38 @@ def main():
 
     im = Image.open(sheet).convert("RGBA")
     W, H = im.size
-    cols = column_filled(im)
-    # 포즈 간 큰 간격만 분할(글자폭의 ~3% 이상 빈틈). 너무 잘게 쪼개지면 min_gap을 키운다.
-    min_gap = max(8, W // 40)
-    bands = split_bands(cols, min_gap)
-    # 너비 너무 작은 밴드(노이즈) 제거
-    bands = [b for b in bands if (b[1] - b[0]) > W * 0.04]
-    print(f"{sid}: {W}x{H}, 검출 밴드 {len(bands)}개 (min_gap={min_gap})")
-    for i, (x0, x1) in enumerate(bands):
-        print(f"  band{i}: x{x0}-{x1} (w{x1-x0})")
+    print(f"{sid}: {W}x{H}")
 
-    n = min(len(bands), len(poses))
-    if len(bands) != len(poses):
-        print(f"  ⚠ 밴드 {len(bands)} ≠ 포즈 {len(poses)} — 앞에서부터 {n}개만 매핑")
+    cells = cut_sheet(im, poses)
+    print(f"  검출 셀 {len(cells)}개")
 
-    saved = []
-    for i in range(n):
-        x0, x1 = bands[i]
-        y0, y1 = y_bounds(im, x0, x1)
-        crop = im.crop((x0, y0, x1, y1))
-        name = f"front_{poses[i]}.png"
-        crop.save(os.path.join(d, name))
-        saved.append(f"front_{poses[i]}")
-        print(f"  → {name}  {crop.size}")
+    tier1_poses = []
+    for tier_idx, pose, crop in cells:
+        subdir = TIER_SUBDIR.get(tier_idx, f"t{tier_idx + 1}")
+        if subdir:
+            outdir = os.path.join(d, subdir)
+            os.makedirs(outdir, exist_ok=True)
+        else:
+            outdir = d
+        name = f"front_{pose}.png"
+        crop.save(os.path.join(outdir, name))
+        tier_label = f"tier{tier_idx + 1}" if subdir else "tier1(root)"
+        print(f"  → [{tier_label}] {os.path.join(subdir, name) if subdir else name}  {crop.size}")
+        if tier_idx == 0:
+            tier1_poses.append(f"front_{pose}")
 
-    # manifest 등록
+    # manifest 등록 — tier1(루트) 포즈만
     man_path = os.path.join(SPRITES, "manifest.json")
     man = json.load(open(man_path, encoding="utf-8")) if os.path.exists(man_path) else {}
     entry = man.get(sid, {})
     existing = set(entry.get("poses", []))
-    existing.update(saved)
+    existing.update(tier1_poses)
     entry["poses"] = sorted(existing)
     entry["source"] = "_posesheet.png"
     entry["method"] = "cut_posesheet.py"
     man[sid] = entry
-    json.dump(man, open(man_path, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    with open(man_path, "w", encoding="utf-8") as f:
+        json.dump(man, f, ensure_ascii=False, indent=2)
     print(f"manifest 등록: {sid} → {entry['poses']}")
     print("게임 새로고침 시 반영. 배포본 반영은 python tools/upload-assets.py")
 
