@@ -131,6 +131,19 @@ const MOUNT_CHARIOT = 'MOUNT — in EVERY pose the character is a lord riding a 
 const MOUNT_CART = 'MOUNT — in EVERY pose the character is seated calmly on his iconic four-wheeled scholar\'s cart (a small wheeled handcart-throne, no horse, optionally implied to be pushed), the unmistakable strategist silhouette; never standing on foot. The three poses become: (1) seated idle fanning himself, (2) the cart advancing, (3) seated raising the feather-fan to command — the power is in the mind, not in fighting.';
 const MOUNT_FOOT = 'MOUNT — the character is on foot in every pose (no horse, no vehicle), a standard infantry/scholar unit.';
 
+/* ── S-pose 포즈시트(idle/move/attack 한 장) 전용 탈것 구절 ──
+   위 MOUNT_* (일기토/구 SD 6포즈용)와 별개로 IDLE/MOVE/ATTACK 3포즈 포맷에 맞춤.
+   누가 무슨 탈것인지는 손으로 정하지 않고 '게임 병종 데이터'에서 도출 → MOUNT_BY_NAME.
+   규칙: 기병계=horse / 군주·전차병종=chariot / 제갈량=cart / 그 외=foot(구절 없음, 기존 유지).
+   MOUNT_BY_NAME 재생성: python tools/derive-mount-map.py  (rosters.json + stages + unitClasses.json) */
+const POSE_MOUNT = {
+  horse:   'MOUNT — a CAVALRY unit: in EVERY cell of the sheet (the same mount in all 3 poses and all 3 rank rows) the character rides a compact round chibi warhorse (matching the SD ~2.5-head scale), never on foot. IDLE = mounted at rest with the horse standing; MOVE = the horse at a cantering advance; ATTACK = a strike delivered from horseback. The horse faces SCREEN-LEFT exactly like the rider.',
+  chariot: 'MOUNT — a LORD/commander unit: in EVERY cell of the sheet (the same mount in all 3 poses and all 3 rank rows) the character rides a small two-wheeled horse-drawn war chariot (one compact chibi warhorse pulling a cart, the figure standing in the cart holding the reins and weapon), never on foot. IDLE = the chariot halted; MOVE = the chariot rolling forward at speed; ATTACK = a commanding strike or gesture from the moving chariot. The chariot and horse face SCREEN-LEFT.',
+  cart:    'MOUNT — a STRATEGIST unit: in EVERY cell of the sheet (the same mount in all 3 poses and all 3 rank rows) the character sits calmly on his iconic four-wheeled scholar\'s cart (a small wheeled seat, no horse), never standing on foot. IDLE = seated fanning himself; MOVE = the cart advancing; ATTACK = raising the feather-fan to command (the power is in the mind, not melee). The cart faces SCREEN-LEFT.',
+};
+/* 병종 데이터 도출 결과 — foot 기본(여기 없는 이름은 전부 도보). 재생성: python tools/derive-mount-map.py */
+const MOUNT_BY_NAME = {"유비":"chariot", "관우":"horse", "장비":"horse", "감녕":"horse", "공손찬":"horse", "국의":"horse", "기령":"horse", "도겸":"chariot", "동탁":"chariot", "서영":"horse", "손권":"chariot", "여건":"horse", "여포":"horse", "장무":"horse", "조운":"horse", "장요":"horse", "장합":"horse", "제갈량":"cart", "조인":"horse", "조조":"chariot", "진손":"horse", "채모":"horse", "하후돈":"horse", "하후란":"horse", "하후상":"horse", "하후은":"horse", "한섬":"horse", "화웅":"horse", "황개":"horse", "후성":"horse", "[제네릭] 기병·아군":"horse", "[제네릭] 기병·적":"horse"};
+
 /* facing 고정(canonical facing) — SD 쿼터뷰 유닛 스프라이트 전용. 렌더러가 한 기준 방향(screen-left)으로 그린 스프라이트를 좌우 미러링하므로, 모든 포즈(idle/move/attack)가 반드시 동일한 왼쪽 방향이어야 한다. 레퍼런스 시트(3뷰)·일기토 키프레임·맵·이펙트에는 주입 금지. */
 const FACING_LOCK = 'CRITICAL — facing consistency: the character (and any mount/vehicle) faces SCREEN-LEFT in every single pose; the attacking strike — the weapon and the body — is aimed toward the LEFT edge of the cell; NEVER mirror, flip, or rotate the character horizontally between poses or between the idle/move/attack columns; all six cells share the IDENTICAL left-facing orientation (top row = front-left three-quarter, bottom row = back-left three-quarter, i.e. the same body simply seen from behind, still turned toward screen-left). Any cell facing right, or any mix of left- and right-facing cells, is WRONG output and must not be produced.';
 
@@ -1424,8 +1437,12 @@ function buildPrompt(item) {
   }
   const parts = [];
   if (item.poseSheet) {
-    /* 포즈 시트: SD 유닛 스타일(탈것·전장). COMMON(정면 등) 래퍼 회피. */
+    /* 포즈 시트: SD 유닛 스타일 + 병종별 탈것(MOUNT_BY_NAME→POSE_MOUNT) 주입. COMMON(정면 등) 래퍼 회피. */
     parts.push(body);
+    const _ci = (varState[item.id] || {})['캐릭터'] || 0;
+    const _cn = (item.vars && item.vars['캐릭터']) ? item.vars['캐릭터'][_ci][0] : null;
+    const _mt = _cn && MOUNT_BY_NAME[_cn];
+    if (_mt) parts.push(POSE_MOUNT[_mt]);
     parts.push('Art style: detailed painterly chibi (SD, ~2.5 heads) battle-map unit for a top-down tactical RPG, East Asian ink-wash + soft cel shading, crisp readable silhouette, muted earth tones with gold/jade accents, clean even lighting, NO baked ground shadow.');
     parts.push('Avoid: text, labels, watermark, UI, frame, ground shadow, busy background, photorealistic, anime-cel, Koei-style. Keep the SAME character identity/colors across all 3 poses.');
   } else if (item.portraitSheet) {
