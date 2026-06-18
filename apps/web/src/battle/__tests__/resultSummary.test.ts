@@ -53,6 +53,7 @@ function vmWith(
     status: "victory",
     units,
     pendingRewards,
+    levelUps: [],
   };
 }
 

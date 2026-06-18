@@ -523,6 +523,8 @@ export const RosterEntrySchema = z.object({
   role: RosterRoleSchema,
   uniqueSkillId: z.string().optional(),
   startItems: z.array(z.string()).default([]),  // ★ 시작 장비(Phase F) — selectRoster equipped 기본값
+  /** 이 stageId를 클리어하면 해당 장수가 이탈 — 투자 자원 환급 룰(§6). */
+  departsAfterStage: z.string().optional(),
 });
 export type RosterEntry = z.infer<typeof RosterEntrySchema>;
 

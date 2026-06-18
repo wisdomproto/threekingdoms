@@ -32,6 +32,7 @@ function makeState(p: {
     metStrategyConditions: [],
     spawnedReinforcements: [],
     pendingRewards: [],
+    levelUps: [],
   };
 }
 

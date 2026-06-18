@@ -53,6 +53,13 @@ export interface MetaState {
   serendipity: number;
   /** 기연 천장 카운터(§12) — 보물 없이 뽑은 연속 횟수. 보물 획득 시 0. */
   serendipityPity: number;
+  /**
+   * 이탈한 장수 commanderId 목록(§6 — 서서·진등). departsAfterStage 클리어 시 자동 기록.
+   * selectRoster에서 이 목록을 걸러 편성 화면에 보이지 않도록 한다.
+   */
+  departedCharacters: string[];
+  /** 2회차 카운터(§11). 0=1회차(첫 플레이), 1=2회차, …. startNewGame()이 증가시킨다. */
+  playthroughCount: number;
 }
 
 /** 상점 골드 충전 광고 일일 캡(§13 "소액·일일 캡"). 하루 최대 시청 횟수. */
@@ -83,7 +90,47 @@ export function initialMeta(): MetaState {
     adFree: false,
     serendipity: 0,
     serendipityPity: 0,
+    departedCharacters: [],
+    playthroughCount: 0,
   };
+}
+
+/** 이탈 장수 1명의 장착 아이템을 인벤토리로 돌려보내고 위로금 골드를 지급(§6). */
+const DEPARTURE_GOLD_REFUND = 300;
+export function reduceDeparture(s: MetaState, commanderId: string): MetaState {
+  if (s.departedCharacters.includes(commanderId)) return s;
+  const progress = s.rosterProgress[commanderId];
+  const equippedItems = progress?.equipped ?? [];
+  let next: MetaState = {
+    ...s,
+    departedCharacters: [...s.departedCharacters, commanderId],
+    // 장착 아이템 인벤토리 반환
+    inventory: [...s.inventory, ...equippedItems],
+    // 장착 기록 초기화(이탈 후 스테이지에서 참조되지 않도록)
+    rosterProgress: progress
+      ? { ...s.rosterProgress, [commanderId]: { ...progress, equipped: [] } }
+      : s.rosterProgress,
+  };
+  next = reduceAddGold(next, DEPARTURE_GOLD_REFUND);
+  return next;
+}
+
+/**
+ * stageId를 클리어했을 때 departsAfterStage가 일치하는 장수들을 이탈 처리.
+ * rosters는 gameData.rosters(기본값) — 테스트에서 주입 가능하도록 파라미터화.
+ */
+export function reduceTriggerDepartures(
+  s: MetaState,
+  stageId: string,
+  rosters: Record<string, RosterEntry> = gameData.rosters,
+): MetaState {
+  let next = s;
+  for (const entry of Object.values(rosters)) {
+    if (entry.departsAfterStage === stageId) {
+      next = reduceDeparture(next, entry.commanderId);
+    }
+  }
+  return next;
 }
 
 /** 로컬 날짜 키(YYYY-MM-DD). 캡 롤오버 기준. 테스트는 now 주입 가능. */
@@ -179,9 +226,16 @@ export function reduceApplyPull(s: MetaState, outcome: PullOutcome): MetaState |
   return next;
 }
 
-export function reduceMarkCleared(s: MetaState, stageId: string): MetaState {
+export function reduceMarkCleared(
+  s: MetaState,
+  stageId: string,
+  rosters: Record<string, RosterEntry> = gameData.rosters,
+): MetaState {
   if (s.clearedStages.includes(stageId)) return s;
-  return { ...s, clearedStages: [...s.clearedStages, stageId] };
+  let next: MetaState = { ...s, clearedStages: [...s.clearedStages, stageId] };
+  // 이탈 조건 체크 — 해당 스테이지 클리어 시 departsAfterStage 장수 이탈 처리.
+  next = reduceTriggerDepartures(next, stageId, rosters);
+  return next;
 }
 
 export function reduceSetEquipped(s: MetaState, commanderId: string, items: string[]): MetaState {
@@ -213,9 +267,11 @@ export function selectRoster(
   // 후반 장수(제갈량 등)가 클리어 누적만으로 1장 스테이지에 등장하던 버그 방지.
   // 미지정 시 종전 휴리스틱(1 + 클리어 수) — 전역 로스터 조회 등 챕터 맥락이 없는 호출용.
   const unlockedChapter = maxChapter ?? 1 + s.clearedStages.length;
+  const departed = new Set(s.departedCharacters ?? []);
   const out: RosterUnit[] = [];
   for (const entry of Object.values(rosters)) {
     if (entry.joinChapter > unlockedChapter) continue;
+    if (departed.has(entry.commanderId)) continue; // 이탈 장수 제외(§6)
     const p = s.rosterProgress[entry.commanderId];
     out.push({
       commanderId: entry.commanderId,
@@ -279,6 +335,15 @@ function loadFromStorage(): MetaState {
       serendipityPity:
         typeof parsed.serendipityPity === "number" && parsed.serendipityPity >= 0
           ? Math.floor(parsed.serendipityPity)
+          : 0,
+      // 이탈 장수(§6) — 신규 필드. 구버전 로드 시 빈 배열.
+      departedCharacters: Array.isArray(parsed.departedCharacters)
+        ? parsed.departedCharacters.filter((x) => typeof x === "string")
+        : [],
+      // 2회차(§11) — 신규 필드. 구버전은 첫 플레이(0).
+      playthroughCount:
+        typeof parsed.playthroughCount === "number" && parsed.playthroughCount >= 0
+          ? Math.floor(parsed.playthroughCount)
           : 0,
     };
     // legacy gold가 v1보다 크면(결산이 v1 밖에서 누적했을 수 있음) 더 큰 값 채택.
@@ -420,6 +485,41 @@ export function reset(): void {
   } catch {
     // 무시 — 메모리 캐시는 초기화됨.
   }
+}
+
+/**
+ * 2회차 시작(§11 "레벨/보물 일부 계승 + 적 강화"). 다음을 이행한다:
+ *  - 계승: 보물(category=treasure) 인벤토리 전량 + gold 50%(상한 5000) + serendipity 50%
+ *  - 리셋: clearedStages / rosterProgress / departedCharacters / adGoldCap
+ *  - playthroughCount +1 (적 강화 배율 기반 — BattleScreen이 읽어 scaleEnemies)
+ *  - adFree는 유지(구매는 영구 효력)
+ */
+export function startNewGame(
+  items: Record<string, { category: string }> = gameData.items,
+): void {
+  const s = loadFromStorage();
+  const treasureInventory = s.inventory.filter((id) => items[id]?.category === "treasure");
+  const carryGold = Math.min(5000, Math.floor(s.gold * 0.5));
+  const carrySerendipity = Math.floor(s.serendipity * 0.5);
+  const next: MetaState = {
+    ...initialMeta(),
+    gold: carryGold,
+    inventory: [...treasureInventory],
+    adFree: s.adFree,
+    serendipity: carrySerendipity,
+    playthroughCount: s.playthroughCount + 1,
+  };
+  saveToStorage(next);
+}
+
+/** 현재 플레이 회차(0=1회차, 1=2회차, …). BattleScreen 적 강화 배율에 사용. */
+export function getPlaythroughCount(): number {
+  return loadFromStorage().playthroughCount;
+}
+
+/** 이탈 장수 commanderId 목록(편성 화면 등에서 참고용). */
+export function getDepartedCharacters(): string[] {
+  return loadFromStorage().departedCharacters;
 }
 
 // ---------------------------------------------------------------------------

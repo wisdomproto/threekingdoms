@@ -179,8 +179,8 @@ describe("광고 공개 API (node 메모리 캐시)", () => {
 
 describe("selectRoster 해금 게이팅", () => {
   const rosters: Record<string, RosterEntry> = {
-    유비: { commanderId: "유비", classId: "footman", joinChapter: 1, role: "lord" },
-    조운: { commanderId: "조운", classId: "lightCavalry", joinChapter: 3, role: "melee" },
+    유비: { commanderId: "유비", classId: "footman", joinChapter: 1, role: "lord", startItems: [] },
+    조운: { commanderId: "조운", classId: "lightCavalry", joinChapter: 3, role: "melee", startItems: [] },
   };
 
   it("클리어 없으면 1장 장수만, 클리어 누적 시 다음 장 해금", () => {
@@ -227,6 +227,8 @@ describe("공개 API (node 비브라우저 — 메모리 캐시 폴백)", () => 
       adFree: false,
       serendipity: 0,
       serendipityPity: 0,
+      departedCharacters: [],
+      playthroughCount: 0,
     });
   });
 

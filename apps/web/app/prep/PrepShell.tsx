@@ -57,11 +57,14 @@ export function PrepShell(): React.ReactElement {
   const [refreshKey, setRefreshKey] = useState(0);
   const [roster, setRoster] = useState<RosterUnit[]>([]);
   const [gold, setGold] = useState(0);
+  const [isCleared, setIsCleared] = useState(false);
 
   useEffect(() => {
+    const meta = getMeta();
     setRoster(getRoster(chapter));
-    setGold(getMeta().gold);
-  }, [refreshKey, chapter]);
+    setGold(meta.gold);
+    setIsCleared(meta.clearedStages.includes(stageId));
+  }, [refreshKey, chapter, stageId]);
 
   const [selected, setSelected] = useState<SortieMember[]>([]);
   const [activeTab, setActiveTab] = useState<"formation" | "shop">("formation");
@@ -117,9 +120,19 @@ export function PrepShell(): React.ReactElement {
         }}
       >
         <h1 style={{ margin: 0, fontSize: 18 }}>출진 준비 — {stage.name}</h1>
-        <Link href="/stages" style={{ color: "#8a7350", fontSize: 14, textDecoration: "none" }}>
-          ◀ 전장 선택
-        </Link>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          {isCleared && (
+            <Link
+              href={`/merchant?stage=${encodeURIComponent(stageId)}`}
+              style={{ color: "#cdab6e", fontSize: 13, textDecoration: "none" }}
+            >
+              🏕️ 상인
+            </Link>
+          )}
+          <Link href="/stages" style={{ color: "#8a7350", fontSize: 14, textDecoration: "none" }}>
+            ◀ 전장 선택
+          </Link>
+        </div>
       </header>
 
       {/* 탭 바 */}

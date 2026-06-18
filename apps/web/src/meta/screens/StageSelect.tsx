@@ -12,11 +12,11 @@
  * 챕터/클리어는 localStorage(metaStore)에 의존 → 마운트 후 1회 로드(SSR에서는 미해금/0G로
  * 그려 하이드레이션 일치). 자금(gold)은 상단 바에 표시.
  */
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { stages } from "@tk/data";
 import type { Stage } from "@tk/data";
-import { getMeta } from "../metaStore";
+import { getMeta, startNewGame } from "../metaStore";
 import { PANEL_FRAME } from "../../battle/hud/frames";
 
 const INK = "#1a1714";
@@ -48,12 +48,20 @@ function chapterOf(num: number): number {
 export function StageSelect(): React.ReactElement {
   const [cleared, setCleared] = useState<string[]>([]);
   const [gold, setGold] = useState(0);
+  const [playthroughCount, setPlaythroughCount] = useState(0);
+  const [confirmNg, setConfirmNg] = useState(false);
 
-  useEffect(() => {
+  const reload = useCallback(() => {
     const m = getMeta();
     setCleared(m.clearedStages);
     setGold(m.gold);
+    setPlaythroughCount(m.playthroughCount);
+    setConfirmNg(false);
   }, []);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
 
   // 전역 진행 순서(번호 오름차순) — 해금 게이팅의 기준.
   const ordered = useMemo(
@@ -80,6 +88,8 @@ export function StageSelect(): React.ReactElement {
       list: ordered.filter((s) => chapterOf(stageNumber(s.id)) === ch.chapter),
     }));
   }, [ordered]);
+
+  const allCleared = ordered.length > 0 && ordered.every((s) => clearedSet.has(s.id));
 
   return (
     <section
@@ -147,6 +157,69 @@ export function StageSelect(): React.ReactElement {
             )}
           </div>
         ))}
+
+        {/* 2회차 시작 — 전 스테이지 클리어 후 표시(§11). */}
+        {allCleared && (
+          <div
+            style={{
+              marginTop: 16,
+              padding: "20px 18px",
+              borderRadius: 10,
+              border: `1px solid ${BRONZE_GOLD}66`,
+              background: "rgba(40,34,20,0.6)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+            }}
+          >
+            <div style={{ fontSize: 16, fontWeight: 800, color: BRONZE_GOLD }}>
+              {playthroughCount > 0 ? `${playthroughCount + 1}회차 시작` : "2회차 시작"}
+            </div>
+            <div style={{ fontSize: 12, color: BRONZE_DIM, lineHeight: 1.6 }}>
+              보물·자금 일부를 계승하고 적이 강해집니다.
+              레벨·편성·장비는 초기화됩니다.
+            </div>
+            {confirmNg ? (
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => { startNewGame(); reload(); }}
+                  style={{
+                    flex: 1, padding: "10px 0", borderRadius: 8,
+                    border: "1px solid #e06c3a", background: "rgba(80,30,10,0.7)",
+                    color: "#f0b080", fontSize: 14, fontWeight: 700, cursor: "pointer",
+                  }}
+                >
+                  확인 — 시작
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmNg(false)}
+                  style={{
+                    flex: 1, padding: "10px 0", borderRadius: 8,
+                    border: "1px solid #3a414a", background: "rgba(20,18,14,0.5)",
+                    color: BRONZE_DIM, fontSize: 14, cursor: "pointer",
+                  }}
+                >
+                  취소
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmNg(true)}
+                style={{
+                  padding: "10px 0", borderRadius: 8,
+                  border: `1px solid ${BRONZE_GOLD}88`,
+                  background: "rgba(50,40,14,0.7)",
+                  color: BRONZE_GOLD, fontSize: 14, fontWeight: 700, cursor: "pointer",
+                }}
+              >
+                {playthroughCount > 0 ? `${playthroughCount + 1}회차 도전` : "2회차 도전"}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

@@ -12,8 +12,9 @@
  *
  * HUD는 useSyncExternalStore로 settled 기반 뷰모델 스냅샷만 구독 (설계 §4 스포일러 차단).
  */
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { gameData } from "@tk/data";
+import { getMeta, getPlaythroughCount } from "../meta/metaStore";
 import type { BattleContext, BattleEvent, BattleState, Coord } from "@tk/engine";
 import { BattleStore } from "./store";
 import type { Presenter, PresentedSnapshot } from "./eventPlayer";
@@ -128,6 +129,31 @@ function makeCtx(): BattleContext {
     sortie && sortie.members.length > 0
       ? { ...baseStage, units: applySortieToStage(baseStage, sortie.members) }
       : baseStage;
+
+  // 2회차 적 강화(§11): playthroughCount × 25% 스탯 배율을 적 지휘관에게 적용.
+  const ng = getPlaythroughCount();
+  if (ng > 0) {
+    const scale = 1 + ng * 0.25;
+    const enemyIds = new Set(
+      stage.units.filter((u) => u.side === "enemy").map((u) => u.commanderId),
+    );
+    const scaledCommanders = Object.fromEntries(
+      Object.entries(gameData.commanders).map(([id, cmd]) => {
+        if (!enemyIds.has(id)) return [id, cmd];
+        return [
+          id,
+          {
+            ...cmd,
+            war: Math.round(cmd.war * scale),
+            leadership: Math.round(cmd.leadership * scale),
+            intelligence: Math.round(cmd.intelligence * scale),
+          },
+        ];
+      }),
+    );
+    return { data: { ...gameData, commanders: scaledCommanders }, stage, map };
+  }
+
   return { data: gameData, stage, map };
 }
 
@@ -190,7 +216,13 @@ export default function BattleScreen(): React.ReactElement {
 
   const snap = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
   const dispatch = useCallback((e: UiEvent) => store.dispatchUi(e), [store]);
-  const toggleAuto = useCallback(() => store.setAutoBattle(!store.autoBattle), [store]);
+  // 자동전투는 클리어한 스테이지에서만 활성화(§15 "배속/자동전투 클리어 스테이지 한정").
+  const stageId = ctx.stage.id;
+  const isCleared = useMemo(() => getMeta().clearedStages.includes(stageId), [stageId]);
+  const toggleAuto = useCallback(() => {
+    if (!isCleared) return;
+    store.setAutoBattle(!store.autoBattle);
+  }, [isCleared, store]);
   const resetCamera = useCallback(() => delegate.target?.resetCamera(), [delegate]);
   // 배속 순환 1→2→3→1 — store(라벨)와 렌더러(연출) 동시 반영
   const cycleSpeed = useCallback(() => {
@@ -240,6 +272,7 @@ export default function BattleScreen(): React.ReactElement {
           onResetCamera={resetCamera}
           speed={snap.speed}
           onCycleSpeed={cycleSpeed}
+          canAutoFight={isCleared}
         />
       </div>
       <DialogueOverlay

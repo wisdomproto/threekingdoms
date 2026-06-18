@@ -38,17 +38,25 @@ export function BattleControls({
   onResetCamera,
   speed,
   onCycleSpeed,
+  canAutoFight = false,
 }: {
   auto: boolean;
   onToggleAuto: () => void;
   onResetCamera: () => void;
   speed: number;
   onCycleSpeed: () => void;
+  /** 자동전투 허용 여부 — 이 스테이지를 이미 클리어한 경우만 true(§15). */
+  canAutoFight?: boolean;
 }): React.ReactElement {
   const accent = (active: boolean): React.CSSProperties =>
     active
       ? { ...BTN_STYLE, borderColor: "#ffc24b", color: "#ffc24b", background: "rgba(50, 40, 14, 0.92)" }
       : BTN_STYLE;
+  const dimmed: React.CSSProperties = {
+    ...BTN_STYLE,
+    opacity: 0.4,
+    cursor: "not-allowed",
+  };
   return (
     <div style={STACK_STYLE}>
       <button type="button" style={BTN_STYLE} onClick={onResetCamera}>
@@ -57,7 +65,12 @@ export function BattleControls({
       <button type="button" style={accent(speed > 1)} onClick={onCycleSpeed}>
         ⏩ 배속 ×{speed}
       </button>
-      <button type="button" style={accent(auto)} onClick={onToggleAuto}>
+      <button
+        type="button"
+        style={canAutoFight ? accent(auto) : dimmed}
+        onClick={canAutoFight ? onToggleAuto : undefined}
+        title={canAutoFight ? undefined : "클리어한 스테이지에서만 사용 가능"}
+      >
         {auto ? "⏸ 자동전투" : "▶ 자동전투"}
       </button>
     </div>
