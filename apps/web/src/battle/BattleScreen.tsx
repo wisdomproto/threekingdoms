@@ -242,7 +242,14 @@ export default function BattleScreen(): React.ReactElement {
           onCycleSpeed={cycleSpeed}
         />
       </div>
-      <DialogueOverlay store={store} dialogue={ctx.stage.dialogue} />
+      <DialogueOverlay
+        store={store}
+        dialogue={ctx.stage.dialogue}
+        onLineChange={(speaker) => {
+          const unit = store.committedState.units.find((u) => u.id === speaker);
+          if (unit) delegate.target?.focusOn({ x: unit.x, y: unit.y }, 500);
+        }}
+      />
       <EndTurnConfirm ui={snap.ui} dispatch={dispatch} />
       <ResultSequence
         ui={snap.ui}

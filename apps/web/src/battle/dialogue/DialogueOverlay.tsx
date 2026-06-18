@@ -224,10 +224,13 @@ function DialogueBubble({
 export function DialogueOverlay({
   store,
   dialogue,
+  onLineChange,
 }: {
   store: BattleStore;
   /** stage.dialogue (없으면 오버레이 자체가 no-op) */
   dialogue?: readonly StageDialogue[];
+  /** 새 대사 줄 표시될 때 호출 — 카메라 pan 등 외부 연출용 */
+  onLineChange?: (speaker: string) => void;
 }): React.ReactElement | null {
   const [queue, dispatch] = useReducer(queueReducer, { lines: [], playedIds: new Set<string>() });
   // 디렉터 전이 추적 — 직전 디렉터 스냅샷(결정론 상태의 read-only 슬라이스)
@@ -254,6 +257,14 @@ export function DialogueOverlay({
   }, [settled, dialogue]);
 
   const advance = useCallback(() => dispatch({ type: "advance" }), []);
+
+  // 새 줄이 표시될 때마다 카메라 pan 콜백 호출
+  const currentSpeaker = queue.lines[0]?.line.speaker ?? null;
+  useEffect(() => {
+    if (currentSpeaker) onLineChange?.(currentSpeaker);
+    // onLineChange는 렌더 사이클마다 새 함수 참조가 올 수 있어 의존성에서 제외
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSpeaker]);
 
   if (!dialogue || queue.lines.length === 0) return null;
 

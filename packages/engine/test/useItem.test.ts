@@ -120,7 +120,7 @@ describe("회복 책략 (heal strategy)", () => {
     const s = damaged(createBattle(ctx, 1), "유봉", 50); // maxTroops 100, 현재 50 (회복 여지 충분)
     const gan0 = get(s, "간옹");
     const before = get(s, "유봉").troops; // 50
-    const power = gameData.strategies["소보급"]!.power; // 10
+    const power = gameData.strategies["소보급"]!.power; // 6
     const expectHeal = power + Math.round((spiritPower(gan0) * power) / 10);
 
     const r = applyAction(ctx, s, { type: "strategy", unitId: "간옹", strategyId: "소보급", target: { x: 3, y: 4 } });
