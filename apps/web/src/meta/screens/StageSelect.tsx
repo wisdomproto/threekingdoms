@@ -127,7 +127,10 @@ export function StageSelect(): React.ReactElement {
             기연
           </Link>
           <Link href="/codex" style={{ color: BRONZE_DIM, fontSize: 14, textDecoration: "none" }}>
-            보물 도감
+            도감
+          </Link>
+          <Link href="/save" style={{ color: BRONZE_DIM, fontSize: 14, textDecoration: "none" }}>
+            세이브
           </Link>
           <span style={{ fontSize: 14, color: BRONZE_GOLD }}>
             자금 {gold.toLocaleString()}<span style={{ color: BRONZE_DIM }}> 金</span>

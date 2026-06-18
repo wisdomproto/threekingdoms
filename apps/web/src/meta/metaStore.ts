@@ -475,6 +475,37 @@ export function getRoster(
   return selectRoster(loadFromStorage(), rosters, maxChapter);
 }
 
+/**
+ * 현재 세이브를 JSON 문자열로 직렬화(내보내기).
+ * 버전·타임스탬프를 wrapper에 포함해 미래 마이그레이션을 대비한다.
+ */
+export function exportSave(): string {
+  const state = loadFromStorage();
+  return JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), state }, null, 2);
+}
+
+/**
+ * JSON 문자열을 파싱해 세이브를 덮어쓴다(불러오기).
+ * - "ok": 정상 반영
+ * - "invalid": JSON 파싱 실패 또는 브라우저 환경이 아님
+ * - "error": 예상치 못한 오류
+ */
+export function importSave(json: string): "ok" | "invalid" | "error" {
+  if (!hasStorage()) return "invalid"; // 브라우저 전용
+  try {
+    const wrapper = JSON.parse(json) as Record<string, unknown>;
+    // {version, state, ...} wrapper와 MetaState 직접 넣기 둘 다 지원
+    const raw = wrapper.state !== undefined ? wrapper.state : wrapper;
+    // raw를 STORAGE_KEY에 쓴 뒤 loadFromStorage가 정규화·검증
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(raw));
+    const normalized = loadFromStorage();
+    saveToStorage(normalized); // 정규화된 상태로 재저장
+    return "ok";
+  } catch {
+    return "error";
+  }
+}
+
 /** 신규 게임 초기화 — v1 + legacy gold 키 모두 정리. adFree는 보존하지 않음(초기값 false). */
 export function reset(): void {
   memory = initialMeta();
