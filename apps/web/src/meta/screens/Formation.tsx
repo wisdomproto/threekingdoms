@@ -23,6 +23,8 @@ import { getMeta, setEquipped } from "../metaStore";
 import type { SortieMember } from "../sortie";
 import { PANEL_FRAME, PORTRAIT_FRAME, BUTTON_FRAME } from "../../battle/hud/frames";
 import { assetUrl } from "../../assetUrl";
+import { unitStats } from "../unitStats";
+import { sortRoster, type SortKey } from "../rosterSort";
 
 export interface FormationProps {
   /** 출진 후보(보유/합류 장수 + 메타 진행). metaStore.getRoster() 결과. */
@@ -33,6 +35,8 @@ export interface FormationProps {
   selected: SortieMember[];
   /** 편성 변경 시 부모로 올림(부모가 writeSortie에 사용). */
   onChange: (members: SortieMember[]) => void;
+  /** 현재 스테이지 챕터 — NEW 배지·정렬 기준. */
+  chapter: number;
 }
 
 /** 초상 보유 장수(UnitPanel과 동일 규약 — 생기는 대로 추가). 없으면 이름 이니셜 폴백. */
@@ -132,13 +136,15 @@ function toMember(u: RosterUnit, items: string[]): SortieMember {
   };
 }
 
-export function Formation({ roster, maxSlots, selected, onChange }: FormationProps): React.ReactElement {
+export function Formation({ roster, maxSlots, selected, onChange, chapter }: FormationProps): React.ReactElement {
   // 인벤토리 스냅샷(장착 후보). 장착/해제로 inventory 자체는 줄지 않지만(소유 유지),
   // 다른 슬롯과의 중복 장착을 막기 위해 "현재 편성에서 이미 쓴 아이템"을 제외해 보여준다.
   const [inventory, setInventory] = useState<string[]>([]);
   useEffect(() => {
     setInventory(getMeta().inventory);
   }, []);
+
+  const [sortKey, setSortKey] = useState<SortKey>("role");
 
   // commanderId → 선택 여부 빠른 조회.
   const selectedIds = useMemo(() => new Set(selected.map((m) => m.commanderId)), [selected]);
@@ -148,6 +154,11 @@ export function Formation({ roster, maxSlots, selected, onChange }: FormationPro
     for (const u of roster) m.set(u.commanderId, u);
     return m;
   }, [roster]);
+
+  const sortedRoster = useMemo(
+    () => sortRoster(roster, sortKey, chapter),
+    [roster, sortKey, chapter],
+  );
 
   // 편성 전체에서 이미 장착된 아이템(중복 장착 방지용 카운트).
   const equippedCount = useMemo(() => {
@@ -226,8 +237,31 @@ export function Formation({ roster, maxSlots, selected, onChange }: FormationPro
 
       {/* 후보 목록 */}
       <div style={{ marginTop: 12, borderTop: `1px solid ${RULE}`, paddingTop: 8 }}>
-        <div style={{ fontSize: 11, color: ACCENT, letterSpacing: 1, marginBottom: 6 }}>
-          후보 ({roster.length}명)
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+          <div style={{ fontSize: 11, color: ACCENT, letterSpacing: 1 }}>
+            후보 ({roster.length}명)
+          </div>
+          {/* 정렬 칩 */}
+          <div style={{ display: "flex", gap: 4 }}>
+            {(["role", "power", "level", "new"] as SortKey[]).map((k) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setSortKey(k)}
+                style={{
+                  fontSize: 10,
+                  padding: "2px 7px",
+                  borderRadius: 10,
+                  border: `1px solid ${sortKey === k ? ACCENT : RULE}`,
+                  background: sortKey === k ? "rgba(202,168,106,0.18)" : "transparent",
+                  color: sortKey === k ? ACCENT : MUTED,
+                  cursor: "pointer",
+                }}
+              >
+                {{ role: "역할", power: "전력", level: "레벨", new: "신규" }[k]}
+              </button>
+            ))}
+          </div>
         </div>
         <div
           style={{
@@ -236,9 +270,10 @@ export function Formation({ roster, maxSlots, selected, onChange }: FormationPro
             gap: 6,
           }}
         >
-          {roster.map((u) => {
+          {sortedRoster.map((u) => {
             const on = selectedIds.has(u.commanderId);
             const full = !on && selected.length >= maxSlots;
+            const power = unitStats(u.commanderId, u.classId, u.level, u.equipped).power;
             return (
               <button
                 key={u.commanderId}
@@ -262,14 +297,26 @@ export function Formation({ roster, maxSlots, selected, onChange }: FormationPro
               >
                 <Portrait commanderId={u.commanderId} size={40} />
                 <span style={{ minWidth: 0, flex: 1 }}>
-                  <span style={{ display: "flex", justifyContent: "space-between", gap: 6 }}>
-                    <strong style={{ fontSize: 14 }}>{commanderName(u.commanderId)}</strong>
+                  <span style={{ display: "flex", justifyContent: "space-between", gap: 6, flexWrap: "wrap" }}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                      <strong style={{ fontSize: 14 }}>{commanderName(u.commanderId)}</strong>
+                      {u.joinChapter === chapter && (
+                        <span style={{
+                          fontSize: 9, padding: "1px 4px", borderRadius: 8,
+                          background: "#c0392b", color: "#fff", fontWeight: 700, lineHeight: 1.4,
+                        }}>
+                          NEW
+                        </span>
+                      )}
+                    </span>
                     {on ? <span style={{ color: ACCENT, fontSize: 12 }}>출전</span> : null}
                   </span>
                   <span style={{ display: "block", fontSize: 11, color: MUTED }}>
                     {className(u.classId)} · {ROLE_LABEL[u.role]} · Lv.{u.level}
                   </span>
-                  <StatLine commanderId={u.commanderId} />
+                  <span style={{ display: "block", fontSize: 11, color: MUTED, marginTop: 1 }}>
+                    전력 <strong style={{ color: ACCENT }}>{power}</strong>
+                  </span>
                 </span>
               </button>
             );
@@ -277,6 +324,24 @@ export function Formation({ roster, maxSlots, selected, onChange }: FormationPro
         </div>
       </div>
     </section>
+  );
+}
+
+/** 아이템 1개 추가 시 전력 변화 — 인라인 장착 칩에 표시. */
+function PowerDelta({
+  commanderId, classId, level, currentItems, candidateItem,
+}: {
+  commanderId: string; classId: string; level: number;
+  currentItems: string[]; candidateItem: string;
+}): React.ReactElement {
+  const base = unitStats(commanderId, classId, level, currentItems).power;
+  const next = unitStats(commanderId, classId, level, [...currentItems, candidateItem]).power;
+  const delta = next - base;
+  if (delta === 0) return <></>;
+  return (
+    <span style={{ marginLeft: 4, fontSize: 10, color: delta > 0 ? "#7dcc88" : "#9aa3ad" }}>
+      {delta > 0 ? `+${delta}` : `${delta}`}
+    </span>
   );
 }
 
@@ -356,6 +421,12 @@ function SortieRow({
             {className(member.classId)} · {ROLE_LABEL[role]} · Lv.{member.level}
           </span>
         </div>
+        {/* 현재 전력(장착 반영) */}
+        <span style={{ display: "block", fontSize: 11, color: MUTED, marginTop: 1 }}>
+          전력 <strong style={{ color: ACCENT }}>
+            {unitStats(member.commanderId, member.classId, member.level, member.items).power}
+          </strong>
+        </span>
 
         {/* 장착 슬롯 — 칩, 탭하면 해제 */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
@@ -385,38 +456,41 @@ function SortieRow({
           )}
         </div>
 
-        {/* 장착 가능 인벤토리 — 탭하면 장착 */}
-        {available.length > 0 ? (
-          <details style={{ marginTop: 4 }}>
-            <summary style={{ fontSize: 11, color: PLAYER_BLUE, cursor: "pointer", listStyle: "none" }}>
-              + 장비 장착 ({available.length})
-            </summary>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
-              {available.map((itemId) => {
-                const it = items[itemId];
-                return (
-                  <button
-                    key={itemId}
-                    type="button"
-                    onClick={() => addItem(itemId)}
-                    style={{
-                      fontSize: 11,
-                      padding: "2px 7px",
-                      borderRadius: 10,
-                      border: `1px solid ${RULE}`,
-                      background: "rgba(255,255,255,0.03)",
-                      color: TEXT,
-                      cursor: "pointer",
-                    }}
-                  >
-                    {it?.name ?? itemId}
-                    {it ? <span style={{ color: DIM, marginLeft: 4 }}>{CATEGORY_LABEL[it.category]}</span> : null}
-                  </button>
-                );
-              })}
-            </div>
-          </details>
-        ) : null}
+        {/* 장착 가능 후보 — 항상 인라인 칩(details 없음) */}
+        {available.length > 0 && (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
+            {available.map((itemId) => {
+              const it = items[itemId];
+              return (
+                <button
+                  key={itemId}
+                  type="button"
+                  onClick={() => addItem(itemId)}
+                  style={{
+                    fontSize: 11,
+                    padding: "2px 7px",
+                    borderRadius: 10,
+                    border: `1px solid ${RULE}`,
+                    background: "rgba(255,255,255,0.03)",
+                    color: TEXT,
+                    cursor: "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                  }}
+                >
+                  {it?.name ?? itemId}
+                  <PowerDelta
+                    commanderId={member.commanderId}
+                    classId={member.classId}
+                    level={member.level}
+                    currentItems={member.items}
+                    candidateItem={itemId}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <button
