@@ -131,6 +131,41 @@ const MOUNT_CHARIOT = 'MOUNT — in EVERY pose the character is a lord riding a 
 const MOUNT_CART = 'MOUNT — in EVERY pose the character is seated calmly on his iconic four-wheeled scholar\'s cart (a small wheeled handcart-throne, no horse, optionally implied to be pushed), the unmistakable strategist silhouette; never standing on foot. The three poses become: (1) seated idle fanning himself, (2) the cart advancing, (3) seated raising the feather-fan to command — the power is in the mind, not in fighting.';
 const MOUNT_FOOT = 'MOUNT — the character is on foot in every pose (no horse, no vehicle), a standard infantry/scholar unit.';
 
+/* ── S-pose 포즈시트(idle/move/attack 한 장) 전용 탈것 구절 ──
+   위 MOUNT_* (일기토/구 SD 6포즈용)와 별개로 IDLE/MOVE/ATTACK 3포즈 포맷에 맞춤.
+   누가 무슨 탈것인지는 손으로 정하지 않고 '게임 병종 데이터'에서 도출 → MOUNT_BY_NAME.
+   규칙: 기병계=horse / 군주·전차병종=chariot / 제갈량=cart / 그 외=foot(구절 없음, 기존 유지).
+   MOUNT_BY_NAME 재생성: python tools/derive-mount-map.py  (rosters.json + stages + unitClasses.json) */
+const POSE_MOUNT = {
+  horse:   'MOUNT — a CAVALRY unit, mounted on a compact round chibi warhorse in EVERY cell (all 3 poses × all 3 rank rows), never on foot. The horse and its tack ESCALATE clearly by rank row: TOP row = a plain unarmored horse with a simple harness; MIDDLE row = partial steel barding, a saddle blanket and some gold trim; BOTTOM row = full ornate gilded barding, a head plume and tasseled caparison, gold-trimmed saddle. Per pose column: IDLE = mounted at rest, horse standing; MOVE = the horse at a cantering charge; ATTACK = a strike delivered from horseback. The horse faces SCREEN-LEFT exactly like the rider.',
+  chariot: 'MOUNT — a LORD/commander war-chariot unit in EVERY cell (all 3 poses × all 3 rank rows), never on foot, the figure standing in the cart holding the reins and weapon. The chariot ESCALATES DRAMATICALLY by rank row, growing grander and adding horses: TOP row = a plain SINGLE-horse two-wheeled cart, bare wood, no gold; MIDDLE row = a sturdier chariot drawn by TWO horses, steel fittings, side banners and gold trim; BOTTOM row = a magnificent chariot drawn by THREE horses abreast, lavishly gilded with dragon-carved fittings, tall command banners, jeweled spoked wheels and flowing silk. CRITICAL — the number of horses is FIXED PER ROW and IDENTICAL across that row\'s three pose cells: exactly 1 horse in EVERY top-row cell, exactly 2 in EVERY middle-row cell, exactly 3 in EVERY bottom-row cell; NEVER change the horse count between the idle / move / attack columns of the same row. Per pose column: IDLE = chariot halted; MOVE = rolling forward at speed with dust at the wheels; ATTACK = a commanding strike or gesture from the moving chariot. Chariot and horses face SCREEN-LEFT.',
+  cart:    'MOUNT — a STRATEGIST seated on his iconic wheeled scholar\'s cart in EVERY cell (all 3 poses × all 3 rank rows), never on foot, no horse. The cart ESCALATES by rank row: TOP row = a plain wooden handcart-seat; MIDDLE row = a lacquered cart with a canopy and modest trim; BOTTOM row = an ornate gilded throne-cart with carved dragons, a silk canopy and banners. Per pose column: IDLE = seated calmly fanning himself; MOVE = the cart advancing; ATTACK = raising the feather-fan to command (power of the mind, not melee). The cart faces SCREEN-LEFT.',
+};
+/* 병종 데이터 도출 결과 — foot 기본(여기 없는 이름은 전부 도보). 재생성: python tools/derive-mount-map.py */
+const MOUNT_BY_NAME = {"유비":"chariot", "관우":"horse", "장비":"horse", "감녕":"horse", "공손찬":"horse", "국의":"horse", "기령":"horse", "도겸":"chariot", "동탁":"chariot", "서영":"horse", "손권":"chariot", "여건":"horse", "여포":"horse", "장무":"horse", "조운":"horse", "장요":"horse", "장합":"horse", "제갈량":"cart", "조인":"horse", "조조":"chariot", "진손":"horse", "채모":"horse", "하후돈":"horse", "하후란":"horse", "하후상":"horse", "하후은":"horse", "한섬":"horse", "화웅":"horse", "황개":"horse", "후성":"horse", "[제네릭] 기병·아군":"horse", "[제네릭] 기병·적":"horse"};
+
+/* 캐릭터별 시그니처 무기·정체성 — 이름-only 프롬프트면 모델이 무기를 멋대로 그려서(유비→창 등) 명시 주입.
+   기존 B-5/F-5 sig 문자열 재사용 + ★/주요 네임드. 여기 없는 군소 장수는 일반 무기로(주입 안 함). */
+const SIG_BY_NAME = {
+  "유비": "his TWIN STRAIGHT SWORDS — one elegant straight jian sword held in EACH hand (a matched pair, NOT a spear, NOT a single blade) — dark-red and white robe, kind face with a long thin mustache and large earlobes",
+  "관우": "his Green Dragon Crescent Blade (a long guandao pole-glaive with a heavy curved blade), a very long flowing black beard, ruddy red face, deep green robe",
+  "장비": "his serpent spear (a long spear with a wavy snake-shaped blade), wire-like bristling black beard, fierce round eyes, dark skin, leopard-pattern accents",
+  "여포": "his sky-piercer halberd (a ji — crescent axe-blade plus spear point), a golden pheasant-tail plumed headdress, crimson-and-gold armor",
+  "화웅": "his heavy dao saber, a scarred brutal face, dark iron armor with bronze accents",
+  "장료": "his long-handled war glaive with a clean blade, a short well-kept beard, practical steel-blue armor",
+  "조운": "his bright leaf-bladed straight spear, gleaming silver-white armor and a white cloak, a handsome clean-shaven face",
+  "제갈량": "his white crane-feather fan (he is a scholar-strategist, NOT a melee fighter), a flowing white robe and a dark Taoist headband",
+  "동탁": "a bloated cruel frame, opulent black-and-gold armor and brocade silks (a tyrant)",
+  "조조": "a pair of fine swords or a single ornate jian, sharp piercing eyes, a neat trimmed beard, dark crimson-and-black lacquered armor",
+  "간옹": "a scholar headcloth and loose robe with a wine cup or fan (a witty advisor, lightly armed)",
+  "미축": "rich silk robes and a benevolent merchant-official look (lightly armed)",
+  "미방": "foot-soldier armor with an infantry sword and spear",
+  "서서": "a plain dark scholar robe and a sheathed straight sword",
+  "관평": "muted-green field armor, a saber and a small shield, a youthful face resembling a young Guan Yu",
+  "유봉": "dark-red scaled armor and a broad saber",
+  "주창": "the great guandao glaive he carries for his lord, rough armor, dark skin and a wild beard",
+};
+
 /* facing 고정(canonical facing) — SD 쿼터뷰 유닛 스프라이트 전용. 렌더러가 한 기준 방향(screen-left)으로 그린 스프라이트를 좌우 미러링하므로, 모든 포즈(idle/move/attack)가 반드시 동일한 왼쪽 방향이어야 한다. 레퍼런스 시트(3뷰)·일기토 키프레임·맵·이펙트에는 주입 금지. */
 const FACING_LOCK = 'CRITICAL — facing consistency: the character (and any mount/vehicle) faces SCREEN-LEFT in every single pose; the attacking strike — the weapon and the body — is aimed toward the LEFT edge of the cell; NEVER mirror, flip, or rotate the character horizontally between poses or between the idle/move/attack columns; all six cells share the IDENTICAL left-facing orientation (top row = front-left three-quarter, bottom row = back-left three-quarter, i.e. the same body simply seen from behind, still turned toward screen-left). Any cell facing right, or any mix of left- and right-facing cells, is WRONG output and must not be produced.';
 
@@ -947,7 +982,7 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
       { id: 'S-pose', title: '캐릭터 선택 → 포즈 시트', poseSheet: true, roster: ROSTER,
         vars: { '캐릭터': ROSTER.map((r) => [r.n, r.n]) },
         note: '드롭다운에서 캐릭터 선택 → 프롬프트 복사 → 생성 → 붙여넣기 → 📤 시트 넘기기. 무명 장수는 안 만들어도 병종 제네릭으로 표시됨.',
-        prompt: 'A single horizontal POSE SHEET of {캐릭터} (a Three Kingdoms warrior/officer), the SAME character repeated in 3 distinct full-body poses evenly spaced LEFT TO RIGHT with clear empty transparent gaps: (1) IDLE relaxed battle stance, (2) MOVE mid-stride advancing, (3) ATTACK dynamic weapon swing with a sweeping motion arc. Every pose in 3/4 SIDE view FACING SCREEN-LEFT (profile turned left, NOT facing camera). Each a complete finished chibi (SD, ~2.5 heads) illustration, fully transparent background, no overlap between poses.' },
+        prompt: 'A single SD pose sheet of {캐릭터}, ONE image containing a 3-row by 3-column grid on a fully transparent background, cells evenly spaced with clear transparent gaps and NO overlap. The SAME character in all 9 cells — identical face, weapon and identity in every cell. ROWS = three cosmetic rank tiers of the SAME unit (same face, body, signature weapon and mount TYPE), escalating DRAMATICALLY in richness top→bottom so the three rows look obviously different at a glance — armor ornamentation AND mount grandeur both rise: TOP row = humble low rank, plain cloth and worn leather, muted earthy browns/greens, NO gold, minimal decoration; MIDDLE row = veteran rank, proper lamellar steel armor with a colored sash or cape, clear gold trim and noticeably richer saturated color; BOTTOM row = elite royal rank, heavily ornate gilded armor with extensive gold filigree and dragon/phoenix motifs, a plumed helm, a flowing patterned cape and jewel accents in vivid saturated colors. COLUMNS = three poses, every cell in 3/4 SIDE view FACING SCREEN-LEFT (profile turned left, NOT facing camera): column 1 = IDLE relaxed battle stance, column 2 = MOVE mid-stride advancing, column 3 = ATTACK dynamic weapon swing with a sweeping motion arc. Each cell a complete finished chibi (SD, ~2.5 heads).' },
     ],
   });
 })();
@@ -1424,8 +1459,14 @@ function buildPrompt(item) {
   }
   const parts = [];
   if (item.poseSheet) {
-    /* 포즈 시트: SD 유닛 스타일(탈것·전장). COMMON(정면 등) 래퍼 회피. */
+    /* 포즈 시트: SD 유닛 스타일 + 병종별 탈것(MOUNT_BY_NAME→POSE_MOUNT) 주입. COMMON(정면 등) 래퍼 회피. */
     parts.push(body);
+    const _ci = (varState[item.id] || {})['캐릭터'] || 0;
+    const _cn = (item.vars && item.vars['캐릭터']) ? item.vars['캐릭터'][_ci][0] : null;
+    const _mt = _cn && MOUNT_BY_NAME[_cn];
+    if (_mt) parts.push(POSE_MOUNT[_mt]);
+    const _sig = _cn && SIG_BY_NAME[_cn];
+    if (_sig) parts.push('IDENTITY — this specific character MUST be recognizable by ' + _sig + '. Keep that EXACT signature weapon and look in all 9 cells; do NOT invent or substitute a different weapon.');
     parts.push('Art style: detailed painterly chibi (SD, ~2.5 heads) battle-map unit for a top-down tactical RPG, East Asian ink-wash + soft cel shading, crisp readable silhouette, muted earth tones with gold/jade accents, clean even lighting, NO baked ground shadow.');
     parts.push('Avoid: text, labels, watermark, UI, frame, ground shadow, busy background, photorealistic, anime-cel, Koei-style. Keep the SAME character identity/colors across all 3 poses.');
   } else if (item.portraitSheet) {
