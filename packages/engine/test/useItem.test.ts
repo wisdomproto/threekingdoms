@@ -120,12 +120,12 @@ describe("회복 책략 (heal strategy)", () => {
     const s = damaged(createBattle(ctx, 1), "유봉", 50); // maxTroops 100, 현재 50 (회복 여지 충분)
     const gan0 = get(s, "간옹");
     const before = get(s, "유봉").troops; // 50
-    const power = gameData.strategies["회복"]!.power; // 10
+    const power = gameData.strategies["소보급"]!.power; // 10
     const expectHeal = power + Math.round((spiritPower(gan0) * power) / 10);
 
-    const r = applyAction(ctx, s, { type: "strategy", unitId: "간옹", strategyId: "회복", target: { x: 3, y: 4 } });
+    const r = applyAction(ctx, s, { type: "strategy", unitId: "간옹", strategyId: "소보급", target: { x: 3, y: 4 } });
     expect(get(r.state, "유봉").troops).toBe(before + expectHeal);
-    expect(get(r.state, "간옹").mp).toBe(gan0.mp - gameData.strategies["회복"]!.mp);
+    expect(get(r.state, "간옹").mp).toBe(gan0.mp - gameData.strategies["소보급"]!.mp);
     expect(get(r.state, "간옹").acted).toBe(true);
     // 회복은 damageDealt 이벤트를 만들지 않는다
     expect(r.events.some((e) => e.type === "damageDealt")).toBe(false);
@@ -135,13 +135,13 @@ describe("회복 책략 (heal strategy)", () => {
   it("회복은 maxTroops를 넘지 않는다", () => {
     const s = createBattle(ctx, 1);
     // 간옹 자신(troops 80 = maxTroops 80) 회복 — 상한이라 변화 없음, but 책략은 castRange 내 self 가능
-    const r = applyAction(ctx, s, { type: "strategy", unitId: "간옹", strategyId: "회복", target: { x: 2, y: 4 } });
+    const r = applyAction(ctx, s, { type: "strategy", unitId: "간옹", strategyId: "소보급", target: { x: 2, y: 4 } });
     expect(get(r.state, "간옹").troops).toBe(80);
   });
 
   it("정신력이 높을수록 회복량이 크다 (결정론 공식)", () => {
     const s = createBattle(ctx, 1);
-    const power = gameData.strategies["회복"]!.power;
+    const power = gameData.strategies["소보급"]!.power;
     const lowSpirit = { ...get(s, "간옹"), intelligence: 1 };
     const a = power + Math.round((spiritPower(get(s, "간옹")) * power) / 10);
     const b = power + Math.round((spiritPower(lowSpirit) * power) / 10);
@@ -158,8 +158,8 @@ describe("회복 책략 (heal strategy)", () => {
 
   it("결정론: 회복 책략 반복 일치", () => {
     const s = createBattle(ctx, 1);
-    const a = applyAction(ctx, s, { type: "strategy", unitId: "간옹", strategyId: "회복", target: { x: 3, y: 4 } });
-    const b = applyAction(ctx, s, { type: "strategy", unitId: "간옹", strategyId: "회복", target: { x: 3, y: 4 } });
+    const a = applyAction(ctx, s, { type: "strategy", unitId: "간옹", strategyId: "소보급", target: { x: 3, y: 4 } });
+    const b = applyAction(ctx, s, { type: "strategy", unitId: "간옹", strategyId: "소보급", target: { x: 3, y: 4 } });
     expect(a.state.units).toEqual(b.state.units);
     expect(a.events).toEqual(b.events);
   });

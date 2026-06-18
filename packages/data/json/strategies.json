@@ -1,8 +1,94 @@
 {
-  "초열": { "id": "초열", "name": "초열", "category": "fire", "mp": 13, "power": 6, "castRange": 3, "aoe": "cross", "target": "enemy" },
-  "업화": { "id": "업화", "name": "업화", "category": "fire", "mp": 12, "power": 10, "castRange": 3, "aoe": "cross", "target": "enemy" },
-  "화염": { "id": "화염", "name": "화염", "category": "fire", "mp": 13, "power": 12, "castRange": 3, "aoe": "cross", "target": "enemy" },
-  "화룡": { "id": "화룡", "name": "화룡", "category": "fire", "mp": 12, "power": 20, "castRange": 3, "aoe": "cross", "target": "enemy" },
-  "회복": { "id": "회복", "name": "회복", "category": "heal", "mp": 8, "power": 10, "castRange": 2, "aoe": "single", "target": "ally" },
-  "치유": { "id": "치유", "name": "치유", "category": "heal", "mp": 16, "power": 20, "castRange": 2, "aoe": "cross", "target": "ally" }
+  "초열":      { "id": "초열",      "name": "초열",      "category": "fire",    "mp": 13, "power": 6,  "castRange": 3, "aoe": "cross",  "target": "enemy" },
+  "업화":      { "id": "업화",      "name": "업화",      "category": "fire",    "mp": 12, "power": 10, "castRange": 3, "aoe": "cross",  "target": "enemy" },
+  "화진":      { "id": "화진",      "name": "화진",      "category": "fire",    "mp": 13, "power": 12, "castRange": 3, "aoe": "cross",  "target": "enemy" },
+  "화룡":      { "id": "화룡",      "name": "화룡",      "category": "fire",    "mp": 12, "power": 20, "castRange": 3, "aoe": "single", "target": "enemy" },
+  "폭염":      { "id": "폭염",      "name": "폭염",      "category": "fire",    "mp":  5, "power": 24, "castRange": 3, "aoe": "single", "target": "enemy" },
+
+  "탁류":      { "id": "탁류",      "name": "탁류",      "category": "water",   "mp": 13, "power": 6,  "castRange": 3, "aoe": "cross",  "target": "enemy" },
+  "격류":      { "id": "격류",      "name": "격류",      "category": "water",   "mp": 12, "power": 10, "castRange": 3, "aoe": "cross",  "target": "enemy" },
+  "수진":      { "id": "수진",      "name": "수진",      "category": "water",   "mp": 13, "power": 12, "castRange": 3, "aoe": "cross",  "target": "enemy" },
+  "수룡":      { "id": "수룡",      "name": "수룡",      "category": "water",   "mp": 12, "power": 20, "castRange": 3, "aoe": "single", "target": "enemy" },
+  "해일":      { "id": "해일",      "name": "해일",      "category": "water",   "mp":  6, "power": 20, "castRange": 3, "aoe": "cross",  "target": "enemy" },
+
+  "선풍":      { "id": "선풍",      "name": "선풍",      "category": "wind",    "mp": 13, "power": 6,  "castRange": 3, "aoe": "cross",  "target": "enemy" },
+  "회오리바람": { "id": "회오리바람", "name": "회오리바람", "category": "wind",    "mp": 13, "power": 10, "castRange": 3, "aoe": "cross",  "target": "enemy" },
+  "풍진":      { "id": "풍진",      "name": "풍진",      "category": "wind",    "mp": 13, "power": 12, "castRange": 3, "aoe": "cross",  "target": "enemy" },
+  "풍룡":      { "id": "풍룡",      "name": "풍룡",      "category": "wind",    "mp": 13, "power": 20, "castRange": 3, "aoe": "single", "target": "enemy" },
+  "모래폭풍":  { "id": "모래폭풍",  "name": "모래폭풍",  "category": "wind",    "mp": 11, "power": 24, "castRange": 3, "aoe": "cross",  "target": "enemy" },
+
+  "낙석":      { "id": "낙석",      "name": "낙석",      "category": "earth",   "mp": 13, "power": 6,  "castRange": 3, "aoe": "cross",  "target": "enemy" },
+  "산사태":    { "id": "산사태",    "name": "산사태",    "category": "earth",   "mp": 12, "power": 10, "castRange": 3, "aoe": "cross",  "target": "enemy" },
+  "지진":      { "id": "지진",      "name": "지진",      "category": "earth",   "mp": 13, "power": 12, "castRange": 3, "aoe": "cross",  "target": "enemy" },
+  "지룡":      { "id": "지룡",      "name": "지룡",      "category": "earth",   "mp": 12, "power": 20, "castRange": 3, "aoe": "single", "target": "enemy" },
+  "거암":      { "id": "거암",      "name": "거암",      "category": "earth",   "mp":  6, "power": 18, "castRange": 3, "aoe": "cross",  "target": "enemy" },
+
+  "유혹":      { "id": "유혹",      "name": "유혹",      "category": "debuff",  "mp": 12, "power": 8,  "castRange": 3, "aoe": "single", "target": "enemy" },
+  "현혹":      { "id": "현혹",      "name": "현혹",      "category": "debuff",  "mp": 12, "power": 16, "castRange": 3, "aoe": "single", "target": "enemy" },
+  "첩보":      { "id": "첩보",      "name": "첩보",      "category": "debuff",  "mp": 12, "power": 4,  "castRange": 3, "aoe": "single", "target": "enemy" },
+  "둔병":      { "id": "둔병",      "name": "둔병",      "category": "debuff",  "mp": 13, "power": 6,  "castRange": 3, "aoe": "cross",  "target": "enemy" },
+  "둔대":      { "id": "둔대",      "name": "둔대",      "category": "debuff",  "mp": 12, "power": 16, "castRange": 3, "aoe": "cross",  "target": "enemy" },
+
+  "허탈":      { "id": "허탈",      "name": "허탈",      "category": "debuff",  "mp": 13, "power": 6,  "castRange": 3, "aoe": "single", "target": "enemy",
+                 "statusEffect": { "kind": "seal", "chance": 60, "turns": 2 } },
+  "염전":      { "id": "염전",      "name": "염전",      "category": "debuff",  "mp": 12, "power": 16, "castRange": 3, "aoe": "cross",  "target": "enemy",
+                 "statusEffect": { "kind": "seal", "chance": 80, "turns": 2 } },
+
+  "압박":      { "id": "압박",      "name": "압박",      "category": "debuff",  "mp": 13, "power": 6,  "castRange": 3, "aoe": "single", "target": "enemy" },
+  "위압":      { "id": "위압",      "name": "위압",      "category": "debuff",  "mp": 12, "power": 16, "castRange": 3, "aoe": "cross",  "target": "enemy" },
+  "욕설":      { "id": "욕설",      "name": "욕설",      "category": "debuff",  "mp": 13, "power": 6,  "castRange": 3, "aoe": "single", "target": "enemy" },
+  "도발":      { "id": "도발",      "name": "도발",      "category": "debuff",  "mp": 12, "power": 16, "castRange": 3, "aoe": "single", "target": "enemy" },
+  "허보":      { "id": "허보",      "name": "허보",      "category": "debuff",  "mp": 13, "power": 8,  "castRange": 3, "aoe": "single", "target": "enemy" },
+  "유언":      { "id": "유언",      "name": "유언",      "category": "debuff",  "mp": 12, "power": 18, "castRange": 3, "aoe": "single", "target": "enemy" },
+
+  "독연":      { "id": "독연",      "name": "독연",      "category": "debuff",  "mp": 13, "power": 8,  "castRange": 2, "aoe": "single", "target": "enemy",
+                 "statusEffect": { "kind": "poison", "chance": 70, "turns": 3 } },
+  "독무":      { "id": "독무",      "name": "독무",      "category": "debuff",  "mp": 12, "power": 18, "castRange": 2, "aoe": "cross",  "target": "enemy",
+                 "statusEffect": { "kind": "poison", "chance": 90, "turns": 4 } },
+
+  "포박":      { "id": "포박",      "name": "포박",      "category": "debuff",  "mp": 13, "power": 8,  "castRange": 2, "aoe": "single", "target": "enemy",
+                 "statusEffect": { "kind": "immobilize", "chance": 70, "turns": 2 } },
+  "주박":      { "id": "주박",      "name": "주박",      "category": "debuff",  "mp": 12, "power": 18, "castRange": 2, "aoe": "cross",  "target": "enemy",
+                 "statusEffect": { "kind": "immobilize", "chance": 90, "turns": 3 } },
+
+  "봉책":      { "id": "봉책",      "name": "봉책",      "category": "debuff",  "mp": 13, "power": 8,  "castRange": 3, "aoe": "single", "target": "enemy",
+                 "statusEffect": { "kind": "seal", "chance": 80, "turns": 3 } },
+  "팔진도":    { "id": "팔진도",    "name": "팔진도",    "category": "earth",   "mp": 12, "power": 20, "castRange": 3, "aoe": "cross",  "target": "enemy" },
+
+  "소보급":    { "id": "소보급",    "name": "소보급",    "category": "heal",    "mp": 13, "power": 6,  "castRange": 3, "aoe": "cross",  "target": "ally" },
+  "대보급":    { "id": "대보급",    "name": "대보급",    "category": "heal",    "mp": 12, "power": 10, "castRange": 3, "aoe": "cross",  "target": "ally" },
+  "구원대":    { "id": "구원대",    "name": "구원대",    "category": "heal",    "mp": 13, "power": 12, "castRange": 3, "aoe": "cross",  "target": "ally" },
+  "구원군":    { "id": "구원군",    "name": "구원군",    "category": "heal",    "mp": 12, "power": 20, "castRange": 3, "aoe": "single", "target": "ally" },
+  "수송":      { "id": "수송",      "name": "수송",      "category": "heal",    "mp": 10, "power": 18, "castRange": 3, "aoe": "cross",  "target": "ally" },
+
+  "조언":      { "id": "조언",      "name": "조언",      "category": "heal",    "mp": 12, "power": 24, "castRange": 3, "aoe": "single", "target": "ally" },
+  "헌책":      { "id": "헌책",      "name": "헌책",      "category": "heal",    "mp":  6, "power": 48, "castRange": 3, "aoe": "single", "target": "ally" },
+
+  "각성":      { "id": "각성",      "name": "각성",      "category": "heal",    "mp": 13, "power": 8,  "castRange": 2, "aoe": "single", "target": "ally" },
+  "대각성":    { "id": "대각성",    "name": "대각성",    "category": "heal",    "mp": 12, "power": 18, "castRange": 2, "aoe": "cross",  "target": "ally" },
+  "강행":      { "id": "강행",      "name": "강행",      "category": "heal",    "mp": 12, "power": 8,  "castRange": 2, "aoe": "single", "target": "ally" },
+
+  "연병":      { "id": "연병",      "name": "연병",      "category": "heal",    "mp": 13, "power": 6,  "castRange": 2, "aoe": "single", "target": "ally" },
+  "연대":      { "id": "연대",      "name": "연대",      "category": "heal",    "mp": 12, "power": 16, "castRange": 2, "aoe": "cross",  "target": "ally" },
+  "고양":      { "id": "고양",      "name": "고양",      "category": "heal",    "mp": 13, "power": 6,  "castRange": 2, "aoe": "single", "target": "ally" },
+  "환성":      { "id": "환성",      "name": "환성",      "category": "heal",    "mp": 12, "power": 16, "castRange": 2, "aoe": "cross",  "target": "ally" },
+  "분기":      { "id": "분기",      "name": "분기",      "category": "heal",    "mp": 13, "power": 6,  "castRange": 2, "aoe": "single", "target": "ally" },
+  "고무":      { "id": "고무",      "name": "고무",      "category": "heal",    "mp": 12, "power": 16, "castRange": 2, "aoe": "cross",  "target": "ally" },
+  "견고":      { "id": "견고",      "name": "견고",      "category": "heal",    "mp": 13, "power": 6,  "castRange": 2, "aoe": "single", "target": "ally" },
+  "강진":      { "id": "강진",      "name": "강진",      "category": "heal",    "mp": 12, "power": 16, "castRange": 2, "aoe": "cross",  "target": "ally" },
+
+  "회귀":      { "id": "회귀",      "name": "회귀",      "category": "heal",    "mp":  1, "power": 24, "castRange": 1, "aoe": "single", "target": "ally" },
+
+  "호우":      { "id": "호우",      "name": "호우",      "category": "water",   "mp": 11, "power": 16, "castRange": 4, "aoe": "cross",  "target": "enemy" },
+  "맑음":      { "id": "맑음",      "name": "맑음",      "category": "wind",    "mp": 11, "power": 16, "castRange": 4, "aoe": "cross",  "target": "enemy" },
+  "흐림":      { "id": "흐림",      "name": "흐림",      "category": "earth",   "mp": 11, "power": 10, "castRange": 4, "aoe": "cross",  "target": "enemy" },
+
+  "기합":      { "id": "기합",      "name": "기합",      "category": "heal",    "mp": 11, "power": 3,  "castRange": 2, "aoe": "cross",  "target": "ally" },
+  "명상":      { "id": "명상",      "name": "명상",      "category": "heal",    "mp": 11, "power": 5,  "castRange": 1, "aoe": "single", "target": "ally" },
+  "패기":      { "id": "패기",      "name": "패기",      "category": "heal",    "mp": 11, "power": 8,  "castRange": 1, "aoe": "single", "target": "ally" },
+
+  "청룡":      { "id": "청룡",      "name": "청룡",      "category": "special", "mp": 12, "power": 40, "castRange": 4, "aoe": "single", "target": "enemy" },
+  "주작":      { "id": "주작",      "name": "주작",      "category": "special", "mp": 13, "power": 40, "castRange": 4, "aoe": "single", "target": "enemy" },
+  "현무":      { "id": "현무",      "name": "현무",      "category": "special", "mp": 11, "power": 40, "castRange": 4, "aoe": "single", "target": "enemy" },
+  "백호":      { "id": "백호",      "name": "백호",      "category": "special", "mp": 11, "power": 40, "castRange": 4, "aoe": "single", "target": "enemy" }
 }

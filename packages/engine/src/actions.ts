@@ -592,6 +592,18 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
           next = hit.state;
           events.push(...hit.events);
         }
+        // 상태이상(debuff 책략) — 데미지/회복 후 chance 시드 롤 → 발동 시 대상에 부여.
+        // heal 계열에는 statusEffect 없음(데이터 보증). rngState를 소비하므로 시드 시퀀스 일관.
+        if (strat.statusEffect) {
+          const { kind, chance, turns } = strat.statusEffect;
+          const [v, ns] = nextRandom(next.rngState);
+          next = { ...next, rngState: ns };
+          const tAfter = getUnit(next, t.id);
+          if (!tAfter.retreated && v * 100 < chance) {
+            next = replaceUnit(next, { ...tAfter, statuses: applyStatus(tAfter.statuses, kind, turns) });
+            events.push({ type: "statusApplied", unitId: t.id, kind, turns });
+          }
+        }
       }
       next = replaceUnit(next, { ...getUnit(next, unit.id), acted: true });
       break;

@@ -73,19 +73,45 @@ export const UnitClassSchema = z.object({
 }).refine((c) => c.rangeMin <= c.rangeMax, { message: "rangeMin must be <= rangeMax" });
 export type UnitClass = z.infer<typeof UnitClassSchema>;
 
+/** 상태이상 종류 (Phase D: 부동·금책·중독. 확장: confuse/debuff 후속). */
+export const StatusKindSchema = z.enum(["poison", "seal", "immobilize"]);
+export type StatusKind = z.infer<typeof StatusKindSchema>;
+
+/** 활성 상태이상 1건 (런타임 부여분). turns = 남은 지속 턴. */
+export const StatusEffectSchema = z.object({
+  kind: StatusKindSchema,
+  turns: z.number().int().min(1),
+});
+export type StatusEffect = z.infer<typeof StatusEffectSchema>;
+
 /**
- * 책략 (§8 스킬 1층, 액티브·MP). 효과 정의는 조조전 원작(strategies.json 73종) 기반.
- * "어느 병종이 무슨 책략"의 할당은 원작 데이터 미추출 → §8대로 우리가 설계(UnitClass.strategies).
+ * 책략 (§8 스킬 1층, 액티브·MP). 효과 정의는 조조전 원작(strategies.json 68종) 기반.
+ * "어느 병종이 무슨 책략"의 할당은 원작 문법에 따라 unitClasses.strategies로 설계(§8).
+ *
+ * category:
+ *  fire/water/wind/earth — 4원소 공격 (대상 정신력 기반 데미지)
+ *  heal                  — 아군 회복/보급/버프 (정신력 기반 치유)
+ *  debuff                — 상태이상·사기 약화 (미약 데미지 + statusEffect)
+ *  special               — 사신·극초강 단타 (fire와 동일 공식, 위력 40)
  */
 export const StrategySchema = z.object({
   id: z.string(),
   name: z.string(),
-  category: z.enum(["fire", "water", "earth", "wind", "heal", "debuff"]),
+  category: z.enum(["fire", "water", "earth", "wind", "heal", "debuff", "special"]),
   mp: z.number().int().min(0),
-  power: z.number().int().min(0),       // 위력 — 데미지 배수(×power/10)
-  castRange: z.number().int().min(1),   // 시전 거리 (시전자→대상 칸)
-  aoe: z.enum(["single", "cross"]),     // 대상 칸만 / 십자(대상+상하좌우)
+  power: z.number().int().min(0),        // 위력 — 데미지·치유량 배수(×power/10)
+  castRange: z.number().int().min(1),    // 시전 거리 (시전자→대상 칸, 맨해튼)
+  aoe: z.enum(["single", "cross"]),      // 대상 칸만 / 십자(대상+상하좌우 4칸)
   target: z.enum(["enemy", "ally"]),
+  /**
+   * 책략 발동 시 상태이상 부여 — 데미지·치유와 독립 적용(둘 다 실행 후 chance% 롤).
+   * debuff 계열(독·포박·봉책·허탈)에 설정. heal/fire 등은 미설정(생략=무효).
+   */
+  statusEffect: z.object({
+    kind: StatusKindSchema,
+    chance: z.number().int().min(0).max(100),
+    turns: z.number().int().min(1),
+  }).optional(),
 });
 export type Strategy = z.infer<typeof StrategySchema>;
 
@@ -99,17 +125,6 @@ export const TerrainSchema = z.object({
   healMp: z.boolean().optional(),                       // 촌락 true
 });
 export type Terrain = z.infer<typeof TerrainSchema>;
-
-/** 상태이상 종류 (Phase D: 부동·금책·중독. 확장: confuse/debuff 후속). */
-export const StatusKindSchema = z.enum(["poison", "seal", "immobilize"]);
-export type StatusKind = z.infer<typeof StatusKindSchema>;
-
-/** 활성 상태이상 1건 (런타임 부여분). turns = 남은 지속 턴. */
-export const StatusEffectSchema = z.object({
-  kind: StatusKindSchema,
-  turns: z.number().int().min(1),
-});
-export type StatusEffect = z.infer<typeof StatusEffectSchema>;
 
 /**
  * 아이템 장착 효과(§7 아이템 효과 시스템 / §10 보물 "고유 효과 고정") — 전부 결정론.

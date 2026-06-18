@@ -113,22 +113,24 @@ describe("회복 책략 UI 전체 경로 (아군 타깃)", () => {
     store.dispatchUi({ type: "tapTile", coord: { x: 3, y: 4 } });   // 제자리 → postMoveMenu
     const pm = store.uiState;
     if (pm.kind !== "postMoveMenu") throw new Error("unreachable");
-    expect(pm.strategies).toContain("회복");                        // 아군 사거리 내 → 회복 시전 가능
+    expect(pm.strategies).toContain("소보급");                        // 아군 사거리 내 → 회복 시전 가능
 
     store.dispatchUi({ type: "menuStrategy" });
-    store.dispatchUi({ type: "selectStrategy", strategyId: "회복" });
+    store.dispatchUi({ type: "selectStrategy", strategyId: "소보급" });
     const st = store.uiState;
     if (st.kind !== "strategyTarget") throw new Error("unreachable");
-    // 회복(target:ally) 후보엔 아군(유비 3,5)이 포함, 적 화웅(4,5)은 제외 — ally 분기 증명
+    // 소보급(aoe=cross, target:ally): 아군(유비 3,5)이 범위 내 → 포함.
+    // cross AoE라 (4,5)을 center로 해도 인접 유비(3,5)가 맞으므로 castTile로 유효(enemy-only 제외는 single AoE에서 보장).
     expect(st.castTiles.some((c) => c.x === 3 && c.y === 5)).toBe(true);
-    expect(st.castTiles.some((c) => c.x === 4 && c.y === 5)).toBe(false);
+    // 아군이 전혀 닿지 않는 원거리 빈칸(10,10)은 제외 — ally 분기 보장
+    expect(st.castTiles.some((c) => c.x === 10 && c.y === 10)).toBe(false);
     store.dispatchUi({ type: "tapTile", coord: { x: 3, y: 5 } });   // 유비 조준 → 시전
 
     await store.whenIdle();
 
     const gan1 = store.committedState.units.find((u) => u.id === "간옹")!;
     const liu1 = store.committedState.units.find((u) => u.id === "유비")!;
-    expect(gan1.mp).toBe(gan0.mp - gameData.strategies["회복"]!.mp);  // MP 소비
+    expect(gan1.mp).toBe(gan0.mp - gameData.strategies["소보급"]!.mp);  // MP 소비
     expect(liu1.troops).toBe(liu0.troops);                           // 만피 클램프 — 피해 아님
     expect(store.actionLog.some((a) => a.type === "strategy")).toBe(true);
   });
