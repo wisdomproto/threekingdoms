@@ -72,6 +72,6 @@ export function createBattle(ctx: BattleContext, seed: number): BattleState {
   return {
     // rngState = 전투 시드(시드 고정 확률 — 같은 시드+행동열이면 동일 재현, 리플레이/세이브스컴 방지).
     turn: 1, phase: "player", status: "ongoing", units, rngState: seed, firedEvents: [],
-    duelHistory: [], metStrategyConditions: [], spawnedReinforcements: [], pendingRewards: [], combo: 0,
+    duelHistory: [], metStrategyConditions: [], spawnedReinforcements: [], pendingRewards: [], combo: 0, levelUps: [],
   };
 }

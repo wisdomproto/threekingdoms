@@ -164,12 +164,14 @@ function grantExp(
 
   let level = attacker.level;
   let exp = attacker.exp + gain;
+  const newLevelUps = [...(state.levelUps ?? [])];
   while (exp >= expForNextLevel(level) && level < cap) {
     exp -= expForNextLevel(level);
     level += 1;
     events.push({ type: "levelUp", unitId: attackerId, newLevel: level });
+    newLevelUps.push({ unitId: attackerId, newLevel: level });
   }
-  return { state: replaceUnit(state, { ...attacker, level, exp }), events };
+  return { state: replaceUnit({ ...state, levelUps: newLevelUps }, { ...attacker, level, exp }), events };
 }
 
 /** id로 유닛을 찾되 없으면 undefined (미투입 증원 대상 등 — 던지지 않음) */

@@ -86,6 +86,8 @@ export interface BattleState {
   pendingRewards: PendingReward[];
   /** 콤보(§7/§12) — 현재 아군 페이즈의 연속 격파 수. 아군 페이즈 시작 시 0으로 리셋. 미설정=0 */
   combo?: number;
+  /** 이번 전투에서 레벨업한 유닛 기록 — 결산 연출(레벨업 팝) 전달용. 결정론적 누적. */
+  levelUps: { unitId: string; newLevel: number }[];
 }
 
 export type Action =

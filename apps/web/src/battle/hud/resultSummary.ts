@@ -18,6 +18,12 @@ export interface RewardCard {
   name: string;
 }
 
+export interface LevelUpEntry {
+  unitId: string;
+  name: string;
+  newLevel: number;
+}
+
 export interface ResultSummary {
   grade: "S" | "A" | "B" | "C";
   score: number;
@@ -26,6 +32,8 @@ export interface ResultSummary {
   gold: number;
   exp: number;
   treasures: RewardCard[];
+  /** 이번 전투에서 레벨업한 아군 목록 — 결산 레벨업 팝용. 중복 unitId는 마지막 newLevel만. */
+  levelUps: LevelUpEntry[];
   turnsUsed: number;
   turnLimit: number;
   playerRetreats: number;
@@ -104,6 +112,18 @@ export function buildResultSummary(
   });
 
   const gold = (reward?.gold ?? 0) + pending.reduce((sum, p) => sum + p.gold, 0);
+
+  // 레벨업 목록: unitId별 마지막 newLevel만 남기고, 이름은 vm.units에서 조회.
+  const nameOf = (unitId: string): string =>
+    vm.units.find((u) => u.id === unitId)?.name ?? unitId;
+  const levelUpMap = new Map<string, number>();
+  for (const lu of vm.levelUps ?? []) levelUpMap.set(lu.unitId, lu.newLevel);
+  const levelUps: LevelUpEntry[] = Array.from(levelUpMap.entries()).map(([unitId, newLevel]) => ({
+    unitId,
+    name: nameOf(unitId),
+    newLevel,
+  }));
+
   return {
     grade,
     score,
@@ -111,6 +131,7 @@ export function buildResultSummary(
     gold,
     exp: reward?.exp ?? 0,
     treasures: treasureIds.map((id) => ({ id, name: items[id]?.name ?? id })),
+    levelUps,
     turnsUsed: vm.turn.turn,
     turnLimit: vm.turn.turnLimit,
     playerRetreats,

@@ -116,6 +116,8 @@ export interface BattleVM {
   units: UnitVM[];
   /** 전략조건으로 적립된 보상(보물·자금) — 결산에서 stage.reward와 병합·중복제거(M3① §2-1) */
   pendingRewards: PendingReward[];
+  /** 이번 전투에서 레벨업한 유닛 목록 — 결산 레벨업 연출용 */
+  levelUps: { unitId: string; newLevel: number }[];
 }
 
 /** line(병종 계열) 한글명 */
@@ -255,5 +257,6 @@ export function battleVM(ctx: BattleContext, settled: BattleState): BattleVM {
     status: settled.status,
     units: settled.units.map((u) => unitVM(ctx, u)),
     pendingRewards: settled.pendingRewards,
+    levelUps: settled.levelUps ?? [],
   };
 }

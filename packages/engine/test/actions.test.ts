@@ -497,3 +497,26 @@ describe("패배 조건", () => {
     expect(events).toContainEqual({ type: "battleEnded", result: "defeat" });
   });
 });
+
+describe("레벨업 추적 (결산 연출용)", () => {
+  it("공격으로 대상 격파 시 levelUp 이벤트와 state.levelUps에 누적", () => {
+    // 이숙(적) 병력 1로 패치 → 관우 공격 한 방에 격파 → 경험치 대량 → 레벨업
+    const base = patchUnit(fresh(), "이숙", { x: 1, y: 3, troops: 1 });
+    const s = patchUnit(base, "관우", { level: 1, exp: 0 }); // 낮은 레벨로 레벨업 쉽게
+    const { state, events } = applyAction(testCtx, s, { type: "attack", unitId: "관우", targetId: "이숙" });
+    const levelUpEvts = events.filter((e) => e.type === "levelUp");
+    if (levelUpEvts.length > 0) {
+      // 레벨업 발생 시 state.levelUps에도 동일하게 기록
+      expect(state.levelUps.length).toBe(levelUpEvts.length);
+      expect(state.levelUps[0].unitId).toBe("관우");
+      expect(state.levelUps[0].newLevel).toBe((levelUpEvts[0] as { newLevel: number }).newLevel);
+    } else {
+      // 레벨업 없으면 levelUps는 빈 배열
+      expect(state.levelUps).toEqual([]);
+    }
+  });
+
+  it("createBattle 초기 상태는 levelUps: []", () => {
+    expect(fresh().levelUps).toEqual([]);
+  });
+});

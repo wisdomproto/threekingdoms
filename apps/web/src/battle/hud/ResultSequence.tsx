@@ -653,6 +653,44 @@ export function ResultSequence({
               />
             </div>
           </div>
+          {/* 레벨업 팝 뱃지 — 레벨업한 아군마다 한 칸씩 순차 등장 */}
+          {summary.levelUps.length > 0 && (
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 6,
+                justifyContent: "center",
+                marginTop: 8,
+              }}
+            >
+              {summary.levelUps.map((lu, idx) => (
+                <div
+                  key={lu.unitId}
+                  style={{
+                    padding: "5px 10px",
+                    borderRadius: 8,
+                    background: "rgba(106, 191, 105, 0.18)",
+                    border: "1px solid #6abf69aa",
+                    color: "#9ee37d",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 5,
+                    animation:
+                      expFilled && !skipped
+                        ? `tkLevelUp 420ms cubic-bezier(0.2,1.2,0.3,1) ${idx * 120}ms both`
+                        : "none",
+                  }}
+                >
+                  <span style={{ color: "#9aa3ad", fontWeight: 400 }}>{lu.name}</span>
+                  <span>Lv.{lu.newLevel}</span>
+                  <span style={{ color: "#ffd76a", fontSize: 10 }}>▲</span>
+                </div>
+              ))}
+            </div>
+          )}
         </Reveal>
       </div>
 
