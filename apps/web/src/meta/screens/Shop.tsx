@@ -18,7 +18,7 @@ import type { Shop as ShopData, Item } from "@tk/data";
 import { PANEL_FRAME } from "../../battle/hud/frames";
 import { getMeta, spendGold, addItem, addGold, canWatchGoldAd, recordAdGold } from "../metaStore";
 import { RewardedAdButton } from "../RewardedAdButton";
-import { buildShopRows, type ShopRow } from "./shopItemView";
+import { buildShopRows, buildShopGroups, type ShopRow } from "./shopItemView";
 
 /**
  * 광고 1회 시청당 충전되는 *확정* 골드(§13 가드레일 — 소액·랜덤 없음, 전투력 영향 없음).
@@ -107,11 +107,16 @@ export function Shop({
       {rows.length === 0 ? (
         <p style={{ color: C.inkDim, margin: "8px 4px" }}>진열 중인 물품이 없습니다.</p>
       ) : (
-        <ul style={listStyle}>
-          {rows.map((row) => (
-            <ShopRowView key={row.itemId} row={row} onBuy={() => handleBuy(row)} />
-          ))}
-        </ul>
+        buildShopGroups(rows).map((group) => (
+          <div key={group.category} style={{ marginBottom: 10 }}>
+            <div style={groupHeaderStyle}>{group.label}</div>
+            <ul style={listStyle}>
+              {group.rows.map((row) => (
+                <ShopRowView key={row.itemId} row={row} onBuy={() => handleBuy(row)} />
+              ))}
+            </ul>
+          </div>
+        ))
       )}
     </section>
   );
@@ -209,6 +214,15 @@ const listStyle: CSSProperties = {
   display: "flex",
   flexDirection: "column",
   gap: 6,
+};
+
+const groupHeaderStyle: CSSProperties = {
+  fontSize: 11,
+  color: C.bronze,
+  letterSpacing: "0.08em",
+  padding: "4px 2px",
+  marginBottom: 2,
+  borderBottom: "1px solid rgba(202,168,106,0.2)",
 };
 
 const badgeStyle: CSSProperties = {
