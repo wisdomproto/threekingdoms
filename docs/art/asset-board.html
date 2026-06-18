@@ -58,6 +58,11 @@
   .pmembers .pchips { display: flex; flex-wrap: wrap; gap: 4px; }
   .pmembers .pchip { font-size: 11px; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--line); color: var(--dim); background: var(--panel2); white-space: nowrap; cursor: help; }
   .pmembers .pchip.on { color: var(--acc2); border-color: var(--acc2); }
+  .btn.btn-ok { background: var(--acc2) !important; color: #0b0f0b !important; border-color: var(--acc2) !important; }
+  .btn.btn-bad { background: var(--red) !important; color: #fff !important; border-color: var(--red) !important; }
+  .sendstatus { margin-top: 8px; padding: 8px 10px; border-radius: 6px; background: var(--panel2); border: 1px solid var(--line); font-size: 12px; line-height: 1.5; }
+  .sendstatus code { background: rgba(0,0,0,0.25); padding: 0 4px; border-radius: 3px; }
+  .sendstatus .dimnote { color: var(--dim); }
   .thumb { position: relative; width: 96px; }
   .thumb img { width: 96px; height: 96px; object-fit: cover; border-radius: 6px; border: 2px solid var(--line); display: block; cursor: zoom-in; }
   .thumb.picked img { border-color: var(--acc); box-shadow: 0 0 6px rgba(212,168,67,.5); }
@@ -88,6 +93,7 @@
   <span class="sub">v1 캐릭터 비주얼 = <b>① SD 포즈시트</b>(idle/move/attack 한 장 → 📤 넘기기 → Claude 컷 → sprites/{id}) + <b>② 초상시트</b>(여러 명 한 장 → 📤 넘기기 → Claude 슬라이스 → ui/portraits/{이름}) + <b>③ 시나리오 씬</b>. ¾ 좌향·투명배경, 뒤모습 선택(front 폴백). 보조: UI·이펙트·지형. ⏸ 보류(v1.5+/막바지): 전신레퍼·무기스킨·일기토키프레임·리그. 컷·슬라이스는 Claude가 처리.</span>
   <span class="stylefixed">화풍: 수묵담채 (확정)</span>
   <button class="btn" id="dirbtn" title="⬇ 저장이 향할 폴더 (docs\art 권장)">저장 폴더: 미연결</button>
+  <button class="btn" id="refreshbtn" title="서버(:8080)에서 게임에 들어간 에셋 목록을 다시 읽어 ✓/⬜·미리보기 갱신">🔄 게임 상태 새로고침</button>
   <div id="progress"></div>
 </header>
 <div id="tabbar"></div>
@@ -1521,6 +1527,8 @@ function renderTabs() {
   }).join('');
 }
 
+document.getElementById('refreshbtn').addEventListener('click', () => refreshAssetStatus(false));
+
 document.getElementById('tabbar').addEventListener('click', e => {
   const t = e.target.closest('.tab');
   if (!t) return;
@@ -1614,6 +1622,57 @@ function renderExisting(cardId) {
     <div class="exrow">` +
     poses.map(([p, label]) => `<figure class="exfig"><div class="exbox"><img src="${base}/${p}.png?t=${assetStatusStamp}" alt="${label}" loading="lazy"></div><figcaption>${label}</figcaption></figure>`).join('') +
     `</div>`;
+}
+
+/* ── 시트 넘기기 피드백: 버튼 상태 변화 + 카드 하단 영속 상태줄 ── */
+function flashBtn(btn, text, ok) {
+  if (!btn) return;
+  const orig = btn.dataset._orig || btn.textContent;
+  btn.dataset._orig = orig;
+  btn.textContent = text;
+  btn.classList.toggle('btn-ok', !!ok);
+  btn.classList.toggle('btn-bad', !ok);
+  clearTimeout(btn._t);
+  btn._t = setTimeout(() => {
+    btn.textContent = btn.dataset._orig; btn.disabled = false;
+    btn.classList.remove('btn-ok', 'btn-bad');
+  }, 2600);
+}
+function setCardStatus(btnOrCard, html) {
+  const card = btnOrCard.closest ? btnOrCard.closest('.card') : btnOrCard;
+  if (!card) return;
+  let s = card.querySelector('.sendstatus');
+  if (!s) { s = document.createElement('div'); s.className = 'sendstatus'; card.appendChild(s); }
+  s.innerHTML = html;
+}
+async function sheetSend(btn, path, blob, label) {
+  btn.disabled = true; flashBtn(btn, '넘기는 중…', true);
+  setCardStatus(btn, `⏳ <b>${label}</b> 서버로 전송 중… <code>${path}</code>`);
+  try {
+    const b64 = await blobToB64(blob);
+    const r = await fetch(SAVE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path, b64, contentType: blob.type || 'image/png' }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.ok) throw new Error(j.error || ('HTTP ' + r.status));
+    const kb = Math.round((j.bytes || 0) / 1024);
+    flashBtn(btn, '✓ 넘김!', true);
+    toast(`${label} 넘김 — ${kb}KB 저장${j.r2 ? ' + R2 ✓' : ''}. Claude가 처리합니다`);
+    setCardStatus(btn, `✅ <b>넘김 완료</b> — <code>${path}</code> · ${kb}KB${j.r2 ? ' · R2 ✓' : ' · R2 건너뜀'}<br><span class="dimnote">Claude에게 "넘겼어"라고 하면 잘라서 게임에 넣습니다.</span>`);
+    refreshAssetStatus(true); // 게임 상태 갱신(직접 저장된 씬은 즉시 ✓, 시트는 컷 후 반영)
+  } catch (e) {
+    flashBtn(btn, '✗ 실패', false);
+    toast('넘기기 실패: ' + e.message + ' (:8080 서버 확인)', true);
+    setCardStatus(btn, `❌ <b>실패</b>: ${e.message}<br><span class="dimnote">tools 서버(:8080)가 떠 있는지 확인하세요.</span>`);
+  }
+}
+
+/* 서버에서 게임 보유 에셋 목록을 다시 읽어 ✓/⬜·미리보기·초상칩을 통째 새로고침(페이지 리로드 없이). */
+async function refreshAssetStatus(silent) {
+  await loadAssetStatus();
+  renderTabs();
+  renderBoard();
+  loadImagesForCurrentTab();
+  if (!silent) toast('게임 상태 새로고침됨 — ✓/⬜·현재 스프라이트 갱신');
 }
 
 function render() {
@@ -1766,17 +1825,11 @@ board.addEventListener('click', async e => {
     const item = findItem(ps.dataset.posesheet);
     const idx = (varState[item.id] || {})['캐릭터'] || 0;
     const sel = (item.roster || [])[idx];
-    if (!sel) { toast('캐릭터를 선택하세요', true); return; }
+    if (!sel) { flashBtn(ps, '✗ 캐릭터 선택', false); toast('캐릭터를 먼저 선택하세요', true); return; }
     const all = await dbAll();
     const recs = all.filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
-    if (!recs.length) { toast('먼저 이 카드에 포즈 시트를 붙여넣으세요', true); return; }
-    try {
-      const b64 = await blobToB64(recs[0].blob);
-      const r = await fetch(SAVE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: `assets/sprites/${sel.s}/_posesheet.png`, b64, contentType: recs[0].blob.type || 'image/png' }) });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      toast(`${sel.n}(${sel.s}) 포즈 시트 넘김 → Claude가 컷·저장합니다`);
-    } catch (e2) { toast('넘기기 실패: ' + e2.message + ' (:8080 확인)', true); }
+    if (!recs.length) { flashBtn(ps, '✗ 시트 없음', false); setCardStatus(ps, '✗ 먼저 이 카드에 포즈 시트 이미지를 붙여넣으세요(클릭→Ctrl+V).'); return; }
+    await sheetSend(ps, `assets/sprites/${sel.s}/_posesheet.png`, recs[0].blob, `${sel.n}(${sel.s}) 포즈 시트`);
     return;
   }
   const pt = e.target.closest('button[data-portraitsheet]');
@@ -1784,14 +1837,8 @@ board.addEventListener('click', async e => {
     const item = findItem(pt.dataset.portraitsheet);
     const all = await dbAll();
     const recs = all.filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
-    if (!recs.length) { toast('먼저 이 카드에 초상 시트를 붙여넣으세요', true); return; }
-    try {
-      const b64 = await blobToB64(recs[0].blob);
-      const r = await fetch(SAVE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ path: `assets/ui/portraits/_sheet_${item.portraitGroup}.png`, b64, contentType: recs[0].blob.type || 'image/png' }) });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      toast(`초상시트 ${item.portraitGroup} 넘김 → Claude가 슬라이스합니다`);
-    } catch (e2) { toast('넘기기 실패: ' + e2.message + ' (:8080 확인)', true); }
+    if (!recs.length) { flashBtn(pt, '✗ 시트 없음', false); setCardStatus(pt, '✗ 먼저 이 카드에 초상 시트 이미지를 붙여넣으세요(클릭→Ctrl+V).'); return; }
+    await sheetSend(pt, `assets/ui/portraits/_sheet_${item.portraitGroup}.png`, recs[0].blob, `초상시트 ${item.portraitGroup}`);
     return;
   }
   const th = e.target.closest('.thumb');
