@@ -21,6 +21,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Item, StageReward } from "@tk/data";
+import { gameData } from "@tk/data";
 import type { InputState } from "../inputMachine";
 import type { BattleVM } from "../viewmodel";
 import { PANEL_FRAME, BUTTON_FRAME } from "./frames";
@@ -71,6 +72,12 @@ const GRADE_COLOR: Record<string, string> = {
 
 /** 잭팟 골드 — S등급 플래시/글로우 액센트. */
 const JACKPOT_GOLD = "#ffe08a";
+
+/** 이탈 장수별 짧은 사연 — hardcode (§6: 서서·진등 2명) */
+const DEPARTURE_FLAVOR: Record<string, string> = {
+  서서: "조조의 위협에 어머니를 구하러 떠납니다.",
+  진등: "서주의 뒤처리를 위해 이탈합니다.",
+};
 
 // ── 시퀀스 스텝(누적 공개) ────────────────────────────────────────────────
 // 0 숨김 → 1 별 펀치 시작 → 2 보물 → 3 자금(카운트업/코인) → 4 exp바/레벨업
@@ -259,6 +266,8 @@ export function ResultSequence({
   const doubleRafRef = useRef<number | null>(null);
   // 메타 반영(클리어 기록 + 자금 + 출진 소비)은 승리당 1회만.
   const metaCommitted = useRef(false);
+  // markCleared 직전에 캡처한 이탈 장수 목록(결산 완료 후 알림 표시).
+  const [departures, setDepartures] = useState<{ commanderId: string; items: string[] }[]>([]);
   // 자금 카운트업 rAF 핸들(언마운트/스킵 시 취소).
   const rafRef = useRef<number | null>(null);
 
@@ -284,7 +293,23 @@ export function ResultSequence({
       serendipityBaseRef.current = pts;
       setSerendipityPts(pts);
       addSerendipity(pts);
-      if (stageId) markCleared(stageId); // 다음 전장 해금
+      // markCleared 직전: 이탈 장수 캡처(reduceTriggerDepartures가 내부에서 실행됨).
+      if (stageId) {
+        const meta = getMeta();
+        const pending: { commanderId: string; items: string[] }[] = [];
+        for (const entry of Object.values(gameData.rosters)) {
+          if (
+            entry.departsAfterStage === stageId &&
+            !meta.departedCharacters.includes(entry.commanderId)
+          ) {
+            const equipped = meta.rosterProgress[entry.commanderId]?.equipped ?? [];
+            const itemNames = equipped.map((id) => gameData.items[id]?.name ?? id);
+            pending.push({ commanderId: entry.commanderId, items: itemNames });
+          }
+        }
+        if (pending.length > 0) setDepartures(pending);
+        markCleared(stageId); // 다음 전장 해금 (+ 내부 이탈 처리)
+      }
       // 획득 보물을 인벤토리에 적립 (편성 장착 + §10 보물 도감 수집 반영). 종전 누락 보완.
       for (const t of summary.treasures) addItem(t.id);
       clearSortie(); // 1회성 출진 페이로드 소비(새로고침 시 stale 편성 방지)
@@ -706,6 +731,40 @@ export function ResultSequence({
           }}
           onClick={(e) => e.stopPropagation()}
         >
+          {/* 이탈 장수 알림 카드 — markCleared 시 이탈 처리된 장수만 표시 */}
+          {departures.map((dep) => (
+            <div
+              key={dep.commanderId}
+              style={{
+                ...PANEL_FRAME,
+                background: "rgba(40, 24, 18, 0.92)",
+                padding: "12px 18px",
+                minWidth: 260,
+                maxWidth: 340,
+                display: "flex",
+                flexDirection: "column",
+                gap: 6,
+                borderColor: "#8a503a",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 16 }}>⬡</span>
+                <span style={{ fontSize: 15, fontWeight: 700, color: "#e8c9a0" }}>
+                  {dep.commanderId} 이탈
+                </span>
+              </div>
+              <div style={{ fontSize: 12, color: "#9a8070", lineHeight: 1.5 }}>
+                {DEPARTURE_FLAVOR[dep.commanderId] ?? "부득이한 사정으로 떠납니다."}
+              </div>
+              <div style={{ fontSize: 12, color: "#cdab6e", marginTop: 2 }}>
+                위로금 +300 金
+                {dep.items.length > 0 && (
+                  <span style={{ color: "#9a8070" }}> · 반환: {dep.items.join(", ")}</span>
+                )}
+              </div>
+            </div>
+          ))}
+
           {/* 결산 보상 2배(§12/§13) — 광고 완주 1회만. 누르면 사라짐. adFree면 버튼 자체 미표시. */}
           {!doubled && (
             <RewardedAdButton
