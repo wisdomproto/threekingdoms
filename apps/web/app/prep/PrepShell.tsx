@@ -1,11 +1,11 @@
 "use client";
 /**
  * 출진 준비 셸(클라이언트) — §10 막간 = 상점→편성→출진. <Formation/>과 <Shop/>을 합성하고
- * 하단에 "출진" 버튼을 둔다. 출진 = writeSortie(편성) 후 /battle?stage=ID 로 이동.
+ * 하단 고정 출진 바를 둔다. 출진 = writeSortie(편성) 후 /battle?stage=ID 로 이동.
  *
- * 이 파일은 **셸(배관)**만 담당 — 슬롯/구매/장비 UI는 Formation/Shop 스텁이 채운다.
  * 셸이 보유하는 상태:
  *  - stageId: ?stage= 쿼리(없으면 M1 기본 사수관).
+ *  - activeTab: "formation" | "shop" (기본 편성).
  *  - selected: SortieMember[] (Formation onChange로 갱신).
  *  - gold/roster: metaStore에서 로드(구매/장착 후 재조회 트리거).
  * maxSlots = 그 stage의 player 슬롯 수(좌표 재사용 상한, sortie.ts 계약).
@@ -18,9 +18,11 @@ import Link from "next/link";
 import { gameData, stages } from "@tk/data";
 import { Formation } from "../../src/meta/screens/Formation";
 import { Shop } from "../../src/meta/screens/Shop";
+import { SortieBar } from "../../src/meta/screens/SortieBar";
 import { LoadingTransition } from "../../src/meta/screens/LoadingTransition";
 import { getMeta, getRoster, type RosterUnit } from "../../src/meta/metaStore";
 import { writeSortie, type SortieMember } from "../../src/meta/sortie";
+import { sortieSummary } from "../../src/meta/sortieSummary";
 import { shouldShowInterstitial } from "../../src/meta/interstitialPolicy";
 
 /** id "05-sishuiguan" → 5. 챕터 매핑(상점 unlockChapter 필터)에 사용. 파싱 실패 시 1. */
@@ -53,39 +55,36 @@ export function PrepShell(): React.ReactElement {
   // meta는 SSR에서 비어있고 클라 마운트 후 채워진다(하이드레이션 일치). 구매/장착 후엔
   // refreshKey를 올려 gold/roster를 재로드 — Shop이 onPurchase로 알려준다.
   const [refreshKey, setRefreshKey] = useState(0);
-  // SSR·클라 첫 렌더는 빈 후보(하이드레이션 일치) — getRoster()는 localStorage 의존이라
-  // 초기화에서 호출하면 SSR(빈 메타)≠클라(진행 메타) 불일치가 난다. 마운트 후 useEffect로 채운다.
   const [roster, setRoster] = useState<RosterUnit[]>([]);
   const [gold, setGold] = useState(0);
 
   useEffect(() => {
-    // 이 스테이지의 챕터로 후보 게이팅 — 후반 합류 장수가 조기 등장하지 않게(§6 합류 시점).
     setRoster(getRoster(chapter));
     setGold(getMeta().gold);
   }, [refreshKey, chapter]);
 
   const [selected, setSelected] = useState<SortieMember[]>([]);
+  const [activeTab, setActiveTab] = useState<"formation" | "shop">("formation");
 
-  // 출진 클릭 후 로딩/전면광고 전환 셸을 띄울지(true면 <LoadingTransition/> 오버레이).
-  // showAd = 이번 전환에 전면광고를 끼울지(절제형 빈도 규칙 — adFree는 adService가 단락).
+  // 출진 클릭 후 로딩/전면광고 전환 셸을 띄울지.
   const [transition, setTransition] = useState<{ showAd: boolean } | null>(null);
 
-  // 상점 구매 후 — 잔액/인벤토리(장비 후보)를 재조회하도록 셸 상태를 무효화.
   const onPurchase = useCallback(() => setRefreshKey((k) => k + 1), []);
 
   const onSortie = useCallback(() => {
-    // 편성이 비면 기존 동작(stage JSON 그대로)으로 출진 — sortie.ts 계약상 override 안 함.
     writeSortie({ stageId, members: selected });
-    // §13 절제형: clearedStages 진행 척도 + 보스 규칙으로 이번 전환의 전면광고 노출 결정.
-    // 결정 후 로딩 셸을 띄운다(직접 router.push 대체). 실제 전투 진입은 onEnter에서.
     const showAd = shouldShowInterstitial(getMeta().clearedStages.length, stageId);
     setTransition({ showAd });
   }, [stageId, selected]);
 
-  // 로딩 셸의 "전장으로" → 실제 전투 진입(광고/카드 완료 후).
   const onEnterBattle = useCallback(() => {
     router.push(`/battle?stage=${encodeURIComponent(stageId)}`);
   }, [router, stageId]);
+
+  const summary = useMemo(
+    () => sortieSummary(selected, roster, maxSlots),
+    [selected, roster, maxSlots],
+  );
 
   if (transition) {
     return (
@@ -99,30 +98,88 @@ export function PrepShell(): React.ReactElement {
   }
 
   return (
-    <main style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
-      <header style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
-        <h1 style={{ margin: 0 }}>출진 준비 — {stage.name}</h1>
+    <main
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100dvh",
+        paddingBottom: 64,
+      }}
+    >
+      {/* 헤더 */}
+      <header
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: 12,
+          padding: "16px 16px 0",
+        }}
+      >
+        <h1 style={{ margin: 0, fontSize: 18 }}>출진 준비 — {stage.name}</h1>
         <Link href="/stages" style={{ color: "#8a7350", fontSize: 14, textDecoration: "none" }}>
           ◀ 전장 선택
         </Link>
       </header>
-      <Shop
-        shop={gameData.shops.ch1!}
-        items={gameData.items}
-        gold={gold}
-        chapter={chapter}
-        onPurchase={onPurchase}
-      />
-      <Formation
-        key={refreshKey}
-        roster={roster}
-        maxSlots={maxSlots}
-        selected={selected}
-        onChange={setSelected}
-      />
-      <button type="button" onClick={onSortie} style={{ alignSelf: "flex-start", padding: "8px 24px" }}>
-        출진 ▶
-      </button>
+
+      {/* 탭 바 */}
+      <div
+        style={{
+          display: "flex",
+          borderBottom: "1px solid #2a2f36",
+          margin: "12px 16px 0",
+        }}
+      >
+        {(["formation", "shop"] as const).map((tab) => {
+          const label = tab === "formation" ? "편성" : "상점";
+          const active = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setActiveTab(tab)}
+              style={{
+                padding: "8px 20px",
+                fontSize: 15,
+                fontWeight: active ? 700 : 400,
+                color: active ? "#caa86a" : "#9aa3ad",
+                background: "transparent",
+                border: "none",
+                borderBottom: active ? "2px solid #caa86a" : "2px solid transparent",
+                cursor: "pointer",
+                marginBottom: -1,
+              }}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 탭 콘텐츠 (비활성 탭 언마운트) */}
+      <div style={{ flex: 1, padding: 16 }}>
+        {activeTab === "formation" ? (
+          <Formation
+            key={refreshKey}
+            roster={roster}
+            maxSlots={maxSlots}
+            selected={selected}
+            onChange={setSelected}
+            chapter={chapter}
+          />
+        ) : (
+          <Shop
+            shop={gameData.shops.ch1!}
+            items={gameData.items}
+            gold={gold}
+            chapter={chapter}
+            onPurchase={onPurchase}
+          />
+        )}
+      </div>
+
+      {/* 고정 출진 바 */}
+      <SortieBar summary={summary} maxSlots={maxSlots} onSortie={onSortie} />
     </main>
   );
 }
