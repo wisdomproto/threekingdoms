@@ -1,9 +1,6 @@
 {
   "guanyu": {
     "poses": [
-      "back_attack",
-      "back_idle",
-      "back_move",
       "front_attack",
       "front_idle",
       "front_move"
@@ -13,9 +10,6 @@
   },
   "liubei": {
     "poses": [
-      "back_attack",
-      "back_idle",
-      "back_move",
       "front_attack",
       "front_idle",
       "front_move"
@@ -25,12 +19,8 @@
   },
   "zhangfei": {
     "poses": [
-      "back_attack",
-      "back_idle",
-      "back_move",
       "front_attack",
-      "front_idle",
-      "front_move"
+      "front_idle"
     ],
     "source": "_posesheet.png",
     "method": "cut_posesheet.py"
