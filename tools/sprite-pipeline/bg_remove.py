@@ -41,6 +41,74 @@ def remove_white_bg(im, thresh=235):
     return Image.fromarray(arr, "RGBA")
 
 
+def remove_checker_bg(im, sat_max=40, bright_min=160):
+    """가장자리에서 연결된 '무채색·밝은·불투명' 픽셀(체커보드·흰/회색 카드)을 투명화.
+
+    AI가 투명 대신 *체커보드 패턴*(흰+회색 교차)이나 흰 카드를 그려 넣는 경우가 잦은데,
+    near-white(remove_white_bg)는 회색 칸을 못 잡아 인게임에 흰 박스로 남는다(Read 도구의
+    투명 표시와 똑같이 생겨 육안 검수도 속는다). 채도 낮고(sat<sat_max) 밝은(min RGB>bright_min)
+    불투명 픽셀을 대상으로, **가장자리 연결 성분만** 제거 → 캐릭터 내부 무채색(은갑옷)은 보존.
+    """
+    im = im.convert("RGBA")
+    arr = np.array(im)
+    rgb = arr[:, :, :3].astype(int)
+    al = arr[:, :, 3]
+    sat = rgb.max(2) - rgb.min(2)
+    bright = rgb.min(2)
+    bg_like = (sat < sat_max) & (bright > bright_min) & (al > 120)
+    labels, n = ndimage.label(bg_like)
+    if n == 0:
+        return im
+    border = set(labels[0, :]) | set(labels[-1, :]) | set(labels[:, 0]) | set(labels[:, -1])
+    border.discard(0)
+    if border:
+        arr[np.isin(labels, list(border)), 3] = 0
+    return Image.fromarray(arr, "RGBA")
+
+
+def drop_small_components(im, frac=0.10):
+    """불투명 연결성분 중 최대(캐릭터)만 남기고, 그보다 frac 미만이며 *가장자리에 닿는*
+    소형 고립 성분(격자 좌표 라벨 'C1/C2' 등)을 제거. 무기는 손에 연결돼 최대 성분에
+    포함되므로 보존, 캐릭터 파편(보통 중앙)은 가장자리 비접촉이라 안전."""
+    im = im.convert("RGBA")
+    arr = np.array(im)
+    opaque = arr[:, :, 3] > 40
+    labels, n = ndimage.label(opaque)
+    if n <= 1:
+        return im
+    sizes = ndimage.sum(opaque, labels, range(1, n + 1))
+    largest = int(np.argmax(sizes)) + 1
+    border = set(labels[0, :]) | set(labels[-1, :]) | set(labels[:, 0]) | set(labels[:, -1])
+    for i in range(1, n + 1):
+        if i != largest and sizes[i - 1] < sizes[largest - 1] * frac and i in border:
+            arr[labels == i, 3] = 0
+    return Image.fromarray(arr, "RGBA")
+
+
+def needs_bg_cleanup(im, gray_frac=0.20):
+    """배경 정리 필요 여부 — 흰 코너 OR 무채색·밝은 불투명 픽셀이 많음(체커보드/카드).
+    체커보드는 코너가 투명일 수 있어 has_opaque_white_bg만으론 놓친다."""
+    if has_opaque_white_bg(im):
+        return True
+    arr = np.array(im.convert("RGBA"))
+    rgb = arr[:, :, :3].astype(int)
+    al = arr[:, :, 3]
+    sat = rgb.max(2) - rgb.min(2)
+    bright = rgb.min(2)
+    bg_like = (sat < 40) & (bright > 160) & (al > 120)
+    return float(bg_like.mean()) > gray_frac
+
+
+def clean_bg(im, trim=True):
+    """배경 종합 정리: 흰 flood + 체커보드/회색카드 제거. **시트-안전**(가장자리 연결
+    배경만 지움 → 다중 셀 시트에 써도 셀이 안 지워짐). 이미 깨끗한 시트엔 무해.
+    ⚠ 라벨(소형 고립 성분) 제거는 `drop_small_components`로 *셀별*(컷 후)에 한다 — 시트에
+    drop을 쓰면 최대 셀 하나만 남으니 금지. trim=False면 트림 생략(시트 크기 유지)."""
+    im = remove_white_bg(im)
+    im = remove_checker_bg(im)
+    return trim_alpha(im) if trim else im
+
+
 def trim_alpha(im):
     """알파 bbox로 투명 테두리 트림 (배경 제거 후 타이트하게)."""
     bbox = im.convert("RGBA").split()[3].getbbox()

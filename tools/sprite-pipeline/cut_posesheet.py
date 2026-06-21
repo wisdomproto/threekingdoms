@@ -25,7 +25,7 @@
 """
 import sys, os, json
 from PIL import Image
-from bg_remove import remove_white_bg, has_opaque_white_bg
+from bg_remove import clean_bg, needs_bg_cleanup, drop_small_components, trim_alpha
 
 # Derive ROOT from this file's location: sprite-pipeline → tools → repo root
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -191,9 +191,9 @@ def main():
         print(f"포즈 시트 없음: {sheet} (보드에서 📤 시트 넘기기 먼저)"); sys.exit(1)
 
     im = Image.open(sheet).convert("RGBA")
-    if has_opaque_white_bg(im):
-        im = remove_white_bg(im)
-        print("  흰 배경 감지 → 가장자리 흰색 투명화(배경 제거)")
+    if needs_bg_cleanup(im):
+        im = clean_bg(im)
+        print("  배경 감지 → 흰배경/체커보드/라벨 정리(투명화)")
     W, H = im.size
     print(f"{sid}: {W}x{H}{'  [--flip 좌우반전→screen-left]' if flip else ''}")
 
@@ -217,6 +217,7 @@ def main():
         else:
             outdir = d
         name = f"front_{pose}.png"
+        crop = trim_alpha(drop_small_components(crop))  # 셀별 격자라벨(C1/C2 등) 제거 + 타이트 트림
         crop.save(os.path.join(outdir, name))
         tier_label = f"tier{tier_idx + 1}" if subdir else "tier1(root)"
         print(f"  → [{tier_label}] {os.path.join(subdir, name) if subdir else name}  {crop.size}")
