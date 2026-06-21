@@ -1,5 +1,7 @@
 # 전투 타격 FX 이미지화 Implementation Plan
 
+> **상태: ✅ 구현 완료 (2026-06-21)** — 6 태스크 전부 구현·검증·커밋(abde610→046e51d, subagent-driven). 검증: Python unittest·vitest·web 517테스트·typecheck 그린, 브라우저 `[TextureResolver] fx 로드 완료: 4종`. 실슬라이스=`assets/fx/{slash,sparkle,coin,flash}.png`(C-1 시트). 실제 타격 비주얼은 전투 중 발동. Sub-project #2(앰비언트/화공)는 화공 메커니즘 선행 필요라 이연.
+
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 길중이 생성한 발광 이펙트 시트를 `FxLayer`의 절차적 Graphics 이펙트에 드롭인해, 평타·협공·필살·격파 연출을 이미지로 격상한다(이미지 없으면 현 연출 폴백 = 무회귀).
