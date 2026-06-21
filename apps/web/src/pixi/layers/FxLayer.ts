@@ -2,9 +2,11 @@
  * FxLayer (설계 §2.2) — 데미지 팝업(월드 공간) + 배너(스크린 공간) 이펙트. Text 풀링.
  * world는 카메라 변환 컨테이너 아래에, screen은 stage 직속(카메라 무관)에 부착한다.
  */
-import { Container, Graphics, Text } from "pixi.js";
+import { Container, Graphics, Sprite, Text } from "pixi.js";
 import type { WorldPoint } from "../projection";
 import { easeOut, type TweenRunner } from "../tweens";
+import type { TextureResolver } from "../textures";
+import { FX, pickFlashKey } from "../fxKeys";
 
 const POPUP_MS = 650;
 const POPUP_RISE_PX = 28;
@@ -36,15 +38,39 @@ export class FxLayer {
   readonly screen = new Container();
 
   private readonly tweens: TweenRunner;
+  private readonly textures?: TextureResolver;
   private readonly popupPool: Text[] = [];
   private screenW = 0;
   private screenH = 0;
 
-  constructor(tweens: TweenRunner) {
+  constructor(tweens: TweenRunner, textures?: TextureResolver) {
     this.tweens = tweens;
+    this.textures = textures;
     this.world.sortableChildren = false;
     // 팝업/배너는 항상 유닛 위에 — zIndex 큰 값
     this.world.zIndex = 10_000;
+  }
+
+  /**
+   * fx 텍스처를 additive 스프라이트로 1회 재생. update(t, sprite)로 트윈, ms 후 제거.
+   * 텍스처 미보유 시 null 반환 → 호출자가 절차적 폴백으로 이어진다.
+   */
+  private playFxSprite(
+    key: string, at: WorldPoint, ms: number,
+    update: (t: number, s: Sprite) => void, baseRot = 0,
+  ): Promise<void> | null {
+    const tex = this.textures?.getFx(key);
+    if (!tex) return null; // 폴백 신호
+    const s = new Sprite(tex);
+    s.anchor.set(0.5);
+    s.blendMode = "add";
+    s.position.set(at.x, at.y);
+    s.rotation = baseRot;
+    this.world.addChild(s);
+    return this.tweens.run(ms, (t) => update(t, s)).then(() => {
+      this.world.removeChild(s);
+      s.destroy(); // texture는 공유 캐시라 파기 안 함
+    });
   }
 
   resize(width: number, height: number): void {
@@ -160,6 +186,14 @@ export class FxLayer {
    * 즉사 아님(설계 §10 퇴각만) — 톤은 "소멸"이되 잔혹X.
    */
   retreatBurst(at: WorldPoint): Promise<void> {
+    const img = this.playFxSprite(FX.coin, { x: at.x, y: at.y - 4 }, RETREAT_MS, (t, s) => {
+      const e = 1 - (1 - t) * (1 - t);              // ease-out
+      s.position.y = at.y - 4 - 18 * e;             // 튀어오름
+      s.scale.set(0.6 + e * 0.7);
+      s.alpha = t < 0.5 ? 1 : 1 - (t - 0.5) / 0.5;
+    });
+    if (img) return img;
+    // ── 폴백: 기존 흰/연두 파편 ──
     const root = new Container();
     root.position.set(at.x, at.y);
 
@@ -211,6 +245,17 @@ export class FxLayer {
    * 월드 공간(카메라 변환 하). 순수 표현 — 게임 상태 불변, TweenRunner로 배속 존중.
    */
   slashArc(from: WorldPoint, to: WorldPoint, indirect = false): Promise<void> {
+    const dx0 = to.x - from.x, dy0 = to.y - from.y;
+    const ang0 = Math.atan2(dy0, dx0);   // 공격 방향
+    const img = this.playFxSprite(FX.slash, { x: to.x, y: to.y - 8 }, SLASH_MS, (t, s) => {
+      const e = easeOut(t);
+      s.rotation = ang0 + (e - 0.5) * 0.9;          // 휘두르는 쓸기
+      s.scale.set(0.8 + e * 0.5);
+      s.alpha = t < 0.35 ? 1 : 1 - (t - 0.35) / 0.65;
+      if (indirect) s.tint = 0x9fd8ff;              // 간접=청백(PIERCE_TINT 톤)
+    }, ang0);
+    if (img) return img;
+    // ── 폴백: 기존 절차적 호 ──
     const dx = to.x - from.x;
     const dy = to.y - from.y;
     const len = Math.hypot(dx, dy) || 1;
@@ -266,7 +311,15 @@ export class FxLayer {
    * 임팩트 플래시 (§4 타격 주스) — 타격점에 짧고 강한 흰빛 원 1회(빠르게 확장·소멸).
    * 묵직한 "맞았다" 신호. 월드 공간, 순수 표현, 배속 존중.
    */
-  impactFlash(at: WorldPoint): Promise<void> {
+  impactFlash(at: WorldPoint, big = false): Promise<void> {
+    const key = pickFlashKey(big);                  // big→sparkle, else flash
+    const scaleTo = big ? 2.0 : 1.3;
+    const img = this.playFxSprite(key, { x: at.x, y: at.y - 6 }, big ? 220 : FLASH_MS, (t, s) => {
+      s.scale.set(0.5 + t * scaleTo);
+      s.alpha = Math.max(0, 1 - t);
+    });
+    if (img) return img;
+    // ── 폴백: 기존 흰 원 ──
     const flash = new Graphics();
     flash.circle(0, 0, FLASH_R).fill({ color: 0xffffff, alpha: 1 });
     flash.position.set(at.x, at.y - 6);
