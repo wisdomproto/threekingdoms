@@ -79,6 +79,15 @@ const DECO_FILES: Record<string, string> = {
   bridge: "bridge.png",
 };
 
+/** 맵 구조물 오브젝트 텍스처 (ObjectLayer). 성벽 세그먼트(오토타일) + 성문 상태. /assets/objects/.
+ *  미보유 키는 로드 실패 → null, ObjectLayer가 스킵(아트는 후속 컷 도구로 채움). */
+const OBJECT_FILES: Record<string, string> = {
+  wall_single: "wall_single.png", wall_end: "wall_end.png", wall_straight: "wall_straight.png",
+  wall_corner: "wall_corner.png", wall_tee: "wall_tee.png", wall_cross: "wall_cross.png",
+  gate_closed: "gate_closed.png", gate_open: "gate_open.png", gate_destroyed: "gate_destroyed.png",
+};
+const OBJECT_BASE = assetUrl("/assets/objects");
+
 /**
  * 지형 → 시임리스 바닥 텍스처 (E-* 에셋, 576×576). getGround에서 (gx,gy) wrap 서브렉트.
  * 미등록 지형은 단색 베이크 폴백.
@@ -149,6 +158,8 @@ export class TextureResolver {
   private readonly macroSubCache = new Map<string, Texture>();
   /** 특징 지형 오브젝트 데코: terrainId → Texture. loadTiles() 내에서 로드. */
   private readonly decoTex = new Map<string, Texture>();
+  /** 맵 구조물 오브젝트 텍스처: 키(wall_단어 | gate_상태) → Texture. loadObjects() 후 채워짐. */
+  private readonly objectTex = new Map<string, Texture>();
   /** 시임리스 바닥 원본: terrainId → Texture (576×576). */
   private readonly groundTex = new Map<string, Texture>();
   /** 바닥 서브렉트 캐시: "${terrainId}:${mx}:${my}" → Texture (48×48). */
@@ -383,6 +394,11 @@ export class TextureResolver {
     return this.decoTex.get(terrainId) ?? null;
   }
 
+  /** 구조물 오브젝트 텍스처(없으면 null → ObjectLayer 스킵). */
+  getObject(key: string): Texture | null {
+    return this.objectTex.get(key) ?? null;
+  }
+
   /**
    * 시임리스 바닥의 (gx,gy) wrap 서브렉트 (48×48). 인접 칸이 이어진다.
    * 미보유 지형/로드 전이면 null (호출자가 단색 베이크로 폴백).
@@ -402,8 +418,25 @@ export class TextureResolver {
     return sub;
   }
 
+  /** 구조물 오브젝트 텍스처 로드 (실패해도 빈 맵 유지 — throw 안 함). */
+  private async loadObjects(): Promise<void> {
+    const entries = Object.entries(OBJECT_FILES);
+    const urls = entries.map(([, f]) => `${OBJECT_BASE}/${f}`);
+    try {
+      const loaded = await Assets.load<Texture>(urls);
+      for (const [key, f] of entries) {
+        const tex = loaded[`${OBJECT_BASE}/${f}`];
+        if (tex) this.objectTex.set(key, tex);
+      }
+      console.info(`[TextureResolver] 구조물 오브젝트 로드 완료: ${this.objectTex.size}종`);
+    } catch (e) {
+      console.warn("[TextureResolver] 구조물 오브젝트 로드 오류(아트 미보유 단계 정상):", e);
+    }
+  }
+
   async loadTiles(): Promise<void> {
     await this.loadDecos();
+    await this.loadObjects();
     await this.loadGround();
     let manifest: TilesManifest;
     try {
