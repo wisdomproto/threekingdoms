@@ -14,7 +14,7 @@ import sys, json, os, glob
 from PIL import Image
 sys.stdout.reconfigure(encoding="utf-8")
 
-ROOT = r"C:\project\threekingdoms"
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 mapId = sys.argv[1] if len(sys.argv) > 1 else "sishuiguan"
 TARGET = int(sys.argv[2]) if len(sys.argv) > 2 else 96  # 출력 px/타일 (96 → 사수관 5376×3072)
 

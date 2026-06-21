@@ -25,6 +25,7 @@
 """
 import sys, os, json
 from PIL import Image
+from bg_remove import remove_white_bg, has_opaque_white_bg
 
 # Derive ROOT from this file's location: sprite-pipeline → tools → repo root
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -190,6 +191,9 @@ def main():
         print(f"포즈 시트 없음: {sheet} (보드에서 📤 시트 넘기기 먼저)"); sys.exit(1)
 
     im = Image.open(sheet).convert("RGBA")
+    if has_opaque_white_bg(im):
+        im = remove_white_bg(im)
+        print("  흰 배경 감지 → 가장자리 흰색 투명화(배경 제거)")
     W, H = im.size
     print(f"{sid}: {W}x{H}{'  [--flip 좌우반전→screen-left]' if flip else ''}")
 

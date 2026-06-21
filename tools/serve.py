@@ -14,6 +14,8 @@ import sys, os, json, base64, mimetypes, subprocess, re
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUBLIC = os.path.join(ROOT, "apps", "web", "public")
 CUT_SCRIPT = os.path.join(ROOT, "tools", "sprite-pipeline", "cut_posesheet.py")
+STITCH_SCRIPT = os.path.join(ROOT, "tools", "sprite-pipeline", "stitch_chunks.py")
+CHUNKS_DIR = os.path.join(ROOT, "docs", "art", "chunks")
 PORT = 8080
 
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -78,6 +80,33 @@ def _run_cut(sid, flip):
                 "flip": flip, "output": out[-800:]}
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "error": str(e)}
+
+
+def _stitch_chunk(stage):
+    """그 스테이지 painted 조각이 manifest 수만큼 다 차면 stitch_chunks.py 실행 → /assets/maps/{stage}.webp.
+    아직 덜 찼으면 {stitched:False, have, total}. 다 차서 합치면 {stitched:True}."""
+    import glob as _glob
+    man_path = os.path.join(CHUNKS_DIR, f"{stage}_manifest.json")
+    if not os.path.exists(man_path):
+        return {"stitched": False, "reason": "manifest 없음(export_chunks.py 먼저)"}
+    try:
+        man = json.load(open(man_path, encoding="utf-8"))
+    except Exception as e:  # noqa: BLE001
+        return {"stitched": False, "error": f"manifest 로드 실패: {e}"}
+    chunks = man.get("chunks", [])
+    total = len(chunks)
+    have = sum(1 for ch in chunks
+               if _glob.glob(os.path.join(CHUNKS_DIR, f"painted_{stage}_r{ch['row']}_c{ch['col']}.*")))
+    if have < total:
+        return {"stitched": False, "have": have, "total": total}
+    env = {**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}
+    try:
+        p = subprocess.run([sys.executable, STITCH_SCRIPT, stage], capture_output=True, text=True,
+                           encoding="utf-8", env=env, cwd=ROOT, timeout=180)
+        return {"stitched": p.returncode == 0, "have": have, "total": total,
+                "output": ((p.stdout or "") + (p.stderr or ""))[-600:]}
+    except Exception as e:  # noqa: BLE001
+        return {"stitched": False, "have": have, "total": total, "error": str(e)}
 
 
 class NoCacheHandler(SimpleHTTPRequestHandler):
@@ -159,8 +188,9 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
             self._json(400, {"ok": False, "error": f"잘못된 요청: {e}"})
             return
 
-        # 경로 안전성: assets/ 하위만, 상위 탈출 금지.
-        if not rel.startswith("assets/") or ".." in rel.split("/"):
+        # 경로 안전성: assets/ 또는 docs/art/chunks/(청크 painted) 하위만, 상위 탈출 금지.
+        is_chunk = rel.startswith("docs/art/chunks/")
+        if not (rel.startswith("assets/") or is_chunk) or ".." in rel.split("/"):
             self._json(400, {"ok": False, "error": f"허용되지 않은 경로: {rel}"})
             return
 
@@ -170,8 +200,8 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
             self._json(400, {"ok": False, "error": f"base64 디코드 실패: {e}"})
             return
 
-        # ① 로컬 public/ 에 쓰기 (dev 즉시 반영)
-        dest = os.path.join(PUBLIC, *rel.split("/"))
+        # ① 로컬에 쓰기 — assets→public/(dev 즉시 반영), 청크→repo docs/art/chunks/(중간산출물)
+        dest = os.path.join(ROOT, *rel.split("/")) if is_chunk else os.path.join(PUBLIC, *rel.split("/"))
         try:
             os.makedirs(os.path.dirname(dest), exist_ok=True)
             with open(dest, "wb") as f:
@@ -180,15 +210,17 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
             self._json(500, {"ok": False, "error": f"로컬 쓰기 실패: {e}"})
             return
 
-        # ② R2 업로드 (설정돼 있으면)
-        r2_ok, r2_info = _r2_upload(rel, data, ctype)
+        # ② R2 업로드 (assets 만 — 청크는 중간산출물이라 생략)
+        if is_chunk:
+            r2_ok, r2_info = False, "청크 R2 생략"
+        else:
+            r2_ok, r2_info = _r2_upload(rel, data, ctype)
+        sys.stdout.write(f"[save-asset] {'repo/' if is_chunk else 'public/'}{rel} 저장"
+                         + (f" + R2({r2_info})" if r2_ok else f" (R2: {r2_info})") + "\n")
 
-        msg = f"public/{rel} 저장"
-        msg += f" + R2 업로드({r2_info})" if r2_ok else f" (R2 건너뜀: {r2_info})"
-        sys.stdout.write("[save-asset] " + msg + "\n")
+        resp = {"ok": True, "local": rel, "r2": r2_ok, "r2info": r2_info, "bytes": len(data)}
 
         # ③ 포즈 시트 자동 컷 (payload.cut) — _posesheet.png 저장 직후 cut_posesheet.py 실행
-        resp = {"ok": True, "local": rel, "r2": r2_ok, "r2info": r2_info, "bytes": len(data)}
         if payload.get("cut") and rel.startswith("assets/sprites/") and rel.endswith("/_posesheet.png"):
             parts = rel.split("/")
             sid = parts[2] if len(parts) >= 4 else None
@@ -196,6 +228,14 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
                 cut = _run_cut(sid, bool(payload.get("flip")))
                 resp["cut"] = cut
                 sys.stdout.write(f"[save-asset] cut {sid} flip={bool(payload.get('flip'))} → ok={cut.get('ok')} cells={cut.get('cells')}\n")
+
+        # ④ 맵 청크 자동 stitch (payload.stitch) — painted_{stage}_r#_c# 저장 후 전 조각 차면 stitch_chunks.py
+        if payload.get("stitch") and is_chunk:
+            m = re.match(r"docs/art/chunks/painted_(.+)_r\d+_c\d+\.\w+$", rel)
+            if m:
+                st = _stitch_chunk(m.group(1))
+                resp["stitch"] = st
+                sys.stdout.write(f"[save-asset] chunk {m.group(1)} stitch → ok={st.get('stitched')} ({st.get('have')}/{st.get('total')})\n")
 
         self._json(200, resp)
 

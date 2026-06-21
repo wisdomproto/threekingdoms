@@ -92,10 +92,10 @@
 'use strict';
 
 const CHUNK_PROMPT =
-`Top-down orthographic battlefield map, traditional East Asian ink-wash painting (수묵 담채), muted earth tones, soft brush texture and paper grain, LOW contrast so game units read on top.
-Repaint this color-block layout EXACTLY — keep every region's position, shape and size:
-pale tan = open dry-dirt plain, sage/dark green = dense forest canopy seen from above, light khaki = dry cracked wasteland, grey = stone fortress wall, dark brown = wooden fortress gate, orange-tan = army camp tents, tan = supply depot, dusty blue = river/water, brown plank = wooden bridge.
-Painterly continuous terrain, blend region edges naturally, NO grid lines, NO hard outlines around regions, NO text, NO characters, NO UI.
+`Top-down orthographic battlefield GROUND map for a tactics game, traditional East Asian ink-wash painting (수묵 담채), muted earth tones, soft brush texture and paper grain, LOW contrast so game units and objects read clearly on top.
+Repaint this color-block layout EXACTLY (keep every region's position, shape and size) but paint ONLY the flat GROUND surface of each region — NEVER any standing 3D structure:
+pale tan = open dry-dirt plain; sage/dark green = dense forest canopy seen straight from directly above; light khaki = dry cracked wasteland; dusty blue = calm river water; grey = bare grey stone flagstone / paved courtyard ground (NO wall — the wall is placed separately as a game object); dark brown = packed earth or stone gateway ground (NO gate building); orange-tan and tan = bare trampled dirt ground of a camp/depot area (NO tents, NO crates, NO fences); brown-plank region = paint the river WATER beneath it (NO bridge — placed separately).
+Painterly continuous terrain, blend region edges naturally. ABSOLUTELY NO walls, gates, buildings, tents, watchtowers, bridges, fences, crates or any standing object — ONLY flat ground/terrain (structures are added afterward as separate top-down game objects). Strict top-down view, flat with NO isometric angle and NO 3D height. NO grid lines, NO hard outlines around regions, NO text, NO characters, NO UI.
 The painting must continue all the way to the image edges (for seamless tiling with neighboring map sections).`;
 
 const STAGES = window.CHUNK_STAGES || {};
@@ -258,9 +258,24 @@ async function saveChunk(card, blob) {
   const name = `painted_${card}.${extOf(blob)}`;
   await dbPut({ card, blob, name, at: Date.now() });
   setDropImage(card, blob);
-  const wrote = await writeToDir(name, blob);
   updateProgress();
-  toast(wrote ? `${name} → 폴더 저장됨` : `${name} 저장됨 (폴더 미연결 — ⬇로 저장)`);
+  const stage = card.replace(/_r\d+_c\d+$/, '');
+  toast(`⏳ ${name} 서버 저장 중…`);
+  try {
+    const b64 = await blobToB64(blob);
+    const r = await fetch('http://localhost:8080/save-asset', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: `docs/art/chunks/${name}`, b64, contentType: blob.type || 'image/png', stitch: true }),
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.ok) throw new Error(j.error || ('HTTP ' + r.status));
+    const st = j.stitch || {};
+    if (st.stitched) toast(`✅ ${name} → 전체 stitch 완료! /assets/maps/${stage}.webp 게임 적용 (게임 하드리프레시)`);
+    else if (st.have != null) toast(`🧩 ${name} 저장 — 조각 ${st.have}/${st.total} (다 채우면 자동 stitch→게임)`);
+    else toast(`${name} 저장됨${st.reason ? ' · ' + st.reason : ''}`);
+  } catch (e) {
+    toast(`${name} 서버 저장 실패: ${e.message} (:8080 서버 확인)`);
+  }
 }
 
 function updateProgress() {

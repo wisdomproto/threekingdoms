@@ -30,6 +30,22 @@ export class UnitLayer extends Container {
     this.tweens = tweens;
     this.sortableChildren = true;
     for (const u of state.units) this.createView(u);
+    this.orientInitial(state); // 시작 시 적을 바라보게 (기본 facing=우향 보정)
+  }
+
+  /** 전투 시작 시 각 유닛이 가장 가까운 적을 바라보게 초기 방향 설정.
+   *  UnitView 기본 facing=+1(우향)이라, 안 하면 우측의 적군이 플레이어 반대(우측)를 본다. */
+  private orientInitial(state: BattleState): void {
+    const living = state.units.filter((u) => !u.retreated);
+    for (const u of living) {
+      const view = this.views.get(u.id);
+      if (!view) continue;
+      const foes = living.filter((o) => (o.side === "enemy") !== (u.side === "enemy"));
+      if (!foes.length) continue;
+      const dist = (o: { x: number; y: number }): number => Math.abs(o.x - u.x) + Math.abs(o.y - u.y);
+      const nearest = foes.reduce((a, b) => (dist(b) < dist(a) ? b : a));
+      view.faceToward({ x: nearest.x, y: nearest.y });
+    }
   }
 
   /** UnitState(또는 동형 데이터)로 뷰 1개 생성·등록. 초기 배치·증원 스폰·sync 폴백이 공유. */
