@@ -13,15 +13,15 @@
   },
   "liubei": {
     "poses": [
-      "front_idle",
-      "front_move",
-      "front_attack",
+      "back_attack",
       "back_idle",
       "back_move",
-      "back_attack"
+      "front_attack",
+      "front_idle",
+      "front_move"
     ],
-    "source": "B-5a_ink_02.png",
-    "method": "blob"
+    "source": "_posesheet.png",
+    "method": "cut_posesheet.py"
   },
   "zhangfei": {
     "poses": [

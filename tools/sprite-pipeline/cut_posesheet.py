@@ -10,8 +10,13 @@
 로 저장하고 manifest.json에 tier1(루트) 포즈만 등록한다.
 단일 행 시트(구형 1×3)는 전부 tier1/루트로 저장(하위호환).
 
-사용: python cut_posesheet.py <spriteId> [pose1 pose2 ...]
-  예: python cut_posesheet.py guanyu
+방향: SD 스프라이트는 facing=screen-left 고정(CLAUDE.md §4/§7, 코드 미러링 기준).
+  이미지 모델이 좌/우를 자주 반전하므로 시트가 오른쪽 바라보기로 나오면 --flip 으로
+  셀별 좌우 반전해 왼쪽 기준에 맞춘다(칸 위치로 포즈를 판정하므로 매핑은 불변).
+
+사용: python cut_posesheet.py <spriteId> [pose1 pose2 ...] [--flip]
+  예: python cut_posesheet.py guanyu          (왼쪽 바라보기 시트)
+      python cut_posesheet.py guanyu --flip    (오른쪽 바라보기로 나온 시트를 뒤집어 컷)
 """
 import sys, os, json
 from PIL import Image
@@ -109,11 +114,13 @@ def detect_grid(im):
     return grid
 
 
-def cut_sheet(im, poses):
+def cut_sheet(im, poses, flip=False):
     """포즈 시트를 격자로 잘라 (tier_index, pose_name, crop_image) 리스트 반환.
 
     tier_index: 0=tier1(루트), 1=tier2, 2=tier3 (행 순서)
     단일 행이면 전부 tier_index=0 (하위호환).
+    flip=True 면 각 셀을 좌우 반전(screen-right → screen-left). 셀 위치로 포즈를
+      판정하므로 칸 안 그림만 미러되고 idle/move/attack 매핑은 불변.
     """
     grid = detect_grid(im)
     result = []
@@ -123,6 +130,8 @@ def cut_sheet(im, poses):
         for col_idx in range(n):
             x0, y0, x1, y1 = row_cells[col_idx]
             crop = im.crop((x0, y0, x1, y1))
+            if flip:
+                crop = crop.transpose(Image.FLIP_LEFT_RIGHT)
             result.append((tier_idx, poses[col_idx], crop))
     return result
 
@@ -132,10 +141,13 @@ TIER_SUBDIR = {0: "", 1: "t2", 2: "t3"}
 
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
-    if len(sys.argv) < 2:
-        print("사용: python cut_posesheet.py <spriteId> [poses...]"); sys.exit(1)
-    sid = sys.argv[1]
-    poses = sys.argv[2:] or DEFAULT_POSES
+    args = sys.argv[1:]
+    flip = "--flip" in args
+    args = [a for a in args if not a.startswith("--")]
+    if not args:
+        print("사용: python cut_posesheet.py <spriteId> [poses...] [--flip]"); sys.exit(1)
+    sid = args[0]
+    poses = args[1:] or DEFAULT_POSES
     d = os.path.join(SPRITES, sid)
     sheet = os.path.join(d, "_posesheet.png")
     if not os.path.exists(sheet):
@@ -143,9 +155,9 @@ def main():
 
     im = Image.open(sheet).convert("RGBA")
     W, H = im.size
-    print(f"{sid}: {W}x{H}")
+    print(f"{sid}: {W}x{H}{'  [--flip 좌우반전→screen-left]' if flip else ''}")
 
-    cells = cut_sheet(im, poses)
+    cells = cut_sheet(im, poses, flip)
     print(f"  검출 셀 {len(cells)}개")
 
     tier1_poses = []
