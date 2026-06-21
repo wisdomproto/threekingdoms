@@ -99,6 +99,8 @@
   <button class="btn" id="dirbtn" title="⬇ 저장이 향할 폴더 (docs\art 권장)">저장 폴더: 미연결</button>
   <button class="btn" id="refreshbtn" title="서버(:8080)에서 게임에 들어간 에셋 목록을 다시 읽어 ✓/⬜·미리보기 갱신">🔄 게임 상태 새로고침</button>
   <button class="btn" id="applytilesbtn" title="이미 붙여둔(보드 IndexedDB) E 바닥 이미지를 전부 /assets/tiles/ 로 일괄 적용 (자동저장 도입 전 백로그)">🟫 붙여둔 바닥 전부 게임 적용</button>
+  <button class="btn" id="applyobjectsbtn" title="이미 붙여둔(보드 IndexedDB) K-4~K-7 오브젝트 시트를 전부 /assets/objects/_sheet_*.png 로 디스크에 올림. 그 뒤 Claude가 시트를 보고 cut_object_sheet.py 로 컷">🧱 붙여둔 오브젝트 시트 전부 디스크로</button>
+  <button class="btn primary" id="dumpallbtn" title="모든 카드의 붙여둔 이미지를 전부 디스크로 — 타일/오브젝트/씬은 게임 경로, 이펙트·UI 등은 _board_dump/ 로 원본 보존. 데이터가 있는 이 브라우저에서 한 번 누르면 끝.">💾 붙여둔 것 전부 디스크로 (모든 카드)</button>
   <div id="progress"></div>
 </header>
 <div id="tabbar"></div>
@@ -600,16 +602,16 @@ const SECTIONS = [
         ['성내 전돌 (벽돌 바닥)', 'a packed grey brick paving, subtle regular brick pattern, muted and weathered']
       ]},
       prompt: 'SEAMLESS TILEABLE texture, strictly top-down view: {지형}. Painted in subtle East Asian ink-wash tones on a textured paper feel. LOW CONTRAST — the paving pattern is faint and must read as an almost flat surface from a distance, no objects, no directional shadows, no perspective, edges must wrap seamlessly (left matches right, top matches bottom). Square 1:1.' },
-    { id: 'K-4', title: '성곽 오브젝트 시트 (성벽 오토타일·성문 상태·망루)', multi: '한 장에 12조각',
+    { id: 'K-4', title: '성곽 오브젝트 시트 (성벽 오토타일·성문 상태·망루)', multi: '한 장에 12조각', objectSheet: 'k4',
       note: '⭐ wall/gate/fort 지형 구동(설계 §5.1). 성벽=오토타일 세그먼트(직선·모서리·T·십자·끝)로 임의 배치 자동 조립 / 성문=상태별(닫힘·열림·파괴) / 성벽 붕괴 + 망루. 칸 footprint 정렬. 시점=TOPDOWN_OBJ(아이소 금지).',
       prompt: 'Game map object sheet in ONE image on plain white background, ' + TOPDOWN_OBJ + ', ink-wash painted style, muted stone-grey and timber tones, soft contact shadow only at the very base, each piece sized to ONE square grid tile so wall segments tile seamlessly edge-to-edge: (1) a straight stone wall segment running left-to-right, (2) a wall corner / L-junction segment, (3) a wall T-junction segment, (4) a wall four-way cross segment, (5) a wall end-cap segment, (6) a crenellated battlement wall-top variant, (7) a ruined / breached wall gap with rubble, (8) a closed fortified gate with twin timber doors, (9) the SAME gate open with both doors swung inward, (10) the SAME gate shattered and destroyed with splintered doors and rubble, (11) a square corner watchtower, (12) a two-storey gatehouse tower. Each object complete and clearly separated with generous white spacing, clean croppable edges, drawn so wall segments align on a square grid, NO ground slab attached. No grid lines, no labels.' },
-    { id: 'K-5', title: '방어·진영 오브젝트 시트 (목책·녹채·군기·천막)', multi: '한 장에 12조각',
+    { id: 'K-5', title: '방어·진영 오브젝트 시트 (목책·녹채·군기·천막)', multi: '한 장에 12조각', objectSheet: 'k5',
       note: '⭐ 야전 진영/방어선 액센트(데코 배치, 설계 §5.2). 목책도 오토타일(직선·모서리). 시점=TOPDOWN_OBJ.',
       prompt: 'Game map object sheet in ONE image on plain white background, ' + TOPDOWN_OBJ + ', ink-wash painted style, muted timber-brown and earthy tones with selective banner colors, soft contact shadow only at the very base: (1) a straight wooden palisade fence segment running left-to-right, (2) a palisade corner segment, (3) a sharpened-stake abatis barricade, (4) a low woven bamboo fence segment, (5) a closed camp gate set in a palisade, (6) a tall command banner on a pole, (7) a row of small army pennants, (8) a signal-flag standard, (9) a stacked sandbag / earthwork rampart, (10) a small open supply-cart, (11) a campfire with a cooking pot, (12) a watch-brazier on a stand. Each object complete and clearly separated with generous white spacing, clean croppable edges, drawn straight-down, NO ground slab attached. No grid lines, no labels.' },
-    { id: 'K-6', title: '자연·잔해 오브젝트 시트 (바위·고목·잔해)', multi: '한 장에 12조각',
+    { id: 'K-6', title: '자연·잔해 오브젝트 시트 (바위·고목·잔해)', multi: '한 장에 12조각', objectSheet: 'k6',
       note: '⭐ 자연 장식 + 전투 잔해(데코 배치) — forest/mountain/cliff/waste 칸 액센트. 시점=TOPDOWN_OBJ.',
       prompt: 'Game map object sheet in ONE image on plain white background, ' + TOPDOWN_OBJ + ', ink-wash painted style, muted natural tones, soft contact shadow only at the very base: (1) a single large boulder, (2) a cluster of small rocks, (3) a jagged cliff-edge rock outcrop, (4) a bare gnarled dead tree seen from above, (5) a leafy deciduous tree seen from above (round canopy with a slight hint of trunk), (6) a fallen log, (7) a dry shrub / bush, (8) a tall reed clump, (9) a broken overturned cart with a snapped wheel, (10) scattered shattered weapons and a cracked shield, (11) a discarded broken siege-machine frame, (12) a somber strewn battlefield debris pile, rendered restrained and non-graphic. Each object complete and clearly separated with generous white spacing, clean croppable edges, drawn looking down from above, NO ground slab attached. No grid lines, no labels.' },
-    { id: 'K-7', title: '수상전 오브젝트 시트 (배·선착장·부교)', multi: '한 장에 10조각',
+    { id: 'K-7', title: '수상전 오브젝트 시트 (배·선착장·부교)', multi: '한 장에 10조각', objectSheet: 'k7',
       note: '⭐ 5장 적벽·삼강구 수상전 — river 칸 위 배/선착장(설계 §5.1 수상 피처). 시점=TOPDOWN_OBJ.',
       prompt: 'Game map object sheet in ONE image on plain white background, ' + TOPDOWN_OBJ + ', ink-wash painted style, muted timber and lacquered-hull tones, soft contact shadow / faint water-line only at the very base, each vessel a complete croppable sprite: (1) a large two-deck war-junk with a sail, (2) a medium battle-junk oriented horizontally (left-to-right), (3) the same battle-junk oriented vertically (top-to-bottom), (4) a small fast scout boat, (5) a fishing sampan, (6) a flat ferry raft, (7) a wooden pier / jetty, (8) a pontoon plank-bridge segment, (9) several ships lashed side-by-side with planks between them (linked-ships formation), (10) a half-burnt smoking war-junk for fire-attack scenes. Each object complete and clearly separated with generous white spacing, clean croppable edges, NO water attached underneath. No grid lines, no labels.' },
     { id: 'K-8', title: '동적 지형 VFX 오브젝트 시트 (불·연기·물보라)', multi: '한 장에 8요소', vfx: true,
@@ -1558,6 +1560,29 @@ document.getElementById('applytilesbtn').addEventListener('click', async () => {
   btn.textContent = orig; btn.disabled = false;
 });
 
+document.getElementById('applyobjectsbtn').addEventListener('click', async () => {
+  const btn = document.getElementById('applyobjectsbtn');
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = '⏳ 올리는 중…';
+  try {
+    const { applied, failed } = await applyAllObjects();
+    if (!applied.length && !failed.length) toast('붙여둔 오브젝트 시트가 없습니다 — K-4~K-7 카드에 붙여넣으면 이후엔 자동 저장됩니다.');
+    else toast(`🧱 ${applied.length}장 디스크 적용: ${applied.join(', ')}${failed.length ? ` · 실패 ${failed.length}` : ''} — Claude에게 "오브젝트 넘겼어"라고 하면 컷합니다`);
+  } catch (e) { toast('일괄 적용 실패: ' + e.message + ' (:8080 서버 확인)', true); }
+  btn.textContent = orig; btn.disabled = false;
+});
+
+document.getElementById('dumpallbtn').addEventListener('click', async () => {
+  const btn = document.getElementById('dumpallbtn');
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = '⏳ 전부 디스크로…';
+  try {
+    const r = await dumpAllToDisk();
+    if (!r.total) toast('붙여둔 이미지가 없습니다 (이 브라우저 IndexedDB가 비어있음).');
+    else toast(`💾 ${r.total}장 디스크 저장 — 게임경로 ${r.game.length} · 보존덤프 ${r.dump.length}${r.failed.length ? ` · 실패 ${r.failed.length}` : ''}. Claude에게 "덤프했어" 하면 라우팅합니다`);
+    console.log('[dumpAllToDisk]', r);
+  } catch (e) { toast('덤프 실패: ' + e.message + ' (:8080 서버 확인)', true); }
+  btn.textContent = orig; btn.disabled = false;
+});
+
 document.getElementById('tabbar').addEventListener('click', e => {
   const t = e.target.closest('.tab');
   if (!t) return;
@@ -1775,6 +1800,72 @@ async function applyAllTiles() {
   }
   return { applied, failed };
 }
+/* 맵 오브젝트 시트(K-4~K-7) → /assets/objects/_sheet_{key}.png 스테이징 경로(붙여넣기 시 자동 저장).
+   원본 한 장을 그대로 디스크에 올려두면 Claude가 Read로 격자를 눈으로 보고 cut_object_sheet.py 로
+   올바른 --grid 로 컷한다(SD 포즈시트와 같은 비전 QA — 모델 배치가 일정치 않아 자동컷은 위험). */
+function objectSheetTarget(item) {
+  return item && item.objectSheet ? `_sheet_${item.objectSheet}.png` : null;
+}
+/* 이미 붙여둔(IndexedDB) 오브젝트 시트를 전부 /assets/objects/_sheet_{key}.png 로 일괄 디스크 적용
+   — 자동저장 도입 전 백로그용. 카드당 가장 최근 1장. 컷은 Claude가 시트를 보고 수행. */
+async function applyAllObjects() {
+  const all = (await dbAll()).sort((a, b) => a.at - b.at);
+  const byCard = {};
+  for (const r of all) (byCard[r.card] = byCard[r.card] || []).push(r);
+  const applied = [], failed = [];
+  for (const [cardId, recs] of Object.entries(byCard)) {
+    const item = findItem(cardId);
+    const target = objectSheetTarget(item);
+    if (!target) continue;
+    try { await applyToGame(`assets/objects/${target}`, recs[recs.length - 1].blob); applied.push(target); }
+    catch (e) { failed.push(`${target}(${e.message})`); }
+  }
+  return { applied, failed };
+}
+/* 모든 카드의 붙여둔 이미지를 디스크로 (백로그 일괄). 알려진 게임 타깃(타일/오브젝트/씬)은 정식 경로,
+   그 외(이펙트 C·UI D/L·기타)는 assets/_board_dump/{card}/{name} 로 원본 보존(게임 소비 슬롯 생기면 라우팅).
+   ⚠ 브라우저 보안: IndexedDB 는 *이 탭의 JS* 만 읽는다 — 자동화 확장이 다른 브라우저 인스턴스라
+   사용자가 *데이터가 있는 자기 브라우저에서* 한 번 눌러야 한다. 이후 붙여넣기는 자동 보존(else 분기). */
+async function dumpAllToDisk() {
+  const all = (await dbAll()).sort((a, b) => a.at - b.at);
+  const byCard = {};
+  for (const r of all) (byCard[r.card] = byCard[r.card] || []).push(r);
+  const game = [], dump = [], failed = [];
+  for (const [card, recs] of Object.entries(byCard)) {
+    const item = findItem(card);
+    try {
+      if (item && item.tile) {
+        const arr = Array.isArray(item.tile) ? item.tile : [item.tile];
+        const use = recs.slice(-arr.length); // 최근 N장 → 변형 0..N
+        for (let i = 0; i < use.length; i++) { await applyToGame(`assets/tiles/${arr[i]}`, use[i].blob); game.push('tiles/' + arr[i]); }
+      } else if (item && item.objectSheet) {
+        await applyToGame(`assets/objects/_sheet_${item.objectSheet}.png`, recs[recs.length - 1].blob); game.push('objects/_sheet_' + item.objectSheet + '.png');
+      } else if (item && item.sceneCard && item.saveName) {
+        await applyToGame(`assets/scenes/${item.saveName}`, recs[recs.length - 1].blob); game.push('scenes/' + item.saveName);
+      } else {
+        for (const r of recs) { const safe = (r.name || card + '.png').replace(/[^\w.\-]/g, '_'); await applyToGame(`assets/_board_dump/${card}/${safe}`, r.blob); dump.push(card + '/' + safe); }
+      }
+    } catch (e) { failed.push(card + ': ' + e.message); }
+  }
+  return { total: all.length, cards: Object.keys(byCard).length, game, dump, failed };
+}
+/* 보드 로드 시 붙여둔 이미지를 디스크로 자동 보존 — IndexedDB 내용(개수+최신시각)이 직전 덤프 이후
+   바뀌었을 때만 실행(매 새로고침 재업로드 방지). :8080 서버 꺼져있으면 조용히 스킵(수동 💾 버튼으로 가능). */
+async function autoDumpOnLoad() {
+  try {
+    const all = await dbAll();
+    if (!all.length) return;
+    const sig = all.length + ':' + Math.max(...all.map(r => r.at || 0));
+    if (localStorage.getItem('ab_dump_sig') === sig) return; // 변경 없음 → 스킵
+    const r = await dumpAllToDisk();
+    if (!r.failed.length) {
+      localStorage.setItem('ab_dump_sig', sig);
+      toast(`💾 자동 보존: ${r.total}장 디스크 (게임 ${r.game.length} · 덤프 ${r.dump.length}). Claude에게 "덤프했어"`);
+    } else {
+      toast(`💾 자동 보존 ${r.total - r.failed.length}/${r.total} · 실패 ${r.failed.length} (:8080 서버 확인)`, true);
+    }
+  } catch (e) { /* 서버 꺼짐 등 — 조용히 무시(수동 💾 버튼으로 재시도 가능) */ }
+}
 async function addImageToCard(cardId, blob) {
   const item = findItem(cardId);
   let finalBlob = blob;
@@ -1820,8 +1911,24 @@ async function addImageToCard(cardId, blob) {
     } catch (e) {
       toast(`${name} 저장됨 (타일 적용 실패: ${e.message} — :8080 서버 켜졌는지 확인)`);
     }
+  } else if (objectSheetTarget(item)) {
+    const target = objectSheetTarget(item);
+    try {
+      await applyToGame(`assets/objects/${target}`, finalBlob);
+      toast(`🧱 오브젝트 시트 디스크 저장: ${target} → Claude에게 "오브젝트 넘겼어"라고 하면 격자 보고 컷합니다`);
+    } catch (e) {
+      toast(`${name} 저장됨 (오브젝트 적용 실패: ${e.message} — :8080 서버 켜졌는지 확인)`);
+    }
   } else {
-    toast(`${name} 저장됨`);
+    /* 알려진 게임 타깃이 없는 카드(이펙트 C·UI D/L·기타) — 원본을 디스크에 보존(브라우저 IndexedDB 휘발 방지).
+       게임이 이미지로 소비하는 슬롯이 생기면 _board_dump 에서 정식 경로로 라우팅. */
+    const safe = name.replace(/[^\w.\-]/g, '_');
+    try {
+      await applyToGame(`assets/_board_dump/${cardId}/${safe}`, finalBlob);
+      toast(`💾 디스크 보존: _board_dump/${cardId}/${safe}`);
+    } catch (e) {
+      toast(`${name} 저장됨(IndexedDB) — 디스크 보존 실패: ${e.message} (:8080 확인)`);
+    }
   }
 }
 
@@ -2002,7 +2109,7 @@ document.getElementById('dirbtn').addEventListener('click', async () => {
 (async () => {
   await loadAssetStatus();
   render();
-  try { db = await openDB(); await loadImagesForCurrentTab(); await restoreDir(); }
+  try { db = await openDB(); await loadImagesForCurrentTab(); await restoreDir(); await autoDumpOnLoad(); }
   catch (err) {
     document.querySelector('.info').insertAdjacentHTML('beforeend',
       '<br><b style="color:var(--red)">⚠ 이 브라우저에서 IndexedDB를 열 수 없어 이미지 저장이 비활성화됩니다.</b> (' + err + ')');

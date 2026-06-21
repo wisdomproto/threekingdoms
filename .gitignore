@@ -18,6 +18,10 @@ docs/art/chunks/
 apps/web/public/assets/iso/
 # 생성 유닛 스프라이트(슬라이스 PNG, 대용량·재생성 가능) — 미보유 시 렌더러가 placeholder 폴백
 apps/web/public/assets/sprites/
+# 맵 오브젝트 시트 원본(대용량·재생성) — cut_object_sheet.py 가 자른 wall_*/gate_* 슬라이스만 추적
+apps/web/public/assets/objects/_sheet_*.png
+# 보드 IndexedDB 덤프(이펙트/UI 등 아직 게임 소비자 없는 원본 보존) — 소비 슬롯 생기면 정식 경로로 라우팅
+apps/web/public/assets/_board_dump/
 
 # 조조전 대사·이벤트 원문 추출 — 코에이 저작 텍스트(IP). 로컬 레퍼런스만, 커밋 금지.
 # 재생성: tools/hero-extract/eex_extract.py·eex_events.py. 수치 테이블(generals/weapons/strategies 등)은 추적.
