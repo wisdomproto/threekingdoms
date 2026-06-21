@@ -8,6 +8,8 @@
 
 **Tech Stack:** TypeScript, PixiJS 8, Vitest, pnpm monorepo (`apps/web`). Spec: `docs/superpowers/specs/2026-06-21-hybrid-map-rendering-design.md`.
 
+> **Status (2026-06-21):** ✅ **Chunk 1·2 구현·커밋** (autotile/objectModel 순수+TDD, ObjectLayer, TerrainLayer 데코 흡수, BattleRenderer 배선) — typecheck/test 515/build 전부 green, 렌더러 가동(기존 데코 always-visible). ✅ **Chunk 3 컷 도구** `tools/sprite-pipeline/cut_object_sheet.py`(합성 검증). ⏳ 미착수: 벽이 보이려면 K-4 top-down 시트 생성→컷 / 보드 📤-오브젝트 자동컷 배선 / 성문 상태 이벤트 / `decorations` 데이터 / yingchuan 맵 수정.
+
 ---
 
 ## File Structure

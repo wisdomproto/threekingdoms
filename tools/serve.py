@@ -9,10 +9,11 @@
   ② .env.r2 가 있으면 R2 버킷 key=<path> 로도 업로드(= 배포본 자동 동기화).
   시크릿(R2 키)은 이 서버에만 있고 에디터엔 노출되지 않는다.
 """
-import sys, os, json, base64, mimetypes
+import sys, os, json, base64, mimetypes, subprocess, re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUBLIC = os.path.join(ROOT, "apps", "web", "public")
+CUT_SCRIPT = os.path.join(ROOT, "tools", "sprite-pipeline", "cut_posesheet.py")
 PORT = 8080
 
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -58,6 +59,25 @@ def _r2_upload(key, data, content_type):
         return True, env["R2_BUCKET"]
     except Exception as e:  # noqa: BLE001
         return False, str(e)
+
+
+def _run_cut(sid, flip):
+    """저장된 _posesheet.png 를 cut_posesheet.py 로 자동 컷(고정 3×3 + 선택 flip).
+
+    9칸 시트를 front_{idle,move,attack}.png(등급1 루트) + t2/t3 로 잘라 게임에 즉시 반영한다.
+    flip=True 면 좌우 반전(screen-right→left). 결과 {ok, cells, flip, output} 반환.
+    """
+    cmd = [sys.executable, CUT_SCRIPT, sid, "--grid=3x3"] + (["--flip"] if flip else [])
+    env = {**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}
+    try:
+        p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
+                           env=env, cwd=ROOT, timeout=60)
+        out = (p.stdout or "") + (p.stderr or "")
+        m = re.search(r"(\d+)\s*칸", out) or re.search(r"검출 셀 (\d+)", out)
+        return {"ok": p.returncode == 0, "cells": int(m.group(1)) if m else None,
+                "flip": flip, "output": out[-800:]}
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "error": str(e)}
 
 
 class NoCacheHandler(SimpleHTTPRequestHandler):
@@ -166,7 +186,18 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
         msg = f"public/{rel} 저장"
         msg += f" + R2 업로드({r2_info})" if r2_ok else f" (R2 건너뜀: {r2_info})"
         sys.stdout.write("[save-asset] " + msg + "\n")
-        self._json(200, {"ok": True, "local": rel, "r2": r2_ok, "r2info": r2_info, "bytes": len(data)})
+
+        # ③ 포즈 시트 자동 컷 (payload.cut) — _posesheet.png 저장 직후 cut_posesheet.py 실행
+        resp = {"ok": True, "local": rel, "r2": r2_ok, "r2info": r2_info, "bytes": len(data)}
+        if payload.get("cut") and rel.startswith("assets/sprites/") and rel.endswith("/_posesheet.png"):
+            parts = rel.split("/")
+            sid = parts[2] if len(parts) >= 4 else None
+            if sid:
+                cut = _run_cut(sid, bool(payload.get("flip")))
+                resp["cut"] = cut
+                sys.stdout.write(f"[save-asset] cut {sid} flip={bool(payload.get('flip'))} → ok={cut.get('ok')} cells={cut.get('cells')}\n")
+
+        self._json(200, resp)
 
 
 if __name__ == "__main__":

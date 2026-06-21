@@ -14,9 +14,14 @@
   이미지 모델이 좌/우를 자주 반전하므로 시트가 오른쪽 바라보기로 나오면 --flip 으로
   셀별 좌우 반전해 왼쪽 기준에 맞춘다(칸 위치로 포즈를 판정하므로 매핑은 불변).
 
-사용: python cut_posesheet.py <spriteId> [pose1 pose2 ...] [--flip]
-  예: python cut_posesheet.py guanyu          (왼쪽 바라보기 시트)
-      python cut_posesheet.py guanyu --flip    (오른쪽 바라보기로 나온 시트를 뒤집어 컷)
+격자: 기본은 간격 감지(detect_grid). 9칸 시트가 빽빽해(말·전차) 칸 사이 투명 간격을
+  못 찾으면 통짜 1칸이 되는데, 정사각 대형 시트면 자동으로 3×3 고정 격자로 폴백한다.
+  `--grid=3x3` 으로 감지를 건너뛰고 고정 균등 분할(+칸별 투명 트림)을 강제할 수도 있다.
+
+사용: python cut_posesheet.py <spriteId> [pose1 pose2 ...] [--flip] [--grid=3x3]
+  예: python cut_posesheet.py guanyu                 (왼쪽 바라보기 시트, 감지)
+      python cut_posesheet.py guanyu --flip          (오른쪽 바라보기 시트를 뒤집어 컷)
+      python cut_posesheet.py guanyu --grid=3x3 --flip  (3×3 고정 격자 강제 + 뒤집기)
 """
 import sys, os, json
 from PIL import Image
@@ -136,16 +141,47 @@ def cut_sheet(im, poses, flip=False):
     return result
 
 
+def cut_fixed_grid(im, poses, rows, cols, flip=False):
+    """고정 균등 격자(rows×cols)로 분할 + 칸별 투명여백 트림.
+
+    9칸 시트는 항상 3×3 균등 격자(프롬프트 보장)라, 칸이 빽빽해 간격 감지(detect_grid)가
+    실패할 때(말·전차 등) 이 고정 분할이 안정적이다. 각 칸을 W/cols × H/rows 로 나눈 뒤
+    알파 bbox 로 투명 테두리를 잘라낸다. flip=True 면 칸별 좌우 반전(포즈 매핑 불변).
+    """
+    W, H = im.size
+    cw, ch = W // cols, H // rows
+    result = []
+    for r in range(rows):
+        for c in range(min(cols, len(poses))):
+            cell = im.crop((c * cw, r * ch, (c + 1) * cw, (r + 1) * ch))
+            bbox = cell.split()[3].getbbox()  # 알파 채널 bbox → 투명 테두리 트림
+            if bbox:
+                cell = cell.crop(bbox)
+            if flip:
+                cell = cell.transpose(Image.FLIP_LEFT_RIGHT)
+            result.append((r, poses[c], cell))
+    return result
+
+
 TIER_SUBDIR = {0: "", 1: "t2", 2: "t3"}
 
 
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
-    args = sys.argv[1:]
-    flip = "--flip" in args
-    args = [a for a in args if not a.startswith("--")]
+    raw = sys.argv[1:]
+    flip = "--flip" in raw
+    grid = None
+    for a in raw:
+        if a.startswith("--grid="):
+            gv = a.split("=", 1)[1].lower()
+            try:
+                rr, cc = (int(x) for x in gv.split("x"))
+                grid = (rr, cc)
+            except ValueError:
+                print(f"--grid 형식 오류: {a} (예: --grid=3x3)"); sys.exit(1)
+    args = [a for a in raw if not a.startswith("--")]
     if not args:
-        print("사용: python cut_posesheet.py <spriteId> [poses...] [--flip]"); sys.exit(1)
+        print("사용: python cut_posesheet.py <spriteId> [poses...] [--flip] [--grid=3x3]"); sys.exit(1)
     sid = args[0]
     poses = args[1:] or DEFAULT_POSES
     d = os.path.join(SPRITES, sid)
@@ -157,8 +193,16 @@ def main():
     W, H = im.size
     print(f"{sid}: {W}x{H}{'  [--flip 좌우반전→screen-left]' if flip else ''}")
 
-    cells = cut_sheet(im, poses, flip)
-    print(f"  검출 셀 {len(cells)}개")
+    if grid:
+        cells = cut_fixed_grid(im, poses, grid[0], grid[1], flip)
+        print(f"  고정 격자 {grid[0]}x{grid[1]} → {len(cells)}칸")
+    else:
+        cells = cut_sheet(im, poses, flip)
+        # 빽빽한 9칸 시트는 간격 감지가 실패해 통짜 1칸이 되곤 한다 → 정사각 대형 시트면 3×3 폴백
+        if len(cells) == 1 and min(W, H) >= 512 and 0.9 <= W / H <= 1.1:
+            print("  ⚠ 간격 감지 1칸(통짜) — 정사각 대형 시트라 3x3 고정 격자로 폴백")
+            cells = cut_fixed_grid(im, poses, 3, 3, flip)
+        print(f"  검출 셀 {len(cells)}개")
 
     tier1_poses = []
     for tier_idx, pose, crop in cells:

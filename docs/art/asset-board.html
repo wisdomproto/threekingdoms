@@ -63,6 +63,10 @@
   .sendstatus { margin-top: 8px; padding: 8px 10px; border-radius: 6px; background: var(--panel2); border: 1px solid var(--line); font-size: 12px; line-height: 1.5; }
   .sendstatus code { background: rgba(0,0,0,0.25); padding: 0 4px; border-radius: 3px; }
   .sendstatus .dimnote { color: var(--dim); }
+  .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid var(--line); border-top-color: var(--acc); border-radius: 50%; animation: ab-spin .7s linear infinite; vertical-align: -2px; margin-right: 5px; }
+  @keyframes ab-spin { to { transform: rotate(360deg); } }
+  .flipchk { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--dim); cursor: pointer; user-select: none; }
+  .flipchk input { cursor: pointer; margin: 0; }
   .thumb { position: relative; width: 96px; }
   .thumb img { width: 96px; height: 96px; object-fit: cover; border-radius: 6px; border: 2px solid var(--line); display: block; cursor: zoom-in; }
   .thumb.picked img { border-color: var(--acc); box-shadow: 0 0 6px rgba(212,168,67,.5); }
@@ -127,6 +131,9 @@
 const STYLE = 'Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. Clean silhouette readability for game use. NOT photorealistic, NOT anime-cel.';
 const COMMON = 'Setting: Three Kingdoms era China (Han dynasty, ~190 AD), historically grounded armor and clothing with fantasy flair. Original character design — must NOT resemble any existing game\'s artwork (especially Koei Tecmo\'s style or illustrations). No text, no watermark, no logo, no UI elements in the image.';
 const NEGATIVE = 'Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects.';
+/* 맵 오브젝트 시점 — 엄격 top-down(아이소 금지). 설계=docs/superpowers/specs/2026-06-21-hybrid-map-rendering-design.md §4.
+   바닥은 톱다운, 오브젝트는 정면 직립(빌보드)·약한 높이감. 절대 45° 아이소(두 측면 보이는 블록) 금지. */
+const TOPDOWN_OBJ = 'strict top-down tactics-map view looking straight down from above — NO isometric, NO 45-degree rotation, NO two-sided oblique projection: each object faces the viewer squarely, showing its top and at most a slight near-face hint of height like the flat terrain tiles of a classic top-down tactical-RPG battle map, NEVER a 3/4 isometric block with two receding side faces';
 const SHEET_FMT = 'Character reference sheet layout on plain white background, everything in ONE image: full-body front view, side view, and back view standing in neutral A-pose, same scale, aligned in a row; plus two head close-ups with different expressions (calm / battle fury) in a corner. Flat even lighting, no dramatic shadows, character design sheet for game production.';
 const VFX_PREFIX = 'VFX sprite sheet on pure black background, additive-blending ready (bright elements on black), no characters, no scenery, game effect assets. All elements clearly separated with generous black spacing in a loose grid, each element complete and uncropped.';
 const GRID_NOTE = 'All cells same scale, generous white spacing between cells, no grid lines, no labels, each figure complete and uncropped.';
@@ -269,13 +276,13 @@ const SECTIONS = [
       prompt: 'Wide panoramic background art for the top edge of an isometric battle map: distant hazy mountains and a pale dawn sky over the Central Plains of China, very low detail at the bottom edge (fades to neutral), strong atmospheric perspective, no foreground objects. 21:9 aspect ratio, muted tones that will not compete with battle units.' },
     { id: 'B-6', title: '산봉우리 오브젝트 (투명 배경)', multi: '한 장에 3변형',
       note: '⭐ 돌산 액센트 교체용. 지금 산이 구린 핵심 — 바위 무더기 대신 단독 봉우리로. 바위 바닥(E-2) 위에 듬성듬성 얹습니다.',
-      prompt: 'Three separate mountain peak objects in a row on plain white background, top-down oblique view (camera ~50° above) for a tactics map. Rugged East Asian mountain peaks — weathered grey rock with a little sparse pine, each a distinct compact peak with a clear silhouette, three different shapes (one tall craggy, one broad, one twin-summit). Ink-wash painted style, soft contact shadow only at the very base. Each peak complete and separated with generous white spacing, clean croppable edges, NO ground slab attached. No grid, no labels.' },
+      prompt: 'Three separate mountain peak objects in a row on plain white background, ' + TOPDOWN_OBJ + ' for a tactics map. Rugged East Asian mountain peaks — weathered grey rock with a little sparse pine, each a distinct compact peak with a clear silhouette, three different shapes (one tall craggy, one broad, one twin-summit). Ink-wash painted style, soft contact shadow only at the very base. Each peak complete and separated with generous white spacing, clean croppable edges, NO ground slab attached. No grid, no labels.' },
     { id: 'B-7', title: '다리 오브젝트 (투명 배경)', multi: '한 장에 2방향',
       note: '강(E-4) 위에 놓는 다리. 가로/세로 2방향. 물과 함께 써야 의미 있음.',
-      prompt: 'Two traditional East Asian wooden bridges side by side on plain white background, top-down oblique view for a tactics map. Wooden plank deck with low railings, gentle arch. LEFT: oriented to span left-to-right (horizontal). RIGHT: oriented to span top-to-bottom (vertical). Ink-wash painted style, weathered wood tones. Each bridge complete and separated, clean croppable edges, NO water attached underneath. No grid, no labels.' },
+      prompt: 'Two traditional East Asian wooden bridges side by side on plain white background, ' + TOPDOWN_OBJ + ' for a tactics map. Wooden plank deck with low railings, gentle arch. LEFT: oriented to span left-to-right (horizontal). RIGHT: oriented to span top-to-bottom (vertical). Ink-wash painted style, weathered wood tones. Each bridge complete and separated, clean croppable edges, NO water attached underneath. No grid, no labels.' },
     { id: 'B-8', title: '회복 지형 오브젝트 (움막/막사/창고)', multi: '한 장에 3종',
       note: '⭐ 기능성 지형물 — 회복 칸 마커 (촌락=움막 / 병영=막사 / 보급=창고). 장식이 아니라 게임 요소라 명시 스프라이트로(영걸전 회복 지형). 칸 위에 얹어 "여기 서면 회복"을 한눈에. 바닥(E-*) 위 액센트로 배치.',
-      prompt: 'Three separate functional map structures in a row on plain white background, top-down oblique view (camera ~50° above) for a tactics map, each sized to sit on a single grid tile. LEFT — a small thatched-roof peasant hut (village / healing spot): round mud-wall hut with a conical straw roof and a tiny dark doorway. CENTER — a military camp war-tent (barracks / healing spot): a peaked canvas tent with rope guy-lines and a short banner pole. RIGHT — a timber supply storehouse (depot): a sturdy raised-floor granary hut with a slatted gable roof. Ink-wash painted style, muted earth tones with subtle bronze/wood accents, soft contact shadow only at the very base. Each structure complete and clearly separated with generous white spacing, clean croppable edges, NO ground slab attached. No grid, no labels.' }
+      prompt: 'Three separate functional map structures in a row on plain white background, ' + TOPDOWN_OBJ + ' for a tactics map, each sized to sit on a single grid tile. LEFT — a small thatched-roof peasant hut (village / healing spot): round mud-wall hut with a conical straw roof and a tiny dark doorway. CENTER — a military camp war-tent (barracks / healing spot): a peaked canvas tent with rope guy-lines and a short banner pole. RIGHT — a timber supply storehouse (depot): a sturdy raised-floor granary hut with a slatted gable roof. Ink-wash painted style, muted earth tones with subtle bronze/wood accents, soft contact shadow only at the very base. Each structure complete and clearly separated with generous white spacing, clean croppable edges, NO ground slab attached. No grid, no labels.' }
   ]
 },
 {
@@ -565,8 +572,8 @@ const SECTIONS = [
   ]
 },
 {
-  id: 'K', title: 'K. 지형 전수 (시임리스 바닥 추가분 + 오브젝트 + 동적 VFX)',
-  desc: 'terrains.json 전 지형 중 E(평지/초원/맨땅/숲·E-2 산악바위·E-3 숲캐노피·E-4 강물) 및 B-6 산봉우리·B-7 다리·B-8 회복움막에 없는 나머지를 망라. 시임리스는 1장=1지형(묶음 불가, E와 동일 vars 방식). 오브젝트는 한 장 다조각 그리드. 동적 VFX는 배경 위에 얹는 맵 스프라이트(C 전투 이펙트와 별개 — 지형 상시 연출).',
+  id: 'K', title: 'K. 지형 전수 (시임리스 바닥 + top-down 오브젝트 + 동적 VFX)',
+  desc: 'terrains.json 전 지형 중 E에 없는 시임리스 바닥(painted 배경 미생성 시 타일 렌더 폴백)과, <b>구별되는 top-down 오브젝트</b>(설계 2026-06-21 하이브리드 §3-1 개정): 성벽 오토타일·성문 상태(닫힘/열림/파괴)·망루·목책·자연·수상 — wall/gate/forest/mountain 등 <b>지형 구동</b>으로 ObjectLayer가 칸에 배치. K-8 동적 VFX는 배경 위 오버레이. ⚠ 시점은 <b>엄격 top-down</b>(아이소 금지) — <code>TOPDOWN_OBJ</code> 상수 공용 주입(바닥=톱다운, 오브젝트=정면 직립·약한 높이감). 같은 시점 보정이 숨은 B-6 산봉우리·B-7 다리·B-8 움막 프롬프트에도 적용됨. 설계=docs/superpowers/specs/2026-06-21-hybrid-map-rendering-design.md.',
   items: [
     { id: 'K-1', title: '시임리스 바닥 추가분 (황무지·산비탈·길)', multi: '지형 골라 3장',
       note: '⭐ terrains.json waste(황무지)·mountain 경사면 톤·road 포장길 — E에 없는 베이스. E 규약 동일: 매우 낮은 대비·낮은 채도, 멀리서 거의 단색, 오브젝트 금지, 시임리스.',
@@ -591,18 +598,18 @@ const SECTIONS = [
         ['성내 전돌 (벽돌 바닥)', 'a packed grey brick paving, subtle regular brick pattern, muted and weathered']
       ]},
       prompt: 'SEAMLESS TILEABLE texture, strictly top-down view: {지형}. Painted in subtle East Asian ink-wash tones on a textured paper feel. LOW CONTRAST — the paving pattern is faint and must read as an almost flat surface from a distance, no objects, no directional shadows, no perspective, edges must wrap seamlessly (left matches right, top matches bottom). Square 1:1.' },
-    { id: 'K-4', title: '성곽 오브젝트 시트 (성문·성벽·망루)', multi: '한 장에 12조각',
-      note: '⭐ gate/wall/fort region 액센트 — B-6 산봉우리·B-7 다리와 별개. 성벽 세그먼트(직선/모서리/끊긴 곳)·성문(닫힘/열림/파괴)·망루·성가퀴. 바닥(K-3) 위에 얹어 성을 구성. 투명/흰배경 분리.',
-      prompt: 'Game map object sheet in ONE image on plain white background, top-down oblique view (camera ~50° above) for a tactics map, ink-wash painted style, muted stone-grey and timber tones, soft contact shadow only at the very base, each piece sized to its grid footprint: (1) straight stone wall segment, (2) wall corner segment, (3) ruined/breached wall gap, (4) crenellated battlement wall top, (5) closed fortified gate with timber doors, (6) open gate with doors swung in, (7) shattered/destroyed gate, (8) tall corner watchtower, (9) two-storey gatehouse tower, (10) wooden parapet walkway, (11) stone stair ramp up a wall, (12) a beacon-fire signal platform. Each object complete and clearly separated with generous white spacing, clean croppable edges, NO ground slab attached. No grid, no labels.' },
-    { id: 'K-5', title: '방어·진영 오브젝트 시트 (목책·울타리·군기·천막·녹채)', multi: '한 장에 12조각',
-      note: '⭐ 야전 진영/방어선 액센트 — B-8 회복움막(촌락/병영/창고)과 중복 없는 추가 천막·방어물. 목책·울타리·녹채(가시방어)·군기/깃발 여러 종·모래주머니·전투용 천막 추가분.',
-      prompt: 'Game map object sheet in ONE image on plain white background, top-down oblique view (camera ~50° above) for a tactics map, ink-wash painted style, muted timber-brown and earthy tones with selective banner colors, soft contact shadow only at the very base: (1) straight wooden palisade fence segment, (2) palisade corner, (3) sharpened-stake abatis barricade (chevaux-de-frise), (4) low woven bamboo fence, (5) a closed camp gate in a palisade, (6) tall command banner on a pole, (7) a row of small army pennants, (8) a signal flag standard, (9) stacked sandbag / earthwork rampart, (10) a small open supply-cart, (11) a campfire with cooking pot, (12) a watch-brazier on a stand. Each object complete and clearly separated with generous white spacing, clean croppable edges, NO ground slab attached. No grid, no labels.' },
-    { id: 'K-6', title: '자연·잔해 오브젝트 시트 (바위·고목·잔해·시체)', multi: '한 장에 12조각',
-      note: '⭐ 자연 장식 + 전투 잔해 액센트 — cliff 바위·마른 고목·부서진 수레/병기·전장 시체더미(절제된 수묵 톤). B-6 산봉우리와 구분되는 소형 단품들. 바닥 위 듬성듬성.',
-      prompt: 'Game map object sheet in ONE image on plain white background, top-down oblique view (camera ~50° above) for a tactics map, ink-wash painted style, muted natural tones, soft contact shadow only at the very base: (1) a single large boulder, (2) a cluster of small rocks, (3) a jagged cliff-edge rock outcrop, (4) a bare gnarled dead tree, (5) a leafy deciduous tree, (6) a fallen log, (7) dry shrub / bush, (8) tall reed clump, (9) a broken overturned cart with a snapped wheel, (10) scattered shattered weapons and a cracked shield, (11) a discarded broken siege-machine frame, (12) a somber strewn battlefield debris / fallen-soldier remains pile rendered restrained and non-graphic. Each object complete and clearly separated with generous white spacing, clean croppable edges, NO ground slab attached. No grid, no labels.' },
+    { id: 'K-4', title: '성곽 오브젝트 시트 (성벽 오토타일·성문 상태·망루)', multi: '한 장에 12조각',
+      note: '⭐ wall/gate/fort 지형 구동(설계 §5.1). 성벽=오토타일 세그먼트(직선·모서리·T·십자·끝)로 임의 배치 자동 조립 / 성문=상태별(닫힘·열림·파괴) / 성벽 붕괴 + 망루. 칸 footprint 정렬. 시점=TOPDOWN_OBJ(아이소 금지).',
+      prompt: 'Game map object sheet in ONE image on plain white background, ' + TOPDOWN_OBJ + ', ink-wash painted style, muted stone-grey and timber tones, soft contact shadow only at the very base, each piece sized to ONE square grid tile so wall segments tile seamlessly edge-to-edge: (1) a straight stone wall segment running left-to-right, (2) a wall corner / L-junction segment, (3) a wall T-junction segment, (4) a wall four-way cross segment, (5) a wall end-cap segment, (6) a crenellated battlement wall-top variant, (7) a ruined / breached wall gap with rubble, (8) a closed fortified gate with twin timber doors, (9) the SAME gate open with both doors swung inward, (10) the SAME gate shattered and destroyed with splintered doors and rubble, (11) a square corner watchtower, (12) a two-storey gatehouse tower. Each object complete and clearly separated with generous white spacing, clean croppable edges, drawn so wall segments align on a square grid, NO ground slab attached. No grid lines, no labels.' },
+    { id: 'K-5', title: '방어·진영 오브젝트 시트 (목책·녹채·군기·천막)', multi: '한 장에 12조각',
+      note: '⭐ 야전 진영/방어선 액센트(데코 배치, 설계 §5.2). 목책도 오토타일(직선·모서리). 시점=TOPDOWN_OBJ.',
+      prompt: 'Game map object sheet in ONE image on plain white background, ' + TOPDOWN_OBJ + ', ink-wash painted style, muted timber-brown and earthy tones with selective banner colors, soft contact shadow only at the very base: (1) a straight wooden palisade fence segment running left-to-right, (2) a palisade corner segment, (3) a sharpened-stake abatis barricade, (4) a low woven bamboo fence segment, (5) a closed camp gate set in a palisade, (6) a tall command banner on a pole, (7) a row of small army pennants, (8) a signal-flag standard, (9) a stacked sandbag / earthwork rampart, (10) a small open supply-cart, (11) a campfire with a cooking pot, (12) a watch-brazier on a stand. Each object complete and clearly separated with generous white spacing, clean croppable edges, drawn straight-down, NO ground slab attached. No grid lines, no labels.' },
+    { id: 'K-6', title: '자연·잔해 오브젝트 시트 (바위·고목·잔해)', multi: '한 장에 12조각',
+      note: '⭐ 자연 장식 + 전투 잔해(데코 배치) — forest/mountain/cliff/waste 칸 액센트. 시점=TOPDOWN_OBJ.',
+      prompt: 'Game map object sheet in ONE image on plain white background, ' + TOPDOWN_OBJ + ', ink-wash painted style, muted natural tones, soft contact shadow only at the very base: (1) a single large boulder, (2) a cluster of small rocks, (3) a jagged cliff-edge rock outcrop, (4) a bare gnarled dead tree seen from above, (5) a leafy deciduous tree seen from above (round canopy with a slight hint of trunk), (6) a fallen log, (7) a dry shrub / bush, (8) a tall reed clump, (9) a broken overturned cart with a snapped wheel, (10) scattered shattered weapons and a cracked shield, (11) a discarded broken siege-machine frame, (12) a somber strewn battlefield debris pile, rendered restrained and non-graphic. Each object complete and clearly separated with generous white spacing, clean croppable edges, drawn looking down from above, NO ground slab attached. No grid lines, no labels.' },
     { id: 'K-7', title: '수상전 오브젝트 시트 (배·선착장·부교)', multi: '한 장에 10조각',
-      note: '⭐ 5장 적벽·삼강구 수상전용 — E-4 강물 위에 얹는 배/선착장. 군선 여러 종·작은 배·선착장 잔교·부교·불탄 배(화공). top-down 사선. 물 텍스처와 함께 써야 의미.',
-      prompt: 'Game map object sheet in ONE image on plain white background, top-down oblique view (camera ~50° above) for a tactics water map, ink-wash painted style, muted timber and lacquered-hull tones, soft contact shadow / faint water-line only at the very base, each vessel a complete croppable sprite: (1) a large two-deck war-junk with a sail, (2) a medium battle-junk oriented horizontally, (3) the same battle-junk oriented vertically, (4) a small fast scout boat, (5) a fishing sampan, (6) a flat ferry raft, (7) a wooden pier / jetty extending from shore, (8) a pontoon plank bridge segment over water, (9) ships lashed side-by-side with planks between them (linked-ships formation), (10) a half-burnt smoking war-junk for fire-attack scenes. Each object complete and clearly separated with generous white spacing, clean croppable edges, NO water attached underneath. No grid, no labels.' },
+      note: '⭐ 5장 적벽·삼강구 수상전 — river 칸 위 배/선착장(설계 §5.1 수상 피처). 시점=TOPDOWN_OBJ.',
+      prompt: 'Game map object sheet in ONE image on plain white background, ' + TOPDOWN_OBJ + ', ink-wash painted style, muted timber and lacquered-hull tones, soft contact shadow / faint water-line only at the very base, each vessel a complete croppable sprite: (1) a large two-deck war-junk with a sail, (2) a medium battle-junk oriented horizontally (left-to-right), (3) the same battle-junk oriented vertically (top-to-bottom), (4) a small fast scout boat, (5) a fishing sampan, (6) a flat ferry raft, (7) a wooden pier / jetty, (8) a pontoon plank-bridge segment, (9) several ships lashed side-by-side with planks between them (linked-ships formation), (10) a half-burnt smoking war-junk for fire-attack scenes. Each object complete and clearly separated with generous white spacing, clean croppable edges, NO water attached underneath. No grid lines, no labels.' },
     { id: 'K-8', title: '동적 지형 VFX 오브젝트 시트 (불·연기·물보라)', multi: '한 장에 8요소', vfx: true,
       note: '⭐ 배경 위에 얹는 맵 스프라이트(상시·지속 연출) — C-1/C-2 전투 타격 이펙트와 별개. 화공 지형의 불 번짐 타일·기둥 연기·물보라·잔불·먼지바람 등. 격자 칸 위에 깔거나 오브젝트에 붙여 "이 칸 불타는 중"을 표현. additive 검은배경.',
       prompt: 'Eight separate map-overlay effect elements arranged in a loose grid, for sprites laid ON TOP of a battle map (persistent ambient terrain effects, not a single hit-spark): (1) a patch of ground fire / burning tile flames spreading low and wide, (2) a tall rising column of smoke, orange-lit at the base fading to grey-black, (3) thin drifting smoke wisps for a smoldering tile, (4) a burst of water splash / spray for a vessel impact, (5) a low rolling river mist / fog band, (6) small lingering embers and floating sparks, (7) a swirling dust / sand wind gust, (8) a faint heat-shimmer / scorched glow ring for burnt ground. Each element complete and clearly separated with generous black spacing. ' }
@@ -1586,7 +1593,8 @@ function renderBoard() {
           <button class="btn primary" data-copy="${it.id}">프롬프트 복사</button>
           <button class="btn" data-file="${it.id}">파일 선택…</button>
           ${it.rigParts ? `<button class="btn" data-rigcut="${it.id}">✂ 파츠 컷 → 게임</button>` : ''}
-          ${it.poseSheet ? `<button class="btn" data-posesheet="${it.id}">📤 시트 넘기기(Claude 컷)</button>` : ''}
+          ${it.poseSheet ? `<button class="btn" data-posesheet="${it.id}">📤 시트 넘기기(자동 컷)</button>` : ''}
+          ${it.poseSheet ? `<label class="flipchk" title="생성 시트가 화면 오른쪽을 보면 체크 → screen-left 기준으로 좌우 반전해 컷"><input type="checkbox" data-flip="${it.id}"> 좌우 반전</label>` : ''}
           ${it.portraitSheet ? `<button class="btn" data-portraitsheet="${it.id}">📤 초상시트 넘기기(Claude 슬라이스)</button>` : ''}
         </div>
         ${it.poseSheet && it.roster ? `<div class="existing" data-existing="${it.id}"></div>` : ''}
@@ -1654,23 +1662,35 @@ function setCardStatus(btnOrCard, html) {
   if (!s) { s = document.createElement('div'); s.className = 'sendstatus'; card.appendChild(s); }
   s.innerHTML = html;
 }
-async function sheetSend(btn, path, blob, label) {
-  btn.disabled = true; flashBtn(btn, '넘기는 중…', true);
-  setCardStatus(btn, `⏳ <b>${label}</b> 서버로 전송 중… <code>${path}</code>`);
+async function sheetSend(btn, path, blob, label, opts = {}) {
+  btn.disabled = true;
+  btn.dataset._orig = btn.dataset._orig || btn.textContent;
+  btn.textContent = '⏳ 처리 중…';
+  setCardStatus(btn, `<span class="spinner"></span> <b>${label}</b> 저장${opts.cut ? ' + 컷' : ''} 중…${opts.cut && opts.flip ? ' (↔ 좌우 반전)' : ''}`);
   try {
     const b64 = await blobToB64(blob);
-    const r = await fetch(SAVE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ path, b64, contentType: blob.type || 'image/png' }) });
+    const body = { path, b64, contentType: blob.type || 'image/png' };
+    if (opts.cut) { body.cut = true; body.flip = !!opts.flip; }
+    const r = await fetch(SAVE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !j.ok) throw new Error(j.error || ('HTTP ' + r.status));
     const kb = Math.round((j.bytes || 0) / 1024);
-    flashBtn(btn, '✓ 넘김!', true);
-    toast(`${label} 넘김 — ${kb}KB 저장${j.r2 ? ' + R2 ✓' : ''}. Claude가 처리합니다`);
-    setCardStatus(btn, `✅ <b>넘김 완료</b> — <code>${path}</code> · ${kb}KB${j.r2 ? ' · R2 ✓' : ' · R2 건너뜀'}<br><span class="dimnote">Claude에게 "넘겼어"라고 하면 잘라서 게임에 넣습니다.</span>`);
-    refreshAssetStatus(true); // 게임 상태 갱신(직접 저장된 씬은 즉시 ✓, 시트는 컷 후 반영)
+    if (opts.cut) {
+      const c = j.cut || {};
+      if (!c.ok) throw new Error('컷 실패: ' + String(c.error || c.output || '').slice(-200));
+      const cells = c.cells != null ? `${c.cells}칸` : '컷';
+      flashBtn(btn, '✓ 컷 완료!', true);
+      toast(`${label} — ${cells} 컷 완료${opts.flip ? ' (↔ 반전)' : ''}. 게임 반영됨`);
+      setCardStatus(btn, `✅ <b>컷 완료</b> — ${cells}${opts.flip ? ' · ↔ 좌우반전' : ''} · front_*.png 갱신<br><span class="dimnote">아래 "현재 스프라이트"가 새 그림으로 바뀝니다. 게임(:3000)은 하드리프레시로 반영. 방향이 거꾸로면 "좌우 반전" 체크 후 다시 넘기기.</span>`);
+    } else {
+      flashBtn(btn, '✓ 넘김!', true);
+      toast(`${label} 넘김 — ${kb}KB 저장${j.r2 ? ' + R2 ✓' : ''}. Claude가 처리합니다`);
+      setCardStatus(btn, `✅ <b>넘김 완료</b> — <code>${path}</code> · ${kb}KB${j.r2 ? ' · R2 ✓' : ' · R2 건너뜀'}<br><span class="dimnote">Claude에게 "넘겼어"라고 하면 슬라이스해 게임에 넣습니다.</span>`);
+    }
+    refreshAssetStatus(true); // 컷 후 front_*.png 갱신 → 미리보기 즉시 반영
   } catch (e) {
     flashBtn(btn, '✗ 실패', false);
-    toast('넘기기 실패: ' + e.message + ' (:8080 서버 확인)', true);
+    toast('실패: ' + e.message + ' (:8080 서버 확인)', true);
     setCardStatus(btn, `❌ <b>실패</b>: ${e.message}<br><span class="dimnote">tools 서버(:8080)가 떠 있는지 확인하세요.</span>`);
   }
 }
@@ -1851,7 +1871,8 @@ board.addEventListener('click', async e => {
     const all = await dbAll();
     const recs = all.filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
     if (!recs.length) { flashBtn(ps, '✗ 시트 없음', false); setCardStatus(ps, '✗ 먼저 이 카드에 포즈 시트 이미지를 붙여넣으세요(클릭→Ctrl+V).'); return; }
-    await sheetSend(ps, `assets/sprites/${sel.s}/_posesheet.png`, recs[0].blob, `${sel.n}(${sel.s}) 포즈 시트`);
+    const flip = !!document.querySelector(`input[data-flip="${CSS.escape(item.id)}"]`)?.checked;
+    await sheetSend(ps, `assets/sprites/${sel.s}/_posesheet.png`, recs[0].blob, `${sel.n}(${sel.s}) 포즈 시트`, { cut: true, flip });
     return;
   }
   const pt = e.target.closest('button[data-portraitsheet]');

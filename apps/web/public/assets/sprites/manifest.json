@@ -1,15 +1,15 @@
 {
   "guanyu": {
     "poses": [
-      "front_idle",
-      "front_move",
-      "front_attack",
+      "back_attack",
       "back_idle",
       "back_move",
-      "back_attack"
+      "front_attack",
+      "front_idle",
+      "front_move"
     ],
-    "source": "A-3_ink_01.png",
-    "method": "blob"
+    "source": "_posesheet.png",
+    "method": "cut_posesheet.py"
   },
   "liubei": {
     "poses": [
@@ -25,15 +25,15 @@
   },
   "zhangfei": {
     "poses": [
-      "front_idle",
-      "front_move",
-      "front_attack",
+      "back_attack",
       "back_idle",
       "back_move",
-      "back_attack"
+      "front_attack",
+      "front_idle",
+      "front_move"
     ],
-    "source": "B-5b_ink_01.png",
-    "method": "blob"
+    "source": "_posesheet.png",
+    "method": "cut_posesheet.py"
   },
   "lvbu": {
     "poses": [
@@ -130,5 +130,50 @@
     "source": "B-2_ink_03.png",
     "method": "blob",
     "note": "back_view=front_mirror (scale.x flip in renderer)"
+  },
+  "간옹": {
+    "poses": [
+      "front_attack",
+      "front_idle",
+      "front_move"
+    ],
+    "source": "_posesheet.png",
+    "method": "cut_posesheet.py"
+  },
+  "미축": {
+    "poses": [
+      "front_attack",
+      "front_idle",
+      "front_move"
+    ],
+    "source": "_posesheet.png",
+    "method": "cut_posesheet.py"
+  },
+  "정원지": {
+    "poses": [
+      "front_attack",
+      "front_idle",
+      "front_move"
+    ],
+    "source": "_posesheet.png",
+    "method": "cut_posesheet.py"
+  },
+  "조조": {
+    "poses": [
+      "front_attack",
+      "front_idle",
+      "front_move"
+    ],
+    "source": "_posesheet.png",
+    "method": "cut_posesheet.py"
+  },
+  "하후돈": {
+    "poses": [
+      "front_attack",
+      "front_idle",
+      "front_move"
+    ],
+    "source": "_posesheet.png",
+    "method": "cut_posesheet.py"
   }
 }
