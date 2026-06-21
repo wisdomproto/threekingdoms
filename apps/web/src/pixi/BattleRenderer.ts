@@ -22,6 +22,7 @@ import { TextureResolver } from "./textures";
 import { TweenRunner } from "./tweens";
 import { InputAdapter } from "./inputAdapter";
 import { TerrainLayer } from "./layers/TerrainLayer";
+import { ObjectLayer } from "./layers/ObjectLayer";
 import { HighlightLayer } from "./layers/HighlightLayer";
 import { ThreatLayer } from "./layers/ThreatLayer";
 import { UnitLayer } from "./layers/UnitLayer";
@@ -99,6 +100,7 @@ interface Scene {
   tweens: TweenRunner;
   textures: TextureResolver;
   terrain: TerrainLayer;
+  objects: ObjectLayer;
   highlights: HighlightLayer;
   threat: ThreatLayer;
   units: UnitLayer;
@@ -209,13 +211,15 @@ export class BattleRenderer implements Presenter {
     // 자체 컷아웃 리그(§4) — spriteId에 스켈레톤이 있으면 베이크 스프라이트를 리그로 격상.
     // 비동기·방어적: 리그 없으면 베이크 유지(무회귀). 스프라이트 로드와 독립 진행.
     units.applySkeletons();
+    const objects = new ObjectLayer(this.ctx, textures);
+    objects.zIndex = 1.8; // highlights(1)/threat(1.5) 위, units(2) 아래
     // 지형 타일 로드 완료 → TerrainLayer 이미지 텍스처로 교체 + 청크 캐시 재생성
     // (terrain은 아래에서 선언되므로, Promise 콜백은 terrain 참조 가능 — JS 클로저)
     tilesReady
-      .then(() => terrain.rebake())
+      .then(() => { terrain.rebake(); objects.rebake(); })
       .catch((e) => console.warn("[BattleRenderer] loadTiles 예외 (단색 폴백 유지):", e));
     fx.world.zIndex = 3;
-    world.addChild(terrain, highlights, threat, units, fx.world);
+    world.addChild(terrain, highlights, threat, objects, units, fx.world);
 
     // painted 맵 배경 (있으면 타일 렌더 대체) + 정합 확인용 격자 오버레이.
     const mapW = this.ctx.map.width;
@@ -244,6 +248,7 @@ export class BattleRenderer implements Presenter {
         mapBg.position.set(0, 0);
         mapBg.visible = true;
         terrain.visible = false; // 타일 끄고 그림으로
+        // objects 레이어는 painted 배경과 무관하게 항상 표시(설계 §3) — terrain만 끈다.
         // gridOverlay.visible = true; // 정합 확인용 — 확정되어 기본 OFF (새 맵 검증 시 재활성)
       })
       .catch((e) => console.warn("[BattleRenderer] loadMapBackground 예외:", e));
@@ -360,6 +365,7 @@ export class BattleRenderer implements Presenter {
         this.shakeAmp = 0;
       }
       terrain.cull(camera.viewWorldRect());
+      objects.cull(camera.viewWorldRect());
       units.tickIdle(app.ticker.deltaMS);
     };
     app.ticker.add(tick);
@@ -393,7 +399,7 @@ export class BattleRenderer implements Presenter {
     this.updateThreat(threat);
 
     this.scene = {
-      app, world, tweens, textures, terrain, highlights, threat, units, fx, camera, input,
+      app, world, tweens, textures, terrain, objects, highlights, threat, units, fx, camera, input,
       unsubscribe, onWheel, tick, resizeObserver,
     };
 
