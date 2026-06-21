@@ -23,5 +23,6 @@ const TABLE: Record<number, WallTile> = {
 };
 
 export function wallTile(mask: number): WallTile {
-  return TABLE[mask & 0b1111];
+  // TABLE is exhaustive over all 16 values of a 4-bit mask
+  return TABLE[mask & 0b1111]!;
 }
