@@ -66,6 +66,33 @@ def remove_checker_bg(im, sat_max=40, bright_min=160):
     return Image.fromarray(arr, "RGBA")
 
 
+def remove_glow(im, bright_min=185, sat_max=55):
+    """가장자리에서 '투명 또는 흰~밝은회색'을 통과하는 flood로 닿는 *흰끼 픽셀*만 투명화.
+
+    AI가 오브젝트 둘레에 소프트 흰 글로우/그림자를 그려 넣는 경우, 그게 *투명에 둘러싸인
+    불투명 흰 섬*이라 가장자리 비연결 → remove_white_bg가 못 잡는다(인게임에서 지저분한
+    흰 헤일로). 여기선 *투명까지 통과*하는 flood라 그 섬에 도달해 제거. 객체 내부의 흰색
+    (수레 자루·은갑옷)은 채도 높은/어두운 몸체에 *둘러싸여* flood가 못 들어가므로 보존.
+    """
+    im = im.convert("RGBA")
+    arr = np.array(im)
+    rgb = arr[:, :, :3].astype(int)
+    al = arr[:, :, 3]
+    sat = rgb.max(2) - rgb.min(2)
+    bright = rgb.min(2)
+    whitish = (sat < sat_max) & (bright > bright_min)
+    passable = (al == 0) | whitish
+    labels, n = ndimage.label(passable)
+    if n == 0:
+        return im
+    border = set(labels[0, :]) | set(labels[-1, :]) | set(labels[:, 0]) | set(labels[:, -1])
+    border.discard(0)
+    if border:
+        bg = np.isin(labels, list(border))
+        arr[bg & whitish & (al > 0), 3] = 0
+    return Image.fromarray(arr, "RGBA")
+
+
 def drop_small_components(im, frac=0.10):
     """불투명 연결성분 중 최대(캐릭터)만 남기고, 그보다 frac 미만이며 *가장자리에 닿는*
     소형 고립 성분(격자 좌표 라벨 'C1/C2' 등)을 제거. 무기는 손에 연결돼 최대 성분에
@@ -106,6 +133,7 @@ def clean_bg(im, trim=True):
     drop을 쓰면 최대 셀 하나만 남으니 금지. trim=False면 트림 생략(시트 크기 유지)."""
     im = remove_white_bg(im)
     im = remove_checker_bg(im)
+    im = remove_glow(im)
     return trim_alpha(im) if trim else im
 
 
