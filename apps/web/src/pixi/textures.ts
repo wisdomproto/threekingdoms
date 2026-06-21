@@ -239,23 +239,21 @@ export class TextureResolver {
       }
     }
 
-    // Assets.load는 URL 배열을 한 번에 처리 (내부적으로 병렬)
-    const urls = loadQueue.map((q) => q.url);
-    let loaded: Record<string, Texture> = {};
-    try {
-      loaded = await Assets.load<Texture>(urls);
-    } catch (e) {
-      console.warn("[TextureResolver] 스프라이트 텍스처 로드 오류 — 부분 폴백", e);
-    }
-
-    for (const { spriteId, pose, url } of loadQueue) {
-      const tex = loaded[url];
-      if (!tex) continue;
-      if (!this.sprites.has(spriteId)) {
-        this.sprites.set(spriteId, new Map());
+    // 개별 로드(allSettled) — 매니페스트에 등록됐으나 파일이 없는(삭제/미생성) 포즈가 404여도
+    // 그 포즈만 빠지고 나머지는 정상 로드. 단일 배치 Assets.load는 1개 실패에 전체 거부라 위험
+    // (back_* 같은 옵션 포즈 삭제 시 전 스프라이트가 사라졌던 버그). loadGround와 동일한 per-file 내성.
+    const results = await Promise.allSettled(
+      loadQueue.map((q) => Assets.load<Texture>(q.url)),
+    );
+    results.forEach((r, i) => {
+      if (r.status !== "fulfilled" || !r.value) return;
+      const item = loadQueue[i];
+      if (!item) return;
+      if (!this.sprites.has(item.spriteId)) {
+        this.sprites.set(item.spriteId, new Map());
       }
-      this.sprites.get(spriteId)!.set(pose, tex);
-    }
+      this.sprites.get(item.spriteId)!.set(item.pose, r.value);
+    });
 
     const loadedCount = [...this.sprites.values()].reduce((s, m) => s + m.size, 0);
     console.info(`[TextureResolver] 스프라이트 로드 완료: ${this.sprites.size}종 ${loadedCount}컷`);
