@@ -186,7 +186,7 @@ export class BattleRenderer implements Presenter {
     // 지형 타일 비동기 로드 — 실패 시 폴백(단색 베이크) 유지, mount는 계속 진행.
     // 완료 후 TerrainLayer.rebake()로 이미지 텍스처로 교체 + 청크 캐시 재생성.
     const tilesReady = textures.loadTiles();
-    const fx = new FxLayer(tweens);
+    const fx = new FxLayer(tweens, textures);
 
     // 씬그래프: stage → world(카메라 변환) → terrain/highlight/unit/fx.world, stage → fx.screen
     const world = new Container();
@@ -649,7 +649,7 @@ export class BattleRenderer implements Presenter {
     // 공격 모션 시작 후 ~110ms(배속존중) 지연 — playAttack의 lunge 정점(LUNGE_END≈0.5)에 근접.
     const strike = (): void => {
       void s.fx.slashArc(aPos, popupAt, indirect);
-      void s.fx.impactFlash(popupAt);
+      void s.fx.impactFlash(popupAt, big);
       void defender.flash();
       this.triggerShake(big ? SHAKE_PX_BIG : SHAKE_PX_HIT);
       s.tweens.hitstop(big ? HITSTOP_MS_BIG : HITSTOP_MS_HIT); // 묵직한 정지(배속 존중)
@@ -781,7 +781,7 @@ export class BattleRenderer implements Presenter {
     const defender = s.units.view(e.defenderId);
     const at = gridToWorld({ x: defender.gridX, y: defender.gridY });
     this.triggerShake(SHAKE_PX_BIG);
-    void s.fx.impactFlash(at);
+    void s.fx.impactFlash(at, true);
     // 네임드 시그니처면 그 이름(「청룡언월!」), 아니면 일반 「필살! 장수」
     await s.fx.banner(e.name ? `${e.name}!  ${attacker}` : `필살! ${attacker}`, DUEL_BANNER_MS);
   }
