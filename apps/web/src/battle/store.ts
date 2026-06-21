@@ -59,6 +59,9 @@ export interface MenuAnchor {
   y: number;
   /** 셀의 화면상 반폭(px) — 좌/우 자동 전환 시 유닛을 가리지 않게 메뉴를 셀 밖으로 밀어내는 거리 */
   half: number;
+  /** 메뉴 기본 배치 쪽(원작 "유닛 옆"). 렌더러가 좌/우 밴드의 *유닛 점유*를 보고 빈 쪽 결정(true=우측).
+   *  placeMenu가 이 쪽을 우선하고, 화면 밖이면 반대로 뒤집는다. */
+  preferRight: boolean;
 }
 
 /** 미니맵 뷰포트 박스 (§6) — 카메라 가시영역을 *타일 좌표*로. 렌더러가 매 틱 push */
@@ -197,7 +200,8 @@ export class BattleStore {
       if (
         Math.abs(prev.x - anchor.x) < 0.5 &&
         Math.abs(prev.y - anchor.y) < 0.5 &&
-        Math.abs(prev.half - anchor.half) < 0.5
+        Math.abs(prev.half - anchor.half) < 0.5 &&
+        prev.preferRight === anchor.preferRight
       ) {
         return;
       }
@@ -218,7 +222,8 @@ export class BattleStore {
       if (
         Math.abs(prev.x - anchor.x) < 0.5 &&
         Math.abs(prev.y - anchor.y) < 0.5 &&
-        Math.abs(prev.half - anchor.half) < 0.5
+        Math.abs(prev.half - anchor.half) < 0.5 &&
+        prev.preferRight === anchor.preferRight
       ) {
         return;
       }

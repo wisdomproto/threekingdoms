@@ -106,12 +106,16 @@ export function placeMenu(
   const menuH = menuPanelHeight(itemCount);
   const offset = anchor.half + SIDE_PAD; // 셀 중심에서 메뉴 안쪽 변까지
 
-  // 가로: 기본 우측(메뉴 좌변 = center + offset). 우측 초과 시 좌측으로 뒤집기.
-  let left = anchor.x + offset;
-  if (left + MENU_WIDTH + EDGE > viewport.width) {
-    left = anchor.x - offset - MENU_WIDTH; // 좌측: 메뉴 우변 = center - offset
+  // 가로: 기본 = anchor.preferRight(렌더러가 유닛 점유 보고 빈 쪽 결정). 그 쪽이 화면 밖이면 반대로.
+  const rightPos = anchor.x + offset; // 우측: 메뉴 좌변 = center + offset
+  const leftPos = anchor.x - offset - MENU_WIDTH; // 좌측: 메뉴 우변 = center - offset
+  let left = anchor.preferRight ? rightPos : leftPos;
+  if (anchor.preferRight && rightPos + MENU_WIDTH + EDGE > viewport.width) {
+    left = leftPos; // 우측 초과 → 좌측
+  } else if (!anchor.preferRight && leftPos < EDGE) {
+    left = rightPos; // 좌측 초과 → 우측
   }
-  // 좌측도 화면 밖이면(양쪽 다 좁음) 화면 안으로 클램프
+  // 양쪽 다 좁으면 화면 안으로 클램프
   left = Math.max(EDGE, Math.min(left, viewport.width - MENU_WIDTH - EDGE));
 
   // 세로: 셀 중심 기준 수직 중앙 정렬 후 화면 안 클램프

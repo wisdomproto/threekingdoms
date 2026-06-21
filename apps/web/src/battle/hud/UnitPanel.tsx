@@ -7,6 +7,7 @@
 import { useState } from "react";
 import type { Grade } from "@tk/data";
 import type { InputState } from "../inputMachine";
+import type { MenuAnchor } from "../store";
 import { rangeGrid } from "../rangeGrid";
 import type { BattleVM, ItemVM, StrategyVM, UnitVM } from "../viewmodel";
 import { PANEL_FRAME, PORTRAIT_FRAME } from "./frames";
@@ -440,13 +441,30 @@ function TabStrip({ active, onSelect }: { active: TabId; onSelect: (t: TabId) =>
   );
 }
 
-export function UnitPanel({ ui, vm }: { ui: InputState; vm: BattleVM }): React.ReactElement | null {
+export function UnitPanel({
+  ui,
+  vm,
+  anchor,
+  viewport,
+}: {
+  ui: InputState;
+  vm: BattleVM;
+  anchor: MenuAnchor | null;
+  viewport: { width: number; height: number };
+}): React.ReactElement | null {
   const [tab, setTab] = useState<TabId>("ability");
   const id = activeUnitId(ui);
   const unit = id ? (vm.units.find((u) => u.id === id) ?? null) : null;
   if (!unit) return null;
+  // 원작(영걸전 리메이크 §7-A): 정보창은 선택 유닛 가림 회피로 좌/우 자동 전환.
+  // 유닛 화면 x가 좌측 절반이면 패널을 우측으로(반대편). anchor 없으면 기본 좌측.
+  const flipRight = anchor != null && viewport.width > 0 && anchor.x < viewport.width / 2;
+  // 우측 전환 시엔 우상단 미니맵·줌/배속/자동전투 버튼(대략 top<210)을 피해 아래로 내린다.
+  const panelStyle: React.CSSProperties = flipRight
+    ? { ...PANEL_STYLE, left: "auto", right: 12, top: 220 }
+    : PANEL_STYLE;
   return (
-    <div style={PANEL_STYLE}>
+    <div style={panelStyle}>
       <div style={{ display: "flex", gap: 8 }}>
         {PORTRAIT_IDS.has(unit.name) ? <PortraitBox name={unit.name} /> : null}
         <div style={{ flex: 1, minWidth: 0 }}>

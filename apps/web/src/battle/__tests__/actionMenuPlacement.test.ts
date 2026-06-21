@@ -11,8 +11,8 @@ const VP = { width: 800, height: 600 };
 const HALF = 24; // 줌 1.0 기준 셀 반폭(48/2)
 const MENU_W = MENU_WIDTH; // ActionMenu에서 직접 import — 상수 드리프트 방지
 
-function anchor(x: number, y: number): MenuAnchor {
-  return { x, y, half: HALF };
+function anchor(x: number, y: number, preferRight = true): MenuAnchor {
+  return { x, y, half: HALF, preferRight };
 }
 
 describe("placeMenu — 좌/우 자동 전환(§174)", () => {
@@ -43,6 +43,18 @@ describe("placeMenu — 좌/우 자동 전환(§174)", () => {
     const low = placeMenu(anchor(400, VP.height - 5), 8, VP); // 하단 근처
     const menuH = menuPanelHeight(8);
     expect(low.top + menuH).toBeLessThanOrEqual(VP.height);
+  });
+
+  it("preferRight=false(우측 점유)면 메뉴가 좌측에 떠 유닛 왼쪽에 배치된다", () => {
+    const ax = 400; // 중앙 — 양쪽 다 화면 안
+    const { left } = placeMenu(anchor(ax, 300, false), 8, VP);
+    expect(left + MENU_W).toBeLessThanOrEqual(ax - HALF + 0.01); // 메뉴 우변 ≤ 셀 좌측
+  });
+
+  it("preferRight=false라도 좌측이 화면 밖이면 우측으로 뒤집힌다", () => {
+    const { left } = placeMenu(anchor(30, 300, false), 8, VP); // 좌측 가장자리
+    expect(left).toBeGreaterThanOrEqual(0);
+    expect(left).toBeGreaterThan(30 + HALF - 0.01); // 우측 전환
   });
 
   it("항목 수가 적으면(취소만) 메뉴 높이도 작아 더 자유롭게 배치된다", () => {

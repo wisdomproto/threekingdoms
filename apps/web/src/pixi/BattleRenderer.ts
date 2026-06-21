@@ -38,6 +38,7 @@ type Ev<T extends BattleEvent["type"]> = Extract<BattleEvent, { type: T }>;
  */
 function menuUnitId(ui: InputState): string | null {
   switch (ui.kind) {
+    case "selected": // 이동범위 표시 중 — 메뉴는 아직이지만 UnitPanel 좌/우 전환용 앵커 필요
     case "postMoveMenu":
     case "strategyMenu":
     case "itemMenu":
@@ -67,9 +68,9 @@ export interface RendererStore {
    * 커맨드 메뉴 앵커 (레퍼런스 §9·§263) — 활성 유닛의 스크린 좌표를 매 틱 push.
    * 메뉴 비표시 상태면 null. ε 이내 변화는 store가 무시(불필요 리렌더 방지).
    */
-  setMenuAnchor(anchor: { x: number; y: number; half: number } | null): void;
+  setMenuAnchor(anchor: { x: number; y: number; half: number; preferRight: boolean } | null): void;
   /** 조회(호버/탭) 유닛 스크린 앵커 — InspectPopup 커서 옆 배치용. 매 틱 push */
-  setInspectAnchor(anchor: { x: number; y: number; half: number } | null): void;
+  setInspectAnchor(anchor: { x: number; y: number; half: number; preferRight: boolean } | null): void;
   /** 미니맵 뷰포트 박스(§6) — 카메라 가시영역을 타일 좌표로 매 틱 push */
   setViewport(rect: { x: number; y: number; w: number; h: number } | null): void;
 }
@@ -519,7 +520,16 @@ export class BattleRenderer implements Presenter {
     const center = camera.worldToScreen(centerWorld);
     // 셀의 화면상 반폭 = (타일/2) × 현재 줌. 좌/우 자동 전환 시 유닛을 가리지 않을 거리.
     const half = (TILE_SIZE / 2) * camera.current.scale;
-    store.setMenuAnchor({ x: center.x, y: center.y, half });
+    // 메뉴 기본 배치 쪽 = 빈 쪽(원작 "유닛 옆" + 가림 최소화). 선택 유닛 좌/우 밴드(가로 1~3칸·세로 ±3칸)
+    // 의 다른 living 유닛 수를 비교해 적은 쪽을 우선. 동률이면 우측(기본).
+    const gx = view.gridX, gy = view.gridY;
+    const band = (lo: number, hi: number): number =>
+      store.committedState.units.filter(
+        (u) => !u.retreated && u.id !== unitId &&
+          u.x - gx >= lo && u.x - gx <= hi && Math.abs(u.y - gy) <= 3,
+      ).length;
+    const preferRight = band(1, 3) <= band(-3, -1);
+    store.setMenuAnchor({ x: center.x, y: center.y, half, preferRight });
     this.updateInspectAnchor(camera, units);
   }
 
@@ -534,7 +544,8 @@ export class BattleRenderer implements Presenter {
       return;
     }
     const c = camera.worldToScreen(gridToWorld({ x: iv.gridX, y: iv.gridY }));
-    store.setInspectAnchor({ x: c.x, y: c.y, half: (TILE_SIZE / 2) * camera.current.scale });
+    // preferRight는 InspectPopup 미사용(자체 좌/우 플립) — 타입 충족용 기본값.
+    store.setInspectAnchor({ x: c.x, y: c.y, half: (TILE_SIZE / 2) * camera.current.scale, preferRight: true });
   }
 
   /**
