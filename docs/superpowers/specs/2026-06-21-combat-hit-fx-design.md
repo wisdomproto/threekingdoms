@@ -52,6 +52,7 @@ CLAUDE.md §12(도파민 — 격파 코인팝·크리 잭팟)·§15에서 전투
 - **책임**: fx 텍스처 1회 로드 + 키→Texture 조회.
 - **인터페이스**: `getFx(key: string): Texture | null` (미보유=null → 폴백 신호). `OBJECT_FILES`↔`FX_FILES`, `loadObjects`↔`loadFx`, `objectTex`↔`fxTex`, `OBJECT_BASE`↔`FX_BASE = assetUrl("/assets/fx")` 그대로 미러.
 - **의존**: PixiJS `Assets`, `assetUrl`. 로드 실패해도 throw 안 함(빈 맵 유지 = 전부 폴백).
+- **수명**: fx 텍스처는 `objectTex`와 동일하게 **리졸버(TextureResolver) 수명에 종속** — 별도 teardown 없음(리졸버 파기 시 함께). FxLayer는 텍스처를 *소유*하지 않고 조회만 하므로, 1회 재생 스프라이트는 `destroy()`하되 그 `texture`는 파기하지 않는다(공유 캐시).
 
 ### 유닛 3: `FxLayer` 이미지 변형 `apps/web/src/pixi/layers/FxLayer.ts`
 
@@ -117,4 +118,4 @@ mount → textures.loadFx(assets/fx/*)         [1회, 실패해도 빈 맵]
 
 - 실제 시트 격자(C-1 vs D-1, 몇 행×열) — 슬라이스 단계에서 실물 Read 후 키맵 확정.
 - `slash` 스프라이트의 회전·쓸기 트윈 파라미터(현 `drawArc` sweep을 sprite로 옮길 때 시각 튜닝) — 브라우저 검증으로 조정.
-- 간접공격(궁/포) 전용 `pierce` 키를 둘지, `slash` tint 재사용할지 — 실물 시트에 관통형 요소 있으면 분리.
+- 간접공격(궁/포) 전용 `pierce` 키를 둘지, `slash` tint 재사용할지 — 실물 시트에 관통형 요소 있으면 분리. **기존 `slashArc`은 이미 `indirect=true`에서 `PIERCE_TINT`(청백) + 직선 스트로크 분기를 가짐** — fx 미보유/미분리 시 이 절차적 분기가 그대로 폴백이라, "tint 재사용 vs 별도 키"는 회귀 위험 없이 결정 가능(원점 재설계 불필요).
