@@ -98,6 +98,7 @@
   <span class="stylefixed">화풍: 수묵담채 (확정)</span>
   <button class="btn" id="dirbtn" title="⬇ 저장이 향할 폴더 (docs\art 권장)">저장 폴더: 미연결</button>
   <button class="btn" id="refreshbtn" title="서버(:8080)에서 게임에 들어간 에셋 목록을 다시 읽어 ✓/⬜·미리보기 갱신">🔄 게임 상태 새로고침</button>
+  <button class="btn" id="applytilesbtn" title="이미 붙여둔(보드 IndexedDB) E 바닥 이미지를 전부 /assets/tiles/ 로 일괄 적용 (자동저장 도입 전 백로그)">🟫 붙여둔 바닥 전부 게임 적용</button>
   <div id="progress"></div>
 </header>
 <div id="tabbar"></div>
@@ -302,6 +303,7 @@ const SECTIONS = [
   desc: '현재 바닥은 단색 + 오브젝트 데코. 이 텍스처가 오면 단색을 저대비 질감으로 교체한다. 시임리스 특성상 1장 = 1지형 (시트 묶음 불가).',
   items: [
     { id: 'E-1', title: '지형 바닥 텍스처', multi: '지형 골라 4장',
+      tile: ['ground_plain.png', 'ground_grass.png', 'ground_waste.png', 'ground_forest.png'],
       note: '⭐ 베이스 색 전면 교체(리뷰 결론): 밝은 황토 → 차분한 풀빛/세이지. 황토는 길·맨땅 악센트로만. 핵심: 매우 낮은 대비·낮은 채도(수묵 담채), 멀리서 거의 단색으로 보여야 유닛이 산다. 오브젝트 금지. ※ 평지를 새 베이스로 다시 뽑아 ground_plain 교체.',
       vars: { '지형': [
         ['평지 (풀빛 — 새 베이스)', 'open grassland ground, calm muted olive-sage green with very sparse faint dry earth patches, desaturated ink-wash tone'],
@@ -310,13 +312,13 @@ const SECTIONS = [
         ['숲 바닥', 'forest floor of moss and fallen needles, deep muted green']
       ]},
       prompt: 'SEAMLESS TILEABLE texture, strictly top-down view: {지형}. Painted in subtle East Asian ink-wash tones on textured paper feel. VERY LOW CONTRAST and low detail — must read as almost flat color from a distance, no objects, no rocks, no plants sticking out, no shadows with direction, no perspective, edges must wrap seamlessly (left matches right, top matches bottom). Square 1:1.' },
-    { id: 'E-2', title: '산악 바위 바닥 (시임리스)',
+    { id: 'E-2', title: '산악 바위 바닥 (시임리스)', tile: 'ground_mountain.png',
       note: '⭐ 산맥 region의 베이스. 지금 산이 구린 핵심 원인 — 봉우리 일러스트를 전 칸에 깔아서. 이 바닥을 깔고 봉우리는 듬성듬성 액센트로만 올립니다. 저대비 필수.',
       prompt: 'SEAMLESS TILEABLE texture, strictly top-down view: rugged rocky mountain ground — weathered grey-brown stone, gravel and scree with subtle cracks and tonal variation. Subtle East Asian ink-wash tones on textured paper feel. LOW CONTRAST and low detail — must read as one cohesive rocky surface from a distance, NO individual peaks, no objects sticking out, no perspective, no directional shadows, edges wrap seamlessly (left=right, top=bottom). Square 1:1.' },
-    { id: 'E-3', title: '숲 캐노피 바닥 (시임리스)',
+    { id: 'E-3', title: '숲 캐노피 바닥 (시임리스)', tile: 'ground_forest.png',
       note: '숲 region 베이스(위에서 본 나뭇잎 군집). 나무 스프라이트는 이 위에 액센트로만. 캐노피라 평지보다 대비 살짝 높아도 OK.',
       prompt: 'SEAMLESS TILEABLE texture, strictly top-down view: dense forest canopy seen straight from directly above — clustered rounded treetop crowns in muted deep greens, soft organic clumps of foliage. Subtle East Asian ink-wash tones, textured paper feel. LOW-TO-MEDIUM CONTRAST — must read as a continuous forest mass from a distance, no visible trunks, no perspective, no directional shadows, edges wrap seamlessly (left=right, top=bottom). Square 1:1.' },
-    { id: 'E-4', title: '강물 시임리스 텍스처',
+    { id: 'E-4', title: '강물 시임리스 텍스처', tile: 'ground_river.png',
       note: '강/하천 지면. 다리(B-7) 밑에 깔림. 흐르는 결, 너무 쨍하지 않게.',
       prompt: 'SEAMLESS TILEABLE texture, strictly top-down view: calm river water — soft blue-green ripples and subtle flowing current lines, gentle muted reflections. Subtle East Asian ink-wash tones, textured paper feel. LOW-TO-MEDIUM CONTRAST — must read as a continuous water surface from a distance, no shoreline, no objects, no perspective, no directional shadows, edges wrap seamlessly (left=right, top=bottom). Square 1:1.' }
   ]
@@ -1545,6 +1547,17 @@ function renderTabs() {
 
 document.getElementById('refreshbtn').addEventListener('click', () => refreshAssetStatus(false));
 
+document.getElementById('applytilesbtn').addEventListener('click', async () => {
+  const btn = document.getElementById('applytilesbtn');
+  btn.disabled = true; const orig = btn.textContent; btn.textContent = '⏳ 적용 중…';
+  try {
+    const { applied, failed } = await applyAllTiles();
+    if (!applied.length && !failed.length) toast('붙여둔 바닥 이미지가 없습니다 — E 카드(지형·바닥 탭)에 붙여넣으면 이후엔 자동 저장됩니다.');
+    else toast(`🟫 ${applied.length}장 적용: ${applied.join(', ')}${failed.length ? ` · 실패 ${failed.length}` : ''} — 게임 하드리프레시하면 바뀝니다`);
+  } catch (e) { toast('일괄 적용 실패: ' + e.message + ' (:8080 서버 확인)', true); }
+  btn.textContent = orig; btn.disabled = false;
+});
+
 document.getElementById('tabbar').addEventListener('click', e => {
   const t = e.target.closest('.tab');
   if (!t) return;
@@ -1733,6 +1746,35 @@ function thumbNode(rec) {
   return div;
 }
 
+/* 타일/바닥 카드(E-*) → /assets/tiles/ 타깃 파일명. E-1은 지형 변형 인덱스별, 그 외 단일. 붙여넣기 시 자동 저장. */
+function tileTarget(item, cardId) {
+  if (!item || !item.tile) return null;
+  if (Array.isArray(item.tile)) return item.tile[(varState[cardId] || {})['지형'] || 0] || null;
+  return item.tile;
+}
+/* 이미 붙여둔(IndexedDB) 타일/바닥 이미지를 전부 /assets/tiles/ 로 일괄 적용 — 자동저장 도입 전 백로그용.
+   단일 카드(E-2/3/4)=가장 최근 1장→타깃. E-1(배열)=붙여넣은 순서대로 변형 0..N 에 매핑(최근 N장). */
+async function applyAllTiles() {
+  const all = (await dbAll()).sort((a, b) => a.at - b.at);
+  const byCard = {};
+  for (const r of all) (byCard[r.card] = byCard[r.card] || []).push(r);
+  const applied = [], failed = [];
+  for (const [cardId, recs] of Object.entries(byCard)) {
+    const item = findItem(cardId);
+    if (!item || !item.tile) continue;
+    if (Array.isArray(item.tile)) {
+      const use = recs.slice(-item.tile.length); // 최근 N장 → 변형 0..N
+      for (let i = 0; i < use.length; i++) {
+        try { await applyToGame(`assets/tiles/${item.tile[i]}`, use[i].blob); applied.push(item.tile[i]); }
+        catch (e) { failed.push(`${item.tile[i]}(${e.message})`); }
+      }
+    } else {
+      try { await applyToGame(`assets/tiles/${item.tile}`, recs[recs.length - 1].blob); applied.push(item.tile); }
+      catch (e) { failed.push(`${item.tile}(${e.message})`); }
+    }
+  }
+  return { applied, failed };
+}
 async function addImageToCard(cardId, blob) {
   const item = findItem(cardId);
   let finalBlob = blob;
@@ -1763,12 +1805,20 @@ async function addImageToCard(cardId, blob) {
   rec.id = await dbAdd(rec);
   document.querySelector(`#card-${CSS.escape(cardId)} .drop`).appendChild(thumbNode(rec));
   await updateProgress();
+  const tileFile = tileTarget(item, cardId);
   if (item && item.sceneCard) {
     try {
       const res = await applyToGame(`assets/scenes/${name}`, finalBlob);
       toast(`${name} → 게임 적용 완료${res.r2 ? ' (+R2)' : ''}. 게임 새로고침하면 보입니다`);
     } catch (e) {
       toast(`${name} 저장됨 (게임 적용 실패: ${e.message} — :8080 서버 켜졌는지 확인)`);
+    }
+  } else if (tileFile) {
+    try {
+      const res = await applyToGame(`assets/tiles/${tileFile}`, finalBlob);
+      toast(`🟫 타일 자동 저장: ${tileFile} → 게임 하드리프레시하면 바뀜${res.r2 ? ' (+R2)' : ''}`);
+    } catch (e) {
+      toast(`${name} 저장됨 (타일 적용 실패: ${e.message} — :8080 서버 켜졌는지 확인)`);
     }
   } else {
     toast(`${name} 저장됨`);

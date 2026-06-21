@@ -25,7 +25,7 @@ COLOR = {
 DEFAULT = (217, 207, 157)
 TILE = 48  # 런타임 월드 픽셀/타일 (projection.TILE_SIZE) — 스티처 월드좌표 기준
 
-ROOT = r"C:\project\threekingdoms"
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 mapId = sys.argv[1] if len(sys.argv) > 1 else "sishuiguan"
 
 # "all" → 전체 맵 일괄: 크기 기반 cols/rows = ceil(W/20)×ceil(H/18) (사수관 56×32 → 3×2와 일치)로 self 호출.

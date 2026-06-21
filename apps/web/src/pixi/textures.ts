@@ -98,6 +98,7 @@ const GROUND_FILES: Record<string, string> = {
   waste: "ground_waste.png",
   mountain: "ground_mountain.png", // E-2 바위 스크리
   forest: "ground_forest.png", // E-3 캐노피
+  river: "ground_river.png", // E-4 강물 (파일 없으면 단색 폴백 — loadGround 파일별 내성)
   // 전용 바닥 미보유 지형 — 기존 텍스처 재사용으로 회색 단색 폴백 제거(리뷰 P0).
   wall: "ground_mountain.png", // 성벽 = 돌
   fort: "ground_mountain.png", // 요새 = 돌
@@ -375,18 +376,16 @@ export class TextureResolver {
 
   /** 시임리스 바닥 텍스처 로드 (실패해도 단색 베이크 유지). */
   private async loadGround(): Promise<void> {
+    // 파일별 독립 로드 — 한 지형 파일이 없어도(404) 나머지는 정상(그 지형만 단색 폴백).
+    // 배치 Assets.load는 한 url 404 시 전체 reject라, 신규 바닥(ground_river 등) 추가에 취약했음.
     const entries = Object.entries(GROUND_FILES);
-    const urls = entries.map(([, f]) => `${TILE_BASE}/${f}`);
-    try {
-      const loaded = await Assets.load<Texture>(urls);
-      for (const [terrainId, f] of entries) {
-        const tex = loaded[`${TILE_BASE}/${f}`];
+    await Promise.all(entries.map(async ([terrainId, f]) => {
+      try {
+        const tex = await Assets.load<Texture>(`${TILE_BASE}/${f}`);
         if (tex) this.groundTex.set(terrainId, tex);
-      }
-      console.info(`[TextureResolver] 시임리스 바닥 로드 완료: ${this.groundTex.size}종`);
-    } catch (e) {
-      console.warn("[TextureResolver] 바닥 텍스처 로드 오류 — 단색 폴백 유지", e);
-    }
+      } catch { /* 파일 없음 → 그 지형은 단색 폴백 */ }
+    }));
+    console.info(`[TextureResolver] 시임리스 바닥 로드 완료: ${this.groundTex.size}종`);
   }
 
   /** 특징 지형의 오브젝트 데코 텍스처. 없으면 null (베이스만 표시). */
