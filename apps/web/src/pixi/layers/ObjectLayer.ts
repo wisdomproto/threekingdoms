@@ -8,7 +8,7 @@ import { TILE_SIZE } from "../projection";
 import type { TextureResolver } from "../textures";
 import type { WorldRect } from "./TerrainLayer";
 import { wallTile } from "../objects/autotile";
-import { objectKind } from "../objects/objectModel";
+import { objectKind, decoObjectKey } from "../objects/objectModel";
 
 const CHUNK_TILES = 16;
 const N = 1, E = 2, S = 4, W = 8;
@@ -110,7 +110,9 @@ export class ObjectLayer extends Container {
   }
 
   private addDeco(chunk: Chunk, terrainId: string, tx: number, ty: number): void {
-    const tex = this.textures.getDeco(terrainId);
+    // 새 K-5/K-6 오브젝트 우선(decoObjectKey), 미보유 시 옛 DECO_FILES 폴백.
+    const objKey = decoObjectKey(terrainId);
+    const tex = (objKey ? this.textures.getObject(objKey) : null) ?? this.textures.getDeco(terrainId);
     if (!tex || tex.width === 0) return;
     const s = (TILE_SIZE * 1.18) / tex.width;
     const cx = tx * TILE_SIZE + TILE_SIZE / 2;

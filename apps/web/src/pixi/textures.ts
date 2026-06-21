@@ -85,6 +85,9 @@ const OBJECT_FILES: Record<string, string> = {
   wall_single: "wall_single.png", wall_end: "wall_end.png", wall_straight: "wall_straight.png",
   wall_corner: "wall_corner.png", wall_tee: "wall_tee.png", wall_cross: "wall_cross.png",
   gate_closed: "gate_closed.png", gate_open: "gate_open.png", gate_destroyed: "gate_destroyed.png",
+  // K-5/K-6 데코 오브젝트 (objectModel.DECO_OBJECT_MAP가 지형→이 키로 매핑). 미보유 시 옛 데코 폴백.
+  rock_cluster: "rock_cluster.png", rock_cliff: "rock_cliff.png", tree_leafy: "tree_leafy.png",
+  supply_cart: "supply_cart.png", camp_gate: "camp_gate.png",
 };
 const OBJECT_BASE = assetUrl("/assets/objects");
 
