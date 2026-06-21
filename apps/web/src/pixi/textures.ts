@@ -88,6 +88,12 @@ const OBJECT_FILES: Record<string, string> = {
 };
 const OBJECT_BASE = assetUrl("/assets/objects");
 
+// 전투 타격 fx 텍스처(검은배경 발광, additive). 미보유 키는 FxLayer가 절차적 폴백.
+const FX_FILES: Record<string, string> = {
+  slash: "slash.png", flash: "flash.png", sparkle: "sparkle.png", coin: "coin.png",
+};
+const FX_BASE = assetUrl("/assets/fx");
+
 /**
  * 지형 → 시임리스 바닥 텍스처 (E-* 에셋, 576×576). getGround에서 (gx,gy) wrap 서브렉트.
  * 미등록 지형은 단색 베이크 폴백.
@@ -161,6 +167,8 @@ export class TextureResolver {
   private readonly decoTex = new Map<string, Texture>();
   /** 맵 구조물 오브젝트 텍스처: 키(wall_단어 | gate_상태) → Texture. loadObjects() 후 채워짐. */
   private readonly objectTex = new Map<string, Texture>();
+  /** 전투 타격 fx 텍스처: 키(slash|flash|sparkle|coin 등) → Texture. loadFx() 후 채워짐. */
+  private readonly fxTex = new Map<string, Texture>();
   /** 시임리스 바닥 원본: terrainId → Texture (576×576). */
   private readonly groundTex = new Map<string, Texture>();
   /** 바닥 서브렉트 캐시: "${terrainId}:${mx}:${my}" → Texture (48×48). */
@@ -398,6 +406,11 @@ export class TextureResolver {
     return this.objectTex.get(key) ?? null;
   }
 
+  /** 전투 fx 텍스처(없으면 null → FxLayer 절차적 폴백). */
+  getFx(key: string): Texture | null {
+    return this.fxTex.get(key) ?? null;
+  }
+
   /**
    * 시임리스 바닥의 (gx,gy) wrap 서브렉트 (48×48). 인접 칸이 이어진다.
    * 미보유 지형/로드 전이면 null (호출자가 단색 베이크로 폴백).
@@ -433,9 +446,26 @@ export class TextureResolver {
     }
   }
 
+  /** fx 텍스처 로드 (실패해도 빈 맵 유지 — throw 안 함, 전부 폴백). */
+  private async loadFx(): Promise<void> {
+    const entries = Object.entries(FX_FILES);
+    const urls = entries.map(([, f]) => `${FX_BASE}/${f}`);
+    try {
+      const loaded = await Assets.load<Texture>(urls);
+      for (const [key, f] of entries) {
+        const tex = loaded[`${FX_BASE}/${f}`];
+        if (tex) this.fxTex.set(key, tex);
+      }
+      console.info(`[TextureResolver] fx 로드 완료: ${this.fxTex.size}종`);
+    } catch (e) {
+      console.warn("[TextureResolver] fx 로드 오류(아트 미보유 단계 정상):", e);
+    }
+  }
+
   async loadTiles(): Promise<void> {
     await this.loadDecos();
     await this.loadObjects();
+    await this.loadFx();
     await this.loadGround();
     let manifest: TilesManifest;
     try {
