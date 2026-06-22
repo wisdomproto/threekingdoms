@@ -39,8 +39,8 @@ export interface FormationProps {
   chapter: number;
 }
 
-/** 초상 보유 장수(UnitPanel과 동일 규약 — 생기는 대로 추가). 없으면 이름 이니셜 폴백. */
-const PORTRAIT_IDS = new Set(["관우", "화웅"]);
+// 초상은 파일 유무로 자동 판정 — 있으면 표시, 없으면 onError로 이니셜 폴백(하드코딩 목록 제거,
+// 107장 슬라이스 + 보드 자동 슬라이스 흐름과 정합 — 새 초상은 코드 수정 없이 자동 표시).
 
 /** 역할 라벨(편성 분류 — §6 role). */
 const ROLE_LABEL: Record<RosterUnit["role"], string> = {
@@ -81,6 +81,8 @@ function className(classId: string): string {
 /** 청동 초상 박스(UnitPanel.PortraitBox 축약판) — 초상 없으면 이름 첫 글자. */
 function Portrait({ commanderId, size = 52 }: { commanderId: string; size?: number }): React.ReactElement {
   const name = commanderName(commanderId);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [commanderId]); // id 바뀌면 초상 재시도
   return (
     <div
       style={{
@@ -99,10 +101,11 @@ function Portrait({ commanderId, size = 52 }: { commanderId: string; size?: numb
         fontWeight: 700,
       }}
     >
-      {PORTRAIT_IDS.has(commanderId) ? (
+      {!failed ? (
         <img
           src={assetUrl(`/assets/ui/portraits/${encodeURIComponent(commanderId)}.webp`)}
           alt={name}
+          onError={() => setFailed(true)}
           style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
         />
       ) : (

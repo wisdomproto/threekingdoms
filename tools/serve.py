@@ -15,6 +15,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUBLIC = os.path.join(ROOT, "apps", "web", "public")
 CUT_SCRIPT = os.path.join(ROOT, "tools", "sprite-pipeline", "cut_posesheet.py")
 STITCH_SCRIPT = os.path.join(ROOT, "tools", "sprite-pipeline", "stitch_chunks.py")
+GEN_DIR = os.path.join(ROOT, "tools", "sprite-pipeline", "gen")  # slice_portraits.py 위치
 CHUNKS_DIR = os.path.join(ROOT, "docs", "art", "chunks")
 PORT = 8080
 
@@ -237,7 +238,33 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
                 resp["stitch"] = st
                 sys.stdout.write(f"[save-asset] chunk {m.group(1)} stitch → ok={st.get('stitched')} ({st.get('have')}/{st.get('total')})\n")
 
+        # ⑤ 초상 시트 자동 슬라이스 (payload.slice) — _sheet_{group}.png 저장 직후 멤버별 webp 컷
+        if payload.get("slice") and rel.startswith("assets/ui/portraits/_sheet_") and rel.endswith(".png"):
+            group = payload.get("group") or rel.split("_sheet_", 1)[1].rsplit(".", 1)[0]
+            sl = _run_slice_portraits(dest, payload.get("members") or [], payload.get("grid"))
+            resp["slice"] = sl
+            sys.stdout.write(f"[save-asset] slice {group} → ok={sl.get('ok')} count={sl.get('count')}\n")
+
         self._json(200, resp)
+
+
+def _run_slice_portraits(sheet_path, members, grid):
+    """초상 그룹 시트 → /assets/ui/portraits/{멤버}.webp 슬라이스(검정배경 제거 포함).
+    slice_portraits.slice_sheet 재사용. grid={cols,rows}(검정배경 시트는 밴드검출 실패 → 그리드 폴백).
+    반환 {ok, count, saved, missing} 또는 {ok:False, error}."""
+    if not members:
+        return {"ok": False, "error": "members 없음"}
+    try:
+        if GEN_DIR not in sys.path:
+            sys.path.insert(0, GEN_DIR)
+        from slice_portraits import slice_sheet
+        out_dir = os.path.join(PUBLIC, "assets", "ui", "portraits")
+        res = slice_sheet(sheet_path, members, out_dir, grid=grid)
+        saved = [n for n, _p, ok in res if ok]
+        missing = [n for n, _p, ok in res if not ok]
+        return {"ok": True, "count": len(saved), "saved": saved, "missing": missing}
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "error": str(e)}
 
 
 if __name__ == "__main__":

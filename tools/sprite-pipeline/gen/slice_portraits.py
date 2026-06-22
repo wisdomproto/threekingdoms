@@ -8,8 +8,17 @@
 import os
 from PIL import Image
 
+# 검정배경 제거용(선택) — AI가 투명 대신 검정으로 시트를 내는 경우가 잦다.
+try:
+    import numpy as np
+    from scipy import ndimage
+    _HAS_NP = True
+except Exception:
+    _HAS_NP = False
+
 ALPHA_THRESH = 16
 MIN_RUN = 8  # 밴드로 인정할 최소 픽셀 길이
+BLACK_THRESH = 48  # 근-검정(near-black) 판정 — 셀 가장자리 연결분만 제거
 
 
 def _content_mask_cols(im):
@@ -66,6 +75,30 @@ def _bands(mask):
     return bands
 
 
+def _remove_black_bg(cell):
+    """셀 가장자리에 연결된 근-검정만 투명화. 내부 어두운 부분(머리/갑옷)은 보존.
+    numpy/scipy 없으면 원본 그대로(폴백). 이미 충분히 투명한 셀은 변화 거의 없음."""
+    if not _HAS_NP:
+        return cell
+    im = cell.convert("RGBA")
+    arr = np.array(im)
+    rgb = arr[:, :, :3].astype(int)
+    al = arr[:, :, 3]
+    nearblack = rgb.max(2) < BLACK_THRESH
+    if not nearblack.any():
+        return im
+    passable = nearblack | (al == 0)
+    lbl, n = ndimage.label(passable)
+    if n == 0:
+        return im
+    border = set(lbl[0, :]) | set(lbl[-1, :]) | set(lbl[:, 0]) | set(lbl[:, -1])
+    border.discard(0)
+    if border:
+        mask = np.isin(lbl, list(border)) & nearblack & (al > 0)
+        arr[mask, 3] = 0
+    return Image.fromarray(arr, "RGBA")
+
+
 def _trim(cell):
     bbox = cell.getbbox()
     return cell.crop(bbox) if bbox else cell
@@ -96,7 +129,7 @@ def slice_sheet(sheet_path, members, out_dir, grid=None):
         if i >= len(cells):
             results.append((name, None, False))
             continue
-        cell = _trim(im.crop(cells[i]))
+        cell = _trim(_remove_black_bg(im.crop(cells[i])))
         out = os.path.join(out_dir, f"{name}.webp")
         cell.save(out, "WEBP", quality=92)
         results.append((name, out, True))

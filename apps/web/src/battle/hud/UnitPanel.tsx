@@ -13,11 +13,12 @@ import type { BattleVM, ItemVM, StrategyVM, UnitVM } from "../viewmodel";
 import { PANEL_FRAME, PORTRAIT_FRAME } from "./frames";
 import { assetUrl } from "../../assetUrl";
 
-/** 초상 보유 장수 (apps/web/public/assets/ui/portraits/{name}.webp). 생기는 대로 추가 */
-const PORTRAIT_IDS = new Set(["관우", "화웅"]);
+// 초상은 파일 유무로 자동 판정 — PortraitBox가 onError 시 미표시(하드코딩 목록 제거).
 
-/** 청동 초상 프레임 + 얼굴 (조조전 장수 정보 패널 §1) */
-function PortraitBox({ name }: { name: string }): React.ReactElement {
+/** 청동 초상 프레임 + 얼굴 (조조전 장수 정보 패널 §1). 초상 파일 없으면(onError) 미표시(종전 동작). */
+function PortraitBox({ name }: { name: string }): React.ReactElement | null {
+  const [failed, setFailed] = useState(false);
+  if (failed) return null;
   return (
     <div
       style={{
@@ -33,6 +34,7 @@ function PortraitBox({ name }: { name: string }): React.ReactElement {
       <img
         src={assetUrl(`/assets/ui/portraits/${encodeURIComponent(name)}.webp`)}
         alt={name}
+        onError={() => setFailed(true)}
         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
       />
     </div>
@@ -466,7 +468,7 @@ export function UnitPanel({
   return (
     <div style={panelStyle}>
       <div style={{ display: "flex", gap: 8 }}>
-        {PORTRAIT_IDS.has(unit.name) ? <PortraitBox name={unit.name} /> : null}
+        <PortraitBox key={unit.name} name={unit.name} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
             <strong style={{ fontSize: 16 }}>{unit.name}</strong>

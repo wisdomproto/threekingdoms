@@ -1307,14 +1307,26 @@ function blobToB64(blob) {
   });
 }
 /** assetPath 예: "assets/scenes/05-sishuiguan-intro.webp". 서버가 public/ + R2 양쪽에 쓴다. */
-async function applyToGame(assetPath, blob) {
+async function applyToGame(assetPath, blob, extra) {
   const b64 = await blobToB64(blob);
+  const body = { path: assetPath, b64, contentType: blob.type || 'image/webp' };
+  if (extra) Object.assign(body, extra); // 예: {slice, group, members, grid} → serve.py 자동 슬라이스
   const r = await fetch(SAVE_ENDPOINT, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ path: assetPath, b64, contentType: blob.type || 'image/webp' }),
+    body: JSON.stringify(body),
   });
   if (!r.ok) throw new Error('HTTP ' + r.status);
   return r.json();
+}
+
+/** 초상 그룹 카드 → serve.py 슬라이스 페이로드({slice,group,members,grid}). 보드 buildPortraitPrompt와 동일 그리드. */
+function portraitSliceArgs(item) {
+  if (!item || !item.portraitSheet || !item.members) return null;
+  const members = item.members.map((m) => m[0]);
+  const N = members.length;
+  const cols = N <= 4 ? N : Math.ceil(N / 2);
+  const rows = Math.ceil(N / cols);
+  return { slice: true, group: item.portraitGroup, members, grid: { cols, rows } };
 }
 
 /* ─────────── 리그 파츠 컷 (SD 한 장 → 박스로 파트 크롭 → /save-asset → skeletons/{id}/) ─────────── */
@@ -1633,7 +1645,7 @@ function renderBoard() {
           ${it.rigParts ? `<button class="btn" data-rigcut="${it.id}">✂ 파츠 컷 → 게임</button>` : ''}
           ${it.poseSheet ? `<button class="btn" data-posesheet="${it.id}">📤 시트 넘기기(자동 컷)</button>` : ''}
           ${it.poseSheet ? `<label class="flipchk" title="생성 시트가 화면 오른쪽을 보면 체크 → screen-left 기준으로 좌우 반전해 컷"><input type="checkbox" data-flip="${it.id}"> 좌우 반전</label>` : ''}
-          ${it.portraitSheet ? `<button class="btn" data-portraitsheet="${it.id}">📤 초상시트 넘기기(Claude 슬라이스)</button>` : ''}
+          ${it.portraitSheet ? `<button class="btn" data-portraitsheet="${it.id}">📤 초상시트 넘기기(자동 슬라이스)</button>` : ''}
         </div>
         ${it.poseSheet && it.roster ? `<div class="existing" data-existing="${it.id}"></div>` : ''}
         <div class="drop" tabindex="0" data-drop="${it.id}">
@@ -1709,6 +1721,7 @@ async function sheetSend(btn, path, blob, label, opts = {}) {
     const b64 = await blobToB64(blob);
     const body = { path, b64, contentType: blob.type || 'image/png' };
     if (opts.cut) { body.cut = true; body.flip = !!opts.flip; }
+    if (opts.slice) { body.slice = true; body.group = opts.group; body.members = opts.members; body.grid = opts.grid; }
     const r = await fetch(SAVE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !j.ok) throw new Error(j.error || ('HTTP ' + r.status));
@@ -1720,6 +1733,12 @@ async function sheetSend(btn, path, blob, label, opts = {}) {
       flashBtn(btn, '✓ 컷 완료!', true);
       toast(`${label} — ${cells} 컷 완료${opts.flip ? ' (↔ 반전)' : ''}. 게임 반영됨`);
       setCardStatus(btn, `✅ <b>컷 완료</b> — ${cells}${opts.flip ? ' · ↔ 좌우반전' : ''} · front_*.png 갱신<br><span class="dimnote">아래 "현재 스프라이트"가 새 그림으로 바뀝니다. 게임(:3000)은 하드리프레시로 반영. 방향이 거꾸로면 "좌우 반전" 체크 후 다시 넘기기.</span>`);
+    } else if (opts.slice) {
+      const s = j.slice || {};
+      if (!s.ok) throw new Error('슬라이스 실패: ' + (s.error || ''));
+      flashBtn(btn, `✓ ${s.count}명 슬라이스!`, true);
+      toast(`${label} — ${s.count}명 초상 슬라이스 완료. 게임 반영됨`);
+      setCardStatus(btn, `✅ <b>슬라이스 완료</b> — ${s.count}명 → /assets/ui/portraits/<br><span class="dimnote">게임(:3000) 하드리프레시로 반영. 칸이 어긋나면 시트 그리드 순서·개수 확인.</span>`);
     } else {
       flashBtn(btn, '✓ 넘김!', true);
       toast(`${label} 넘김 — ${kb}KB 저장${j.r2 ? ' + R2 ✓' : ''}. Claude가 처리합니다`);
@@ -1842,6 +1861,12 @@ async function dumpAllToDisk() {
         await applyToGame(`assets/objects/_sheet_${item.objectSheet}.png`, recs[recs.length - 1].blob); game.push('objects/_sheet_' + item.objectSheet + '.png');
       } else if (item && item.sceneCard && item.saveName) {
         await applyToGame(`assets/scenes/${item.saveName}`, recs[recs.length - 1].blob); game.push('scenes/' + item.saveName);
+      } else if (item && item.portraitSheet) {
+        // 초상 그룹 시트: 시트 저장 + serve.py가 멤버별로 슬라이스 → /assets/ui/portraits/{id}.webp
+        const args = portraitSliceArgs(item);
+        const res = await applyToGame(`assets/ui/portraits/_sheet_${item.portraitGroup}.png`, recs[recs.length - 1].blob, args);
+        const n = (res.slice && res.slice.count) || 0;
+        game.push(`portraits/${item.portraitGroup} (${n}컷)`);
       } else {
         for (const r of recs) { const safe = (r.name || card + '.png').replace(/[^\w.\-]/g, '_'); await applyToGame(`assets/_board_dump/${card}/${safe}`, r.blob); dump.push(card + '/' + safe); }
       }
@@ -2038,7 +2063,8 @@ board.addEventListener('click', async e => {
     const all = await dbAll();
     const recs = all.filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
     if (!recs.length) { flashBtn(pt, '✗ 시트 없음', false); setCardStatus(pt, '✗ 먼저 이 카드에 초상 시트 이미지를 붙여넣으세요(클릭→Ctrl+V).'); return; }
-    await sheetSend(pt, `assets/ui/portraits/_sheet_${item.portraitGroup}.png`, recs[0].blob, `초상시트 ${item.portraitGroup}`);
+    const pargs = portraitSliceArgs(item);
+    await sheetSend(pt, `assets/ui/portraits/_sheet_${item.portraitGroup}.png`, recs[0].blob, `초상시트 ${item.portraitGroup}`, { slice: true, group: pargs.group, members: pargs.members, grid: pargs.grid });
     return;
   }
   const th = e.target.closest('.thumb');
