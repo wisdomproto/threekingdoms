@@ -58,6 +58,21 @@ describe("책략 (strategy) 액션", () => {
     expect(r.events.some((e) => e.type === "damageDealt" && e.counter)).toBe(false);
   });
 
+  it("회복 책략은 회복량을 troopsHealed 이벤트로 서술한다 (자기서술 계약 — 드레인 정합)", () => {
+    // 회복 경로가 troops만 늘리고 이벤트를 안 내면 presenter 투영이 옛 값에 머물러
+    // 드레인 정합 단언(presented<committed)이 터진다 — 흡혈과 동일하게 troopsHealed로 서술해야 한다.
+    const s = createBattle(ctx, 1);
+    // 간옹을 부상 상태로(troops 20) 만들고 자기 칸(2,4)에 헌책(회복·단일·사거리3·target ally) 자가 시전
+    const wounded = { ...s, units: s.units.map((u) => (u.id === "간옹" ? { ...u, troops: 20 } : u)) };
+    const before = wounded.units.find((u) => u.id === "간옹")!.troops;
+    const r = applyAction(ctx, wounded, { type: "strategy", unitId: "간옹", strategyId: "헌책", target: { x: 2, y: 4 } });
+    const after = r.state.units.find((u) => u.id === "간옹")!.troops;
+    expect(after).toBeGreaterThan(before); // 실제 회복됨
+    const healEvents = r.events.filter((e) => e.type === "troopsHealed");
+    expect(healEvents).toHaveLength(1);
+    expect(healEvents[0]).toMatchObject({ type: "troopsHealed", unitId: "간옹", amount: after - before });
+  });
+
   it("MP 부족이면 시전 불가 (throw)", () => {
     const s = createBattle(ctx, 1);
     const drained = {

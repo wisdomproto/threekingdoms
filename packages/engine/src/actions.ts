@@ -588,6 +588,9 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
           const heal = strat.power + Math.round((spiritPower(caster) * strat.power) / 10);
           const res = healTroops(next, getUnit(next, t.id), heal);
           next = res.state;
+          // 회복도 이벤트로 서술해야 투영(presenter)이 따라온다 — 누락 시 드레인 정합 단언 실패
+          // (presented<committed). 흡혈(lifesteal) 경로와 동일 계약. 실제 회복량(클램프 후)만 서술.
+          if (res.healed > 0) events.push({ type: "troopsHealed", unitId: t.id, amount: res.healed });
         } else {
           const dmg = strategyDamage(caster, t, strat.power);
           const hit = dealDamage(next, caster, getUnit(next, t.id), dmg, false);

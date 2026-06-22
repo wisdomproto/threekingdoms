@@ -6,7 +6,7 @@
  * - TrackingPresenter: 이벤트만으로 화면 투영 상태(좌표/troops/retreated/phase)를 유지하고
  *   snapshot()으로 노출 — 드레인 dev 정합 단언(presented ≡ committed)을 실전 구동으로 검증.
  */
-import type { Side } from "@tk/data";
+import { gameData, type Side } from "@tk/data";
 import type { BattleEvent, BattleState } from "@tk/engine";
 import type { PresentedSnapshot, PresentedUnit, Presenter } from "../eventPlayer";
 
@@ -53,6 +53,9 @@ export class FakePresenter implements Presenter {
     return this.handle(e);
   }
   strategyCast(e: Ev<"strategyCast">): Promise<void> {
+    return this.handle(e);
+  }
+  itemUsed(e: Ev<"itemUsed">): Promise<void> {
     return this.handle(e);
   }
   unitRetreated(e: Ev<"unitRetreated">): Promise<void> {
@@ -136,6 +139,23 @@ export class TrackingPresenter extends FakePresenter {
       case "troopsHealed": { // 흡혈·회복 — troops 증가(damageDealt의 역)
         const u = this.units.get(e.unitId);
         if (u) u.troops += e.amount;
+        break;
+      }
+      case "itemUsed": {
+        // 도구 사용(W4). supplyItem(회복약)은 troopsHealed/damageDealt 없이 itemUsed{amount}만
+        // emit하므로 회복을 직접 투영해야 한다(없으면 presented<committed 드레인 위반). attackItem은
+        // 선행 damageDealt가 이미 troops를 차감했으니 여기선 no-op(이중 적용 방지) — BattleRenderer.
+        // itemUsed의 supplyItem/attackItem 분기와 동형. 회복량(delta)은 이벤트(amount)에서만 오고,
+        // item.category는 정적 라우팅(heal vs 기적용 피해)에만 쓴다.
+        if (gameData.items[e.itemId]?.category !== "supplyItem") break; // attackItem → damageDealt가 처리
+        const caster = this.units.get(e.unitId);
+        // target 생략 = 시전자 자신 위치 (useItem 계약). 좌표→대상 유닛은 투영 상태에서 해석.
+        const coord = e.target ?? (caster ? { x: caster.x, y: caster.y } : null);
+        if (!coord) break;
+        const target = [...this.units.values()].find(
+          (u) => u.x === coord.x && u.y === coord.y && !u.retreated,
+        );
+        if (target) target.troops += e.amount;
         break;
       }
       case "statusApplied": // 표시 전용 — diffSnapshot은 statuses 미비교(투영 불필요)

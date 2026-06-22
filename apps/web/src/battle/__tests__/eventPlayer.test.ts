@@ -6,11 +6,12 @@
  *  - dev 계약: battleEnded 최후 재생, 종료 후 enqueue 금지, presented ≡ committed 단언
  */
 import { describe, expect, it } from "vitest";
-import { createBattle, spawnUnit } from "@tk/engine";
-import type { BattleEvent, BattleState } from "@tk/engine";
+import { applyAction, createBattle, spawnUnit } from "@tk/engine";
+import type { BattleContext, BattleEvent, BattleState } from "@tk/engine";
+import { gameData, type Stage } from "@tk/data";
 import { EventPlayer, type PresentedSnapshot } from "../eventPlayer";
 import { FakePresenter, TrackingPresenter } from "./fakePresenter";
-import { sishuiCtx } from "./fixtures";
+import { sishuiCtx, testMap } from "./fixtures";
 
 const state0 = createBattle(sishuiCtx, 42);
 const tick = () => new Promise<void>((r) => setTimeout(r, 0));
@@ -238,5 +239,127 @@ describe("상태이상 statusTick 투영 (Phase D)", () => {
     const u = state0.units.find((x) => x.troops > 0)!;
     await tp.troopsHealed!({ type: "troopsHealed", unitId: u.id, amount: 25 });
     expect(tp.snapshot!()!.units.find((x) => x.id === u.id)!.troops).toBe(u.troops + 25);
+  });
+});
+
+describe("회복 책략 투영 (회귀: 드레인 정합 — 회복이 이벤트로 서술되지 않아 presented<committed)", () => {
+  // 실전 사수관에서 목격한 단언("드레인 정합 단언 실패 — 유닛 X troops 불일치: presented<committed")의
+  // 근본 재현. 책사가 부상당한 아군을 회복하면 troops가 늘지만, 회복 경로(actions.ts strategy heal)가
+  // strategyCast만 emit하고 회복량을 서술하는 이벤트가 없으면 투영이 옛 값에 머물러 드레인에서 드리프트.
+  const healStage: Stage = {
+    id: "heal-drain-test", name: "회복드레인", mapId: "testmap", turnLimit: 30,
+    units: [
+      { commanderId: "간옹", classId: "strategist", level: 10, troops: 80,  items: [], side: "player", x: 2, y: 4 },
+      { commanderId: "유비", classId: "lord",        level: 10, troops: 200, items: [], side: "player", x: 3, y: 4 },
+      { commanderId: "화웅", classId: "footman",     level: 3,  troops: 120, items: [], side: "enemy",  x: 6, y: 0 },
+    ],
+    victory: { kind: "defeatAll" },
+    defeat: { kind: "lordRetreat", unitId: "유비" },
+    events: [],
+  };
+  const healCtx: BattleContext = { data: gameData, stage: healStage, map: testMap };
+
+  it("회복 책략 후 드레인 정합 단언을 통과한다 (회복이 이벤트로 서술됨)", async () => {
+    // 유비를 부상 상태로(troops=10, maxTroops=200) — 회복 여지 충분
+    const base = createBattle(healCtx, 1);
+    const wounded: BattleState = {
+      ...base,
+      units: base.units.map((u) => (u.id === "유비" ? { ...u, troops: 10 } : u)),
+    };
+    // 간옹이 헌책(회복·단일·사거리3)을 부상당한 유비(3,4)에 시전 → 유비 회복
+    const r = applyAction(healCtx, wounded, {
+      type: "strategy", unitId: "간옹", strategyId: "헌책", target: { x: 3, y: 4 },
+    });
+    // 전제: 엔진 진실에서 유비가 실제로 회복됐다 (회복 경로가 탔다)
+    const liubeiCommitted = r.state.units.find((u) => u.id === "유비")!;
+    expect(liubeiCommitted.troops).toBeGreaterThan(10);
+
+    // 투영을 행동 전 상태(wounded)로 프라임 → 이벤트만으로 재구성 (BattleRenderer 부팅과 동일)
+    const tp = new TrackingPresenter();
+    tp.prime(wounded);
+    const violations: string[] = [];
+    const player = new EventPlayer({
+      presenter: tp, getCommitted: () => r.state, dev: true,
+      onDrained: () => {}, onDevViolation: (m) => violations.push(m),
+    });
+    await player.enqueue(r.events);
+
+    // 수정 전: 회복 이벤트 부재 → 유비 투영이 10에 머무름 → "유닛 유비 troops 불일치" 위반.
+    expect(violations).toEqual([]);
+    expect(tp.snapshot!()!.units.find((u) => u.id === "유비")!.troops).toBe(liubeiCommitted.troops);
+  });
+});
+
+describe("회복약(supplyItem) 투영 (회귀: 드레인 정합 — itemUsed가 투영되지 않아 presented<committed)", () => {
+  // 위 "회복 책략 투영"의 형제 버그. supplyItem(회복약)은 troopsHealed/damageDealt 없이
+  // itemUsed{amount}만 emit한다(actions.ts useItem). TrackingPresenter에 itemUsed 케이스가
+  // 없으면 회복이 투영에 반영되지 않아 유닛 troops가 옛 값에 머물러 드레인 정합 단언이
+  // presented<committed로 터진다. 실전은 정상(BattleRenderer.itemUsed가 supplyItem 시
+  // setTroops(target.troops)) — 미러만 불완전했다.
+  const itemStage: Stage = {
+    id: "item-heal-drain-test", name: "회복약드레인", mapId: "testmap", turnLimit: 30,
+    units: [
+      { commanderId: "간옹", classId: "strategist", level: 5, troops: 80,  items: ["쌀", "폭탄"], side: "player", x: 2, y: 4 },
+      { commanderId: "유봉", classId: "footman",     level: 5, troops: 100, items: [], side: "player", x: 3, y: 4 },
+      { commanderId: "화웅", classId: "footman",     level: 3, troops: 120, items: [], side: "enemy",  x: 6, y: 0 },
+    ],
+    victory: { kind: "defeatAll" },
+    defeat: { kind: "lordRetreat", unitId: "간옹" },
+    events: [],
+  };
+  const itemCtx: BattleContext = { data: gameData, stage: itemStage, map: testMap };
+
+  it("회복약 사용 후 드레인 정합 단언을 통과한다 (itemUsed가 이벤트로 투영됨)", async () => {
+    // 유봉을 부상 상태로(troops=50, maxTroops=100) — 회복 여지 충분
+    const base = createBattle(itemCtx, 1);
+    const wounded: BattleState = {
+      ...base,
+      units: base.units.map((u) => (u.id === "유봉" ? { ...u, troops: 50 } : u)),
+    };
+    // 간옹이 회복약(쌀·power40)을 부상당한 유봉(3,4)에 사용 → 유봉 50→90
+    const r = applyAction(itemCtx, wounded, {
+      type: "useItem", unitId: "간옹", itemId: "쌀", target: { x: 3, y: 4 },
+    });
+    // 전제: 엔진 진실에서 유봉이 실제로 회복됐다 (supplyItem 경로가 탔다)
+    const yufengCommitted = r.state.units.find((u) => u.id === "유봉")!;
+    expect(yufengCommitted.troops).toBeGreaterThan(50);
+
+    // 투영을 행동 전 상태(wounded)로 프라임 → 이벤트만으로 재구성 (BattleRenderer 부팅과 동일)
+    const tp = new TrackingPresenter();
+    tp.prime(wounded);
+    const violations: string[] = [];
+    const player = new EventPlayer({
+      presenter: tp, getCommitted: () => r.state, dev: true,
+      onDrained: () => {}, onDevViolation: (m) => violations.push(m),
+    });
+    await player.enqueue(r.events);
+
+    // 수정 전: itemUsed 케이스 부재 → 유봉 투영이 50에 머무름 → "유닛 유봉 troops 불일치" 위반.
+    expect(violations).toEqual([]);
+    expect(tp.snapshot!()!.units.find((u) => u.id === "유봉")!.troops).toBe(yufengCommitted.troops);
+  });
+
+  it("공격아이템(attackItem) 사용은 troops를 이중 적용하지 않는다 (선행 damageDealt에 위임)", async () => {
+    // 가드: 간옹이 폭탄(attackItem·power50)을 적 화웅(6,0)에 사용. 엔진은 damageDealt + itemUsed{amount:50}을
+    // emit한다. itemUsed가 supplyItem처럼 amount를 또 더하면 presented>committed(화웅 과다)로 위반 —
+    // 미러는 attackItem을 선행 damageDealt에 위임(no-op)해야 정합. BattleRenderer.itemUsed 분기와 동형.
+    const s0 = createBattle(itemCtx, 1);
+    const r = applyAction(itemCtx, s0, {
+      type: "useItem", unitId: "간옹", itemId: "폭탄", target: { x: 6, y: 0 },
+    });
+    const huaxiongCommitted = r.state.units.find((u) => u.id === "화웅")!;
+    expect(huaxiongCommitted.troops).toBe(120 - 50); // 폭탄 power 50 고정
+
+    const tp = new TrackingPresenter();
+    tp.prime(s0);
+    const violations: string[] = [];
+    const player = new EventPlayer({
+      presenter: tp, getCommitted: () => r.state, dev: true,
+      onDrained: () => {}, onDevViolation: (m) => violations.push(m),
+    });
+    await player.enqueue(r.events);
+
+    expect(violations).toEqual([]);
+    expect(tp.snapshot!()!.units.find((u) => u.id === "화웅")!.troops).toBe(huaxiongCommitted.troops);
   });
 });
