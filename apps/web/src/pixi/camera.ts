@@ -205,6 +205,11 @@ export class CameraController {
     return worldToScreen(this.state, p);
   }
 
+  /** 뷰포트 폭(CSS px) — 메뉴 좌/우 배치의 화면-안쪽 판정용(§174). */
+  get viewportWidth(): number {
+    return this.viewport.width;
+  }
+
   /** 컬링용 — 현재 뷰포트가 비추는 월드 좌표 rect */
   viewWorldRect(): { x: number; y: number; width: number; height: number } {
     const tl = screenToWorld(this.state, { x: 0, y: 0 });

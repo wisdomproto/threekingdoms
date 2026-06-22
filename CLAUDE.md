@@ -63,8 +63,8 @@
 | 일러스트 | Gemini 이미지 모델 (nano banana). v1 생성=**`gemini-3-pro-image`(나노바나나 Pro)** | 레퍼런스 시트 기반 일관성. ⚠️ 이미지 생성은 **유료(paid tier) 전용** — 키 프로젝트에 결제 활성화 필수(무료 등급 호출 0). 자동 파이프라인=§4 `tools/sprite-pipeline/gen/` |
 | 영상 | Seedance I2V | 일기토/이벤트 컷신 |
 | 음성 | ElevenLabs | 네임드 일기토 대사 + 내레이션 |
-| 음악 | AI 작곡 (Suno/Udio급) | 6~8트랙 + 변형. 상용 라이선스 확인 필요 |
-| 효과음 | 무료/저가 SFX 라이브러리 소싱 | AI 생성보다 효율적 |
+| 음악 | **v1=절차적 Web Audio 신스 BGM**(`apps/web/src/audio/`, synth.ts·bgm.ts·경로별 트랙). 최종=AI 작곡(Suno/Udio급) | 생성 트랙은 manifest 드롭인 교체(코드 불변). 6~8트랙 + 변형 |
+| 효과음 | **v1=절차적 신스 SFX**(`apps/web/src/audio/sfx.ts` — `SFX.slash`·`playSfx`, 전투/결산 배선) | 파일 SFX도 manifest 드롭인. 호출부=배럴 `../audio`(`playSfx`/`playBgm`/`<AudioController/>` layout 마운트) |
 
 ### 3-1. 시점·맵 아트 방식 (2026-06-13 확정 — 시행착오 끝에 정착)
 - **시점: 톱다운 직교** (원작 영걸전·조조전이 그렇다). 아이소메트릭(쿼터뷰)은 시도했다가 폐기 — 원작과 다르고 카메라/정합 비용만 큼.

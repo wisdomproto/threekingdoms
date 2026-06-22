@@ -31,6 +31,7 @@ import { clearReward } from "../../meta/serendipity";
 import { clearSortie } from "../../meta/sortie";
 import { RewardedAdButton } from "../../meta/RewardedAdButton";
 import { useFadeNav } from "../../ui/useFadeNav";
+import { playSfx, SFX } from "../../audio";
 
 const OVERLAY_STYLE: React.CSSProperties = {
   position: "absolute",
@@ -324,17 +325,25 @@ export function ResultSequence({
     at(AT_GOLD, () => setStep(STEP.GOLD));
     at(AT_EXP, () => setStep(STEP.EXP));
 
-    // 별 한 칸씩 "탁탁" — 마지막 별에서 잭팟 플래시(S만).
+    // 별 한 칸씩 "탁탁"(별 꽂힘음) — 마지막 별에서 잭팟 플래시(S만).
     for (let i = 1; i <= summary.stars; i++) {
-      at(AT_STARS + i * STAR_STAGGER, () => setStarsShown(i));
+      at(AT_STARS + i * STAR_STAGGER, () => {
+        setStarsShown(i);
+        playSfx(SFX.star);
+      });
     }
     if (summary.fanfare.jackpot) {
       at(AT_STARS + summary.stars * STAR_STAGGER + 80, () => setFlash(true));
+    }
+    // 보물 상자 개봉음(보물 있을 때만).
+    if (summary.treasures.length > 0) {
+      at(AT_TREASURE + 120, () => playSfx(SFX.chest));
     }
 
     // 자금 카운트업(rAF roll-up) — GOLD 스텝 진입 직후 시작.
     if (summary.gold > 0) {
       at(AT_GOLD + 120, () => {
+        playSfx(SFX.coin); // 자금 카운트업 시작음
         const start = performance.now();
         const tick = (now: number) => {
           const t = Math.min(1, (now - start) / GOLD_ROLLUP_MS);
@@ -347,8 +356,11 @@ export function ResultSequence({
       });
     }
 
-    // exp 바 채움.
-    at(AT_EXP + 250, () => setExpFilled(true));
+    // exp 바 채움(+레벨업한 아군 있으면 레벨업 팡파레).
+    at(AT_EXP + 250, () => {
+      setExpFilled(true);
+      if (summary.levelUps.length > 0) playSfx(SFX.levelup);
+    });
 
     return () => {
       for (const t of timers) clearTimeout(t);

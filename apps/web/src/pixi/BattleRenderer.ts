@@ -28,6 +28,8 @@ import { ThreatLayer } from "./layers/ThreatLayer";
 import { UnitLayer } from "./layers/UnitLayer";
 import { FxLayer } from "./layers/FxLayer";
 import { threatTiles } from "../battle/threatRange";
+import { chooseMenuPreferRight } from "../battle/menuPlacement";
+import { playSfx, SFX } from "../audio";
 
 type Ev<T extends BattleEvent["type"]> = Extract<BattleEvent, { type: T }>;
 
@@ -520,15 +522,20 @@ export class BattleRenderer implements Presenter {
     const center = camera.worldToScreen(centerWorld);
     // 셀의 화면상 반폭 = (타일/2) × 현재 줌. 좌/우 자동 전환 시 유닛을 가리지 않을 거리.
     const half = (TILE_SIZE / 2) * camera.current.scale;
-    // 메뉴 기본 배치 쪽 = 빈 쪽(원작 "유닛 옆" + 가림 최소화). 선택 유닛 좌/우 밴드(가로 1~3칸·세로 ±3칸)
-    // 의 다른 living 유닛 수를 비교해 적은 쪽을 우선. 동률이면 우측(기본).
+    // 메뉴 배치 쪽(레퍼런스 §174 "맵 가림 회피 좌/우 자동 전환"): 선택 유닛 기준 적(공격 대상)이
+    // 적은 쪽에 둬 적·이동범위를 가리지 않게. 동률(빈 전장)이면 화면 안쪽으로(유닛이 우측 절반이면 좌측).
+    // 종전 ±3칸 밴드는 대부분 0=0 동률 → "무조건 우측" + 우측 적을 가리던 버그(길중 지적) → 교체.
     const gx = view.gridX, gy = view.gridY;
-    const band = (lo: number, hi: number): number =>
-      store.committedState.units.filter(
-        (u) => !u.retreated && u.id !== unitId &&
-          u.x - gx >= lo && u.x - gx <= hi && Math.abs(u.y - gy) <= 3,
-      ).length;
-    const preferRight = band(1, 3) <= band(-3, -1);
+    const self = store.committedState.units.find((u) => u.id === unitId);
+    const preferRight = chooseMenuPreferRight({
+      unitId,
+      gx,
+      gy,
+      selfSide: self?.side ?? null,
+      units: store.committedState.units,
+      screenX: center.x,
+      screenWidth: camera.viewportWidth,
+    });
     store.setMenuAnchor({ x: center.x, y: center.y, half, preferRight });
     this.updateInspectAnchor(camera, units);
   }
@@ -640,6 +647,7 @@ export class BattleRenderer implements Presenter {
 
     // 빗나감(시드확률 §2-1): 피해 0 — 공격 모션 + "빗나감" 텍스트만, 슬래시/플래시/넉백/병력변동 없음.
     if (e.hit === false) {
+      playSfx(SFX.slash); // 헛스윙 — 쉭(임팩트음 없음)
       await Promise.all([attacker.play("attack"), s.fx.missPopup(popupAt)]);
       return;
     }
@@ -659,6 +667,8 @@ export class BattleRenderer implements Presenter {
     // 타격 프레임(공격자 돌진이 닿는 순간)에 슬래시·플래시·흔들림·히트스톱을 동기 발사.
     // 공격 모션 시작 후 ~110ms(배속존중) 지연 — playAttack의 lunge 정점(LUNGE_END≈0.5)에 근접.
     const strike = (): void => {
+      playSfx(indirect ? SFX.pierce : SFX.slash); // 휘두름/관통 쉭
+      playSfx(big ? SFX.crit : SFX.hit); // 임팩트 — 큰 피해/반격은 회심음
       void s.fx.slashArc(aPos, popupAt, indirect);
       void s.fx.impactFlash(popupAt, big);
       void defender.flash();
@@ -711,6 +721,7 @@ export class BattleRenderer implements Presenter {
     s.units.view(e.casterId).faceToward(e.target);
     this.autoFocus(gridToWorld(e.target), FOCUS_MS);
     const name = this.ctx.data.strategies[e.strategyId]?.name ?? e.strategyId;
+    playSfx(SFX.spell);
     await s.fx.banner(`책략 · ${name}!`, DUEL_BANNER_MS);
   }
 
@@ -721,6 +732,7 @@ export class BattleRenderer implements Presenter {
     // 순수 표현 — 게임 상태 불변, FxLayer가 TweenRunner로 배속(timeScale)을 존중한다.
     const view = s.units.view(e.unitId);
     const burstAt = gridToWorld({ x: view.gridX, y: view.gridY });
+    playSfx(SFX.defeat);
     await Promise.all([view.play("retreat"), s.fx.retreatBurst(burstAt)]);
   }
 
@@ -761,6 +773,7 @@ export class BattleRenderer implements Presenter {
     const name = (id: string): string => this.ctx.data.commanders[id]?.name ?? id;
     // 일기토 발동 — 큰 화면 흔들림 1회로 무게감(§4 "특히 일기토/큰 피해").
     this.triggerShake(SHAKE_PX_BIG);
+    playSfx(SFX.duel);
     await s.fx.banner(
       `일기토! ${name(e.attackerId)} vs ${name(e.defenderId)} — ${name(e.winnerId)} 승리`,
       DUEL_BANNER_MS,
@@ -775,12 +788,14 @@ export class BattleRenderer implements Presenter {
     const at = gridToWorld({ x: defender.gridX, y: defender.gridY });
     void s.fx.impactFlash(at);
     this.triggerShake(SHAKE_PX_HIT);
+    playSfx(SFX.flank);
     await s.fx.banner(`협공! +${e.bonusPercent}%`, FLANK_BANNER_MS);
   }
 
   async combo(e: Ev<"combo">): Promise<void> {
     const s = this.scene;
     if (!s || e.count < 2) return; // 단일 격파는 연출 생략, 2연속부터 「콤보」
+    playSfx(SFX.combo);
     await s.fx.banner(`콤보 ×${e.count}!  +${e.gold}G`, FLANK_BANNER_MS);
   }
 
@@ -792,6 +807,7 @@ export class BattleRenderer implements Presenter {
     const defender = s.units.view(e.defenderId);
     const at = gridToWorld({ x: defender.gridX, y: defender.gridY });
     this.triggerShake(SHAKE_PX_BIG);
+    playSfx(SFX.ultimate);
     void s.fx.impactFlash(at, true);
     // 네임드 시그니처면 그 이름(「청룡언월!」), 아니면 일반 「필살! 장수」
     await s.fx.banner(e.name ? `${e.name}!  ${attacker}` : `필살! ${attacker}`, DUEL_BANNER_MS);
@@ -814,6 +830,7 @@ export class BattleRenderer implements Presenter {
         this.autoFocus(gridToWorld({ x: firstUnacted.x, y: firstUnacted.y }), FOCUS_MS);
       }
     }
+    playSfx(SFX.phase);
     await s.fx.banner(label, PHASE_BANNER_MS);
   }
 
@@ -823,12 +840,14 @@ export class BattleRenderer implements Presenter {
     if (!s) return;
     s.units.spawn(e.units, e.side);
     const label = e.side === "enemy" ? "적 증원 도착!" : e.side === "ally" ? "우군 증원!" : "증원 도착!";
+    playSfx(SFX.reinforce);
     await s.fx.banner(label, PHASE_BANNER_MS);
   }
 
   async battleEnded(e: Ev<"battleEnded">): Promise<void> {
     const s = this.scene;
     if (!s) return;
+    playSfx(e.result === "victory" ? SFX.victory : SFX.lose);
     await s.fx.banner(e.result === "victory" ? "승리!" : "패배...", END_BANNER_MS);
   }
 

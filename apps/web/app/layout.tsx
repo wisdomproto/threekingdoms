@@ -1,5 +1,6 @@
 import type { Viewport } from "next";
 import { AdHost } from "../src/meta/AdHost";
+import { AudioController } from "../src/audio/AudioController";
 
 export const metadata = { title: "삼국지 SRPG (가칭)" };
 
@@ -25,6 +26,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         {/* 전역 광고 호스트(클라이언트 아일랜드) — adService 큐를 구독해 가짜 광고 모달/전면 렌더. */}
         <AdHost />
+        {/* 전역 오디오 컨트롤러 — 제스처 해제·경로별 BGM·전역 클릭음·뮤트 UI(절차적 SFX/BGM). */}
+        <AudioController />
       </body>
     </html>
   );
