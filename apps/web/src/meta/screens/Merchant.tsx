@@ -12,6 +12,7 @@ import { gameData } from "@tk/data";
 import { getMeta, spendGold, addItem } from "../metaStore";
 import { RewardedAdButton } from "../RewardedAdButton";
 import { PANEL_FRAME } from "../../battle/hud/frames";
+import { ItemIcon } from "../../ui/ItemIcon";
 
 const INK_DEEP = "#0d0b09";
 const BRONZE_GOLD = "#cdab6e";
@@ -139,6 +140,7 @@ export function Merchant(): React.ReactElement {
                   opacity: bought ? 0.45 : 1,
                 }}
               >
+                <ItemIcon itemId={entry.itemId} category={item.category} size={36} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: bought ? BRONZE_DIM : PARCHMENT }}>
                     {item.name}

@@ -15,7 +15,7 @@
  * 좌표·배치 UI는 M1 범위 밖(sortie.ts 계약: stage player 슬롯을 앞에서부터 재사용). 편성은
  * commander/class/level/exp/items/troops만 결정한다.
  */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { gameData } from "@tk/data";
 import type { Item } from "@tk/data";
 import type { RosterUnit } from "../metaStore";
@@ -23,6 +23,7 @@ import { getMeta, setEquipped } from "../metaStore";
 import type { SortieMember } from "../sortie";
 import { PANEL_FRAME, PORTRAIT_FRAME, BUTTON_FRAME } from "../../battle/hud/frames";
 import { assetUrl } from "../../assetUrl";
+import { ItemIcon } from "../../ui/ItemIcon";
 import { unitStats } from "../unitStats";
 import { sortRoster, type SortKey } from "../rosterSort";
 
@@ -82,7 +83,12 @@ function className(classId: string): string {
 function Portrait({ commanderId, size = 52 }: { commanderId: string; size?: number }): React.ReactElement {
   const name = commanderName(commanderId);
   const [failed, setFailed] = useState(false);
-  useEffect(() => setFailed(false), [commanderId]); // id 바뀌면 초상 재시도
+  const imgRef = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    setFailed(false); // id 바뀌면 초상 재시도
+    const img = imgRef.current; // onError 레이스(부착 전 404) 방어 — 깨진 img 대신 이니셜
+    if (img && img.complete && img.naturalWidth === 0) setFailed(true);
+  }, [commanderId]);
   return (
     <div
       style={{
@@ -103,6 +109,7 @@ function Portrait({ commanderId, size = 52 }: { commanderId: string; size?: numb
     >
       {!failed ? (
         <img
+          ref={imgRef}
           src={assetUrl(`/assets/ui/portraits/${encodeURIComponent(commanderId)}.webp`)}
           alt={name}
           onError={() => setFailed(true)}
@@ -444,14 +451,18 @@ function SortieRow({
                 title="해제"
                 style={{
                   fontSize: 11,
-                  padding: "2px 7px",
+                  padding: "2px 7px 2px 4px",
                   borderRadius: 10,
                   border: `1px solid ${ACCENT}`,
                   background: "rgba(202, 168, 106, 0.16)",
                   color: TEXT,
                   cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
                 }}
               >
+                <ItemIcon itemId={itemId} category={items[itemId]?.category} size={18} />
                 {items[itemId]?.name ?? itemId}
                 <span style={{ color: DIM, marginLeft: 4 }}>✕</span>
               </button>
@@ -479,8 +490,10 @@ function SortieRow({
                     cursor: "pointer",
                     display: "inline-flex",
                     alignItems: "center",
+                    gap: 4,
                   }}
                 >
+                  <ItemIcon itemId={itemId} category={it?.category} size={18} />
                   {it?.name ?? itemId}
                   <PowerDelta
                     commanderId={member.commanderId}

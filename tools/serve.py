@@ -238,18 +238,19 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
                 resp["stitch"] = st
                 sys.stdout.write(f"[save-asset] chunk {m.group(1)} stitch → ok={st.get('stitched')} ({st.get('have')}/{st.get('total')})\n")
 
-        # ⑤ 초상 시트 자동 슬라이스 (payload.slice) — _sheet_{group}.png 저장 직후 멤버별 webp 컷
-        if payload.get("slice") and rel.startswith("assets/ui/portraits/_sheet_") and rel.endswith(".png"):
+        # ⑤ 그룹 시트 자동 슬라이스 (payload.slice) — assets/ui/{kind}/_sheet_{group}.png 저장 직후
+        #    멤버별 webp 컷(초상=portraits·아이템=items 공용). out_dir은 시트 경로의 디렉터리에서 도출.
+        if payload.get("slice") and re.match(r"assets/ui/[^/]+/_sheet_.+\.png$", rel):
             group = payload.get("group") or rel.split("_sheet_", 1)[1].rsplit(".", 1)[0]
-            sl = _run_slice_portraits(dest, payload.get("members") or [], payload.get("grid"))
+            sl = _run_slice_sheet(dest, os.path.dirname(dest), payload.get("members") or [], payload.get("grid"))
             resp["slice"] = sl
             sys.stdout.write(f"[save-asset] slice {group} → ok={sl.get('ok')} count={sl.get('count')}\n")
 
         self._json(200, resp)
 
 
-def _run_slice_portraits(sheet_path, members, grid):
-    """초상 그룹 시트 → /assets/ui/portraits/{멤버}.webp 슬라이스(검정배경 제거 포함).
+def _run_slice_sheet(sheet_path, out_dir, members, grid):
+    """그룹 시트 → out_dir/{멤버}.webp 슬라이스(검정배경 제거 포함). 초상·아이템 공용.
     slice_portraits.slice_sheet 재사용. grid={cols,rows}(검정배경 시트는 밴드검출 실패 → 그리드 폴백).
     반환 {ok, count, saved, missing} 또는 {ok:False, error}."""
     if not members:
@@ -258,7 +259,6 @@ def _run_slice_portraits(sheet_path, members, grid):
         if GEN_DIR not in sys.path:
             sys.path.insert(0, GEN_DIR)
         from slice_portraits import slice_sheet
-        out_dir = os.path.join(PUBLIC, "assets", "ui", "portraits")
         res = slice_sheet(sheet_path, members, out_dir, grid=grid)
         saved = [n for n, _p, ok in res if ok]
         missing = [n for n, _p, ok in res if not ok]

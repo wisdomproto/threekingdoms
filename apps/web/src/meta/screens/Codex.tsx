@@ -14,6 +14,7 @@ import { gameData, stages } from "@tk/data";
 import { getMeta } from "../metaStore";
 import { isSerendipityTreasure } from "../serendipity";
 import { PANEL_FRAME } from "../../battle/hud/frames";
+import { ItemIcon } from "../../ui/ItemIcon";
 
 const INK = "#1a1714";
 const INK_DEEP = "#0d0b09";
@@ -88,8 +89,11 @@ export function Codex(): React.ReactElement {
                   minHeight: 78,
                 }}
               >
-                <div style={{ fontSize: 14, fontWeight: 700, color: has ? PARCHMENT : BRONZE_DIM }}>
-                  {has ? t.name : "？？？"}
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  {has && <ItemIcon itemId={t.id} category={t.category} size={34} />}
+                  <div style={{ fontSize: 14, fontWeight: 700, color: has ? PARCHMENT : BRONZE_DIM }}>
+                    {has ? t.name : "？？？"}
+                  </div>
                 </div>
                 {has ? (
                   <div style={{ fontSize: 12, color: BRONZE_GOLD, marginTop: 5, lineHeight: 1.4 }}>

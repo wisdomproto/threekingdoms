@@ -1198,6 +1198,48 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
   });
 })();
 
+/* ───────────────────────── J. 아이템 아이콘 시트 (카테고리별 그룹) ─────────────────────────
+   상점·편성·도감·결산이 /assets/ui/items/{itemId}.webp 를 표시(없으면 카테고리 심볼 폴백).
+   그룹 한 장 생성 → 📤 → serve.py가 그리드 순서대로 슬라이스. 멤버 id = items.json 키 = 파일명. */
+(function() {
+  const styleByCat = {
+    weapon: 'each a distinct Chinese cold weapon (straight sword, glaive/guandao, spear, halberd, twin blades)',
+    treasure: 'each a precious treasure or artifact (jade seal, charm, ornament, fine armor piece, manual)',
+    supplyItem: 'each a supply / medicine / food / military-order item (medicine pouch, wine jar, grain sack, document scroll)',
+    attackItem: 'each a battle consumable — a bomb, or a rolled paper talisman / strategy scroll',
+    book: 'each an ancient bound military manual or bamboo-slip book',
+    horse: 'each a distinct warhorse, side view, no rider',
+  };
+  const GROUPS = [
+    { gid: 'weapon', cat: 'weapon', title: '아이템 — 무기 (12)', members: ['의천검','청강검','칠성검','청룡언월도','삼첨도','방천화극','사모','자웅일대검','영걸검','패자검','쌍고검','용담창'] },
+    { gid: 'treasure', cat: 'treasure', title: '아이템 — 보물 (17)', members: ['qiyuan-charm','qiyuan-token','qiyuan-relic','둔갑천서','청랑서','고취구','궁술지침서','마술지침서','검술지침서','장창','보병차','연노','투석기','마개','근위개','무술교본','의협교본'] },
+    { gid: 'supply', cat: 'supplyItem', title: '아이템 — 소모품 (18)', members: ['옥새','술','특급주','빼갈','콩','보리','쌀','원대서','원부서','원군서','평기서','활기서','용기서','상약','한방약','차','칙명서','원군보고'] },
+    { gid: 'attack', cat: 'attackItem', title: '아이템 — 공격아이템 (13)', members: ['폭탄','낙석서','설붕서','산사태서','소용돌이서','탁류서','해일서','초열서','화룡서','업화서','농무서','기상서','호우서'] },
+    { gid: 'book', cat: 'book', title: '아이템 — 병법서 (5)', members: ['손자의병법서','맹덕신서','육도','삼략','오자의병법서'] },
+    { gid: 'horse', cat: 'horse', title: '아이템 — 말 (3)', members: ['조황비전','적로','적토마'] },
+  ];
+  function buildItemPrompt(g) {
+    const N = g.members.length;
+    const cols = N <= 4 ? N : Math.ceil(N / 2);
+    const rows = Math.ceil(N / cols);
+    const list = g.members.map((m, i) => `${i + 1}) ${m}`).join('; ');
+    return `An ITEM ICON SHEET: ${N} distinct game item icons on a FULLY TRANSPARENT background, arranged in a ${cols}-column × ${rows}-row grid in ROW-MAJOR order (left to right, then the next row down), with clear empty gaps between icons. NO characters, NO people, NO hands, NO text or labels. Art style: East Asian ink-wash + soft cel shading, Three Kingdoms era; each icon a clean, centered single object. ${styleByCat[g.cat] || ''}. The items in THIS EXACT ORDER: ${list}.`;
+  }
+  SECTIONS.push({
+    id: 'ITEMS',
+    title: '아이템 아이콘 시트 (카테고리별 그룹 → 한 장 → 자동 슬라이스)',
+    desc: '아이템/무기 아이콘. 프롬프트 복사 → 한 장 생성 → 붙여넣기 → <b>📤 아이템시트 넘기기(자동 슬라이스)</b> → serve.py가 그리드 좌→우·위→아래 순서대로 잘라 <code>/assets/ui/items/{id}.webp</code> 저장(상점·편성·도감·결산 즉시 반영). 표시측에 폴백 있어 일부 칸만 만들어도 됨. 칸이 어긋나면 그 그룹만 다시 생성.',
+    items: GROUPS.map((g) => ({
+      id: `item-${g.gid}`,
+      title: g.title,
+      itemSheet: true,
+      itemGroup: g.gid,
+      members: g.members.map((m) => [m, '']),
+      prompt: buildItemPrompt(g),
+    })),
+  });
+})();
+
 /* ───────────────────────── 상태/저장 ───────────────────────── */
 
 const varState = JSON.parse(localStorage.getItem('ab_vars') || '{}');
@@ -1327,6 +1369,16 @@ function portraitSliceArgs(item) {
   const cols = N <= 4 ? N : Math.ceil(N / 2);
   const rows = Math.ceil(N / cols);
   return { slice: true, group: item.portraitGroup, members, grid: { cols, rows } };
+}
+
+/** 아이템 아이콘 그룹 카드 → serve.py 슬라이스 페이로드. 경로는 assets/ui/items/_sheet_{group}.png. */
+function itemSliceArgs(item) {
+  if (!item || !item.itemSheet || !item.members) return null;
+  const members = item.members.map((m) => m[0]);
+  const N = members.length;
+  const cols = N <= 4 ? N : Math.ceil(N / 2);
+  const rows = Math.ceil(N / cols);
+  return { slice: true, group: item.itemGroup, members, grid: { cols, rows } };
 }
 
 /* ─────────── 리그 파츠 컷 (SD 한 장 → 박스로 파트 크롭 → /save-asset → skeletons/{id}/) ─────────── */
@@ -1538,6 +1590,7 @@ const TAB_DEFS = [
   { id: 'pose',    label: '① SD 포즈시트',  secs: ['S'] },
   { id: 'portrait',label: '② 초상시트',     secs: ['I'] },
   { id: 'scene',   label: '③ 시나리오 씬',  secs: ['N'] },
+  { id: 'item',    label: '④ 아이템',       secs: ['ITEMS'] },
   { id: 'ui',      label: 'UI',             secs: ['D','L'] },
   { id: 'effect',  label: '이펙트',         secs: ['C'] },
   { id: 'terrain', label: '지형·바닥',      secs: ['E','K'] },
@@ -1646,6 +1699,7 @@ function renderBoard() {
           ${it.poseSheet ? `<button class="btn" data-posesheet="${it.id}">📤 시트 넘기기(자동 컷)</button>` : ''}
           ${it.poseSheet ? `<label class="flipchk" title="생성 시트가 화면 오른쪽을 보면 체크 → screen-left 기준으로 좌우 반전해 컷"><input type="checkbox" data-flip="${it.id}"> 좌우 반전</label>` : ''}
           ${it.portraitSheet ? `<button class="btn" data-portraitsheet="${it.id}">📤 초상시트 넘기기(자동 슬라이스)</button>` : ''}
+          ${it.itemSheet ? `<button class="btn" data-itemsheet="${it.id}">📤 아이템시트 넘기기(자동 슬라이스)</button>` : ''}
         </div>
         ${it.poseSheet && it.roster ? `<div class="existing" data-existing="${it.id}"></div>` : ''}
         <div class="drop" tabindex="0" data-drop="${it.id}">
@@ -1867,6 +1921,12 @@ async function dumpAllToDisk() {
         const res = await applyToGame(`assets/ui/portraits/_sheet_${item.portraitGroup}.png`, recs[recs.length - 1].blob, args);
         const n = (res.slice && res.slice.count) || 0;
         game.push(`portraits/${item.portraitGroup} (${n}컷)`);
+      } else if (item && item.itemSheet) {
+        // 아이템 아이콘 그룹 시트 → serve.py 슬라이스 → /assets/ui/items/{id}.webp
+        const args = itemSliceArgs(item);
+        const res = await applyToGame(`assets/ui/items/_sheet_${item.itemGroup}.png`, recs[recs.length - 1].blob, args);
+        const n = (res.slice && res.slice.count) || 0;
+        game.push(`items/${item.itemGroup} (${n}컷)`);
       } else {
         for (const r of recs) { const safe = (r.name || card + '.png').replace(/[^\w.\-]/g, '_'); await applyToGame(`assets/_board_dump/${card}/${safe}`, r.blob); dump.push(card + '/' + safe); }
       }
@@ -2065,6 +2125,16 @@ board.addEventListener('click', async e => {
     if (!recs.length) { flashBtn(pt, '✗ 시트 없음', false); setCardStatus(pt, '✗ 먼저 이 카드에 초상 시트 이미지를 붙여넣으세요(클릭→Ctrl+V).'); return; }
     const pargs = portraitSliceArgs(item);
     await sheetSend(pt, `assets/ui/portraits/_sheet_${item.portraitGroup}.png`, recs[0].blob, `초상시트 ${item.portraitGroup}`, { slice: true, group: pargs.group, members: pargs.members, grid: pargs.grid });
+    return;
+  }
+  const itm = e.target.closest('button[data-itemsheet]');
+  if (itm) {
+    const item = findItem(itm.dataset.itemsheet);
+    const all = await dbAll();
+    const recs = all.filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
+    if (!recs.length) { flashBtn(itm, '✗ 시트 없음', false); setCardStatus(itm, '✗ 먼저 이 카드에 아이템 시트 이미지를 붙여넣으세요(클릭→Ctrl+V).'); return; }
+    const iargs = itemSliceArgs(item);
+    await sheetSend(itm, `assets/ui/items/_sheet_${item.itemGroup}.png`, recs[0].blob, `아이템시트 ${item.itemGroup}`, { slice: true, group: iargs.group, members: iargs.members, grid: iargs.grid });
     return;
   }
   const th = e.target.closest('.thumb');

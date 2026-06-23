@@ -4,7 +4,7 @@
  * 순수 표시 컴포넌트: settled 기반 BattleVM + InputState만 받아 그린다 (스토어 직접 접근 금지).
  * 표시 대상: selected/postMoveMenu/targetSelect의 unitId, idle의 inspectedId.
  */
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Grade } from "@tk/data";
 import type { InputState } from "../inputMachine";
 import type { MenuAnchor } from "../store";
@@ -18,6 +18,12 @@ import { assetUrl } from "../../assetUrl";
 /** 청동 초상 프레임 + 얼굴 (조조전 장수 정보 패널 §1). 초상 파일 없으면(onError) 미표시(종전 동작). */
 function PortraitBox({ name }: { name: string }): React.ReactElement | null {
   const [failed, setFailed] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    // onError 레이스(부착 전 404) 방어 — 마운트 후 이미 에러난 img면 미표시로 전환
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth === 0) setFailed(true);
+  }, []);
   if (failed) return null;
   return (
     <div
@@ -32,6 +38,7 @@ function PortraitBox({ name }: { name: string }): React.ReactElement | null {
       }}
     >
       <img
+        ref={imgRef}
         src={assetUrl(`/assets/ui/portraits/${encodeURIComponent(name)}.webp`)}
         alt={name}
         onError={() => setFailed(true)}

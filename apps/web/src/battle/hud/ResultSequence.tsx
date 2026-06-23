@@ -32,6 +32,7 @@ import { clearSortie } from "../../meta/sortie";
 import { RewardedAdButton } from "../../meta/RewardedAdButton";
 import { useFadeNav } from "../../ui/useFadeNav";
 import { playSfx, SFX } from "../../audio";
+import { ItemIcon } from "../../ui/ItemIcon";
 
 const OVERLAY_STYLE: React.CSSProperties = {
   position: "absolute",
@@ -603,12 +604,16 @@ export function ResultSequence({
                         fontSize: 14,
                         fontWeight: 600,
                         boxShadow: jackpot ? `0 0 10px ${JACKPOT_GOLD}44` : "none",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
                         animation:
                           open && !skipped
                             ? `tkItemPop 360ms cubic-bezier(0.2,1.3,0.3,1) ${idx * 140 + 560}ms both`
                             : "none",
                       }}
                     >
+                      <ItemIcon itemId={t.id} category={gameData.items[t.id]?.category} size={22} />
                       {t.name}
                     </div>
                   </div>

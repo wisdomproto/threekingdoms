@@ -19,6 +19,7 @@ import { PANEL_FRAME } from "../../battle/hud/frames";
 import { getMeta, spendGold, addItem, addGold, canWatchGoldAd, recordAdGold } from "../metaStore";
 import { RewardedAdButton } from "../RewardedAdButton";
 import { buildShopRows, buildShopGroups, type ShopRow } from "./shopItemView";
+import { ItemIcon } from "../../ui/ItemIcon";
 
 /**
  * 광고 1회 시청당 충전되는 *확정* 골드(§13 가드레일 — 소액·랜덤 없음, 전투력 영향 없음).
@@ -139,6 +140,7 @@ function ShopRowView({
   };
   return (
     <li style={rowStyle}>
+      <ItemIcon itemId={row.itemId} category={row.category} size={36} />
       <span style={badgeStyle}>{row.categoryLabel}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ color: C.ink, fontWeight: 600, fontSize: 15 }}>
