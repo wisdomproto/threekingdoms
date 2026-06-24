@@ -162,7 +162,7 @@
         },
         {
           "commanderId": "관평",
-          "classId": "footman",
+          "classId": "lightCavalry",
           "level": 20,
           "troops": 150,
           "items": ["폭탄"],

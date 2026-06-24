@@ -87,7 +87,7 @@
     },
     {
       "commanderId": "관평",
-      "classId": "footman",
+      "classId": "lightCavalry",
       "level": 12,
       "troops": 180,
       "items": [],

@@ -10,7 +10,7 @@
   "진등": { "commanderId": "진등", "classId": "strategist", "joinChapter": 3, "role": "caster", "departsAfterStage": "15-xutian" },
   "서서": { "commanderId": "서서", "classId": "strategist", "joinChapter": 4, "role": "caster", "departsAfterStage": "18-bowangpo" },
   "제갈량": { "commanderId": "제갈량", "classId": "strategist", "joinChapter": 4, "role": "caster", "uniqueSkillId": "동남풍" },
-  "관평": { "commanderId": "관평", "classId": "footman", "joinChapter": 4, "role": "melee" },
+  "관평": { "commanderId": "관평", "classId": "lightCavalry", "joinChapter": 4, "role": "melee" },
   "유봉": { "commanderId": "유봉", "classId": "footman", "joinChapter": 4, "role": "melee" },
   "주창": { "commanderId": "주창", "classId": "footman", "joinChapter": 4, "role": "melee" },
   "주유": { "commanderId": "주유", "classId": "strategist", "joinChapter": 5, "role": "guest" },

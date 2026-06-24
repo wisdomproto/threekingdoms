@@ -30,7 +30,7 @@
     { "commanderId": "장비", "classId": "lightCavalry", "level": 31, "troops": 255, "items": ["사모"], "side": "player", "x": 18, "y": 30 },
     { "commanderId": "조운", "classId": "lightCavalry", "level": 30, "troops": 250, "items": ["삼첨도", "적로"], "side": "player", "x": 16, "y": 31 },
     { "commanderId": "제갈량", "classId": "strategist", "level": 30, "troops": 200, "items": ["둔갑천서", "화룡서"], "side": "player", "x": 18, "y": 31 },
-    { "commanderId": "관평", "classId": "footman", "level": 28, "troops": 210, "items": ["장창"], "side": "player", "x": 17, "y": 32 },
+    { "commanderId": "관평", "classId": "lightCavalry", "level": 28, "troops": 210, "items": ["장창"], "side": "player", "x": 17, "y": 32 },
     { "commanderId": "주창", "classId": "footman", "level": 27, "troops": 200, "items": [], "side": "player", "x": 19, "y": 31 },
     { "commanderId": "미축", "classId": "strategist", "level": 27, "troops": 175, "items": ["상약"], "side": "player", "x": 19, "y": 32 },
 
