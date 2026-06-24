@@ -719,9 +719,13 @@ export class BattleRenderer implements Presenter {
     if (!s) return;
     // 시전자 방향 + 대상 포커스 + 책략명 배너. 개별 피해 팝업은 후속 damageDealt가 처리.
     s.units.view(e.casterId).faceToward(e.target);
-    this.autoFocus(gridToWorld(e.target), FOCUS_MS);
-    const name = this.ctx.data.strategies[e.strategyId]?.name ?? e.strategyId;
+    const targetWorld = gridToWorld(e.target);
+    this.autoFocus(targetWorld, FOCUS_MS);
+    const strat = this.ctx.data.strategies[e.strategyId];
+    const name = strat?.name ?? e.strategyId;
     playSfx(SFX.spell);
+    // 카테고리별 대표 VFX(불/물/바람/땅/회복/디버프/특수) — 대상 칸에 펼친다(데미지/회복은 후속 이벤트가 처리).
+    if (strat?.category) void s.fx.strategyEffect(strat.category, targetWorld);
     await s.fx.banner(`책략 · ${name}!`, DUEL_BANNER_MS);
   }
 

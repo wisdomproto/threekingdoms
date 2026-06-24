@@ -24,6 +24,8 @@ apps/web/public/assets/objects/_sheet_*.png
 apps/web/public/assets/_board_dump/
 # fx 원본 시트(대용량·재생성) — cut_fx_sheet.py 가 자른 slash/flash/sparkle/coin 슬라이스만 추적
 apps/web/public/assets/fx/_sheet_*.png
+# 초상/아이템 아이콘 원본 그룹 시트(대용량·재생성) — slice_portraits/serve.py가 자른 {id}.webp만 추적
+apps/web/public/assets/ui/*/_sheet_*.png
 # dev 서버 로그(임시)
 apps/web/dev-server.log
 apps/web/dev-server.err.log

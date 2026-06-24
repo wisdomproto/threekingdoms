@@ -143,6 +143,8 @@ export class UnitLayer extends Container {
       v.snapTo(u.x, u.y);
       v.setTroops(u.troops);
       v.setRetreated(u.retreated);
+      // 행동 완료 dim(원작) — 플레이어가 명령할 아군만. committed.acted 추적이라 새 턴에 자동 리셋.
+      v.setActed(u.side === "player" && u.acted);
     }
   }
 

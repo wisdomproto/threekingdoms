@@ -31,6 +31,27 @@ const PIERCE_TINT = 0x9fd8ff; // 간접(궁/포) 충격 — 차가운 청백
 const FLASH_MS = 110; // 임팩트 플래시 수명
 const FLASH_R = 22; // 임팩트 플래시 반경 (px)
 
+// ── 책략 카테고리별 대표 VFX (§8, 절차적 — 에셋 0, 전투 타격 FX와 동형. 생성 FX 드롭인 여지) ──
+const STRATEGY_MS = 640;
+type StrategyMotion = "rise" | "ripple" | "spiral" | "shards" | "sink";
+interface StrategyFxSpec {
+  motion: StrategyMotion;
+  /** 파티클 색 순환. */
+  colors: number[];
+  /** 확장 링 색. */
+  ring: number;
+  count: number;
+}
+const STRATEGY_FX: Record<string, StrategyFxSpec> = {
+  fire: { motion: "rise", colors: [0xff7a2a, 0xffc24a, 0xff4530], ring: 0xff8a3a, count: 14 },
+  water: { motion: "ripple", colors: [0x6ec6ff, 0xbfe9ff, 0x3aa0e0], ring: 0x7cc6ff, count: 12 },
+  wind: { motion: "spiral", colors: [0xeaf6ff, 0xa9e0ff, 0xffffff], ring: 0xcfeaff, count: 16 },
+  earth: { motion: "shards", colors: [0xb78a4a, 0x8a5a2a, 0xd9b079], ring: 0x9a7038, count: 12 },
+  heal: { motion: "rise", colors: [0x8be79a, 0xc8ffd0, 0x5fd07a], ring: 0x8be79a, count: 12 },
+  debuff: { motion: "sink", colors: [0xb070ff, 0x7a4ad0, 0x5a3a90], ring: 0x9a6aff, count: 12 },
+  special: { motion: "ripple", colors: [0xffe08a, 0xfff2c4, 0xffc24a], ring: 0xffe08a, count: 12 },
+};
+
 export class FxLayer {
   /** 카메라 변환 하 — 데미지 팝업 */
   readonly world = new Container();
@@ -332,6 +353,76 @@ export class FxLayer {
       .then(() => {
         this.world.removeChild(flash);
         flash.destroy();
+      });
+  }
+
+  /**
+   * 책략 시전 VFX (§8 — 카테고리별 대표 연출). 절차적 Graphics, 월드 공간, 순수 표현(상태 불변).
+   * category(fire/water/wind/earth/heal/debuff/special)별 색·모션으로 차별화 — 미지의 카테고리는 special.
+   * 데미지/회복 수치는 후속 damageDealt/troopsHealed가 처리 — 여기선 "주문이 펼쳐졌다" 연출만.
+   */
+  strategyEffect(category: string, at: WorldPoint): Promise<void> {
+    const spec = STRATEGY_FX[category] ?? STRATEGY_FX.special!;
+    const root = new Container();
+    root.position.set(at.x, at.y - 8);
+    this.world.addChild(root);
+
+    const ring = new Graphics();
+    root.addChild(ring);
+
+    const parts: { g: Graphics; ang: number; spd: number }[] = [];
+    for (let i = 0; i < spec.count; i++) {
+      const g = new Graphics();
+      const color = spec.colors[i % spec.colors.length] ?? spec.ring;
+      const size = 2.5 + (i % 3);
+      g.circle(0, 0, size).fill({ color, alpha: 1 });
+      root.addChild(g);
+      parts.push({ g, ang: (i / spec.count) * Math.PI * 2 + (i % 2) * 0.5, spd: 26 + (i % 4) * 7 });
+    }
+
+    const RING_R = 30;
+    return this.tweens
+      .run(STRATEGY_MS, (t) => {
+        const e = easeOut(t);
+        const fade = Math.max(0, 1 - t);
+        ring.clear();
+        ring.circle(0, 0, RING_R * (0.25 + e)).stroke({ width: 3, color: spec.ring, alpha: fade * 0.9 });
+        for (const p of parts) {
+          let x = 0;
+          let y = 0;
+          switch (spec.motion) {
+            case "rise": // 불·회복 — 위로 솟구치며 흩어짐
+              x = Math.cos(p.ang) * p.spd * e * 0.45;
+              y = -p.spd * e - 8 * t;
+              break;
+            case "ripple": // 물·special — 사방으로 퍼지는 물보라/광채
+              x = Math.cos(p.ang) * p.spd * e * 1.5;
+              y = Math.sin(p.ang) * p.spd * e * 1.5;
+              break;
+            case "spiral": { // 바람 — 회전하며 바깥으로
+              const a = p.ang + e * 3.2;
+              const r = p.spd * e;
+              x = Math.cos(a) * r;
+              y = Math.sin(a) * r;
+              break;
+            }
+            case "shards": // 땅 — 위로 튄 뒤 낙하(중력)
+              x = Math.cos(p.ang) * p.spd * e;
+              y = -Math.abs(Math.sin(p.ang)) * p.spd * e + 36 * t * t;
+              break;
+            case "sink": // 디버프 — 가라앉는 어두운 기운
+              x = Math.cos(p.ang) * p.spd * e * 0.55;
+              y = p.spd * e * 0.55 + 10 * t;
+              break;
+          }
+          p.g.position.set(x, y);
+          p.g.alpha = fade;
+          p.g.scale.set(Math.max(0.2, 1 - t * 0.55));
+        }
+      })
+      .then(() => {
+        this.world.removeChild(root);
+        root.destroy({ children: true });
       });
   }
 

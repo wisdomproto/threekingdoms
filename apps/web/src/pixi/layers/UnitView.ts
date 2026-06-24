@@ -32,6 +32,7 @@ const MOVE_MS_PER_TILE = 150; // 설계 §6: unitMoved는 경로 타일당 150ms
 const ATTACK_MS = 260; // 앤티시페이션+오버슈트+복귀 재배분 여유로 약간 늘림
 const HIT_MS = 200;
 const RETREAT_MS = 350;
+const ACTED_ALPHA = 0.5; // 행동 완료 유닛 dim(원작: 행동 끝낸 유닛을 어둡게) — 컨테이너 alpha
 const LUNGE_PX = 13; // 오버슈트 최대 전진(px) — 기존 10에서 상향(찰진 돌진)
 const ANTICIPATE_PX = 5; // lunge 전 뒤로 당기는 거리(px)
 const KNOCKBACK_PX = 9; // 피격 기본 넉백(px) — intensity로 가중
@@ -66,6 +67,8 @@ export class UnitView extends Container {
   troops: number;
   readonly maxTroops: number;
   retreatedFlag: boolean;
+  /** 이번 턴 행동 완료(원작 dim) — 컨테이너 alpha를 낮춘 상태인지. */
+  private actedDim = false;
 
   /** 발밑 그림자 (항상 표시) */
   private readonly shadow: Graphics;
@@ -391,7 +394,18 @@ export class UnitView extends Container {
   setRetreated(retreated: boolean): void {
     this.retreatedFlag = retreated;
     this.visible = !retreated;
-    if (!retreated) this.alpha = 1;
+    if (!retreated) this.alpha = this.actedDim ? ACTED_ALPHA : 1;
+  }
+
+  /**
+   * 행동 완료 표시(원작: 이번 턴 행동을 끝낸 유닛을 어둡게). 컨테이너 alpha를 낮춘다 —
+   * flash/playHit는 activeBase(스프라이트)만 건드리므로 충돌하지 않는다. 퇴각 중엔 보류(숨김 우선).
+   * sync가 committed.acted(아군 페이즈 시작 시 false 리셋)를 매 드레인 반영 → 자동 점등/소등.
+   */
+  setActed(acted: boolean): void {
+    if (this.actedDim === acted) return;
+    this.actedDim = acted;
+    if (!this.retreatedFlag) this.alpha = acted ? ACTED_ALPHA : 1;
   }
 
   /**
