@@ -23,7 +23,9 @@ man = json.load(open(rf"{CHUNKDIR}\{mapId}_manifest.json", encoding="utf-8"))
 W, H = man["width"], man["height"]
 COLS, ROWS, OV = man["cols"], man["rows"], man["overlap"]
 outW, outH = W * TARGET, H * TARGET
-feather = OV * TARGET  # 페더 폭 = 겹침 타일 × 출력밀도
+ovx = man.get("ovx", OV)  # 축별 겹침(신 manifest). 구버전은 overlap 단일값 폴백.
+ovy = man.get("ovy", OV)
+feather_x, feather_y = ovx * TARGET, ovy * TARGET  # 페더 폭 = 겹침 타일 × 출력밀도
 
 # float 누적 버퍼 (numpy 없이 PIL만)
 try:
@@ -55,8 +57,8 @@ for ch in man["chunks"]:
     img = Image.open(path).convert("RGB").resize((tw, th), Image.LANCZOS)
     arr = np.asarray(img, dtype=np.float64)
     # 이웃 있는 변에만 페더 (맵 가장자리는 풀 불투명)
-    wx = ramp(tw, feather if c > 0 else 0, feather if c < COLS - 1 else 0)
-    wy = ramp(th, feather if r > 0 else 0, feather if r < ROWS - 1 else 0)
+    wx = ramp(tw, feather_x if c > 0 else 0, feather_x if c < COLS - 1 else 0)
+    wy = ramp(th, feather_y if r > 0 else 0, feather_y if r < ROWS - 1 else 0)
     w = (wy[:, None] * wx[None, :])[:, :, None]  # (th,tw,1)
     px0, py0 = x0 * TARGET, y0 * TARGET
     acc[py0:py0 + th, px0:px0 + tw] += arr * w

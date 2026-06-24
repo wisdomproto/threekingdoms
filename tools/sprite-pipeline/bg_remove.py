@@ -12,6 +12,8 @@ from PIL import Image
 import numpy as np
 from scipy import ndimage
 
+BLACK_THRESH = 48  # near-black 판정 — 가장자리 연결 검정배경만 제거(내부 검정 보존)
+
 
 def has_opaque_white_bg(im, thresh=235):
     """좌상단 코너가 불투명 near-white면 True (배경 제거 대상)."""
@@ -93,6 +95,31 @@ def remove_glow(im, bright_min=185, sat_max=55):
     return Image.fromarray(arr, "RGBA")
 
 
+def remove_black_bg(im, thresh=BLACK_THRESH):
+    """가장자리에서 '투명 또는 near-black'을 통과하는 flood로 닿는 near-black만 투명화.
+
+    AI가 투명 대신 *검정* 배경으로 시트를 내는 경우(전차 유비 등) near-white/checker가
+    못 잡아 인게임에 검정 박스로 남는다. near-black(max RGB<thresh) 불투명 픽셀 중
+    **가장자리 연결 성분만** 제거 → 캐릭터 내부 어두운 색(검은 머리·갑옷 그림자)은 보존.
+    """
+    im = im.convert("RGBA")
+    arr = np.array(im)
+    rgb = arr[:, :, :3].astype(int)
+    al = arr[:, :, 3]
+    nearblack = rgb.max(2) < thresh
+    if not nearblack.any():
+        return im
+    passable = nearblack | (al == 0)
+    labels, n = ndimage.label(passable)
+    if n == 0:
+        return im
+    border = set(labels[0, :]) | set(labels[-1, :]) | set(labels[:, 0]) | set(labels[:, -1])
+    border.discard(0)
+    if border:
+        arr[np.isin(labels, list(border)) & nearblack & (al > 0), 3] = 0
+    return Image.fromarray(arr, "RGBA")
+
+
 def drop_small_components(im, frac=0.10):
     """불투명 연결성분 중 최대(캐릭터)만 남기고, 그보다 frac 미만이며 *가장자리에 닿는*
     소형 고립 성분(격자 좌표 라벨 'C1/C2' 등)을 제거. 무기는 손에 연결돼 최대 성분에
@@ -123,7 +150,11 @@ def needs_bg_cleanup(im, gray_frac=0.20):
     sat = rgb.max(2) - rgb.min(2)
     bright = rgb.min(2)
     bg_like = (sat < 40) & (bright > 160) & (al > 120)
-    return float(bg_like.mean()) > gray_frac
+    if float(bg_like.mean()) > gray_frac:
+        return True
+    # 검정 배경(불투명 near-black 다수)도 정리 대상
+    dark_bg = (rgb.max(2) < BLACK_THRESH) & (al > 120)
+    return float(dark_bg.mean()) > gray_frac
 
 
 def clean_bg(im, trim=True):
@@ -134,6 +165,7 @@ def clean_bg(im, trim=True):
     im = remove_white_bg(im)
     im = remove_checker_bg(im)
     im = remove_glow(im)
+    im = remove_black_bg(im)
     return trim_alpha(im) if trim else im
 
 

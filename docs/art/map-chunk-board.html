@@ -94,9 +94,18 @@
 const CHUNK_PROMPT =
 `Top-down orthographic battlefield GROUND map for a tactics game, traditional East Asian ink-wash painting (수묵 담채), muted earth tones, soft brush texture and paper grain, LOW contrast so game units and objects read clearly on top.
 Repaint this color-block layout EXACTLY (keep every region's position, shape and size) but paint ONLY the flat GROUND surface of each region — NEVER any standing 3D structure:
-pale tan = open dry-dirt plain; sage/dark green = dense forest canopy seen straight from directly above; light khaki = dry cracked wasteland; dusty blue = calm river water; grey = bare grey stone flagstone / paved courtyard ground (NO wall — the wall is placed separately as a game object); dark brown = packed earth or stone gateway ground (NO gate building); orange-tan and tan = bare trampled dirt ground of a camp/depot area (NO tents, NO crates, NO fences); brown-plank region = paint the river WATER beneath it (NO bridge — placed separately).
-Painterly continuous terrain, blend region edges naturally. ABSOLUTELY NO walls, gates, buildings, tents, watchtowers, bridges, fences, crates or any standing object — ONLY flat ground/terrain (structures are added afterward as separate top-down game objects). Strict top-down view, flat with NO isometric angle and NO 3D height. NO grid lines, NO hard outlines around regions, NO text, NO characters, NO UI.
+Identify every region by its EXACT fill hex color (tile interiors; the faint grid lines are slightly darker shades of the same colors — ignore them when color-matching) and paint ONLY that flat ground: #D9CF9D (pale tan) = open dry-dirt plain; #A8C686 (light green) = grassland meadow; #4A6E46 (dark green) = dense forest canopy seen from directly above; #8C7A5E (brown) = bare rocky mountain ground; #5A5048 (dark grey-brown) = rocky cliff / ravine floor; #C7B58F (khaki) = dry cracked wasteland; #6A9EC9 (blue) = calm river water; #6E6E76 (grey) = bare grey stone flagstone / paved courtyard ground (NO wall — placed separately as a game object); #7A6A52 (dark taupe) = packed-earth or stone gateway ground (NO gate building); #E0B87A, #CF9E6A, #C9A86E (orange-tan) = bare trampled dirt of a camp / depot clearing (NO tents, NO crates, NO fences); #B08A5A (tan-brown) = river WATER beneath a footbridge (NO bridge — placed separately).
+Painterly continuous terrain, blend region edges naturally. ABSOLUTELY NO walls, gates, buildings, tents, watchtowers, bridges, fences, crates or any standing object — ONLY flat ground/terrain (structures are added afterward as separate top-down game objects). Strict top-down view, flat with NO isometric angle and NO 3D height. The input image carries a faint dark tile-grid overlay — use it ONLY as a precise spatial alignment guide so every terrain region lands exactly on its tiles, but do NOT reproduce it: render smooth continuous terrain with NO visible grid lines, NO hard outlines around regions, NO text, NO characters, NO UI.
 The painting must continue all the way to the image edges (for seamless tiling with neighboring map sections).`;
+
+// 활성 맵의 타일 박스 크기(manifest.box)를 프롬프트 첫 줄에 자동 주입 — 맵 바꿔도 숫자 수동 수정 불필요.
+function promptFor(st) {
+  const b = st && st.box;
+  const head = (b && b.length === 2)
+    ? `This image is ONE ${b[0]}×${b[1]}-tile section of a larger top-down battlefield map; each cell of the faint grid overlay = exactly one game tile.\n`
+    : '';
+  return head + CHUNK_PROMPT;
+}
 
 const STAGES = window.CHUNK_STAGES || {};
 let activeStage = localStorage.getItem('mcb_stage') || Object.keys(STAGES)[0] || null;
@@ -172,13 +181,13 @@ function renderTabs() {
 }
 
 function render() {
-  document.getElementById('promptpre').textContent = CHUNK_PROMPT;
+  document.getElementById('promptpre').textContent = promptFor(STAGES[activeStage]);
   renderTabs();
   const st = STAGES[activeStage];
   const board = document.getElementById('board');
   if (!st) { board.innerHTML = ''; return; }
   const tile = st.tilePx;
-  let html = `<div class="grid">`;
+  let html = `<div class="sub" style="margin:4px 0 10px">${st.ratio ? `이 맵 비율 <b style="color:var(--acc)">${st.ratio}</b> · 박스 ${st.box?.[0]}×${st.box?.[1]}타일 · ${st.cols}×${st.rows}=${st.chunks.length}조각 · 겹침 ${st.ovx ?? st.overlap}/${st.ovy ?? st.overlap}타일` : ''}</div><div class="grid">`;
   for (const ch of st.chunks) {
     const card = `${st.mapId}_r${ch.row}_c${ch.col}`;
     html += `<div class="card" id="card-${card}">
@@ -324,7 +333,7 @@ async function compositeStitch(st, pv) {
   const octx = off.getContext('2d', { willReadFrequently: true });
   const all = await dbAll();
   const byCard = new Map(all.map(r => [r.card, r]));
-  const feather = st.overlap * pv;
+  const fx = (st.ovx ?? st.overlap) * pv, fy = (st.ovy ?? st.overlap) * pv;  // 축별 겹침 페더(export_chunks ovx/ovy)
   let filled = 0;
   for (const ch of st.chunks) {
     const card = `${st.mapId}_r${ch.row}_c${ch.col}`;
@@ -339,8 +348,8 @@ async function compositeStitch(st, pv) {
     off.width = tw; off.height = th;
     octx.drawImage(img, 0, 0, tw, th);
     const d = octx.getImageData(0, 0, tw, th).data;
-    const wx = ramp(tw, ch.col > 0 ? feather : 0, ch.col < st.cols - 1 ? feather : 0);
-    const wy = ramp(th, ch.row > 0 ? feather : 0, ch.row < st.rows - 1 ? feather : 0);
+    const wx = ramp(tw, ch.col > 0 ? fx : 0, ch.col < st.cols - 1 ? fx : 0);
+    const wy = ramp(th, ch.row > 0 ? fy : 0, ch.row < st.rows - 1 ? fy : 0);
     const px0 = ch.x0 * pv, py0 = ch.y0 * pv;
     for (let y = 0; y < th; y++) {
       const wyy = wy[y], rowOut = (py0 + y) * W + px0, rowIn = y * tw;
@@ -442,7 +451,8 @@ document.getElementById('tabs').addEventListener('change', e => {
   activeStage = e.target.value; localStorage.setItem('mcb_stage', activeStage); render();
 });
 document.getElementById('copyprompt').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText(CHUNK_PROMPT); } catch { const ta=document.createElement('textarea'); ta.value=CHUNK_PROMPT; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+  const p = promptFor(STAGES[activeStage]);
+  try { await navigator.clipboard.writeText(p); } catch { const ta=document.createElement('textarea'); ta.value=p; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
   toast('프롬프트 복사됨');
 });
 document.getElementById('board').addEventListener('click', async e => {
