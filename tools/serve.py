@@ -175,19 +175,43 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
+    def _delete_chunk(self, payload):
+        """painted 청크 조각 삭제 — {card:"{mapId}_r#_c#"} → docs/art/chunks/painted_{card}.* 제거.
+        디스크 파일을 지워야 보드 새로고침 시 tryDiskPainted 부활을 막는다(IndexedDB만 지우면 부활)."""
+        import glob as _glob
+        card = (payload.get("card") or "").strip()
+        if not re.match(r"^[\w가-힣]+_r\d+_c\d+$", card):
+            self._json(400, {"ok": False, "error": f"card 형식 오류: {card}"})
+            return
+        removed = []
+        for f in _glob.glob(os.path.join(CHUNKS_DIR, f"painted_{card}.*")):
+            try:
+                os.remove(f)
+                removed.append(os.path.basename(f))
+            except OSError as e:  # noqa: BLE001
+                sys.stdout.write(f"[delete-asset] 삭제 실패 {f}: {e}\n")
+        sys.stdout.write(f"[delete-asset] {card} → {removed or '없음'}\n")
+        self._json(200, {"ok": True, "removed": removed})
+
     def do_POST(self):  # noqa: N802
-        if self.path.split("?")[0] != "/save-asset":
+        p = self.path.split("?")[0]
+        if p not in ("/save-asset", "/delete-asset"):
             self._json(404, {"ok": False, "error": "unknown endpoint"})
             return
         try:
             length = int(self.headers.get("Content-Length", 0))
-            payload = json.loads(self.rfile.read(length).decode("utf-8"))
-            rel = (payload.get("path") or "").replace("\\", "/").lstrip("/")
-            b64 = payload.get("b64") or ""
-            ctype = payload.get("contentType") or mimetypes.guess_type(rel)[0] or "application/octet-stream"
+            payload = json.loads(self.rfile.read(length).decode("utf-8")) if length else {}
         except Exception as e:  # noqa: BLE001
             self._json(400, {"ok": False, "error": f"잘못된 요청: {e}"})
             return
+
+        if p == "/delete-asset":  # painted 청크 조각 삭제
+            self._delete_chunk(payload)
+            return
+
+        rel = (payload.get("path") or "").replace("\\", "/").lstrip("/")
+        b64 = payload.get("b64") or ""
+        ctype = payload.get("contentType") or mimetypes.guess_type(rel)[0] or "application/octet-stream"
 
         # 경로 안전성: assets/ 또는 docs/art/chunks/(청크 painted) 하위만, 상위 탈출 금지.
         is_chunk = rel.startswith("docs/art/chunks/")

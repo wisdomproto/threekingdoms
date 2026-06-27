@@ -253,7 +253,7 @@ function tryDiskPainted(card) {
     img.style.maxWidth = '100%'; img.style.display = 'block';
     drop.appendChild(img);
     const tag = document.createElement('div'); tag.className = 'ops';
-    tag.innerHTML = '<span style="font-size:10px;color:var(--dim);padding:2px 6px;background:rgba(0,0,0,.5);border-radius:4px">디스크 저장본</span>';
+    tag.innerHTML = '<span style="font-size:10px;color:var(--dim);padding:2px 6px;background:rgba(0,0,0,.5);border-radius:4px">디스크 저장본</span><button class="rm" title="삭제">✕</button>';
     drop.appendChild(tag);
     drop.closest('.card').classList.add('done');
     diskPainted.add(card);
@@ -465,7 +465,17 @@ document.getElementById('board').addEventListener('click', async e => {
   const drop = e.target.closest('.drop');
   if (drop) {
     const card = drop.dataset.drop;
-    if (e.target.closest('.rm')) { await dbDel(card); clearDrop(card); updateProgress(); return; }
+    if (e.target.closest('.rm')) {
+      await dbDel(card); clearDrop(card); diskPainted.delete(card);
+      try {
+        const r = await fetch('http://localhost:8080/delete-asset', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ card }),
+        });
+        const j = await r.json().catch(() => ({}));
+        toast(j.removed && j.removed.length ? `삭제됨 — ${j.removed.join(', ')}` : '조각 삭제 (디스크 파일 없음)');
+      } catch { toast('조각 삭제 — 서버(:8080) 미연결, 디스크 파일은 남을 수 있음'); }
+      updateProgress(); return;
+    }
     if (e.target.closest('.dl')) { const rec=await dbGet(card); if(rec){ const ok=await writeToDir(rec.name, rec.blob) || (()=>{const a=document.createElement('a');a.href=urlFor(card,rec.blob);a.download=rec.name;a.click();return true;})(); toast(rec.name+' 저장'); } return; }
     document.querySelectorAll('.drop.armed').forEach(d=>d.classList.remove('armed'));
     drop.classList.add('armed'); drop.focus();
