@@ -89,6 +89,11 @@
   .cutbox { position: absolute; border: 2px solid var(--acc); background: rgba(212,168,67,.10); cursor: move; box-sizing: border-box; }
   .cutbox .lbl { position: absolute; top: -18px; left: -2px; font-size: 11px; color: #1a1407; background: var(--acc); padding: 0 5px; border-radius: 3px 3px 0 0; white-space: nowrap; }
   .cutbox .hd { position: absolute; right: -6px; bottom: -6px; width: 12px; height: 12px; background: var(--acc); border: 1px solid #1a1407; border-radius: 2px; cursor: nwse-resize; }
+  /* 오디오 카드 */
+  .thumb.audio-thumb { width: 220px; }
+  .thumb.audio-thumb audio { width: 100%; border-radius: 6px; border: 2px solid var(--line); display: block; background: var(--panel2); }
+  .thumb.audio-thumb.picked audio { border-color: var(--acc); box-shadow: 0 0 6px rgba(212,168,67,.5); }
+  .card.audio-card .drop { min-height: 60px; }
 </style>
 </head>
 <body>
@@ -98,9 +103,6 @@
   <span class="stylefixed">화풍: 수묵담채 (확정)</span>
   <button class="btn" id="dirbtn" title="⬇ 저장이 향할 폴더 (docs\art 권장)">저장 폴더: 미연결</button>
   <button class="btn" id="refreshbtn" title="서버(:8080)에서 게임에 들어간 에셋 목록을 다시 읽어 ✓/⬜·미리보기 갱신">🔄 게임 상태 새로고침</button>
-  <button class="btn" id="applytilesbtn" title="이미 붙여둔(보드 IndexedDB) E 바닥 이미지를 전부 /assets/tiles/ 로 일괄 적용 (자동저장 도입 전 백로그)">🟫 붙여둔 바닥 전부 게임 적용</button>
-  <button class="btn" id="applyobjectsbtn" title="이미 붙여둔(보드 IndexedDB) K-4~K-7 오브젝트 시트를 전부 /assets/objects/_sheet_*.png 로 디스크에 올림. 그 뒤 Claude가 시트를 보고 cut_object_sheet.py 로 컷">🧱 붙여둔 오브젝트 시트 전부 디스크로</button>
-  <button class="btn primary" id="dumpallbtn" title="모든 카드의 붙여둔 이미지를 전부 디스크로 — 타일/오브젝트/씬은 게임 경로, 이펙트·UI 등은 _board_dump/ 로 원본 보존. 데이터가 있는 이 브라우저에서 한 번 누르면 끝.">💾 붙여둔 것 전부 디스크로 (모든 카드)</button>
   <div id="progress"></div>
 </header>
 <div id="tabbar"></div>
@@ -108,7 +110,7 @@
   <div class="info">
     <b>사용법</b> ① 카드의 <b>[프롬프트 복사]</b> → 생성기에 붙여넣어 생성 ② 결과 이미지를 복사한 뒤 <b>카드의 점선 영역 클릭 + Ctrl+V</b> (드래그&드롭/파일선택 가능) ③ 잘 나온 장은 ★픽.
     <b>한 장에 여러 에셋이 그리드로 나오는 시트 방식</b>이라 — 셀 일부가 깨져도 살릴 셀이 있으면 픽하고, 깨진 셀만 따로 메모 주면 됩니다. 슬라이스(셀 분리·배경 제거)는 Claude가 합니다.<br>
-    저장은 이 브라우저 IndexedDB에 자동 보존(다시 열어도 유지). <b>⬇ 버튼은 연결된 폴더(상단에서 1회 연결, <code>docs\art</code> 선택)에 바로 파일로 저장</b>됩니다 — 픽한 컷은 ⬇ 눌러두면 Claude가 그 폴더에서 슬라이스 작업을 이어받습니다. 캐릭터 후속 생성(A-2~A-4)에는 <b>픽된 A-1 시트를 참조 이미지로 첨부</b>하세요.
+    이미지는 <b>페이지 로드 시 R2/로컬에서 자동 복원</b>됩니다. 붙여넣기하면 즉시 디스크+R2로 저장. <b>⬇ 버튼은 연결된 폴더(상단에서 1회 연결, <code>docs\art</code> 선택)에 바로 파일로 저장</b>됩니다 — 캐릭터 후속 생성(A-2~A-4)에는 <b>픽된 A-1 시트를 참조 이미지로 첨부</b>하세요.
   </div>
   <div id="board"></div>
 </main>
@@ -637,7 +639,17 @@ const SECTIONS = [
       prompt: 'Game UI ornament sheet in ONE image on a plain dark background, East Asian ink-wash + bronze-and-lacquer theme, decorative chrome parts for shop / codex / title screens: (1) a decorative banner ribbon variant A with a blank center, (2) a banner ribbon variant B (broader, more ornate) with a blank center, (3) an ornate panel corner-flourish piece (top-left), (4) a matching panel corner-flourish piece variant, (5) a codex "undiscovered" slot frame — a dark recessed frame holding a faint blank silhouette placeholder (mystery item not yet obtained), (6) a small price/tag bronze plaque with an empty center, (7) a horizontal divider rule with a centered medallion (arabesque scrollwork), (8) a title emblem crest with a blank center cartouche. Each element clearly separated, no text anywhere. ' + STYLE },
     { id: 'L-5', title: '미니맵 프레임 변형 시트', multi: '한 장에 4변형',
       note: '미니맵 테두리 변형만 — 내부는 빈 채로(맵 데이터가 채움). 투명 배경. 변형 골라 채택.',
-      prompt: 'Four separate empty minimap border frames in a row on a plain transparent-style flat background, East Asian ink-wash + bronze theme, each with a hollow blank interior (the map fills it later): (1) a square frame — bronze-and-lacquer border, (2) a round/circular frame, (3) a hanging-scroll style frame with small roller ends top and bottom, (4) a worn campaign-map parchment frame with a torn deckle edge and bronze corner studs. Each frame complete and clearly separated, hollow center, clean croppable edges, no map content inside, no text, no labels. ' + STYLE }
+      prompt: 'Four separate empty minimap border frames in a row on a plain transparent-style flat background, East Asian ink-wash + bronze theme, each with a hollow blank interior (the map fills it later): (1) a square frame — bronze-and-lacquer border, (2) a round/circular frame, (3) a hanging-scroll style frame with small roller ends top and bottom, (4) a worn campaign-map parchment frame with a torn deckle edge and bronze corner studs. Each frame complete and clearly separated, hollow center, clean croppable edges, no map content inside, no text, no labels. ' + STYLE },
+    { id: 'L-6', title: '편성 역할 뱃지 5종 아이콘 시트', multi: '한 장에 5아이콘', itemSheet: true, itemGroup: 'roles',
+      members: [['lord', ''], ['melee', ''], ['caster', ''], ['support', ''], ['guest', '']],
+      note: '⭐ Formation.tsx 역할 뱃지 — 투명 배경, 5칸 가로 한 줄. 📤 시트 넘기기(자동 슬라이스) → serve.py가 /assets/ui/roles/{lord,melee,caster,support,guest}.webp 자동 저장. 없으면 王/兵/謀/輔/客 유니코드 폴백.',
+      prompt: 'A ROLE BADGE ICON SHEET: 5 small square game icons on a FULLY TRANSPARENT background, arranged in a single horizontal row (1×5 grid), for an East Asian historical SRPG. Each icon is a colored square badge with a centered ink-brush symbol and subtle worn-seal texture. NO text, NO labels, NO borders outside each cell. Clear empty gap between cells. Art style: East Asian ink-wash + bronze/lacquer, game-icon style. The 5 icons in THIS EXACT ORDER left-to-right: (1) LORD 군주 — deep amber/gold background (#b87820 tone), a crown or throne kanji-seal symbol; (2) MELEE 전위 — deep crimson (#8a2020 tone), crossed swords warrior symbol; (3) CASTER 책사 — deep indigo (#2850a0 tone), an open scroll strategy symbol; (4) SUPPORT 보조 — deep jade-green (#1a7040 tone), a medicine gourd or healing vessel symbol; (5) GUEST 객장 — cool grey (#5a5868 tone), a travelling herald pennant symbol. Each badge clearly separated with generous transparent gap. Transparent background only — no white, no fill.' },
+    { id: 'L-7', title: '편성 패널 양피지 배경 텍스처',
+      note: '⭐ Formation.tsx 패널 배경 — 생성 후 /assets/ui/formation-bg.webp 로 저장. CSS 그라디언트 폴백 있어 없어도 무방.',
+      prompt: 'A warm aged parchment texture background for an East Asian SRPG formation/preparation screen. 4:3 landscape format. Colors: warm cream to amber (#ede4cc to #f5edd8). Full surface coverage — just aged rice-paper texture: subtle paper grain, faint ink-wash cloud watermarks and ghost-tone kanji impressions barely visible at very low opacity (like rubbing of aged text through paper). Perfectly FLAT — no depth, no objects, no people, no frame, no border. The texture is a flat background panel that text and UI elements sit on top of. No strong visible elements at all. Very subtle, warm, parchment feel.' },
+    { id: 'L-8', title: '편성 패널 목재+금장 프레임 오버레이',
+      note: '⭐ Formation.tsx 패널 위 position:absolute 오버레이 — 중앙 투명(배경 보임). 생성 후 /assets/ui/formation-frame.webp 로 저장. CSS boxShadow 폴백 있어 없어도 무방.',
+      prompt: 'A decorative UI panel border frame in ONE image on a FULLY TRANSPARENT background — ONLY the frame border is opaque, the large center area is FULLY TRANSPARENT so underlying content shows through. East Asian historical SRPG style. Frame style: dark rich walnut-brown carved lacquered wood border with warm gold inlay engravings. Four ornate corner pieces with scroll-flourish carvings. Top and bottom horizontal border bars with repeating geometric gold-inlay diamond/chevron pattern. Left and right vertical border bars matching. The gold inlay has a warm shine (#c8a440 tone). Frame border width approximately 12% of image on each side. The overall look: a luxurious lacquered wooden game UI panel border from a classic Chinese/Korean tactical RPG circa late 1990s. Style: East Asian ink-wash + lacquerware, dark wood tones, warm gold details. CRITICAL: center must be fully transparent/empty — do NOT fill the interior. No text, no panel content.' }
   ]
 },
 {
@@ -1240,6 +1252,76 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
   });
 })();
 
+/* ── M. BGM / A. SFX 오디오 섹션 ─────────────────────────────────────────── */
+/* BGM: Suno/Udio 스타일 텍스트 프롬프트(태그+설명). 파일은 mp3/webm/ogg 등 중 택일.
+   SFX: ElevenLabs Sound Effects 스타일 설명(짧고 구체적). */
+
+SECTIONS.push({
+  id: 'BGM',
+  title: 'M. 배경음악 (BGM) — 5트랙',
+  desc: '프롬프트를 <b>Suno / Udio / 기타 AI 작곡 툴</b>에 붙여넣어 생성 → mp3·webm·ogg 중 하나를 이 카드에 드래그 또는 파일 선택 → 자동 저장(<code>assets/audio/bgm/{trackId}.{ext}</code>) + R2 + 매니페스트 자동 재빌드. 매니페스트가 갱신되면 게임이 코드 수정 없이 해당 트랙을 파일로 재생합니다(PROCEDURAL_BGM_ENABLED=false라 파일 없는 트랙은 무음).',
+  items: [
+    {
+      id: 'M-title', bgmTrack: 'title', title: '타이틀 화면 BGM',
+      note: '게임 시작 화면. 사색적·장중·수묵화 분위기.',
+      prompt: 'Chinese historical epic, instrumental, guqin and erhu melody, pipa plucking, bamboo flute accent, soft taiko brush drums, contemplative and majestic, Three Kingdoms atmosphere, 85 BPM, 4/4 time, seamless loop, no vocals, no western pop elements, muted earth tones, ink-wash mood',
+    },
+    {
+      id: 'M-menu', bgmTrack: 'menu', title: '메뉴·편성 화면 BGM',
+      note: '상점·편성·준비 화면. 따뜻하고 밝은 준비 분위기.',
+      prompt: 'Chinese historical, warm and bright, guqin solo lead, erhu harmony, gentle zheng plucking, light orchestral backing, tactical preparation mood, hopeful, 78 BPM, 3/4 time, seamless loop, no vocals, peaceful yet purposeful, East Asian folk instruments',
+    },
+    {
+      id: 'M-battle', bgmTrack: 'battle', title: '일반 전투 BGM',
+      note: '일반 전투 화면. 긴장·박진감·드라이빙 리듬.',
+      prompt: 'Chinese war epic, intense and driving, taiko percussion, erhu tension melody, pipa rapid plucking, bass drums, urgent battle rhythm, Three Kingdoms warfare, 118 BPM, 4/4 time, seamless loop, no vocals, no synth, orchestral Chinese instruments, cinematic battle',
+    },
+    {
+      id: 'M-battleBoss', bgmTrack: 'battleBoss', title: '보스·대전 BGM',
+      note: '보스전·주요 일기토 직전. 더 어둡고 위협적.',
+      prompt: 'Chinese epic battle, dark and ominous, massive taiko drums, deep brass, erhu high-tension tremolo, dark pipa, low drones, boss encounter atmosphere, dread and power, 128 BPM, 4/4 time, seamless loop, no vocals, heavy percussion, cinematic climax',
+    },
+    {
+      id: 'M-scene', bgmTrack: 'scene', title: '시나리오 씬 BGM',
+      note: '막간 시나리오 대화 씬. 조용하고 서사적.',
+      prompt: 'Chinese historical drama, ambient and quiet, solo guqin fingerpicking, soft erhu undertone, distant zheng harmonics, narrative storytelling mood, calm contemplation, 68 BPM, seamless loop, no vocals, minimal arrangement, ink-brush stillness, introspective',
+    },
+  ],
+});
+
+SECTIONS.push({
+  id: 'SFX',
+  title: 'A. 효과음 (SFX) — 21종',
+  desc: 'ElevenLabs Sound Effects(또는 유사 툴)에 프롬프트 입력 → wav·mp3·webm 중 하나를 카드에 드래그 → <code>assets/audio/sfx/{key}.{ext}</code> 자동 저장 + 매니페스트 재빌드. 파일 없는 키는 절차적 합성(synth.ts) 폴백.',
+  items: [
+    // UI
+    { id: 'A-click',     sfxKey: 'click',     title: 'UI 클릭',      note: '버튼 탭. 짧고 경쾌.', prompt: 'A crisp soft wooden tap UI button click sound, very short 0.08 seconds, clean and subtle' },
+    { id: 'A-confirm',   sfxKey: 'confirm',   title: 'UI 확인',      note: '선택 확정. 따뜻한 긍정음.', prompt: 'A warm positive confirmation chime, gentle bell tone, short 0.3 seconds, pleasant and reassuring' },
+    { id: 'A-cancel',    sfxKey: 'cancel',    title: 'UI 취소',      note: '취소/뒤로. 가볍게 꺼지는 느낌.', prompt: 'A soft muted cancel sound effect, short downward click, 0.2 seconds, subtle and understated' },
+    // 전투 타격
+    { id: 'A-slash',     sfxKey: 'slash',     title: '베기(참격)',    note: '검·도끼 베기 효과.', prompt: 'A sharp sword slash whoosh through air, metallic swipe, 0.35 seconds, crisp and powerful' },
+    { id: 'A-pierce',    sfxKey: 'pierce',    title: '관통(궁병·창)',  note: '화살·창 꽂히는 소리.', prompt: 'An arrow piercing impact thwack into target, sharp and short, 0.25 seconds, precise hit sound' },
+    { id: 'A-hit',       sfxKey: 'hit',       title: '타격(둔기·보병)', note: '둔탁한 물리 피격음.', prompt: 'A blunt weapon impact hit sound, dull heavy thud, 0.3 seconds, solid and impactful' },
+    { id: 'A-crit',      sfxKey: 'crit',      title: '회심타',        note: '크리티컬 히트. 강렬한 금속음.', prompt: 'A critical hit powerful metal clash impact, loud punchy clash of swords, 0.5 seconds, dramatic and satisfying' },
+    { id: 'A-ultimate',  sfxKey: 'ultimate',  title: '필살기',        note: '필살 게이지 발동. 에너지 폭발.', prompt: 'An ultimate ability energy burst activation, dramatic swoosh and powerful impact, 1.0 seconds, epic and weighty' },
+    { id: 'A-defeat',    sfxKey: 'defeat',    title: '격파',          note: '유닛 사망·퇴각.', prompt: 'A unit defeated short downward tone, brief descending chime with thud, 0.4 seconds, somber finality' },
+    // 책략·연출
+    { id: 'A-spell',     sfxKey: 'spell',     title: '책략 발동',     note: '책략·마법 시전음.', prompt: 'A mystical spell cast magical whoosh with shimmering chime, 0.6 seconds, ethereal and powerful' },
+    { id: 'A-flank',     sfxKey: 'flank',     title: '협공',          note: '측면 협공 보너스 발동.', prompt: 'A quick cavalry flanking rush sound, multiple hooves rushing, short burst 0.5 seconds, dynamic and urgent' },
+    { id: 'A-combo',     sfxKey: 'combo',     title: '콤보',          note: '연속 격파 콤보 누적.', prompt: 'A satisfying combo streak notification sound, cascading multi-hit chimes ascending, 0.5 seconds, rewarding and bright' },
+    { id: 'A-duel',      sfxKey: 'duel',      title: '일기토 발동',   note: '일기토 시작 알림.', prompt: 'A dramatic duel initiation sound, ringing sword clash meeting, 0.65 seconds, tense and theatrical' },
+    { id: 'A-reinforce', sfxKey: 'reinforce', title: '증원 도착',     note: '증원 부대 합류.', prompt: 'Reinforcement troops arriving fanfare, short trumpet call with marching drum, 0.8 seconds, triumphant and urgent' },
+    { id: 'A-phase',     sfxKey: 'phase',     title: '턴 페이즈 전환', note: '아군→적군 턴 전환.', prompt: 'A turn phase change whoosh transition sound, smooth sweep left to right, 0.4 seconds, clean and clear' },
+    // 결산·보상
+    { id: 'A-star',      sfxKey: 'star',      title: '스타 획득',     note: '결산 별점 표시.', prompt: 'A star rating achievement shimmering sound, bright sparkling ascending bells, 0.8 seconds, glittery and satisfying' },
+    { id: 'A-chest',     sfxKey: 'chest',     title: '상자 개봉',     note: '보물 상자 오픈.', prompt: 'A treasure chest opening sound, wooden creak followed by magical shimmer, 0.75 seconds, discovery and delight' },
+    { id: 'A-coin',      sfxKey: 'coin',      title: '코인 드랍',     note: '격파 보상 코인 팝.', prompt: 'Multiple gold coins dropping and jingling on surface, 0.5 seconds, bright metallic clink cluster' },
+    { id: 'A-levelup',   sfxKey: 'levelup',   title: '레벨업',        note: '경험치 레벨업.', prompt: 'A level up fanfare ascending arpeggio, triumphant bright chime melody, 1.0 seconds, celebratory and uplifting' },
+    { id: 'A-victory',   sfxKey: 'victory',   title: '전투 승리',     note: '스테이지 클리어.', prompt: 'A battle victory fanfare, triumphant Chinese orchestral flourish with taiko drums and erhu, 2.0 seconds, glorious' },
+    { id: 'A-lose',      sfxKey: 'lose',      title: '전투 패배',     note: '스테이지 실패.', prompt: 'A battle defeat somber sound, descending minor melody with low drum, 1.5 seconds, melancholic and weighty' },
+  ],
+});
+
 /* ───────────────────────── 상태/저장 ───────────────────────── */
 
 const varState = JSON.parse(localStorage.getItem('ab_vars') || '{}');
@@ -1259,28 +1341,14 @@ async function loadAssetStatus() {
   } catch (_) { /* 서버 직빌드 아닌 file:// 등 — 표시 생략 */ }
 }
 
-let db = null;
-function openDB() {
-  return new Promise((res, rej) => {
-    const rq = indexedDB.open('assetBoard', 2);
-    rq.onupgradeneeded = e => {
-      const d = e.target.result;
-      if (!d.objectStoreNames.contains('imgs')) {
-        const st = d.createObjectStore('imgs', { keyPath: 'id', autoIncrement: true });
-        st.createIndex('byCard', 'card');
-      }
-      if (!d.objectStoreNames.contains('settings')) d.createObjectStore('settings');
-    };
-    rq.onsuccess = e => res(e.target.result);
-    rq.onerror = () => rej(rq.error);
-  });
-}
-function sGet(key) { return new Promise((res, rej) => { const r = db.transaction('settings', 'readonly').objectStore('settings').get(key); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
-function sPut(key, val) { return new Promise((res, rej) => { const tx = db.transaction('settings', 'readwrite'); tx.objectStore('settings').put(val, key); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); }); }
-function dbAdd(rec) { return new Promise((res, rej) => { const tx = db.transaction('imgs', 'readwrite'); const r = tx.objectStore('imgs').add(rec); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
-function dbDel(id) { return new Promise((res, rej) => { const tx = db.transaction('imgs', 'readwrite'); tx.objectStore('imgs').delete(id).onsuccess = () => res(); tx.onerror = () => rej(tx.error); }); }
-function dbPut(rec) { return new Promise((res, rej) => { const tx = db.transaction('imgs', 'readwrite'); tx.objectStore('imgs').put(rec).onsuccess = () => res(); tx.onerror = () => rej(tx.error); }); }
-function dbAll() { return new Promise((res, rej) => { const tx = db.transaction('imgs', 'readonly'); const r = tx.objectStore('imgs').getAll(); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+/* ─── 인메모리 이미지 스토어 (IndexedDB 제거 — R2가 단일 소스) ─── */
+const _imgStore = new Map(); // id → rec
+let _nextImgId = 1;
+function imAdd(rec) { rec.id = _nextImgId++; _imgStore.set(rec.id, rec); return rec.id; }
+function imDel(id) { _imgStore.delete(id); }
+function imGet(id) { return _imgStore.get(id); }
+function imPut(rec) { _imgStore.set(rec.id, rec); }
+function imAll() { return Array.from(_imgStore.values()); }
 
 /* ───────────────────────── 프롬프트 조립 ───────────────────────── */
 
@@ -1297,26 +1365,15 @@ function updateDirUI() {
 }
 
 async function restoreDir() {
-  try {
-    const saved = await sGet('dir');
-    if (saved && await saved.queryPermission({ mode: 'readwrite' }) === 'granted') dirHandle = saved;
-    else if (saved) dirHandle = null; // 권한 재요청은 사용자 제스처에서
-    updateDirUI();
-  } catch (e) { /* ignore */ }
+  /* dirHandle은 세션에만 유지 — FileSystemFileHandle은 localStorage 직렬화 불가 */
+  updateDirUI();
 }
 
 async function ensureDir(interactive) {
   if (dirHandle && await dirHandle.queryPermission({ mode: 'readwrite' }) === 'granted') return dirHandle;
-  try {
-    const saved = await sGet('dir');
-    if (saved && await saved.requestPermission({ mode: 'readwrite' }) === 'granted') {
-      dirHandle = saved; updateDirUI(); return dirHandle;
-    }
-  } catch (e) { /* fall through */ }
   if (!interactive || !window.showDirectoryPicker) return null;
   try {
     dirHandle = await showDirectoryPicker({ id: 'assetArt', mode: 'readwrite' });
-    await sPut('dir', dirHandle);
     updateDirUI();
     toast('연결됨 — 이제 ⬇ 가 ' + dirHandle.name + ' 폴더로 바로 저장됩니다');
     return dirHandle;
@@ -1400,8 +1457,7 @@ function defaultCutBoxes(parts, W, H) {
 async function openCutter(itemId) {
   const item = findItem(itemId);
   if (!item || !item.rigParts) return;
-  const all = await dbAll();
-  const recs = all.filter(r => r.card === itemId).sort((a, b) => b.at - a.at);
+  const recs = imAll().filter(r => r.card === itemId).sort((a, b) => b.at - a.at);
   if (!recs.length) { toast('먼저 이 카드에 SD 이미지를 붙여넣으세요', true); return; }
   const bmp = await createImageBitmap(recs[0].blob);
   const maxW = Math.min(window.innerWidth - 60, 720), maxH = window.innerHeight - 130;
@@ -1572,6 +1628,9 @@ function buildPrompt(item) {
     parts.push(VFX_PREFIX);
     parts.push(body);
     parts.push(NEGATIVE);
+  } else if (item.bgmTrack || item.sfxKey) {
+    /* 오디오 카드: 프롬프트 원문 그대로(이미지 스타일 불필요). */
+    parts.push(body);
   } else {
     parts.push(STYLE);
     parts.push(COMMON);
@@ -1594,6 +1653,7 @@ const TAB_DEFS = [
   { id: 'ui',      label: 'UI',             secs: ['D','L'] },
   { id: 'effect',  label: '이펙트',         secs: ['C'] },
   { id: 'terrain', label: '지형·바닥',      secs: ['E','K'] },
+  { id: 'audio',   label: '🔊 오디오',      secs: ['BGM','SFX'] },
   // 전신레퍼·적전신·병종SD(구)·무기스킨·일기토키프레임·리그파츠 탭은 v1 불필요라 제거(섹션 정의는 코드에 남김).
 ];
 
@@ -1614,39 +1674,76 @@ function renderTabs() {
 
 document.getElementById('refreshbtn').addEventListener('click', () => refreshAssetStatus(false));
 
-document.getElementById('applytilesbtn').addEventListener('click', async () => {
-  const btn = document.getElementById('applytilesbtn');
-  btn.disabled = true; const orig = btn.textContent; btn.textContent = '⏳ 적용 중…';
-  try {
-    const { applied, failed } = await applyAllTiles();
-    if (!applied.length && !failed.length) toast('붙여둔 바닥 이미지가 없습니다 — E 카드(지형·바닥 탭)에 붙여넣으면 이후엔 자동 저장됩니다.');
-    else toast(`🟫 ${applied.length}장 적용: ${applied.join(', ')}${failed.length ? ` · 실패 ${failed.length}` : ''} — 게임 하드리프레시하면 바뀝니다`);
-  } catch (e) { toast('일괄 적용 실패: ' + e.message + ' (:8080 서버 확인)', true); }
-  btn.textContent = orig; btn.disabled = false;
-});
+// ── R2/로컬 자동 로드 ──────────────────────────────────────────────────────────
+const R2_BASE = 'https://pub-0266c86410774a648f958fb4d8fc3e46.r2.dev';
 
-document.getElementById('applyobjectsbtn').addEventListener('click', async () => {
-  const btn = document.getElementById('applyobjectsbtn');
-  btn.disabled = true; const orig = btn.textContent; btn.textContent = '⏳ 올리는 중…';
-  try {
-    const { applied, failed } = await applyAllObjects();
-    if (!applied.length && !failed.length) toast('붙여둔 오브젝트 시트가 없습니다 — K-4~K-7 카드에 붙여넣으면 이후엔 자동 저장됩니다.');
-    else toast(`🧱 ${applied.length}장 디스크 적용: ${applied.join(', ')}${failed.length ? ` · 실패 ${failed.length}` : ''} — Claude에게 "오브젝트 넘겼어"라고 하면 컷합니다`);
-  } catch (e) { toast('일괄 적용 실패: ' + e.message + ' (:8080 서버 확인)', true); }
-  btn.textContent = orig; btn.disabled = false;
-});
+/** 카드 아이템 → 알려진 game 경로 배열(없으면 [] → dump 카드로 처리). */
+function cardGamePaths(item) {
+  if (!item) return [];
+  if (item.tile) { const a = Array.isArray(item.tile) ? item.tile : [item.tile]; return a.map(t => `assets/tiles/${t}`); }
+  if (item.objectSheet) return [`assets/objects/_sheet_${item.objectSheet}.png`];
+  if (item.sceneCard && item.saveName) return [`assets/scenes/${item.saveName}`];
+  if (item.portraitSheet && item.portraitGroup) return [`assets/ui/portraits/_sheet_${item.portraitGroup}.png`];
+  if (item.itemSheet && item.itemGroup) return [`assets/ui/items/_sheet_${item.itemGroup}.png`];
+  if (item.poseSheet && item.charId) return [`assets/sprites/${item.charId}/_posesheet.png`];
+  if (item.bgmTrack) return ['mp3','webm','ogg','m4a','wav'].map(e => `assets/audio/bgm/${item.bgmTrack}.${e}`);
+  if (item.sfxKey)   return ['mp3','webm','ogg','m4a','wav'].map(e => `assets/audio/sfx/${item.sfxKey}.${e}`);
+  return [];
+}
 
-document.getElementById('dumpallbtn').addEventListener('click', async () => {
-  const btn = document.getElementById('dumpallbtn');
-  btn.disabled = true; const orig = btn.textContent; btn.textContent = '⏳ 전부 디스크로…';
-  try {
-    const r = await dumpAllToDisk();
-    if (!r.total) toast('붙여둔 이미지가 없습니다 (이 브라우저 IndexedDB가 비어있음).');
-    else toast(`💾 ${r.total}장 디스크 저장 — 게임경로 ${r.game.length} · 보존덤프 ${r.dump.length}${r.failed.length ? ` · 실패 ${r.failed.length}` : ''}. Claude에게 "덤프했어" 하면 라우팅합니다`);
-    console.log('[dumpAllToDisk]', r);
-  } catch (e) { toast('덤프 실패: ' + e.message + ' (:8080 서버 확인)', true); }
-  btn.textContent = orig; btn.disabled = false;
-});
+/** R2(또는 로컬 serve.py)에서 gamePath 이미지를 fetch. 실패하면 null. */
+async function fetchAsset(gamePath) {
+  for (const base of [R2_BASE, '/apps/web/public']) {
+    try {
+      const res = await fetch(`${base}/${gamePath}`, { cache: 'no-store' });
+      if (res.ok) return res.blob();
+    } catch { /* ignore */ }
+  }
+  return null;
+}
+
+/** 페이지 로드 시 R2/로컬에서 전 카드 이미지 자동 로드 → 인메모리 스토어 + DOM 렌더. */
+async function loadFromR2() {
+  document.getElementById('progress').textContent = '🔄 R2에서 로드 중…';
+  let loaded = 0;
+  for (const section of SECTIONS) {
+    for (const item of section.items) {
+      const paths = cardGamePaths(item);
+      const isAudioCard = !!(item.bgmTrack || item.sfxKey);
+      if (paths.length) {
+        for (const gp of paths) {
+          const blob = await fetchAsset(gp);
+          if (blob) {
+            const rec = { card: item.id, blob, name: gp.split('/').pop(), pick: 0, at: 0, gamePath: gp };
+            imAdd(rec);
+            loaded++;
+            if (isAudioCard) break; // 확장자 여러 개 중 첫 히트만
+          }
+        }
+      } else {
+        try {
+          const listRes = await fetch(`/list-dir?path=assets/_board_dump/${item.id}`, { cache: 'no-store' });
+          if (listRes.ok) {
+            const { files = [] } = await listRes.json();
+            for (const fname of files) {
+              const blob = await fetchAsset(`assets/_board_dump/${item.id}/${fname}`);
+              if (blob) {
+                const rec = { card: item.id, blob, name: fname, pick: 0, at: 0, gamePath: `assets/_board_dump/${item.id}/${fname}` };
+                imAdd(rec);
+                loaded++;
+              }
+            }
+          }
+        } catch { /* 파일 없음 */ }
+      }
+    }
+  }
+  loadImagesForCurrentTab();
+  updateProgress();
+  if (loaded > 0) toast(`📥 R2에서 ${loaded}장 로드됨`);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 document.getElementById('tabbar').addEventListener('click', e => {
   const t = e.target.closest('.tab');
@@ -1669,7 +1766,8 @@ function renderBoard() {
   for (const sec of visibleSecs) {
     html += `<h2 class="sec">${sec.title}</h2><p class="secdesc">${sec.desc}</p><div class="grid">`;
     for (const it of sec.items) {
-      html += `<div class="card" id="card-${it.id}">
+      const _audioCard = !!(it.bgmTrack || it.sfxKey);
+      html += `<div class="card${_audioCard ? ' audio-card' : ''}" id="card-${it.id}">
         <h3><span class="pid">${it.id}</span> ${it.title} ${it.multi ? `<span class="multi">${it.multi}</span>` : ''}</h3>
         ${it.note ? `<div class="note">${it.note}</div>` : ''}
         ${portraitMembersHtml(it)}`;
@@ -1703,7 +1801,7 @@ function renderBoard() {
         </div>
         ${it.poseSheet && it.roster ? `<div class="existing" data-existing="${it.id}"></div>` : ''}
         <div class="drop" tabindex="0" data-drop="${it.id}">
-          <span class="hint">클릭 후 Ctrl+V 로 생성 결과 붙여넣기 (드래그&드롭 가능)</span>
+          <span class="hint">${_audioCard ? '파일 선택 버튼 또는 드래그&드롭으로 오디오 파일 추가' : '클릭 후 Ctrl+V 로 생성 결과 붙여넣기 (드래그&드롭 가능)'}</span>
         </div>
       </div>`;
     }
@@ -1831,11 +1929,15 @@ const blobUrls = new Map();
 
 function thumbNode(rec) {
   const div = document.createElement('div');
-  div.className = 'thumb' + (rec.pick ? ' picked' : '');
+  const isAudio = rec.blob && rec.blob.type.startsWith('audio/');
+  div.className = 'thumb' + (isAudio ? ' audio-thumb' : '') + (rec.pick ? ' picked' : '');
   div.dataset.imgid = rec.id;
   let url = blobUrls.get(rec.id);
   if (!url) { url = URL.createObjectURL(rec.blob); blobUrls.set(rec.id, url); }
-  div.innerHTML = `<img src="${url}" title="${rec.name}">
+  const inner = isAudio
+    ? `<audio controls src="${url}" title="${rec.name}"></audio>`
+    : `<img src="${url}" title="${rec.name}">`;
+  div.innerHTML = inner + `
     <div class="ops">
       <button class="pk" title="픽 토글">★</button>
       <button class="dl" title="다운로드">⬇</button>
@@ -1850,106 +1952,9 @@ function tileTarget(item, cardId) {
   if (Array.isArray(item.tile)) return item.tile[(varState[cardId] || {})['지형'] || 0] || null;
   return item.tile;
 }
-/* 이미 붙여둔(IndexedDB) 타일/바닥 이미지를 전부 /assets/tiles/ 로 일괄 적용 — 자동저장 도입 전 백로그용.
-   단일 카드(E-2/3/4)=가장 최근 1장→타깃. E-1(배열)=붙여넣은 순서대로 변형 0..N 에 매핑(최근 N장). */
-async function applyAllTiles() {
-  const all = (await dbAll()).sort((a, b) => a.at - b.at);
-  const byCard = {};
-  for (const r of all) (byCard[r.card] = byCard[r.card] || []).push(r);
-  const applied = [], failed = [];
-  for (const [cardId, recs] of Object.entries(byCard)) {
-    const item = findItem(cardId);
-    if (!item || !item.tile) continue;
-    if (Array.isArray(item.tile)) {
-      const use = recs.slice(-item.tile.length); // 최근 N장 → 변형 0..N
-      for (let i = 0; i < use.length; i++) {
-        try { await applyToGame(`assets/tiles/${item.tile[i]}`, use[i].blob); applied.push(item.tile[i]); }
-        catch (e) { failed.push(`${item.tile[i]}(${e.message})`); }
-      }
-    } else {
-      try { await applyToGame(`assets/tiles/${item.tile}`, recs[recs.length - 1].blob); applied.push(item.tile); }
-      catch (e) { failed.push(`${item.tile}(${e.message})`); }
-    }
-  }
-  return { applied, failed };
-}
-/* 맵 오브젝트 시트(K-4~K-7) → /assets/objects/_sheet_{key}.png 스테이징 경로(붙여넣기 시 자동 저장).
-   원본 한 장을 그대로 디스크에 올려두면 Claude가 Read로 격자를 눈으로 보고 cut_object_sheet.py 로
-   올바른 --grid 로 컷한다(SD 포즈시트와 같은 비전 QA — 모델 배치가 일정치 않아 자동컷은 위험). */
+
 function objectSheetTarget(item) {
   return item && item.objectSheet ? `_sheet_${item.objectSheet}.png` : null;
-}
-/* 이미 붙여둔(IndexedDB) 오브젝트 시트를 전부 /assets/objects/_sheet_{key}.png 로 일괄 디스크 적용
-   — 자동저장 도입 전 백로그용. 카드당 가장 최근 1장. 컷은 Claude가 시트를 보고 수행. */
-async function applyAllObjects() {
-  const all = (await dbAll()).sort((a, b) => a.at - b.at);
-  const byCard = {};
-  for (const r of all) (byCard[r.card] = byCard[r.card] || []).push(r);
-  const applied = [], failed = [];
-  for (const [cardId, recs] of Object.entries(byCard)) {
-    const item = findItem(cardId);
-    const target = objectSheetTarget(item);
-    if (!target) continue;
-    try { await applyToGame(`assets/objects/${target}`, recs[recs.length - 1].blob); applied.push(target); }
-    catch (e) { failed.push(`${target}(${e.message})`); }
-  }
-  return { applied, failed };
-}
-/* 모든 카드의 붙여둔 이미지를 디스크로 (백로그 일괄). 알려진 게임 타깃(타일/오브젝트/씬)은 정식 경로,
-   그 외(이펙트 C·UI D/L·기타)는 assets/_board_dump/{card}/{name} 로 원본 보존(게임 소비 슬롯 생기면 라우팅).
-   ⚠ 브라우저 보안: IndexedDB 는 *이 탭의 JS* 만 읽는다 — 자동화 확장이 다른 브라우저 인스턴스라
-   사용자가 *데이터가 있는 자기 브라우저에서* 한 번 눌러야 한다. 이후 붙여넣기는 자동 보존(else 분기). */
-async function dumpAllToDisk() {
-  const all = (await dbAll()).sort((a, b) => a.at - b.at);
-  const byCard = {};
-  for (const r of all) (byCard[r.card] = byCard[r.card] || []).push(r);
-  const game = [], dump = [], failed = [];
-  for (const [card, recs] of Object.entries(byCard)) {
-    const item = findItem(card);
-    try {
-      if (item && item.tile) {
-        const arr = Array.isArray(item.tile) ? item.tile : [item.tile];
-        const use = recs.slice(-arr.length); // 최근 N장 → 변형 0..N
-        for (let i = 0; i < use.length; i++) { await applyToGame(`assets/tiles/${arr[i]}`, use[i].blob); game.push('tiles/' + arr[i]); }
-      } else if (item && item.objectSheet) {
-        await applyToGame(`assets/objects/_sheet_${item.objectSheet}.png`, recs[recs.length - 1].blob); game.push('objects/_sheet_' + item.objectSheet + '.png');
-      } else if (item && item.sceneCard && item.saveName) {
-        await applyToGame(`assets/scenes/${item.saveName}`, recs[recs.length - 1].blob); game.push('scenes/' + item.saveName);
-      } else if (item && item.portraitSheet) {
-        // 초상 그룹 시트: 시트 저장 + serve.py가 멤버별로 슬라이스 → /assets/ui/portraits/{id}.webp
-        const args = portraitSliceArgs(item);
-        const res = await applyToGame(`assets/ui/portraits/_sheet_${item.portraitGroup}.png`, recs[recs.length - 1].blob, args);
-        const n = (res.slice && res.slice.count) || 0;
-        game.push(`portraits/${item.portraitGroup} (${n}컷)`);
-      } else if (item && item.itemSheet) {
-        // 아이템 아이콘 그룹 시트 → serve.py 슬라이스 → /assets/ui/items/{id}.webp
-        const args = itemSliceArgs(item);
-        const res = await applyToGame(`assets/ui/items/_sheet_${item.itemGroup}.png`, recs[recs.length - 1].blob, args);
-        const n = (res.slice && res.slice.count) || 0;
-        game.push(`items/${item.itemGroup} (${n}컷)`);
-      } else {
-        for (const r of recs) { const safe = (r.name || card + '.png').replace(/[^\w.\-]/g, '_'); await applyToGame(`assets/_board_dump/${card}/${safe}`, r.blob); dump.push(card + '/' + safe); }
-      }
-    } catch (e) { failed.push(card + ': ' + e.message); }
-  }
-  return { total: all.length, cards: Object.keys(byCard).length, game, dump, failed };
-}
-/* 보드 로드 시 붙여둔 이미지를 디스크로 자동 보존 — IndexedDB 내용(개수+최신시각)이 직전 덤프 이후
-   바뀌었을 때만 실행(매 새로고침 재업로드 방지). :8080 서버 꺼져있으면 조용히 스킵(수동 💾 버튼으로 가능). */
-async function autoDumpOnLoad() {
-  try {
-    const all = await dbAll();
-    if (!all.length) return;
-    const sig = all.length + ':' + Math.max(...all.map(r => r.at || 0));
-    if (localStorage.getItem('ab_dump_sig') === sig) return; // 변경 없음 → 스킵
-    const r = await dumpAllToDisk();
-    if (!r.failed.length) {
-      localStorage.setItem('ab_dump_sig', sig);
-      toast(`💾 자동 보존: ${r.total}장 디스크 (게임 ${r.game.length} · 덤프 ${r.dump.length}). Claude에게 "덤프했어"`);
-    } else {
-      toast(`💾 자동 보존 ${r.total - r.failed.length}/${r.total} · 실패 ${r.failed.length} (:8080 서버 확인)`, true);
-    }
-  } catch (e) { /* 서버 꺼짐 등 — 조용히 무시(수동 💾 버튼으로 재시도 가능) */ }
 }
 async function addImageToCard(cardId, blob) {
   const item = findItem(cardId);
@@ -1978,78 +1983,114 @@ async function addImageToCard(cardId, blob) {
   }
 
   const rec = { card: cardId, blob: finalBlob, name, pick: 0, at: Date.now() };
-  rec.id = await dbAdd(rec);
+  imAdd(rec);
   document.querySelector(`#card-${CSS.escape(cardId)} .drop`).appendChild(thumbNode(rec));
-  await updateProgress();
+  updateProgress();
   const tileFile = tileTarget(item, cardId);
   if (item && item.sceneCard) {
+    rec.gamePath = `assets/scenes/${name}`;
     try {
-      const res = await applyToGame(`assets/scenes/${name}`, finalBlob);
+      const res = await applyToGame(rec.gamePath, finalBlob);
       toast(`${name} → 게임 적용 완료${res.r2 ? ' (+R2)' : ''}. 게임 새로고침하면 보입니다`);
     } catch (e) {
       toast(`${name} 저장됨 (게임 적용 실패: ${e.message} — :8080 서버 켜졌는지 확인)`);
     }
   } else if (tileFile) {
+    rec.gamePath = `assets/tiles/${tileFile}`;
     try {
-      const res = await applyToGame(`assets/tiles/${tileFile}`, finalBlob);
+      const res = await applyToGame(rec.gamePath, finalBlob);
       toast(`🟫 타일 자동 저장: ${tileFile} → 게임 하드리프레시하면 바뀜${res.r2 ? ' (+R2)' : ''}`);
     } catch (e) {
       toast(`${name} 저장됨 (타일 적용 실패: ${e.message} — :8080 서버 켜졌는지 확인)`);
     }
   } else if (objectSheetTarget(item)) {
     const target = objectSheetTarget(item);
+    rec.gamePath = `assets/objects/${target}`;
     try {
-      await applyToGame(`assets/objects/${target}`, finalBlob);
+      await applyToGame(rec.gamePath, finalBlob);
       toast(`🧱 오브젝트 시트 디스크 저장: ${target} → Claude에게 "오브젝트 넘겼어"라고 하면 격자 보고 컷합니다`);
     } catch (e) {
       toast(`${name} 저장됨 (오브젝트 적용 실패: ${e.message} — :8080 서버 켜졌는지 확인)`);
     }
   } else {
-    /* 알려진 게임 타깃이 없는 카드(이펙트 C·UI D/L·기타) — 원본을 디스크에 보존(브라우저 IndexedDB 휘발 방지).
-       게임이 이미지로 소비하는 슬롯이 생기면 _board_dump 에서 정식 경로로 라우팅. */
+    /* 알려진 게임 타깃이 없는 카드(이펙트 C·UI D/L·기타) — 디스크+R2에 바로 보존. */
     const safe = name.replace(/[^\w.\-]/g, '_');
+    const dumpPath = `assets/_board_dump/${cardId}/${safe}`;
+    rec.gamePath = dumpPath;
     try {
-      await applyToGame(`assets/_board_dump/${cardId}/${safe}`, finalBlob);
+      await applyToGame(dumpPath, finalBlob);
       toast(`💾 디스크 보존: _board_dump/${cardId}/${safe}`);
     } catch (e) {
-      toast(`${name} 저장됨(IndexedDB) — 디스크 보존 실패: ${e.message} (:8080 확인)`);
+      toast(`${name} 디스크 보존 실패: ${e.message} (:8080 확인)`);
     }
   }
 }
 
-async function loadImages() {
-  const all = await dbAll();
-  all.sort((a, b) => a.at - b.at);
-  for (const rec of all) {
-    const drop = document.querySelector(`#card-${CSS.escape(rec.card)} .drop`);
-    if (drop) drop.appendChild(thumbNode(rec));
-    /* non-visible cards (other tabs) are expected to not be in DOM — not orphans */
-  }
-  updateProgress();
+/* 오디오 blob → 확장자 추출. MIME type→ext 정규화 포함. */
+const AUDIO_EXT_MAP = { mpeg: 'mp3', 'x-wav': 'wav', 'x-m4a': 'm4a', mp4: 'm4a' };
+function audioExt(blob) {
+  if (blob.name) { const p = blob.name.split('.').pop().toLowerCase(); if (p && p.length <= 5) return p; }
+  const sub = (blob.type || 'audio/mp3').split('/')[1] || 'mp3';
+  return AUDIO_EXT_MAP[sub] || sub;
 }
 
-/* 탭 전환 후 현재 탭 카드에 DB 이미지 다시 붙이기 */
-async function loadImagesForCurrentTab() {
-  const all = await dbAll();
-  all.sort((a, b) => a.at - b.at);
-  for (const rec of all) {
+async function addAudioToCard(cardId, blob) {
+  const item = findItem(cardId);
+  const ext = audioExt(blob);
+  let gamePath, name;
+  if (item && item.bgmTrack) {
+    name = `${item.bgmTrack}.${ext}`;
+    gamePath = `assets/audio/bgm/${name}`;
+  } else if (item && item.sfxKey) {
+    name = `${item.sfxKey}.${ext}`;
+    gamePath = `assets/audio/sfx/${name}`;
+  } else {
+    const safe = (blob.name || cardId).replace(/[^\w.\-]/g, '_');
+    gamePath = `assets/_board_dump/${cardId}/${safe}`;
+    name = safe;
+  }
+  /* 같은 카드의 기존 오디오 썸은 1개만 유지(확장자가 바뀌면 예전 파일 대체). */
+  document.querySelectorAll(`#card-${CSS.escape(cardId)} .drop .audio-thumb`).forEach(t => {
+    const r = imGet(+t.dataset.imgid); if (r) imDel(r.id); t.remove();
+  });
+  const rec = { card: cardId, blob, name, pick: 0, at: Date.now(), gamePath };
+  imAdd(rec);
+  document.querySelector(`#card-${CSS.escape(cardId)} .drop`).appendChild(thumbNode(rec));
+  updateProgress();
+  try {
+    const res = await applyToGame(gamePath, blob);
+    let mNote = '';
+    try {
+      const mr = await fetch('/rebuild-audio-manifest', { method: 'POST' });
+      const mj = mr.ok ? await mr.json() : null;
+      mNote = mj ? ` — 매니페스트 재빌드(sfx:${mj.sfx} bgm:${mj.bgm}${mj.r2 ? '+R2' : ''})` : '';
+    } catch { mNote = ' — 매니페스트 갱신 실패(serve.py 확인)'; }
+    toast(`🎵 ${name} 저장${res.r2 ? '+R2' : ''}${mNote}`);
+  } catch(e) {
+    toast(`${name} 저장 실패: ${e.message} (:8080 서버 확인)`);
+  }
+}
+
+/* 탭 전환 후 현재 탭 카드에 인메모리 이미지 다시 붙이기 */
+function loadImagesForCurrentTab() {
+  const recs = imAll().sort((a, b) => a.at - b.at);
+  for (const rec of recs) {
     const drop = document.querySelector(`#card-${CSS.escape(rec.card)} .drop`);
     if (drop && !drop.querySelector(`[data-imgid="${rec.id}"]`)) drop.appendChild(thumbNode(rec));
   }
   updateProgress();
 }
 
-async function updateProgress() {
+function updateProgress() {
   const total = SECTIONS.reduce((a, s) => a + s.items.length, 0);
-  const all = await dbAll();
+  const all = imAll();
   const doneCards = new Set(all.map(r => r.card));
   const done = doneCards.size;
-  document.getElementById('progress').textContent = `이미지 있는 카드: ${done}/${total}`;
+  document.getElementById('progress').textContent = `에셋 있는 카드: ${done}/${total}`;
   document.querySelectorAll('.card').forEach(c => {
     const hasPick = all.some(r => r.card === c.id.replace('card-', '') && r.pick);
     c.classList.toggle('haspick', hasPick);
   });
-  /* 탭 뱃지에 픽 표시 */
   for (const tab of TAB_DEFS) {
     const secsInTab = SECTIONS.filter(s => tab.secs.includes(s.id));
     const idsInTab = secsInTab.flatMap(s => s.items.map(it => it.id));
@@ -2061,12 +2102,12 @@ async function updateProgress() {
 
 /* ───────────────────────── 이벤트 ───────────────────────── */
 
-/* 카드의 붙여넣기 버퍼(IndexedDB recs + 썸네일 DOM)를 비운다.
+/* 카드의 붙여넣기 버퍼(인메모리 recs + 썸네일 DOM)를 비운다.
    포즈/초상 시트는 한 카드에서 드롭다운으로 캐릭터를 바꾸는데, 버퍼가 카드 단위라
    이전 캐릭터 시트가 남으면 시트 넘기기 시 *다른 캐릭터 경로*로 잘못 저장된다(예: 유비 그림→guanyu). */
-async function clearCardImages(cardId) {
+function clearCardImages(cardId) {
   document.querySelectorAll(`#card-${CSS.escape(cardId)} .drop .thumb`).forEach(t => t.remove());
-  for (const r of (await dbAll()).filter(r => r.card === cardId)) await dbDel(r.id);
+  imAll().filter(r => r.card === cardId).forEach(r => imDel(r.id));
   updateProgress();
 }
 
@@ -2096,9 +2137,11 @@ board.addEventListener('click', async e => {
   }
   const fb = e.target.closest('button[data-file]');
   if (fb) {
+    const _item = findItem(fb.dataset.file);
+    const _isAudio = !!(_item && (_item.bgmTrack || _item.sfxKey));
     const inp = document.createElement('input');
-    inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
-    inp.onchange = () => { for (const f of inp.files) addImageToCard(fb.dataset.file, f); };
+    inp.type = 'file'; inp.accept = _isAudio ? 'audio/*' : 'image/*'; inp.multiple = !_isAudio;
+    inp.onchange = () => { for (const f of inp.files) (_isAudio ? addAudioToCard : addImageToCard)(fb.dataset.file, f); };
     inp.click();
     return;
   }
@@ -2110,8 +2153,7 @@ board.addEventListener('click', async e => {
     const idx = (varState[item.id] || {})['캐릭터'] || 0;
     const sel = (item.roster || [])[idx];
     if (!sel) { flashBtn(ps, '✗ 캐릭터 선택', false); toast('캐릭터를 먼저 선택하세요', true); return; }
-    const all = await dbAll();
-    const recs = all.filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
+    const recs = imAll().filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
     if (!recs.length) { flashBtn(ps, '✗ 시트 없음', false); setCardStatus(ps, '✗ 먼저 이 카드에 포즈 시트 이미지를 붙여넣으세요(클릭→Ctrl+V).'); return; }
     const flip = !!document.querySelector(`input[data-flip="${CSS.escape(item.id)}"]`)?.checked;
     await sheetSend(ps, `assets/sprites/${sel.s}/_posesheet.png`, recs[0].blob, `${sel.n}(${sel.s}) 포즈 시트`, { cut: true, flip });
@@ -2120,8 +2162,7 @@ board.addEventListener('click', async e => {
   const pt = e.target.closest('button[data-portraitsheet]');
   if (pt) {
     const item = findItem(pt.dataset.portraitsheet);
-    const all = await dbAll();
-    const recs = all.filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
+    const recs = imAll().filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
     if (!recs.length) { flashBtn(pt, '✗ 시트 없음', false); setCardStatus(pt, '✗ 먼저 이 카드에 초상 시트 이미지를 붙여넣으세요(클릭→Ctrl+V).'); return; }
     const pargs = portraitSliceArgs(item);
     await sheetSend(pt, `assets/ui/portraits/_sheet_${item.portraitGroup}.png`, recs[0].blob, `초상시트 ${item.portraitGroup}`, { slice: true, group: pargs.group, members: pargs.members, grid: pargs.grid });
@@ -2130,8 +2171,7 @@ board.addEventListener('click', async e => {
   const itm = e.target.closest('button[data-itemsheet]');
   if (itm) {
     const item = findItem(itm.dataset.itemsheet);
-    const all = await dbAll();
-    const recs = all.filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
+    const recs = imAll().filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
     if (!recs.length) { flashBtn(itm, '✗ 시트 없음', false); setCardStatus(itm, '✗ 먼저 이 카드에 아이템 시트 이미지를 붙여넣으세요(클릭→Ctrl+V).'); return; }
     const iargs = itemSliceArgs(item);
     await sheetSend(itm, `assets/ui/items/_sheet_${item.itemGroup}.png`, recs[0].blob, `아이템시트 ${item.itemGroup}`, { slice: true, group: iargs.group, members: iargs.members, grid: iargs.grid });
@@ -2142,16 +2182,21 @@ board.addEventListener('click', async e => {
     const id = +th.dataset.imgid;
     if (e.target.closest('.rm')) {
       if (!confirm('이 이미지를 삭제할까요?')) return;
-      await dbDel(id); th.remove(); updateProgress(); return;
+      const rec = imGet(id);
+      imDel(id); th.remove(); updateProgress();
+      if (rec && rec.gamePath) {
+        fetch('/delete-asset', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: rec.gamePath }) }).catch(() => {});
+      }
+      return;
     }
     if (e.target.closest('.pk')) {
-      const all = await dbAll(); const rec = all.find(r => r.id === id);
-      rec.pick = rec.pick ? 0 : 1; await dbPut(rec);
-      th.classList.toggle('picked', !!rec.pick); updateProgress(); return;
+      const rec = imGet(id);
+      if (rec) { rec.pick = rec.pick ? 0 : 1; imPut(rec); }
+      th.classList.toggle('picked', !!(rec && rec.pick)); updateProgress(); return;
     }
     if (e.target.closest('.dl')) {
-      const all = await dbAll(); const rec = all.find(r => r.id === id);
-      await saveRecToDisk(rec);
+      const rec = imGet(id);
+      if (rec) await saveRecToDisk(rec);
       return;
     }
     if (e.target.tagName === 'IMG') {
@@ -2170,13 +2215,16 @@ document.getElementById('lightbox').addEventListener('click', e => e.currentTarg
 document.addEventListener('paste', e => {
   const dz = document.activeElement.closest?.('.drop') || document.querySelector('.drop.armed');
   if (!dz) return;
+  const _item = findItem(dz.dataset.drop);
+  const _isAudio = !!(_item && (_item.bgmTrack || _item.sfxKey));
   const items = e.clipboardData?.items || [];
   let got = false;
   for (const it of items) {
-    if (it.type.startsWith('image/')) { addImageToCard(dz.dataset.drop, it.getAsFile()); got = true; }
+    if (_isAudio && it.type.startsWith('audio/')) { addAudioToCard(dz.dataset.drop, it.getAsFile()); got = true; }
+    else if (!_isAudio && it.type.startsWith('image/')) { addImageToCard(dz.dataset.drop, it.getAsFile()); got = true; }
   }
   if (got) e.preventDefault();
-  else toast('클립보드에 이미지가 없습니다 — 이미지를 "복사"한 뒤 시도하세요');
+  else toast(_isAudio ? '클립보드에 오디오가 없습니다 — 파일 버튼으로 선택하세요' : '클립보드에 이미지가 없습니다 — 이미지를 "복사"한 뒤 시도하세요');
 });
 
 board.addEventListener('dragover', e => { const dz = e.target.closest('.drop'); if (dz) { e.preventDefault(); dz.classList.add('dragover'); } });
@@ -2185,7 +2233,12 @@ board.addEventListener('drop', e => {
   const dz = e.target.closest('.drop');
   if (!dz) return;
   e.preventDefault(); dz.classList.remove('dragover');
-  for (const f of e.dataTransfer.files) if (f.type.startsWith('image/')) addImageToCard(dz.dataset.drop, f);
+  const _item = findItem(dz.dataset.drop);
+  const _isAudio = !!(_item && (_item.bgmTrack || _item.sfxKey));
+  for (const f of e.dataTransfer.files) {
+    if (_isAudio && f.type.startsWith('audio/')) addAudioToCard(dz.dataset.drop, f);
+    else if (!_isAudio && f.type.startsWith('image/')) addImageToCard(dz.dataset.drop, f);
+  }
 });
 
 let toastTimer = null;
@@ -2205,14 +2258,11 @@ document.getElementById('dirbtn').addEventListener('click', async () => {
 (async () => {
   await loadAssetStatus();
   render();
-  try { db = await openDB(); await loadImagesForCurrentTab(); await restoreDir(); await autoDumpOnLoad(); }
-  catch (err) {
-    document.querySelector('.info').insertAdjacentHTML('beforeend',
-      '<br><b style="color:var(--red)">⚠ 이 브라우저에서 IndexedDB를 열 수 없어 이미지 저장이 비활성화됩니다.</b> (' + err + ')');
-  }
+  restoreDir();
   if (!window.showDirectoryPicker) {
     document.getElementById('dirbtn').title = '이 브라우저는 폴더 직접 저장(File System Access API)을 지원하지 않아 일반 다운로드로 동작합니다 (Chrome/Edge 권장)';
   }
+  await loadFromR2();
 })();
 </script>
 </body>

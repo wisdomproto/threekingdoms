@@ -76,6 +76,9 @@ class PresenterDelegate implements Presenter {
   battleEnded(e: Ev<"battleEnded">): Promise<void> {
     return this.target?.battleEnded(e) ?? Promise.resolve();
   }
+  troopsHealed(e: Ev<"troopsHealed">): Promise<void> {
+    return this.target?.troopsHealed(e) ?? Promise.resolve();
+  }
   sync(state: BattleState): void {
     this.target?.sync(state);
   }
