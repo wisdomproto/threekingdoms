@@ -87,6 +87,32 @@ def _r2_delete(key):
         return False, str(e)
 
 
+def _rebuild_audio_manifest():
+    """assets/audio/sfx/ + bgm/ 스캔 → manifest.json 재생성 + R2 업로드."""
+    audio_pub = os.path.join(PUBLIC, "assets", "audio")
+    manifest = {"sfx": {}, "bgm": {}}
+    audio_exts = {".mp3", ".webm", ".ogg", ".wav", ".m4a", ".aac"}
+    for subdir, mkey in [("sfx", "sfx"), ("bgm", "bgm")]:
+        d = os.path.join(audio_pub, subdir)
+        if not os.path.isdir(d):
+            continue
+        for fname in sorted(os.listdir(d)):
+            stem, ext = os.path.splitext(fname)
+            if ext.lower() in audio_exts:
+                manifest[mkey][stem] = f"{subdir}/{fname}"
+    manifest_path = os.path.join(audio_pub, "manifest.json")
+    os.makedirs(audio_pub, exist_ok=True)
+    manifest_bytes = json.dumps(manifest, ensure_ascii=False, indent=2).encode()
+    with open(manifest_path, "wb") as f:
+        f.write(manifest_bytes)
+    r2_ok, r2_info = _r2_upload("assets/audio/manifest.json", manifest_bytes, "application/json")
+    sys.stdout.write(
+        f"[audio-manifest] sfx={len(manifest['sfx'])} bgm={len(manifest['bgm'])}"
+        + (f" R2({r2_info})" if r2_ok else f" (R2: {r2_info})") + "\n"
+    )
+    return {"ok": True, "sfx": len(manifest["sfx"]), "bgm": len(manifest["bgm"]), "r2": r2_ok}
+
+
 def _run_cut(sid, flip):
     """저장된 _posesheet.png 를 cut_posesheet.py 로 자동 컷(고정 3×3 + 선택 flip).
 
@@ -247,6 +273,13 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
                     return
             r2_ok, r2_info = _r2_delete(rel)
             self._json(200, {"ok": True, "path": rel, "local": deleted_local, "r2": r2_ok, "r2info": r2_info})
+            return
+        if endpoint == "/rebuild-audio-manifest":
+            try:
+                result = _rebuild_audio_manifest()
+                self._json(200, result)
+            except Exception as e:  # noqa: BLE001
+                self._json(500, {"ok": False, "error": str(e)})
             return
         if endpoint != "/save-asset":
             self._json(404, {"ok": False, "error": "unknown endpoint"})

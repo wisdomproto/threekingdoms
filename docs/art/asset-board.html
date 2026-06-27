@@ -89,6 +89,11 @@
   .cutbox { position: absolute; border: 2px solid var(--acc); background: rgba(212,168,67,.10); cursor: move; box-sizing: border-box; }
   .cutbox .lbl { position: absolute; top: -18px; left: -2px; font-size: 11px; color: #1a1407; background: var(--acc); padding: 0 5px; border-radius: 3px 3px 0 0; white-space: nowrap; }
   .cutbox .hd { position: absolute; right: -6px; bottom: -6px; width: 12px; height: 12px; background: var(--acc); border: 1px solid #1a1407; border-radius: 2px; cursor: nwse-resize; }
+  /* 오디오 카드 */
+  .thumb.audio-thumb { width: 220px; }
+  .thumb.audio-thumb audio { width: 100%; border-radius: 6px; border: 2px solid var(--line); display: block; background: var(--panel2); }
+  .thumb.audio-thumb.picked audio { border-color: var(--acc); box-shadow: 0 0 6px rgba(212,168,67,.5); }
+  .card.audio-card .drop { min-height: 60px; }
 </style>
 </head>
 <body>
@@ -1247,6 +1252,76 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
   });
 })();
 
+/* ── M. BGM / A. SFX 오디오 섹션 ─────────────────────────────────────────── */
+/* BGM: Suno/Udio 스타일 텍스트 프롬프트(태그+설명). 파일은 mp3/webm/ogg 등 중 택일.
+   SFX: ElevenLabs Sound Effects 스타일 설명(짧고 구체적). */
+
+SECTIONS.push({
+  id: 'BGM',
+  title: 'M. 배경음악 (BGM) — 5트랙',
+  desc: '프롬프트를 <b>Suno / Udio / 기타 AI 작곡 툴</b>에 붙여넣어 생성 → mp3·webm·ogg 중 하나를 이 카드에 드래그 또는 파일 선택 → 자동 저장(<code>assets/audio/bgm/{trackId}.{ext}</code>) + R2 + 매니페스트 자동 재빌드. 매니페스트가 갱신되면 게임이 코드 수정 없이 해당 트랙을 파일로 재생합니다(PROCEDURAL_BGM_ENABLED=false라 파일 없는 트랙은 무음).',
+  items: [
+    {
+      id: 'M-title', bgmTrack: 'title', title: '타이틀 화면 BGM',
+      note: '게임 시작 화면. 사색적·장중·수묵화 분위기.',
+      prompt: 'Chinese historical epic, instrumental, guqin and erhu melody, pipa plucking, bamboo flute accent, soft taiko brush drums, contemplative and majestic, Three Kingdoms atmosphere, 85 BPM, 4/4 time, seamless loop, no vocals, no western pop elements, muted earth tones, ink-wash mood',
+    },
+    {
+      id: 'M-menu', bgmTrack: 'menu', title: '메뉴·편성 화면 BGM',
+      note: '상점·편성·준비 화면. 따뜻하고 밝은 준비 분위기.',
+      prompt: 'Chinese historical, warm and bright, guqin solo lead, erhu harmony, gentle zheng plucking, light orchestral backing, tactical preparation mood, hopeful, 78 BPM, 3/4 time, seamless loop, no vocals, peaceful yet purposeful, East Asian folk instruments',
+    },
+    {
+      id: 'M-battle', bgmTrack: 'battle', title: '일반 전투 BGM',
+      note: '일반 전투 화면. 긴장·박진감·드라이빙 리듬.',
+      prompt: 'Chinese war epic, intense and driving, taiko percussion, erhu tension melody, pipa rapid plucking, bass drums, urgent battle rhythm, Three Kingdoms warfare, 118 BPM, 4/4 time, seamless loop, no vocals, no synth, orchestral Chinese instruments, cinematic battle',
+    },
+    {
+      id: 'M-battleBoss', bgmTrack: 'battleBoss', title: '보스·대전 BGM',
+      note: '보스전·주요 일기토 직전. 더 어둡고 위협적.',
+      prompt: 'Chinese epic battle, dark and ominous, massive taiko drums, deep brass, erhu high-tension tremolo, dark pipa, low drones, boss encounter atmosphere, dread and power, 128 BPM, 4/4 time, seamless loop, no vocals, heavy percussion, cinematic climax',
+    },
+    {
+      id: 'M-scene', bgmTrack: 'scene', title: '시나리오 씬 BGM',
+      note: '막간 시나리오 대화 씬. 조용하고 서사적.',
+      prompt: 'Chinese historical drama, ambient and quiet, solo guqin fingerpicking, soft erhu undertone, distant zheng harmonics, narrative storytelling mood, calm contemplation, 68 BPM, seamless loop, no vocals, minimal arrangement, ink-brush stillness, introspective',
+    },
+  ],
+});
+
+SECTIONS.push({
+  id: 'SFX',
+  title: 'A. 효과음 (SFX) — 21종',
+  desc: 'ElevenLabs Sound Effects(또는 유사 툴)에 프롬프트 입력 → wav·mp3·webm 중 하나를 카드에 드래그 → <code>assets/audio/sfx/{key}.{ext}</code> 자동 저장 + 매니페스트 재빌드. 파일 없는 키는 절차적 합성(synth.ts) 폴백.',
+  items: [
+    // UI
+    { id: 'A-click',     sfxKey: 'click',     title: 'UI 클릭',      note: '버튼 탭. 짧고 경쾌.', prompt: 'A crisp soft wooden tap UI button click sound, very short 0.08 seconds, clean and subtle' },
+    { id: 'A-confirm',   sfxKey: 'confirm',   title: 'UI 확인',      note: '선택 확정. 따뜻한 긍정음.', prompt: 'A warm positive confirmation chime, gentle bell tone, short 0.3 seconds, pleasant and reassuring' },
+    { id: 'A-cancel',    sfxKey: 'cancel',    title: 'UI 취소',      note: '취소/뒤로. 가볍게 꺼지는 느낌.', prompt: 'A soft muted cancel sound effect, short downward click, 0.2 seconds, subtle and understated' },
+    // 전투 타격
+    { id: 'A-slash',     sfxKey: 'slash',     title: '베기(참격)',    note: '검·도끼 베기 효과.', prompt: 'A sharp sword slash whoosh through air, metallic swipe, 0.35 seconds, crisp and powerful' },
+    { id: 'A-pierce',    sfxKey: 'pierce',    title: '관통(궁병·창)',  note: '화살·창 꽂히는 소리.', prompt: 'An arrow piercing impact thwack into target, sharp and short, 0.25 seconds, precise hit sound' },
+    { id: 'A-hit',       sfxKey: 'hit',       title: '타격(둔기·보병)', note: '둔탁한 물리 피격음.', prompt: 'A blunt weapon impact hit sound, dull heavy thud, 0.3 seconds, solid and impactful' },
+    { id: 'A-crit',      sfxKey: 'crit',      title: '회심타',        note: '크리티컬 히트. 강렬한 금속음.', prompt: 'A critical hit powerful metal clash impact, loud punchy clash of swords, 0.5 seconds, dramatic and satisfying' },
+    { id: 'A-ultimate',  sfxKey: 'ultimate',  title: '필살기',        note: '필살 게이지 발동. 에너지 폭발.', prompt: 'An ultimate ability energy burst activation, dramatic swoosh and powerful impact, 1.0 seconds, epic and weighty' },
+    { id: 'A-defeat',    sfxKey: 'defeat',    title: '격파',          note: '유닛 사망·퇴각.', prompt: 'A unit defeated short downward tone, brief descending chime with thud, 0.4 seconds, somber finality' },
+    // 책략·연출
+    { id: 'A-spell',     sfxKey: 'spell',     title: '책략 발동',     note: '책략·마법 시전음.', prompt: 'A mystical spell cast magical whoosh with shimmering chime, 0.6 seconds, ethereal and powerful' },
+    { id: 'A-flank',     sfxKey: 'flank',     title: '협공',          note: '측면 협공 보너스 발동.', prompt: 'A quick cavalry flanking rush sound, multiple hooves rushing, short burst 0.5 seconds, dynamic and urgent' },
+    { id: 'A-combo',     sfxKey: 'combo',     title: '콤보',          note: '연속 격파 콤보 누적.', prompt: 'A satisfying combo streak notification sound, cascading multi-hit chimes ascending, 0.5 seconds, rewarding and bright' },
+    { id: 'A-duel',      sfxKey: 'duel',      title: '일기토 발동',   note: '일기토 시작 알림.', prompt: 'A dramatic duel initiation sound, ringing sword clash meeting, 0.65 seconds, tense and theatrical' },
+    { id: 'A-reinforce', sfxKey: 'reinforce', title: '증원 도착',     note: '증원 부대 합류.', prompt: 'Reinforcement troops arriving fanfare, short trumpet call with marching drum, 0.8 seconds, triumphant and urgent' },
+    { id: 'A-phase',     sfxKey: 'phase',     title: '턴 페이즈 전환', note: '아군→적군 턴 전환.', prompt: 'A turn phase change whoosh transition sound, smooth sweep left to right, 0.4 seconds, clean and clear' },
+    // 결산·보상
+    { id: 'A-star',      sfxKey: 'star',      title: '스타 획득',     note: '결산 별점 표시.', prompt: 'A star rating achievement shimmering sound, bright sparkling ascending bells, 0.8 seconds, glittery and satisfying' },
+    { id: 'A-chest',     sfxKey: 'chest',     title: '상자 개봉',     note: '보물 상자 오픈.', prompt: 'A treasure chest opening sound, wooden creak followed by magical shimmer, 0.75 seconds, discovery and delight' },
+    { id: 'A-coin',      sfxKey: 'coin',      title: '코인 드랍',     note: '격파 보상 코인 팝.', prompt: 'Multiple gold coins dropping and jingling on surface, 0.5 seconds, bright metallic clink cluster' },
+    { id: 'A-levelup',   sfxKey: 'levelup',   title: '레벨업',        note: '경험치 레벨업.', prompt: 'A level up fanfare ascending arpeggio, triumphant bright chime melody, 1.0 seconds, celebratory and uplifting' },
+    { id: 'A-victory',   sfxKey: 'victory',   title: '전투 승리',     note: '스테이지 클리어.', prompt: 'A battle victory fanfare, triumphant Chinese orchestral flourish with taiko drums and erhu, 2.0 seconds, glorious' },
+    { id: 'A-lose',      sfxKey: 'lose',      title: '전투 패배',     note: '스테이지 실패.', prompt: 'A battle defeat somber sound, descending minor melody with low drum, 1.5 seconds, melancholic and weighty' },
+  ],
+});
+
 /* ───────────────────────── 상태/저장 ───────────────────────── */
 
 const varState = JSON.parse(localStorage.getItem('ab_vars') || '{}');
@@ -1553,6 +1628,9 @@ function buildPrompt(item) {
     parts.push(VFX_PREFIX);
     parts.push(body);
     parts.push(NEGATIVE);
+  } else if (item.bgmTrack || item.sfxKey) {
+    /* 오디오 카드: 프롬프트 원문 그대로(이미지 스타일 불필요). */
+    parts.push(body);
   } else {
     parts.push(STYLE);
     parts.push(COMMON);
@@ -1575,6 +1653,7 @@ const TAB_DEFS = [
   { id: 'ui',      label: 'UI',             secs: ['D','L'] },
   { id: 'effect',  label: '이펙트',         secs: ['C'] },
   { id: 'terrain', label: '지형·바닥',      secs: ['E','K'] },
+  { id: 'audio',   label: '🔊 오디오',      secs: ['BGM','SFX'] },
   // 전신레퍼·적전신·병종SD(구)·무기스킨·일기토키프레임·리그파츠 탭은 v1 불필요라 제거(섹션 정의는 코드에 남김).
 ];
 
@@ -1607,6 +1686,8 @@ function cardGamePaths(item) {
   if (item.portraitSheet && item.portraitGroup) return [`assets/ui/portraits/_sheet_${item.portraitGroup}.png`];
   if (item.itemSheet && item.itemGroup) return [`assets/ui/items/_sheet_${item.itemGroup}.png`];
   if (item.poseSheet && item.charId) return [`assets/sprites/${item.charId}/_posesheet.png`];
+  if (item.bgmTrack) return ['mp3','webm','ogg','m4a','wav'].map(e => `assets/audio/bgm/${item.bgmTrack}.${e}`);
+  if (item.sfxKey)   return ['mp3','webm','ogg','m4a','wav'].map(e => `assets/audio/sfx/${item.sfxKey}.${e}`);
   return [];
 }
 
@@ -1628,6 +1709,7 @@ async function loadFromR2() {
   for (const section of SECTIONS) {
     for (const item of section.items) {
       const paths = cardGamePaths(item);
+      const isAudioCard = !!(item.bgmTrack || item.sfxKey);
       if (paths.length) {
         for (const gp of paths) {
           const blob = await fetchAsset(gp);
@@ -1635,6 +1717,7 @@ async function loadFromR2() {
             const rec = { card: item.id, blob, name: gp.split('/').pop(), pick: 0, at: 0, gamePath: gp };
             imAdd(rec);
             loaded++;
+            if (isAudioCard) break; // 확장자 여러 개 중 첫 히트만
           }
         }
       } else {
@@ -1683,7 +1766,8 @@ function renderBoard() {
   for (const sec of visibleSecs) {
     html += `<h2 class="sec">${sec.title}</h2><p class="secdesc">${sec.desc}</p><div class="grid">`;
     for (const it of sec.items) {
-      html += `<div class="card" id="card-${it.id}">
+      const _audioCard = !!(it.bgmTrack || it.sfxKey);
+      html += `<div class="card${_audioCard ? ' audio-card' : ''}" id="card-${it.id}">
         <h3><span class="pid">${it.id}</span> ${it.title} ${it.multi ? `<span class="multi">${it.multi}</span>` : ''}</h3>
         ${it.note ? `<div class="note">${it.note}</div>` : ''}
         ${portraitMembersHtml(it)}`;
@@ -1717,7 +1801,7 @@ function renderBoard() {
         </div>
         ${it.poseSheet && it.roster ? `<div class="existing" data-existing="${it.id}"></div>` : ''}
         <div class="drop" tabindex="0" data-drop="${it.id}">
-          <span class="hint">클릭 후 Ctrl+V 로 생성 결과 붙여넣기 (드래그&드롭 가능)</span>
+          <span class="hint">${_audioCard ? '파일 선택 버튼 또는 드래그&드롭으로 오디오 파일 추가' : '클릭 후 Ctrl+V 로 생성 결과 붙여넣기 (드래그&드롭 가능)'}</span>
         </div>
       </div>`;
     }
@@ -1845,11 +1929,15 @@ const blobUrls = new Map();
 
 function thumbNode(rec) {
   const div = document.createElement('div');
-  div.className = 'thumb' + (rec.pick ? ' picked' : '');
+  const isAudio = rec.blob && rec.blob.type.startsWith('audio/');
+  div.className = 'thumb' + (isAudio ? ' audio-thumb' : '') + (rec.pick ? ' picked' : '');
   div.dataset.imgid = rec.id;
   let url = blobUrls.get(rec.id);
   if (!url) { url = URL.createObjectURL(rec.blob); blobUrls.set(rec.id, url); }
-  div.innerHTML = `<img src="${url}" title="${rec.name}">
+  const inner = isAudio
+    ? `<audio controls src="${url}" title="${rec.name}"></audio>`
+    : `<img src="${url}" title="${rec.name}">`;
+  div.innerHTML = inner + `
     <div class="ops">
       <button class="pk" title="픽 토글">★</button>
       <button class="dl" title="다운로드">⬇</button>
@@ -1938,6 +2026,51 @@ async function addImageToCard(cardId, blob) {
   }
 }
 
+/* 오디오 blob → 확장자 추출. MIME type→ext 정규화 포함. */
+const AUDIO_EXT_MAP = { mpeg: 'mp3', 'x-wav': 'wav', 'x-m4a': 'm4a', mp4: 'm4a' };
+function audioExt(blob) {
+  if (blob.name) { const p = blob.name.split('.').pop().toLowerCase(); if (p && p.length <= 5) return p; }
+  const sub = (blob.type || 'audio/mp3').split('/')[1] || 'mp3';
+  return AUDIO_EXT_MAP[sub] || sub;
+}
+
+async function addAudioToCard(cardId, blob) {
+  const item = findItem(cardId);
+  const ext = audioExt(blob);
+  let gamePath, name;
+  if (item && item.bgmTrack) {
+    name = `${item.bgmTrack}.${ext}`;
+    gamePath = `assets/audio/bgm/${name}`;
+  } else if (item && item.sfxKey) {
+    name = `${item.sfxKey}.${ext}`;
+    gamePath = `assets/audio/sfx/${name}`;
+  } else {
+    const safe = (blob.name || cardId).replace(/[^\w.\-]/g, '_');
+    gamePath = `assets/_board_dump/${cardId}/${safe}`;
+    name = safe;
+  }
+  /* 같은 카드의 기존 오디오 썸은 1개만 유지(확장자가 바뀌면 예전 파일 대체). */
+  document.querySelectorAll(`#card-${CSS.escape(cardId)} .drop .audio-thumb`).forEach(t => {
+    const r = imGet(+t.dataset.imgid); if (r) imDel(r.id); t.remove();
+  });
+  const rec = { card: cardId, blob, name, pick: 0, at: Date.now(), gamePath };
+  imAdd(rec);
+  document.querySelector(`#card-${CSS.escape(cardId)} .drop`).appendChild(thumbNode(rec));
+  updateProgress();
+  try {
+    const res = await applyToGame(gamePath, blob);
+    let mNote = '';
+    try {
+      const mr = await fetch('/rebuild-audio-manifest', { method: 'POST' });
+      const mj = mr.ok ? await mr.json() : null;
+      mNote = mj ? ` — 매니페스트 재빌드(sfx:${mj.sfx} bgm:${mj.bgm}${mj.r2 ? '+R2' : ''})` : '';
+    } catch { mNote = ' — 매니페스트 갱신 실패(serve.py 확인)'; }
+    toast(`🎵 ${name} 저장${res.r2 ? '+R2' : ''}${mNote}`);
+  } catch(e) {
+    toast(`${name} 저장 실패: ${e.message} (:8080 서버 확인)`);
+  }
+}
+
 /* 탭 전환 후 현재 탭 카드에 인메모리 이미지 다시 붙이기 */
 function loadImagesForCurrentTab() {
   const recs = imAll().sort((a, b) => a.at - b.at);
@@ -1953,7 +2086,7 @@ function updateProgress() {
   const all = imAll();
   const doneCards = new Set(all.map(r => r.card));
   const done = doneCards.size;
-  document.getElementById('progress').textContent = `이미지 있는 카드: ${done}/${total}`;
+  document.getElementById('progress').textContent = `에셋 있는 카드: ${done}/${total}`;
   document.querySelectorAll('.card').forEach(c => {
     const hasPick = all.some(r => r.card === c.id.replace('card-', '') && r.pick);
     c.classList.toggle('haspick', hasPick);
@@ -2004,9 +2137,11 @@ board.addEventListener('click', async e => {
   }
   const fb = e.target.closest('button[data-file]');
   if (fb) {
+    const _item = findItem(fb.dataset.file);
+    const _isAudio = !!(_item && (_item.bgmTrack || _item.sfxKey));
     const inp = document.createElement('input');
-    inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
-    inp.onchange = () => { for (const f of inp.files) addImageToCard(fb.dataset.file, f); };
+    inp.type = 'file'; inp.accept = _isAudio ? 'audio/*' : 'image/*'; inp.multiple = !_isAudio;
+    inp.onchange = () => { for (const f of inp.files) (_isAudio ? addAudioToCard : addImageToCard)(fb.dataset.file, f); };
     inp.click();
     return;
   }
@@ -2080,13 +2215,16 @@ document.getElementById('lightbox').addEventListener('click', e => e.currentTarg
 document.addEventListener('paste', e => {
   const dz = document.activeElement.closest?.('.drop') || document.querySelector('.drop.armed');
   if (!dz) return;
+  const _item = findItem(dz.dataset.drop);
+  const _isAudio = !!(_item && (_item.bgmTrack || _item.sfxKey));
   const items = e.clipboardData?.items || [];
   let got = false;
   for (const it of items) {
-    if (it.type.startsWith('image/')) { addImageToCard(dz.dataset.drop, it.getAsFile()); got = true; }
+    if (_isAudio && it.type.startsWith('audio/')) { addAudioToCard(dz.dataset.drop, it.getAsFile()); got = true; }
+    else if (!_isAudio && it.type.startsWith('image/')) { addImageToCard(dz.dataset.drop, it.getAsFile()); got = true; }
   }
   if (got) e.preventDefault();
-  else toast('클립보드에 이미지가 없습니다 — 이미지를 "복사"한 뒤 시도하세요');
+  else toast(_isAudio ? '클립보드에 오디오가 없습니다 — 파일 버튼으로 선택하세요' : '클립보드에 이미지가 없습니다 — 이미지를 "복사"한 뒤 시도하세요');
 });
 
 board.addEventListener('dragover', e => { const dz = e.target.closest('.drop'); if (dz) { e.preventDefault(); dz.classList.add('dragover'); } });
@@ -2095,7 +2233,12 @@ board.addEventListener('drop', e => {
   const dz = e.target.closest('.drop');
   if (!dz) return;
   e.preventDefault(); dz.classList.remove('dragover');
-  for (const f of e.dataTransfer.files) if (f.type.startsWith('image/')) addImageToCard(dz.dataset.drop, f);
+  const _item = findItem(dz.dataset.drop);
+  const _isAudio = !!(_item && (_item.bgmTrack || _item.sfxKey));
+  for (const f of e.dataTransfer.files) {
+    if (_isAudio && f.type.startsWith('audio/')) addAudioToCard(dz.dataset.drop, f);
+    else if (!_isAudio && f.type.startsWith('image/')) addImageToCard(dz.dataset.drop, f);
+  }
 });
 
 let toastTimer = null;
