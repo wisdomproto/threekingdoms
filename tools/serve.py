@@ -64,6 +64,29 @@ def _r2_upload(key, data, content_type):
         return False, str(e)
 
 
+def _r2_delete(key):
+    """R2에서 단일 객체 삭제. 성공 True / 미설정·실패 False(+사유 반환)."""
+    env = _load_r2_env()
+    need = ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET"]
+    if not all(env.get(k) for k in need):
+        return False, "R2 미설정(.env.r2)"
+    try:
+        import boto3
+        from botocore.config import Config
+    except ImportError:
+        return False, "boto3 미설치"
+    try:
+        s3 = boto3.client(
+            "s3", endpoint_url=f"https://{env['R2_ACCOUNT_ID']}.r2.cloudflarestorage.com",
+            aws_access_key_id=env["R2_ACCESS_KEY_ID"], aws_secret_access_key=env["R2_SECRET_ACCESS_KEY"],
+            config=Config(signature_version="s3v4", region_name="auto"),
+        )
+        s3.delete_object(Bucket=env["R2_BUCKET"], Key=key)
+        return True, env["R2_BUCKET"]
+    except Exception as e:  # noqa: BLE001
+        return False, str(e)
+
+
 def _run_cut(sid, flip):
     """저장된 _posesheet.png 를 cut_posesheet.py 로 자동 컷(고정 3×3 + 선택 flip).
 
@@ -162,21 +185,70 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
                       if f.lower().endswith(".webp")]
         return {"sprites": sorted(sprites), "portraits": sorted(portraits), "scenes": sorted(scenes)}
 
+    def _list_dir(self, rel_path):
+        """PUBLIC 하위 또는 _board_dump 하위 파일 목록(JSON 배열). 상위 탈출 금지."""
+        rel = rel_path.replace("\\", "/").lstrip("/")
+        if ".." in rel.split("/"):
+            return None, "허용되지 않은 경로"
+        # assets/ 하위만 허용
+        if not rel.startswith("assets/"):
+            return None, "assets/ 하위만 허용"
+        full = os.path.join(PUBLIC, *rel.split("/"))
+        if not os.path.isdir(full):
+            return [], None
+        files = sorted(f for f in os.listdir(full) if os.path.isfile(os.path.join(full, f)))
+        return files, None
+
     def do_GET(self):  # noqa: N802
         if self.path.split("?")[0] == "/asset-status":
             self._json(200, self._asset_status())
+            return
+        if self.path.startswith("/list-dir"):
+            from urllib.parse import urlparse, parse_qs
+            qs = parse_qs(urlparse(self.path).query)
+            path = (qs.get("path") or [""])[0]
+            files, err = self._list_dir(path)
+            if err:
+                self._json(400, {"ok": False, "error": err})
+            else:
+                self._json(200, {"ok": True, "files": files})
             return
         super().do_GET()
 
     def do_OPTIONS(self):  # noqa: N802 — CORS 프리플라이트
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "POST, DELETE, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
     def do_POST(self):  # noqa: N802
-        if self.path.split("?")[0] != "/save-asset":
+        endpoint = self.path.split("?")[0]
+        if endpoint == "/delete-asset":
+            try:
+                length = int(self.headers.get("Content-Length", 0))
+                payload = json.loads(self.rfile.read(length).decode("utf-8"))
+                rel = (payload.get("path") or "").replace("\\", "/").lstrip("/")
+            except Exception as e:  # noqa: BLE001
+                self._json(400, {"ok": False, "error": f"잘못된 요청: {e}"})
+                return
+            if not rel.startswith("assets/") or ".." in rel.split("/"):
+                self._json(400, {"ok": False, "error": f"허용되지 않은 경로: {rel}"})
+                return
+            dest = os.path.join(PUBLIC, *rel.split("/"))
+            deleted_local = False
+            if os.path.isfile(dest):
+                try:
+                    os.remove(dest)
+                    deleted_local = True
+                    sys.stdout.write(f"[delete-asset] {rel} 로컬 삭제\n")
+                except Exception as e:  # noqa: BLE001
+                    self._json(500, {"ok": False, "error": f"로컬 삭제 실패: {e}"})
+                    return
+            r2_ok, r2_info = _r2_delete(rel)
+            self._json(200, {"ok": True, "path": rel, "local": deleted_local, "r2": r2_ok, "r2info": r2_info})
+            return
+        if endpoint != "/save-asset":
             self._json(404, {"ok": False, "error": "unknown endpoint"})
             return
         try:

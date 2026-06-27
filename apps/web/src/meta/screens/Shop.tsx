@@ -15,7 +15,6 @@
 import { useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 import type { Shop as ShopData, Item } from "@tk/data";
-import { PANEL_FRAME } from "../../battle/hud/frames";
 import { getMeta, spendGold, addItem, addGold, canWatchGoldAd, recordAdGold } from "../metaStore";
 import { RewardedAdButton } from "../RewardedAdButton";
 import { buildShopRows, buildShopGroups, type ShopRow } from "./shopItemView";
@@ -40,14 +39,24 @@ export interface ShopProps {
   onPurchase?: (itemId: string) => void;
 }
 
-// --- 청동+수묵 팔레트(frames.ts 톤과 일치, 막간 화면 공용) ---
+// --- 양피지+목재 팔레트 (Formation.tsx 일치) ---
 const C = {
-  ink: "#e8e0cf", // 본문 글자(낡은 종이톤)
-  inkDim: "#9aa3ad", // 보조 글자
-  bronze: "#c9a24b", // 강조(가격/제목)
-  bg: "rgba(20,18,14,0.55)", // 패널 안쪽 어둠
-  rowBg: "rgba(40,34,24,0.5)",
-  rowOwned: "rgba(70,58,30,0.55)",
+  parchment: "#ede4cc",
+  parchmentWarm: "#f5edd8",
+  parchmentDark: "#d4c4a0",
+  parchmentShadow: "#c8b890",
+  wood: "#1e1408",
+  woodMid: "#3a2410",
+  gold: "#c8a440",
+  goldBright: "#e0b840",
+  goldDim: "#8a6a28",
+  goldGlow: "rgba(200,164,64,0.18)",
+  darkText: "#1a1008",
+  mutedText: "#5a4a30",
+  dimText: "#8a7850",
+  rowBg: "rgba(255,248,224,0.55)",
+  rowOwned: "rgba(220,200,120,0.35)",
+  rowBorder: "rgba(200,164,64,0.25)",
 };
 
 export function Shop({
@@ -87,38 +96,43 @@ export function Shop({
 
   return (
     <section style={panelStyle} aria-label="상점">
-      <header style={headerStyle}>
+      {/* 목재 제목 바 */}
+      <div style={titleBarStyle}>
+        <span style={shopIconStyle}>⚖</span>
         <h2 style={titleStyle}>{shop.name}</h2>
         <div style={headerRightStyle}>
-          {/* 광고 보고 +골드(§13 shop_gold) — adFree면 RewardedAdButton이 null 반환(미표시).
-              완주 시 *확정* 소액 골드 충전, 일일 캡 도달 시 "오늘 마감"으로 비활성. */}
           <RewardedAdButton
             placement="shop_gold"
-            label={`광고 보고 +${AD_GOLD_REWARD}골드`}
+            label={`+${AD_GOLD_REWARD}냥`}
             capReached={!canWatchGoldAd()}
             onReward={handleAdGold}
           />
           <span style={goldStyle} aria-label="보유 자금">
-            <span style={{ color: C.inkDim, fontSize: 12, marginRight: 4 }}>자금</span>
+            <span style={goldLabelStyle}>자금</span>
             {gold.toLocaleString()}
+            <span style={goldUnitStyle}>냥</span>
           </span>
         </div>
-      </header>
+      </div>
 
-      {rows.length === 0 ? (
-        <p style={{ color: C.inkDim, margin: "8px 4px" }}>진열 중인 물품이 없습니다.</p>
-      ) : (
-        buildShopGroups(rows).map((group) => (
-          <div key={group.category} style={{ marginBottom: 10 }}>
-            <div style={groupHeaderStyle}>{group.label}</div>
-            <ul style={listStyle}>
-              {group.rows.map((row) => (
-                <ShopRowView key={row.itemId} row={row} onBuy={() => handleBuy(row)} />
-              ))}
-            </ul>
-          </div>
-        ))
-      )}
+      <div style={bodyStyle}>
+        {rows.length === 0 ? (
+          <p style={{ color: C.mutedText, margin: "8px 4px", fontStyle: "italic" }}>
+            진열 중인 물품이 없습니다.
+          </p>
+        ) : (
+          buildShopGroups(rows).map((group) => (
+            <div key={group.category} style={{ marginBottom: 12 }}>
+              <div style={groupHeaderStyle}>{group.label}</div>
+              <ul style={listStyle}>
+                {group.rows.map((row) => (
+                  <ShopRowView key={row.itemId} row={row} onBuy={() => handleBuy(row)} />
+                ))}
+              </ul>
+            </div>
+          ))
+        )}
+      </div>
     </section>
   );
 }
@@ -134,79 +148,113 @@ function ShopRowView({
     display: "flex",
     alignItems: "center",
     gap: 10,
-    padding: "8px 10px",
+    padding: "9px 10px",
     borderRadius: 6,
     background: row.owned > 0 ? C.rowOwned : C.rowBg,
+    border: `1px solid ${row.owned > 0 ? C.gold + "55" : C.rowBorder}`,
   };
   return (
     <li style={rowStyle}>
-      <ItemIcon itemId={row.itemId} category={row.category} size={36} />
-      <span style={badgeStyle}>{row.categoryLabel}</span>
+      <ItemIcon
+        itemId={row.itemId}
+        category={row.category}
+        size={44}
+        style={{ borderRadius: 6, border: `1px solid ${C.goldDim}55` }}
+      />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ color: C.ink, fontWeight: 600, fontSize: 15 }}>
-          {row.name}
+        <div style={{ display: "flex", alignItems: "baseline", gap: 6, flexWrap: "wrap" }}>
+          <span style={{ color: C.darkText, fontWeight: 700, fontSize: 14 }}>{row.name}</span>
+          <span style={badgeStyle}>{row.categoryLabel}</span>
           {row.owned > 0 && (
-            <span style={ownedTagStyle}>보유 {row.owned > 1 ? `×${row.owned}` : ""}</span>
+            <span style={ownedTagStyle}>보유{row.owned > 1 ? ` ×${row.owned}` : ""}</span>
           )}
         </div>
-        <div style={{ color: C.inkDim, fontSize: 12 }}>
+        <div style={{ color: C.mutedText, fontSize: 11, marginTop: 2 }}>
           {row.effect}
-          {row.consumable && <span style={{ marginLeft: 6, opacity: 0.7 }}>· 소모품</span>}
+          {row.consumable && <span style={{ marginLeft: 5, opacity: 0.7 }}>· 소모품</span>}
         </div>
       </div>
-      <span style={priceStyle} aria-label="가격">
-        {row.price.toLocaleString()}
-      </span>
-      <button
-        type="button"
-        onClick={onBuy}
-        disabled={!row.affordable}
-        style={buyBtnStyle(row.affordable)}
-        aria-label={`${row.name} 구매`}
-      >
-        {row.affordable ? "구매" : "자금 부족"}
-      </button>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+        <span style={priceStyle} aria-label="가격">
+          {row.price.toLocaleString()}
+          <span style={{ fontSize: 11, marginLeft: 2 }}>냥</span>
+        </span>
+        <button
+          type="button"
+          onClick={onBuy}
+          disabled={!row.affordable}
+          style={buyBtnStyle(row.affordable)}
+          aria-label={`${row.name} 구매`}
+        >
+          {row.affordable ? "구매" : "부족"}
+        </button>
+      </div>
     </li>
   );
 }
 
 // --- 스타일 ---
 const panelStyle: CSSProperties = {
-  ...PANEL_FRAME,
-  background: C.bg,
-  backgroundClip: "padding-box",
-  padding: 14,
-  color: C.ink,
+  background: `linear-gradient(150deg, ${C.parchmentWarm} 0%, ${C.parchment} 100%)`,
+  borderRadius: 8,
+  overflow: "hidden",
+  border: `2px solid ${C.woodMid}`,
+  boxShadow: `0 4px 16px rgba(0,0,0,0.45), inset 0 1px 0 ${C.goldBright}33`,
+  color: C.darkText,
 };
 
-const headerStyle: CSSProperties = {
+const titleBarStyle: CSSProperties = {
   display: "flex",
   alignItems: "center",
-  justifyContent: "space-between",
-  marginBottom: 10,
   gap: 8,
+  padding: "10px 14px",
+  background: `linear-gradient(90deg, ${C.wood} 0%, ${C.woodMid} 100%)`,
+  borderBottom: `2px solid ${C.gold}`,
   flexWrap: "wrap",
 };
 
-// 제목 우측: [광고 보고 +골드] 버튼 + 보유 자금. 좁은 폭에서 줄바꿈 허용.
-const headerRightStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 12,
+const shopIconStyle: CSSProperties = {
+  fontSize: 18,
+  color: C.gold,
+  lineHeight: 1,
 };
 
 const titleStyle: CSSProperties = {
   margin: 0,
-  fontSize: 18,
-  color: C.bronze,
-  letterSpacing: "0.04em",
+  flex: 1,
+  fontSize: 16,
+  fontWeight: 700,
+  color: C.gold,
+  letterSpacing: "0.06em",
+};
+
+const headerRightStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+};
+
+const goldLabelStyle: CSSProperties = {
+  color: C.goldDim,
+  fontSize: 11,
+  marginRight: 3,
+};
+
+const goldUnitStyle: CSSProperties = {
+  fontSize: 11,
+  marginLeft: 2,
+  color: C.goldDim,
 };
 
 const goldStyle: CSSProperties = {
-  color: C.bronze,
+  color: C.goldBright,
   fontVariantNumeric: "tabular-nums",
   fontWeight: 700,
-  fontSize: 16,
+  fontSize: 15,
+};
+
+const bodyStyle: CSSProperties = {
+  padding: "12px 14px 14px",
 };
 
 const listStyle: CSSProperties = {
@@ -219,53 +267,53 @@ const listStyle: CSSProperties = {
 };
 
 const groupHeaderStyle: CSSProperties = {
-  fontSize: 11,
-  color: C.bronze,
-  letterSpacing: "0.08em",
-  padding: "4px 2px",
-  marginBottom: 2,
-  borderBottom: "1px solid rgba(202,168,106,0.2)",
+  fontSize: 10,
+  fontWeight: 700,
+  color: C.woodMid,
+  letterSpacing: "0.12em",
+  padding: "3px 2px",
+  marginBottom: 4,
+  borderBottom: `1px solid ${C.gold}55`,
+  textTransform: "uppercase" as const,
 };
 
 const badgeStyle: CSSProperties = {
-  flex: "0 0 auto",
-  fontSize: 11,
-  color: C.ink,
-  background: "rgba(0,0,0,0.35)",
-  border: `1px solid ${C.bronze}`,
-  borderRadius: 4,
-  padding: "2px 6px",
-  whiteSpace: "nowrap",
+  fontSize: 10,
+  color: C.mutedText,
+  background: `${C.parchmentDark}cc`,
+  border: `1px solid ${C.goldDim}55`,
+  borderRadius: 3,
+  padding: "1px 5px",
+  whiteSpace: "nowrap" as const,
 };
 
 const ownedTagStyle: CSSProperties = {
-  marginLeft: 8,
   fontSize: 11,
-  fontWeight: 400,
-  color: C.bronze,
+  fontWeight: 600,
+  color: C.gold,
 };
 
 const priceStyle: CSSProperties = {
-  flex: "0 0 auto",
-  color: C.bronze,
+  color: C.darkText,
   fontVariantNumeric: "tabular-nums",
-  fontWeight: 600,
+  fontWeight: 700,
   fontSize: 14,
-  minWidth: 48,
-  textAlign: "right",
+  textAlign: "right" as const,
+  lineHeight: 1,
 };
 
 function buyBtnStyle(enabled: boolean): CSSProperties {
   return {
-    flex: "0 0 auto",
-    fontSize: 13,
-    fontWeight: 600,
-    padding: "6px 12px",
-    borderRadius: 6,
-    border: `1px solid ${enabled ? C.bronze : "#555"}`,
-    background: enabled ? "rgba(201,162,75,0.18)" : "rgba(60,60,60,0.3)",
-    color: enabled ? C.bronze : "#777",
+    fontSize: 12,
+    fontWeight: 700,
+    padding: "5px 10px",
+    borderRadius: 5,
+    border: `1px solid ${enabled ? C.gold : C.parchmentShadow}`,
+    background: enabled
+      ? `linear-gradient(180deg, ${C.goldBright}cc 0%, ${C.gold}cc 100%)`
+      : `${C.parchmentDark}88`,
+    color: enabled ? C.wood : C.dimText,
     cursor: enabled ? "pointer" : "not-allowed",
-    whiteSpace: "nowrap",
+    whiteSpace: "nowrap" as const,
   };
 }
