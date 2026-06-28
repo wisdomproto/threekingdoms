@@ -24,6 +24,8 @@ export const SFX = {
   crit: "crit",
   ultimate: "ultimate",
   defeat: "defeat",
+  // 이동
+  step: "step",
   // 책략/연출
   spell: "spell",
   flank: "flank",

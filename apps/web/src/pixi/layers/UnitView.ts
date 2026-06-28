@@ -28,6 +28,7 @@ export type UnitSequence = "idle" | "move" | "attack" | "hit" | "retreat";
 
 const BAR_WIDTH = UNIT_BASE_SIZE;
 const BAR_HEIGHT = 5;
+const SP_BAR_HEIGHT = 3; // 필살 게이지 바(병력 바 아래, 더 얇게)
 const MOVE_MS_PER_TILE = 150; // 설계 §6: unitMoved는 경로 타일당 150ms
 const ATTACK_MS = 260; // 앤티시페이션+오버슈트+복귀 재배분 여유로 약간 늘림
 const HIT_MS = 200;
@@ -58,6 +59,9 @@ export interface UnitViewInit {
   troops: number;
   maxTroops: number;
   retreated: boolean;
+  /** 필살 게이지(미지정/maxSp=0이면 SP 바 미표시). */
+  sp?: number;
+  maxSp?: number;
 }
 
 export class UnitView extends Container {
@@ -83,6 +87,13 @@ export class UnitView extends Container {
 
   private readonly barFill: Graphics;
   private readonly barBg: Graphics;
+  /** 필살 게이지(SP) 바 — 병력 바 아래, 파랑. 가득 차면 발광 펄스. */
+  private readonly spBarFill: Graphics;
+  private readonly spBarBg: Graphics;
+  private sp = 0;
+  private maxSp = 0;
+  private spReady = false;
+  private spPulse = 0;
   private readonly nameLabel: Text;
   private readonly tweens: TweenRunner;
   private readonly textures: TextureResolver;
@@ -167,6 +178,15 @@ export class UnitView extends Container {
     this.barFill = new Graphics();
     this.addChild(this.barFill);
 
+    // ── 필살 게이지 SP 바 (병력 바 아래, 파랑 — 가득 차면 발광 펄스) ──
+    this.spBarBg = new Graphics();
+    this.spBarBg.rect(0, 0, BAR_WIDTH, SP_BAR_HEIGHT).fill(0x16202e);
+    this.addChild(this.spBarBg);
+    this.spBarFill = new Graphics();
+    this.addChild(this.spBarFill);
+    this.sp = init.sp ?? 0;
+    this.maxSp = init.maxSp ?? 0;
+
     // ── 장수명 라벨 (기본 숨김 — 선택 시에만 표시) ──
     this.nameLabel = new Text({
       text: init.name,
@@ -187,6 +207,7 @@ export class UnitView extends Container {
     this.applySpriteTexture("front", "idle");
 
     this.redrawBar();
+    this.redrawSpBar();
     this.repositionUI();
     this.snapTo(init.x, init.y);
     this.setRetreated(init.retreated);
@@ -280,13 +301,13 @@ export class UnitView extends Container {
   }
 
   /** baseScale × facing × 호흡 변위를 spriteBase에 반영.
-   *  idle/move 아트는 좌향(left-facing)이라 facing=+1(우향)일 때 미러(scale.x<0) → -facing.
-   *  attack 아트는 우향으로 그려져 있어 부호가 반대 → +facing (적이 왼쪽이면 좌로 휘두름). */
+   *  SD 아트는 전 포즈 좌향(screen-left, §4 생성 규약)이라 facing=+1(우향)일 때 미러(scale.x<0) → -facing.
+   *  (idle/move/attack 동일 — 종전 attack만 +facing은 "우향 그림" 옛 가정 잔재로 공격이 반대로 나왔음.) */
   private applyScale(): void {
     if (this.skeletonView) return; // 스켈레톤은 자체 클립이 변형 담당 — 스프라이트 스쿼시 미적용
     const taller = (1 + this.breathV) * this.fxSquashY;
     const narrower = (1 - this.breathV * 0.5) * this.fxSquashX; // 부피 보존감 — 늘면 살짝 좁게
-    const mirror = this.pose === "attack" ? this.facing : -this.facing;
+    const mirror = -this.facing;
     this.spriteBase.scale.set(this.baseScale * mirror * narrower, this.baseScale * taller);
   }
 
@@ -311,6 +332,11 @@ export class UnitView extends Container {
    * 스프라이트 표시 + 호흡 on + 미퇴각일 때만. 정지/이동 중엔 중립으로 복귀.
    */
   tickIdle(dtMS: number): void {
+    // 필살 게이지 가득 시 SP 바 발광 펄스 (호흡/이동·렌더모드 무관, 항상).
+    if (this.spReady) {
+      this.spPulse = (this.spPulse + dtMS / 550) % (Math.PI * 2);
+      this.spBarFill.alpha = 0.6 + 0.4 * Math.abs(Math.sin(this.spPulse));
+    }
     // 스켈레톤 경로: idle 클립을 루프 위상으로 진행(결정론 — t는 위상/duration).
     if (this.skeletonView) {
       if (this.retreatedFlag || !this.breathing || this.skelIdleDuration <= 0) return;
@@ -353,6 +379,8 @@ export class UnitView extends Container {
       const headY = feetY - SPRITE_DISPLAY_H;
       this.barBg.position.set(-BAR_WIDTH / 2, feetY + 2);
       this.barFill.position.set(-BAR_WIDTH / 2, feetY + 2);
+      this.spBarBg.position.set(-BAR_WIDTH / 2, feetY + 2 + BAR_HEIGHT + 1);
+      this.spBarFill.position.set(-BAR_WIDTH / 2, feetY + 2 + BAR_HEIGHT + 1);
       this.nameLabel.position.set(0, headY - 2);
       this.shadow.position.set(0, feetY);
       return;
@@ -365,12 +393,16 @@ export class UnitView extends Container {
       const headY = feetY - SPRITE_DISPLAY_H;
       this.barBg.position.set(-BAR_WIDTH / 2, feetY + 2);          // 발 아래 2px
       this.barFill.position.set(-BAR_WIDTH / 2, feetY + 2);
+      this.spBarBg.position.set(-BAR_WIDTH / 2, feetY + 2 + BAR_HEIGHT + 1);   // SP 바 = 병력 바 아래
+      this.spBarFill.position.set(-BAR_WIDTH / 2, feetY + 2 + BAR_HEIGHT + 1);
       this.nameLabel.position.set(0, headY - 2);                   // 머리 위 2px
       this.shadow.position.set(0, feetY);                          // 발밑
     } else {
       // 폴백 색 사각형: anchor=(0.5, 0.5) → 중앙=0
       this.barBg.position.set(-BAR_WIDTH / 2, UNIT_BASE_SIZE / 2 + 2);
       this.barFill.position.set(-BAR_WIDTH / 2, UNIT_BASE_SIZE / 2 + 2);
+      this.spBarBg.position.set(-BAR_WIDTH / 2, UNIT_BASE_SIZE / 2 + 2 + BAR_HEIGHT + 1);
+      this.spBarFill.position.set(-BAR_WIDTH / 2, UNIT_BASE_SIZE / 2 + 2 + BAR_HEIGHT + 1);
       this.nameLabel.position.set(0, -UNIT_BASE_SIZE / 2 - 2);
       this.shadow.position.set(0, UNIT_BASE_SIZE / 2);
     }
@@ -389,6 +421,13 @@ export class UnitView extends Container {
   setTroops(troops: number): void {
     this.troops = Math.max(0, troops);
     this.redrawBar();
+  }
+
+  /** 필살 게이지(SP) 갱신 — sync가 committed.sp/maxSp를 반영. maxSp=0이면 바 숨김. */
+  setSp(sp: number, maxSp: number): void {
+    this.sp = Math.max(0, sp);
+    this.maxSp = Math.max(0, maxSp);
+    this.redrawSpBar();
   }
 
   setRetreated(retreated: boolean): void {
@@ -447,6 +486,25 @@ export class UnitView extends Container {
     }
   }
 
+  /** 필살 게이지 바 — 파랑(가득=밝은 시안 + 발광 테두리). maxSp=0이면 숨김. */
+  private redrawSpBar(): void {
+    this.spBarFill.clear();
+    const has = this.maxSp > 0;
+    this.spBarBg.visible = has;
+    this.spBarFill.visible = has;
+    this.spReady = has && this.sp >= this.maxSp;
+    if (!has) return;
+    const ratio = Math.max(0, Math.min(1, this.sp / this.maxSp));
+    if (ratio > 0) {
+      this.spBarFill.rect(0, 0, BAR_WIDTH * ratio, SP_BAR_HEIGHT).fill(this.spReady ? 0x86ecff : 0x3a8ee0);
+    }
+    if (this.spReady) {
+      this.spBarFill.rect(0, 0, BAR_WIDTH, SP_BAR_HEIGHT).stroke({ width: 1, color: 0xcdf6ff, alpha: 0.9 });
+    } else {
+      this.spBarFill.alpha = 1; // 펄스 상태 리셋(가득 해제 시)
+    }
+  }
+
   // ── 시퀀스 재생기 ────────────────────────────────────────────────────────
 
   play(seq: UnitSequence): Promise<void> {
@@ -473,8 +531,11 @@ export class UnitView extends Container {
     return this.playHit(fromDir, intensity);
   }
 
-  /** 경로(시작 타일 포함)를 따라 타일당 msPerTile 트윈. zIndex/facing을 타일마다 갱신 */
-  async moveAlong(path: readonly Coord[], msPerTile: number = MOVE_MS_PER_TILE): Promise<void> {
+  /**
+   * 경로(시작 타일 포함)를 따라 타일당 msPerTile 트윈. zIndex/facing을 타일마다 갱신.
+   * onStep: 타일 진입마다 호출(발소리 SFX 등) — BattleRenderer가 playSfx(SFX.step)를 주입한다.
+   */
+  async moveAlong(path: readonly Coord[], msPerTile: number = MOVE_MS_PER_TILE, onStep?: () => void): Promise<void> {
     this.breathing = false; // 걷는 동안 호흡 정지
     this.applySpriteTexture(this.view, "move");
     if (this.skeletonView) this.skeletonView.setClip("move");
@@ -484,6 +545,7 @@ export class UnitView extends Container {
       if (!from || !to) continue;
       if (to.x !== from.x) this.setFacing(to.x > from.x ? 1 : -1);
       this.setView(from.y, to.y);
+      onStep?.(); // 타일 진입마다 발소리 (BattleRenderer가 playSfx(SFX.step) 주입)
       const wf = gridToWorld(from);
       const wt = gridToWorld(to);
       await this.tweens.run(msPerTile, (t) => {

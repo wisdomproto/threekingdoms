@@ -4,7 +4,11 @@
  * - 기본 줌 복귀: 수동 줌/팬 후 스테이지 기본 카메라(줌·포커스)로 되돌린다.
  * - 자동전투: 아군 페이즈를 그리디 AI가 대신 진행 (토글). ON이면 강조 표시.
  * TurnBanner(상단 바)·ActionMenu/턴종료(하단)와 겹치지 않게 우상단 세로 스택에 둔다.
+ * - 음악 토글: 전역 음량 패널(좌하단 AudioControl)이 전투 대사창에 가려 안 보일 때를 위한 빠른 BGM on/off.
  */
+import { useEffect, useState } from "react";
+import { audio, DEFAULT_SETTINGS } from "../../audio";
+
 // 우측 컬럼(미니맵 아래)에 흐르도록 — 위치는 BattleScreen의 래퍼가 잡는다
 const STACK_STYLE: React.CSSProperties = {
   display: "flex",
@@ -73,6 +77,34 @@ export function BattleControls({
       >
         {auto ? "⏸ 자동전투" : "▶ 자동전투"}
       </button>
+      <MusicToggle />
     </div>
+  );
+}
+
+/**
+ * 음악(BGM) 켜기/끄기 토글 — audio 엔진 설정(settings.bgm)을 구독해 즉시 반영 + localStorage 저장.
+ * 끄면 bgm=0, 켜면 기본값(0.45) 복귀. 전체 음량/효과음/마스터 음소거는 좌하단 AudioControl 패널 담당.
+ * (data-no-sfx: 음소거 조작에 위임 클릭음이 울리지 않게 — AudioControl과 동일 규약.)
+ */
+function MusicToggle(): React.ReactElement {
+  const [, force] = useState(0);
+  useEffect(() => audio.subscribe(() => force((n) => n + 1)), []);
+  const bgmOff = audio.getSettings().bgm === 0;
+  return (
+    <button
+      type="button"
+      data-no-sfx
+      aria-label={bgmOff ? "음악 켜기" : "음악 끄기"}
+      onClick={() => audio.setSettings({ bgm: bgmOff ? DEFAULT_SETTINGS.bgm : 0 })}
+      style={{
+        ...BTN_STYLE,
+        ...(bgmOff
+          ? { borderColor: "#b5564e", color: "#e0a39c", background: "rgba(60, 30, 28, 0.92)" }
+          : {}),
+      }}
+    >
+      {bgmOff ? "🔇 음악 꺼짐" : "🎵 음악 켜짐"}
+    </button>
   );
 }

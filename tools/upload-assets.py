@@ -105,8 +105,10 @@ def main():
         else:
             break
 
+    # 게임이 안 쓰는 원본(보드 IndexedDB 덤프)은 R2에 올리지 않는다 — --delete 시 R2 오펀으로 정리됨.
+    EXCLUDE = os.sep + "_board_dump" + os.sep
     local_files = [p for p in glob.glob(os.path.join(ASSET_DIR, "**", "*"), recursive=True)
-                   if os.path.isfile(p)]
+                   if os.path.isfile(p) and EXCLUDE not in p]
 
     up = skip = 0
     local_keys = set()

@@ -155,6 +155,13 @@ const defeat: SynthFn = (ctx, d, t) => {
   noise(ctx, d, { t0: t, dur: 0.2, peak: 0.16, type: "lowpass", freq: 1400, freqEnd: 300, q: 0.4 });
 };
 
+// 이동 ----------------------------------------------------------------------
+/** 이동 발소리 — 짧고 부드러운 "툭"(저음 thud + 약한 흙 노이즈). moveAlong이 타일당 1회, 작게. */
+const step: SynthFn = (ctx, d, t) => {
+  tone(ctx, d, { type: "sine", freq: 130, freqEnd: 62, t0: t, dur: 0.09, peak: 0.12, attack: 0.002, release: 0.06 });
+  noise(ctx, d, { t0: t, dur: 0.05, peak: 0.05, type: "lowpass", freq: 800, q: 0.5 });
+};
+
 // 책략/연출 ----------------------------------------------------------------
 /** 책략 시전 — 종소리/반짝(고음 디튠 사인 + 비브라토 잔향감). */
 const spell: SynthFn = (ctx, d, t) => {
@@ -237,6 +244,7 @@ const lose: SynthFn = (ctx, d, t) => {
 export const SYNTHS = {
   click, confirm, cancel,
   slash, pierce, hit, crit, ultimate, defeat,
+  step,
   spell, flank, combo, duel, reinforce, phase,
   star, chest, coin, levelup, victory, lose,
 } satisfies Record<string, SynthFn>;

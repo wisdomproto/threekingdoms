@@ -50,7 +50,7 @@ export class UnitLayer extends Container {
 
   /** UnitState(또는 동형 데이터)로 뷰 1개 생성·등록. 초기 배치·증원 스폰·sync 폴백이 공유. */
   private createView(u: {
-    id: string; classId: string; side: UnitState["side"]; x: number; y: number; troops: number; maxTroops: number; retreated?: boolean;
+    id: string; classId: string; side: UnitState["side"]; x: number; y: number; troops: number; maxTroops: number; retreated?: boolean; sp?: number; maxSp?: number;
   }): UnitView {
     const view = new UnitView(
       {
@@ -64,6 +64,8 @@ export class UnitLayer extends Container {
         troops: u.troops,
         maxTroops: u.maxTroops,
         retreated: u.retreated ?? false,
+        sp: u.sp,
+        maxSp: u.maxSp,
       },
       this.textures,
       this.tweens,
@@ -142,6 +144,7 @@ export class UnitLayer extends Container {
       if (!v) { v = this.createView(u); v.refreshSprite(); }
       v.snapTo(u.x, u.y);
       v.setTroops(u.troops);
+      v.setSp(u.sp ?? 0, u.maxSp ?? 0);
       v.setRetreated(u.retreated);
       // 행동 완료 dim(원작) — 플레이어가 명령할 아군만. committed.acted 추적이라 새 턴에 자동 리셋.
       v.setActed(u.side === "player" && u.acted);

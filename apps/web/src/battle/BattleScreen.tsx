@@ -222,10 +222,12 @@ export default function BattleScreen(): React.ReactElement {
   // 자동전투는 클리어한 스테이지에서만 활성화(§15 "배속/자동전투 클리어 스테이지 한정").
   const stageId = ctx.stage.id;
   const isCleared = useMemo(() => getMeta().clearedStages.includes(stageId), [stageId]);
+  // 개발 중에는 자동전투를 항상 허용(§15 "클리어 스테이지 한정"은 프로덕션만). dev = NODE_ENV !== production.
+  const canAutoFight = isCleared || process.env.NODE_ENV !== "production";
   const toggleAuto = useCallback(() => {
-    if (!isCleared) return;
+    if (!canAutoFight) return;
     store.setAutoBattle(!store.autoBattle);
-  }, [isCleared, store]);
+  }, [canAutoFight, store]);
   const resetCamera = useCallback(() => delegate.target?.resetCamera(), [delegate]);
   // 배속 순환 1→2→3→1 — store(라벨)와 렌더러(연출) 동시 반영
   const cycleSpeed = useCallback(() => {
@@ -280,7 +282,7 @@ export default function BattleScreen(): React.ReactElement {
           onResetCamera={resetCamera}
           speed={snap.speed}
           onCycleSpeed={cycleSpeed}
-          canAutoFight={isCleared}
+          canAutoFight={canAutoFight}
         />
       </div>
       <DialogueOverlay

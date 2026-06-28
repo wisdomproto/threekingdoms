@@ -219,8 +219,15 @@ export class TextureResolver {
   /**
    * manifest.json을 로드하고 등록된 스프라이트 텍스처를 비동기 로드.
    * BattleRenderer.mount() 내에서 await — 실패해도 폴백(색 사각형)이 유지되므로 throw하지 않음.
+   *
+   * onProgress: 텍스처 1개가 도착해 등록될 때마다 호출(점진 표시). 호출측이 디바운스해
+   *   해당 유닛을 refreshSprite하면, 매니페스트 전 종(60종×3≈180컷)의 로드를 기다리지 않고
+   *   먼저 도착한 스프라이트부터 화면에 뜬다. 종전엔 allSettled로 *전부* settle된 뒤에야
+   *   refreshSprites를 불러, cross-origin 180컷이 6연결로 직렬화되는 수십 초 동안 화면에
+   *   실제 등장하는 소수 유닛(예: 삼형제)도 색사각으로 남았다. 매니페스트 선두가 삼형제라
+   *   점진 적용 시 첫 라운드(수백 ms)에 바로 표시된다.
    */
-  async loadSprites(): Promise<void> {
+  async loadSprites(onProgress?: () => void): Promise<void> {
     let manifest: Manifest;
     try {
       const res = await fetch(`${SPRITE_BASE}/manifest.json`);
@@ -242,21 +249,22 @@ export class TextureResolver {
       }
     }
 
-    // 개별 로드(allSettled) — 매니페스트에 등록됐으나 파일이 없는(삭제/미생성) 포즈가 404여도
-    // 그 포즈만 빠지고 나머지는 정상 로드. 단일 배치 Assets.load는 1개 실패에 전체 거부라 위험
-    // (back_* 같은 옵션 포즈 삭제 시 전 스프라이트가 사라졌던 버그). loadGround와 동일한 per-file 내성.
-    const results = await Promise.allSettled(
-      loadQueue.map((q) => Assets.load<Texture>(q.url)),
+    // 개별 로드 + 도착 즉시 등록(allSettled로 전체 완료만 대기 — 반환 시점용).
+    // - per-file 내성: 매니페스트에 등록됐으나 파일이 없는(삭제/미생성) 포즈가 404여도 그 포즈만 빠지고
+    //   나머지는 정상(단일 배치 Assets.load는 1개 실패에 전체 거부라 위험 — loadGround와 동일).
+    // - 점진 적용: 각 .then에서 즉시 sprites에 넣고 onProgress로 통지 → 호출측이 그 유닛만 갱신.
+    await Promise.allSettled(
+      loadQueue.map((q) =>
+        Assets.load<Texture>(q.url).then((tex) => {
+          if (!tex) return;
+          if (!this.sprites.has(q.spriteId)) {
+            this.sprites.set(q.spriteId, new Map());
+          }
+          this.sprites.get(q.spriteId)!.set(q.pose, tex);
+          onProgress?.();
+        }),
+      ),
     );
-    results.forEach((r, i) => {
-      if (r.status !== "fulfilled" || !r.value) return;
-      const item = loadQueue[i];
-      if (!item) return;
-      if (!this.sprites.has(item.spriteId)) {
-        this.sprites.set(item.spriteId, new Map());
-      }
-      this.sprites.get(item.spriteId)!.set(item.pose, r.value);
-    });
 
     const loadedCount = [...this.sprites.values()].reduce((s, m) => s + m.size, 0);
     console.info(`[TextureResolver] 스프라이트 로드 완료: ${this.sprites.size}종 ${loadedCount}컷`);

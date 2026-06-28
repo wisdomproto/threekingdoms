@@ -183,9 +183,8 @@ export class BattleRenderer implements Presenter {
     this.speed = store.speed > 0 ? store.speed : 1; // 재마운트 시 배속 보존
     tweens.setTimeScale(this.speed);
     const textures = new TextureResolver(app.renderer);
-    // 스프라이트 비동기 로드 — 실패 시 폴백(색 사각형) 유지, mount는 계속 진행.
-    // 완료 시 이미 생성된 UnitView들을 갱신해야 한다 (아래 .then — 없으면 대기 유닛이 영원히 폴백).
-    const spritesReady = textures.loadSprites();
+    // 스프라이트 점진 로드는 units 생성 직후 시작한다(scheduleRefresh가 units를 참조하므로).
+    //   → 아래 UnitLayer 선언부 참조. 도착하는 대로 표시해 "처음 색사각" 지연을 없앤다.
     // 지형 타일 비동기 로드 — 실패 시 폴백(단색 베이크) 유지, mount는 계속 진행.
     // 완료 후 TerrainLayer.rebake()로 이미지 텍스처로 교체 + 청크 캐시 재생성.
     const tilesReady = textures.loadTiles();
@@ -207,8 +206,20 @@ export class BattleRenderer implements Presenter {
     threat.zIndex = 1.5;
     const units = new UnitLayer(this.ctx, store.settledState, textures, tweens);
     units.zIndex = 2;
-    // 에셋 로드 완료 → 폴백으로 생성된 기존 UnitView에 스프라이트 적용
-    spritesReady
+    // 스프라이트 점진 로드 — 텍스처가 도착하는 대로 그 유닛을 갱신(매니페스트 전 종 로드 대기 X).
+    // queueMicrotask 디바운스로 한 라운드(브라우저 6연결)의 다중 도착을 1회 refreshSprites로 합친다.
+    // 완료 시 최종 1회 더(누락 방지). 실패해도 폴백(색 사각형) 유지 — mount는 계속 진행.
+    let refreshQueued = false;
+    const scheduleRefresh = (): void => {
+      if (refreshQueued) return;
+      refreshQueued = true;
+      queueMicrotask(() => {
+        refreshQueued = false;
+        units.refreshSprites();
+      });
+    };
+    textures
+      .loadSprites(scheduleRefresh)
       .then(() => units.refreshSprites())
       .catch((e) => console.warn("[BattleRenderer] loadSprites 예외 (폴백 유지):", e));
     // 자체 컷아웃 리그(§4) — spriteId에 스켈레톤이 있으면 베이크 스프라이트를 리그로 격상.
@@ -595,7 +606,7 @@ export class BattleRenderer implements Presenter {
     const path = findPath(this.ctx, patched, e.unitId, e.to) ?? [e.from, e.to];
     // 자동 포커스: 목적지가 화면 중앙 ±35% 밖일 때만 이동 (scale 유지)
     this.autoFocus(gridToWorld(e.to), Math.max(FOCUS_MS, path.length * 150 * 0.6));
-    await view.moveAlong(path); // 타일당 150ms — 직선 금지 (벽/성문 관통 방지)
+    await view.moveAlong(path, undefined, () => playSfx(SFX.step)); // 타일당 150ms + 타일마다 발소리 — 직선 금지 (벽/성문 관통 방지)
   }
 
   /**
@@ -619,7 +630,7 @@ export class BattleRenderer implements Presenter {
     const path = findPath(this.ctx, patched, unitId, to) ?? [from, to];
     // 자동 포커스: 목적지가 화면 중앙 ±35% 밖일 때만 이동 (scale 유지)
     this.autoFocus(gridToWorld(to), Math.max(FOCUS_MS, path.length * 100 * 0.6));
-    await view.moveAlong(path, 100); // 타일당 100ms — 확정 이동(150ms)보다 약간 빠르게
+    await view.moveAlong(path, 100, () => playSfx(SFX.step)); // 타일당 100ms + 발소리 — 확정 이동(150ms)보다 약간 빠르게
   }
 
   /**

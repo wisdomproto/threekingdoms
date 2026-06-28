@@ -72,7 +72,7 @@ const PANEL_STYLE: React.CSSProperties = {
   padding: "2px 6px 4px",
   // 청동 프레임(border-image) + 가운데만 어둡게(padding-box) — 프레임 안쪽에 내용
   ...PANEL_FRAME,
-  background: "rgba(16, 14, 10, 0.86)",
+  background: "rgba(16, 14, 10, 0.58)",
   backgroundClip: "padding-box",
   color: "#e8e6e3",
   fontSize: 14,

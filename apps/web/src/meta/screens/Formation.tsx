@@ -18,6 +18,7 @@ import type { SortieMember } from "../sortie";
 import { assetUrl } from "../../assetUrl";
 import { unitStats } from "../unitStats";
 import { sortRoster, type SortKey } from "../rosterSort";
+import { ItemIcon } from "../../ui/ItemIcon";
 
 export interface FormationProps {
   roster: RosterUnit[];
@@ -228,12 +229,14 @@ function EquipPanel({ member, inventory, equippedCount, onEquip }: {
             <button
               key={`${itemId}-${idx}`} type="button"
               onClick={() => { const n = member.items.slice(); n.splice(idx, 1); onEquip(n); }}
-              style={{ fontSize: 11, padding: "2px 8px", borderRadius: 10,
+              style={{ fontSize: 11, padding: "2px 6px", borderRadius: 10,
                 border: `1px solid ${GOLD}77`, background: GOLD_GLOW,
-                color: PARCHMENT, cursor: "pointer" }}
+                color: PARCHMENT, cursor: "pointer",
+                display: "inline-flex", alignItems: "center", gap: 4 }}
             >
+              <ItemIcon itemId={itemId} category={items[itemId]?.category} size={18} />
               {items[itemId]?.name ?? itemId}
-              <span style={{ color: GOLD_DIM, marginLeft: 4 }}>✕</span>
+              <span style={{ color: GOLD_DIM, marginLeft: 2 }}>✕</span>
             </button>
           ))
         )}
@@ -244,10 +247,11 @@ function EquipPanel({ member, inventory, equippedCount, onEquip }: {
           {available.map((itemId) => (
             <button key={itemId} type="button"
               onClick={() => onEquip([...member.items, itemId])}
-              style={{ fontSize: 11, padding: "2px 8px", borderRadius: 10,
+              style={{ fontSize: 11, padding: "2px 6px", borderRadius: 10,
                 border: `1px solid rgba(200,164,64,0.2)`, background: "rgba(255,255,255,0.04)",
-                color: PARCHMENT, cursor: "pointer", display: "inline-flex", alignItems: "center" }}
+                color: PARCHMENT, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4 }}
             >
+              <ItemIcon itemId={itemId} category={items[itemId]?.category} size={18} />
               {items[itemId]?.name ?? itemId}
               <PowerDelta commanderId={member.commanderId} classId={member.classId}
                 level={member.level} currentItems={member.items} candidateItem={itemId} />
