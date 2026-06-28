@@ -996,6 +996,19 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
 (function() {
   // 전체 시나리오(27스테이지) 등장 네임드 전원 + 병종 제네릭. 구분 없이 한 드롭다운에.
   // s = spriteId: 6종만 영문 폴더(기존 SD), 나머진 commanderId(한국어)=폴더명. 병종 제네릭은 classId_side.
+  // 제네릭 병종 묘사(d) — S-pose 프롬프트 {캐릭터} 자리에 영문으로 들어간다(드롭다운 표시는 r.n 한글 유지).
+  //   이름만("[제네릭] 산적·적")으론 모델이 약하게 그려서 외형·무기·탈것을 주입. 진영색은 베이스 사각형 담당이라 d는 병종만.
+  const GEN = {
+    footman:      'a generic infantry footman, an anonymous rank-and-file soldier (no named identity), standard lamellar armor and a conical helm, wielding a spear or dao saber, on foot',
+    archer:       'a generic archer, an anonymous rank-and-file bowman, light leather-and-cloth armor, drawing a longbow with a quiver on the back, on foot',
+    lightCavalry: 'a generic light-cavalry rider, an anonymous rank-and-file horseman, light armor, wielding a spear or saber, mounted on a swift warhorse',
+    heavyCavalry: 'a generic heavy-cavalry trooper, an anonymous rank-and-file soldier, full lamellar steel armor and a closed iron helm, wielding a cavalry lance, mounted on an armored barded warhorse',
+    strategist:   'a generic strategist-officer, an anonymous robed advisor (a scholar, NOT a melee fighter), a scholar cap and long official robe, holding a command feather-fan or a bamboo scroll',
+    lord:         'a generic lord-commander, an anonymous regional warlord, ornate scale armor and a plumed commander helm, standing in a horse-drawn war-chariot holding the reins',
+    bandit:       'a generic Yellow-Turban bandit, an anonymous rough rebel footman, ragged earth-brown clothes and a faded yellow head-wrap, wielding a crude cleaver or wooden club, unkempt and wild',
+    sorcerer:     'a generic Taoist sorcerer, an anonymous robed shaman, a tattered ritual robe hung with paper talismans, holding a gnarled wooden staff or a bronze bell, on foot',
+    civilian:     'a generic civilian, an anonymous fleeing commoner, plain undyed hemp clothes and no armor, clutching a cloth bundle or a simple farm tool, a frightened look',
+  };
   const ROSTER = [
     // 시나리오 등장 순 — tools/derive-roster-order.py 자동 생성. 아군=합류챕터·로스터순, 적/게스트=첫 등장 스테이지순.
     // ── 1장 ──
@@ -1008,9 +1021,15 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
     {n:"제갈량",s:"제갈량"},{n:"관평",s:"관평"},{n:"유봉",s:"유봉"},{n:"주창",s:"주창"},{n:"조순",s:"조순"},{n:"여건",s:"여건"},{n:"공지",s:"공지"},{n:"이적",s:"이적"},{n:"진응",s:"진응"},{n:"진진",s:"진진"},{n:"조홍",s:"조홍"},{n:"유선",s:"유선"},{n:"하후은",s:"하후은"},{n:"서황",s:"서황"},{n:"문빙",s:"문빙"},
     // ── 5장 ──
     {n:"주유",s:"주유"},{n:"노숙",s:"노숙"},{n:"황개",s:"황개"},{n:"손권",s:"손권"},{n:"장무",s:"장무"},{n:"진손",s:"진손"},{n:"왕개",s:"왕개"},{n:"양앙",s:"양앙"},{n:"정보",s:"정보"},{n:"한당",s:"한당"},{n:"채모",s:"채모"},{n:"장윤",s:"장윤"},{n:"채중",s:"채중"},{n:"진무",s:"진무"},{n:"반장",s:"반장"},{n:"감녕",s:"감녕"},{n:"정봉",s:"정봉"},{n:"능통",s:"능통"},{n:"장합",s:"장합"},
-    // 병종 제네릭(무명 장수 공용)
-    {n:"[제네릭] 보병·아군",s:"footman_player"},{n:"[제네릭] 궁병·아군",s:"archer_player"},{n:"[제네릭] 기병·아군",s:"lightCavalry_player"},
-    {n:"[제네릭] 보병·적",s:"footman_enemy"},{n:"[제네릭] 궁병·적",s:"archer_enemy"},{n:"[제네릭] 기병·적",s:"lightCavalry_enemy"},
+    // 병종 제네릭(무명 장수 공용) — 게임은 시트 없으면 계열 폴백(spriteMap CLASS_LINE_REP), 생기면 자동 사용. d=프롬프트 묘사(GEN).
+    {n:"[제네릭] 보병·아군",s:"footman_player",d:GEN.footman},{n:"[제네릭] 궁병·아군",s:"archer_player",d:GEN.archer},{n:"[제네릭] 기병·아군",s:"lightCavalry_player",d:GEN.lightCavalry},
+    {n:"[제네릭] 보병·적",s:"footman_enemy",d:GEN.footman},{n:"[제네릭] 궁병·적",s:"archer_enemy",d:GEN.archer},{n:"[제네릭] 기병·적",s:"lightCavalry_enemy",d:GEN.lightCavalry},
+    {n:"[제네릭] 중기병·적",s:"heavyCavalry_enemy",d:GEN.heavyCavalry},{n:"[제네릭] 중기병·아군",s:"heavyCavalry_player",d:GEN.heavyCavalry},
+    {n:"[제네릭] 책사·아군",s:"strategist_player",d:GEN.strategist},{n:"[제네릭] 책사·적",s:"strategist_enemy",d:GEN.strategist},
+    {n:"[제네릭] 군주·아군",s:"lord_player",d:GEN.lord},{n:"[제네릭] 군주·적",s:"lord_enemy",d:GEN.lord},
+    {n:"[제네릭] 산적·적",s:"bandit_enemy",d:GEN.bandit},{n:"[제네릭] 산적·아군",s:"bandit_player",d:GEN.bandit},
+    {n:"[제네릭] 주술사·적",s:"sorcerer_enemy",d:GEN.sorcerer},{n:"[제네릭] 주술사·아군",s:"sorcerer_player",d:GEN.sorcerer},
+    {n:"[제네릭] 백성·우군",s:"civilian_ally",d:GEN.civilian},
   ];
   SECTIONS.push({
     id: 'S',
@@ -1018,7 +1037,7 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
     desc: '캐릭터 드롭다운에서 선택 → 프롬프트 복사 → idle/move/attack **한 장 시트**(좌→우, ¾ 좌향, 투명배경) 생성 → 붙여넣기 → **📤 시트 넘기기** → Claude가 front_idle/move/attack로 컷 + manifest 등록. **이미지 없으면 게임은 병종 제네릭 SD로 표시, 생기면 자동으로 이걸 씀.** 아군/적/병종 구분 없이 전원 한 탭.',
     items: [
       { id: 'S-pose', title: '캐릭터 선택 → 포즈 시트', poseSheet: true, roster: ROSTER,
-        vars: { '캐릭터': ROSTER.map((r) => [r.n, r.n]) },
+        vars: { '캐릭터': ROSTER.map((r) => [r.n, r.d || r.n]) },
         note: '드롭다운에서 캐릭터 선택 → 프롬프트 복사 → 생성 → 붙여넣기 → 📤 시트 넘기기. 무명 장수는 안 만들어도 병종 제네릭으로 표시됨.',
         prompt: 'A single SD pose sheet of {캐릭터}, ONE image containing a 3-row by 3-column grid on a fully transparent background, cells evenly spaced with clear transparent gaps and NO overlap. The SAME character in all 9 cells — identical face, weapon and identity in every cell. ROWS = three cosmetic rank tiers of the SAME unit (same face, body, signature weapon and mount TYPE), escalating DRAMATICALLY in richness top→bottom so the three rows look obviously different at a glance — armor ornamentation AND mount grandeur both rise: TOP row = humble low rank, plain cloth and worn leather, muted earthy browns/greens, NO gold, minimal decoration; MIDDLE row = veteran rank, proper lamellar steel armor with a colored sash or cape, clear gold trim and noticeably richer saturated color; BOTTOM row = elite royal rank, heavily ornate gilded armor with extensive gold filigree and dragon/phoenix motifs, a plumed helm, a flowing patterned cape and jewel accents in vivid saturated colors. COLUMNS = three poses, every cell in 3/4 SIDE view FACING SCREEN-LEFT (profile turned left, NOT facing camera): column 1 = IDLE relaxed battle stance, column 2 = MOVE mid-stride advancing, column 3 = ATTACK dynamic weapon swing with a sweeping motion arc. Each cell a complete finished chibi (SD, ~2.5 heads).' },
     ],

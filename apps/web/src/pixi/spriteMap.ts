@@ -48,6 +48,30 @@ export const CLASS_SIDE_SPRITE_MAP: Record<string, string> = {
   footman_enemy:        "footman_enemy",
   archer_enemy:         "archer_enemy",
   lightCavalry_enemy:   "lightCavalry_enemy",
+  // 추가 병종 제네릭(stages 등장 — 무명 장수 공용). 시트를 만들어 sprites/{id}/에 넣으면 자동 사용.
+  heavyCavalry_enemy:   "heavyCavalry_enemy",
+  heavyCavalry_player:  "heavyCavalry_player",
+  strategist_player:    "strategist_player",
+  strategist_enemy:     "strategist_enemy",
+  lord_player:          "lord_player",
+  lord_enemy:           "lord_enemy",
+  bandit_enemy:         "bandit_enemy",
+  bandit_player:        "bandit_player",
+  sorcerer_enemy:       "sorcerer_enemy",
+  sorcerer_player:      "sorcerer_player",
+  civilian_ally:        "civilian_ally",
+};
+
+/**
+ * 계열(line) 폴백 — 직접 제네릭이 없는 변형 병종을 같은 골격의 계열 대표 제네릭으로 매핑.
+ * 장병/전차=보병, 연노/발석=궁병, 친위대=중기병(없으면 경기병), 흉적/의적/이민족=산적.
+ * (heavyCavalry 자신은 직접 제네릭이 있으면 그게 우선; 미생성 시 경기병으로 폴백.)
+ */
+const CLASS_LINE_REP: Record<string, string> = {
+  pikeman: "footman", chariot: "footman",
+  crossbowman: "archer", catapult: "archer",
+  heavyCavalry: "lightCavalry", guardCavalry: "heavyCavalry",
+  brigand: "bandit", outlaw: "bandit", tribesman: "bandit",
 };
 
 /**
@@ -59,8 +83,21 @@ export const CLASS_SIDE_SPRITE_MAP: Record<string, string> = {
 export function spriteCandidates(commanderId: string, classId: string, side: Side): string[] {
   const out: string[] = [];
   if (commanderId) out.push(COMMANDER_SPRITE_MAP[commanderId] || commanderId);
-  const template = CLASS_SIDE_SPRITE_MAP[`${classId}_${side}`];
-  if (template) out.push(template);
+  // 1) classId+side 직접 제네릭
+  const direct = CLASS_SIDE_SPRITE_MAP[`${classId}_${side}`];
+  if (direct) out.push(direct);
+  // 2) ally 폴백 — ally 전용 제네릭이 없으면 player 제네릭 재사용(우군 색은 베이스 사각형이 담당)
+  if (side === "ally") {
+    const allyPlayer = CLASS_SIDE_SPRITE_MAP[`${classId}_player`];
+    if (allyPlayer) out.push(allyPlayer);
+  }
+  // 3) 계열(line) 폴백 — 직접 제네릭이 없는 변형 병종은 같은 골격의 계열 대표 제네릭으로
+  const rep = CLASS_LINE_REP[classId];
+  if (rep) {
+    const repSide: Side = side === "ally" ? "player" : side;
+    const lineTpl = CLASS_SIDE_SPRITE_MAP[`${rep}_${repSide}`];
+    if (lineTpl) out.push(lineTpl);
+  }
   return [...new Set(out)];
 }
 
