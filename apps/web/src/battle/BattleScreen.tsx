@@ -31,6 +31,7 @@ import { ObjectiveBanner } from "./hud/ObjectiveBanner";
 import { ResultSequence } from "./hud/ResultSequence";
 import { DialogueOverlay } from "./dialogue/DialogueOverlay";
 import { BattleControls } from "./hud/BattleControls";
+import { PauseMenu } from "./hud/PauseMenu";
 import { Minimap } from "./hud/Minimap";
 import type { InputState } from "./inputMachine";
 
@@ -217,6 +218,18 @@ export default function BattleScreen(): React.ReactElement {
     };
   }, [ctx, store, delegate]);
 
+  // 시스템 메뉴(PauseMenu) — ESC 키(데스크탑) / 「☰ 메뉴」 버튼(모바일)으로 토글.
+  // 전투 종료 후(결산 시퀀스 중)에는 열지 않는다 — committed가 ongoing일 때만.
+  const [paused, setPaused] = useState(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key !== "Escape") return;
+      setPaused((p) => (p ? false : store.committedState.status === "ongoing"));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [store]);
+
   const snap = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
   const dispatch = useCallback((e: UiEvent) => store.dispatchUi(e), [store]);
   // 자동전투는 클리어한 스테이지에서만 활성화(§15 "배속/자동전투 클리어 스테이지 한정").
@@ -282,6 +295,7 @@ export default function BattleScreen(): React.ReactElement {
           onResetCamera={resetCamera}
           speed={snap.speed}
           onCycleSpeed={cycleSpeed}
+          onOpenMenu={() => setPaused(true)}
           canAutoFight={canAutoFight}
         />
       </div>
@@ -301,6 +315,7 @@ export default function BattleScreen(): React.ReactElement {
         items={ctx.data.items}
         stageId={ctx.stage.id}
       />
+      <PauseMenu open={paused} onClose={() => setPaused(false)} />
     </div>
   );
 }

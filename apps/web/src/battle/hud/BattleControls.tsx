@@ -42,6 +42,7 @@ export function BattleControls({
   onResetCamera,
   speed,
   onCycleSpeed,
+  onOpenMenu,
   canAutoFight = false,
 }: {
   auto: boolean;
@@ -49,6 +50,8 @@ export function BattleControls({
   onResetCamera: () => void;
   speed: number;
   onCycleSpeed: () => void;
+  /** 시스템 메뉴(PauseMenu) 열기 — ESC 없는 모바일을 위한 보이는 트리거(§3 모바일 우선). */
+  onOpenMenu: () => void;
   /** 자동전투 허용 여부 — 이 스테이지를 이미 클리어한 경우만 true(§15). */
   canAutoFight?: boolean;
 }): React.ReactElement {
@@ -63,6 +66,9 @@ export function BattleControls({
   };
   return (
     <div style={STACK_STYLE}>
+      <button type="button" style={BTN_STYLE} onClick={onOpenMenu} aria-label="메뉴 열기">
+        ☰ 메뉴
+      </button>
       <button type="button" style={BTN_STYLE} onClick={onResetCamera}>
         ⟲ 기본 줌
       </button>
