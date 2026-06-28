@@ -250,6 +250,24 @@ export function reduceSetEquipped(s: MetaState, commanderId: string, items: stri
 }
 
 /**
+ * 전투 후 아군 진행도(레벨/경험치)를 rosterProgress에 반영(§10 성장 영속). equipped는 보존
+ * (장비는 편성 화면 reduceSetEquipped이 관리). 종전엔 결산이 이걸 안 불러 레벨업이
+ * 출진 화면에 반영 안 되던 버그(2026-06-28).
+ */
+export function reduceApplyRosterProgress(
+  s: MetaState,
+  progress: readonly { commanderId: string; level: number; exp: number }[],
+): MetaState {
+  if (progress.length === 0) return s;
+  const rp: Record<string, RosterProgress> = { ...s.rosterProgress };
+  for (const p of progress) {
+    const prev = rp[p.commanderId] ?? { level: DEFAULT_LEVEL, exp: 0, equipped: [] };
+    rp[p.commanderId] = { ...prev, level: p.level, exp: p.exp };
+  }
+  return { ...s, rosterProgress: rp };
+}
+
+/**
  * 보유/합류한 장수 목록(순수). joinChapter 게이팅:
  *  - 1장(튜토리얼 시작) 장수는 항상 해금.
  *  - 이후 장은 "직전 장의 마지막 스테이지를 클리어"로 해금하는 게 이상적이나,
@@ -425,6 +443,13 @@ export function removeItem(itemId: string): void {
 /** 스테이지 클리어 기록(중복 무시). */
 export function markCleared(stageId: string): void {
   saveToStorage(reduceMarkCleared(loadFromStorage(), stageId));
+}
+
+/** 전투 후 아군 레벨/경험치 영속(§10 — 결산에서 1회 호출). */
+export function applyRosterProgress(
+  progress: readonly { commanderId: string; level: number; exp: number }[],
+): void {
+  saveToStorage(reduceApplyRosterProgress(loadFromStorage(), progress));
 }
 
 /** 기연 포인트 누적(§12 — 결산 적립). 새 합계 반환. */

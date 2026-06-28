@@ -31,6 +31,7 @@ export interface UnitVM {
   className: string;
   side: Side;
   level: number;
+  exp: number;       // 누적 경험치(§10) — 결산에서 rosterProgress에 영속(출진 레벨 표시 정합)
   x: number;
   y: number;
   troops: number;
@@ -198,6 +199,7 @@ export function unitVM(ctx: BattleContext, u: UnitState): UnitVM {
     className: ctx.data.unitClasses[u.classId]?.name ?? u.classId,
     side: u.side,
     level: u.level,
+    exp: u.exp,
     x: u.x,
     y: u.y,
     troops: u.troops,

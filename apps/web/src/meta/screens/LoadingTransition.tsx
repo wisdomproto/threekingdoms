@@ -15,15 +15,40 @@
  * 청동/수묵 팔레트는 TitleScreen/HUD frames와 톤 일치.
  */
 import { useEffect, useRef, useState } from "react";
+import { stages } from "@tk/data";
 import { BUTTON_FRAME } from "../../battle/hud/frames";
 import { getAdService } from "../adService";
 import { isBossStage } from "../interstitialPolicy";
+import { spriteCandidates } from "../../pixi/spriteMap";
+import { assetUrl } from "../../assetUrl";
 
 const INK = "#1a1714";
 const INK_DEEP = "#0d0b09";
 const BRONZE_GOLD = "#cdab6e";
 const BRONZE_DIM = "#8a7350";
 const PARCHMENT = "#e8dcc0";
+
+/**
+ * 이 전투에서 곧 쓸 핵심 에셋 URL — 맵 배경(mapId.webp) + 등장 유닛 front_idle 스프라이트.
+ * LoadingTransition이 미리 받아(HTTP 캐시) BattleRenderer의 Assets.load가 캐시 히트하게 한다 →
+ * "전장을 준비하는 중"이 *실제 다운로드*가 되고(게이지=진짜 진행률), 게임 진입 시 색사각 지연도 준다.
+ * 미등록 stage·없는 파일(404)은 fetch가 그냥 통과 — 게이트가 아니라 진행률 카운트용.
+ */
+function battleAssetUrls(stageId: string): string[] {
+  const stage = stages[stageId];
+  if (!stage) return [];
+  const urls: string[] = [];
+  if (stage.mapId) urls.push(assetUrl(`/assets/maps/${stage.mapId}.webp`));
+  const seen = new Set<string>();
+  for (const u of stage.units ?? []) {
+    for (const sid of spriteCandidates(u.commanderId, u.classId, u.side)) {
+      if (seen.has(sid)) continue;
+      seen.add(sid);
+      urls.push(assetUrl(`/assets/sprites/${sid}/front_idle.png`));
+    }
+  }
+  return urls;
+}
 
 export interface LoadingTransitionProps {
   /** 출진 대상 스테이지 id(예 "05-sishuiguan"). 보스 카드 톤 분기에 사용. */
@@ -44,6 +69,9 @@ export function LoadingTransition({
 }: LoadingTransitionProps): React.ReactElement {
   // 광고가 진행/대기 중인 동안 "전장으로"를 잠근다. showAd=false면 즉시 준비 완료.
   const [adPending, setAdPending] = useState(showAd);
+  // 전투 에셋 프리로드 진행률(0~1)과 완료 플래그 — 게이지 표시 + "전장으로" 활성 게이트.
+  const [progress, setProgress] = useState(0);
+  const [assetsReady, setAssetsReady] = useState(false);
   // StrictMode 이중 마운트/리렌더에도 광고를 한 번만 띄우도록 가드.
   const adStarted = useRef(false);
   const boss = isBossStage(stageId);
@@ -55,18 +83,54 @@ export function LoadingTransition({
     }
     if (adStarted.current) return;
     adStarted.current = true;
-
-    let cancelled = false;
-    // showInterstitial은 adFree면 즉시 resolve, 아니면 전면 노출 후 resolve(스킵/완주 무관 void).
+    // ⚠️ cancelled 가드 없음(2026-06-28 무한로딩 수정): StrictMode 이중 마운트에서
+    //    cleanup의 cancelled=true가 *유일한* showInterstitial(Mount1)의 finally를 막아
+    //    광고가 끝나도 adPending이 영영 안 풀리던 버그. adStarted.current로 1회만 호출되니 cleanup 불필요.
+    // showInterstitial은 adFree면 즉시 resolve, 아니면 전면 노출(AdHost) 후 resolve(스킵/완주 무관 void).
     void getAdService()
       .showInterstitial()
-      .finally(() => {
-        if (!cancelled) setAdPending(false);
-      });
+      .finally(() => setAdPending(false));
+  }, [showAd]);
+
+  // 전투 에셋 프리로드 — 맵 배경 + 등장 유닛 스프라이트를 미리 받아(HTTP 캐시) 진행률을 게이지로.
+  // 게이트가 아니라 진척 표시 — 404/실패도 카운트만(통과). BattleRenderer가 곧 같은 URL을 Assets.load.
+  useEffect(() => {
+    let cancelled = false;
+    const urls = battleAssetUrls(stageId);
+    if (urls.length === 0) {
+      setProgress(1);
+      setAssetsReady(true);
+      return;
+    }
+    let done = 0;
+    const tick = (): void => {
+      if (cancelled) return;
+      done += 1;
+      setProgress(done / urls.length);
+    };
+    const finish = (): void => {
+      if (cancelled) return;
+      setProgress(1);
+      setAssetsReady(true);
+    };
+    void Promise.allSettled(
+      urls.map((u) =>
+        fetch(u, { cache: "force-cache" })
+          .then((r) => r.blob())
+          .catch(() => undefined)
+          .finally(tick),
+      ),
+    ).finally(finish);
+    // 안전장치 — 네트워크 hang 등으로 fetch가 안 끝나도 8초 후 진행 보장(§13 무손실 — 로딩이 게이트가 되면 안 됨).
+    const timeout = setTimeout(finish, 8000);
     return () => {
       cancelled = true;
+      clearTimeout(timeout);
     };
-  }, [showAd]);
+  }, [stageId]);
+
+  const ready = !adPending && assetsReady;
+  const pct = Math.round(progress * 100);
 
   return (
     <section
@@ -138,27 +202,48 @@ export function LoadingTransition({
         </p>
       </div>
 
-      {/* 진행 상태 — 광고 대기 중이면 안내, 아니면 "전장으로". */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center" }}>
-        {adPending ? (
-          <p style={{ margin: 0, fontSize: 13, color: BRONZE_DIM }} aria-live="polite">
-            전장을 준비하는 중…
-          </p>
+      {/* 진행 상태 — 에셋 프리로드 게이지 + (준비되면) "전장으로". */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
+        {!ready ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 7, alignItems: "center", width: "min(280px, 72vw)" }}>
+            <div
+              style={{
+                width: "100%",
+                height: 6,
+                borderRadius: 3,
+                background: "rgba(138, 115, 80, 0.18)",
+                border: `1px solid ${BRONZE_DIM}44`,
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  width: `${pct}%`,
+                  height: "100%",
+                  background: `linear-gradient(90deg, ${BRONZE_DIM}, ${BRONZE_GOLD})`,
+                  transition: "width 220ms ease-out",
+                }}
+              />
+            </div>
+            <p style={{ margin: 0, fontSize: 12, color: BRONZE_DIM }} aria-live="polite">
+              {adPending ? "다음 화를 준비하는 중…" : `전장을 준비하는 중… ${pct}%`}
+            </p>
+          </div>
         ) : null}
         <button
           type="button"
           onClick={onEnter}
-          disabled={adPending}
+          disabled={!ready}
           style={{
             ...BUTTON_FRAME,
             background: "transparent",
-            color: adPending ? "#5a5142" : "#f3e7c8",
+            color: !ready ? "#5a5142" : "#f3e7c8",
             fontSize: 18,
             letterSpacing: "0.25em",
             textIndent: "0.25em",
             padding: "10px 28px",
-            cursor: adPending ? "default" : "pointer",
-            opacity: adPending ? 0.5 : 1,
+            cursor: !ready ? "default" : "pointer",
+            opacity: !ready ? 0.5 : 1,
             fontFamily: "inherit",
             fontWeight: 700,
             transition: "color 120ms, opacity 120ms",

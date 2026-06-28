@@ -26,7 +26,7 @@ import type { InputState } from "../inputMachine";
 import type { BattleVM } from "../viewmodel";
 import { PANEL_FRAME, BUTTON_FRAME } from "./frames";
 import { buildResultSummary } from "./resultSummary";
-import { addGold, markCleared, addItem, getMeta, addSerendipity } from "../../meta/metaStore";
+import { addGold, markCleared, addItem, getMeta, addSerendipity, applyRosterProgress } from "../../meta/metaStore";
 import { clearReward } from "../../meta/serendipity";
 import { clearSortie } from "../../meta/sortie";
 import { RewardedAdButton } from "../../meta/RewardedAdButton";
@@ -289,6 +289,13 @@ export function ResultSequence({
     if (!metaCommitted.current) {
       metaCommitted.current = true;
       addGold(summary.gold); // metaStore가 legacy tk.meta.gold에도 mirror — 결산 경로 일원화
+      // 아군 레벨/경험치 영속(§10) — 전투 후 final level/exp를 rosterProgress에 저장. 종전엔 누락돼
+      //   레벨업이 다음 출진 화면에 반영 안 됐다(2026-06-28). 퇴각 아군도 진행 유지(다음 전투 복귀).
+      applyRosterProgress(
+        vm.units
+          .filter((u) => u.side === "player")
+          .map((u) => ({ commanderId: u.id, level: u.level, exp: u.exp })),
+      );
       // 기연 포인트 적립(§12). 첫 클리어=등급 기반, 재도전=소액(파밍 방지) — markCleared 전에 판정.
       const firstClear = stageId ? !getMeta().clearedStages.includes(stageId) : true;
       const pts = clearReward(summary.grade, firstClear);

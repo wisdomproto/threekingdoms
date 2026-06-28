@@ -16,6 +16,7 @@ function unit(partial: Partial<UnitVM>): UnitVM {
     className: "c",
     side: "player",
     level: 1,
+    exp: 0,
     x: 0,
     y: 0,
     troops: 10,
