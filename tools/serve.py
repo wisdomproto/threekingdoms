@@ -366,17 +366,20 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
         #    멤버별 webp 컷(초상=portraits·아이템=items 공용). out_dir은 시트 경로의 디렉터리에서 도출.
         if payload.get("slice") and re.match(r"assets/ui/[^/]+/_sheet_.+\.png$", rel):
             group = payload.get("group") or rel.split("_sheet_", 1)[1].rsplit(".", 1)[0]
-            sl = _run_slice_sheet(dest, os.path.dirname(dest), payload.get("members") or [], payload.get("grid"))
+            sl = _run_slice_sheet(dest, os.path.dirname(dest), payload.get("members") or [],
+                                  payload.get("grid"), os.path.dirname(rel))
             resp["slice"] = sl
-            sys.stdout.write(f"[save-asset] slice {group} → ok={sl.get('ok')} count={sl.get('count')}\n")
+            sys.stdout.write(f"[save-asset] slice {group} → ok={sl.get('ok')} count={sl.get('count')} r2={sl.get('r2')}\n")
 
         self._json(200, resp)
 
 
-def _run_slice_sheet(sheet_path, out_dir, members, grid):
+def _run_slice_sheet(sheet_path, out_dir, members, grid, rel_dir=None):
     """그룹 시트 → out_dir/{멤버}.webp 슬라이스(검정배경 제거 포함). 초상·아이템 공용.
     slice_portraits.slice_sheet 재사용. grid={cols,rows}(검정배경 시트는 밴드검출 실패 → 그리드 폴백).
-    반환 {ok, count, saved, missing} 또는 {ok:False, error}."""
+    슬라이스된 webp는 rel_dir(멤버들의 버킷 디렉터리, 예: assets/ui/portraits)가 있으면 **R2에도 업로드**.
+    게임/dev가 R2 직독이라 로컬만 두면 반영 안 됨 — 종전엔 시트 원본만 R2 가고 멤버 초상은 로컬에
+    갇혀 게임에 옛 버전이 보이던 버그(2026-06-28). 반환 {ok, count, saved, missing, r2}."""
     if not members:
         return {"ok": False, "error": "members 없음"}
     try:
@@ -386,7 +389,20 @@ def _run_slice_sheet(sheet_path, out_dir, members, grid):
         res = slice_sheet(sheet_path, members, out_dir, grid=grid)
         saved = [n for n, _p, ok in res if ok]
         missing = [n for n, _p, ok in res if not ok]
-        return {"ok": True, "count": len(saved), "saved": saved, "missing": missing}
+        # 슬라이스 결과를 R2에 업로드(없으면 dev R2 직독 게임에 반영 안 됨).
+        r2_up = 0
+        if rel_dir:
+            for name, path, ok in res:
+                if not ok:
+                    continue
+                try:
+                    with open(path, "rb") as f:
+                        ru_ok, _info = _r2_upload(f"{rel_dir}/{name}.webp", f.read(), "image/webp")
+                    if ru_ok:
+                        r2_up += 1
+                except Exception:  # noqa: BLE001
+                    pass
+        return {"ok": True, "count": len(saved), "saved": saved, "missing": missing, "r2": r2_up}
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "error": str(e)}
 
