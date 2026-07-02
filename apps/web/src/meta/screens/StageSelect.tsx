@@ -10,7 +10,6 @@ import Link from "next/link";
 import { stages } from "@tk/data";
 import type { Stage } from "@tk/data";
 import { getMeta, startNewGame } from "../metaStore";
-import { AdFitBanner } from "../AdFitBanner";
 
 const INK = "#17130f";
 const INK_DEEP = "#0c0a07";
@@ -231,10 +230,6 @@ export function StageSelect(): React.ReactElement {
             )}
           </div>
         )}
-
-        {/* 애드핏 배너(§13 막간 배너 — 광고단위 발급 전엔 아무것도 안 그림, adFree 숨김).
-            단위는 애드핏 콘솔에서 320×100으로 생성 후 NEXT_PUBLIC_ADFIT_UNIT_STAGES에 코드 주입. */}
-        <AdFitBanner unitId={process.env.NEXT_PUBLIC_ADFIT_UNIT_STAGES} />
       </div>
     </section>
   );
