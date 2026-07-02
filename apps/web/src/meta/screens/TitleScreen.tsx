@@ -28,6 +28,10 @@ export function TitleScreen(): React.ReactElement {
   // 진행 유무는 클라에서만 확정(localStorage). 초기 false로 SSR/하이드레이션 일치.
   const [hasProgress, setHasProgress] = useState(false);
   const [confirmingNew, setConfirmingNew] = useState(false);
+  // 확인창에 "뭘 지우게 되는지"를 보여주는 요약(예: "클리어 3 전장 · 1,240 金") —
+  // 안 보여주면 유저가 "첫판인데 왜 물어보지?"가 된다(2026-06-30 피드백. 확인 자체는
+  // 진행 있을 때만 뜨는 게 맞고, 이 요약이 그 근거를 화면에 드러낸다).
+  const [progressSummary, setProgressSummary] = useState("");
 
   useEffect(() => {
     const m = getMeta();
@@ -37,6 +41,15 @@ export function TitleScreen(): React.ReactElement {
       Object.keys(m.rosterProgress).length > 0 ||
       m.inventory.length > 0;
     setHasProgress(progressed);
+    if (progressed) {
+      const parts: string[] = [];
+      if (m.clearedStages.length > 0) parts.push(`클리어 ${m.clearedStages.length}개 전장`);
+      if (m.gold > 0) parts.push(`${m.gold.toLocaleString()} 金`);
+      const grown = Object.keys(m.rosterProgress).length;
+      if (grown > 0) parts.push(`육성 장수 ${grown}명`);
+      if (m.inventory.length > 0) parts.push(`장비·보물 ${m.inventory.length}개`);
+      setProgressSummary(parts.join(" · "));
+    }
   }, []);
 
   function onContinue(): void {
@@ -142,20 +155,32 @@ export function TitleScreen(): React.ReactElement {
           tone={confirmingNew ? "warn" : "default"}
         />
         {confirmingNew ? (
-          <button
-            type="button"
-            onClick={() => setConfirmingNew(false)}
-            style={{
-              background: "none",
-              border: "none",
-              color: BRONZE_DIM,
-              fontSize: 13,
-              cursor: "pointer",
-              padding: 4,
-            }}
-          >
-            취소 — 기존 진행 유지
-          </button>
+          <>
+            {/* 왜 확인을 받는지 = 지워질 진행을 그대로 보여준다 */}
+            <p style={{ margin: 0, fontSize: 12.5, color: "#e7c34a", lineHeight: 1.7 }}>
+              저장된 진행이 모두 삭제됩니다
+              {progressSummary && (
+                <>
+                  <br />
+                  <span style={{ color: BRONZE_DIM }}>{progressSummary}</span>
+                </>
+              )}
+            </p>
+            <button
+              type="button"
+              onClick={() => setConfirmingNew(false)}
+              style={{
+                background: "none",
+                border: "none",
+                color: BRONZE_DIM,
+                fontSize: 13,
+                cursor: "pointer",
+                padding: 4,
+              }}
+            >
+              취소 — 기존 진행 유지
+            </button>
+          </>
         ) : (
           hasProgress && (
             <p style={{ margin: 0, fontSize: 12, color: BRONZE_DIM }}>

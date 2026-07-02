@@ -88,6 +88,13 @@ const OBJECT_FILES: Record<string, string> = {
   // K-5/K-6 데코 오브젝트 (objectModel.DECO_OBJECT_MAP가 지형→이 키로 매핑). 미보유 시 옛 데코 폴백.
   rock_cluster: "rock_cluster.png", rock_cliff: "rock_cliff.png", tree_leafy: "tree_leafy.png",
   supply_cart: "supply_cart.png", camp_gate: "camp_gate.png",
+  // 정밀 데코 바닥 소품(@tk/data DECORATION_KINDS와 1:1) — 여기 미등록 키는 getObject=null로
+  // 조용히 생략된다("수레만 보이던" 2026-06-30 버그). 새 kind 추가 시 이 레지스트리도 함께.
+  banner_command: "banner_command.png", pennants: "pennants.png", signal_flag: "signal_flag.png",
+  campfire: "campfire.png", brazier: "brazier.png",
+  debris_pile: "debris_pile.png", debris_cart: "debris_cart.png",
+  debris_weapons: "debris_weapons.png", debris_siege: "debris_siege.png",
+  shrub: "shrub.png", reeds: "reeds.png",
 };
 const OBJECT_BASE = assetUrl("/assets/objects");
 
@@ -439,20 +446,21 @@ export class TextureResolver {
     return sub;
   }
 
-  /** 구조물 오브젝트 텍스처 로드 (실패해도 빈 맵 유지 — throw 안 함). */
+  /** 구조물 오브젝트 텍스처 로드 (실패해도 빈 맵 유지 — throw 안 함).
+   *  파일별 개별 로드(allSettled) — 종전 일괄 Assets.load(urls)는 한 파일만 404여도 배치
+   *  전체가 거부돼 성벽까지 다 사라지는 구조였다(loadSprites 2026-06-28 수정과 동일 계열). */
   private async loadObjects(): Promise<void> {
-    const entries = Object.entries(OBJECT_FILES);
-    const urls = entries.map(([, f]) => `${OBJECT_BASE}/${f}`);
-    try {
-      const loaded = await Assets.load<Texture>(urls);
-      for (const [key, f] of entries) {
-        const tex = loaded[`${OBJECT_BASE}/${f}`];
-        if (tex) this.objectTex.set(key, tex);
-      }
-      console.info(`[TextureResolver] 구조물 오브젝트 로드 완료: ${this.objectTex.size}종`);
-    } catch (e) {
-      console.warn("[TextureResolver] 구조물 오브젝트 로드 오류(아트 미보유 단계 정상):", e);
-    }
+    await Promise.allSettled(
+      Object.entries(OBJECT_FILES).map(async ([key, f]) => {
+        try {
+          const tex = await Assets.load<Texture>(`${OBJECT_BASE}/${f}`);
+          if (tex) this.objectTex.set(key, tex);
+        } catch {
+          // 미보유 파일 = 그 키만 스킵(아트 미생성 단계 정상)
+        }
+      }),
+    );
+    console.info(`[TextureResolver] 구조물 오브젝트 로드 완료: ${this.objectTex.size}종`);
   }
 
   /** fx 텍스처 로드 (실패해도 빈 맵 유지 — throw 안 함, 전부 폴백). */
