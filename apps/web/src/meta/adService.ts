@@ -19,6 +19,11 @@
  *
  * 다음 단계(적용처 에이전트)는 getAdService()와 컴포넌트(AdHost/RewardedAdButton)만 import.
  */
+import {
+  createPortalAdService,
+  resolveProviderKind,
+  __registerAdServiceEnsurer,
+} from "./adProviders";
 
 /** 리워드 4곳(§13) + 전면 1종. 적용처는 이 리터럴만 넘긴다. */
 export type AdPlacement =
@@ -149,17 +154,24 @@ let singleton: AdService | null = null;
 /**
  * 공유 AdService 싱글톤. adFree 판정은 metaStore.isAdFree로 지연 주입(순환 import 회피 위해
  * 동적 require 대신 함수 클로저로 연결). 테스트는 setAdService로 교체 가능.
+ *
+ * 공급자 선택(§13 포털 우선, 2026-07-03): NEXT_PUBLIC_AD_PROVIDER=poki|crazygames|gd 로 빌드하면
+ * 해당 포털 SDK 어댑터(adProviders/)가 붙고, 미지정(stub)이면 종전 DevMock — 자체 도메인/개발 무변.
+ * 포털의 "우리 광고만" 규칙은 포털별 빌드 env로 준수된다.
  */
 export function getAdService(): AdService {
   if (singleton) return singleton;
-  // 지연 import: metaStore → adService 역참조가 없으므로 정적 import도 안전하지만,
-  // 배관 독립성을 위해 함수 주입만 사용한다.
-  singleton = new DevMockAdService(() => {
-    // metaStore.isAdFree를 런타임에 읽는다(adFree 토글이 즉시 반영되도록).
-    return getAdFreeProvider()();
-  });
+  const adFree = (): boolean => getAdFreeProvider()();
+  singleton =
+    createPortalAdService(resolveProviderKind(process.env.NEXT_PUBLIC_AD_PROVIDER), adFree) ??
+    new DevMockAdService(adFree);
   return singleton;
 }
+
+// lifecycle 신호(adProviders/lifecycle)가 서비스 생성 전에 와도 안전하도록 생성 훅 등록.
+__registerAdServiceEnsurer(() => {
+  void getAdService();
+});
 
 /** 테스트/대체 구현 주입(예: 실제 SDK 어댑터). null로 초기화도 가능. */
 export function setAdService(impl: AdService | null): void {

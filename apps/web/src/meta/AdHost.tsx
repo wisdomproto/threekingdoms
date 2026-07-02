@@ -19,6 +19,7 @@ import {
   resolveActive,
   type AdRequest,
 } from "./adService";
+import { adLifecycle } from "./adProviders";
 
 const INK_DEEP = "#0d0b09";
 const BRONZE_GOLD = "#cdab6e";
@@ -38,6 +39,11 @@ export function AdHost(): React.ReactElement | null {
   const [req, setReq] = useState<AdRequest | null>(null);
   const [remaining, setRemaining] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // 포털 SDK 프리로드 킥(§13) — 레이아웃 전역 마운트 1회. stub이면 no-op.
+  useEffect(() => {
+    adLifecycle.boot();
+  }, []);
 
   // 광고 큐 구독 — 활성 요청이 생기면 모달을 띄우고 카운트다운을 시작.
   useEffect(() => {

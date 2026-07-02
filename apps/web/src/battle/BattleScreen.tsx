@@ -33,6 +33,7 @@ import { DialogueOverlay } from "./dialogue/DialogueOverlay";
 import { BattleControls } from "./hud/BattleControls";
 import { PauseMenu } from "./hud/PauseMenu";
 import { Minimap } from "./hud/Minimap";
+import { adLifecycle } from "../meta/adProviders";
 import type { InputState } from "./inputMachine";
 
 /** 고정 시드 — dev 재현성 (seed + actionLog가 버그 재현 수단, 설계 §1 리플레이 기반) */
@@ -232,6 +233,17 @@ export default function BattleScreen(): React.ReactElement {
 
   const snap = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot);
   const dispatch = useCallback((e: UiEvent) => store.dispatchUi(e), [store]);
+
+  // 포털 게임플레이 신호(§13 심사 요건 — stub이면 no-op, 라우터가 start/stop 짝 dedupe).
+  // 전투 화면 진입 = start, 종료(결산 진입)·이탈 = stop.
+  useEffect(() => {
+    adLifecycle.gameplayStart();
+    return () => adLifecycle.gameplayStop();
+  }, []);
+  const battleOngoing = snap.vm.status === "ongoing";
+  useEffect(() => {
+    if (!battleOngoing) adLifecycle.gameplayStop();
+  }, [battleOngoing]);
   // 자동전투는 클리어한 스테이지에서만 활성화(§15 "배속/자동전투 클리어 스테이지 한정").
   const stageId = ctx.stage.id;
   const isCleared = useMemo(() => getMeta().clearedStages.includes(stageId), [stageId]);

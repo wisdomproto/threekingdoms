@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BUTTON_FRAME } from "../../battle/hud/frames";
 import { getMeta, reset } from "../metaStore";
+import { adLifecycle } from "../adProviders";
 
 /** 수묵·청동 공유 팔레트 (frames.ts 청동기 톤 + 먹빛 배경). */
 const INK = "#1a1714";
@@ -34,6 +35,8 @@ export function TitleScreen(): React.ReactElement {
   const [progressSummary, setProgressSummary] = useState("");
 
   useEffect(() => {
+    // 포털 로딩 완료 신호(§13 — 타이틀 = 상호작용 가능 시점. stub이면 no-op, 내부 1회 가드).
+    adLifecycle.loadingFinished();
     const m = getMeta();
     const progressed =
       m.clearedStages.length > 0 ||
