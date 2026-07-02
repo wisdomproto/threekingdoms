@@ -4,6 +4,23 @@
   "mapId": "zhuojun",
   "turnLimit": 20,
   "camera": { "zoom": 1.6, "focus": [8, 12] },
+  "decorations": [
+    { "cell": [4, 8], "kind": "banner_command" },
+    { "cell": [3, 12], "kind": "campfire" },
+    { "cell": [3, 14], "kind": "supply_cart" },
+    { "cell": [21, 10], "kind": "shrub" },
+    { "cell": [22, 13], "kind": "campfire" },
+    { "cell": [25, 10], "kind": "pennants", "flip": true },
+    { "cell": [26, 12], "kind": "debris_cart" },
+    { "cell": [35, 10], "kind": "banner_command" },
+    { "cell": [34, 12], "kind": "campfire" },
+    { "cell": [32, 8], "kind": "pennants" },
+    { "cell": [30, 11], "kind": "debris_weapons" },
+    { "cell": [12, 6], "kind": "shrub" },
+    { "cell": [18, 14], "kind": "shrub", "flip": true },
+    { "cell": [26, 17], "kind": "shrub" },
+    { "cell": [9, 18], "kind": "shrub" }
+  ],
   "reward": { "gold": 120, "exp": 0, "treasures": [] },
   "levelCap": 6,
   "scenario": {

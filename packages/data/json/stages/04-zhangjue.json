@@ -4,6 +4,20 @@
   "mapId": "zhangjue",
   "turnLimit": 34,
   "camera": {
+  "decorations": [
+    { "cell": [11, 10], "kind": "brazier" },
+    { "cell": [12, 11], "kind": "brazier", "flip": true },
+    { "cell": [17, 10], "kind": "pennants" },
+    { "cell": [33, 11], "kind": "pennants", "flip": true },
+    { "cell": [7, 12], "kind": "reeds" },
+    { "cell": [36, 12], "kind": "reeds", "flip": true },
+    { "cell": [30, 15], "kind": "reeds" },
+    { "cell": [21, 29], "kind": "banner_command" },
+    { "cell": [23, 26], "kind": "campfire" },
+    { "cell": [17, 24], "kind": "supply_cart" },
+    { "cell": [24, 20], "kind": "debris_cart" },
+    { "cell": [19, 22], "kind": "debris_pile", "flip": true }
+  ],
     "zoom": 1.5,
     "focus": [
       10,

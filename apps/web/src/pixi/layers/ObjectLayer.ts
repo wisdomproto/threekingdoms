@@ -1,8 +1,11 @@
 /** ObjectLayer (설계 2026-06-21-hybrid-map-rendering §3·§5) — 바닥 위·유닛 아래(zIndex 1.8)의
  *  구별되는 top-down 오브젝트. 지형 구동: wall=오토타일, gate=상태별, 그 외=데코(빌보드).
+ *  + 스테이지 정밀 데코(§5.2 stage.decorations — 진영 깃발·모닥불·잔해 등 서사 소품, 순수 시각).
  *  painted 배경과 무관하게 항상 표시. TerrainLayer의 청크/cull 패턴 재사용. */
 import { Container, Graphics, Sprite } from "pixi.js";
+import type { Texture } from "pixi.js";
 import type { BattleContext } from "@tk/engine";
+import type { Decoration } from "@tk/data";
 import { terrainAt } from "@tk/engine";
 import { TILE_SIZE } from "../projection";
 import type { TextureResolver } from "../textures";
@@ -22,11 +25,14 @@ export class ObjectLayer extends Container {
   private readonly textures: TextureResolver;
   /** 칸별 성문/성벽 상태. 키=`${gx},${gy}` */
   private readonly state = new Map<string, string>();
+  /** 스테이지 정밀 데코(§5.2) — 청크 rebuild 때마다 소속 칸 기준으로 얹는다. */
+  private readonly decorations: readonly Decoration[];
 
   constructor(ctx: BattleContext, textures: TextureResolver) {
     super();
     this.ctx = ctx;
     this.textures = textures;
+    this.decorations = ctx.stage.decorations ?? [];
     const { width, height } = ctx.map;
     const chunksX = Math.ceil(width / CHUNK_TILES);
     const chunksY = Math.ceil(height / CHUNK_TILES);
@@ -79,6 +85,16 @@ export class ObjectLayer extends Container {
       else if (kind === "gate") this.addGate(chunk, gx, gy, tx, ty);
       else this.addDeco(chunk, terrainId, tx, ty);
     }
+    // 스테이지 정밀 데코(§5.2) — 이 청크에 속한 칸만. 지형 자동 데코 위에 얹는다(순수 시각).
+    const ox = chunk.x / TILE_SIZE, oy = chunk.y / TILE_SIZE;
+    const tw = chunk.width / TILE_SIZE, th = chunk.height / TILE_SIZE;
+    for (const d of this.decorations) {
+      const [gx, gy] = d.cell;
+      if (gx < ox || gx >= ox + tw || gy < oy || gy >= oy + th) continue;
+      const tex = this.textures.getObject(d.kind);
+      if (!tex || tex.width === 0) continue; // 미보유 키 = 조용히 생략(드롭인)
+      this.placeDeco(chunk, tex, gx - ox, gy - oy, d.flip, d.scale);
+    }
   }
 
   private addWall(chunk: Chunk, gx: number, gy: number, tx: number, ty: number): void {
@@ -114,7 +130,19 @@ export class ObjectLayer extends Container {
     const objKey = decoObjectKey(terrainId);
     const tex = (objKey ? this.textures.getObject(objKey) : null) ?? this.textures.getDeco(terrainId);
     if (!tex || tex.width === 0) return;
-    const s = (TILE_SIZE * 1.18) / tex.width;
+    this.placeDeco(chunk, tex, tx, ty);
+  }
+
+  /** 데코 스프라이트 1개 배치(그림자 타원 + 바닥 앵커 빌보드) — 지형 자동 데코·정밀 데코 공용. */
+  private placeDeco(
+    chunk: Chunk,
+    tex: Texture,
+    tx: number,
+    ty: number,
+    flip?: boolean,
+    scaleMul = 1,
+  ): void {
+    const s = ((TILE_SIZE * 1.18) / tex.width) * scaleMul;
     const cx = tx * TILE_SIZE + TILE_SIZE / 2;
     const cy = ty * TILE_SIZE + TILE_SIZE - 1;
     const shadow = new Graphics();
@@ -124,7 +152,7 @@ export class ObjectLayer extends Container {
     chunk.sprites.push(shadow);
     const deco = new Sprite(tex);
     deco.anchor.set(0.5, 1);
-    deco.scale.set(s);
+    deco.scale.set(flip ? -s : s, s);
     deco.position.set(cx, cy);
     chunk.container.addChild(deco);
     chunk.sprites.push(deco);

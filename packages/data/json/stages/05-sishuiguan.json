@@ -4,6 +4,19 @@
   "mapId": "sishuiguan",
   "turnLimit": 30,
   "camera": { "zoom": 1.7, "focus": [50, 15] },
+  "decorations": [
+    { "cell": [49, 13], "kind": "banner_command" },
+    { "cell": [52, 17], "kind": "campfire" },
+    { "cell": [48, 15], "kind": "pennants", "flip": true },
+    { "cell": [53, 12], "kind": "supply_cart" },
+    { "cell": [22, 16], "kind": "debris_weapons" },
+    { "cell": [25, 18], "kind": "debris_cart", "flip": true },
+    { "cell": [13, 12], "kind": "pennants" },
+    { "cell": [15, 17], "kind": "brazier" },
+    { "cell": [6, 20], "kind": "reeds" },
+    { "cell": [4, 21], "kind": "reeds", "flip": true },
+    { "cell": [9, 24], "kind": "reeds" }
+  ],
   "reward": { "gold": 300, "exp": 0, "treasures": ["무술교본"] },
   "levelCap": 12,
   "scenario": {

@@ -4,6 +4,21 @@
   "mapId": "huluguan",
   "turnLimit": 20,
   "camera": {
+  "decorations": [
+    { "cell": [13, 6], "kind": "pennants" },
+    { "cell": [18, 6], "kind": "pennants", "flip": true },
+    { "cell": [15, 10], "kind": "brazier" },
+    { "cell": [20, 9], "kind": "banner_command" },
+    { "cell": [14, 20], "kind": "debris_weapons" },
+    { "cell": [18, 22], "kind": "debris_cart", "flip": true },
+    { "cell": [12, 25], "kind": "debris_pile" },
+    { "cell": [10, 29], "kind": "reeds" },
+    { "cell": [20, 33], "kind": "reeds", "flip": true },
+    { "cell": [12, 43], "kind": "banner_command" },
+    { "cell": [17, 41], "kind": "campfire" },
+    { "cell": [10, 44], "kind": "pennants", "flip": true },
+    { "cell": [6, 38], "kind": "supply_cart" }
+  ],
     "zoom": 1.4,
     "focus": [
       15,

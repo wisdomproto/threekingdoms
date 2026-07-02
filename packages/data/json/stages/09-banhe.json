@@ -4,6 +4,19 @@
   "mapId": "banhe",
   "turnLimit": 18,
   "camera": { "zoom": 1.4, "focus": [22, 17] },
+  "decorations": [
+    { "cell": [24, 5], "kind": "pennants" },
+    { "cell": [26, 6], "kind": "banner_command" },
+    { "cell": [21, 8], "kind": "brazier" },
+    { "cell": [8, 14], "kind": "reeds" },
+    { "cell": [20, 14], "kind": "reeds", "flip": true },
+    { "cell": [33, 17], "kind": "reeds" },
+    { "cell": [40, 17], "kind": "reeds", "flip": true },
+    { "cell": [16, 31], "kind": "banner_command" },
+    { "cell": [23, 31], "kind": "campfire" },
+    { "cell": [10, 31], "kind": "supply_cart" },
+    { "cell": [7, 22], "kind": "debris_cart" }
+  ],
   "reward": { "gold": 650, "exp": 0, "treasures": [] },
   "levelCap": 17,
   "scenario": {

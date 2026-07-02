@@ -4,6 +4,23 @@
   "mapId": "yingchuan",
   "turnLimit": 25,
   "camera": {
+  "decorations": [
+    { "cell": [38, 13], "kind": "banner_command" },
+    { "cell": [39, 17], "kind": "pennants" },
+    { "cell": [36, 17], "kind": "campfire" },
+    { "cell": [18, 14], "kind": "brazier" },
+    { "cell": [24, 14], "kind": "brazier", "flip": true },
+    { "cell": [25, 17], "kind": "campfire" },
+    { "cell": [10, 14], "kind": "reeds" },
+    { "cell": [15, 17], "kind": "reeds", "flip": true },
+    { "cell": [30, 14], "kind": "reeds" },
+    { "cell": [35, 17], "kind": "reeds", "flip": true },
+    { "cell": [19, 29], "kind": "banner_command" },
+    { "cell": [23, 28], "kind": "campfire" },
+    { "cell": [18, 31], "kind": "supply_cart" },
+    { "cell": [36, 20], "kind": "debris_cart" },
+    { "cell": [41, 20], "kind": "debris_pile" }
+  ],
     "zoom": 1.5,
     "focus": [
       22,

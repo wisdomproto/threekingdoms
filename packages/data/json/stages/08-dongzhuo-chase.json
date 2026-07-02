@@ -4,6 +4,21 @@
   "mapId": "dongzhuo-chase",
   "turnLimit": 16,
   "camera": { "zoom": 1.4, "focus": [18, 16] },
+  "decorations": [
+    { "cell": [19, 3], "kind": "pennants" },
+    { "cell": [18, 6], "kind": "debris_cart" },
+    { "cell": [23, 8], "kind": "debris_cart", "flip": true },
+    { "cell": [16, 9], "kind": "debris_pile" },
+    { "cell": [24, 10], "kind": "supply_cart" },
+    { "cell": [21, 13], "kind": "debris_weapons" },
+    { "cell": [14, 11], "kind": "debris_pile" },
+    { "cell": [10, 15], "kind": "reeds" },
+    { "cell": [30, 15], "kind": "reeds", "flip": true },
+    { "cell": [25, 18], "kind": "reeds" },
+    { "cell": [35, 19], "kind": "reeds", "flip": true },
+    { "cell": [18, 30], "kind": "campfire" },
+    { "cell": [19, 33], "kind": "banner_command" }
+  ],
   "reward": { "gold": 600, "exp": 0, "treasures": [] },
   "levelCap": 16,
   "scenario": {

@@ -4,6 +4,19 @@
   "mapId": "luoyang",
   "turnLimit": 28,
   "camera": { "zoom": 1.5, "focus": [10, 8] },
+  "decorations": [
+    { "cell": [10, 7], "kind": "debris_cart" },
+    { "cell": [17, 10], "kind": "debris_pile", "flip": true },
+    { "cell": [25, 8], "kind": "debris_weapons" },
+    { "cell": [15, 5], "kind": "brazier" },
+    { "cell": [30, 15], "kind": "brazier", "flip": true },
+    { "cell": [36, 10], "kind": "brazier" },
+    { "cell": [33, 21], "kind": "debris_pile" },
+    { "cell": [3, 17], "kind": "supply_cart" },
+    { "cell": [43, 25], "kind": "debris_cart", "flip": true },
+    { "cell": [16, 9], "kind": "pennants", "flip": true },
+    { "cell": [8, 21], "kind": "campfire" }
+  ],
   "reward": { "gold": 500, "exp": 0, "treasures": [] },
   "levelCap": 14,
   "scenario": {

@@ -4,6 +4,20 @@
   "mapId": "guangzong",
   "turnLimit": 25,
   "camera": { "zoom": 1.5, "focus": [40, 16] },
+  "decorations": [
+    { "cell": [46, 15], "kind": "banner_command" },
+    { "cell": [42, 16], "kind": "campfire" },
+    { "cell": [46, 19], "kind": "supply_cart" },
+    { "cell": [42, 13], "kind": "pennants" },
+    { "cell": [30, 15], "kind": "debris_siege" },
+    { "cell": [18, 12], "kind": "debris_weapons" },
+    { "cell": [17, 20], "kind": "debris_cart", "flip": true },
+    { "cell": [9, 7], "kind": "pennants" },
+    { "cell": [5, 10], "kind": "brazier" },
+    { "cell": [4, 11], "kind": "campfire" },
+    { "cell": [5, 24], "kind": "shrub" },
+    { "cell": [9, 26], "kind": "debris_pile" }
+  ],
   "reward": { "gold": 250, "exp": 0, "treasures": ["무술교본"] },
   "levelCap": 8,
   "scenario": {

@@ -468,12 +468,46 @@ export const StageScenarioSchema = z.object({
 });
 export type StageScenario = z.infer<typeof StageScenarioSchema>;
 
+/**
+ * 정밀 데코 배치 (§3-1 하이브리드 Chunk 3 — 스테이지별 "장소감").
+ * 순수 시각 — 지형/통행/전투 판정 불변(ObjectLayer가 그리기만 한다).
+ *  - kind: /assets/objects/{kind}.png 오브젝트 키. 미보유 키는 렌더러가 조용히 생략(드롭인).
+ *  - 통행 가능한 칸 위 데코는 이동을 막지 않으므로 "막는 것처럼 보이는" 대형물(나무·바위·목책)은
+ *    스키마가 원천 차단 — 아래 enum(바닥 소품 전용)만 허용(시각 정직성).
+ */
+export const DECORATION_KINDS = [
+  "banner_command", // 진영 지휘 깃발
+  "pennants",       // 작은 깃발 무리
+  "signal_flag",    // 신호기
+  "campfire",       // 모닥불
+  "brazier",        // 화로(의식/화공 모티프)
+  "supply_cart",    // 보급 수레
+  "debris_pile",    // 잔해 더미
+  "debris_cart",    // 부서진 수레
+  "debris_weapons", // 버려진 무기
+  "debris_siege",   // 공성 잔해
+  "shrub",          // 수풀
+  "reeds",          // 갈대(물가)
+] as const;
+
+export const DecorationSchema = z.object({
+  cell: z.tuple([z.number().int().min(0), z.number().int().min(0)]),
+  kind: z.enum(DECORATION_KINDS),
+  /** 좌우 반전(같은 소품 반복 시 시각 다양화) */
+  flip: z.boolean().optional(),
+  /** 크기 배율(기본 1 — 렌더러 기본 스케일에 곱) */
+  scale: z.number().positive().max(3).optional(),
+});
+export type Decoration = z.infer<typeof DecorationSchema>;
+
 export const StageSchema = z.object({
   id: z.string(),
   name: z.string(),
   mapId: z.string(),
   turnLimit: z.number().int().min(1),
   camera: StageCameraSchema.optional(),
+  // 정밀 데코(§3-1 Chunk 3) — 지형 자동 데코 위에 스테이지 서사 소품을 얹는다. 미지정 = 없음.
+  decorations: z.array(DecorationSchema).optional(),
   // 대사/스토리 (C — §344 말풍선). 순수 표현·하위호환(미지정 = 대사 없음). 디렉터가 read-only 구독.
   dialogue: z.array(StageDialogueSchema).optional(),
   // 막간 시나리오 씬 (§5 — 전투 밖 컷신). intro→상점→전투→outro 캠페인 루프. 하위호환(미지정 = 씬 없음).
