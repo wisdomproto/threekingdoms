@@ -61,10 +61,11 @@ function className(classId: string): string {
 
 function Stars({ level }: { level: number }): React.ReactElement {
   const n = Math.min(5, Math.max(1, Math.round(level / 10)));
+  // 빈 별은 아주 희미하게(0.15) — 종전 0.4는 채운 별과 구분이 안 돼 전원 만점처럼 읽혔다(P0 리뷰).
   return (
     <span style={{ lineHeight: 1 }}>
       <span style={{ color: GOLD, fontSize: 11, letterSpacing: -0.5 }}>{"★".repeat(n)}</span>
-      <span style={{ color: GOLD_DIM, fontSize: 11, letterSpacing: -0.5, opacity: 0.4 }}>{"★".repeat(5 - n)}</span>
+      <span style={{ color: GOLD_DIM, fontSize: 11, letterSpacing: -0.5, opacity: 0.15 }}>{"★".repeat(5 - n)}</span>
     </span>
   );
 }
@@ -409,7 +410,7 @@ export function Formation({ roster, maxSlots, selected, onChange, chapter }: For
                   <Stars level={u.level} />
                 </div>
                 {u.equipped.length > 0 && (
-                  <span style={{ fontSize: 9, color: GOLD_DIM }}>⚔ {u.equipped.length}</span>
+                  <span style={{ fontSize: 9, color: GOLD_DIM }}>장비 {u.equipped.length}</span>
                 )}
               </div>
             </button>
@@ -495,7 +496,7 @@ export function Formation({ roster, maxSlots, selected, onChange, chapter }: For
                       <span style={{
                         position: "absolute", bottom: 18, right: 3,
                         fontSize: 8, color: GOLD, lineHeight: 1,
-                      }}>⚔{m.items.length}</span>
+                      }}>장비{m.items.length}</span>
                     )}
                   </button>
                 );

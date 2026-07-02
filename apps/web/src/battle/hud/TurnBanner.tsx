@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Side } from "@tk/data";
 import type { InputState, UiEvent } from "../inputMachine";
 import type { BattleVM } from "../viewmodel";
+import { HUD_FONT, HUD_INK, HUD_BRONZE_DIM, HUD_PARCHMENT } from "./frames";
 
 const BAR_STYLE: React.CSSProperties = {
   position: "absolute",
@@ -20,6 +21,7 @@ const BAR_STYLE: React.CSSProperties = {
   padding: "calc(10px + env(safe-area-inset-top)) 14px 10px", // 노치 기기 상단 안전 영역
   color: "#e8e6e3",
   fontSize: 15,
+  fontFamily: HUD_FONT, // 수묵/청동 크롬 서체 통일(P0)
   background: "linear-gradient(rgba(10, 12, 15, 0.75), rgba(10, 12, 15, 0))",
   pointerEvents: "none",
   userSelect: "none",
@@ -45,14 +47,17 @@ const END_TURN_STYLE: React.CSSProperties = {
   minHeight: 56,
   minWidth: 104,
   padding: "0 18px",
-  borderRadius: 14,
-  border: "1px solid #3a414a",
-  background: "rgba(24, 28, 33, 0.92)",
-  color: "#e8e6e3",
+  borderRadius: 10,
+  border: `1.5px solid ${HUD_BRONZE_DIM}`,
+  background: HUD_INK,
+  color: HUD_PARCHMENT,
   fontSize: 17,
-  fontWeight: 600,
+  fontWeight: 700,
+  letterSpacing: "0.08em",
+  fontFamily: HUD_FONT,
   cursor: "pointer",
   touchAction: "manipulation",
+  boxShadow: "0 3px 10px rgba(0,0,0,0.45)",
 };
 
 function phaseLabel(ui: InputState, vm: BattleVM): string {
@@ -169,6 +174,7 @@ function PhaseFlash({ phase, turn, status }: { phase: Side; turn: number; status
             fontWeight: 800,
             letterSpacing: 4,
             color: "#f5f3ef",
+            fontFamily: HUD_FONT,
             textShadow: `0 0 10px ${tint}, 0 2px 4px rgba(0,0,0,0.8)`,
           }}
         >

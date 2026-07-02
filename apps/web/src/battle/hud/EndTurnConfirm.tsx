@@ -8,6 +8,7 @@
  * 아니오→cancel(아군 페이즈 복귀). 엔진/스토어 불변 — ui 상태만 본다.
  */
 import type { InputState, UiEvent } from "../inputMachine";
+import { HUD_FONT } from "./frames";
 
 const OVERLAY_STYLE: React.CSSProperties = {
   position: "absolute",
@@ -31,6 +32,7 @@ const CARD_STYLE: React.CSSProperties = {
   boxShadow: "0 8px 28px rgba(0, 0, 0, 0.6)",
   color: "#ece8e0",
   textAlign: "center",
+  fontFamily: HUD_FONT, // HUD 크롬 서체 통일(P0)
 };
 
 const BTN_BASE: React.CSSProperties = {
@@ -63,7 +65,7 @@ export function EndTurnConfirm({
         <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
           <button
             type="button"
-            style={{ ...BTN_BASE, border: "1px solid #3a414a", background: "rgba(40, 34, 24, 0.9)", color: "#cdd2d8" }}
+            style={{ ...BTN_BASE, border: "1px solid #55462a", background: "rgba(40, 34, 24, 0.9)", color: "#d8ccb2" }}
             onClick={() => dispatch({ type: "cancel" })}
           >
             아니오

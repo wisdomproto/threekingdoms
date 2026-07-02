@@ -656,6 +656,7 @@ export function ResultSequence({
             >
               +{(doubled ? goldShown : skipped ? summary.gold : goldShown).toLocaleString()}
             </span>
+            <span style={{ color: "#8a7350", fontSize: 12 }}>金</span>
           </div>
           {/* 기연 포인트 적립(§12) — 막간 기연 뽑기 자원. 자금 줄 아래 한 줄. */}
           {serendipityPts > 0 && (

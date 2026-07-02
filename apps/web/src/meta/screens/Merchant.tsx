@@ -13,6 +13,7 @@ import { getMeta, spendGold, addItem } from "../metaStore";
 import { RewardedAdButton } from "../RewardedAdButton";
 import { PANEL_FRAME } from "../../battle/hud/frames";
 import { ItemIcon } from "../../ui/ItemIcon";
+import { CATEGORY_LABEL, effectText } from "./shopItemView";
 
 const INK_DEEP = "#0d0b09";
 const BRONZE_GOLD = "#cdab6e";
@@ -119,7 +120,7 @@ export function Merchant(): React.ReactElement {
           노변의 상인이 좌판을 벌였다. 가격이 좀 비싸지만 구색은 나쁘지 않다.
         </div>
         <div style={{ fontSize: 13, color: BRONZE_GOLD, marginBottom: 16 }}>
-          보유 자금: <strong>{gold}</strong> 전
+          보유 자금: <strong>{gold.toLocaleString()}</strong> 金
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
@@ -150,15 +151,18 @@ export function Merchant(): React.ReactElement {
                         fontSize: 11,
                         fontWeight: 400,
                         color: BRONZE_DIM,
-                        textTransform: "uppercase",
                       }}
                     >
-                      {item.category}
+                      {CATEGORY_LABEL[item.category] ?? item.category}
                     </span>
+                  </div>
+                  {/* 효과 한 줄 — 일반 상점과 동일 정보(900金짜리를 효과 표기 없이 팔지 않는다) */}
+                  <div style={{ fontSize: 11, color: BRONZE_DIM, marginTop: 2 }}>
+                    {effectText(item)}
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
-                  <span style={{ color: BRONZE_GOLD, fontSize: 13, fontWeight: 600 }}>{entry.price} 전</span>
+                  <span style={{ color: BRONZE_GOLD, fontSize: 13, fontWeight: 600 }}>{entry.price.toLocaleString()} 金</span>
                   <button
                     type="button"
                     disabled={bought || gold < entry.price}

@@ -103,14 +103,14 @@ export function Shop({
         <div style={headerRightStyle}>
           <RewardedAdButton
             placement="shop_gold"
-            label={`+${AD_GOLD_REWARD}냥`}
+            label={`+${AD_GOLD_REWARD} 金`}
             capReached={!canWatchGoldAd()}
             onReward={handleAdGold}
           />
           <span style={goldStyle} aria-label="보유 자금">
             <span style={goldLabelStyle}>자금</span>
             {gold.toLocaleString()}
-            <span style={goldUnitStyle}>냥</span>
+            <span style={goldUnitStyle}>金</span>
           </span>
         </div>
       </div>
@@ -171,13 +171,16 @@ function ShopRowView({
         </div>
         <div style={{ color: C.mutedText, fontSize: 11, marginTop: 2 }}>
           {row.effect}
-          {row.consumable && <span style={{ marginLeft: 5, opacity: 0.7 }}>· 소모품</span>}
+          {/* 소모성 표기는 분류 배지가 이미 "소모품"인 supplyItem엔 중복이라 생략(공격 아이템 등에만) */}
+          {row.consumable && row.category !== "supplyItem" && (
+            <span style={{ marginLeft: 5, opacity: 0.7 }}>· 소모성</span>
+          )}
         </div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
         <span style={priceStyle} aria-label="가격">
           {row.price.toLocaleString()}
-          <span style={{ fontSize: 11, marginLeft: 2 }}>냥</span>
+          <span style={{ fontSize: 11, marginLeft: 2 }}>金</span>
         </span>
         <button
           type="button"

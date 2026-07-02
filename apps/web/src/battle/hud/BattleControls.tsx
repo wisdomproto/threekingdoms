@@ -5,9 +5,12 @@
  * - 자동전투: 아군 페이즈를 그리디 AI가 대신 진행 (토글). ON이면 강조 표시.
  * TurnBanner(상단 바)·ActionMenu/턴종료(하단)와 겹치지 않게 우상단 세로 스택에 둔다.
  * - 음악 토글: 전역 음량 패널(좌하단 AudioControl)이 전투 대사창에 가려 안 보일 때를 위한 빠른 BGM on/off.
+ * 톤 = frames.ts HUD 청동/수묵 크롬 토큰(2026-06-30 P0: 회색 사각+컬러 이모지 → 청동 먹 패널.
+ * 글리프는 텍스트 렌더 유니코드만 — 컬러 이모지는 OS마다 다르게 떠 수묵 톤을 깬다).
  */
 import { useEffect, useState } from "react";
 import { audio, DEFAULT_SETTINGS } from "../../audio";
+import { HUD_FONT, HUD_INK, HUD_BRONZE, HUD_BRONZE_DIM, HUD_PARCHMENT } from "./frames";
 
 // 우측 컬럼(미니맵 아래)에 흐르도록 — 위치는 BattleScreen의 래퍼가 잡는다
 const STACK_STYLE: React.CSSProperties = {
@@ -21,19 +24,22 @@ const STACK_STYLE: React.CSSProperties = {
 
 const BTN_STYLE: React.CSSProperties = {
   minHeight: 40,
-  minWidth: 96,
+  minWidth: 104,
   padding: "0 14px",
-  borderRadius: 12,
+  borderRadius: 8,
   borderWidth: 1,
   borderStyle: "solid",
-  borderColor: "#3a414a",
-  background: "rgba(24, 28, 33, 0.92)",
-  color: "#e8e6e3",
+  borderColor: HUD_BRONZE_DIM,
+  background: HUD_INK,
+  color: HUD_PARCHMENT,
   fontSize: 14,
-  fontWeight: 600,
+  fontWeight: 700,
+  letterSpacing: "0.05em",
+  fontFamily: HUD_FONT,
   cursor: "pointer",
   pointerEvents: "auto",
   touchAction: "manipulation",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
 };
 
 export function BattleControls({
@@ -57,7 +63,7 @@ export function BattleControls({
 }): React.ReactElement {
   const accent = (active: boolean): React.CSSProperties =>
     active
-      ? { ...BTN_STYLE, borderColor: "#ffc24b", color: "#ffc24b", background: "rgba(50, 40, 14, 0.92)" }
+      ? { ...BTN_STYLE, borderColor: HUD_BRONZE, color: HUD_BRONZE, background: "rgba(46, 36, 16, 0.94)" }
       : BTN_STYLE;
   const dimmed: React.CSSProperties = {
     ...BTN_STYLE,
@@ -73,7 +79,7 @@ export function BattleControls({
         ⟲ 기본 줌
       </button>
       <button type="button" style={accent(speed > 1)} onClick={onCycleSpeed}>
-        ⏩ 배속 ×{speed}
+        » 배속 ×{speed}
       </button>
       <button
         type="button"
@@ -81,7 +87,7 @@ export function BattleControls({
         onClick={canAutoFight ? onToggleAuto : undefined}
         title={canAutoFight ? undefined : "클리어한 스테이지에서만 사용 가능"}
       >
-        {auto ? "⏸ 자동전투" : "▶ 자동전투"}
+        {auto ? "■ 자동전투" : "▶︎ 자동전투"}
       </button>
       <MusicToggle />
     </div>
@@ -110,7 +116,7 @@ function MusicToggle(): React.ReactElement {
           : {}),
       }}
     >
-      {bgmOff ? "🔇 음악 꺼짐" : "🎵 음악 켜짐"}
+      {bgmOff ? "♪ 음악 꺼짐" : "♪ 음악 켜짐"}
     </button>
   );
 }

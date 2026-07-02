@@ -19,6 +19,7 @@ import { useCallback, useEffect, useReducer, useRef, useState, useSyncExternalSt
 import type { StageDialogue, DialogueLine } from "@tk/data";
 import type { BattleStore } from "../store";
 import { PORTRAIT_FRAME } from "../hud/frames";
+import { assetUrl } from "../../assetUrl";
 import {
   type DialogueSnapshot,
   toDialogueSnapshot,
@@ -115,7 +116,16 @@ const OVERLAY_STYLE: React.CSSProperties = {
 const ARROW_KEYFRAMES = `@keyframes tk-dlg-arrow { 0%,100% { transform: translateY(0); opacity: 0.55; } 50% { transform: translateY(3px); opacity: 1; } }`;
 
 function PortraitFrame({ name }: { name: string }): React.ReactElement {
-  // portraitId 에셋 파이프라인 연결 전까지는 화자명 머리글자 플레이스홀더(청동 액자).
+  // 실제 초상(/assets/ui/portraits/{화자명}.webp — UnitPanel·ScenePlayer와 동일 규약).
+  // 파일 없으면(onError) 종전 머리글자 플레이스홀더로 폴백 — 새 초상은 코드 수정 없이 자동 표시.
+  const [failed, setFailed] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    // onError 레이스(핸들러 부착 전 404) 방어 — UnitPanel PortraitBox와 동일 패턴
+    setFailed(false);
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth === 0) setFailed(true);
+  }, [name]);
   return (
     <div
       style={{
@@ -131,9 +141,20 @@ function PortraitFrame({ name }: { name: string }): React.ReactElement {
         color: "#d8c9a0",
         fontSize: 30,
         fontWeight: 700,
+        overflow: "hidden",
       }}
     >
-      {name.slice(0, 1)}
+      {!failed ? (
+        <img
+          ref={imgRef}
+          src={assetUrl(`/assets/ui/portraits/${encodeURIComponent(name)}.webp`)}
+          alt={name}
+          onError={() => setFailed(true)}
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
+        />
+      ) : (
+        name.slice(0, 1)
+      )}
     </div>
   );
 }

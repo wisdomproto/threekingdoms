@@ -44,3 +44,17 @@ export const PORTRAIT_FRAME: CSSProperties = {
   borderImageSlice: "53 36 50 38",
   borderImageRepeat: "stretch",
 };
+
+// ── 전투 HUD 공통 청동/수묵 크롬 토큰 ─────────────────────────────────────────
+// 상시 컨트롤(BattleControls·턴 종료)·모달이 공유 — 팝업(청동 프레임)과 톤을 맞춘다.
+// (종전엔 상시 크롬만 회색 사각+이모지라 씬/팝업과 톤이 널뛰었다 — 2026-06-30 리뷰 P0.)
+/** 수묵/청동 HUD 서체 — ScenePlayer·LoadingTransition·PauseMenu와 동일 스택 */
+export const HUD_FONT = '"Noto Serif KR", "Nanum Myeongjo", "Apple SD Gothic Neo", serif';
+/** 먹빛 패널 바탕 (상시 버튼) */
+export const HUD_INK = "rgba(24, 20, 13, 0.92)";
+/** 청동 테두리(기본) */
+export const HUD_BRONZE_DIM = "#6f5a34";
+/** 청동 하이라이트(활성/강조) */
+export const HUD_BRONZE = "#e0b84a";
+/** 양피지 글자색 */
+export const HUD_PARCHMENT = "#e8d9b0";

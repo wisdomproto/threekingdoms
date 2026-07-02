@@ -6,8 +6,8 @@
  */
 import type { Item, Shop, ShopItem } from "@tk/data";
 
-/** 카테고리 한글 라벨 — 진열 분류 배지. */
-const CATEGORY_LABEL: Record<Item["category"], string> = {
+/** 카테고리 한글 라벨 — 진열 분류 배지 (상점·떠돌이상인 공용, raw enum 노출 금지). */
+export const CATEGORY_LABEL: Record<Item["category"], string> = {
   weapon: "무기",
   treasure: "보물",
   attackItem: "공격 아이템",
