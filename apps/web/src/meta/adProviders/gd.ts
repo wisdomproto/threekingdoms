@@ -85,4 +85,5 @@ export class GdAdService implements AdService, PortalLifecycle {
   loadingFinished(): void {}
   gameplayStart(): void {}
   gameplayStop(): void {}
+  happytime(): void {} // GD 대응 API 없음
 }

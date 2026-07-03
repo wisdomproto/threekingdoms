@@ -15,6 +15,8 @@ export interface PortalLifecycle {
   loadingFinished(): void;
   gameplayStart(): void;
   gameplayStop(): void;
+  /** 기쁜 순간(전투 승리 등) — 포털 참여 지표/광고 타이밍 힌트. CrazyGames/Poki 지원, GD no-op. */
+  happytime(): void;
 }
 
 let active: PortalLifecycle | null = null;
@@ -55,5 +57,9 @@ export const adLifecycle = {
     if (!playing) return; // start 없이 stop 금지(포털 짝 요건)
     playing = false;
     active?.gameplayStop();
+  },
+  happytime(): void {
+    ensureService?.();
+    active?.happytime(); // 기쁜 순간 펄스 — dedupe 없음(승리마다 1회)
   },
 };

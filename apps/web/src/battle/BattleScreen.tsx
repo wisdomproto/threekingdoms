@@ -277,6 +277,11 @@ export default function BattleScreen(): React.ReactElement {
   useEffect(() => {
     if (!battleOngoing) adLifecycle.gameplayStop();
   }, [battleOngoing]);
+  // 승리 = 기쁜 순간(§13 happytime) — 포털 참여 지표/광고 타이밍 힌트. 패배는 제외. stub=no-op.
+  const battleWon = snap.vm.status === "victory";
+  useEffect(() => {
+    if (battleWon) adLifecycle.happytime();
+  }, [battleWon]);
   // 자동전투는 클리어한 스테이지에서만 활성화(§15 "배속/자동전투 클리어 스테이지 한정").
   const stageId = ctx.stage.id;
   const isCleared = useMemo(() => getMeta().clearedStages.includes(stageId), [stageId]);

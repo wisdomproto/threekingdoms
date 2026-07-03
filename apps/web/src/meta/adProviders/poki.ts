@@ -23,6 +23,7 @@ export interface PokiSdkLike {
   gameLoadingFinished?(): void;
   gameplayStart?(): void;
   gameplayStop?(): void;
+  happyTime?(progress: number): void;
 }
 
 export class PokiAdService implements AdService, PortalLifecycle {
@@ -88,5 +89,9 @@ export class PokiAdService implements AdService, PortalLifecycle {
   }
   gameplayStop(): void {
     void this.sdk().then((s) => s.gameplayStop?.()).catch(() => {});
+  }
+  happytime(): void {
+    // Poki happyTime(progress 0~1) — 승리는 절정이라 1.
+    void this.sdk().then((s) => s.happyTime?.(1)).catch(() => {});
   }
 }

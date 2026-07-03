@@ -32,6 +32,7 @@ export interface CrazySdkLike {
     gameplayStop?(): void;
     loadingStart?(): void;
     loadingStop?(): void;
+    happytime?(): void;
   };
 }
 
@@ -114,5 +115,8 @@ export class CrazyGamesAdService implements AdService, PortalLifecycle {
   }
   gameplayStop(): void {
     void this.sdk().then((s) => s.game?.gameplayStop?.()).catch(() => {});
+  }
+  happytime(): void {
+    void this.sdk().then((s) => s.game?.happytime?.()).catch(() => {});
   }
 }
