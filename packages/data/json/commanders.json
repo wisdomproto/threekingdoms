@@ -7,7 +7,11 @@
     "intelligence": 76,
     "faceId": 0,
     "agility": 74,
-    "ultimate": { "name": "인덕의 결의", "percent": 150 }
+    "ultimate": {
+      "name": "인덕의 결의",
+      "percent": 150
+    },
+    "luck": 99
   },
   "관우": {
     "id": "관우",
@@ -17,7 +21,11 @@
     "intelligence": 90,
     "faceId": 1,
     "agility": 68,
-    "ultimate": { "name": "청룡언월", "percent": 180 }
+    "ultimate": {
+      "name": "청룡언월",
+      "percent": 180
+    },
+    "luck": 62
   },
   "장비": {
     "id": "장비",
@@ -27,7 +35,11 @@
     "intelligence": 46,
     "faceId": 2,
     "agility": 72,
-    "ultimate": { "name": "장팔사모", "percent": 170 }
+    "ultimate": {
+      "name": "장팔사모",
+      "percent": 170
+    },
+    "luck": 76
   },
   "동탁": {
     "id": "동탁",
@@ -36,7 +48,8 @@
     "war": 88,
     "intelligence": 46,
     "faceId": 136,
-    "agility": 52
+    "agility": 52,
+    "luck": 48
   },
   "여포": {
     "id": "여포",
@@ -45,7 +58,8 @@
     "war": 100,
     "intelligence": 12,
     "faceId": 148,
-    "agility": 94
+    "agility": 94,
+    "luck": 84
   },
   "화웅": {
     "id": "화웅",
@@ -54,7 +68,8 @@
     "war": 90,
     "intelligence": 38,
     "faceId": 138,
-    "agility": 56
+    "agility": 56,
+    "luck": 54
   },
   "이유": {
     "id": "이유",
@@ -63,7 +78,8 @@
     "war": 50,
     "intelligence": 92,
     "faceId": 137,
-    "agility": 58
+    "agility": 58,
+    "luck": 62
   },
   "공융": {
     "id": "공융",
@@ -80,7 +96,8 @@
     "war": 82,
     "intelligence": 92,
     "faceId": 27,
-    "agility": 80
+    "agility": 80,
+    "luck": 84
   },
   "원소": {
     "id": "원소",
@@ -89,7 +106,8 @@
     "war": 70,
     "intelligence": 74,
     "faceId": 110,
-    "agility": 80
+    "agility": 80,
+    "luck": 78
   },
   "손견": {
     "id": "손견",
@@ -98,7 +116,8 @@
     "war": 92,
     "intelligence": 72,
     "faceId": 77,
-    "agility": 76
+    "agility": 76,
+    "luck": 84
   },
   "원술": {
     "id": "원술",
@@ -107,7 +126,8 @@
     "war": 64,
     "intelligence": 62,
     "faceId": 144,
-    "agility": 60
+    "agility": 60,
+    "luck": 52
   },
   "공손찬": {
     "id": "공손찬",
@@ -116,7 +136,8 @@
     "war": 60,
     "intelligence": 60,
     "faceId": 107,
-    "agility": 60
+    "agility": 60,
+    "luck": 60
   },
   "정보": {
     "id": "정보",
@@ -125,7 +146,8 @@
     "war": 90,
     "intelligence": 68,
     "faceId": 78,
-    "agility": 58
+    "agility": 58,
+    "luck": 56
   },
   "황개": {
     "id": "황개",
@@ -134,7 +156,8 @@
     "war": 90,
     "intelligence": 58,
     "faceId": 170,
-    "agility": 52
+    "agility": 52,
+    "luck": 54
   },
   "도겸": {
     "id": "도겸",
@@ -143,7 +166,8 @@
     "war": 74,
     "intelligence": 72,
     "faceId": 189,
-    "agility": 58
+    "agility": 58,
+    "luck": 56
   },
   "하후돈": {
     "id": "하후돈",
@@ -152,7 +176,8 @@
     "war": 98,
     "intelligence": 64,
     "faceId": 28,
-    "agility": 90
+    "agility": 90,
+    "luck": 66
   },
   "하후연": {
     "id": "하후연",
@@ -161,7 +186,8 @@
     "war": 92,
     "intelligence": 62,
     "faceId": 29,
-    "agility": 66
+    "agility": 66,
+    "luck": 78
   },
   "조인": {
     "id": "조인",
@@ -170,7 +196,8 @@
     "war": 88,
     "intelligence": 66,
     "faceId": 30,
-    "agility": 70
+    "agility": 70,
+    "luck": 62
   },
   "조홍": {
     "id": "조홍",
@@ -179,7 +206,8 @@
     "war": 64,
     "intelligence": 82,
     "faceId": 31,
-    "agility": 66
+    "agility": 66,
+    "luck": 70
   },
   "이숙": {
     "id": "이숙",
@@ -188,7 +216,8 @@
     "war": 34,
     "intelligence": 82,
     "faceId": 139,
-    "agility": 72
+    "agility": 72,
+    "luck": 58
   },
   "호진": {
     "id": "호진",
@@ -221,7 +250,8 @@
     "war": 48,
     "intelligence": 84,
     "faceId": 200,
-    "agility": 62
+    "agility": 62,
+    "luck": 60
   },
   "공손월": {
     "id": "공손월",
@@ -270,7 +300,8 @@
     "war": 74,
     "intelligence": 88,
     "faceId": 26,
-    "agility": 74
+    "agility": 74,
+    "luck": 52
   },
   "이풍": {
     "id": "이풍",
@@ -295,7 +326,8 @@
     "war": 80,
     "intelligence": 34,
     "faceId": 16,
-    "agility": 68
+    "agility": 68,
+    "luck": 78
   },
   "사마가": {
     "id": "사마가",
@@ -304,7 +336,8 @@
     "war": 88,
     "intelligence": 28,
     "faceId": 216,
-    "agility": 64
+    "agility": 64,
+    "luck": 68
   },
   "순상": {
     "id": "순상",
@@ -329,7 +362,8 @@
     "war": 58,
     "intelligence": 78,
     "faceId": 63,
-    "agility": 54
+    "agility": 54,
+    "luck": 60
   },
   "조루": {
     "id": "조루",
@@ -378,7 +412,8 @@
     "war": 92,
     "intelligence": 52,
     "faceId": 211,
-    "agility": 60
+    "agility": 60,
+    "luck": 64
   },
   "한당": {
     "id": "한당",
@@ -387,7 +422,8 @@
     "war": 84,
     "intelligence": 60,
     "faceId": 88,
-    "agility": 64
+    "agility": 64,
+    "luck": 82
   },
   "주연": {
     "id": "주연",
@@ -404,7 +440,8 @@
     "war": 76,
     "intelligence": 60,
     "faceId": 141,
-    "agility": 62
+    "agility": 62,
+    "luck": 52
   },
   "곽사": {
     "id": "곽사",
@@ -413,7 +450,8 @@
     "war": 74,
     "intelligence": 62,
     "faceId": 142,
-    "agility": 58
+    "agility": 58,
+    "luck": 64
   },
   "서영": {
     "id": "서영",
@@ -422,7 +460,8 @@
     "war": 84,
     "intelligence": 50,
     "faceId": 143,
-    "agility": 52
+    "agility": 52,
+    "luck": 56
   },
   "전풍": {
     "id": "전풍",
@@ -431,7 +470,8 @@
     "war": 54,
     "intelligence": 96,
     "faceId": 113,
-    "agility": 56
+    "agility": 56,
+    "luck": 38
   },
   "저수": {
     "id": "저수",
@@ -440,7 +480,8 @@
     "war": 52,
     "intelligence": 94,
     "faceId": 114,
-    "agility": 60
+    "agility": 60,
+    "luck": 36
   },
   "안량": {
     "id": "안량",
@@ -449,7 +490,8 @@
     "war": 94,
     "intelligence": 42,
     "faceId": 111,
-    "agility": 64
+    "agility": 64,
+    "luck": 56
   },
   "문추": {
     "id": "문추",
@@ -458,7 +500,8 @@
     "war": 94,
     "intelligence": 36,
     "faceId": 112,
-    "agility": 66
+    "agility": 66,
+    "luck": 62
   },
   "조운": {
     "id": "조운",
@@ -468,7 +511,11 @@
     "intelligence": 68,
     "faceId": 3,
     "agility": 66,
-    "ultimate": { "name": "단기필마", "percent": 170 }
+    "ultimate": {
+      "name": "단기필마",
+      "percent": 170
+    },
+    "luck": 64
   },
   "봉기": {
     "id": "봉기",
@@ -477,7 +524,8 @@
     "war": 48,
     "intelligence": 84,
     "faceId": 122,
-    "agility": 74
+    "agility": 74,
+    "luck": 66
   },
   "허유": {
     "id": "허유",
@@ -486,7 +534,8 @@
     "war": 46,
     "intelligence": 82,
     "faceId": 123,
-    "agility": 72
+    "agility": 72,
+    "luck": 48
   },
   "진진": {
     "id": "진진",
@@ -535,7 +584,8 @@
     "war": 22,
     "intelligence": 98,
     "faceId": 34,
-    "agility": 82
+    "agility": 82,
+    "luck": 90
   },
   "우금": {
     "id": "우금",
@@ -544,7 +594,8 @@
     "war": 78,
     "intelligence": 60,
     "faceId": 39,
-    "agility": 92
+    "agility": 92,
+    "luck": 98
   },
   "손건": {
     "id": "손건",
@@ -553,7 +604,8 @@
     "war": 76,
     "intelligence": 66,
     "faceId": 12,
-    "agility": 62
+    "agility": 62,
+    "luck": 76
   },
   "미축": {
     "id": "미축",
@@ -562,7 +614,8 @@
     "war": 72,
     "intelligence": 68,
     "faceId": 13,
-    "agility": 62
+    "agility": 62,
+    "luck": 74
   },
   "진등": {
     "id": "진등",
@@ -587,7 +640,8 @@
     "war": 98,
     "intelligence": 36,
     "faceId": 37,
-    "agility": 68
+    "agility": 68,
+    "luck": 98
   },
   "순욱": {
     "id": "순욱",
@@ -596,7 +650,8 @@
     "war": 54,
     "intelligence": 98,
     "faceId": 32,
-    "agility": 56
+    "agility": 56,
+    "luck": 62
   },
   "기영": {
     "id": "기영",
@@ -605,7 +660,8 @@
     "war": 80,
     "intelligence": 66,
     "faceId": 146,
-    "agility": 68
+    "agility": 68,
+    "luck": 38
   },
   "동소": {
     "id": "동소",
@@ -630,7 +686,8 @@
     "war": 88,
     "intelligence": 48,
     "faceId": 150,
-    "agility": 62
+    "agility": 62,
+    "luck": 38
   },
   "위속": {
     "id": "위속",
@@ -639,7 +696,8 @@
     "war": 78,
     "intelligence": 42,
     "faceId": 151,
-    "agility": 58
+    "agility": 58,
+    "luck": 44
   },
   "송겸": {
     "id": "송겸",
@@ -656,7 +714,8 @@
     "war": 68,
     "intelligence": 90,
     "faceId": 149,
-    "agility": 62
+    "agility": 62,
+    "luck": 52
   },
   "순유": {
     "id": "순유",
@@ -665,7 +724,8 @@
     "war": 34,
     "intelligence": 94,
     "faceId": 33,
-    "agility": 76
+    "agility": 76,
+    "luck": 78
   },
   "정욱": {
     "id": "정욱",
@@ -674,7 +734,8 @@
     "war": 58,
     "intelligence": 92,
     "faceId": 35,
-    "agility": 64
+    "agility": 64,
+    "luck": 76
   },
   "서황": {
     "id": "서황",
@@ -683,7 +744,8 @@
     "war": 92,
     "intelligence": 56,
     "faceId": 38,
-    "agility": 78
+    "agility": 78,
+    "luck": 96
   },
   "장요": {
     "id": "장요",
@@ -700,7 +762,8 @@
     "war": 76,
     "intelligence": 54,
     "faceId": 153,
-    "agility": 52
+    "agility": 52,
+    "luck": 54
   },
   "미방": {
     "id": "미방",
@@ -709,7 +772,8 @@
     "war": 78,
     "intelligence": 52,
     "faceId": 14,
-    "agility": 66
+    "agility": 66,
+    "luck": 70
   },
   "간옹": {
     "id": "간옹",
@@ -718,7 +782,8 @@
     "war": 54,
     "intelligence": 68,
     "faceId": 15,
-    "agility": 50
+    "agility": 50,
+    "luck": 76
   },
   "만총": {
     "id": "만총",
@@ -727,7 +792,8 @@
     "war": 54,
     "intelligence": 90,
     "faceId": 100,
-    "agility": 78
+    "agility": 78,
+    "luck": 84
   },
   "허사": {
     "id": "허사",
@@ -760,7 +826,8 @@
     "war": 72,
     "intelligence": 50,
     "faceId": 157,
-    "agility": 64
+    "agility": 64,
+    "luck": 76
   },
   "손관": {
     "id": "손관",
@@ -793,7 +860,8 @@
     "war": 50,
     "intelligence": 90,
     "faceId": 116,
-    "agility": 66
+    "agility": 66,
+    "luck": 38
   },
   "곽도": {
     "id": "곽도",
@@ -802,7 +870,8 @@
     "war": 40,
     "intelligence": 92,
     "faceId": 115,
-    "agility": 74
+    "agility": 74,
+    "luck": 68
   },
   "가후": {
     "id": "가후",
@@ -811,7 +880,8 @@
     "war": 52,
     "intelligence": 96,
     "faceId": 42,
-    "agility": 80
+    "agility": 80,
+    "luck": 78
   },
   "유표": {
     "id": "유표",
@@ -844,7 +914,8 @@
     "war": 90,
     "intelligence": 52,
     "faceId": 185,
-    "agility": 66
+    "agility": 66,
+    "luck": 40
   },
   "진림": {
     "id": "진림",
@@ -869,7 +940,8 @@
     "war": 72,
     "intelligence": 84,
     "faceId": 57,
-    "agility": 52
+    "agility": 52,
+    "luck": 82
   },
   "장수": {
     "id": "장수",
@@ -878,7 +950,8 @@
     "war": 80,
     "intelligence": 62,
     "faceId": 155,
-    "agility": 58
+    "agility": 58,
+    "luck": 56
   },
   "장합": {
     "id": "장합",
@@ -887,7 +960,8 @@
     "war": 90,
     "intelligence": 66,
     "faceId": 117,
-    "agility": 74
+    "agility": 74,
+    "luck": 92
   },
   "고람": {
     "id": "고람",
@@ -896,7 +970,8 @@
     "war": 80,
     "intelligence": 54,
     "faceId": 125,
-    "agility": 62
+    "agility": 62,
+    "luck": 78
   },
   "한맹": {
     "id": "한맹",
@@ -913,7 +988,8 @@
     "war": 72,
     "intelligence": 40,
     "faceId": 127,
-    "agility": 68
+    "agility": 68,
+    "luck": 52
   },
   "장기": {
     "id": "장기",
@@ -962,7 +1038,8 @@
     "war": 60,
     "intelligence": 60,
     "faceId": 5,
-    "agility": 60
+    "agility": 60,
+    "luck": 60
   },
   "채모": {
     "id": "채모",
@@ -979,7 +1056,8 @@
     "war": 38,
     "intelligence": 80,
     "faceId": 11,
-    "agility": 72
+    "agility": 72,
+    "luck": 62
   },
   "유기": {
     "id": "유기",
@@ -988,7 +1066,8 @@
     "war": 62,
     "intelligence": 68,
     "faceId": 177,
-    "agility": 66
+    "agility": 66,
+    "luck": 74
   },
   "이전": {
     "id": "이전",
@@ -997,7 +1076,8 @@
     "war": 82,
     "intelligence": 68,
     "faceId": 41,
-    "agility": 74
+    "agility": 74,
+    "luck": 56
   },
   "유봉": {
     "id": "유봉",
@@ -1006,7 +1086,8 @@
     "war": 64,
     "intelligence": 74,
     "faceId": 18,
-    "agility": 68
+    "agility": 68,
+    "luck": 60
   },
   "장무": {
     "id": "장무",
@@ -1047,7 +1128,8 @@
     "war": 86,
     "intelligence": 64,
     "faceId": 179,
-    "agility": 66
+    "agility": 66,
+    "luck": 60
   },
   "왕위": {
     "id": "왕위",
@@ -1080,7 +1162,10 @@
     "war": 44,
     "intelligence": 100,
     "faceId": 4,
-    "ultimate": { "name": "동남풍", "percent": 160 }
+    "ultimate": {
+      "name": "동남풍",
+      "percent": 160
+    }
   },
   "위연": {
     "id": "위연",
@@ -1089,7 +1174,8 @@
     "war": 94,
     "intelligence": 54,
     "faceId": 7,
-    "agility": 74
+    "agility": 74,
+    "luck": 52
   },
   "관평": {
     "id": "관평",
@@ -1098,7 +1184,8 @@
     "war": 90,
     "intelligence": 68,
     "faceId": 19,
-    "agility": 66
+    "agility": 66,
+    "luck": 62
   },
   "하후란": {
     "id": "하후란",
@@ -1139,7 +1226,8 @@
     "war": 64,
     "intelligence": 98,
     "faceId": 8,
-    "agility": 68
+    "agility": 68,
+    "luck": 50
   },
   "왕찬": {
     "id": "왕찬",
@@ -1164,7 +1252,8 @@
     "war": 76,
     "intelligence": 58,
     "faceId": 58,
-    "agility": 60
+    "agility": 60,
+    "luck": 82
   },
   "안명": {
     "id": "안명",
@@ -1205,7 +1294,8 @@
     "war": 92,
     "intelligence": 50,
     "faceId": 59,
-    "agility": 68
+    "agility": 68,
+    "luck": 64
   },
   "손권": {
     "id": "손권",
@@ -1214,7 +1304,8 @@
     "war": 74,
     "intelligence": 82,
     "faceId": 79,
-    "agility": 78
+    "agility": 78,
+    "luck": 92
   },
   "주유": {
     "id": "주유",
@@ -1223,7 +1314,8 @@
     "war": 78,
     "intelligence": 98,
     "faceId": 80,
-    "agility": 62
+    "agility": 62,
+    "luck": 38
   },
   "노숙": {
     "id": "노숙",
@@ -1232,7 +1324,8 @@
     "war": 52,
     "intelligence": 94,
     "faceId": 86,
-    "agility": 52
+    "agility": 52,
+    "luck": 68
   },
   "장소": {
     "id": "장소",
@@ -1241,7 +1334,8 @@
     "war": 24,
     "intelligence": 92,
     "faceId": 81,
-    "agility": 50
+    "agility": 50,
+    "luck": 76
   },
   "제갈근": {
     "id": "제갈근",
@@ -1250,7 +1344,8 @@
     "war": 36,
     "intelligence": 92,
     "faceId": 82,
-    "agility": 70
+    "agility": 70,
+    "luck": 72
   },
   "감택": {
     "id": "감택",
@@ -1275,7 +1370,8 @@
     "war": 80,
     "intelligence": 88,
     "faceId": 83,
-    "agility": 52
+    "agility": 52,
+    "luck": 46
   },
   "태사자": {
     "id": "태사자",
@@ -1284,7 +1380,8 @@
     "war": 94,
     "intelligence": 68,
     "faceId": 85,
-    "agility": 64
+    "agility": 64,
+    "luck": 60
   },
   "육손": {
     "id": "육손",
@@ -1293,7 +1390,8 @@
     "war": 76,
     "intelligence": 96,
     "faceId": 87,
-    "agility": 54
+    "agility": 54,
+    "luck": 60
   },
   "포용": {
     "id": "포용",
@@ -1326,7 +1424,8 @@
     "war": 92,
     "intelligence": 42,
     "faceId": 20,
-    "agility": 68
+    "agility": 68,
+    "luck": 84
   },
   "고옹": {
     "id": "고옹",
@@ -1391,7 +1490,8 @@
     "war": 94,
     "intelligence": 52,
     "faceId": 102,
-    "agility": 80
+    "agility": 80,
+    "luck": 58
   },
   "채훈": {
     "id": "채훈",
@@ -1408,7 +1508,8 @@
     "war": 76,
     "intelligence": 46,
     "faceId": 90,
-    "agility": 90
+    "agility": 90,
+    "luck": 52
   },
   "서성": {
     "id": "서성",
@@ -1417,7 +1518,8 @@
     "war": 70,
     "intelligence": 74,
     "faceId": 91,
-    "agility": 64
+    "agility": 64,
+    "luck": 74
   },
   "능통": {
     "id": "능통",
@@ -1426,7 +1528,8 @@
     "war": 90,
     "intelligence": 56,
     "faceId": 92,
-    "agility": 68
+    "agility": 68,
+    "luck": 60
   },
   "진무": {
     "id": "진무",
@@ -1435,7 +1538,8 @@
     "war": 72,
     "intelligence": 50,
     "faceId": 93,
-    "agility": 64
+    "agility": 64,
+    "luck": 78
   },
   "모개": {
     "id": "모개",
@@ -1452,7 +1556,8 @@
     "war": 92,
     "intelligence": 62,
     "faceId": 6,
-    "agility": 56
+    "agility": 56,
+    "luck": 58
   },
   "우금_2": {
     "id": "우금_2",
@@ -1461,7 +1566,8 @@
     "war": 78,
     "intelligence": 60,
     "faceId": 49,
-    "agility": 92
+    "agility": 92,
+    "luck": 98
   },
   "진교": {
     "id": "진교",
@@ -1486,7 +1592,8 @@
     "war": 60,
     "intelligence": 62,
     "faceId": 94,
-    "agility": 62
+    "agility": 62,
+    "luck": 52
   },
   "마량": {
     "id": "마량",
@@ -1599,7 +1706,8 @@
     "war": 46,
     "intelligence": 86,
     "faceId": 9,
-    "agility": 62
+    "agility": 62,
+    "luck": 58
   },
   "유장": {
     "id": "유장",
@@ -1608,7 +1716,8 @@
     "war": 60,
     "intelligence": 60,
     "faceId": 159,
-    "agility": 60
+    "agility": 60,
+    "luck": 60
   },
   "마초": {
     "id": "마초",
@@ -1617,7 +1726,8 @@
     "war": 94,
     "intelligence": 40,
     "faceId": 186,
-    "agility": 66
+    "agility": 66,
+    "luck": 64
   },
   "맹달": {
     "id": "맹달",
@@ -1626,7 +1736,8 @@
     "war": 74,
     "intelligence": 72,
     "faceId": 61,
-    "agility": 50
+    "agility": 50,
+    "luck": 36
   },
   "왕누": {
     "id": "왕누",
@@ -1699,7 +1810,8 @@
     "war": 80,
     "intelligence": 46,
     "faceId": 171,
-    "agility": 90
+    "agility": 90,
+    "luck": 52
   },
   "오란": {
     "id": "오란",
@@ -1708,7 +1820,8 @@
     "war": 82,
     "intelligence": 72,
     "faceId": 172,
-    "agility": 68
+    "agility": 68,
+    "luck": 62
   },
   "뇌동": {
     "id": "뇌동",
@@ -1717,7 +1830,8 @@
     "war": 84,
     "intelligence": 42,
     "faceId": 173,
-    "agility": 92
+    "agility": 92,
+    "luck": 60
   },
   "엄안": {
     "id": "엄안",
@@ -1726,7 +1840,8 @@
     "war": 84,
     "intelligence": 62,
     "faceId": 23,
-    "agility": 54
+    "agility": 54,
+    "luck": 58
   },
   "마대": {
     "id": "마대",
@@ -1735,7 +1850,8 @@
     "war": 86,
     "intelligence": 48,
     "faceId": 187,
-    "agility": 50
+    "agility": 50,
+    "luck": 42
   },
   "장노": {
     "id": "장노",
@@ -1744,7 +1860,8 @@
     "war": 44,
     "intelligence": 88,
     "faceId": 191,
-    "agility": 52
+    "agility": 52,
+    "luck": 76
   },
   "장위": {
     "id": "장위",
@@ -1753,7 +1870,8 @@
     "war": 74,
     "intelligence": 56,
     "faceId": 192,
-    "agility": 58
+    "agility": 58,
+    "luck": 62
   },
   "양임": {
     "id": "양임",
@@ -1802,7 +1920,8 @@
     "war": 92,
     "intelligence": 58,
     "faceId": 53,
-    "agility": 64
+    "agility": 64,
+    "luck": 60
   },
   "조비": {
     "id": "조비",
@@ -1811,7 +1930,8 @@
     "war": 70,
     "intelligence": 68,
     "faceId": 67,
-    "agility": 58
+    "agility": 58,
+    "luck": 99
   },
   "사마의": {
     "id": "사마의",
@@ -1820,7 +1940,8 @@
     "war": 78,
     "intelligence": 100,
     "faceId": 66,
-    "agility": 46
+    "agility": 46,
+    "luck": 42
   },
   "조휴": {
     "id": "조휴",
@@ -1837,7 +1958,8 @@
     "war": 90,
     "intelligence": 78,
     "faceId": 188,
-    "agility": 62
+    "agility": 62,
+    "luck": 60
   },
   "관해": {
     "id": "관해",
@@ -1854,7 +1976,8 @@
     "war": 78,
     "intelligence": 76,
     "faceId": 40,
-    "agility": 54
+    "agility": 54,
+    "luck": 86
   },
   "왕철": {
     "id": "왕철",
@@ -2023,7 +2146,8 @@
     "war": 60,
     "intelligence": 60,
     "faceId": 204,
-    "agility": 60
+    "agility": 60,
+    "luck": 60
   },
   "사마사": {
     "id": "사마사",
@@ -2064,7 +2188,8 @@
     "war": 84,
     "intelligence": 92,
     "faceId": 21,
-    "agility": 70
+    "agility": 70,
+    "luck": 54
   },
   "한영": {
     "id": "한영",
@@ -2097,7 +2222,8 @@
     "war": 70,
     "intelligence": 54,
     "faceId": 129,
-    "agility": 52
+    "agility": 52,
+    "luck": 80
   },
   "유순": {
     "id": "유순",
@@ -2122,7 +2248,8 @@
     "war": 60,
     "intelligence": 60,
     "faceId": 43,
-    "agility": 60
+    "agility": 60,
+    "luck": 60
   },
   "왕평": {
     "id": "왕평",
@@ -2131,7 +2258,8 @@
     "war": 78,
     "intelligence": 68,
     "faceId": 119,
-    "agility": 52
+    "agility": 52,
+    "luck": 76
   },
   "유선": {
     "id": "유선",
@@ -2140,7 +2268,8 @@
     "war": 40,
     "intelligence": 56,
     "faceId": 196,
-    "agility": 52
+    "agility": 52,
+    "luck": 86
   },
   "이엄": {
     "id": "이엄",
@@ -2149,7 +2278,8 @@
     "war": 68,
     "intelligence": 74,
     "faceId": 106,
-    "agility": 64
+    "agility": 64,
+    "luck": 56
   },
   "비관": {
     "id": "비관",
@@ -2934,7 +3064,8 @@
     "war": 84,
     "intelligence": 30,
     "faceId": 231,
-    "agility": 98
+    "agility": 98,
+    "luck": 38
   },
   "장완": {
     "id": "장완",
@@ -2943,7 +3074,8 @@
     "war": 42,
     "intelligence": 82,
     "faceId": 207,
-    "agility": 58
+    "agility": 58,
+    "luck": 60
   },
   "비위": {
     "id": "비위",
@@ -2952,7 +3084,8 @@
     "war": 40,
     "intelligence": 80,
     "faceId": 203,
-    "agility": 70
+    "agility": 70,
+    "luck": 74
   },
   "장각": {
     "id": "장각",
@@ -2969,7 +3102,8 @@
     "war": 60,
     "intelligence": 65,
     "faceId": 221,
-    "agility": 72
+    "agility": 72,
+    "luck": 62
   },
   "장량": {
     "id": "장량",
@@ -2978,7 +3112,8 @@
     "war": 60,
     "intelligence": 65,
     "faceId": 222,
-    "agility": 74
+    "agility": 74,
+    "luck": 56
   },
   "기령": {
     "id": "기령",

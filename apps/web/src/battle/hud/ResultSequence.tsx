@@ -255,6 +255,7 @@ export function ResultSequence({
   reward,
   items,
   stageId,
+  sandbox = false,
 }: {
   ui: InputState;
   vm: BattleVM;
@@ -262,6 +263,11 @@ export function ResultSequence({
   items: Record<string, Item>;
   /** 클리어 기록 대상 stageId(다음 전장 해금). 미지정이면 markCleared 생략. */
   stageId?: string;
+  /**
+   * 실험실(/lab) 샌드박스 — 결산 연출은 그대로 재생하되 **메타를 일절 쓰지 않는다**
+   * (골드/레벨 영속/기연/클리어/보물 적립/광고 2배 전부 생략). 종료 내비게이션은 /lab 복귀.
+   */
+  sandbox?: boolean;
 }): React.ReactElement | null {
   const isOver = ui.kind === "battleOver";
   const victory = isOver && ui.result === "victory";
@@ -317,7 +323,7 @@ export function ResultSequence({
       serendipityBaseRef.current = 0;
       return;
     }
-    if (!metaCommitted.current) {
+    if (!sandbox && !metaCommitted.current) {
       metaCommitted.current = true;
       addGold(summary.gold); // metaStore가 legacy tk.meta.gold에도 mirror — 결산 경로 일원화
       // 아군 레벨/경험치 영속(§10) — 전투 후 final level/exp를 rosterProgress에 저장. 종전엔 누락돼
@@ -406,7 +412,7 @@ export function ResultSequence({
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
       if (doubleRafRef.current != null) cancelAnimationFrame(doubleRafRef.current);
     };
-  }, [victory, summary, stageId]);
+  }, [victory, summary, stageId, sandbox, vm.units]);
 
   /**
    * 결산 보상 2배(result_double) — 광고 완주 콜백. **1회만**(doubled 가드).
@@ -468,13 +474,13 @@ export function ResultSequence({
           <button type="button" style={BUTTON_STYLE} onClick={() => window.location.reload()}>
             다시 도전
           </button>
-          {/* outroDefeat 씬으로(없으면 씬 가드가 전장 선택으로). 페이드 전환. */}
+          {/* outroDefeat 씬으로(없으면 씬 가드가 전장 선택으로). 샌드박스=실험실 복귀. */}
           <button
             type="button"
             style={BUTTON_STYLE}
-            onClick={() => fadeTo(stageId ? `/scene?stage=${stageId}&type=outroDefeat` : "/stages")}
+            onClick={() => fadeTo(sandbox ? "/lab" : stageId ? `/scene?stage=${stageId}&type=outroDefeat` : "/stages")}
           >
-            이야기 계속 ▶
+            {sandbox ? "실험실로 ▶" : "이야기 계속 ▶"}
           </button>
         </div>
         {fadeOverlay}
@@ -933,8 +939,8 @@ export function ResultSequence({
             </div>
           ))}
 
-          {/* 결산 보상 2배(§12/§13) — 광고 완주 1회만. 누르면 사라짐. adFree면 버튼 자체 미표시. */}
-          {!doubled && (
+          {/* 결산 보상 2배(§12/§13) — 광고 완주 1회만. 누르면 사라짐. adFree면 버튼 자체 미표시. 샌드박스=메타 불가침이라 미표시. */}
+          {!doubled && !sandbox && (
             <RewardedAdButton
               placement="result_double"
               label="광고 보고 보상 2배"
@@ -945,13 +951,13 @@ export function ResultSequence({
             <button type="button" style={BUTTON_STYLE} onClick={() => window.location.reload()}>
               다시 도전
             </button>
-            {/* 캠페인 진행: outro 씬 → 다음 스테이지 intro(없으면 전장 선택). 페이드 전환 + 빈 씬 가드. */}
+            {/* 캠페인 진행: outro 씬 → 다음 스테이지 intro(없으면 전장 선택). 샌드박스=실험실 복귀. */}
             <button
               type="button"
               style={BUTTON_STYLE}
-              onClick={() => fadeTo(stageId ? `/scene?stage=${stageId}&type=outro` : "/stages")}
+              onClick={() => fadeTo(sandbox ? "/lab" : stageId ? `/scene?stage=${stageId}&type=outro` : "/stages")}
             >
-              다음으로 ▶
+              {sandbox ? "실험실로 ▶" : "다음으로 ▶"}
             </button>
           </div>
         </div>

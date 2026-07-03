@@ -78,25 +78,32 @@ export function clearSortie(): void {
 
 /**
  * 순수 변환(node 테스트 대상) — stage + 편성으로 override된 stage units를 만든다.
- * player 슬롯을 앞에서부터 members로 매핑하고(좌표 유지), enemy/잉여 슬롯은 그대로 둔다.
+ * player 슬롯을 앞에서부터 members로 매핑하고(좌표 유지), enemy/ally 슬롯은 그대로 둔다.
  * members가 player 슬롯보다 많으면 잉여는 버린다(M1 좌표 슬롯이 상한).
+ * **편성이 슬롯보다 적으면 남는 player 슬롯은 제거한다** — 종전 "원본 유지"는 스테이지 JSON에
+ * 박힌 템플릿 장수가 유령처럼 스폰되는 버그였다(합류 전 조운이 전장에 등장, 2026-07-03).
+ * 편성 화면이 내보낸 명단이 아군의 전부여야 한다.
  * members가 비었거나 player 슬롯이 없으면 stage.units를 그대로 반환.
  */
 export function applySortieToStage(stage: Stage, members: SortieMember[]): Stage["units"] {
   if (members.length === 0) return stage.units;
   let memberIdx = 0;
-  const units = stage.units.map((u) => {
-    if (u.side !== "player") return u;
-    if (memberIdx >= members.length) return u; // 편성이 모자라면 남은 슬롯 원본 유지
+  const units: Stage["units"] = [];
+  for (const u of stage.units) {
+    if (u.side !== "player") {
+      units.push(u);
+      continue;
+    }
+    if (memberIdx >= members.length) continue; // 편성 못 채운 잉여 슬롯 = 스폰 안 함
     const m = members[memberIdx++]!;
-    return {
+    units.push({
       ...u,
       commanderId: m.commanderId,
       classId: m.classId,
       level: m.level,
       items: [...m.items],
       ...(m.troops != null ? { troops: m.troops } : {}),
-    };
-  });
+    });
+  }
   return units;
 }

@@ -15,6 +15,7 @@
  */
 import { gameData } from "@tk/data";
 import type { RosterEntry } from "@tk/data";
+import { effectiveClassId } from "@tk/engine";
 import { registerAdFreeProvider } from "./adService";
 import { PULL_COST, rollSerendipity } from "./serendipity";
 import type { PullOutcome, SerendipityReward } from "./serendipity";
@@ -344,13 +345,16 @@ export function selectRoster(
     if (entry.joinChapter > unlockedChapter) continue;
     if (departed.has(entry.commanderId)) continue; // 이탈 장수 제외(§6)
     const p = s.rosterProgress[entry.commanderId];
+    const level = p?.level ?? DEFAULT_LEVEL;
     out.push({
       commanderId: entry.commanderId,
-      classId: entry.classId,
+      // 승급(§7) = 레벨의 순수 함수 — 로스터 기본 병종에서 레벨 임계만큼 체인 전진.
+      // 편성 화면·출진 페이로드·전투가 전부 이 값으로 일치(메타에 승급 상태 저장 없음).
+      classId: effectiveClassId(gameData, entry.classId, level),
       joinChapter: entry.joinChapter,
       role: entry.role,
       uniqueSkillId: entry.uniqueSkillId,
-      level: p?.level ?? DEFAULT_LEVEL,
+      level,
       exp: p?.exp ?? 0,
       equipped: p?.equipped ?? entry.startItems ?? [], // ★ 시작 장비(Phase F) — 진행 저장 없으면 startItems(없으면 [])
     });

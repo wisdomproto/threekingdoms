@@ -730,25 +730,45 @@ export class BattleRenderer implements Presenter {
     const intensity = Math.max(0.3, Math.min(1.4, ratio * 2 + (lethal ? 0.5 : 0)));
     // 넉백/플래시 방향: 공격자가 방어자 기준 어느 x쪽인가 (+1=오른쪽, -1=왼쪽)
     const fromDir: 1 | -1 = attacker.gridX >= defender.gridX ? 1 : -1;
-    const big = intensity >= 0.85 || e.counter; // 큰 피해·반격은 더 묵직하게
+    const crit = e.crit === true; // 회심(운 기반 시드 롤, 엔진 판정) — 금빛 잭팟 연출
+    const guarded = e.guarded === true; // 가드(통솔 기반 피해 반감) — 강청색 「막음」 팝업
+    const big = intensity >= 0.85 || e.counter || crit; // 큰 피해·반격·회심은 더 묵직하게
 
-    // 타격 프레임(공격자 돌진이 닿는 순간)에 슬래시·플래시·흔들림·히트스톱을 동기 발사.
-    // 공격 모션 시작 후 ~110ms(배속존중) 지연 — playAttack의 lunge 정점(LUNGE_END≈0.5)에 근접.
-    const strike = (): void => {
-      playSfx(indirect ? SFX.pierce : SFX.slash); // 휘두름/관통 쉭
-      playSfx(big ? SFX.crit : SFX.hit); // 임팩트 — 큰 피해/반격은 회심음
-      void s.fx.slashArc(aPos, popupAt, indirect);
+    // 공격 종류별 FX(2026-07-03 다양화) — 간접=화살 투사체(비행 후 명중), 기병계=찌르기(창 런지),
+    // 그 외=베기(참격 호). 공격자 병종 line은 committed 진실에서.
+    const atkLine = this.store?.committedState.units.find((u) => u.id === e.attackerId)?.line;
+    const meleeKind = atkLine === "cavalry" ? ("thrust" as const) : ("slash" as const);
+
+    // 타격 프레임(공격자 돌진이 닿는 순간)에 임팩트·플래시·흔들림·히트스톱을 동기 발사.
+    // 근접: 공격 모션 시작 후 ~110ms(lunge 정점) / 간접: 화살이 꽂히는 순간.
+    const impact = (): void => {
+      playSfx(big ? SFX.crit : SFX.hit); // 임팩트 — 큰 피해/반격/회심은 회심음
       void s.fx.impactFlash(popupAt, big);
       void defender.flash();
       this.triggerShake(big ? SHAKE_PX_BIG : SHAKE_PX_HIT);
       s.tweens.hitstop(big ? HITSTOP_MS_BIG : HITSTOP_MS_HIT); // 묵직한 정지(배속 존중)
     };
-    void s.tweens.delay(110).then(strike);
+    if (indirect) {
+      // 발사(활시위 쉭) → 화살 비행 → 명중 순간 관통 톤 임팩트
+      void s.tweens.delay(90).then(() => {
+        playSfx(SFX.pierce);
+        void s.fx.arrowShot(aPos, popupAt).then(() => {
+          void s.fx.slashArc(aPos, popupAt, "pierce");
+          impact();
+        });
+      });
+    } else {
+      void s.tweens.delay(110).then(() => {
+        playSfx(SFX.slash); // 휘두름 쉭
+        void s.fx.slashArc(aPos, popupAt, meleeKind);
+        impact();
+      });
+    }
 
     await Promise.all([
       attacker.play("attack"),
       defender.playHitFrom(fromDir, intensity),
-      s.fx.damagePopup(popupAt, e.damage, e.counter),
+      s.fx.damagePopup(popupAt, e.damage, e.counter, crit, guarded),
     ]);
     defender.setTroops(defender.troops - e.damage);
   }
@@ -771,6 +791,54 @@ export class BattleRenderer implements Presenter {
 
   async statusExpired(_e: Ev<"statusExpired">): Promise<void> {
     // 만료 — 표시 전용, 현재 no-op(아이콘 제거는 후속).
+  }
+
+  // 전략조건 달성(§10 보물 3문법 ①특정 적 격파 등) — 전투 중 「획득!」 순간(원작 문법).
+  // 실제 지급은 결산(pendingRewards)이 그대로 담당 — 여기선 순간의 배너·상자음만.
+  async strategyConditionMet(e: Ev<"strategyConditionMet">): Promise<void> {
+    const s = this.scene;
+    if (!s) return;
+    const names = e.treasures.map((id) => this.ctx.data.items[id]?.name ?? id);
+    const parts = [...names, ...(e.gold > 0 ? [`金 ${e.gold}`] : [])];
+    if (parts.length === 0) return;
+    playSfx(SFX.chest);
+    await s.fx.banner(`획득! ${parts.join(" · ")}`, DUEL_BANNER_MS);
+  }
+
+  // 승급(§7 레벨 자동) — 배너 + 해당 유닛 스프라이트 재계산(t2/t3 코스메틱, 미보유 폴백).
+  async unitPromoted(e: Ev<"unitPromoted">): Promise<void> {
+    const s = this.scene;
+    if (!s) return;
+    const name = this.ctx.data.commanders[e.unitId]?.name ?? e.unitId;
+    const from = this.ctx.data.unitClasses[e.fromClassId]?.name ?? e.fromClassId;
+    const to = this.ctx.data.unitClasses[e.toClassId]?.name ?? e.toClassId;
+    const tier = this.ctx.data.unitClasses[e.toClassId]?.tier ?? 1;
+    const view = s.units.tryView(e.unitId);
+    playSfx(SFX.levelup);
+    if (view) {
+      view.setClass(e.toClassId, tier);
+      void s.fx.impactFlash(gridToWorld({ x: view.gridX, y: view.gridY }), true); // 금빛 폭발
+    }
+    await s.fx.banner(`승급! ${name} — ${from} → ${to}`, DUEL_BANNER_MS);
+  }
+
+  // 날씨 전환(날씨 책략 — 호우/맑음/흐림). 배너로 전장 전체에 선언(HUD 라벨은 TurnBanner가 스냅샷으로).
+  async weatherChanged(e: Ev<"weatherChanged">): Promise<void> {
+    const s = this.scene;
+    if (!s) return;
+    const label = e.weather === "rain" ? "호우 — 화계가 죽고 수계가 산다"
+      : e.weather === "cloudy" ? "흐림" : "맑음";
+    playSfx(SFX.spell);
+    await s.fx.banner(`날씨 · ${label}`, DUEL_BANNER_MS);
+  }
+
+  // 전투 중 레벨업(§12) — 유닛 위 금빛 「레벨 업!」 팝업 + SFX. 표시 전용(스탯은 엔진 커밋 완료).
+  async levelUp(e: Ev<"levelUp">): Promise<void> {
+    const s = this.scene;
+    if (!s) return;
+    const u = s.units.view(e.unitId);
+    playSfx(SFX.levelup);
+    await s.fx.levelUpPopup(gridToWorld({ x: u.gridX, y: u.gridY }), e.newLevel);
   }
 
   // 회복(흡혈·회복책략) — 초록 "+amount" 팝업 + 막대 증가(엔진 정합).

@@ -1,4 +1,4 @@
-import type { GameData, Stage, BattleMap, Side, Line, MoveClass, ClassGrades, StatusEffect, StatusKind } from "@tk/data";
+import type { GameData, Stage, BattleMap, Side, Line, MoveClass, ClassGrades, StatusEffect, StatusKind, Weather } from "@tk/data";
 
 export interface Coord { x: number; y: number }
 
@@ -43,6 +43,7 @@ export interface UnitState {
   mp: number; maxMp: number;          // 책략치 = (레벨+10)×지력÷40
   war: number; leadership: number; intelligence: number;
   agility: number;       // 민첩(장수 원값) → agilityPower(순발력) 입력. 미보유 장수=기본 50
+  luck: number;          // 운(장수 원값) → 회심률(critChance) 입력. 미보유 장수=기본 50
   baseAtk: number; baseDef: number;
   grades: ClassGrades;                // 병과 5스탯 등급(§1) — corpsStat 성장 입력
   weaponBonus: number;                // 1 + 최고 무기 bonusPercent/100 (소지품 중 최고 1개 — 원작 룰)
@@ -100,6 +101,8 @@ export interface BattleState {
   levelUps: { unitId: string; newLevel: number }[];
   /** 부대 공유 소지품 풀(§7 원작 창고). 소모품은 유닛이 아닌 진영 풀에 모여 useItem으로 소비. */
   sharedItems: SharedItems;
+  /** 전장 날씨(원작 재현 — 비=화계 반감·수계 강화, combat.weather 곱보정). 미설정=clear(하위호환). */
+  weather?: Weather;
 }
 
 export type Action =
@@ -125,10 +128,15 @@ export interface ReinforcedUnit {
 
 export type BattleEvent =
   | { type: "unitMoved"; unitId: string; from: Coord; to: Coord }
-  | { type: "damageDealt"; attackerId: string; defenderId: string; damage: number; counter: boolean; hit: boolean }
+  // crit = 회심(운 기반 시드 롤 — combat.crit) / guarded = 가드(통솔 기반 피해 반감 — combat.guard). 미설정=일반 타격(하위호환).
+  | { type: "damageDealt"; attackerId: string; defenderId: string; damage: number; counter: boolean; hit: boolean; crit?: boolean; guarded?: boolean }
   | { type: "statusApplied"; unitId: string; kind: StatusKind; turns: number }
   | { type: "statusTick"; unitId: string; kind: StatusKind; damage: number }
   | { type: "statusExpired"; unitId: string; kind: StatusKind }
+  // 날씨 전환(날씨 책략 시전) — casterId = 시전자. 연출: 배너 + HUD 라벨 갱신.
+  | { type: "weatherChanged"; weather: Weather; casterId: string }
+  // 승급(§7 — 레벨 자동, 전투 중 레벨업으로 임계 돌파 시). 연출: 배너 + 스프라이트 갱신.
+  | { type: "unitPromoted"; unitId: string; fromClassId: string; toClassId: string }
   | { type: "troopsHealed"; unitId: string; amount: number }
   // 협공 발동(결정론) — surround = 대상 포위도(공격자 포함), bonusPercent = 추가피해%. 연출용.
   | { type: "flank"; attackerId: string; defenderId: string; surround: number; bonusPercent: number }

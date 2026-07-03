@@ -6,7 +6,7 @@ import {
   computeDamage, distance, getAttackableTargets,
   strategyDamage, strategyAoeCells, getStrategyTargets, expForNextLevel,
   spiritPower, flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes, canUltimate,
-  hitChance, agilityPower,
+  hitChance, agilityPower, critChance, guardChance, effectiveClassId, applyPromotion,
 } from "./combat";
 import { nextRandom } from "./rng";
 import { hasStatus, applyStatus, tickStatuses } from "./status";
@@ -56,11 +56,15 @@ function assertCanAct(state: BattleState, unit: UnitState, forMove: boolean): vo
 /** 병력 차감 → 0이면 퇴각. 새 상태와 이벤트를 반환. hit=false(미스)는 호출측이 따로 emit하므로 기본 true. */
 function dealDamage(
   state: BattleState, attacker: UnitState, defender: UnitState, damage: number, counter: boolean, hit = true,
+  crit = false, guarded = false,
 ): { state: BattleState; events: BattleEvent[] } {
   const troops = Math.max(0, defender.troops - damage);
   const retreated = troops === 0;
   const events: BattleEvent[] = [
-    { type: "damageDealt", attackerId: attacker.id, defenderId: defender.id, damage, counter, hit },
+    {
+      type: "damageDealt", attackerId: attacker.id, defenderId: defender.id, damage, counter, hit,
+      ...(crit ? { crit } : {}), ...(guarded ? { guarded } : {}),
+    },
   ];
   if (retreated) events.push({ type: "unitRetreated", unitId: defender.id });
   return { state: replaceUnit(state, { ...defender, troops, retreated }), events };
@@ -99,11 +103,28 @@ function resolveStrike(
       return { state: next, events, hit: false };
     }
   }
-  const dmg = attacker.flatDamagePerLevel != null
+  // 회심(치명일격) 롤 — 운 기반 시드 확률(combat.crit). 명중 후에만 굴려 시드 시퀀스를
+  // "명중→회심→가드" 순으로 고정. 발동 시 피해 ×damagePercent/100. 필살/책략은 이 경로를 안 탄다.
+  const cc = critChance(attacker.luck, defender.luck, ctx.data.combat.crit);
+  const [cv, cs] = nextRandom(next.rngState);
+  next = { ...next, rngState: cs };
+  const crit = cv * 100 < cc;
+  // 가드(막기) 롤 — 통솔 기반 시드 확률(combat.guard). 고정뎀(flatDamagePerLevel)은 "방어
+  // 무시" 정체성이라 가드 불가(롤 자체를 생략 — 결정론이라 스트림 분기 무해).
+  let guarded = false;
+  if (attacker.flatDamagePerLevel == null) {
+    const gc = guardChance(defender.leadership, attacker.leadership, ctx.data.combat.guard);
+    const [gv, gs] = nextRandom(next.rngState);
+    next = { ...next, rngState: gs };
+    guarded = gv * 100 < gc;
+  }
+  const base = attacker.flatDamagePerLevel != null
     ? Math.max(ctx.data.combat.minDamage, attacker.flatDamagePerLevel * (attacker.level + 1))
     : computeDamage(ctx, attacker, defender, opts.ratio, opts.mult);
+  let dmg = crit ? Math.floor((base * ctx.data.combat.crit.damagePercent) / 100) : base;
+  if (guarded) dmg = Math.max(ctx.data.combat.minDamage, Math.floor((dmg * ctx.data.combat.guard.damagePercent) / 100));
   const defLvl = defender.level;
-  const dd = dealDamage(next, attacker, defender, dmg, opts.counter);
+  const dd = dealDamage(next, attacker, defender, dmg, opts.counter, true, crit, guarded);
   next = dd.state;
   events.push(...dd.events);
   const exp = grantExp(ctx, next, attackerId, dmg, getUnit(next, defenderId).retreated, defLvl);
@@ -203,7 +224,18 @@ function grantExp(
     events.push({ type: "levelUp", unitId: attackerId, newLevel: level });
     newLevelUps.push({ unitId: attackerId, newLevel: level });
   }
-  return { state: replaceUnit({ ...state, levelUps: newLevelUps }, { ...attacker, level, exp }), events };
+  // 승급(§7) — 레벨업으로 임계 돌파 시 병종 체인 전진(레벨의 순수 함수, 상향 전용).
+  // 실험실(autoPromote=false)은 수동 티어 보존. 이벤트로 서술해 연출(배너·스프라이트 갱신)이 따른다.
+  let promoted: UnitState = { ...attacker, level, exp };
+  if (ctx.stage.autoPromote !== false && level > attacker.level) {
+    const eff = effectiveClassId(ctx.data, promoted.classId, level);
+    if (eff !== promoted.classId) {
+      const from = promoted.classId;
+      promoted = applyPromotion(ctx.data, promoted, eff);
+      events.push({ type: "unitPromoted", unitId: attackerId, fromClassId: from, toClassId: eff });
+    }
+  }
+  return { state: replaceUnit({ ...state, levelUps: newLevelUps }, promoted), events };
 }
 
 /** id로 유닛을 찾되 없으면 undefined (미투입 증원 대상 등 — 던지지 않음) */
@@ -379,7 +411,8 @@ function applyReinforcements(ctx: BattleContext, state: BattleState): { state: B
     if (!fire) continue;
     // 증원 유닛 소모품도 진영 공유 풀로 분리(정규 배치와 동일 — 원작 창고 §7).
     const pool = { friendly: [...next.sharedItems.friendly], hostile: [...next.sharedItems.hostile] };
-    const spawned = r.units.map((p) => drainConsumables(ctx.data, spawnUnit(ctx.data, { ...p, side: r.side }), pool));
+    const spawned = r.units.map((p) =>
+      drainConsumables(ctx.data, spawnUnit(ctx.data, { ...p, side: r.side }, ctx.stage.autoPromote !== false), pool));
     next = {
       ...next,
       units: [...next.units, ...spawned],
@@ -622,6 +655,15 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
       events.push({
         type: "strategyCast", casterId: unit.id, strategyId: action.strategyId, target: action.target,
       });
+      // 날씨 책략(호우/맑음/흐림) — 전장 전역 날씨 전환. 피해·상태이상 없음(원작 문법:
+      // 날씨 자체가 화계/수계 위력을 좌우한다 — computeDamage 아래 weatherFactor 참조).
+      if (strat.category === "weather") {
+        const w = strat.setWeather ?? "clear";
+        next = { ...next, weather: w };
+        events.push({ type: "weatherChanged", weather: w, casterId: unit.id });
+        next = replaceUnit(next, { ...getUnit(next, unit.id), acted: true });
+        break;
+      }
       for (const c of strategyAoeCells(action.target, strat.aoe)) {
         const t = unitAt(next, c.x, c.y);
         if (!t || t.retreated) continue;
@@ -639,7 +681,11 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
           // (presented<committed). 흡혈(lifesteal) 경로와 동일 계약. 실제 회복량(클램프 후)만 서술.
           if (res.healed > 0) events.push({ type: "troopsHealed", unitId: t.id, amount: res.healed });
         } else {
-          const dmg = strategyDamage(caster, t, strat.power);
+          // 날씨 곱보정(원작 재현 — 비=화계 반감·수계 강화). 물리/기타 원소는 무영향.
+          const w = ctx.data.combat.weather[next.weather ?? "clear"];
+          const wf = strat.category === "fire" ? w.firePercent / 100
+            : strat.category === "water" ? w.waterPercent / 100 : 1;
+          const dmg = Math.max(ctx.data.combat.minDamage, Math.floor(strategyDamage(caster, t, strat.power) * wf));
           const hit = dealDamage(next, caster, getUnit(next, t.id), dmg, false);
           next = hit.state;
           events.push(...hit.events);

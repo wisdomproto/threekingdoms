@@ -129,8 +129,9 @@ function PortraitFrame({ name }: { name: string }): React.ReactElement {
   return (
     <div
       style={{
-        width: 84,
-        height: 100,
+        // 원작 대사창의 존재감(2026-07-03 리뷰 "대사 화면이 너무 작다") — 초상 확대
+        width: 112,
+        height: 132,
         flexShrink: 0,
         ...PORTRAIT_FRAME,
         background: "rgba(20, 17, 12, 0.92)",
@@ -139,7 +140,7 @@ function PortraitFrame({ name }: { name: string }): React.ReactElement {
         alignItems: "center",
         justifyContent: "center",
         color: "#d8c9a0",
-        fontSize: 30,
+        fontSize: 38,
         fontWeight: 700,
         overflow: "hidden",
       }}
@@ -198,20 +199,20 @@ function DialogueBubble({
         style={{
           position: "relative",
           flex: 1,
-          maxWidth: 560,
+          maxWidth: 760, // 원작 대사창 존재감(리뷰: "너무 작다") — 폭·글자·높이 확대
           marginBottom: 8,
-          padding: "10px 16px 12px",
+          padding: "12px 20px 16px",
           borderRadius: 16,
           background: "rgba(228, 226, 220, 0.97)", // 둥근 회색 말풍선
           border: "2px solid #8a6a3a", // 청동 테두리(독자 스킨)
           boxShadow: "0 4px 16px rgba(0,0,0,0.45)",
           color: "#1a1a1a", // 본문 검정
-          fontSize: 16,
-          lineHeight: 1.5,
-          minHeight: 56,
+          fontSize: 18,
+          lineHeight: 1.6,
+          minHeight: 84,
         }}
       >
-        <div style={{ color: "#1e5fb0", fontWeight: 700, fontSize: 14, marginBottom: 3 }}>
+        <div style={{ color: "#1e5fb0", fontWeight: 700, fontSize: 16, marginBottom: 4 }}>
           {/* 화자명 = 파랑 (적/중립도 파랑, §344) */}
           {line.speaker}
         </div>

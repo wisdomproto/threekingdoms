@@ -19,6 +19,7 @@ except Exception:
 ALPHA_THRESH = 16
 MIN_RUN = 8  # 밴드로 인정할 최소 픽셀 길이
 BLACK_THRESH = 48  # 근-검정(near-black) 판정 — 셀 가장자리 연결분만 제거
+WHITE_THRESH = 228  # 근-백(near-white) 판정 — AI가 투명 대신 흰/미색 배경으로 내는 시트
 
 
 def _content_mask_cols(im):
@@ -99,6 +100,30 @@ def _remove_black_bg(cell):
     return Image.fromarray(arr, "RGBA")
 
 
+def _remove_white_bg(cell):
+    """셀 가장자리에 연결된 근-백(흰/미색)만 투명화 — _remove_black_bg의 흰 배경 판.
+    내부 흰 부분(갑옷 하이라이트·수염)은 가장자리 비연결이라 보존. numpy 없으면 원본."""
+    if not _HAS_NP:
+        return cell
+    im = cell.convert("RGBA")
+    arr = np.array(im)
+    rgb = arr[:, :, :3].astype(int)
+    al = arr[:, :, 3]
+    nearwhite = rgb.min(2) > WHITE_THRESH
+    if not nearwhite.any():
+        return im
+    passable = nearwhite | (al == 0)
+    lbl, n = ndimage.label(passable)
+    if n == 0:
+        return im
+    border = set(lbl[0, :]) | set(lbl[-1, :]) | set(lbl[:, 0]) | set(lbl[:, -1])
+    border.discard(0)
+    if border:
+        mask = np.isin(lbl, list(border)) & nearwhite & (al > 0)
+        arr[mask, 3] = 0
+    return Image.fromarray(arr, "RGBA")
+
+
 def _trim(cell):
     bbox = cell.getbbox()
     return cell.crop(bbox) if bbox else cell
@@ -129,7 +154,7 @@ def slice_sheet(sheet_path, members, out_dir, grid=None):
         if i >= len(cells):
             results.append((name, None, False))
             continue
-        cell = _trim(_remove_black_bg(im.crop(cells[i])))
+        cell = _trim(_remove_white_bg(_remove_black_bg(im.crop(cells[i]))))
         out = os.path.join(out_dir, f"{name}.webp")
         cell.save(out, "WEBP", quality=92)
         results.append((name, out, True))

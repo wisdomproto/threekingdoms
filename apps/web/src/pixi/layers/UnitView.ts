@@ -62,6 +62,8 @@ export interface UnitViewInit {
   /** 필살 게이지(미지정/maxSp=0이면 SP 바 미표시). */
   sp?: number;
   maxSp?: number;
+  /** 병종 티어(§4 승급 코스메틱 — t2/t3 스프라이트 변형 우선 시도). 미지정=1. */
+  tier?: number;
 }
 
 export class UnitView extends Container {
@@ -97,9 +99,11 @@ export class UnitView extends Container {
   private readonly nameLabel: Text;
   private readonly tweens: TweenRunner;
   private readonly textures: TextureResolver;
-  private readonly spriteId: string | null;
-  /** 텍스처 후보(전용→병종 제네릭). applySpriteTexture가 순서대로 시도 — 전용 없으면 제네릭. */
-  private readonly spriteCands: string[];
+  private spriteId: string | null;
+  /** 텍스처 후보(티어 변형→전용→병종 제네릭). applySpriteTexture가 순서대로 시도. 승급 시 재계산. */
+  private spriteCands: string[];
+  /** 승급(setClass) 시 후보 재계산에 필요 — 생성 시 고정. */
+  private readonly commanderId: string;
 
   /** "front" | "back" — 현재 뷰 방향 */
   private view: "front" | "back" = "front";
@@ -117,6 +121,9 @@ export class UnitView extends Container {
   private breathPhase = 0;
   /** 현재 호흡 변위(-AMP..+AMP) */
   private breathV = 0;
+  /** 진영 — 병력 바 색(전장 가독성: 아군 초록/우군 파랑/적 빨강, 원작 문법) */
+  private readonly unitSide: Side;
+
   /** 호흡 on/off — 이동 중엔 끔 */
   private breathing = true;
 
@@ -140,6 +147,7 @@ export class UnitView extends Container {
   constructor(init: UnitViewInit, textures: TextureResolver, tweens: TweenRunner) {
     super();
     this.unitId = init.id;
+    this.unitSide = init.side;
     this.gridX = init.x;
     this.gridY = init.y;
     this.troops = init.troops;
@@ -147,8 +155,9 @@ export class UnitView extends Container {
     this.retreatedFlag = init.retreated;
     this.tweens = tweens;
     this.textures = textures;
-    this.spriteCands = spriteCandidates(init.commanderId, init.classId, init.side);
-    this.spriteId = resolveSpriteId(init.commanderId, init.classId, init.side);
+    this.commanderId = init.commanderId;
+    this.spriteCands = spriteCandidates(init.commanderId, init.classId, init.side, init.tier ?? 1);
+    this.spriteId = resolveSpriteId(init.commanderId, init.classId, init.side, init.tier ?? 1);
 
     // 유닛 id 해시로 호흡 위상 분산 (전원이 같은 박자로 숨쉬지 않게)
     let hp = 0;
@@ -223,6 +232,16 @@ export class UnitView extends Container {
     }
     this.applySpriteTexture(this.view, "idle");
     this.applyFacing();
+  }
+
+  /**
+   * 승급(§7 unitPromoted) — 병종·티어 변화에 맞춰 스프라이트 후보를 재계산하고 즉시 갱신.
+   * 순수 표현(게임 상태는 엔진이 이미 커밋). 티어 코스메틱(t2/t3) 미보유면 기존 외형 유지(폴백).
+   */
+  setClass(classId: string, tier: number): void {
+    this.spriteCands = spriteCandidates(this.commanderId, classId, this.unitSide, tier);
+    this.spriteId = resolveSpriteId(this.commanderId, classId, this.unitSide, tier);
+    this.refreshSprite();
   }
 
   /** 현재 렌더 모드 — 스켈레톤이 주입돼 있으면 'skeleton', 아니면 'sprite'(폴백 색사각 포함). */
@@ -481,7 +500,11 @@ export class UnitView extends Container {
     const ratio = this.maxTroops > 0 ? this.troops / this.maxTroops : 0;
     this.barFill.clear();
     if (ratio > 0) {
-      const color = ratio > 0.5 ? 0x4caf50 : ratio > 0.25 ? 0xe6b042 : 0xd54a3a;
+      // 채움색 = **진영색**(아군 초록/우군 파랑/적 빨강 — 전장 적아 식별, 원작 문법).
+      // HP 비율은 바 길이가 전달. 저체력(≤25%)만 진영 무관 경고색(주황)으로 깜빡임 없이 강조.
+      const sideColor =
+        this.unitSide === "enemy" ? 0xd54a3a : this.unitSide === "ally" ? 0x4f8fe8 : 0x4caf50;
+      const color = ratio <= 0.25 ? 0xe6842e : sideColor;
       this.barFill.rect(0, 0, BAR_WIDTH * ratio, BAR_HEIGHT).fill(color);
     }
   }

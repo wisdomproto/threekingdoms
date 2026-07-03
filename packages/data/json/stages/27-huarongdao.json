@@ -23,34 +23,46 @@
       "bg": "27-huarongdao-intro",
       "lines": [
         {
+          "text": "적벽은 불탔다. 백만 선단이 하룻밤 새 재가 되어 강을 덮었고 — 조조는 몇 백 기의 패잔병을 이끌고 북으로 달아났다."
+        },
+        {
+          "text": "그 마지막 길목, 화용도. 좁은 산길의 매복 하나가 조용히 조조를 기다리고 있었다."
+        },
+        {
           "speaker": "관우",
           "side": "player",
           "portraitId": "관우",
-          "text": "화용도의 매복은... 제가 청했습니다, 형님. 군사, 군령장까지 썼습니다."
+          "text": "이 매복은... 제가 청한 자리입니다, 형님. 군령장까지 썼습니다."
         },
         {
           "speaker": "제갈량",
           "side": "player",
           "portraitId": "제갈량",
-          "text": "운장, 그대는 옛 은혜를 갚을 사람. ...그것까지 헤아려 보냈습니다."
+          "text": "운장. 그대가 옛 은혜를 갚을 사람이라는 것까지 — 헤아려서 보낸 자리이기도 합니다."
         },
         {
           "speaker": "관우",
           "side": "player",
           "portraitId": "관우",
-          "text": "...조공. 천 리를 보내준 옛 은혜, 오늘 갚겠소. 길을 비키리다."
+          "text": "...조공에게 천 리를 배웅받은 옛 은혜. 오늘, 여기서 갚겠소."
         },
         {
           "speaker": "유비",
           "side": "player",
           "portraitId": "유비",
-          "text": "운장의 선택이다. 의리를 아는 자만이 할 수 있는."
+          "text": "운장의 선택이다. 의를 아는 자만이 질 수 있는 짐이지."
+        },
+        {
+          "text": "덫을 놓은 사냥꾼과 덫에 걸린 효웅 — 1부 마지막 이야기가 시작된다."
         }
       ]
     },
     "outro": {
       "bg": "27-huarongdao-outro",
       "lines": [
+        {
+          "text": "조조는 화용도를 벗어나 북으로 사라졌다. 관우는 빈 창을 든 채 오래도록 그 길 끝을 바라보았다."
+        },
         {
           "speaker": "관우",
           "side": "player",
@@ -61,13 +73,16 @@
           "speaker": "제갈량",
           "side": "player",
           "portraitId": "제갈량",
-          "text": "됐습니다. 조조의 명운은 아직 하늘에 있고, 운장의 의리는 천하에 남았으니."
+          "text": "됐습니다. 조조의 명운은 아직 하늘에 있고 — 운장의 의리는 오늘 천하에 남았으니."
         },
         {
           "speaker": "유비",
           "side": "player",
           "portraitId": "유비",
-          "text": "삼형제가 함께 여기까지 왔다. ...이것이 우리 첫 장의 끝이로구나. 천하는, 이제부터다."
+          "text": "일어나라, 운장. 의를 아는 아우를 둔 것이, 이 형의 자랑이다."
+        },
+        {
+          "text": "황건의 들불에서 적벽의 불바다까지 — 세 형제의 첫 장이 여기서 막을 내린다. 천하는 이제, 셋으로 갈라진다."
         }
       ]
     }
@@ -102,7 +117,7 @@
       "commanderId": "장비",
       "classId": "lightCavalry",
       "level": 40,
-      "troops": 215,
+      "troops": 330,
       "items": [
         "사모"
       ],
@@ -114,7 +129,7 @@
       "commanderId": "조운",
       "classId": "lightCavalry",
       "level": 40,
-      "troops": 215,
+      "troops": 320,
       "items": [
         "청강검"
       ],
@@ -126,7 +141,7 @@
       "commanderId": "제갈량",
       "classId": "strategist",
       "level": 40,
-      "troops": 180,
+      "troops": 230,
       "items": [
         "둔갑천서",
         "낙석서"
@@ -139,7 +154,7 @@
       "commanderId": "관평",
       "classId": "lightCavalry",
       "level": 38,
-      "troops": 195,
+      "troops": 260,
       "items": [],
       "side": "player",
       "x": 9,
@@ -149,7 +164,7 @@
       "commanderId": "주창",
       "classId": "footman",
       "level": 38,
-      "troops": 190,
+      "troops": 255,
       "items": [],
       "side": "player",
       "x": 21,
@@ -159,7 +174,7 @@
       "commanderId": "유봉",
       "classId": "archer",
       "level": 38,
-      "troops": 180,
+      "troops": 240,
       "items": [
         "연노"
       ],

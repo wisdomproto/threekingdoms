@@ -3,7 +3,9 @@
  * 파일명(assets/fx/{key}.png)과 1:1. FxLayer와 textures.FX_FILES가 공유.
  */
 export const FX = {
-  slash: "slash",     // 참격 호 (평타·간접)
+  slash: "slash",     // 참격 호 (보병·산적 등 베기)
+  thrust: "thrust",   // 창 찌르기 (기병계 — 돌격 톤)
+  arrow: "arrow",     // 화살 투사체 (궁병·간접 — 비행 후 명중)
   flash: "flash",     // 흰 섬광 (평타·협공 임팩트)
   sparkle: "sparkle", // 대형 금빛 폭발 (회심·필살)
   coin: "coin",       // 코인팝 (격파, §12)

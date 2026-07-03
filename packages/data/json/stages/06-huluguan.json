@@ -120,34 +120,51 @@
       "bg": "06-huluguan-intro",
       "lines": [
         {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "동탁이 호로관에 여포를 세웠소. 천하의 맹장이라더니, 제후들이 줄줄이 꺾였다지."
+          "text": "사수관이 뚫리자 동탁은 낙양의 마지막 방패, 호로관에 최강의 패를 세웠다 — 여포 봉선."
+        },
+        {
+          "text": "관문 앞은 이상하리만치 조용했다. 붉은 적토마 위의 그림자 하나가, 제후 연합 전체를 멈춰 세우고 있었다."
         },
         {
           "speaker": "관우",
           "side": "player",
           "portraitId": "관우",
-          "text": "여포라... 인중여포 마중적토. 셋이 함께라야 승산이 있겠습니다, 형님."
+          "text": "인중여포, 마중적토라... 헛소문이 아니었군요. 혼자서는 어렵습니다, 형님."
         },
         {
           "speaker": "장비",
           "side": "player",
           "portraitId": "장비",
-          "text": "흥, 잘난 척하는 그 여포 놈! 내가 먼저 맛을 보여주리다!"
+          "text": "흥! 아비를 둘씩이나 갈아치운 패륜아 놈! 내가 먼저 간을 보고 오겠소!"
         },
         {
           "speaker": "유비",
           "side": "player",
           "portraitId": "유비",
-          "text": "삼형제가 한 몸으로 움직인다. 여포를 에워싸 빈틈을 친다 — 협공이다."
+          "text": "익덕! ...혼자는 안 된다. 셋이 간다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "삼형제가 한 몸으로 움직인다 — 에워싸고, 지치게 하고, 빈틈을 문다. 도원의 맹세를 여기서 보여주자."
+        },
+        {
+          "text": "뒷날 천하가 두고두고 입에 올릴 싸움이 시작되려 하고 있었다."
         }
       ]
     },
     "outro": {
       "bg": "06-huluguan-outro",
       "lines": [
+        {
+          "text": "여포가 말머리를 돌려 관 안으로 사라지자, 연합군 진영에서 뒤늦은 함성이 터졌다. 셋이서 천하의 여포를 물러세운 것이다."
+        },
+        {
+          "speaker": "병사",
+          "side": "player",
+          "text": "물러났다! 여포가 물러났다! 저 세 분이 해냈다!!"
+        },
         {
           "speaker": "장비",
           "side": "player",
@@ -158,13 +175,13 @@
           "speaker": "관우",
           "side": "player",
           "portraitId": "관우",
-          "text": "놓쳤으나 기세는 꺾었다. 동탁이 낙양을 불태우고 달아날 것이다."
+          "text": "놓쳤으나 기세는 꺾었다. 동탁은 이제 낙양을 지킬 패가 없다."
         },
         {
           "speaker": "유비",
           "side": "player",
           "portraitId": "유비",
-          "text": "...천하가 무너지는 소리가 들리는구나. 쫓자."
+          "text": "...천하가 무너지는 소리가 들리는구나. 낙양으로 — 쫓는다."
         }
       ]
     }
@@ -218,8 +235,8 @@
       "y": 42
     },
     {
-      "commanderId": "미방",
-      "classId": "footman",
+      "commanderId": "미축",
+      "classId": "strategist",
       "level": 5,
       "troops": 100,
       "items": [],
@@ -228,8 +245,8 @@
       "y": 42
     },
     {
-      "commanderId": "조잠",
-      "classId": "archer",
+      "commanderId": "손건",
+      "classId": "strategist",
       "level": 5,
       "troops": 90,
       "items": [],

@@ -48,12 +48,24 @@ describe("applySortieToStage (순수 — player 슬롯 override)", () => {
     // 좌표는 stage 슬롯 그대로(배치 UI 없음).
     expect(outPlayers[0]!.x).toBe(slots[0]!.x);
     expect(outPlayers[0]!.y).toBe(slots[0]!.y);
-    // 편성이 모자란 나머지 슬롯은 원본 유지.
-    expect(outPlayers[1]!.commanderId).toBe(slots[1]!.commanderId);
+    // 편성 못 채운 잉여 슬롯은 스폰하지 않음 — 편성 명단이 아군의 전부.
+    // (종전 "원본 유지"는 스테이지 템플릿 장수가 유령 스폰되는 버그: 합류 전 조운 등장.)
+    expect(outPlayers.length).toBe(1);
     // enemy는 손대지 않음.
     const enemiesBefore = STAGE.units.filter((u) => u.side === "enemy").length;
     const enemiesAfter = out.filter((u) => u.side === "enemy").length;
     expect(enemiesAfter).toBe(enemiesBefore);
+  });
+
+  it("편성이 슬롯보다 적으면 잉여 player 슬롯은 제거된다(유령 스폰 방지)", () => {
+    const slotCount = playerUnits(STAGE.units).length;
+    expect(slotCount).toBeGreaterThan(2);
+    const members: SortieMember[] = [
+      { commanderId: "유비", classId: "lord", level: 5, exp: 0, items: [] },
+      { commanderId: "관우", classId: "lightCavalry", level: 5, exp: 0, items: [] },
+    ];
+    const out = applySortieToStage(STAGE, members);
+    expect(playerUnits(out).map((u) => u.commanderId)).toEqual(["유비", "관우"]);
   });
 
   it("members가 player 슬롯보다 많으면 잉여는 버린다(슬롯이 상한)", () => {

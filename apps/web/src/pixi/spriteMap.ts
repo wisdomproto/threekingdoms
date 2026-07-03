@@ -76,27 +76,42 @@ const CLASS_LINE_REP: Record<string, string> = {
 
 /**
  * 유닛의 spriteId 후보를 우선순위대로 반환.
+ *  ⓪ 티어 코스메틱(§4, tier≥2): `{id}/t{tier}` — 승급 외형(9칸 시트의 t2/t3 컷). 미보유 시 아래로 폴백.
  *  ① 캐릭터 전용: COMMANDER_SPRITE_MAP override || commanderId(한국어) — `sprites/{이름}/`이 있으면 사용
  *  ② 병종 제네릭: classId+side — ①이 미로드(이미지 없음)면 폴백
  * UnitView가 순서대로 getSprite를 시도해 첫 로드된 텍스처를 쓴다(있으면 전용, 없으면 제네릭).
  */
-export function spriteCandidates(commanderId: string, classId: string, side: Side): string[] {
+export function spriteCandidates(commanderId: string, classId: string, side: Side, tier = 1): string[] {
   const out: string[] = [];
-  if (commanderId) out.push(COMMANDER_SPRITE_MAP[commanderId] || commanderId);
-  // 1) classId+side 직접 제네릭
+  if (commanderId) {
+    const base = COMMANDER_SPRITE_MAP[commanderId] || commanderId;
+    if (tier >= 2) out.push(`${base}/t${Math.min(3, tier)}`);
+    out.push(base);
+  }
+  // 1) classId+side 직접 제네릭 (티어 코스메틱 변형 우선 — sprites/{cls}_{side}/t2 등, 미보유 폴백)
   const direct = CLASS_SIDE_SPRITE_MAP[`${classId}_${side}`];
-  if (direct) out.push(direct);
+  if (direct) {
+    if (tier >= 2) out.push(`${direct}/t${Math.min(3, tier)}`);
+    out.push(direct);
+  }
   // 2) ally 폴백 — ally 전용 제네릭이 없으면 player 제네릭 재사용(우군 색은 베이스 사각형이 담당)
   if (side === "ally") {
     const allyPlayer = CLASS_SIDE_SPRITE_MAP[`${classId}_player`];
-    if (allyPlayer) out.push(allyPlayer);
+    if (allyPlayer) {
+      if (tier >= 2) out.push(`${allyPlayer}/t${Math.min(3, tier)}`);
+      out.push(allyPlayer);
+    }
   }
-  // 3) 계열(line) 폴백 — 직접 제네릭이 없는 변형 병종은 같은 골격의 계열 대표 제네릭으로
+  // 3) 계열(line) 폴백 — 직접 제네릭이 없는 변형 병종은 같은 골격의 계열 대표 제네릭으로.
+  //    티어 변형 우선(승급 장병 → footman_player/t2 — §4 코스메틱 등급이 승급 외형을 담당).
   const rep = CLASS_LINE_REP[classId];
   if (rep) {
     const repSide: Side = side === "ally" ? "player" : side;
     const lineTpl = CLASS_SIDE_SPRITE_MAP[`${rep}_${repSide}`];
-    if (lineTpl) out.push(lineTpl);
+    if (lineTpl) {
+      if (tier >= 2) out.push(`${lineTpl}/t${Math.min(3, tier)}`);
+      out.push(lineTpl);
+    }
   }
   return [...new Set(out)];
 }
@@ -109,6 +124,7 @@ export function resolveSpriteId(
   commanderId: string,
   classId: string,
   side: Side,
+  tier = 1,
 ): string | null {
-  return spriteCandidates(commanderId, classId, side)[0] ?? null;
+  return spriteCandidates(commanderId, classId, side, tier)[0] ?? null;
 }

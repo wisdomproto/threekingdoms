@@ -203,12 +203,19 @@ export function TurnBanner({
     <>
       <PhaseFlash phase={vm.turn.phase} turn={vm.turn.turn} status={vm.status} />
       <div style={BAR_STYLE}>
-        {/* 좌: 스테이지명 배지 + 턴 수 (§5 "스테이지명 배지(좌) / 턴 수(우)") */}
+        {/* 좌: 스테이지명 배지 + 턴 수 + 날씨 (§5 "스테이지명 배지(좌) / 턴 수(우)") */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           {stageName ? <span style={STAGE_BADGE_STYLE}>{stageName}</span> : null}
           <strong>
             {vm.turn.turn}턴 <span style={{ color: "#9aa3ad" }}>/ {vm.turn.turnLimit}</span>
           </strong>
+          {/* 날씨 라벨 — clear는 표시 생략(기본 상태 노이즈 방지). 비/흐림만 알린다(화계 보정 중). */}
+          {vm.turn.weather === "rain" && (
+            <span style={{ color: "#8fbce8", fontSize: 13, fontWeight: 700 }}>비 · 화계 약화</span>
+          )}
+          {vm.turn.weather === "cloudy" && (
+            <span style={{ color: "#aab2bd", fontSize: 13, fontWeight: 700 }}>흐림</span>
+          )}
         </div>
         <span style={{ color: vm.turn.phase === "player" ? "#4da3ff" : vm.turn.phase === "ally" ? "#ffa53d" : "#ff6b6b" }}>
           {phaseLabel(ui, vm)}

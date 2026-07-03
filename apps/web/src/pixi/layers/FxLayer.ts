@@ -99,8 +99,8 @@ export class FxLayer {
     this.screenH = height;
   }
 
-  /** 데미지 팝업 — 위로 떠오르며 페이드. counter면 색 구분 */
-  damagePopup(at: WorldPoint, amount: number, counter: boolean): Promise<void> {
+  /** 데미지 팝업 — 위로 떠오르며 페이드. counter면 색 구분. crit=회심(금빛 확대) / guarded=가드(강청색 「막음」). */
+  damagePopup(at: WorldPoint, amount: number, counter: boolean, crit = false, guarded = false): Promise<void> {
     let text = this.popupPool.find((t) => !t.visible);
     if (!text) {
       text = new Text({
@@ -117,8 +117,9 @@ export class FxLayer {
       this.popupPool.push(text);
       this.world.addChild(text);
     }
-    text.text = String(amount);
-    text.tint = counter ? COUNTER_TINT : NORMAL_TINT;
+    text.text = crit ? `회심! ${amount}` : guarded ? `막음 ${amount}` : String(amount);
+    text.tint = crit ? 0xffd75e : guarded ? 0x9fd8ff : counter ? COUNTER_TINT : NORMAL_TINT;
+    text.scale.set(crit ? 1.3 : 1); // 풀 공유라 매 사용 시 리셋
     text.visible = true;
     text.alpha = 1;
     const startY = at.y - 18;
@@ -128,6 +129,40 @@ export class FxLayer {
       .run(POPUP_MS, (t) => {
         captured.position.y = startY - POPUP_RISE_PX * t;
         captured.alpha = t < 0.6 ? 1 : 1 - (t - 0.6) / 0.4;
+      })
+      .then(() => {
+        captured.visible = false;
+      });
+  }
+
+  /** 레벨업 팝업(§12 — 원작 「레벨 업!」 순간). 금빛 텍스트 상승 + 유닛 자리 반짝임. */
+  levelUpPopup(at: WorldPoint, newLevel: number): Promise<void> {
+    let text = this.popupPool.find((t) => !t.visible);
+    if (!text) {
+      text = new Text({
+        text: "",
+        style: {
+          fontFamily: "sans-serif", fontSize: 18, fontWeight: "bold",
+          fill: 0xffffff, stroke: { color: 0x000000, width: 4 },
+        },
+      });
+      text.anchor.set(0.5);
+      this.popupPool.push(text);
+      this.world.addChild(text);
+    }
+    text.text = `레벨 업! Lv.${newLevel}`;
+    text.tint = 0xffe27a;
+    text.scale.set(1.15);
+    text.visible = true;
+    text.alpha = 1;
+    const startY = at.y - 30; // 데미지 팝업과 겹치지 않게 한 단 위
+    text.position.set(at.x, startY);
+    const captured = text;
+    void this.impactFlash(at, false); // 가벼운 반짝임 동반
+    return this.tweens
+      .run(POPUP_MS * 1.4, (t) => {
+        captured.position.y = startY - POPUP_RISE_PX * t;
+        captured.alpha = t < 0.65 ? 1 : 1 - (t - 0.65) / 0.35;
       })
       .then(() => {
         captured.visible = false;
@@ -264,27 +299,83 @@ export class FxLayer {
   }
 
   /**
-   * 슬래시 아크 (§4 타격 주스) — 공격자→방어자 방향으로 휘두르는 흰금빛 호(arc) 1회.
-   * 방어자 칸 위에 절차적 Graphics로 그리고, 휘두르는 방향으로 쓸고 지나가며 페이드.
-   * indirect=true(궁/포)면 베기 대신 차가운 청백 "관통/충격" 톤 + 직선형 스트로크.
-   * 월드 공간(카메라 변환 하). 순수 표현 — 게임 상태 불변, TweenRunner로 배속 존중.
+   * 화살 투사체 (공격 종류별 FX, 2026-07-03) — 공격자→방어자로 화살이 날아가 명중.
+   * FX.arrow 스프라이트(있으면) 또는 절차적 화살(축선+촉). Promise는 **명중 순간** resolve —
+   * 호출측(BattleRenderer)이 임팩트(섬광/흔들림/SFX)를 이어 발사한다. 배속 존중.
    */
-  slashArc(from: WorldPoint, to: WorldPoint, indirect = false): Promise<void> {
+  arrowShot(from: WorldPoint, to: WorldPoint): Promise<void> {
+    const sx = from.x, sy = from.y - 14; // 발사 높이(상체)
+    const ex = to.x, ey = to.y - 10;
+    const dx = ex - sx, dy = ey - sy;
+    const dist = Math.hypot(dx, dy) || 1;
+    const ang = Math.atan2(dy, dx);
+    const ms = Math.max(120, Math.min(320, dist * 0.55)); // 거리 비례 비행(1~4칸)
+    const tex = this.textures?.getFx(FX.arrow);
+    if (tex) {
+      const s = new Sprite(tex);
+      s.anchor.set(0.5);
+      s.rotation = ang;
+      s.blendMode = "add";
+      // 생성 시트는 고해상(수백 px) — 월드 화살 길이 ~44px(타일 미만)로 정규화
+      const k = 44 / Math.max(1, tex.width);
+      this.world.addChild(s);
+      return this.tweens.run(ms, (t) => {
+        // 얕은 포물선(아치) — 중간에서 살짝 떠오른다
+        const arc = Math.sin(t * Math.PI) * Math.min(14, dist * 0.12);
+        s.position.set(sx + dx * t, sy + dy * t - arc);
+        s.scale.set(k);
+      }).then(() => { this.world.removeChild(s); s.destroy(); });
+    }
+    // ── 폴백: 절차적 화살(황갈 축선 + 백색 촉) ──
+    const g = new Graphics();
+    g.moveTo(-9, 0).lineTo(6, 0).stroke({ width: 2, color: 0xd8b46a, alpha: 1 });
+    g.poly([9, 0, 4, -2.6, 4, 2.6]).fill({ color: 0xf3ead2 });
+    g.rotation = ang;
+    this.world.addChild(g);
+    return this.tweens.run(ms, (t) => {
+      const arc = Math.sin(t * Math.PI) * Math.min(14, dist * 0.12);
+      g.position.set(sx + dx * t, sy + dy * t - arc);
+    }).then(() => { this.world.removeChild(g); g.destroy(); });
+  }
+
+  /**
+   * 슬래시 아크 (§4 타격 주스) — 공격 종류별 3톤(2026-07-03 다양화):
+   *  - "slash"  베기(보병·산적): 금빛 호를 휘둘러 쓸기 (기존).
+   *  - "thrust" 찌르기(기병계): 진행 방향 직선 런지 — FX.thrust 스프라이트 or 금빛 창 스트로크.
+   *  - "pierce" 관통(원거리 임팩트 톤): 청백 직선 스트로크 (기존 indirect).
+   * 방어자 칸 위 절차적 Graphics/스프라이트. 월드 공간, 순수 표현, 배속 존중.
+   */
+  slashArc(from: WorldPoint, to: WorldPoint, kind: "slash" | "pierce" | "thrust" = "slash"): Promise<void> {
+    const indirect = kind === "pierce";
     const dx0 = to.x - from.x, dy0 = to.y - from.y;
     const ang0 = Math.atan2(dy0, dx0);   // 공격 방향
-    const img = this.playFxSprite(FX.slash, { x: to.x, y: to.y - 8 }, SLASH_MS, (t, s) => {
-      const e = easeOut(t);
-      s.rotation = ang0 + (e - 0.5) * 0.9;          // 휘두르는 쓸기
-      s.scale.set(0.8 + e * 0.5);
-      s.alpha = t < 0.35 ? 1 : 1 - (t - 0.35) / 0.65;
-      if (indirect) s.tint = 0x9fd8ff;              // 간접=청백(PIERCE_TINT 톤)
-    }, ang0);
-    if (img) return img;
-    // ── 폴백: 기존 절차적 호 ──
+    if (kind === "thrust") {
+      // 찌르기: 전용 스프라이트(있으면) — 방향 고정 + 전진 스트레치. 없으면 절차적 창 스트로크(아래).
+      // 생성 시트는 고해상 — 월드 창광 길이 ~64px 기준으로 텍스처 폭 정규화 후 런지 스트레치.
+      const img = this.playFxSprite(FX.thrust, { x: to.x, y: to.y - 8 }, SLASH_MS, (t, s) => {
+        const e = easeOut(t);
+        const k = 64 / Math.max(1, s.texture.width);
+        s.rotation = ang0;
+        s.scale.set(k * (0.7 + e * 0.65), k * 0.9);
+        s.alpha = t < 0.4 ? 1 : 1 - (t - 0.4) / 0.6;
+      }, ang0);
+      if (img) return img;
+    } else {
+      const img = this.playFxSprite(FX.slash, { x: to.x, y: to.y - 8 }, SLASH_MS, (t, s) => {
+        const e = easeOut(t);
+        s.rotation = ang0 + (e - 0.5) * 0.9;          // 휘두르는 쓸기
+        s.scale.set(0.8 + e * 0.5);
+        s.alpha = t < 0.35 ? 1 : 1 - (t - 0.35) / 0.65;
+        if (indirect) s.tint = 0x9fd8ff;              // 간접=청백(PIERCE_TINT 톤)
+      }, ang0);
+      if (img) return img;
+    }
+    // ── 폴백: 절차적 (베기=호 / 찌르기·관통=직선 스트로크) ──
     const dx = to.x - from.x;
     const dy = to.y - from.y;
     const len = Math.hypot(dx, dy) || 1;
     const ang = Math.atan2(dy, dx); // 공격 진행 방향
+    const straight = indirect || kind === "thrust"; // 직선 스트로크 계열
     const color = indirect ? PIERCE_TINT : SLASH_GOLD;
 
     const root = new Container();
@@ -298,12 +389,12 @@ export class FxLayer {
 
     const drawArc = (progress: number, alpha: number): void => {
       g.clear();
-      if (indirect) {
-        // 관통: 진행 방향 짧은 창 스트로크 + 충격 점
-        const half = SLASH_LEN * 0.5;
+      if (straight) {
+        // 찌르기/관통: 진행 방향 창 스트로크 + 충격 점 (thrust=금빛·pierce=청백)
+        const half = SLASH_LEN * (kind === "thrust" ? 0.62 : 0.5);
         g.moveTo(-half * (1 - progress) - 4, 0)
           .lineTo(half, 0)
-          .stroke({ width: 4, color, alpha });
+          .stroke({ width: kind === "thrust" ? 5 : 4, color, alpha });
         g.circle(half, 0, 3 + 4 * (1 - progress)).fill({ color, alpha: alpha * 0.8 });
       } else {
         // 베기: 호현 SLASH_LEN, 활 SLASH_BOW. progress로 호를 "쓸어내리며" 회전 인상.

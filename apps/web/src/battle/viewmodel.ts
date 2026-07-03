@@ -3,7 +3,7 @@
  * committed가 연출보다 앞서가도 HUD 수치는 드레인 시점(settled)에만 갱신된다 — 스포일러 차단.
  * 반환값은 전부 직렬화 가능한 평면 객체 (useSyncExternalStore 스냅샷에 그대로 실린다).
  */
-import type { ClassGrades, Side } from "@tk/data";
+import type { ClassGrades, Side, Weather } from "@tk/data";
 import { terrainAt, attackPower, defensePower, spiritPower } from "@tk/engine";
 import type { BattleContext, BattleState, UnitState, PendingReward } from "@tk/engine";
 
@@ -109,6 +109,8 @@ export interface TurnVM {
   turn: number;
   turnLimit: number;
   phase: Side;
+  /** 전장 날씨(원작 재현 — 비=화계 반감). HUD 라벨용. 미설정=clear. */
+  weather?: Weather;
 }
 
 export interface BattleVM {
@@ -245,7 +247,7 @@ export function unitPanelVM(
 }
 
 export function turnVM(ctx: BattleContext, settled: BattleState): TurnVM {
-  return { turn: settled.turn, turnLimit: ctx.stage.turnLimit, phase: settled.phase };
+  return { turn: settled.turn, turnLimit: ctx.stage.turnLimit, phase: settled.phase, weather: settled.weather };
 }
 
 /** 종료 전이면 null — ResultOverlay 표시 여부 판정용 */

@@ -1,6 +1,7 @@
 # 설계: 캐릭터 SD 코스메틱 승급 포즈시트 (3등급 × 3포즈 9칸) — 2026-06-17
 
-> 상태: ✅ **구현 완료 (2026-06-17)** — asset-board.html S-pose 9칸 + cut_posesheet.py 2D 컷, 4 테스트 통과, 최종 코드리뷰 승인. 엔진 tier 스위칭·back_* 등급화는 후속(§2 비목표). 계획=docs/superpowers/plans/2026-06-17-promotion-tier-pose-sheet.md.
+> 상태: ✅ **구현 완료 (2026-06-17)** — asset-board.html S-pose 9칸 + cut_posesheet.py 2D 컷, 4 테스트 통과, 최종 코드리뷰 승인. 계획=docs/superpowers/plans/2026-06-17-promotion-tier-pose-sheet.md.
+> **후속 소화(2026-07-04)**: §2 비목표였던 *엔진 승급 메커니즘·게임 내 스위칭·manifest 등급 인식* 구현 완료 — CLAUDE.md §7 「병종 승급」. 승급=레벨 순수 함수(`unitClasses.promotesTo` 체인, T2=Lv15/T3=Lv30, 상향 전용·양 진영 균등). **(A)↔(B) 연동 결정**: 엔진 클래스-tier(A)가 코스메틱 tier(B)의 *선택 기준*이 됨 — tier≥2 유닛은 `spriteCandidates`가 `{id}/t{n}` 우선(미보유 폴백), `rebuild_manifest.py`가 t2/t3 하위폴더를 매니페스트 키로 등록(+110키). (B)의 본질(같은 인물·치장 강화)은 유지 — 형태가 다른 병종(전차·발석차 등)은 여전히 계열 폴백/별도 템플릿. 잔여 = back_* 티어 포즈 **생성**(코드는 소비 준비 완료).
 > 관련: [docs/art/asset-board.html](../../art/asset-board.html) S-pose 생성기, [tools/derive-mount-map.py](../../../tools/derive-mount-map.py), CLAUDE.md §4(에셋 파이프라인).
 
 ---

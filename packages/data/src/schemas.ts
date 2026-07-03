@@ -10,6 +10,7 @@ export const CommanderSchema = z.object({
   war: Stat,                 // 무력 → 공격 공식
   intelligence: Stat,        // 지력 → 책략치(MP)
   agility: Stat.optional(),  // 민첩 → 순발력(명중/회피, §2-1 시드확률). 미지정 시 spawnUnit 기본 50
+  luck: Stat.optional(),     // 운 → 회심률(combat.crit). sosoden 추출(15~50)×2 스케일. 미지정 기본 50
   faceId: z.number().int().min(0).max(255),
   /**
    * 네임드 시그니처 궁극기(§8 고유 스킬) — 필살 발동 시 이 장수만의 이름·위력. 미지정=일반 필살.
@@ -66,6 +67,13 @@ export const UnitClassSchema = z.object({
   rangeMax: z.number().int().min(1),
   line: LineSchema,
   tier: z.number().int().min(1).max(3),      // 승급 단계
+  /**
+   * 승급 대상 병종 id(§7 승급 체인 — 단병→장병→전차 등). 미지정 = 승급 없음(군주/책사 등).
+   * 승급 = 레벨의 순수 함수(engine effectiveClassId: T2=combat.promotion.tier2Level, T3=tier3Level).
+   * 원작 조조전은 印綬 소비식이나, 캐주얼 우선(§2-3)·밸런스 자동측정(§11)·메타 상태 0 원칙으로
+   * 레벨 자동 승급 채택(영걸전 원형) — 인수 소비식은 BM/아이템 후속 옵션.
+   */
+  promotesTo: z.string().optional(),
   moveClass: MoveClassSchema,
   strategies: z.array(z.string()).default([]), // 이 병종이 쓰는 책략 id 목록 (§8 병종별 리스트)
   // 조조전 5스탯 등급(§1). 미지정 시 전부 "C" — 기존 JSON 무파손.
@@ -93,11 +101,13 @@ export type StatusEffect = z.infer<typeof StatusEffectSchema>;
  *  heal                  — 아군 회복/보급/버프 (정신력 기반 치유)
  *  debuff                — 상태이상·사기 약화 (미약 데미지 + statusEffect)
  *  special               — 사신·극초강 단타 (fire와 동일 공식, 위력 40)
+ *  weather               — 전장 날씨 전환(호우/맑음/흐림 — setWeather 필수). 피해 없음.
+ *                          날씨는 화계/수계 책략 위력에 곱보정(combat.weather) — "비 오면 화공 무효" 원작 문법.
  */
 export const StrategySchema = z.object({
   id: z.string(),
   name: z.string(),
-  category: z.enum(["fire", "water", "earth", "wind", "heal", "debuff", "special"]),
+  category: z.enum(["fire", "water", "earth", "wind", "heal", "debuff", "special", "weather"]),
   mp: z.number().int().min(0),
   power: z.number().int().min(0),        // 위력 — 데미지·치유량 배수(×power/10)
   castRange: z.number().int().min(1),    // 시전 거리 (시전자→대상 칸, 맨해튼)
@@ -112,8 +122,14 @@ export const StrategySchema = z.object({
     chance: z.number().int().min(0).max(100),
     turns: z.number().int().min(1),
   }).optional(),
+  /** category "weather" 전용 — 시전 시 전장 날씨를 이 값으로 전환. */
+  setWeather: z.enum(["clear", "rain", "cloudy"]).optional(),
 });
 export type Strategy = z.infer<typeof StrategySchema>;
+
+/** 전장 날씨 — 화계/수계 책략 위력 곱보정(combat.weather). 기본 clear. */
+export const WeatherSchema = z.enum(["clear", "rain", "cloudy"]);
+export type Weather = z.infer<typeof WeatherSchema>;
 
 export const TerrainSchema = z.object({
   id: z.string(),
@@ -231,6 +247,50 @@ export const CombatConfigSchema = z.object({
   status: z.object({
     poisonDamage: z.number().int().min(0),
   }).default({ poisonDamage: 20 }),
+  /**
+   * 회심(치명일격, 시드 고정 확률 — 리파인 카탈로그 "운 기반 확률 큰 피해").
+   * 회심% = clamp(basePercent + luckSlope×(atkLuck − defLuck), minPercent, maxPercent).
+   * luck = 장수 운 스탯(commanders.json, sosoden 추출 ×2 스케일 — 미보유 기본 50).
+   * 발동 시 피해 ×damagePercent/100. 일반 공격·반격·연속공격만(필살/책략/아이템 제외).
+   */
+  crit: z.object({
+    basePercent: z.number().min(0).max(100),
+    luckSlope: z.number().min(0),
+    minPercent: z.number().min(0).max(100),
+    maxPercent: z.number().min(0).max(100),
+    damagePercent: z.number().min(100),
+  }).default({ basePercent: 10, luckSlope: 0.25, minPercent: 3, maxPercent: 30, damagePercent: 150 }),
+  /**
+   * 확률 가드(막기, 시드 고정 확률 — 리파인 카탈로그 "확률/능력 방어").
+   * 가드% = clamp(basePercent + leadSlope×(방어 통솔 − 공격 통솔), min, max). 발동 시 피해 ×damagePercent/100.
+   * 일반 공격·반격·연속공격만(필살/책략/고정뎀 제외 — 고정뎀은 "방어 무시" 정체성 유지).
+   */
+  guard: z.object({
+    basePercent: z.number().min(0).max(100),
+    leadSlope: z.number().min(0),
+    minPercent: z.number().min(0).max(100),
+    maxPercent: z.number().min(0).max(100),
+    damagePercent: z.number().min(0).max(100),
+  }).default({ basePercent: 8, leadSlope: 0.2, minPercent: 2, maxPercent: 20, damagePercent: 50 }),
+  /** 승급 레벨 임계(§7 — 레벨 자동 승급). T2 도달 레벨 / T3 도달 레벨. */
+  promotion: z.object({
+    tier2Level: z.number().int().min(1),
+    tier3Level: z.number().int().min(1),
+  }).default({ tier2Level: 15, tier3Level: 30 }),
+  /**
+   * 날씨(§원작 재현 — 비 오면 화공이 죽는다). 전장 전역 상태(BattleState.weather, 기본 clear).
+   * 화계(fire) 책략 위력 ×firePercent/100, 수계(water) ×waterPercent/100. 물리 공격 무영향.
+   * 변경 수단 = 날씨 책략(호우/맑음/흐림 — category "weather"). 스테이지 초기값 = stage.weather.
+   */
+  weather: z.object({
+    rain: z.object({ firePercent: z.number().min(0), waterPercent: z.number().min(0) }),
+    cloudy: z.object({ firePercent: z.number().min(0), waterPercent: z.number().min(0) }),
+    clear: z.object({ firePercent: z.number().min(0), waterPercent: z.number().min(0) }),
+  }).default({
+    rain: { firePercent: 30, waterPercent: 120 },
+    cloudy: { firePercent: 70, waterPercent: 100 },
+    clear: { firePercent: 100, waterPercent: 100 },
+  }),
 }).refine(
   (c) => Object.entries(c.lineAdvantage).every(([k, v]) => k !== v),
   { message: "lineAdvantage must not be self-referential" },
@@ -451,14 +511,30 @@ export const StageDialogueSchema = z.object({
 export type StageDialogue = z.infer<typeof StageDialogueSchema>;
 
 /**
- * 막간 시나리오 씬 (전투 밖 컷신 — §5 스토리). 풀스크린 배경 + 화자 초상 대사.
- *  - bg: 씬 배경 이미지 키(선택, /assets/scenes/{bg}.webp). 미지정 시 수묵 placeholder.
- *  - lines: DialogueLine 재사용(화자·진영·초상·본문). 최소 1줄.
+ * 막간 씬 대사 한 줄 — DialogueLine의 씬 전용 확장 (전투 dialogue는 DialogueLine 그대로).
+ *  - speaker 생략 = **내레이션** — 화자·초상 없는 서술 박스(정세·장소·시간 경과).
+ *    "갑자기 전투" 문제의 해법: 회의 요약이 아니라 사건·이동·경과를 씬 안에서 서술한다.
+ *  - bg: 이 줄부터 배경 전환(선택, /assets/scenes/{bg}.webp) — 회의→행군→전장 장면 전환.
+ *    미지정 줄은 직전 배경 유지(첫 배경은 ScenarioScene.bg).
+ */
+export const ScenarioLineSchema = z.object({
+  speaker: z.string().optional(),
+  side: SideSchema.optional(),
+  portraitId: z.string().optional(),
+  text: z.string(),
+  bg: z.string().optional(),
+});
+export type ScenarioLine = z.infer<typeof ScenarioLineSchema>;
+
+/**
+ * 막간 시나리오 씬 (전투 밖 컷신 — §5 스토리). 풀스크린 배경 + 화자 초상 대사 + 내레이션.
+ *  - bg: 씬 시작 배경 이미지 키(선택, /assets/scenes/{bg}.webp). 미지정 시 수묵 placeholder.
+ *  - lines: ScenarioLine(화자 생략=내레이션, bg=장면 전환). 최소 1줄.
  * 전투 내 dialogue(트리거 구동)와 별개 — intro(전투 전)·outro(전투 후) 스토리.
  */
 export const ScenarioSceneSchema = z.object({
   bg: z.string().optional(),
-  lines: z.array(DialogueLineSchema).min(1),
+  lines: z.array(ScenarioLineSchema).min(1),
 });
 export type ScenarioScene = z.infer<typeof ScenarioSceneSchema>;
 
@@ -507,6 +583,10 @@ export const StageSchema = z.object({
   name: z.string(),
   mapId: z.string(),
   turnLimit: z.number().int().min(1),
+  // 초기 날씨(선택, 기본 clear) — 화계/수계 책략 위력 곱보정. 날씨 책략(호우/맑음/흐림)으로 전환 가능.
+  weather: WeatherSchema.optional(),
+  // 레벨 자동 승급(§7) 끄기 — 실험실(__lab)이 수동 티어 A/B를 위해 false. 미지정=true(승급 작동).
+  autoPromote: z.boolean().optional(),
   camera: StageCameraSchema.optional(),
   // 정밀 데코(§3-1 Chunk 3) — 지형 자동 데코 위에 스테이지 서사 소품을 얹는다. 미지정 = 없음.
   decorations: z.array(DecorationSchema).optional(),

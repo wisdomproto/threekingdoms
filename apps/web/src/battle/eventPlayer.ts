@@ -51,6 +51,14 @@ export interface Presenter {
   statusTick?(e: Ev<"statusTick">): Promise<void>;
   /** 회복(흡혈 등) — troops 증가 투영 필수(diffSnapshot 정합). */
   troopsHealed?(e: Ev<"troopsHealed">): Promise<void>;
+  /** 전투 중 레벨업 연출(§12 도파민 — 원작의 「레벨 업!」 순간). 표시 전용, 옵셔널. */
+  levelUp?(e: Ev<"levelUp">): Promise<void>;
+  /** 전략조건 달성(특정 적 격파 보물 등) — 전투 중 「획득!」 순간(§10 3문법). 지급은 결산. */
+  strategyConditionMet?(e: Ev<"strategyConditionMet">): Promise<void>;
+  /** 날씨 전환(날씨 책략) — 배너 + HUD 라벨. 표시 전용, 옵셔널. */
+  weatherChanged?(e: Ev<"weatherChanged">): Promise<void>;
+  /** 승급(§7 레벨 자동) — 배너 + 유닛 스프라이트 갱신. 표시 전용, 옵셔널. */
+  unitPromoted?(e: Ev<"unitPromoted">): Promise<void>;
   /** 증원 도착 — 중도 스폰 유닛의 스프라이트 생성(이벤트 데이터로). 미구현이면 sync가 폴백 생성. */
   reinforcementArrived?(e: Ev<"reinforcementArrived">): Promise<void>;
   battleEnded(e: Ev<"battleEnded">): Promise<void>;
@@ -175,6 +183,14 @@ export class EventPlayer {
         return p.statusExpired?.(e) ?? Promise.resolve();
       case "troopsHealed":
         return p.troopsHealed?.(e) ?? Promise.resolve();
+      case "levelUp":
+        return p.levelUp?.(e) ?? Promise.resolve();
+      case "strategyConditionMet":
+        return p.strategyConditionMet?.(e) ?? Promise.resolve();
+      case "weatherChanged":
+        return p.weatherChanged?.(e) ?? Promise.resolve();
+      case "unitPromoted":
+        return p.unitPromoted?.(e) ?? Promise.resolve();
       case "reinforcementArrived":
         return p.reinforcementArrived?.(e) ?? Promise.resolve();
       case "battleEnded":

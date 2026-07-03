@@ -11,7 +11,7 @@
     {
       "name": "tools",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["C:\\project\\threekingdoms\\tools\\serve.py"],
+      "runtimeArgs": ["tools/serve.py"],
       "port": 8080,
       "autoPort": false
     }

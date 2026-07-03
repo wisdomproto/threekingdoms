@@ -10,8 +10,11 @@
 정책:
  - 기존 엔트리는 **보존**(source/method/note 유지) — 검증된 항목을 건드리지 않는다.
  - 디스크에 sprites/{id}/{pose}.png가 있는데 매니페스트에 없는 dir만 **추가**.
- - poses = 그 dir 루트에 실제 존재하는 {front,back}_{idle,move,attack}.png (tier1만; t2/t3 제외).
+ - poses = 그 dir 루트에 실제 존재하는 {front,back}_{idle,move,attack}.png.
    loadSprites는 per-file 내성이라(없는 포즈 404는 스킵) 실재 파일만 나열하면 안전.
+ - **티어 코스메틱(§7 승급, 2026-07-03)**: sprites/{id}/t2·t3/에 포즈가 있으면 `{id}/t2` 키로
+   추가 — loadSprites 경로 규약(`{spriteId}/{pose}.png`)이 그대로 하위 폴더를 탄다.
+   spriteCandidates가 tier≥2 유닛에서 `{id}/t{n}`을 우선 시도(미보유 폴백).
 
 사용:
   python tools/sprite-pipeline/rebuild_manifest.py            # 재빌드 후 저장
@@ -42,18 +45,27 @@ def main():
         d = os.path.join(SPRITES, name)
         if not os.path.isdir(d):
             continue
-        if name in manifest:
-            continue  # 기존 보존
-        poses = poses_in(d)
-        if not poses:
-            continue  # 루트에 로드할 포즈 없음(시트만 있는 경우 등)
-        has_sheet = os.path.isfile(os.path.join(d, "_posesheet.png"))
-        manifest[name] = {
-            "poses": poses,
-            "source": "_posesheet.png" if has_sheet else "",
-            "method": "rebuild_manifest.py",
-        }
-        added.append((name, poses))
+        if name not in manifest:
+            poses = poses_in(d)
+            if not poses:
+                continue  # 루트에 로드할 포즈 없음(시트만 있는 경우 등)
+            has_sheet = os.path.isfile(os.path.join(d, "_posesheet.png"))
+            manifest[name] = {
+                "poses": poses,
+                "source": "_posesheet.png" if has_sheet else "",
+                "method": "rebuild_manifest.py",
+            }
+            added.append((name, poses))
+        # 티어 코스메틱(t2/t3) — 루트 등록 여부와 무관하게 스캔(기존 엔트리도 티어 키는 추가).
+        for t in ("t2", "t3"):
+            key = f"{name}/{t}"
+            if key in manifest:
+                continue
+            tposes = poses_in(os.path.join(d, t))
+            if not tposes:
+                continue
+            manifest[key] = {"poses": tposes, "source": "", "method": "rebuild_manifest.py(tier)"}
+            added.append((key, tposes))
 
     print(f"기존 보존 {kept} · 추가 {len(added)}  → 총 {len(manifest)}")
     for n, p in added:

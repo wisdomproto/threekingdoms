@@ -294,12 +294,15 @@ const SECTIONS = [
   id: 'C', title: 'C. 이펙트 시트 (코드 합성용)',
   desc: '프레임 시퀀스 아님 — 검은 배경 단일 발광 요소 모음(additive 블렌딩). 2장으로 압축.',
   items: [
-    { id: 'C-1', title: '전투 이펙트 시트', multi: '한 장에 6요소', vfx: true,
-      note: '슬래시/크리티컬/일기토/먼지/코인 — 전투 연출 기본 세트.',
-      prompt: 'Six separate effect elements: (1) single curved sword-slash arc — sharp white-gold crescent light trail with thin tapering ends, (2) radial burst of golden light rays with sparks — critical-hit jackpot energy, (3) two crossed blade glints colliding at center — X-shaped spark flash, red versus green light clash, (4) horizontal dust kick-up puffs in three stages side by side, tan-grey, (5) small bouncing gold coins and a tiny treasure pouch — game pickup sprites, (6) small impact starburst flash.' },
+    { id: 'C-1', title: '전투 이펙트 시트', multi: '한 장에 8요소', vfx: true,
+      note: '슬래시/크리티컬/일기토/먼지/코인/화살/창 — 전투 연출 기본 세트. 컷 키: slash,sparkle,duel,dust,coin,flash,arrow,thrust',
+      prompt: 'Eight separate effect elements: (1) single curved sword-slash arc — sharp white-gold crescent light trail with thin tapering ends, (2) radial burst of golden light rays with sparks — critical-hit jackpot energy, (3) two crossed blade glints colliding at center — X-shaped spark flash, red versus green light clash, (4) horizontal dust kick-up puffs in three stages side by side, tan-grey, (5) small bouncing gold coins and a tiny treasure pouch — game pickup sprites, (6) small impact starburst flash, (7) single flying arrow projectile with thin golden speed-line trail, fletching visible, horizontal, (8) straight spear-thrust light streak — long tapered golden lance of light with a bright piercing point at the tip, horizontal.' },
     { id: 'C-2', title: '책략 이펙트 시트', multi: '한 장에 5요소', vfx: true,
       note: '화계/수계/산계/회복/사기저하 — 책략 연출 세트.',
-      prompt: 'Five separate effect elements: (1) stylized burst of flames — swirling fire tongues forming a loose dragon shape, orange-to-white hot core, ink-brush flame edges, (2) spiraling water vortex with foam crests — deep blue to cyan, (3) cluster of tumbling boulders with dust trail and motion-blurred debris, (4) soft rising green-gold healing motes with a gentle lotus-petal light swirl, (5) dark purple descending smoke wisps — drooping morale-break feel.' }
+      prompt: 'Five separate effect elements: (1) stylized burst of flames — swirling fire tongues forming a loose dragon shape, orange-to-white hot core, ink-brush flame edges, (2) spiraling water vortex with foam crests — deep blue to cyan, (3) cluster of tumbling boulders with dust trail and motion-blurred debris, (4) soft rising green-gold healing motes with a gentle lotus-petal light swirl, (5) dark purple descending smoke wisps — drooping morale-break feel.' },
+    { id: 'C-3', title: '공격 FX 확장 시트 (화살·창)', multi: '한 장에 2요소', vfx: true,
+      note: '⭐ 부족분 전용 — C-1 재생성 불필요. 요소 순서=컷 키 순서. 컷: python tools/sprite-pipeline/cut_fx_sheet.py <시트> --keys arrow,thrust → assets/fx/{arrow,thrust}.png (미생성 동안은 절차적 폴백이 뛰는 중). 화살=간접공격 투사체(우향 기준, 코드가 회전), 창=기병 찌르기 런지.',
+      prompt: 'Two separate effect elements, side by side with generous black spacing, both strictly horizontal and pointing to the RIGHT: (1) a single flying arrow projectile — slender dark wooden shaft, small bright steel arrowhead at the right end, visible fletching feathers at the tail, thin white-gold speed-line light trail streaming behind it to the left, crisp readable game-sprite silhouette, (2) a straight spear-thrust light streak — one long tapered lance of white-gold light, widest at the left tail and narrowing to a brilliant piercing point at the right tip, small bright flare burst at the very tip, subtle ink-brush energy wisps along the shaft.' }
   ]
 },
 {

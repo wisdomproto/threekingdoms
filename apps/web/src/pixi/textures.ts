@@ -105,8 +105,10 @@ const OBJECT_FILES: Record<string, string> = {
 const OBJECT_BASE = assetUrl("/assets/objects");
 
 // 전투 타격 fx 텍스처(검은배경 발광, additive). 미보유 키는 FxLayer가 절차적 폴백.
+// arrow(화살 투사체)·thrust(창 찌르기)는 공격 종류별 FX(2026-07-03) — 시트 미생성 시 절차적 폴백.
 const FX_FILES: Record<string, string> = {
   slash: "slash.png", flash: "flash.png", sparkle: "sparkle.png", coin: "coin.png",
+  arrow: "arrow.png", thrust: "thrust.png",
 };
 const FX_BASE = assetUrl("/assets/fx");
 

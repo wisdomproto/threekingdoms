@@ -79,9 +79,9 @@
 
   "회귀":      { "id": "회귀",      "name": "회귀",      "category": "heal",    "mp":  1, "power": 24, "castRange": 1, "aoe": "single", "target": "ally" },
 
-  "호우":      { "id": "호우",      "name": "호우",      "category": "water",   "mp": 11, "power": 16, "castRange": 4, "aoe": "cross",  "target": "enemy" },
-  "맑음":      { "id": "맑음",      "name": "맑음",      "category": "wind",    "mp": 11, "power": 16, "castRange": 4, "aoe": "cross",  "target": "enemy" },
-  "흐림":      { "id": "흐림",      "name": "흐림",      "category": "earth",   "mp": 11, "power": 10, "castRange": 4, "aoe": "cross",  "target": "enemy" },
+  "호우":      { "id": "호우",      "name": "호우",      "category": "weather", "mp": 11, "power": 0,  "castRange": 4, "aoe": "single", "target": "enemy", "setWeather": "rain" },
+  "맑음":      { "id": "맑음",      "name": "맑음",      "category": "weather", "mp": 11, "power": 0,  "castRange": 4, "aoe": "single", "target": "enemy", "setWeather": "clear" },
+  "흐림":      { "id": "흐림",      "name": "흐림",      "category": "weather", "mp": 11, "power": 0,  "castRange": 4, "aoe": "single", "target": "enemy", "setWeather": "cloudy" },
 
   "기합":      { "id": "기합",      "name": "기합",      "category": "heal",    "mp": 11, "power": 3,  "castRange": 2, "aoe": "cross",  "target": "ally" },
   "명상":      { "id": "명상",      "name": "명상",      "category": "heal",    "mp": 11, "power": 5,  "castRange": 1, "aoe": "single", "target": "ally" },

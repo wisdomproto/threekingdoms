@@ -66,10 +66,13 @@ function SoundRow({
 export function PauseMenu({
   open,
   onClose,
+  exitTo = "/stages",
 }: {
   open: boolean;
   /** 패널을 닫는다(계속하기/백드롭/ESC). 실제 paused 상태는 BattleScreen이 소유. */
   onClose: () => void;
+  /** 「나가기」 목적지 — 기본 전장 선택. 실험실(__lab) 전투는 /lab 복귀. */
+  exitTo?: string;
 }): React.ReactElement | null {
   const router = useRouter();
   const [confirmExit, setConfirmExit] = useState(false);
@@ -142,7 +145,7 @@ export function PauseMenu({
                 진행 중인 전투는 저장되지 않습니다.
               </span>
             </p>
-            <button type="button" onClick={() => router.push("/stages")} style={{ ...MENU_BTN, color: "#e7b4ac" }}>
+            <button type="button" onClick={() => router.push(exitTo)} style={{ ...MENU_BTN, color: "#e7b4ac" }}>
               나가기
             </button>
             <button type="button" onClick={() => setConfirmExit(false)} style={MENU_BTN}>

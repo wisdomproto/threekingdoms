@@ -66,6 +66,8 @@ export class UnitLayer extends Container {
         retreated: u.retreated ?? false,
         sp: u.sp,
         maxSp: u.maxSp,
+        // 병종 티어(§4 승급 코스메틱) — t2/t3 스프라이트 변형 우선 시도(미보유 폴백)
+        tier: this.ctx.data.unitClasses[u.classId]?.tier ?? 1,
       },
       this.textures,
       this.tweens,

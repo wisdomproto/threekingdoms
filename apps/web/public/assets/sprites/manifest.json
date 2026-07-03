@@ -588,5 +588,995 @@
     ],
     "source": "_posesheet.png",
     "method": "rebuild_manifest.py"
+  },
+  "bandit_enemy/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "bandit_enemy/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "bandit_player/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "bandit_player/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "guanyu/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "guanyu/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "heavyCavalry_enemy/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "heavyCavalry_enemy/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "heavyCavalry_player/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "heavyCavalry_player/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "liubei/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "liubei/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "lord_enemy/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "lord_enemy/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "lord_player/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "lord_player/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "zhangfei/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "zhangfei/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "간옹/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "간옹/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "감녕/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "감녕/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "고순/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "고순/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "공손찬/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "공손찬/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "공융/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "공융/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "곽사/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "곽사/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "관평/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "관평/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "관해/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "관해/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "노숙/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "노숙/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "도겸/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "도겸/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "동탁/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "동탁/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "두습/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "두습/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "미방/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "미방/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "미축/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "미축/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "서황/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "서황/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "손건/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "손건/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "손권/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "손권/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "악진/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "악진/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "왕보/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "왕보/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "요화/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "요화/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "우금/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "우금/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "원술/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "원술/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "위속/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "위속/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "이각/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "이각/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "이전/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "이전/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "장각/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "장각/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "장보/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "장보/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "장합/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "장합/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "정보/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "정보/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "정원지/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "정원지/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "제갈량/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "제갈량/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "조루/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "조루/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "조운/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "조운/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "조인/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "조인/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "조조/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "조조/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "조홍/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "조홍/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "주유/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "주유/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "주창/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "주창/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "진궁/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "진궁/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "진등/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "진등/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "하후돈/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "하후돈/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "하후연/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "하후연/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "한당/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "한당/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "허저/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "허저/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "황개/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "황개/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "후성/t2": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
+  },
+  "후성/t3": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "",
+    "method": "rebuild_manifest.py(tier)"
   }
 }

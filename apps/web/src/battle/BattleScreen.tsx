@@ -21,6 +21,7 @@ import type { Presenter, PresentedSnapshot } from "./eventPlayer";
 import type { UiEvent } from "./inputMachine";
 import { BattleRenderer } from "../pixi/BattleRenderer";
 import { readSortie, applySortieToStage } from "../meta/sortie";
+import { readLab, LAB_STAGE_ID } from "../lab/lab";
 import { UnitPanel } from "./hud/UnitPanel";
 import { InspectPopup } from "./hud/InspectPopup";
 import { AttackForecast } from "./hud/AttackForecast";
@@ -84,6 +85,41 @@ class PresenterDelegate implements Presenter {
   troopsHealed(e: Ev<"troopsHealed">): Promise<void> {
     return this.target?.troopsHealed(e) ?? Promise.resolve();
   }
+  // ⚠ 옵셔널 Presenter 메서드도 **반드시 여기 위임을 추가**해야 실제 게임에서 연출이 나온다.
+  // EventPlayer는 `p.flank?.(e)`로 델리게이트를 보므로, 델리게이트에 메서드가 없으면 렌더러에
+  // 구현돼 있어도 조용히 스킵된다 — 협공/필살/콤보/상태이상 연출이 전부 무음 통과되던
+  // 잠복 버그의 근본(2026-07-03 발견). 새 연출 이벤트 추가 시 3곳 세트: 렌더러 구현 +
+  // eventPlayer 인터페이스/디스패치 + 이 델리게이트.
+  flank(e: Ev<"flank">): Promise<void> {
+    return this.target?.flank(e) ?? Promise.resolve();
+  }
+  ultimate(e: Ev<"ultimate">): Promise<void> {
+    return this.target?.ultimate(e) ?? Promise.resolve();
+  }
+  combo(e: Ev<"combo">): Promise<void> {
+    return this.target?.combo(e) ?? Promise.resolve();
+  }
+  statusApplied(e: Ev<"statusApplied">): Promise<void> {
+    return this.target?.statusApplied(e) ?? Promise.resolve();
+  }
+  statusTick(e: Ev<"statusTick">): Promise<void> {
+    return this.target?.statusTick(e) ?? Promise.resolve();
+  }
+  statusExpired(e: Ev<"statusExpired">): Promise<void> {
+    return this.target?.statusExpired(e) ?? Promise.resolve();
+  }
+  levelUp(e: Ev<"levelUp">): Promise<void> {
+    return this.target?.levelUp(e) ?? Promise.resolve();
+  }
+  strategyConditionMet(e: Ev<"strategyConditionMet">): Promise<void> {
+    return this.target?.strategyConditionMet(e) ?? Promise.resolve();
+  }
+  weatherChanged(e: Ev<"weatherChanged">): Promise<void> {
+    return this.target?.weatherChanged(e) ?? Promise.resolve();
+  }
+  unitPromoted(e: Ev<"unitPromoted">): Promise<void> {
+    return this.target?.unitPromoted(e) ?? Promise.resolve();
+  }
   sync(state: BattleState): void {
     this.target?.sync(state);
   }
@@ -125,8 +161,17 @@ function activeUnitId(ui: InputState): string | null {
  * BattleContext 생성. 출진 페이로드(sessionStorage tk.sortie)가 있으면 그 stageId의
  * stage를 고르고 player 슬롯을 편성으로 override한다. 없으면 사수관을 기존 그대로 로드
  * (override 진입점이 no-op → 전투 테스트/직접 /battle 진입 회귀 없음).
+ * 실험실(/lab): URL이 stage=__lab이면 sessionStorage tk.lab 페이로드(스테이지·맵·공유풀·시드)로
+ * ctx를 직접 구성 — 정규 스테이지 경로·2회차 강화와 완전 분리(메타 불가침은 결산 sandbox가 담당).
  */
-function makeCtx(): { ctx: BattleContext; sharedItems: string[] } {
+function makeCtx(): { ctx: BattleContext; sharedItems: string[]; seed?: number } {
+  if (typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("stage") === LAB_STAGE_ID) {
+    const lab = readLab();
+    if (lab) {
+      return { ctx: { data: gameData, stage: lab.stage, map: lab.map }, sharedItems: lab.sharedItems, seed: lab.seed };
+    }
+  }
   const sortie = readSortie();
   // 부대 창고 소모품(원작 창고 §7) — friendly 공유 풀로 주입할 목록. 편성이 없으면 빈 풀.
   const sharedItems = sortie?.sharedItems ?? [];
@@ -174,9 +219,9 @@ interface Session {
 }
 
 function createSession(): Session {
-  const { ctx, sharedItems } = makeCtx();
+  const { ctx, sharedItems, seed } = makeCtx();
   const delegate = new PresenterDelegate();
-  const store = new BattleStore(ctx, SEED, {
+  const store = new BattleStore(ctx, seed ?? SEED, {
     presenter: delegate,
     dev: process.env.NODE_ENV !== "production",
     onDevViolation: (m) => console.error(`[battle dev 단언] ${m}`),
@@ -264,6 +309,8 @@ export default function BattleScreen(): React.ReactElement {
           attackerName: name(e.attackerId),
           defenderName: name(e.defenderId),
           loserRetreats: ev?.type === "duel" ? ev.outcome.loserRetreats === true : false,
+          winnerIsFriendly:
+            store.committedState.units.find((u) => u.id === e.winnerId)?.side !== "enemy",
           lines: duelBanter(ctx.stage.dialogue, e.eventId),
         },
         resolve,
@@ -426,7 +473,8 @@ export default function BattleScreen(): React.ReactElement {
           vm={snap.vm}
           reward={ctx.stage.reward}
           items={ctx.data.items}
-          stageId={ctx.stage.id}
+          stageId={ctx.stage.id === LAB_STAGE_ID ? undefined : ctx.stage.id}
+          sandbox={ctx.stage.id === LAB_STAGE_ID}
         />
       )}
       {/* 부트 장막 — 에셋 준비 전 전장을 가린다(입력도 차단). 준비/타임아웃 시 즉시 걷힘. */}
@@ -478,7 +526,7 @@ export default function BattleScreen(): React.ReactElement {
           </p>
         </div>
       )}
-      <PauseMenu open={paused} onClose={() => setPaused(false)} />
+      <PauseMenu open={paused} onClose={() => setPaused(false)} exitTo={ctx.stage.id === LAB_STAGE_ID ? "/lab" : "/stages"} />
     </div>
   );
 }

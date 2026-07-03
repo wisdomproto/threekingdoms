@@ -1,6 +1,7 @@
 import type { GameData, StageUnit } from "@tk/data";
 import type { BattleContext, BattleState, SharedItems, UnitState } from "./types";
 import { camp } from "./types";
+import { effectiveClassId } from "./combat";
 
 /** 소모품(전투 중 「도구」로 쓰는 것) 카테고리 판정 — supplyItem(회복)/attackItem(공격). */
 export function isConsumable(category: string): boolean {
@@ -28,7 +29,17 @@ export function drainConsumables(data: GameData, unit: UnitState, pool: SharedIt
  * exp/grades/weaponBonus/bookBonus/maxMp 등 초기화 규칙을 한 곳에 둬 증원 유닛이 정규 배치와
  * 동일하게 생성되도록 보장. 결정론(난수 없음).
  */
-export function spawnUnit(data: GameData, p: StageUnit): UnitState {
+export function spawnUnit(data: GameData, p: StageUnit, autoPromote = true): UnitState {
+  // 승급(§7) — 레벨의 순수 함수. 저작 병종에서 상향 전용(하후돈 L9 중기병 등 원작 배치 보존).
+  // 실험실(stage.autoPromote=false)은 수동 티어 A/B를 위해 끈다.
+  if (autoPromote) {
+    const eff = effectiveClassId(data, p.classId, p.level);
+    if (eff !== p.classId) p = { ...p, classId: eff };
+  }
+  return spawnUnitRaw(data, p);
+}
+
+function spawnUnitRaw(data: GameData, p: StageUnit): UnitState {
   const cmd = data.commanders[p.commanderId];
   if (!cmd) throw new Error(`unknown commander: ${p.commanderId}`);
   const cls = data.unitClasses[p.classId];
@@ -75,6 +86,7 @@ export function spawnUnit(data: GameData, p: StageUnit): UnitState {
     mp: maxMp, maxMp,
     war: cmd.war, leadership: cmd.leadership, intelligence: cmd.intelligence,
     agility: cmd.agility ?? 50,
+    luck: cmd.luck ?? 50,
 
     baseAtk: cls.baseAtk, baseDef: cls.baseDef, grades: cls.grades, weaponBonus, bookBonus,
     move: cls.move + moveBonus, baseMove: cls.move, rangeMin: cls.rangeMin, rangeMax: cls.rangeMax + rangeBonus,
@@ -98,7 +110,8 @@ export function createBattle(ctx: BattleContext, seed: number, opts?: CreateBatt
   const { data, stage } = ctx;
   const sharedItems: SharedItems = { friendly: [], hostile: [] };
   // 스폰 후 각 유닛 소모품을 진영 풀로 분리(원작 창고). stage 적 유닛의 소모품 → hostile 풀.
-  const units: UnitState[] = stage.units.map((p) => drainConsumables(data, spawnUnit(data, p), sharedItems));
+  const units: UnitState[] = stage.units.map((p) =>
+    drainConsumables(data, spawnUnit(data, p, stage.autoPromote !== false), sharedItems));
   // 편성 창고(플레이어 부대) 소모품 주입 — friendly 풀에. 비소모 id는 방어적으로 배제.
   for (const id of opts?.sharedItems ?? []) {
     const item = data.items[id];
@@ -109,5 +122,6 @@ export function createBattle(ctx: BattleContext, seed: number, opts?: CreateBatt
     turn: 1, phase: "player", status: "ongoing", units, rngState: seed, firedEvents: [],
     duelHistory: [], metStrategyConditions: [], spawnedReinforcements: [], pendingRewards: [], combo: 0, levelUps: [],
     sharedItems,
+    weather: stage.weather ?? "clear",
   };
 }

@@ -4,9 +4,10 @@ export { createBattle, spawnUnit, drainConsumables, isConsumable } from "./creat
 export type { CreateBattleOptions } from "./createBattle";
 export { getMovableTiles, terrainAt, moveCostFor, unitAt, pathCostField } from "./movement";
 export {
-  adjustedStat, attackPower, defensePower, spiritPower, agilityPower, hitChance, computeDamage, getAttackableTargets, distance,
+  adjustedStat, attackPower, defensePower, spiritPower, agilityPower, hitChance, critChance, guardChance, computeDamage, getAttackableTargets, distance,
   strategyDamage, strategyAoeCells, getStrategyTargets, expForNextLevel,
   flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes, canUltimate,
+  effectiveClassId, applyPromotion,
 } from "./combat";
 export { evaluateStage } from "./grade";
 export { corpsStat, growthCoeff } from "./growth";

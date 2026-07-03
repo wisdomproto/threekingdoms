@@ -102,28 +102,40 @@
       "bg": "09-banhe-intro",
       "lines": [
         {
+          "text": "반동탁연합은 결국 제 무게를 못 이기고 무너졌다. 제후들은 저마다 땅을 다투기 시작했고 — 북방에선 원소가 공손찬을 몰아붙였다."
+        },
+        {
+          "speaker": "공손찬",
+          "side": "ally",
+          "portraitId": "공손찬",
+          "text": "현덕, 미안하네. 자네 힘을 또 빌리게 됐어. 원소의 선봉 국의가 반하까지 밀고 들어왔네."
+        },
+        {
           "speaker": "유비",
           "side": "player",
           "portraitId": "유비",
-          "text": "반동탁연합이 깨졌소. 이제 제후들끼리 땅을 다투는 난세요."
+          "text": "형님의 어려움에 어찌 잔말이 있겠소. 함께 막겠소이다."
+        },
+        {
+          "text": "그때 — 공손찬의 진영에서 백마를 탄 젊은 장수가 나섰다. 창을 쥔 자세에 한 치의 흐트러짐이 없었다."
         },
         {
           "speaker": "조운",
-          "side": "player",
+          "side": "ally",
           "portraitId": "조운",
-          "text": "원소의 군세가 공손찬 공을 압박합니다. 반하에서 막아야 합니다."
+          "text": "국의의 선등영은 방패 뒤에 쇠뇌를 숨깁니다. 정면 돌격은 위험합니다 — 측면을 제게 맡겨 주십시오."
         },
         {
-          "speaker": "관우",
+          "speaker": "장비",
           "side": "player",
-          "portraitId": "관우",
-          "text": "국의의 진이 까다롭습니다. 궁병을 앞세워 진을 흩트립시다."
+          "portraitId": "장비",
+          "text": "오, 제법인데? 형님, 저 백마 탄 친구 물건이오!"
         },
         {
           "speaker": "유비",
           "side": "player",
           "portraitId": "유비",
-          "text": "백규 형님을 위해서다. 반하를 건너 적을 친다."
+          "text": "(눈빛이 맑고 곧다... 예사 장수가 아니구나.) 좋소, 젊은 장군. 측면을 부탁하오. 전군 — 반하를 건넌다!"
         }
       ]
     },
@@ -131,16 +143,28 @@
       "bg": "09-banhe-outro",
       "lines": [
         {
+          "text": "국의의 선봉이 꺾이자 원소군은 강 너머로 물러났다. 공손찬 진영에 안도의 함성이 울렸다."
+        },
+        {
           "speaker": "조운",
-          "side": "player",
+          "side": "ally",
           "portraitId": "조운",
-          "text": "...주공. 제 이름은 조운, 자는 자룡입니다. 공손찬 공 밑에 있으나, 주공의 인덕을 보았습니다."
+          "text": "...주공. 제 이름은 조운, 자는 자룡입니다. 공손찬 공 밑에 있으나, 오늘 주공의 싸움에서 인덕을 보았습니다."
         },
         {
           "speaker": "유비",
           "side": "player",
           "portraitId": "유비",
           "text": "자룡... 언젠가 그대와 한 깃발 아래 서고 싶구나."
+        },
+        {
+          "speaker": "조운",
+          "side": "ally",
+          "portraitId": "조운",
+          "text": "그날이 오면 — 이 창은 주공의 것입니다."
+        },
+        {
+          "text": "젊은 창잡이는 깊이 허리를 숙였다. 이 약속은, 몇 해 뒤 서주에서 지켜진다."
         }
       ]
     }
@@ -186,7 +210,7 @@
       "level": 7,
       "troops": 135,
       "items": [],
-      "side": "player",
+      "side": "ally",
       "x": 13,
       "y": 28
     },
@@ -204,8 +228,8 @@
       "y": 28
     },
     {
-      "commanderId": "미방",
-      "classId": "footman",
+      "commanderId": "미축",
+      "classId": "strategist",
       "level": 7,
       "troops": 120,
       "items": [],
@@ -214,8 +238,8 @@
       "y": 29
     },
     {
-      "commanderId": "조잠",
-      "classId": "archer",
+      "commanderId": "손건",
+      "classId": "strategist",
       "level": 7,
       "troops": 105,
       "items": [],

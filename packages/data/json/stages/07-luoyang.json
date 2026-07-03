@@ -104,28 +104,34 @@
       "bg": "07-luoyang-intro",
       "lines": [
         {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "낙양이 불타고 있소. 동탁이 천도를 핑계로 도성을 약탈하는구나."
+          "text": "호로관의 기세가 꺾이자 동탁은 어린 천자를 끌고 장안 천도를 선포했다. 그리고 — 떠나는 길에 낙양에 불을 놓았다."
         },
         {
-          "speaker": "조운",
+          "text": "사백 년 도읍이 통째로 타오르고 있었다. 성문 밖까지 매캐한 연기와 울음소리가 밀려왔다."
+        },
+        {
+          "speaker": "간옹",
           "side": "player",
-          "portraitId": "조운",
-          "text": "주공, 백성들이 길에 쓰러져 있습니다. 한시가 급합니다."
+          "portraitId": "간옹",
+          "text": "주공, 성안에 백성들이 갇혀 있습니다. 동탁의 후군은 아직도 약탈 중입니다."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "이런 개 같은...! 사람 사는 성에 불을 질러?!"
         },
         {
           "speaker": "관우",
           "side": "player",
           "portraitId": "관우",
-          "text": "동탁의 본대가 아직 성안에 있습니다. 불길을 헤치고 들이칩시다."
+          "text": "본대는 이미 서쪽으로 빠져나가고 있습니다. 불길이 길을 삼키기 전에 들이쳐야 합니다."
         },
         {
           "speaker": "유비",
           "side": "player",
           "portraitId": "유비",
-          "text": "한 명이라도 더 구한다. 동탁을 막아라!"
+          "text": "재물은 버려라 — 사람부터다. 한 명이라도 더 구한다!"
         }
       ]
     },
@@ -133,16 +139,27 @@
       "bg": "07-luoyang-outro",
       "lines": [
         {
+          "text": "불은 사흘을 탔다. 사백 년 도읍이 숯이 되는 동안, 구해낸 백성들은 잿더미 앞에서 말을 잃었다."
+        },
+        {
+          "speaker": "백성",
+          "side": "player",
+          "text": "집이... 낙양이... 흑. 그래도, 장군님들 덕에 목숨은 건졌습니다..."
+        },
+        {
           "speaker": "유비",
           "side": "player",
           "portraitId": "유비",
           "text": "동탁은 달아났고, 낙양은 잿더미가 됐다... 우리가 한발 늦었구나."
         },
         {
-          "speaker": "조운",
+          "speaker": "간옹",
           "side": "player",
-          "portraitId": "조운",
-          "text": "주공의 잘못이 아닙니다. 살릴 수 있는 이들을 살렸습니다."
+          "portraitId": "간옹",
+          "text": "그래도 살릴 수 있는 이들은 살렸습니다. 백성들은 불길 속에서 내민 손을 기억할 겁니다."
+        },
+        {
+          "text": "서쪽 하늘 끝, 장안으로 이어진 길 위로 동탁의 행렬이 꼬리를 감추고 있었다."
         }
       ]
     }
@@ -183,8 +200,8 @@
       "y": 8
     },
     {
-      "commanderId": "조운",
-      "classId": "lightCavalry",
+      "commanderId": "손건",
+      "classId": "strategist",
       "level": 5,
       "troops": 120,
       "items": [],
@@ -206,8 +223,8 @@
       "y": 8
     },
     {
-      "commanderId": "미방",
-      "classId": "footman",
+      "commanderId": "미축",
+      "classId": "strategist",
       "level": 5,
       "troops": 105,
       "items": [],

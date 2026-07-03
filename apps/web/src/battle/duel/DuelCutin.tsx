@@ -28,6 +28,8 @@ export interface DuelCineVM {
   defenderName: string;
   /** 패자 즉시 퇴각(스토리 일기토 결과) 여부 — 결과 배너 문구용 */
   loserRetreats: boolean;
+  /** 승자가 아군 진영(player/ally)인가 — 승부 순간 사운드 분기(승리 스팅 vs 패배음) */
+  winnerIsFriendly: boolean;
   /** 이 일기토의 banter 대사(duelMedia.duelBanter) — 합 전에 재생 */
   lines: DialogueLine[];
 }
@@ -89,11 +91,13 @@ export function DuelCutin({ vm, onDone }: { vm: DuelCineVM; onDone: () => void }
       const t = setTimeout(() => setExchange((n) => n + 1), EXCHANGE_MS);
       return () => clearTimeout(t);
     }
-    // result
-    if (vm.loserRetreats) playSfx(SFX.defeat);
+    // result — 승부 순간: 아군 승리=승리 스팅(§9 간판의 보상감), 적 승리=패배음.
+    // 패자 즉시 퇴각(스토리 일기토)이면 퇴각 임팩트를 한 겹 얹는다(아군 승리 시).
+    playSfx(vm.winnerIsFriendly ? SFX.victory : SFX.defeat);
+    if (vm.loserRetreats && vm.winnerIsFriendly) playSfx(SFX.defeat);
     const t = setTimeout(finish, RESULT_MS);
     return () => clearTimeout(t);
-  }, [phase, lineIdx, exchange, hasBanter, vm.lines.length, vm.loserRetreats, finish]);
+  }, [phase, lineIdx, exchange, hasBanter, vm.lines.length, vm.loserRetreats, vm.winnerIsFriendly, finish]);
 
   // 탭: banter=다음 대사, 그 외=단계 스킵(빨리감기).
   const onTap = useCallback(() => {

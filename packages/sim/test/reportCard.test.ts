@@ -19,7 +19,10 @@ import {
 /**
  * 회귀 스냅샷 — 스테이지별 분류 베이스라인(report-card CLI 출력으로 갱신).
  * 의도적 밸런스 변경 시 이 맵을 1줄 고치면 diff가 PR에 그대로 보인다.
- * 🟡BRITTLE(17 여남) = 그리디 봇이 +2에서 비단조로 짐 — 정책 한계지 데이터 불가 아님(게이트 비차단).
+ * 2026-07-03 재측정: ①적 AI 수성 방관 수정(hold 자세 = 수비측 한정 — 방어전 4개가 처음으로
+ * 실전이 됨) ②지원계 회복 책략 정책(healPlan — 회복 없는 수성전을 재던 봇의 비현실 해소)
+ * ③방어전 데이터 튜닝(10 우금 병종·21 장비 병력·23 장무 하향). 종전 🟡BRITTLE(17 여남)도
+ * 회복 정책으로 해소(비단조의 원인 = 지원 유닛 개죽음) → 전 스테이지 HEALTHY(04만 EASY).
  */
 const BASELINE_LABELS: Record<string, Label> = {
   "01-zhuojun": "HEALTHY", "02-yingchuan": "HEALTHY", "03-guangzong": "HEALTHY",
@@ -27,7 +30,7 @@ const BASELINE_LABELS: Record<string, Label> = {
   "07-luoyang": "HEALTHY", "08-dongzhuo-chase": "HEALTHY", "09-banhe": "HEALTHY",
   "10-xuzhou": "HEALTHY", "11-xiaopei": "HEALTHY", "12-xiapi1": "HEALTHY",
   "13-yuanshu": "HEALTHY", "14-xiapi2": "HEALTHY", "15-xutian": "HEALTHY",
-  "16-guandu-escape": "HEALTHY", "17-runan": "BRITTLE", "18-bowangpo": "HEALTHY",
+  "16-guandu-escape": "HEALTHY", "17-runan": "HEALTHY", "18-bowangpo": "HEALTHY",
   "19-xinye": "HEALTHY", "20-changbanpo": "HEALTHY", "21-changbanqiao": "HEALTHY",
   "22-hanjin": "HEALTHY", "23-jiangxia": "HEALTHY", "24-sanjiangkou": "HEALTHY",
   "25-wulin": "HEALTHY", "26-chibi": "HEALTHY", "27-huarongdao": "HEALTHY",

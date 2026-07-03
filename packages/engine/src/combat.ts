@@ -1,3 +1,4 @@
+import type { GameData, UnitClass } from "@tk/data";
 import type { BattleContext, BattleState, Coord, UnitState } from "./types";
 import { areFoes } from "./types";
 import { terrainAt, unitAt } from "./movement";
@@ -44,9 +45,75 @@ export function hitChance(
   return Math.max(cfg.floorPercent, Math.min(100, raw));
 }
 
+/**
+ * 회심률(%) — 시드 고정 확률(리파인 카탈로그 "회심/치명일격 — 운 기반 확률 큰 피해").
+ *   회심% = clamp(basePercent + luckSlope × (atkLuck − defLuck), minPercent, maxPercent)
+ * luck = 장수 운 원값(성장 없음 — grades에 운 등급이 없어 corpsStat 미적용, 원값 비교).
+ * 순수·결정론(롤은 actions.ts resolveStrike에서 시드로 굴림). 필살/책략/아이템은 회심 없음.
+ */
+export function critChance(
+  atkLuck: number, defLuck: number,
+  cfg: { basePercent: number; luckSlope: number; minPercent: number; maxPercent: number },
+): number {
+  const raw = cfg.basePercent + cfg.luckSlope * (atkLuck - defLuck);
+  return Math.max(cfg.minPercent, Math.min(cfg.maxPercent, raw));
+}
+
+/**
+ * 가드율(%) — 시드 고정 확률(리파인 카탈로그 "확률/능력 방어"). 통솔 기반 —
+ *   가드% = clamp(basePercent + leadSlope × (방어 통솔 − 공격 통솔), minPercent, maxPercent)
+ * 발동 시 피해 ×damagePercent/100 (기본 반감). 필살/책략/고정뎀은 가드 불가(호출측 제어).
+ */
+export function guardChance(
+  defLead: number, atkLead: number,
+  cfg: { basePercent: number; leadSlope: number; minPercent: number; maxPercent: number },
+): number {
+  const raw = cfg.basePercent + cfg.leadSlope * (defLead - atkLead);
+  return Math.max(cfg.minPercent, Math.min(cfg.maxPercent, raw));
+}
+
 /** 다음 레벨까지 필요 경험치 = level × 50 (§10 행동 기반 성장). */
 export function expForNextLevel(level: number): number {
   return level * 50;
+}
+
+/**
+ * 승급(§7) — **레벨의 순수 함수**(메타 상태 없음, 상향 전용). 저작된 병종에서 시작해
+ * promotesTo 체인을 레벨 임계(combat.promotion: T2/T3 도달 레벨)만큼 걷는다.
+ * 저작이 이미 상위 티어면 그대로(하향 없음 — 하후돈 L9 중기병 등 원작 배치 보존).
+ * 군주/책사 등 promotesTo 없는 병종은 항상 자기 자신.
+ */
+export function effectiveClassId(data: GameData, classId: string, level: number): string {
+  const start = data.unitClasses[classId];
+  if (!start) return classId;
+  let cur: UnitClass = start;
+  const cfg = data.combat.promotion;
+  while (cur.promotesTo) {
+    const next: UnitClass | undefined = data.unitClasses[cur.promotesTo];
+    if (!next) break;
+    const need = next.tier >= 3 ? cfg.tier3Level : cfg.tier2Level;
+    if (level < need) break;
+    cur = next;
+  }
+  return cur.id;
+}
+
+/**
+ * 전투 중 승급 적용(§7) — 유닛의 병종 유래 필드를 새 병종으로 교체. 아이템 보정(말 move/
+ * 사거리 보너스)은 "저작 병종 대비 증분"으로 보존, 병력/SP/MP/경험치/소지품은 불변.
+ * 결정론 — 난수 없음. 호출측(grantExp)이 unitPromoted 이벤트를 서술한다.
+ */
+export function applyPromotion(data: GameData, u: UnitState, newClassId: string): UnitState {
+  const oldCls = data.unitClasses[u.classId];
+  const cls = data.unitClasses[newClassId];
+  if (!oldCls || !cls || newClassId === u.classId) return u;
+  return {
+    ...u,
+    classId: cls.id, line: cls.line, moveClass: cls.moveClass,
+    baseAtk: cls.baseAtk, baseDef: cls.baseDef, grades: cls.grades,
+    move: cls.move + (u.move - oldCls.move), baseMove: cls.move,
+    rangeMin: cls.rangeMin, rangeMax: cls.rangeMax + (u.rangeMax - oldCls.rangeMax),
+  };
 }
 
 /** 영걸전 레거시 보정 커브 — 미사용(호환 위해 보존). */

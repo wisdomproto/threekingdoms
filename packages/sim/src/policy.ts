@@ -1,7 +1,7 @@
 import {
-  getAttackableTargets, getMovableTiles, distance, areFoes, pathCostField,
+  getAttackableTargets, getMovableTiles, distance, areFoes, camp, pathCostField,
   computeDamage, flankingCount, flankMultiplier, chargeMultiplier, doubleStrikes, canUltimate,
-  hitChance, agilityPower,
+  hitChance, agilityPower, getStrategyTargets, spiritPower, hasStatus,
   type Action, type BattleContext, type BattleState, type UnitState, type Coord,
 } from "@tk/engine";
 
@@ -55,6 +55,13 @@ export function chooseAction(ctx: BattleContext, state: BattleState): Action | u
     return { type: "wait", unitId: unit.id };
   }
 
+  // ── 지원계(support 라인) 회복 책략 — 다친 아군 치유가 교전보다 우선 ──────────────
+  // 책사/도사/주술사는 전투 기여의 본체가 회복이다(baseAtk 40). 종전 봇은 책략을 아예 안 써서
+  // 15~35턴 수성전이 "회복 없는 소모전"이 되어 항상 졌다(2026-07-03 적 AI 수정으로 드러난 구멍).
+  // 사람 플레이의 핵심 수단(회복 사이클)을 정책에 반영해야 밸런스 매트릭스가 현실을 잰다.
+  const heal = healPlan(ctx, state, unit);
+  if (heal) return heal;
+
   // ── 이동+공격 탐색 (협공/돌격 활용) ──────────────────────────────────────────
   // 일반 전투 유닛은 제자리 공격뿐 아니라 *이동 후 공격*까지 실제 피해(협공·돌격 포함)로
   // 평가해 격파 > 최대피해 위치를 고른다. 그래야 결정론 보너스(협공/돌격)를 정책이 실제로 살린다.
@@ -64,10 +71,10 @@ export function chooseAction(ctx: BattleContext, state: BattleState): Action | u
     isProtected(ctx, unit) ||
     (!unit.moved && captureGoalFor(ctx, state, unit) !== undefined);
   if (!special) {
-    // 전진(이동 후 공격) 허용 여부: *생존(surviveTurns) 스테이지에서만* 금지(제자리 공격만).
+    // 전진(이동 후 공격) 허용 여부: *생존(surviveTurns) 스테이지의 수비측만* 금지(제자리 공격만).
     // 섬멸은 물론 *탈출(reachTile)* 스테이지에서도 호위 유닛은 전진해 적을 쳐 길을 열어야 한다 —
     // 묶어두면 탈출 유닛이 단신으로 적진에 갇혀 목표에 도달 못 한다(여남).
-    const plan = bestAttackPlan(ctx, state, unit, !isHoldPosture(ctx));
+    const plan = bestAttackPlan(ctx, state, unit, !holdsPosition(ctx, unit));
     if (plan) {
       // SP 가득 + 제자리 공격 가능이면 필살로 전환(대형 일격). 이동 계획이면 먼저 이동 후 다음 호출에서.
       if (plan.type === "attack" && canUltimate(unit)) {
@@ -135,6 +142,10 @@ export function chooseAction(ctx: BattleContext, state: BattleState): Action | u
       if (isProtected(ctx, unit)) {
         const SAFE_BUFFER = 3;
         const curDist = nearestEnemyDist({ x: unit.x, y: unit.y });
+        // 수성(surviveTurns) 스테이지의 보호 유닛은 **제자리 사수** — 카이팅은 초크포인트
+        // (다리·성문)를 버리고 벌판에서 포위당하는 자살수다(장판교 장비가 다리를 버리면 진다).
+        // 버티기의 본질 = 자리를 지키는 것. 지형 방어·교량 초크가 그 자리에서 작동한다.
+        if (isHoldPosture(ctx)) return { type: "wait", unitId: unit.id };
         if (isOffensivePosture(ctx)) {
           // 섬멸전: 안전권(≥BUFFER) 칸 중 적에 가장 가까운 칸으로 전진(전열 뒤를 따라감).
           const safe = tiles.filter((t) => nearestEnemyDist(t) >= SAFE_BUFFER);
@@ -156,17 +167,11 @@ export function chooseAction(ctx: BattleContext, state: BattleState): Action | u
         return { type: "wait", unitId: unit.id };
       }
 
-      // *생존(surviveTurns)* 스테이지만: 일반 유닛도 돌진 금지 — 안전하면 hold, 위험하면
-      // 적에서 멀어지는 칸으로만 후퇴(스크린 유지). 탈출/섬멸은 전진(아래)으로 길을 연다.
-      if (isHoldPosture(ctx)) {
-        const SAFE = 2;
-        const curDist = nearestEnemyDist({ x: unit.x, y: unit.y });
-        if (curDist < SAFE) {
-          const away = [...tiles].sort((a, b) => nearestEnemyDist(b) - nearestEnemyDist(a))[0];
-          if (away && nearestEnemyDist(away) > curDist) {
-            return { type: "move", unitId: unit.id, to: away };
-          }
-        }
+      // *생존(surviveTurns)* 스테이지의 수비측만: 일반 유닛도 돌진 금지 — **제자리 사수**.
+      // 종전의 "위험하면 후퇴(카이팅)"는 방어선을 뒤로 끌며 스스로 진형을 허물었다(2026-07-03:
+      // 적 AI가 실제로 공격하게 되자 수비 봇이 초크를 버리고 벌판에서 각개격파당하는 패인).
+      // 탈출/섬멸은 전진(아래)으로 길을 연다.
+      if (holdsPosition(ctx, unit)) {
         return { type: "wait", unitId: unit.id };
       }
 
@@ -282,6 +287,59 @@ function bestAttackPlan(
   return best?.action;
 }
 
+/** 회복 대상 판정 임계 — 결손이 최대병력의 30% 이상인 아군만 치유(낭비 방지, 결정론). */
+const HEAL_DEFICIT_RATIO = 0.3;
+
+/**
+ * 지원계 유닛의 회복 계획 — 병종 책략 중 heal/ally 계열을 보유하고 MP가 닿으면:
+ *  1) 사거리 내 가장 결손 큰 아군(자신 포함)에게 **회복량 최대** 책략 시전
+ *  2) 사거리 밖이면 가장 결손 큰 아군 쪽으로 이동(다음 호출에서 시전)
+ * support 라인 한정(baseAtk 40 — 교전 기대값이 없어 회복 우선이 항상 옳다). 군주(유비)의
+ * 조언/헌책은 제외 — 군주는 전열 유지·막타가 본업이라 기존 로직(보호/교전)을 침범하지 않는다.
+ * 금책(seal) 상태면 엔진이 거부하므로 스킵. 결정론(동률은 배열 순서 = 유닛 순서).
+ */
+function healPlan(ctx: BattleContext, state: BattleState, unit: UnitState): Action | undefined {
+  const cls = ctx.data.unitClasses[unit.classId];
+  if (!cls || cls.line !== "support" || !cls.strategies) return undefined;
+  if (hasStatus(unit, "seal")) return undefined;
+  const heals = cls.strategies
+    .map((id) => ctx.data.strategies[id])
+    .filter((s): s is NonNullable<typeof s> =>
+      s != null && s.category === "heal" && s.target === "ally" && s.mp <= unit.mp,
+    )
+    // 회복량 = power + round(정신력×power/10) — 엔진 공식과 동일 평가로 최대 회복 우선.
+    .sort((a, b) =>
+      (b.power + Math.round((spiritPower(unit) * b.power) / 10)) -
+      (a.power + Math.round((spiritPower(unit) * a.power) / 10)),
+    );
+  if (heals.length === 0) return undefined;
+
+  const wounded = state.units
+    .filter((u) =>
+      !areFoes(u.side, unit.side) && !u.retreated &&
+      u.maxTroops - u.troops >= u.maxTroops * HEAL_DEFICIT_RATIO,
+    )
+    .sort((a, b) => (b.maxTroops - b.troops) - (a.maxTroops - a.troops));
+  if (wounded.length === 0) return undefined;
+
+  // 1) 제자리 시전 — 결손 큰 순으로, 닿는 첫 (책략, 대상) 조합.
+  for (const strat of heals) {
+    const castable = getStrategyTargets(ctx, state, unit.id, strat.id);
+    for (const w of wounded) {
+      if (castable.some((c) => c.x === w.x && c.y === w.y)) {
+        return { type: "strategy", unitId: unit.id, strategyId: strat.id, target: { x: w.x, y: w.y } };
+      }
+    }
+  }
+  // 2) 접근 — 가장 결손 큰 아군 쪽으로 한 걸음(지형비용 최단). 이동 후 다음 호출에서 시전 시도.
+  if (!unit.moved) {
+    const target = wounded[0]!;
+    const step = stepToward(ctx, state, unit, { x: target.x, y: target.y });
+    if (step) return step;
+  }
+  return undefined;
+}
+
 /** 이 유닛이 non-optional reachTile 목표의 대상이면 그 목표 칸. 아니면 undefined. */
 function escapeGoalFor(ctx: BattleContext, unit: UnitState): Coord | undefined {
   for (const o of ctx.stage.objectives ?? []) {
@@ -349,6 +407,17 @@ function isHoldPosture(ctx: BattleContext): boolean {
   const objs = ctx.stage.objectives;
   if (!objs) return false;
   return objs.some((o) => !o.optional && o.kind === "surviveTurns");
+}
+
+/**
+ * 이 유닛이 hold 자세를 취해야 하는가 — **수비측(friendly camp)에 한정**.
+ * 스테이지 objectives는 *플레이어의* 목표라, surviveTurns(버티기)에서 웅크려야 하는 건
+ * player·ally뿐이다. 적(hostile)은 그 반대 — 공격측이므로 평소대로 전진·교전한다.
+ * (종전엔 진영 무분별이라 방어전 4개(서주·소패·장판교·강하)에서 적군까지 대기 모드가 되어
+ *  전투가 성립하지 않았다. 밸런스 게이트도 "봇이 기다려도 승리"라 못 잡던 구멍 — 2026-07-03.)
+ */
+function holdsPosition(ctx: BattleContext, unit: UnitState): boolean {
+  return camp(unit.side) !== "hostile" && isHoldPosture(ctx);
 }
 
 /** 이 유닛이 unitRetreated 패배조건(보호 대상 군주)이면 true — 단신 돌격 금지. */
