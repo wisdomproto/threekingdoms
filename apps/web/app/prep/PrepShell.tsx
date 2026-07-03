@@ -240,6 +240,7 @@ export function PrepShell(): React.ReactElement {
             onSortie={onSortie}
             onRemove={(id) => setSelected(selected.filter((m) => m.commanderId !== id))}
             onFocus={(id) => { setActiveTab("formation"); setFocusId(id); }}
+            onClearAll={() => { setSelected([]); setFocusId(null); }}
           />
         </div>
       </div>

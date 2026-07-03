@@ -26,6 +26,8 @@ export interface SortieBarProps {
   onSortie: () => void;
   onRemove: (commanderId: string) => void;
   onFocus: (commanderId: string) => void;
+  /** 「철회」 — 출진 편성 전체 해제(레퍼런스 툴바). */
+  onClearAll: () => void;
 }
 
 // 출진 슬롯 칩 크기 — 40×52는 초상·글자가 안 보일 만큼 작았다(2026-07-03). 레퍼런스 카드 비례로 격상.
@@ -33,7 +35,7 @@ const SLOT_W = 60;
 const SLOT_H = 82;
 
 export function SortieBar({
-  summary, maxSlots, members, onSortie, onRemove, onFocus,
+  summary, maxSlots, members, onSortie, onRemove, onFocus, onClearAll,
 }: SortieBarProps): React.ReactElement {
   const { count, totalPower, warnings, emptyDefault } = summary;
 
@@ -147,30 +149,47 @@ export function SortieBar({
         )}
       </span>
 
-      {/* ── 출정 — 붉은 판 + 청동 프레임 (항상 활성: sortie.ts 계약, 빈 편성=stage 기본값) ── */}
-      <button
-        type="button"
-        onClick={onSortie}
-        style={{
-          ...BUTTON_FRAME,
-          borderWidth: "12px 18px",
-          padding: "8px 26px",
-          fontSize: 19,
-          fontWeight: 900,
-          letterSpacing: "0.35em",
-          textIndent: "0.35em",
-          fontFamily: SERIF,
-          color: "#f4e2b8",
-          textShadow: "0 1px 3px rgba(0,0,0,0.8), 0 0 12px rgba(224,184,74,0.35)",
-          background: "linear-gradient(to bottom, #8a2a1e, #5e1a10)",
-          boxShadow: `inset 0 0 14px rgba(0,0,0,0.5), 0 0 16px rgba(200,164,64,0.18)`,
-          cursor: "pointer",
-          marginLeft: "auto",
-          flexShrink: 0,
-        }}
-      >
-        출정
-      </button>
+      {/* ── 툴바: 철회 + 출정(레퍼런스 우측 클러스터) ── */}
+      <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+        {!emptyDefault && count > 0 && (
+          <button
+            type="button"
+            onClick={onClearAll}
+            title="출진 편성 전체 해제"
+            style={{
+              padding: "9px 16px", borderRadius: 7, fontFamily: SERIF,
+              border: `1px solid ${GOLD_DIM}`, background: "rgba(30,24,16,0.85)",
+              color: "#c8b48a", fontSize: 14, fontWeight: 700, letterSpacing: "0.14em",
+              cursor: "pointer", flexShrink: 0,
+            }}
+          >
+            철회
+          </button>
+        )}
+        {/* 출정 — 붉은 판 + 청동 프레임 (항상 활성: sortie.ts 계약, 빈 편성=stage 기본값) */}
+        <button
+          type="button"
+          onClick={onSortie}
+          style={{
+            ...BUTTON_FRAME,
+            borderWidth: "13px 20px",
+            padding: "10px 40px",
+            fontSize: 23,
+            fontWeight: 900,
+            letterSpacing: "0.4em",
+            textIndent: "0.4em",
+            fontFamily: SERIF,
+            color: "#f6e6bc",
+            textShadow: "0 1px 3px rgba(0,0,0,0.85), 0 0 14px rgba(224,184,74,0.45)",
+            background: "linear-gradient(to bottom, #97301f, #5e1a10)",
+            boxShadow: `inset 0 0 16px rgba(0,0,0,0.5), 0 0 20px rgba(200,164,64,0.25)`,
+            cursor: "pointer",
+            flexShrink: 0,
+          }}
+        >
+          출정
+        </button>
+      </div>
     </div>
     </div>
   );

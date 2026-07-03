@@ -155,11 +155,21 @@ export function Formation({
     onChange(selected.filter((m) => m.commanderId !== commanderId));
   }, [onChange, selected]);
 
-  // 카드 탭: 미배치+여유 → 배치까지, 그 외 → 상세만(배치됨 카드 탭이 해제가 되지 않게)
+  // 카드 탭(2026-07-03 유저 요청 "한번 더 클릭하면 출진에서 빠지게"):
+  //  - 미배치 + 여유 → 배치 + 포커스
+  //  - 배치됨 & 이미 포커스된 카드 재탭 → 해제 (오탭 방지: 다른 배치 카드는 포커스만)
+  //  - 슬롯 가득/그 외 → 상세 포커스만
   const tapCard = useCallback((u: RosterUnit) => {
-    if (!selectedIds.has(u.commanderId) && selected.length < maxSlots) deploy(u);
-    onFocus(u.commanderId);
-  }, [selectedIds, selected.length, maxSlots, deploy, onFocus]);
+    const id = u.commanderId;
+    if (selectedIds.has(id)) {
+      if (focusId === id) { undeploy(id); return; }
+      onFocus(id);
+    } else if (selected.length < maxSlots) {
+      deploy(u); onFocus(id);
+    } else {
+      onFocus(id);
+    }
+  }, [selectedIds, focusId, selected.length, maxSlots, deploy, undeploy, onFocus]);
 
   const updateEquip = useCallback((commanderId: string, items: string[]) => {
     setEquipped(commanderId, items);
@@ -176,13 +186,10 @@ export function Formation({
     <CommanderDetail
       unit={detailUnit}
       member={detailMember}
-      canDeploy={selected.length < maxSlots}
       statMax={statMax}
       inventory={inventory}
       equippedCount={equippedCount}
       onEquip={(items) => updateEquip(detailUnit.commanderId, items)}
-      onDeploy={() => deploy(detailUnit)}
-      onUndeploy={() => undeploy(detailUnit.commanderId)}
       onClose={narrow ? () => onFocus(null) : undefined}
     />
   );
