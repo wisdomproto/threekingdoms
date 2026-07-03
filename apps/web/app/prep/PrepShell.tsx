@@ -68,6 +68,8 @@ export function PrepShell(): React.ReactElement {
 
   const [selected, setSelected] = useState<SortieMember[]>([]);
   const [activeTab, setActiveTab] = useState<"formation" | "shop">("formation");
+  // 상세 패널 대상 — Formation 카드/하단 슬롯 칩이 공유(리마운트(key=refreshKey)에도 생존).
+  const [focusId, setFocusId] = useState<string | null>(null);
 
   // 출진 클릭 후 로딩/전면광고 전환 셸을 띄울지.
   const [transition, setTransition] = useState<{ showAd: boolean } | null>(null);
@@ -109,29 +111,45 @@ export function PrepShell(): React.ReactElement {
         paddingBottom: 64,
       }}
     >
-      {/* 헤더 */}
+      {/* 헤더 — 먹빛 바 + 청동 타이틀 + 출진 카운터(레퍼런스 우상단 플라크) */}
       <header
         style={{
           display: "flex",
-          alignItems: "baseline",
-          justifyContent: "space-between",
+          alignItems: "center",
           gap: 12,
-          padding: "16px 16px 0",
+          padding: "12px 16px",
+          background: "linear-gradient(to bottom, #1a140c, #100c07)",
+          borderBottom: "1px solid #6f5a3488",
+          fontFamily: '"Noto Serif KR", "Nanum Myeongjo", "Apple SD Gothic Neo", serif',
         }}
       >
-        <h1 style={{ margin: 0, fontSize: 18 }}>출진 준비 — {stage.name}</h1>
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <h1 style={{ margin: 0, fontSize: 18, color: "#e0b84a", letterSpacing: "0.1em", fontWeight: 800 }}>
+          출진 준비
+          <span style={{ fontSize: 13.5, color: "#b8a070", fontWeight: 600, marginLeft: 10 }}>
+            — {stage.name}
+          </span>
+        </h1>
+        <div style={{ display: "flex", gap: 12, alignItems: "center", marginLeft: "auto" }}>
           {isCleared && (
             <Link
               href={`/merchant?stage=${encodeURIComponent(stageId)}`}
               style={{ color: "#cdab6e", fontSize: 13, textDecoration: "none" }}
             >
-              🏕️ 상인
+              상인
             </Link>
           )}
-          <Link href="/stages" style={{ color: "#8a7350", fontSize: 14, textDecoration: "none" }}>
+          <Link href="/stages" style={{ color: "#8a7350", fontSize: 13, textDecoration: "none" }}>
             ◀ 전장 선택
           </Link>
+          <span style={{
+            padding: "4px 12px", borderRadius: 6,
+            border: "1.5px solid #8a6a28", background: "rgba(200,164,64,0.1)",
+            fontSize: 13, color: "#e8d9b0", fontWeight: 700, letterSpacing: "0.06em",
+            boxShadow: "inset 0 0 8px rgba(200,164,64,0.12)",
+          }}>
+            출진 <strong style={{ color: "#e0b84a", fontSize: 15 }}>{selected.length}</strong>
+            <span style={{ color: "#8a7350" }}> / {maxSlots}</span>
+          </span>
         </div>
       </header>
 
@@ -155,10 +173,12 @@ export function PrepShell(): React.ReactElement {
                 padding: "8px 20px",
                 fontSize: 15,
                 fontWeight: active ? 700 : 400,
-                color: active ? "#caa86a" : "#9aa3ad",
+                fontFamily: '"Noto Serif KR", "Nanum Myeongjo", "Apple SD Gothic Neo", serif',
+                letterSpacing: "0.14em",
+                color: active ? "#e0b84a" : "#9aa3ad",
                 background: "transparent",
                 border: "none",
-                borderBottom: active ? "2px solid #caa86a" : "2px solid transparent",
+                borderBottom: active ? "2px solid #e0b84a" : "2px solid transparent",
                 cursor: "pointer",
                 marginBottom: -1,
               }}
@@ -179,6 +199,8 @@ export function PrepShell(): React.ReactElement {
             selected={selected}
             onChange={setSelected}
             chapter={chapter}
+            focusId={focusId}
+            onFocus={setFocusId}
           />
         ) : (
           <Shop
@@ -191,8 +213,15 @@ export function PrepShell(): React.ReactElement {
         )}
       </div>
 
-      {/* 고정 출진 바 */}
-      <SortieBar summary={summary} maxSlots={maxSlots} onSortie={onSortie} />
+      {/* 고정 출진 바 — 슬롯 칩 탭 = 편성 탭으로 전환 + 상세 포커스 */}
+      <SortieBar
+        summary={summary}
+        maxSlots={maxSlots}
+        members={selected}
+        onSortie={onSortie}
+        onRemove={(id) => setSelected(selected.filter((m) => m.commanderId !== id))}
+        onFocus={(id) => { setActiveTab("formation"); setFocusId(id); }}
+      />
     </main>
   );
 }
