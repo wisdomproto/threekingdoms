@@ -102,7 +102,9 @@ export class CrazyGamesAdService implements AdService, PortalLifecycle {
 
   // ── PortalLifecycle ──
   boot(): void {
-    void this.sdk().catch(() => {});
+    // SDK 준비 즉시 loadingStart — QA는 loadingStart↔loadingStop 짝을 본다(v3 요건).
+    // boot이 loadingFinished보다 먼저 호출되므로 .then 등록 순서상 start→stop 순서 보장.
+    void this.sdk().then((s) => s.game?.loadingStart?.()).catch(() => {});
   }
   loadingFinished(): void {
     void this.sdk().then((s) => s.game?.loadingStop?.()).catch(() => {});
