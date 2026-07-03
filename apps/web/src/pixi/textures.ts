@@ -234,7 +234,7 @@ export class TextureResolver {
    *   실제 등장하는 소수 유닛(예: 삼형제)도 색사각으로 남았다. 매니페스트 선두가 삼형제라
    *   점진 적용 시 첫 라운드(수백 ms)에 바로 표시된다.
    */
-  async loadSprites(onProgress?: () => void): Promise<void> {
+  async loadSprites(onProgress?: (done: number, total: number) => void): Promise<void> {
     let manifest: Manifest;
     try {
       const res = await fetch(`${SPRITE_BASE}/manifest.json`);
@@ -259,17 +259,27 @@ export class TextureResolver {
     // 개별 로드 + 도착 즉시 등록(allSettled로 전체 완료만 대기 — 반환 시점용).
     // - per-file 내성: 매니페스트에 등록됐으나 파일이 없는(삭제/미생성) 포즈가 404여도 그 포즈만 빠지고
     //   나머지는 정상(단일 배치 Assets.load는 1개 실패에 전체 거부라 위험 — loadGround와 동일).
-    // - 점진 적용: 각 .then에서 즉시 sprites에 넣고 onProgress로 통지 → 호출측이 그 유닛만 갱신.
+    // - 점진 적용: 각 도착마다 sprites에 넣고 onProgress(done,total)로 통지 → 호출측이 갱신 + 게이지.
+    //   실패(404)도 done에 센다 — 게이지가 100%에 도달 못 하는 구멍 방지(전투 부트 게이트 §13 무손실).
+    let done = 0;
+    const total = loadQueue.length;
     await Promise.allSettled(
       loadQueue.map((q) =>
-        Assets.load<Texture>(q.url).then((tex) => {
-          if (!tex) return;
-          if (!this.sprites.has(q.spriteId)) {
-            this.sprites.set(q.spriteId, new Map());
-          }
-          this.sprites.get(q.spriteId)!.set(q.pose, tex);
-          onProgress?.();
-        }),
+        Assets.load<Texture>(q.url)
+          .then((tex) => {
+            if (!tex) return;
+            if (!this.sprites.has(q.spriteId)) {
+              this.sprites.set(q.spriteId, new Map());
+            }
+            this.sprites.get(q.spriteId)!.set(q.pose, tex);
+          })
+          .catch(() => {
+            /* 404 = 그 포즈만 생략(폴백 유지) */
+          })
+          .finally(() => {
+            done += 1;
+            onProgress?.(done, total);
+          }),
       ),
     );
 

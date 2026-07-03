@@ -137,9 +137,22 @@ export class BattleRenderer implements Presenter {
    */
   private shakeAmp = 0;
   private shakePhase = 0;
+  /** 전투 부트 게이트(BattleScreen 로딩 장막) — mount의 에셋 3원천이 전부 settle되면 resolve.
+   *  allSettled 집계라 404/실패에도 반드시 열린다(§13 무손실). destroy와 무관하게 안전(resolve만). */
+  private assetsReadyResolve: (() => void) | null = null;
+  readonly assetsReady: Promise<void>;
+  private assetProgressCb: ((pct: number) => void) | null = null;
 
   constructor(ctx: BattleContext) {
     this.ctx = ctx;
+    this.assetsReady = new Promise<void>((resolve) => {
+      this.assetsReadyResolve = resolve;
+    });
+  }
+
+  /** 부트 진행률(0~1) 구독 — BattleScreen 로딩 게이지용. 마지막 등록만 유효(단일 소비자). */
+  onAssetProgress(cb: ((pct: number) => void) | null): void {
+    this.assetProgressCb = cb;
   }
 
   /** store 생성(presenter=this) 후, mount 이전에 호출 */
@@ -218,8 +231,24 @@ export class BattleRenderer implements Presenter {
         units.refreshSprites();
       });
     };
-    textures
-      .loadSprites(scheduleRefresh)
+    // ── 전투 부트 게이트 집계(assetsReady/onAssetProgress — BattleScreen 로딩 장막용) ──
+    // 스프라이트(지배적 물량)·타일+오브젝트·맵배경 3원천의 가중 진행률. 실패/404도 "완료"로
+    // 집계된다(§13 무손실 — 게이트가 영원히 안 닫히는 구멍 금지, 폴백 렌더는 그대로 유지).
+    const bootState = { spritesDone: 0, spritesTotal: 0, tiles: 0, mapBg: 0 };
+    const emitBoot = (): void => {
+      const spriteFrac =
+        bootState.spritesTotal > 0 ? bootState.spritesDone / bootState.spritesTotal : 0;
+      this.assetProgressCb?.(
+        Math.min(1, spriteFrac * 0.85 + bootState.tiles * 0.1 + bootState.mapBg * 0.05),
+      );
+    };
+    const spritesBoot = textures
+      .loadSprites((done, total) => {
+        bootState.spritesDone = done;
+        bootState.spritesTotal = total;
+        scheduleRefresh();
+        emitBoot();
+      })
       .then(() => units.refreshSprites())
       .catch((e) => console.warn("[BattleRenderer] loadSprites 예외 (폴백 유지):", e));
     // 자체 컷아웃 리그(§4) — spriteId에 스켈레톤이 있으면 베이크 스프라이트를 리그로 격상.
@@ -229,9 +258,13 @@ export class BattleRenderer implements Presenter {
     objects.zIndex = 1.8; // highlights(1)/threat(1.5) 위, units(2) 아래
     // 지형 타일 로드 완료 → TerrainLayer 이미지 텍스처로 교체 + 청크 캐시 재생성
     // (terrain은 아래에서 선언되므로, Promise 콜백은 terrain 참조 가능 — JS 클로저)
-    tilesReady
+    const tilesBoot = tilesReady
       .then(() => { terrain.rebake(); objects.rebake(); })
-      .catch((e) => console.warn("[BattleRenderer] loadTiles 예외 (단색 폴백 유지):", e));
+      .catch((e) => console.warn("[BattleRenderer] loadTiles 예외 (단색 폴백 유지):", e))
+      .finally(() => {
+        bootState.tiles = 1; // 실패도 폴백 확정 = 부트 관점 "완료"
+        emitBoot();
+      });
     fx.world.zIndex = 3;
     world.addChild(terrain, highlights, threat, objects, units, fx.world);
 
@@ -252,7 +285,7 @@ export class BattleRenderer implements Presenter {
     gridOverlay.zIndex = 0.5; // 배경 위, 유닛 아래 — 정합 확인용
     gridOverlay.visible = false;
     world.addChild(mapBg, gridOverlay);
-    textures
+    const mapBgBoot = textures
       .loadMapBackground(this.ctx.map.id)
       .then((tex) => {
         if (!tex) return;
@@ -265,7 +298,18 @@ export class BattleRenderer implements Presenter {
         // objects 레이어는 painted 배경과 무관하게 항상 표시(설계 §3) — terrain만 끈다.
         // gridOverlay.visible = true; // 정합 확인용 — 확정되어 기본 OFF (새 맵 검증 시 재활성)
       })
-      .catch((e) => console.warn("[BattleRenderer] loadMapBackground 예외:", e));
+      .catch((e) => console.warn("[BattleRenderer] loadMapBackground 예외:", e))
+      .finally(() => {
+        bootState.mapBg = 1; // 파일 없음/실패 = 타일 폴백 확정 = 부트 관점 "완료"
+        emitBoot();
+      });
+
+    // 부트 게이트 완료 — 3원천 전부 settle되면 resolve(§13: 어떤 실패에도 반드시 열린다).
+    // 원경 산수(loadBackground)는 순수 장식이라 게이트에서 제외.
+    void Promise.allSettled([spritesBoot, tilesBoot, mapBgBoot]).then(() => {
+      this.assetProgressCb?.(1);
+      this.assetsReadyResolve?.();
+    });
 
     // 맵 뒤 배경 (화면 고정 — 카메라 변환 밖). 휑한 가장자리를 원경 산수로 채운다.
     const bg = new Sprite();

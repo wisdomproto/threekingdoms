@@ -34,6 +34,7 @@ import { BattleControls } from "./hud/BattleControls";
 import { PauseMenu } from "./hud/PauseMenu";
 import { Minimap } from "./hud/Minimap";
 import { adLifecycle } from "../meta/adProviders";
+import { HUD_FONT, HUD_BRONZE, HUD_BRONZE_DIM, HUD_PARCHMENT } from "./hud/frames";
 import type { InputState } from "./inputMachine";
 
 /** 고정 시드 — dev 재현성 (seed + actionLog가 버그 재현 수단, 설계 §1 리플레이 기반) */
@@ -204,16 +205,37 @@ export default function BattleScreen(): React.ReactElement {
     return () => ro.disconnect();
   }, []);
 
+  // 전투 부트 게이트 — 에셋(스프라이트·오브젝트·맵배경) 로드 완료까지 로딩 장막을 덮는다.
+  // "캐릭터/오브젝트가 뒤늦게 뜨는" 점진 노출 대신 준비 후 시작(2026-07-03 피드백).
+  // 타임아웃(15s) 폴백 = §13 무손실 — 파일 누락/네트워크 행이 게임을 인질 잡지 않는다
+  // (장막만 걷히고, 밑에서는 기존 점진 로드가 계속 채운다).
+  const [boot, setBoot] = useState({ pct: 0, ready: false });
+
   useEffect(() => {
     const el = mountRef.current;
     if (!el) return;
     const renderer = new BattleRenderer(ctx);
     renderer.connect(store);
     delegate.target = renderer;
+    // 부트 게이트 구독 — StrictMode 재마운트 시 새 렌더러 기준으로 리셋.
+    let cancelled = false;
+    setBoot({ pct: 0, ready: false });
+    renderer.onAssetProgress((pct) => {
+      if (!cancelled) setBoot((b) => (b.ready ? b : { pct, ready: false }));
+    });
+    void renderer.assetsReady.then(() => {
+      if (!cancelled) setBoot({ pct: 1, ready: true });
+    });
+    const bootTimeout = window.setTimeout(() => {
+      if (!cancelled) setBoot((b) => ({ ...b, ready: true }));
+    }, 15_000);
     renderer.mount(el).catch((err: unknown) => {
       console.error("[battle] 렌더러 mount 실패", err);
     });
     return () => {
+      cancelled = true;
+      window.clearTimeout(bootTimeout);
+      renderer.onAssetProgress(null);
       if (delegate.target === renderer) delegate.target = null;
       renderer.destroy(); // init 진행 중이면 BattleRenderer 내부 가드가 완료 후 파괴
     };
@@ -269,11 +291,14 @@ export default function BattleScreen(): React.ReactElement {
     >
       <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
       <TurnBanner ui={snap.ui} vm={snap.vm} dispatch={dispatch} stageName={ctx.stage.name} />
-      <ObjectiveBanner
-        vm={snap.vm}
-        stage={ctx.stage}
-        nameOf={(id) => ctx.data.commanders[id]?.name ?? id}
-      />
+      {/* 승리조건 배너/개전 대사는 장막이 걷힌 뒤 마운트 — 안 보이는 채 연출이 지나가지 않게 */}
+      {boot.ready && (
+        <ObjectiveBanner
+          vm={snap.vm}
+          stage={ctx.stage}
+          nameOf={(id) => ctx.data.commanders[id]?.name ?? id}
+        />
+      )}
       <UnitPanel
         ui={snap.ui}
         vm={snap.vm}
@@ -311,14 +336,16 @@ export default function BattleScreen(): React.ReactElement {
           canAutoFight={canAutoFight}
         />
       </div>
-      <DialogueOverlay
-        store={store}
-        dialogue={ctx.stage.dialogue}
-        onLineChange={(speaker) => {
-          const unit = store.committedState.units.find((u) => u.id === speaker);
-          if (unit) delegate.target?.focusOn({ x: unit.x, y: unit.y }, 500);
-        }}
-      />
+      {boot.ready && (
+        <DialogueOverlay
+          store={store}
+          dialogue={ctx.stage.dialogue}
+          onLineChange={(speaker) => {
+            const unit = store.committedState.units.find((u) => u.id === speaker);
+            if (unit) delegate.target?.focusOn({ x: unit.x, y: unit.y }, 500);
+          }}
+        />
+      )}
       <EndTurnConfirm ui={snap.ui} dispatch={dispatch} />
       <ResultSequence
         ui={snap.ui}
@@ -327,6 +354,55 @@ export default function BattleScreen(): React.ReactElement {
         items={ctx.data.items}
         stageId={ctx.stage.id}
       />
+      {/* 부트 장막 — 에셋 준비 전 전장을 가린다(입력도 차단). 준비/타임아웃 시 즉시 걷힘. */}
+      {!boot.ready && (
+        <div
+          aria-label="전장 로딩"
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 60, // PauseMenu(80)보다 아래 — ESC 메뉴는 로딩 중에도 사용 가능
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 18,
+            background: "radial-gradient(120% 90% at 50% 30%, #1a1714 0%, #0d0b09 80%)",
+            color: HUD_PARCHMENT,
+            fontFamily: HUD_FONT,
+            userSelect: "none",
+          }}
+        >
+          <p style={{ margin: 0, fontSize: 12, letterSpacing: "0.4em", textIndent: "0.4em", color: HUD_BRONZE_DIM }}>
+            戰 場
+          </p>
+          <h2 style={{ margin: 0, fontSize: 24, letterSpacing: "0.12em", color: HUD_BRONZE, fontWeight: 700 }}>
+            {ctx.stage.name}
+          </h2>
+          <div
+            style={{
+              width: "min(260px, 68vw)",
+              height: 6,
+              borderRadius: 3,
+              background: "rgba(138, 115, 80, 0.18)",
+              border: `1px solid ${HUD_BRONZE_DIM}44`,
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                width: `${Math.round(boot.pct * 100)}%`,
+                height: "100%",
+                background: `linear-gradient(90deg, ${HUD_BRONZE_DIM}, ${HUD_BRONZE})`,
+                transition: "width 180ms ease-out",
+              }}
+            />
+          </div>
+          <p style={{ margin: 0, fontSize: 12, color: HUD_BRONZE_DIM }} aria-live="polite">
+            전장을 준비하는 중… {Math.round(boot.pct * 100)}%
+          </p>
+        </div>
+      )}
       <PauseMenu open={paused} onClose={() => setPaused(false)} />
     </div>
   );
