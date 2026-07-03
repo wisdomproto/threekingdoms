@@ -116,7 +116,28 @@ def do_sd(job, gen, dry):
     return [job["savePath"]]
 
 
-HANDLERS = {"scene": do_scene, "portrait": do_portrait, "sd": do_sd, "duel": do_scene}
+def do_objsheet(job, gen, dry):
+    """오브젝트 시트(K-*) — 생성 → public/assets/objects/_sheet_{name}.png → cut_object_sheet
+    --sheet {name} 자동 컷 → outputs(컷 png)까지 R2 업로드 대상으로 반환."""
+    sheet_path = os.path.join(PUBLIC, *job["savePath"].split("/"))
+    if dry:
+        print(f"  [dry] objsheet {job['sheet']} → {job['savePath']} (+컷 {len(job.get('outputs', []))})")
+        return [job["savePath"], *job.get("outputs", [])]
+    os.makedirs(os.path.dirname(sheet_path), exist_ok=True)
+    if not gen(job["prompt"], sheet_path, None):
+        return []
+    try:
+        import subprocess
+        subprocess.run([sys.executable, os.path.join(os.path.dirname(HERE), "cut_object_sheet.py"),
+                        sheet_path, "--sheet", job["sheet"]], check=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"    [경고] 오브젝트 컷 실패({job['sheet']}): {e} — 시트만 저장")
+        return [job["savePath"]]
+    return [job["savePath"], *job.get("outputs", [])]
+
+
+HANDLERS = {"scene": do_scene, "portrait": do_portrait, "sd": do_sd, "duel": do_scene,
+            "objsheet": do_objsheet}
 
 
 def already_done(job):
@@ -136,7 +157,7 @@ def main():
     except Exception:  # noqa: BLE001
         pass
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", choices=["scene", "portrait", "sd", "duel"])
+    ap.add_argument("--only", choices=["scene", "portrait", "sd", "duel", "objsheet"])
     ap.add_argument("--id")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--force", action="store_true")
@@ -147,11 +168,14 @@ def main():
     # prompts.json(보드 SSOT) + duel-prompts.json(§9 derive_duel_prompts.mjs) merge.
     # 일기토만 돌릴 땐 prompts.json 없이도 동작(둘 다 없으면 안내 후 종료).
     duel_prompts = os.path.join(HERE, "duel-prompts.json")
+    objsheet_prompts = os.path.join(HERE, "objsheet-prompts.json")
     jobs = []
     if os.path.exists(PROMPTS):
         jobs += json.load(open(PROMPTS, encoding="utf-8"))["jobs"]
     if os.path.exists(duel_prompts):
         jobs += json.load(open(duel_prompts, encoding="utf-8"))["jobs"]
+    if os.path.exists(objsheet_prompts):
+        jobs += json.load(open(objsheet_prompts, encoding="utf-8"))["jobs"]
     if not jobs:
         print("prompts.json/duel-prompts.json 없음 — 먼저: node tools/sprite-pipeline/gen/export_prompts.mjs "
               "또는 node tools/sprite-pipeline/gen/derive_duel_prompts.mjs"); sys.exit(1)

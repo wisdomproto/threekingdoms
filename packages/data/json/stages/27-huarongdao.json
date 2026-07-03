@@ -405,5 +405,66 @@
       },
       "once": true
     }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        16,
+        17
+      ],
+      "kind": "debris_cart"
+    },
+    {
+      "cell": [
+        14,
+        17
+      ],
+      "kind": "debris_cart",
+      "flip": true
+    },
+    {
+      "cell": [
+        15,
+        17
+      ],
+      "kind": "debris_weapons"
+    },
+    {
+      "cell": [
+        17,
+        17
+      ],
+      "kind": "debris_weapons",
+      "flip": true
+    },
+    {
+      "cell": [
+        16,
+        6
+      ],
+      "kind": "debris_pile"
+    },
+    {
+      "cell": [
+        14,
+        6
+      ],
+      "kind": "debris_pile",
+      "flip": true
+    },
+    {
+      "cell": [
+        15,
+        6
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        15,
+        27
+      ],
+      "kind": "signal_flag"
+    }
   ]
 }

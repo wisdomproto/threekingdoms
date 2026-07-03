@@ -351,6 +351,21 @@
         ],
         "gold": 150
       }
+    },
+    {
+      "id": "depot_02-yingchuan",
+      "description": "영천 곡창 — 황건이 쌓아둔 군량을 회수한다.",
+      "trigger": {
+        "kind": "unitReachedTile",
+        "x": 42,
+        "y": 12
+      },
+      "reward": {
+        "treasures": [
+          "쌀"
+        ],
+        "gold": 250
+      }
     }
   ],
   "dialogue": [

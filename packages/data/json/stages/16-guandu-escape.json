@@ -427,5 +427,65 @@
       },
       "once": true
     }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        22,
+        22
+      ],
+      "kind": "debris_siege"
+    },
+    {
+      "cell": [
+        22,
+        20
+      ],
+      "kind": "debris_siege",
+      "flip": true
+    },
+    {
+      "cell": [
+        22,
+        21
+      ],
+      "kind": "debris_cart"
+    },
+    {
+      "cell": [
+        21,
+        22
+      ],
+      "kind": "debris_weapons"
+    },
+    {
+      "cell": [
+        40,
+        21
+      ],
+      "kind": "debris_pile"
+    },
+    {
+      "cell": [
+        41,
+        22
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        41,
+        20
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        3,
+        21
+      ],
+      "kind": "campfire"
+    }
   ]
 }

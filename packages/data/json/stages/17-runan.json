@@ -305,6 +305,21 @@
         ],
         "gold": 400
       }
+    },
+    {
+      "id": "depot_17-runan",
+      "description": "여남 의창 — 유벽이 남긴 물자를 넘겨받는다.",
+      "trigger": {
+        "kind": "unitReachedTile",
+        "x": 61,
+        "y": 18
+      },
+      "reward": {
+        "treasures": [
+          "한방약"
+        ],
+        "gold": 300
+      }
     }
   ],
   "dialogue": [
@@ -414,6 +429,66 @@
         "loserRetreats": true
       },
       "once": true
+    }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        5,
+        31
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        5,
+        29
+      ],
+      "kind": "campfire",
+      "flip": true
+    },
+    {
+      "cell": [
+        4,
+        30
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        6,
+        30
+      ],
+      "kind": "supply_cart"
+    },
+    {
+      "cell": [
+        30,
+        25
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        30,
+        23
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        18,
+        28
+      ],
+      "kind": "debris_pile"
+    },
+    {
+      "cell": [
+        18,
+        27
+      ],
+      "kind": "shrub"
     }
   ]
 }

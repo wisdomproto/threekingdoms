@@ -1,0 +1,20 @@
+{
+  "note": "오브젝트 시트 생성 잡 — gen_assets.py가 merge. 프롬프트는 보드 K-* 카드와 동일 템플릿(수정 시 양쪽 동기화). 생성→cut_object_sheet --sheet {sheet} 자동 컷→outputs R2 업로드.",
+  "jobs": [
+    {
+      "kind": "objsheet",
+      "id": "objsheet-k9",
+      "sheet": "k9",
+      "savePath": "assets/objects/_sheet_k9.png",
+      "outputs": [
+        "assets/objects/village_hut.png",
+        "assets/objects/camp_tent.png",
+        "assets/objects/depot_store.png",
+        "assets/objects/bridge_v.png",
+        "assets/objects/bridge_h.png",
+        "assets/objects/village_hut2.png"
+      ],
+      "prompt": "Game map object sheet in ONE image on plain white background, strict top-down tactics-map view looking straight down from above — NO isometric, NO 45-degree rotation, NO two-sided oblique projection: each object faces the viewer squarely, showing its top and at most a slight near-face hint of height like the flat terrain tiles of a classic top-down tactical-RPG battle map, NEVER a 3/4 isometric block with two receding side faces, ink-wash painted style, muted earth and timber tones, soft contact shadow only, each object a complete croppable sprite with generous white spacing: (1) a small thatched-roof village hut seen from directly above (round-ish straw roof), (2) a military camp tent from directly above (dark canvas, banner pole), (3) a small supply storehouse from above (tiled roof, grain sacks beside), (4) a stone-and-timber bridge segment running VERTICALLY (north-south roadway, water-worn stone edges left and right, tileable so segments connect top-to-bottom), (5) the same bridge segment running HORIZONTALLY (east-west roadway, tileable left-to-right), (6) a second thatched hut variant with a small yard fence. No grid lines, no labels, no text."
+    }
+  ]
+}

@@ -427,8 +427,14 @@ function evaluateStrategyConditions(ctx: BattleContext, state: BattleState): { s
         met = duelsInOrderSatisfied(next.duelHistory, sc.trigger.duelIds);
         break;
       case "unitReachedTile": {
-        const u = findUnit(next, sc.trigger.unitId);
-        met = !!u && !u.retreated && u.x === sc.trigger.x && u.y === sc.trigger.y;
+        // unitId 지정 = 그 유닛만 / 생략 = 아무 아군(player) 도달(보물창고 회수 §10 — 2026-07-04)
+        const { x, y, unitId } = sc.trigger;
+        if (unitId != null) {
+          const u = findUnit(next, unitId);
+          met = !!u && !u.retreated && u.x === x && u.y === y;
+        } else {
+          met = next.units.some((u) => u.side === "player" && !u.retreated && u.x === x && u.y === y);
+        }
         break;
       }
     }

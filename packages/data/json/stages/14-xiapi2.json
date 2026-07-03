@@ -490,5 +490,72 @@
       },
       "once": true
     }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        25,
+        37
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        22,
+        37
+      ],
+      "kind": "reeds",
+      "flip": true
+    },
+    {
+      "cell": [
+        27,
+        37
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        24,
+        23
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        24,
+        21
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        23,
+        23
+      ],
+      "kind": "debris_siege"
+    },
+    {
+      "cell": [
+        23,
+        43
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        22,
+        43
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        24,
+        33
+      ],
+      "kind": "debris_weapons"
+    }
   ]
 }

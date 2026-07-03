@@ -449,5 +449,72 @@
       },
       "once": true
     }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        32,
+        1
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        30,
+        1
+      ],
+      "kind": "reeds",
+      "flip": true
+    },
+    {
+      "cell": [
+        34,
+        1
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        20,
+        18
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        20,
+        16
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        20,
+        17
+      ],
+      "kind": "brazier"
+    },
+    {
+      "cell": [
+        44,
+        19
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        44,
+        18
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        32,
+        19
+      ],
+      "kind": "debris_pile"
+    }
   ]
 }

@@ -323,5 +323,65 @@
       },
       "once": true
     }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        10,
+        11
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        10,
+        10
+      ],
+      "kind": "brazier"
+    },
+    {
+      "cell": [
+        10,
+        12
+      ],
+      "kind": "brazier",
+      "flip": true
+    },
+    {
+      "cell": [
+        9,
+        11
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        11,
+        11
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        27,
+        10
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        26,
+        11
+      ],
+      "kind": "supply_cart"
+    },
+    {
+      "cell": [
+        19,
+        11
+      ],
+      "kind": "debris_pile"
+    }
   ]
 }

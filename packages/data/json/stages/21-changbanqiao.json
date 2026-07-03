@@ -376,5 +376,58 @@
       },
       "once": true
     }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        21,
+        4
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        18,
+        2
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        20,
+        2
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        19,
+        10
+      ],
+      "kind": "debris_weapons"
+    },
+    {
+      "cell": [
+        19,
+        8
+      ],
+      "kind": "debris_weapons",
+      "flip": true
+    },
+    {
+      "cell": [
+        19,
+        9
+      ],
+      "kind": "debris_cart"
+    },
+    {
+      "cell": [
+        19,
+        15
+      ],
+      "kind": "debris_pile"
+    }
   ]
 }

@@ -421,5 +421,66 @@
       },
       "once": true
     }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        20,
+        16
+      ],
+      "kind": "brazier"
+    },
+    {
+      "cell": [
+        20,
+        14
+      ],
+      "kind": "brazier",
+      "flip": true
+    },
+    {
+      "cell": [
+        10,
+        17
+      ],
+      "kind": "signal_flag"
+    },
+    {
+      "cell": [
+        20,
+        15
+      ],
+      "kind": "shrub"
+    },
+    {
+      "cell": [
+        20,
+        17
+      ],
+      "kind": "shrub",
+      "flip": true
+    },
+    {
+      "cell": [
+        29,
+        13
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        27,
+        14
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        10,
+        16
+      ],
+      "kind": "campfire"
+    }
   ]
 }

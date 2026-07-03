@@ -331,6 +331,21 @@
         ],
         "gold": 200
       }
+    },
+    {
+      "id": "depot_11-xiaopei",
+      "description": "소패 창고 — 농성 물자를 회수한다.",
+      "trigger": {
+        "kind": "unitReachedTile",
+        "x": 24,
+        "y": 32
+      },
+      "reward": {
+        "treasures": [
+          "상약"
+        ],
+        "gold": 250
+      }
     }
   ],
   "dialogue": [
@@ -440,6 +455,66 @@
         "loserRetreats": false
       },
       "once": true
+    }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        24,
+        30
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        24,
+        29
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        24,
+        31
+      ],
+      "kind": "campfire",
+      "flip": true
+    },
+    {
+      "cell": [
+        23,
+        30
+      ],
+      "kind": "supply_cart"
+    },
+    {
+      "cell": [
+        24,
+        10
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        24,
+        8
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        24,
+        20
+      ],
+      "kind": "debris_weapons"
+    },
+    {
+      "cell": [
+        23,
+        20
+      ],
+      "kind": "debris_pile"
     }
   ]
 }

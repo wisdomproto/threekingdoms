@@ -391,7 +391,9 @@ export type Reinforcement = z.infer<typeof ReinforcementSchema>;
 export const StrategyConditionTriggerSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("duelOccurred"), duelId: z.string() }),
   z.object({ kind: z.literal("duelsInOrder"), duelIds: z.array(z.string()).min(1) }),
-  z.object({ kind: z.literal("unitReachedTile"), unitId: z.string(), x: z.number().int().min(0), y: z.number().int().min(0) }),
+  // unitId 생략 = **아무 아군(player)** 도달로 충족(보물창고 회수 §10 — 편성이 자유라 특정
+  // 장수 고정은 사수 못 함, 2026-07-04). 지정 시 그 유닛만(회남 성채 피신 패턴 유지).
+  z.object({ kind: z.literal("unitReachedTile"), unitId: z.string().optional(), x: z.number().int().min(0), y: z.number().int().min(0) }),
 ]);
 export const StrategyConditionSchema = z.object({
   id: z.string(),

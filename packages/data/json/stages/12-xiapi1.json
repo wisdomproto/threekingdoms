@@ -307,5 +307,58 @@
       },
       "once": true
     }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        35,
+        13
+      ],
+      "kind": "debris_weapons"
+    },
+    {
+      "cell": [
+        33,
+        13
+      ],
+      "kind": "debris_weapons",
+      "flip": true
+    },
+    {
+      "cell": [
+        35,
+        12
+      ],
+      "kind": "debris_cart"
+    },
+    {
+      "cell": [
+        32,
+        16
+      ],
+      "kind": "debris_pile"
+    },
+    {
+      "cell": [
+        37,
+        9
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        39,
+        10
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        38,
+        10
+      ],
+      "kind": "brazier"
+    }
   ]
 }

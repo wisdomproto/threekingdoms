@@ -362,5 +362,22 @@
       },
       "once": true
     }
+  ],
+  "strategyConditions": [
+    {
+      "id": "depot_05-sishuiguan",
+      "description": "사수관 병참고 — 동탁군의 약재를 노획한다.",
+      "trigger": {
+        "kind": "unitReachedTile",
+        "x": 7,
+        "y": 20
+      },
+      "reward": {
+        "treasures": [
+          "한방약"
+        ],
+        "gold": 300
+      }
+    }
   ]
 }

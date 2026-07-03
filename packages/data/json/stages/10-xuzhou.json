@@ -361,5 +361,72 @@
       },
       "once": true
     }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        44,
+        5
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        44,
+        4
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        43,
+        5
+      ],
+      "kind": "supply_cart"
+    },
+    {
+      "cell": [
+        44,
+        3
+      ],
+      "kind": "supply_cart",
+      "flip": true
+    },
+    {
+      "cell": [
+        28,
+        7
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        28,
+        5
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        28,
+        6
+      ],
+      "kind": "debris_siege"
+    },
+    {
+      "cell": [
+        36,
+        6
+      ],
+      "kind": "debris_cart"
+    },
+    {
+      "cell": [
+        36,
+        5
+      ],
+      "kind": "debris_pile"
+    }
   ]
 }

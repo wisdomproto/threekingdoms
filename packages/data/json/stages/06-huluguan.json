@@ -388,6 +388,21 @@
           "쌀"
         ]
       }
+    },
+    {
+      "id": "depot_06-huluguan",
+      "description": "호로관 무기고 — 버려진 화약을 손에 넣는다.",
+      "trigger": {
+        "kind": "unitReachedTile",
+        "x": 4,
+        "y": 37
+      },
+      "reward": {
+        "treasures": [
+          "폭탄"
+        ],
+        "gold": 300
+      }
     }
   ],
   "dialogue": [

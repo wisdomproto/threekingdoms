@@ -447,6 +447,21 @@
         ],
         "gold": 400
       }
+    },
+    {
+      "id": "depot_25-wulin",
+      "description": "오림 군량 둔소 — 조조군 보급의 심장을 턴다.",
+      "trigger": {
+        "kind": "unitReachedTile",
+        "x": 31,
+        "y": 3
+      },
+      "reward": {
+        "treasures": [
+          "업화서"
+        ],
+        "gold": 400
+      }
     }
   ],
   "dialogue": [
@@ -551,6 +566,82 @@
         "loserRetreats": true
       },
       "once": true
+    }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        20,
+        21
+      ],
+      "kind": "supply_cart"
+    },
+    {
+      "cell": [
+        18,
+        21
+      ],
+      "kind": "supply_cart",
+      "flip": true
+    },
+    {
+      "cell": [
+        19,
+        21
+      ],
+      "kind": "brazier"
+    },
+    {
+      "cell": [
+        21,
+        21
+      ],
+      "kind": "brazier",
+      "flip": true
+    },
+    {
+      "cell": [
+        22,
+        21
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        17,
+        21
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        18,
+        29
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        20,
+        31
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        24,
+        21
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        15,
+        21
+      ],
+      "kind": "reeds",
+      "flip": true
     }
   ]
 }

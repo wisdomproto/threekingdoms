@@ -443,5 +443,65 @@
       },
       "once": true
     }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        24,
+        7
+      ],
+      "kind": "supply_cart"
+    },
+    {
+      "cell": [
+        24,
+        5
+      ],
+      "kind": "supply_cart",
+      "flip": true
+    },
+    {
+      "cell": [
+        23,
+        7
+      ],
+      "kind": "debris_cart"
+    },
+    {
+      "cell": [
+        25,
+        7
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        23,
+        6
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        25,
+        6
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        23,
+        8
+      ],
+      "kind": "debris_pile"
+    },
+    {
+      "cell": [
+        25,
+        8
+      ],
+      "kind": "shrub"
+    }
   ]
 }

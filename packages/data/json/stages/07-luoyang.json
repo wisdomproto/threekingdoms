@@ -348,6 +348,21 @@
         ],
         "gold": 200
       }
+    },
+    {
+      "id": "depot_07-luoyang",
+      "description": "낙양 내탕고 — 동탁이 챙기다 만 재물이 남아 있다.",
+      "trigger": {
+        "kind": "unitReachedTile",
+        "x": 43,
+        "y": 14
+      },
+      "reward": {
+        "treasures": [
+          "특급주"
+        ],
+        "gold": 400
+      }
     }
   ],
   "dialogue": [

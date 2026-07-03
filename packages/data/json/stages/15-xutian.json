@@ -369,5 +369,66 @@
       },
       "once": true
     }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        19,
+        17
+      ],
+      "kind": "signal_flag"
+    },
+    {
+      "cell": [
+        19,
+        15
+      ],
+      "kind": "signal_flag",
+      "flip": true
+    },
+    {
+      "cell": [
+        19,
+        16
+      ],
+      "kind": "shrub"
+    },
+    {
+      "cell": [
+        19,
+        18
+      ],
+      "kind": "shrub",
+      "flip": true
+    },
+    {
+      "cell": [
+        19,
+        9
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        17,
+        9
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        18,
+        9
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        18,
+        26
+      ],
+      "kind": "campfire"
+    }
   ]
 }

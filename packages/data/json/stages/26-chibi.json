@@ -579,5 +579,87 @@
       },
       "once": true
     }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        16,
+        20
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        18,
+        20
+      ],
+      "kind": "reeds",
+      "flip": true
+    },
+    {
+      "cell": [
+        20,
+        20
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        10,
+        20
+      ],
+      "kind": "reeds",
+      "flip": true
+    },
+    {
+      "cell": [
+        19,
+        6
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        18,
+        7
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        20,
+        6
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        19,
+        8
+      ],
+      "kind": "debris_siege"
+    },
+    {
+      "cell": [
+        13,
+        30
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        12,
+        30
+      ],
+      "kind": "brazier"
+    },
+    {
+      "cell": [
+        14,
+        30
+      ],
+      "kind": "campfire"
+    }
   ]
 }

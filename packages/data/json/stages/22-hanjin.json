@@ -334,6 +334,21 @@
         "treasures": [],
         "gold": 300
       }
+    },
+    {
+      "id": "depot_22-hanjin",
+      "description": "한진 나루 창고 — 강하로 보낼 군량을 확보한다.",
+      "trigger": {
+        "kind": "unitReachedTile",
+        "x": 55,
+        "y": 34
+      },
+      "reward": {
+        "treasures": [
+          "쌀"
+        ],
+        "gold": 300
+      }
     }
   ],
   "dialogue": [
@@ -443,6 +458,73 @@
         "loserRetreats": true
       },
       "once": true
+    }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        28,
+        23
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        28,
+        21
+      ],
+      "kind": "reeds",
+      "flip": true
+    },
+    {
+      "cell": [
+        28,
+        25
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        35,
+        32
+      ],
+      "kind": "signal_flag"
+    },
+    {
+      "cell": [
+        35,
+        31
+      ],
+      "kind": "supply_cart"
+    },
+    {
+      "cell": [
+        34,
+        32
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        38,
+        14
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        38,
+        12
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        37,
+        23
+      ],
+      "kind": "debris_pile"
     }
   ]
 }

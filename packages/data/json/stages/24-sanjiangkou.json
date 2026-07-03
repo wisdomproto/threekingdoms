@@ -370,6 +370,21 @@
         ],
         "gold": 300
       }
+    },
+    {
+      "id": "depot_24-sanjiangkou",
+      "description": "형주 수군 화약고 — 채모의 화약을 탈취한다.",
+      "trigger": {
+        "kind": "unitReachedTile",
+        "x": 45,
+        "y": 2
+      },
+      "reward": {
+        "treasures": [
+          "폭탄"
+        ],
+        "gold": 350
+      }
     }
   ],
   "dialogue": [
@@ -479,6 +494,81 @@
         "loserRetreats": false
       },
       "once": true
+    }
+  ],
+  "decorations": [
+    {
+      "cell": [
+        24,
+        27
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        22,
+        27
+      ],
+      "kind": "reeds",
+      "flip": true
+    },
+    {
+      "cell": [
+        20,
+        27
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        28,
+        27
+      ],
+      "kind": "reeds",
+      "flip": true
+    },
+    {
+      "cell": [
+        24,
+        18
+      ],
+      "kind": "signal_flag"
+    },
+    {
+      "cell": [
+        24,
+        17
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        26,
+        18
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        25,
+        36
+      ],
+      "kind": "signal_flag"
+    },
+    {
+      "cell": [
+        25,
+        37
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        23,
+        28
+      ],
+      "kind": "debris_pile"
     }
   ]
 }
