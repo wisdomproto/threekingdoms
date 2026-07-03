@@ -143,7 +143,7 @@ function SlotGroup({ slot, ids, interactive, onUnequip }: {
   const names = ids.map((id) => gameData.items[id]?.name ?? id).join(" · ");
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0, flex: cap }}>
-      <span style={{ fontSize: 10, letterSpacing: "0.18em", color: GOLD_DIM, textAlign: "center" }}>
+      <span style={{ fontSize: 10.5, letterSpacing: "0.18em", color: "#b8a070", textAlign: "center" }}>
         {SLOT_LABEL[slot]}
       </span>
       <div style={{ display: "grid", gridTemplateColumns: `repeat(${cap}, 1fr)`, gap: 5 }}>
@@ -204,13 +204,53 @@ export function CommanderDetail({
       fontFamily: SERIF,
       display: "flex", flexDirection: "column",
     }}>
-      {/* ── 히어로 초상 ── */}
-      <div style={{ position: "relative", height: 190, flexShrink: 0 }}>
-        <CommanderPortrait commanderId={unit.commanderId} name={name} />
+      {/* ── 히어로: 초상 액자 + 명판 (우리 초상은 정사각 흉상 — 와이드 크롭은 얼굴만 확대돼 금지) ── */}
+      <div style={{
+        position: "relative", flexShrink: 0,
+        display: "flex", gap: 12, alignItems: "center",
+        padding: "14px 14px 12px",
+        background: "linear-gradient(160deg, rgba(46,36,18,0.55), rgba(20,15,8,0.2))",
+        borderBottom: `1px solid ${GOLD_DIM}55`,
+      }}>
         <div style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(to bottom, rgba(10,8,4,0.12) 0%, transparent 35%, rgba(14,10,5,0.92) 96%)",
-        }} />
+          width: 92, height: 112, flexShrink: 0,
+          borderRadius: 8, overflow: "hidden",
+          border: `1.5px solid ${GOLD_DIM}`,
+          boxShadow: `0 4px 12px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(200,164,64,0.2)`,
+        }}>
+          <CommanderPortrait commanderId={unit.commanderId} name={name} />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{
+              fontSize: 25, fontWeight: 800, color: PARCHMENT, lineHeight: 1,
+              textShadow: "0 2px 6px rgba(0,0,0,0.7)", letterSpacing: "0.08em",
+              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+            }}>
+              {name}
+            </span>
+            {/* 붉은 인장 — 역할 문자 */}
+            <span style={{
+              width: 22, height: 22, borderRadius: 4, flexShrink: 0,
+              background: `linear-gradient(135deg, ${SEAL_RED}, #6a1e14)`,
+              border: "1px solid rgba(0,0,0,0.5)", boxShadow: "0 1px 4px rgba(0,0,0,0.5)",
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              fontSize: 13, fontWeight: 900, color: "#f0e2c8",
+            }}>{sealChar}</span>
+          </div>
+          <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+            <span style={{
+              fontSize: 12, fontWeight: 700, color: PARCHMENT, padding: "2px 9px",
+              borderRadius: 10, border: `1px solid ${GOLD_DIM}`, background: "rgba(14,10,5,0.7)",
+            }}>Lv.{unit.level}</span>
+            <span style={{
+              fontSize: 12, fontWeight: 700, color: "#f0e2c8", padding: "2px 9px",
+              borderRadius: 10, border: "1px solid rgba(0,0,0,0.4)",
+              background: `linear-gradient(135deg, ${SEAL_RED}, #6a1e14)`,
+            }}>{className(unit.classId)}</span>
+          </div>
+          <Stars level={unit.level} />
+        </div>
         {onClose && (
           <button
             type="button" onClick={onClose} aria-label="닫기"
@@ -222,35 +262,6 @@ export function CommanderDetail({
             }}
           >✕</button>
         )}
-        <div style={{
-          position: "absolute", left: 12, right: 12, bottom: 8,
-          display: "flex", alignItems: "flex-end", gap: 8, flexWrap: "wrap",
-        }}>
-          <span style={{
-            fontSize: 26, fontWeight: 800, color: PARCHMENT, lineHeight: 1,
-            textShadow: "0 2px 6px rgba(0,0,0,0.8)", letterSpacing: "0.06em",
-          }}>
-            {name}
-          </span>
-          {/* 붉은 인장 — 역할 문자 */}
-          <span style={{
-            width: 22, height: 22, borderRadius: 4, flexShrink: 0,
-            background: `linear-gradient(135deg, ${SEAL_RED}, #6a1e14)`,
-            border: "1px solid rgba(0,0,0,0.5)", boxShadow: "0 1px 4px rgba(0,0,0,0.5)",
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            fontSize: 13, fontWeight: 900, color: "#f0e2c8",
-          }}>{sealChar}</span>
-          <span style={{ flex: 1 }} />
-          <span style={{
-            fontSize: 12, fontWeight: 700, color: PARCHMENT, padding: "2px 9px",
-            borderRadius: 10, border: `1px solid ${GOLD_DIM}`, background: "rgba(14,10,5,0.7)",
-          }}>Lv.{unit.level}</span>
-          <span style={{
-            fontSize: 12, fontWeight: 700, color: "#f0e2c8", padding: "2px 9px",
-            borderRadius: 10, border: "1px solid rgba(0,0,0,0.4)",
-            background: `linear-gradient(135deg, ${SEAL_RED}, #6a1e14)`,
-          }}>{className(unit.classId)}</span>
-        </div>
       </div>
 
       <div style={{ padding: "12px 14px 14px", display: "flex", flexDirection: "column", gap: 12 }}>
@@ -259,10 +270,9 @@ export function CommanderDetail({
           <StatBar label="무력" value={stats.atk} max={statMax.atk} color="#c23b2a" />
           <StatBar label="통솔" value={stats.def} max={statMax.def} color="#2e8050" />
           <StatBar label="지력" value={stats.spirit} max={statMax.spirit} color="#3565b0" />
-          <div style={{ display: "flex", gap: 14, fontSize: 11, color: DIM_TEXT, paddingLeft: 38 }}>
+          <div style={{ display: "flex", gap: 14, fontSize: 11, color: "#b8a070", paddingLeft: 38 }}>
             <span>기동 <strong style={{ color: PARCHMENT }}>{stats.move}</strong></span>
             <span>전력 <strong style={{ color: GOLD_BRIGHT }}>{stats.power}</strong></span>
-            <span style={{ marginLeft: "auto" }}><Stars level={unit.level} /></span>
           </div>
         </div>
 
@@ -295,7 +305,7 @@ export function CommanderDetail({
         {deployed ? (
           available.length > 0 && (
             <div>
-              <div style={{ fontSize: 10, color: DIM_TEXT, marginBottom: 5 }}>
+              <div style={{ fontSize: 10.5, color: "#b8a070", marginBottom: 5 }}>
                 소지품 — 탭하면 장착됩니다 (같은 슬롯은 교체)
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>

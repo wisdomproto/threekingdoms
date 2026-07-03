@@ -25,6 +25,9 @@ import { writeSortie, type SortieMember } from "../../src/meta/sortie";
 import { sortieSummary } from "../../src/meta/sortieSummary";
 import { shouldShowInterstitial } from "../../src/meta/interstitialPolicy";
 
+/** 데스크톱에서 콘텐츠가 화면 전폭으로 퍼지지 않게 잡는 상한(레퍼런스 구도 유지, 2026-07-03). */
+const CONTENT_MAX = 1240;
+
 /** id "05-sishuiguan" → 5. 챕터 매핑(상점 unlockChapter 필터)에 사용. 파싱 실패 시 1. */
 function stageNumber(id: string): number {
   const n = Number.parseInt(id.slice(0, id.indexOf("-")), 10);
@@ -114,42 +117,43 @@ export function PrepShell(): React.ReactElement {
       {/* 헤더 — 먹빛 바 + 청동 타이틀 + 출진 카운터(레퍼런스 우상단 플라크) */}
       <header
         style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          padding: "12px 16px",
           background: "linear-gradient(to bottom, #1a140c, #100c07)",
           borderBottom: "1px solid #6f5a3488",
           fontFamily: '"Noto Serif KR", "Nanum Myeongjo", "Apple SD Gothic Neo", serif',
         }}
       >
-        <h1 style={{ margin: 0, fontSize: 18, color: "#e0b84a", letterSpacing: "0.1em", fontWeight: 800 }}>
-          출진 준비
-          <span style={{ fontSize: 13.5, color: "#b8a070", fontWeight: 600, marginLeft: 10 }}>
-            — {stage.name}
-          </span>
-        </h1>
-        <div style={{ display: "flex", gap: 12, alignItems: "center", marginLeft: "auto" }}>
-          {isCleared && (
-            <Link
-              href={`/merchant?stage=${encodeURIComponent(stageId)}`}
-              style={{ color: "#cdab6e", fontSize: 13, textDecoration: "none" }}
-            >
-              상인
+        <div style={{
+          display: "flex", alignItems: "center", gap: 12,
+          padding: "12px 16px", maxWidth: CONTENT_MAX, margin: "0 auto",
+        }}>
+          <h1 style={{ margin: 0, fontSize: 18, color: "#e0b84a", letterSpacing: "0.1em", fontWeight: 800 }}>
+            출진 준비
+            <span style={{ fontSize: 13.5, color: "#b8a070", fontWeight: 600, marginLeft: 10 }}>
+              — {stage.name}
+            </span>
+          </h1>
+          <div style={{ display: "flex", gap: 12, alignItems: "center", marginLeft: "auto" }}>
+            {isCleared && (
+              <Link
+                href={`/merchant?stage=${encodeURIComponent(stageId)}`}
+                style={{ color: "#cdab6e", fontSize: 13, textDecoration: "none" }}
+              >
+                상인
+              </Link>
+            )}
+            <Link href="/stages" style={{ color: "#8a7350", fontSize: 13, textDecoration: "none" }}>
+              ◀ 전장 선택
             </Link>
-          )}
-          <Link href="/stages" style={{ color: "#8a7350", fontSize: 13, textDecoration: "none" }}>
-            ◀ 전장 선택
-          </Link>
-          <span style={{
-            padding: "4px 12px", borderRadius: 6,
-            border: "1.5px solid #8a6a28", background: "rgba(200,164,64,0.1)",
-            fontSize: 13, color: "#e8d9b0", fontWeight: 700, letterSpacing: "0.06em",
-            boxShadow: "inset 0 0 8px rgba(200,164,64,0.12)",
-          }}>
-            출진 <strong style={{ color: "#e0b84a", fontSize: 15 }}>{selected.length}</strong>
-            <span style={{ color: "#8a7350" }}> / {maxSlots}</span>
-          </span>
+            <span style={{
+              padding: "4px 12px", borderRadius: 6,
+              border: "1.5px solid #8a6a28", background: "rgba(200,164,64,0.1)",
+              fontSize: 13, color: "#e8d9b0", fontWeight: 700, letterSpacing: "0.06em",
+              boxShadow: "inset 0 0 8px rgba(200,164,64,0.12)",
+            }}>
+              출진 <strong style={{ color: "#e0b84a", fontSize: 15 }}>{selected.length}</strong>
+              <span style={{ color: "#8a7350" }}> / {maxSlots}</span>
+            </span>
+          </div>
         </div>
       </header>
 
@@ -158,7 +162,9 @@ export function PrepShell(): React.ReactElement {
         style={{
           display: "flex",
           borderBottom: "1px solid #2a2f36",
-          margin: "12px 16px 0",
+          margin: "12px auto 0",
+          width: "calc(100% - 32px)",
+          maxWidth: CONTENT_MAX - 32,
         }}
       >
         {(["formation", "shop"] as const).map((tab) => {
@@ -190,7 +196,7 @@ export function PrepShell(): React.ReactElement {
       </div>
 
       {/* 탭 콘텐츠 (비활성 탭 언마운트) */}
-      <div style={{ flex: 1, padding: 16 }}>
+      <div style={{ flex: 1, padding: 16, width: "100%", maxWidth: CONTENT_MAX, margin: "0 auto", boxSizing: "border-box" }}>
         {activeTab === "formation" ? (
           <Formation
             key={refreshKey}

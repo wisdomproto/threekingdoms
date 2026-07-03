@@ -44,12 +44,18 @@ export function SortieBar({
         borderTop: `1px solid ${GOLD_DIM}88`,
         boxShadow: "0 -6px 20px rgba(0,0,0,0.45)",
         padding: "8px 12px",
+        zIndex: 20,
+        fontFamily: SERIF,
+      }}
+    >
+    <div
+      style={{
+        maxWidth: 1240,
+        margin: "0 auto",
         display: "flex",
         alignItems: "center",
         gap: 10,
-        zIndex: 20,
         flexWrap: "wrap",
-        fontFamily: SERIF,
       }}
     >
       {/* ── 출진 슬롯 칩 ── */}
@@ -165,6 +171,7 @@ export function SortieBar({
       >
         출정
       </button>
+    </div>
     </div>
   );
 }

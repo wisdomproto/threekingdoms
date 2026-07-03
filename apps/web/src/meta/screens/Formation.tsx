@@ -186,7 +186,15 @@ export function Formation({
       alignItems: "start",
     }}>
       {/* ━━ 좌: 장수 선택 그리드 ━━ */}
-      <div style={{ minWidth: 0 }}>
+      <div style={{ minWidth: 0, position: "relative" }}>
+        {/* 빈 양피지 채우는 수묵 워터마크 — 초반 챕터(로스터 5명)에 벌판처럼 비지 않게 */}
+        <span aria-hidden style={{
+          position: "absolute", inset: "40px 0 0 0",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          pointerEvents: "none", userSelect: "none",
+          fontSize: "min(240px, 40vw)", fontWeight: 900, lineHeight: 1,
+          color: "rgba(90, 70, 40, 0.06)", letterSpacing: "0.1em",
+        }}>出陣</span>
         <Ribbon seal="將" title={`장수 선택 — ${chapter}장 편성`}>
           {(["role", "power", "level", "new"] as SortKey[]).map((k) => {
             const label = ({ role: "역할", power: "전투", level: "레벨", new: "신규" } as Record<SortKey, string>)[k];
@@ -211,8 +219,10 @@ export function Formation({
 
         <div style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(104px, 1fr))",
+          // 카드가 레퍼런스만큼 큼직하게(≈140~170px) — 104px 자동 채움은 카드가 잘게 흩어졌다(2026-07-03).
+          gridTemplateColumns: "repeat(auto-fill, minmax(132px, 1fr))",
           gap: 10,
+          alignContent: "start",
         }}>
           {sortedRoster.map((u) => {
             const on = selectedIds.has(u.commanderId);
