@@ -33,6 +33,7 @@ import { RewardedAdButton } from "../../meta/RewardedAdButton";
 import { useFadeNav } from "../../ui/useFadeNav";
 import { playSfx, SFX } from "../../audio";
 import { ItemIcon } from "../../ui/ItemIcon";
+import { ItemInfoPopup } from "../../ui/ItemInfoPopup";
 
 const OVERLAY_STYLE: React.CSSProperties = {
   position: "absolute",
@@ -42,26 +43,30 @@ const OVERLAY_STYLE: React.CSSProperties = {
   justifyContent: "center",
   alignItems: "center",
   gap: 18,
-  background: "rgba(8, 10, 13, 0.82)",
-  color: "#e8e6e3",
+  // 웜 잉크 — 종전 한색 남빛(8,10,13)이 승리 화면을 "우울"하게 만들던 주범(2026-07-03 피드백)
+  background: "rgba(12, 9, 6, 0.84)",
+  color: "#ece5d4",
   userSelect: "none",
   padding: 24,
   overflow: "hidden",
+  fontFamily: '"Noto Serif KR", "Nanum Myeongjo", "Apple SD Gothic Neo", serif',
 };
 
 const BUTTON_STYLE: React.CSSProperties = {
   minHeight: 56,
   minWidth: 150,
   padding: "0 24px",
-  background: "rgba(24, 28, 33, 0.95)",
-  color: "#e8e6e3",
+  background: "rgba(30, 25, 16, 0.95)", // 웜 잉크(오버레이·카드와 통일)
+  color: "#f0e7d0",
   fontSize: 17,
-  fontWeight: 600,
+  fontWeight: 700,
+  letterSpacing: "0.08em",
   cursor: "pointer",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   textDecoration: "none",
+  fontFamily: "inherit",
   ...BUTTON_FRAME,
 };
 
@@ -69,7 +74,7 @@ const GRADE_COLOR: Record<string, string> = {
   S: "#ffd76a",
   A: "#ffce5a",
   B: "#cdd3da",
-  C: "#9aa3ad",
+  C: "#b3a78c",
 };
 
 /** 잭팟 골드 — S등급 플래시/글로우 액센트. */
@@ -114,17 +119,10 @@ const KEYFRAME_CSS = `
   60%  { transform: scale(0.9); opacity: 1; letter-spacing: 2px; }
   100% { transform: scale(1); opacity: 1; letter-spacing: 1px; }
 }
-@keyframes tkChestShake {
-  0%, 100% { transform: translateX(0) rotate(0deg); }
-  20% { transform: translateX(-3px) rotate(-3deg); }
-  40% { transform: translateX(3px) rotate(3deg); }
-  60% { transform: translateX(-2px) rotate(-2deg); }
-  80% { transform: translateX(2px) rotate(2deg); }
-}
-@keyframes tkChestOpen {
-  0% { transform: scale(0.8); opacity: 0.4; }
-  60% { transform: scale(1.18); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+@keyframes tkRevealBurst {
+  0%   { transform: scale(0.3); opacity: 0; }
+  30%  { opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
 }
 @keyframes tkItemPop {
   0%   { transform: translateY(10px) scale(0.4); opacity: 0; }
@@ -272,6 +270,8 @@ export function ResultSequence({
   const [departures, setDepartures] = useState<{ commanderId: string; items: string[] }[]>([]);
   // 자금 카운트업 rAF 핸들(언마운트/스킵 시 취소).
   const rafRef = useRef<number | null>(null);
+  // 획득 보물 상세 팝업(2026-07-03 — 칩 탭 → 효과 풀이). 시퀀스 스킵 클릭과는 stopPropagation으로 분리.
+  const [detailItemId, setDetailItemId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!victory || !summary) {
@@ -475,6 +475,17 @@ export function ResultSequence({
       {/* keyframes 주입(1회) */}
       <style>{KEYFRAME_CSS}</style>
 
+      {/* 승리 원광 — 카드 뒤 따뜻한 금빛 스포트라이트(상시). 축하 무드의 기둥. */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: `radial-gradient(85% 62% at 50% 36%, ${jackpot ? "rgba(255,224,138,0.20)" : "rgba(255,205,110,0.14)"} 0%, transparent 65%)`,
+          pointerEvents: "none",
+        }}
+      />
+
       {/* 잭팟 플래시(S) — 화면 전체 1회 번쩍 */}
       {flash && (
         <div
@@ -491,11 +502,16 @@ export function ResultSequence({
 
       <h1
         style={{
-          fontSize: 40,
+          fontSize: 42,
           margin: 0,
+          fontWeight: 800,
           color: jackpot ? JACKPOT_GOLD : "#ffd76a",
-          letterSpacing: 2,
-          textShadow: jackpot ? `0 0 18px ${JACKPOT_GOLD}88` : "none",
+          letterSpacing: "0.18em",
+          textIndent: "0.18em",
+          // 승리도 항상 금빛 발광 — 종전엔 잭팟(S)만 빛나 일반 승리가 밋밋했다
+          textShadow: jackpot
+            ? `0 0 18px ${JACKPOT_GOLD}88`
+            : "0 0 14px rgba(255,215,106,0.5), 0 2px 10px rgba(0,0,0,0.6)",
           animation: jackpot ? "tkPulseGlow 1.8s ease-in-out infinite" : "none",
           ["--glow" as string]: `${JACKPOT_GOLD}99`,
         }}
@@ -506,7 +522,7 @@ export function ResultSequence({
       <div
         style={{
           ...PANEL_FRAME,
-          background: "rgba(18, 21, 25, 0.92)",
+          background: "rgba(30, 24, 15, 0.93)", // 웜 잉크(종전 한색 남빛 카드가 우울 톤의 절반)
           padding: "20px 28px",
           minWidth: 280,
           maxWidth: 360,
@@ -528,7 +544,7 @@ export function ResultSequence({
                 <span
                   key={i}
                   style={{
-                    color: filled && punched ? litColor : "#3a414a",
+                    color: filled && punched ? litColor : "#4a4030",
                     display: "inline-block",
                     // 펀치-인: 꽂히는 순간 keyframe, 스킵 시 애니메이션 없이 즉시.
                     animation:
@@ -561,68 +577,72 @@ export function ResultSequence({
             >
               {summary.grade}
             </span>
-            <span style={{ fontSize: 15, color: "#9aa3ad" }}>{summary.score}점</span>
+            <span style={{ fontSize: 15, color: "#b3a78c" }}>{summary.score}점</span>
           </div>
-          <div style={{ fontSize: 12, color: "#9aa3ad" }}>
+          <div style={{ fontSize: 12, color: "#b3a78c" }}>
             {summary.turnsUsed}턴 / 제한 {summary.turnLimit}턴
             {summary.playerRetreats > 0 ? ` · 퇴각 ${summary.playerRetreats}` : ""}
           </div>
         </Reveal>
 
-        {/* 2. 보물 카드 — 상자 개봉(흔들→열림→팝) */}
+        {/* 2. 보물 리빌 — 금빛 버스트 + 칩 팝(컬러 이모지 🎁 폐기 — HUD 글리프 규칙).
+            칩 탭 = 상세 팝업(효과 풀이). 시퀀스 스킵 클릭과는 stopPropagation으로 분리. */}
         {summary.treasures.length > 0 && (
           <Reveal show={step >= STEP.TREASURE}>
-            <div style={{ fontSize: 12, color: "#9aa3ad" }}>획득 보물</div>
+            <div style={{ fontSize: 12, color: "#b3a78c" }}>획득 보물</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
               {summary.treasures.map((t, idx) => {
                 const open = step >= STEP.TREASURE;
                 return (
-                  <div
-                    key={t.id}
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: 4,
-                    }}
-                  >
-                    {/* 상자: 공개 직후 흔들→열림 */}
+                  <div key={t.id} style={{ position: "relative", display: "flex", justifyContent: "center" }}>
+                    {/* 리빌 버스트 — 칩 등장 순간 뒤에서 금빛 원광이 퍼진다 */}
                     <div
                       aria-hidden
                       style={{
-                        fontSize: 26,
-                        lineHeight: 1,
+                        position: "absolute",
+                        inset: -18,
+                        borderRadius: "50%",
+                        background: `radial-gradient(circle, ${jackpot ? JACKPOT_GOLD : "#ffd76a"}55, transparent 70%)`,
                         animation:
                           open && !skipped
-                            ? `tkChestShake 360ms ease-in-out ${idx * 140}ms both, tkChestOpen 320ms ease-out ${idx * 140 + 360}ms both`
+                            ? `tkRevealBurst 700ms ease-out ${idx * 140 + 380}ms both`
                             : "none",
+                        opacity: skipped ? 0 : undefined,
+                        pointerEvents: "none",
                       }}
-                    >
-                      🎁
-                    </div>
-                    {/* 아이템 칩: 상자 열린 뒤 튀어나옴 */}
-                    <div
+                    />
+                    {/* 아이템 칩 — 탭하면 상세(효과 풀이) */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation(); // 오버레이 탭=스킵과 분리
+                        setDetailItemId(t.id);
+                      }}
+                      title={`${t.name} — 자세히 보기`}
                       style={{
-                        padding: "8px 14px",
+                        padding: "9px 16px",
                         borderRadius: 10,
-                        border: `1px solid ${jackpot ? "#8a6a2a" : "#6a5a32"}`,
-                        background: "rgba(58, 48, 24, 0.6)",
-                        color: jackpot ? JACKPOT_GOLD : "#ffd76a",
+                        border: `1px solid ${jackpot ? "#a8842a" : "#8a7342"}`,
+                        background: "linear-gradient(180deg, rgba(74, 60, 28, 0.85), rgba(52, 42, 20, 0.85))",
+                        color: jackpot ? JACKPOT_GOLD : "#ffdf8a",
                         fontSize: 14,
-                        fontWeight: 600,
-                        boxShadow: jackpot ? `0 0 10px ${JACKPOT_GOLD}44` : "none",
+                        fontWeight: 700,
+                        boxShadow: jackpot ? `0 0 12px ${JACKPOT_GOLD}55` : "0 0 8px rgba(255,215,106,0.25)",
                         display: "flex",
                         alignItems: "center",
-                        gap: 6,
+                        gap: 8,
+                        cursor: "pointer",
+                        fontFamily: "inherit",
                         animation:
                           open && !skipped
                             ? `tkItemPop 360ms cubic-bezier(0.2,1.3,0.3,1) ${idx * 140 + 560}ms both`
                             : "none",
                       }}
                     >
-                      <ItemIcon itemId={t.id} category={gameData.items[t.id]?.category} size={22} />
+                      <ItemIcon itemId={t.id} category={gameData.items[t.id]?.category} size={34} />
                       {t.name}
-                    </div>
+                      <span aria-hidden style={{ fontSize: 11, color: jackpot ? "#c8a24a" : "#a8905a" }}>▸</span>
+                    </button>
                   </div>
                 );
               })}
@@ -645,7 +665,7 @@ export function ResultSequence({
             {step >= STEP.GOLD && !skipped && summary.fanfare.coinPops > 0 && (
               <CoinBurst count={summary.fanfare.coinPops} gold={jackpot ? JACKPOT_GOLD : "#ffd76a"} />
             )}
-            <span style={{ color: "#9aa3ad", fontSize: 13 }}>자금</span>
+            <span style={{ color: "#b3a78c", fontSize: 13 }}>자금</span>
             <span
               style={{
                 color: jackpot ? JACKPOT_GOLD : "#ffd76a",
@@ -661,7 +681,7 @@ export function ResultSequence({
           {/* 기연 포인트 적립(§12) — 막간 기연 뽑기 자원. 자금 줄 아래 한 줄. */}
           {serendipityPts > 0 && (
             <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, marginTop: 2 }}>
-              <span style={{ color: "#9aa3ad", fontSize: 13 }}>기연</span>
+              <span style={{ color: "#b3a78c", fontSize: 13 }}>기연</span>
               <span style={{ color: "#b890ff", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
                 +{serendipityPts}
               </span>
@@ -678,7 +698,7 @@ export function ResultSequence({
                 display: "flex",
                 justifyContent: "space-between",
                 fontSize: 12,
-                color: "#9aa3ad",
+                color: "#b3a78c",
                 marginBottom: 4,
               }}
             >
@@ -734,7 +754,7 @@ export function ResultSequence({
                         : "none",
                   }}
                 >
-                  <span style={{ color: "#9aa3ad", fontWeight: 400 }}>{lu.name}</span>
+                  <span style={{ color: "#b3a78c", fontWeight: 400 }}>{lu.name}</span>
                   <span>Lv.{lu.newLevel}</span>
                   <span style={{ color: "#ffd76a", fontSize: 10 }}>▲</span>
                 </div>
@@ -813,8 +833,10 @@ export function ResultSequence({
           </div>
         </div>
       ) : (
-        <div style={{ fontSize: 12, color: "#7a828c", marginTop: 4 }}>탭하여 건너뛰기</div>
+        <div style={{ fontSize: 12, color: "#8a7f68", marginTop: 4 }}>탭하여 건너뛰기</div>
       )}
+      {/* 획득 보물 상세(칩 탭) — 시퀀스 스킵 클릭과 분리(팝업 내부 stopPropagation) */}
+      {detailItemId && <ItemInfoPopup itemId={detailItemId} onClose={() => setDetailItemId(null)} />}
       {fadeOverlay}
     </div>
   );
