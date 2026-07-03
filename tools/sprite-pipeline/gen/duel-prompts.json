@@ -1,0 +1,208 @@
+{
+  "generatedAt": "derive_duel_prompts.mjs",
+  "jobs": [
+    {
+      "kind": "duel",
+      "id": "duel-관우_관해",
+      "savePath": "assets/duels/관우_관해.webp",
+      "stages": [
+        "02-yingchuan"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Guan Yu, a towering general with a magnificent long black beard, deep-green robe over lamellar armor, wielding a huge crescent-moon glaive, charging from the left and facing right. RIGHT fighter: Guan Hai, a Yellow Turban chieftain with a yellow head-wrap and ragged patchwork armor, swinging a crude heavy saber, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-관우_유벽",
+      "savePath": "assets/duels/관우_유벽.webp",
+      "stages": [
+        "04-zhangjue"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Guan Yu, a towering general with a magnificent long black beard, deep-green robe over lamellar armor, wielding a huge crescent-moon glaive, charging from the left and facing right. RIGHT fighter: Liu Pi, a Yellow Turban commander in a yellow turban and worn leather armor, thrusting a battered spear, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-관우_화웅",
+      "savePath": "assets/duels/관우_화웅.webp",
+      "stages": [
+        "05-sishuiguan"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Guan Yu, a towering general with a magnificent long black beard, deep-green robe over lamellar armor, wielding a huge crescent-moon glaive, charging from the left and facing right. RIGHT fighter: Hua Xiong, a fearsome vanguard general in dark iron armor with a red-crested helmet, swinging a broad executioner saber, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-장비_여포",
+      "savePath": "assets/duels/장비_여포.webp",
+      "stages": [
+        "06-huluguan"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Zhang Fei, a burly ferocious general with bristling whiskers and glaring eyes, dark armor, wielding a long serpent-coiled spear, charging from the left and facing right. RIGHT fighter: Lu Bu, a peerless warrior in crimson-and-gold armor with twin pheasant-tail plumes, wielding a sky-piercing halberd, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-관우_서영",
+      "savePath": "assets/duels/관우_서영.webp",
+      "stages": [
+        "07-luoyang"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Guan Yu, a towering general with a magnificent long black beard, deep-green robe over lamellar armor, wielding a huge crescent-moon glaive, charging from the left and facing right. RIGHT fighter: Xu Rong, a grim western field general in dark cavalry armor and iron helm, leveling a long lance, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-장비_이각",
+      "savePath": "assets/duels/장비_이각.webp",
+      "stages": [
+        "08-dongzhuo-chase"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Zhang Fei, a burly ferocious general with bristling whiskers and glaring eyes, dark armor, wielding a long serpent-coiled spear, charging from the left and facing right. RIGHT fighter: Li Jue, a cruel Xiliang warlord in heavy western armor and fur-trimmed cloak, slashing a curved blade, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-조운_국의",
+      "savePath": "assets/duels/조운_국의.webp",
+      "stages": [
+        "09-banhe"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Zhao Yun, a young gallant cavalry general in silver-white armor with a white plume, wielding a slender dragon spear, charging from the left and facing right. RIGHT fighter: Qu Yi, an elite vanguard commander in black-iron armor, thrusting a long halberd, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-관우_우금",
+      "savePath": "assets/duels/관우_우금.webp",
+      "stages": [
+        "10-xuzhou"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Guan Yu, a towering general with a magnificent long black beard, deep-green robe over lamellar armor, wielding a huge crescent-moon glaive, charging from the left and facing right. RIGHT fighter: Yu Jin, a stern disciplined general in blue-black armor, striking with a straight long sword, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-관우_장요",
+      "savePath": "assets/duels/관우_장요.webp",
+      "stages": [
+        "11-xiaopei",
+        "14-xiapi2"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Guan Yu, a towering general with a magnificent long black beard, deep-green robe over lamellar armor, wielding a huge crescent-moon glaive, charging from the left and facing right. RIGHT fighter: Zhang Liao, a dignified elite general in teal-and-iron armor, sweeping a long halberd, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-장비_장요",
+      "savePath": "assets/duels/장비_장요.webp",
+      "stages": [
+        "12-xiapi1"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Zhang Fei, a burly ferocious general with bristling whiskers and glaring eyes, dark armor, wielding a long serpent-coiled spear, charging from the left and facing right. RIGHT fighter: Zhang Liao, a dignified elite general in teal-and-iron armor, sweeping a long halberd, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-장비_기령",
+      "savePath": "assets/duels/장비_기령.webp",
+      "stages": [
+        "13-yuanshu"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Zhang Fei, a burly ferocious general with bristling whiskers and glaring eyes, dark armor, wielding a long serpent-coiled spear, charging from the left and facing right. RIGHT fighter: Ji Ling, a bronze-armored champion swinging a three-pointed double-edged saber, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-관우_허저",
+      "savePath": "assets/duels/관우_허저.webp",
+      "stages": [
+        "15-xutian"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Guan Yu, a towering general with a magnificent long black beard, deep-green robe over lamellar armor, wielding a huge crescent-moon glaive, charging from the left and facing right. RIGHT fighter: Xu Chu, a hulking bear-like warrior of massive frame in simple heavy armor, swinging an enormous broadsword, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-조운_허저",
+      "savePath": "assets/duels/조운_허저.webp",
+      "stages": [
+        "16-guandu-escape",
+        "17-runan"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Zhao Yun, a young gallant cavalry general in silver-white armor with a white plume, wielding a slender dragon spear, charging from the left and facing right. RIGHT fighter: Xu Chu, a hulking bear-like warrior of massive frame in simple heavy armor, swinging an enormous broadsword, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-관우_이전",
+      "savePath": "assets/duels/관우_이전.webp",
+      "stages": [
+        "18-bowangpo"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Guan Yu, a towering general with a magnificent long black beard, deep-green robe over lamellar armor, wielding a huge crescent-moon glaive, charging from the left and facing right. RIGHT fighter: Li Dian, a calm scholarly general in dark blue armor, thrusting a straight sword, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-조운_조인",
+      "savePath": "assets/duels/조운_조인.webp",
+      "stages": [
+        "19-xinye"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Zhao Yun, a young gallant cavalry general in silver-white armor with a white plume, wielding a slender dragon spear, charging from the left and facing right. RIGHT fighter: Cao Ren, a stalwart defensive general in heavy gray-blue armor with a tall shield silhouette, bracing a long spear, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-조운_하후은",
+      "savePath": "assets/duels/조운_하후은.webp",
+      "stages": [
+        "20-changbanpo",
+        "22-hanjin"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Zhao Yun, a young gallant cavalry general in silver-white armor with a white plume, wielding a slender dragon spear, charging from the left and facing right. RIGHT fighter: Xiahou En, a proud sword-bearer officer in light ornate armor, drawing a jeweled precious sword, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-장비_허저",
+      "savePath": "assets/duels/장비_허저.webp",
+      "stages": [
+        "21-changbanqiao",
+        "26-chibi"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Zhang Fei, a burly ferocious general with bristling whiskers and glaring eyes, dark armor, wielding a long serpent-coiled spear, charging from the left and facing right. RIGHT fighter: Xu Chu, a hulking bear-like warrior of massive frame in simple heavy armor, swinging an enormous broadsword, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-장비_진손",
+      "savePath": "assets/duels/장비_진손.webp",
+      "stages": [
+        "23-jiangxia"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Zhang Fei, a burly ferocious general with bristling whiskers and glaring eyes, dark armor, wielding a long serpent-coiled spear, charging from the left and facing right. RIGHT fighter: Chen Sun, a wiry bandit leader in leather armor wielding twin sabers, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-조운_장무",
+      "savePath": "assets/duels/조운_장무.webp",
+      "stages": [
+        "23-jiangxia"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Zhao Yun, a young gallant cavalry general in silver-white armor with a white plume, wielding a slender dragon spear, charging from the left and facing right. RIGHT fighter: Zhang Wu, a river-pirate warlord in scale armor swinging a heavy cutlass, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-황개_채모",
+      "savePath": "assets/duels/황개_채모.webp",
+      "stages": [
+        "24-sanjiangkou",
+        "25-wulin"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Huang Gai, a grizzled veteran naval commander with a gray beard, Wu navy lamellar armor, swinging an iron whip-staff, charging from the left and facing right. RIGHT fighter: Cai Mao, a naval commander in Jing-province lamellar armor with an officer's saber, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-관우_조인",
+      "savePath": "assets/duels/관우_조인.webp",
+      "stages": [
+        "26-chibi"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Guan Yu, a towering general with a magnificent long black beard, deep-green robe over lamellar armor, wielding a huge crescent-moon glaive, charging from the left and facing right. RIGHT fighter: Cao Ren, a stalwart defensive general in heavy gray-blue armor with a tall shield silhouette, bracing a long spear, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    },
+    {
+      "kind": "duel",
+      "id": "duel-관우_조조",
+      "savePath": "assets/duels/관우_조조.webp",
+      "stages": [
+        "27-huarongdao"
+      ],
+      "prompt": "Dramatic one-on-one duel keyframe for a Three Kingdoms tactics game. LEFT fighter: Guan Yu, a towering general with a magnificent long black beard, deep-green robe over lamellar armor, wielding a huge crescent-moon glaive, charging from the left and facing right. RIGHT fighter: Cao Cao, the supreme warlord with keen piercing eyes, black-and-gold ornate armor and a flowing war cloak, raising a straight sword, charging from the right and facing left. Their weapons collide at the center with sparks and torn dust, low heroic camera angle, dark hazy battlefield backdrop with distant war banners and drifting smoke, charged duel atmosphere. Both warriors fully in frame, dynamic diagonal composition. Art style: East Asian ink-wash painting fused with modern game illustration. Confident calligraphic linework, muted earth tones with selective vivid accent colors (vermilion, jade green, gold), textured rice-paper feel in shading, dramatic negative space. NOT photorealistic, NOT anime-cel. Avoid: Koei-style portraits, Dynasty Warriors look, Japanese sengoku armor, photobash, text, watermark, frame, border, modern objects. 16:9 aspect ratio, no text anywhere."
+    }
+  ]
+}

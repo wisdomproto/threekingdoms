@@ -63,10 +63,12 @@ def r2_put(s3, bucket, rel_key, local_path):
 
 # ---------- 카테고리별 처리 ----------
 def do_scene(job, gen, dry):
-    final = os.path.join(PUBLIC, *job["savePath"].split("/"))  # .../scenes/{bg}.webp
+    # scene(씬 배경)과 duel(일기토 키비주얼 §9 Tier 1)이 공유 — 텍스트→이미지→webp→savePath.
+    final = os.path.join(PUBLIC, *job["savePath"].split("/"))  # .../scenes/{bg}.webp | .../duels/{pair}.webp
     if dry:
-        print(f"  [dry] scene → {job['savePath']}"); return [job["savePath"]]
-    raw_png = os.path.join(RAW, "scene", os.path.basename(job["savePath"]).replace(".webp", ".png"))
+        print(f"  [dry] {job['kind']} → {job['savePath']}"); return [job["savePath"]]
+    raw_png = os.path.join(RAW, job["kind"], os.path.basename(job["savePath"]).replace(".webp", ".png"))
+    os.makedirs(os.path.dirname(raw_png), exist_ok=True)
     if not gen(job["prompt"], raw_png, None):
         return []
     from PIL import Image
@@ -114,7 +116,7 @@ def do_sd(job, gen, dry):
     return [job["savePath"]]
 
 
-HANDLERS = {"scene": do_scene, "portrait": do_portrait, "sd": do_sd}
+HANDLERS = {"scene": do_scene, "portrait": do_portrait, "sd": do_sd, "duel": do_scene}
 
 
 def already_done(job):
@@ -134,7 +136,7 @@ def main():
     except Exception:  # noqa: BLE001
         pass
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", choices=["scene", "portrait", "sd"])
+    ap.add_argument("--only", choices=["scene", "portrait", "sd", "duel"])
     ap.add_argument("--id")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--force", action="store_true")
@@ -142,10 +144,17 @@ def main():
     ap.add_argument("--no-r2", action="store_true")
     args = ap.parse_args()
 
-    if not os.path.exists(PROMPTS):
-        print("prompts.json 없음 — 먼저: node tools/sprite-pipeline/gen/export_prompts.mjs"); sys.exit(1)
-    catalog = json.load(open(PROMPTS, encoding="utf-8"))
-    jobs = catalog["jobs"]
+    # prompts.json(보드 SSOT) + duel-prompts.json(§9 derive_duel_prompts.mjs) merge.
+    # 일기토만 돌릴 땐 prompts.json 없이도 동작(둘 다 없으면 안내 후 종료).
+    duel_prompts = os.path.join(HERE, "duel-prompts.json")
+    jobs = []
+    if os.path.exists(PROMPTS):
+        jobs += json.load(open(PROMPTS, encoding="utf-8"))["jobs"]
+    if os.path.exists(duel_prompts):
+        jobs += json.load(open(duel_prompts, encoding="utf-8"))["jobs"]
+    if not jobs:
+        print("prompts.json/duel-prompts.json 없음 — 먼저: node tools/sprite-pipeline/gen/export_prompts.mjs "
+              "또는 node tools/sprite-pipeline/gen/derive_duel_prompts.mjs"); sys.exit(1)
     if args.only:
         jobs = [j for j in jobs if j["kind"] == args.only]
     if args.id:
