@@ -826,12 +826,23 @@ export class BattleRenderer implements Presenter {
     }
   }
 
+  /** 일기토 컷인 핸들러(§9 Tier 0) — BattleScreen이 등록. resolve까지 이벤트 스트림이 대기한다. */
+  private duelCinematic: ((e: Ev<"duelTriggered">) => Promise<void>) | null = null;
+  setDuelCinematic(handler: ((e: Ev<"duelTriggered">) => Promise<void>) | null): void {
+    this.duelCinematic = handler;
+  }
+
   async duelTriggered(e: Ev<"duelTriggered">): Promise<void> {
     const s = this.scene;
     if (!s) return;
-    const name = (id: string): string => this.ctx.data.commanders[id]?.name ?? id;
     // 일기토 발동 — 큰 화면 흔들림 1회로 무게감(§4 "특히 일기토/큰 피해").
     this.triggerShake(SHAKE_PX_BIG);
+    // 풀스크린 컷인(React 오버레이)이 등록돼 있으면 그 완주를 기다린다 — 배너는 헤드리스 폴백.
+    if (this.duelCinematic) {
+      await this.duelCinematic(e);
+      return;
+    }
+    const name = (id: string): string => this.ctx.data.commanders[id]?.name ?? id;
     playSfx(SFX.duel);
     await s.fx.banner(
       `일기토! ${name(e.attackerId)} vs ${name(e.defenderId)} — ${name(e.winnerId)} 승리`,

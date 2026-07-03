@@ -30,6 +30,8 @@ import { EndTurnConfirm } from "./hud/EndTurnConfirm";
 import { ObjectiveBanner } from "./hud/ObjectiveBanner";
 import { ResultSequence } from "./hud/ResultSequence";
 import { DialogueOverlay } from "./dialogue/DialogueOverlay";
+import { DuelCutin, type DuelCineVM } from "./duel/DuelCutin";
+import { duelBanter } from "./duel/duelMedia";
 import { BattleControls } from "./hud/BattleControls";
 import { PauseMenu } from "./hud/PauseMenu";
 import { Minimap } from "./hud/Minimap";
@@ -225,6 +227,9 @@ export default function BattleScreen(): React.ReactElement {
   // 스테이지는 그 대사가 다 재생된 뒤에 ResultSequence를 띄운다. 순서: 승패 확정 → 마무리
   // 대사(탭 진행) → 결산. 해당 결과의 battleEnd 대사가 없으면(패배 등) 즉시 통과.
   const [endDialogueDone, setEndDialogueDone] = useState(false);
+  // 일기토 컷인(§9 Tier 0) — 렌더러 duelTriggered가 여기 등록된 핸들러를 await.
+  // resolve가 호출될 때까지 이벤트 스트림이 멈춘다(컷인 = 블로킹 시네마틱).
+  const [duelCine, setDuelCine] = useState<{ vm: DuelCineVM; resolve: () => void } | null>(null);
 
   useEffect(() => {
     const el = mountRef.current;
@@ -244,6 +249,26 @@ export default function BattleScreen(): React.ReactElement {
     const bootTimeout = window.setTimeout(() => {
       if (!cancelled) setBoot((b) => ({ ...b, ready: true }));
     }, 15_000);
+    // 일기토 컷인(§9) — duelTriggered마다 React 오버레이를 띄우고 완주(resolve)까지 대기.
+    // vm은 스테이지 데이터에서 조립: 이름·즉사 여부(duel 이벤트 outcome)·banter 대사.
+    renderer.setDuelCinematic((e) => new Promise<void>((resolve) => {
+      if (cancelled) { resolve(); return; } // 정리 후 잔여 이벤트 — 즉시 통과(교착 방지)
+      const name = (id: string): string => ctx.data.commanders[id]?.name ?? id;
+      const ev = ctx.stage.events.find((x) => x.id === e.eventId);
+      setDuelCine({
+        vm: {
+          duelId: e.eventId,
+          attackerId: e.attackerId,
+          defenderId: e.defenderId,
+          winnerId: e.winnerId,
+          attackerName: name(e.attackerId),
+          defenderName: name(e.defenderId),
+          loserRetreats: ev?.type === "duel" ? ev.outcome.loserRetreats === true : false,
+          lines: duelBanter(ctx.stage.dialogue, e.eventId),
+        },
+        resolve,
+      });
+    }));
     renderer.mount(el).catch((err: unknown) => {
       console.error("[battle] 렌더러 mount 실패", err);
     });
@@ -251,6 +276,9 @@ export default function BattleScreen(): React.ReactElement {
       cancelled = true;
       window.clearTimeout(bootTimeout);
       renderer.onAssetProgress(null);
+      renderer.setDuelCinematic(null);
+      // 컷인 표시 중 정리(라우트 이탈 등) — 대기 중 resolve를 풀어 EventPlayer 교착 방지.
+      setDuelCine((d) => { d?.resolve(); return null; });
       if (delegate.target === renderer) delegate.target = null;
       renderer.destroy(); // init 진행 중이면 BattleRenderer 내부 가드가 완료 후 파괴
     };
@@ -368,7 +396,8 @@ export default function BattleScreen(): React.ReactElement {
       {boot.ready && (
         <DialogueOverlay
           store={store}
-          dialogue={ctx.stage.dialogue}
+          // duelOccurred 대사는 컷인(DuelCutin)이 직접 재생 — 오버레이 중복 재생 방지(duelMedia 계약).
+          dialogue={ctx.stage.dialogue?.filter((d) => d.trigger.kind !== "duelOccurred")}
           onLineChange={(speaker) => {
             const unit = store.committedState.units.find((u) => u.id === speaker);
             if (unit) delegate.target?.focusOn({ x: unit.x, y: unit.y }, 500);
@@ -381,6 +410,16 @@ export default function BattleScreen(): React.ReactElement {
         />
       )}
       <EndTurnConfirm ui={snap.ui} dispatch={dispatch} />
+      {/* 일기토 컷인 — 이벤트 스트림이 resolve까지 대기(블로킹 시네마틱) */}
+      {duelCine && (
+        <DuelCutin
+          vm={duelCine.vm}
+          onDone={() => {
+            duelCine.resolve();
+            setDuelCine(null);
+          }}
+        />
+      )}
       {endDialogueDone && (
         <ResultSequence
           ui={snap.ui}
