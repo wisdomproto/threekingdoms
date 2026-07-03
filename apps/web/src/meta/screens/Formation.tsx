@@ -113,11 +113,17 @@ export function Formation({
 
   const selectedIds = useMemo(() => new Set(selected.map((m) => m.commanderId)), [selected]);
   const sortedRoster = useMemo(() => sortRoster(roster, sortKey, chapter), [roster, sortKey, chapter]);
+  // 장착 수량 = 배치 멤버(items 실시간) + 미배치 로스터(equipped 저장분). 종전엔 배치 멤버만 세서
+  // 미배치 장수의 시작 장비(유비 쌍고검 등)가 남에게 "장착 가능"으로 떠 복제될 수 있었다(2026-07-03).
   const equippedCount = useMemo(() => {
     const counts = new Map<string, number>();
     for (const m of selected) for (const it of m.items) counts.set(it, (counts.get(it) ?? 0) + 1);
+    for (const u of roster) {
+      if (selectedIds.has(u.commanderId)) continue;
+      for (const it of u.equipped) counts.set(it, (counts.get(it) ?? 0) + 1);
+    }
     return counts;
-  }, [selected]);
+  }, [selected, roster, selectedIds]);
 
   // 스탯 바 정규화 기준 — 로스터 전체 최대치(상대 비교가 정보값)
   const statMax = useMemo<StatMax>(() => {

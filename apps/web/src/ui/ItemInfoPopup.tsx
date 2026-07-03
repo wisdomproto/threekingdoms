@@ -18,9 +18,17 @@ const PARCHMENT = "#e8dcc0";
 export function ItemInfoPopup({
   itemId,
   onClose,
+  actionLabel,
+  onAction,
+  note,
 }: {
   itemId: string;
   onClose: () => void;
+  /** 지정 시 닫기 옆에 금테 행동 버튼(장착/해제 등) — 탭하면 onAction 후 닫힌다 */
+  actionLabel?: string;
+  onAction?: () => void;
+  /** 효과 아래 보조 안내 한 줄(전력 변화·교체 대상 등) */
+  note?: string;
 }): React.ReactElement | null {
   const item = gameData.items[itemId];
   if (!item) return null;
@@ -89,25 +97,54 @@ export function ItemInfoPopup({
           ))}
         </ul>
 
-        <button
-          type="button"
-          onClick={onClose}
-          style={{
-            alignSelf: "center",
-            marginTop: 2,
-            padding: "7px 26px",
-            borderRadius: 8,
-            border: `1px solid ${BRONZE_DIM}`,
-            background: "rgba(40, 32, 20, 0.7)",
-            color: PARCHMENT,
-            fontSize: 13,
-            letterSpacing: "0.15em",
-            cursor: "pointer",
-            fontFamily: "inherit",
-          }}
-        >
-          닫기
-        </button>
+        {note && (
+          <div style={{
+            fontSize: 11.5, color: BRONZE_DIM, textAlign: "center",
+            borderTop: `1px solid ${BRONZE_DIM}44`, paddingTop: 8, marginTop: 2,
+          }}>
+            {note}
+          </div>
+        )}
+
+        <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 2 }}>
+          {actionLabel && onAction && (
+            <button
+              type="button"
+              onClick={() => { onAction(); onClose(); }}
+              style={{
+                padding: "7px 22px",
+                borderRadius: 8,
+                border: `1.5px solid ${BRONZE_GOLD}`,
+                background: "rgba(205, 171, 110, 0.16)",
+                color: BRONZE_GOLD,
+                fontSize: 13,
+                fontWeight: 700,
+                letterSpacing: "0.15em",
+                cursor: "pointer",
+                fontFamily: "inherit",
+              }}
+            >
+              {actionLabel}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              padding: "7px 22px",
+              borderRadius: 8,
+              border: `1px solid ${BRONZE_DIM}`,
+              background: "rgba(40, 32, 20, 0.7)",
+              color: PARCHMENT,
+              fontSize: 13,
+              letterSpacing: "0.15em",
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
+          >
+            닫기
+          </button>
+        </div>
       </div>
     </div>
   );

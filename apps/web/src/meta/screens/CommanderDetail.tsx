@@ -7,12 +7,13 @@
  * 함께 갱신해야 하는 기존 데이터 흐름(updateEquip)을 유지하기 위함. 미배치 장수는
  * 장착 현황을 읽기전용으로 보여주고 「출진 편성」을 권한다.
  */
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { gameData } from "@tk/data";
 import type { RosterUnit } from "../metaStore";
 import type { SortieMember } from "../sortie";
 import { unitStats } from "../unitStats";
 import { ItemIcon } from "../../ui/ItemIcon";
+import { ItemInfoPopup } from "../../ui/ItemInfoPopup";
 import { CommanderPortrait } from "../../ui/CommanderPortrait";
 import { applyEquip, buildSlotView, slotOf, SLOT_LABEL, SLOT_CAP, type EquipSlot } from "../equipSlots";
 import {
@@ -91,9 +92,11 @@ function PowerDelta({ unit, currentItems, nextItems }: {
   );
 }
 
-/** 장비 슬롯 1칸 — 정사각 박스(레퍼런스 문법). 채움=아이콘+이름(탭 해제), 빈칸=+ 점선. */
-function SlotCell({ id, interactive, onUnequip }: {
-  id: string | null; interactive: boolean; onUnequip: (itemId: string) => void;
+/** 장비 슬롯 1칸 — 정사각 박스(레퍼런스 문법). 채움=탭하면 상세 팝업(즉시 해제 금지 — 2026-07-03
+ *  "클릭하면 그냥 없어진다" 지적), 모서리 ✕만 바로 해제. 빈칸=+ 점선. */
+function SlotCell({ id, interactive, onInfo, onUnequip }: {
+  id: string | null; interactive: boolean;
+  onInfo: (itemId: string) => void; onUnequip: (itemId: string) => void;
 }): React.ReactElement {
   const item = id ? gameData.items[id] : undefined;
   if (!id) {
@@ -111,31 +114,38 @@ function SlotCell({ id, interactive, onUnequip }: {
   return (
     <button
       type="button"
-      onClick={interactive ? () => onUnequip(id) : undefined}
-      title={interactive ? `${item?.name ?? id} 해제` : item?.name ?? id}
+      onClick={() => onInfo(id)}
+      title={`${item?.name ?? id} — 상세`}
       style={{
         position: "relative", aspectRatio: "1", borderRadius: 8, minWidth: 0, padding: 0,
         border: `1.5px solid ${GOLD}88`,
         background: `linear-gradient(160deg, rgba(60,46,22,0.85), rgba(28,20,10,0.95))`,
         boxShadow: `inset 0 0 10px ${GOLD_GLOW}`,
         display: "flex", alignItems: "center", justifyContent: "center",
-        cursor: interactive ? "pointer" : "default",
+        cursor: "pointer",
       }}
     >
       <ItemIcon itemId={id} category={item?.category} size={34} />
       {interactive && (
-        <span style={{
-          position: "absolute", top: 1, right: 4, fontSize: 10,
-          color: "rgba(232,217,176,0.55)", lineHeight: 1,
-        }}>✕</span>
+        <span
+          role="button"
+          aria-label={`${item?.name ?? id} 해제`}
+          onClick={(e) => { e.stopPropagation(); onUnequip(id); }}
+          style={{
+            position: "absolute", top: 0, right: 0, padding: "1px 5px 3px",
+            fontSize: 10, color: "rgba(232,217,176,0.6)", lineHeight: 1,
+            cursor: "pointer",
+          }}
+        >✕</span>
       )}
     </button>
   );
 }
 
 /** 슬롯 그룹(라벨 + 칸들 + 채워진 아이템명 캡션) */
-function SlotGroup({ slot, ids, interactive, onUnequip }: {
-  slot: EquipSlot; ids: string[]; interactive: boolean; onUnequip: (itemId: string) => void;
+function SlotGroup({ slot, ids, interactive, onInfo, onUnequip }: {
+  slot: EquipSlot; ids: string[]; interactive: boolean;
+  onInfo: (itemId: string) => void; onUnequip: (itemId: string) => void;
 }): React.ReactElement {
   const cap = SLOT_CAP[slot];
   const cells: (string | null)[] = [...ids];
@@ -148,7 +158,8 @@ function SlotGroup({ slot, ids, interactive, onUnequip }: {
       </span>
       <div style={{ display: "grid", gridTemplateColumns: `repeat(${cap}, 1fr)`, gap: 5 }}>
         {cells.map((id, i) => (
-          <SlotCell key={id ? `${id}-${i}` : `e-${i}`} id={id} interactive={interactive} onUnequip={onUnequip} />
+          <SlotCell key={id ? `${id}-${i}` : `e-${i}`} id={id} interactive={interactive}
+            onInfo={onInfo} onUnequip={onUnequip} />
         ))}
       </div>
       <span style={{
@@ -170,6 +181,9 @@ export function CommanderDetail({
   const equippedIds = deployed ? member.items : unit.equipped;
   const view = buildSlotView(equippedIds, items);
   const stats = unitStats(unit.commanderId, unit.classId, unit.level, [...equippedIds]);
+  // 아이템 상세 팝업 — slot(장착 중, 해제 행동) / bag(소지품, 장착 행동). 2026-07-03 지적:
+  // 소지품 효과 수치를 볼 수 없고, 장착 슬롯 탭이 확인 없이 즉시 해제되던 문제의 해법.
+  const [info, setInfo] = useState<{ id: string; from: "slot" | "bag" } | null>(null);
 
   const available = useMemo(() => {
     const owned = new Map<string, number>();
@@ -281,7 +295,8 @@ export function CommanderDetail({
         {/* ── 장비 슬롯(§10: 무기1·말1·보물1 + 소모품2) ── */}
         <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
           {(["arms", "mount", "relic", "pouch"] as EquipSlot[]).map((s) => (
-            <SlotGroup key={s} slot={s} ids={view[s]} interactive={deployed} onUnequip={unequip} />
+            <SlotGroup key={s} slot={s} ids={view[s]} interactive={deployed}
+              onInfo={(id) => setInfo({ id, from: "slot" })} onUnequip={unequip} />
           ))}
         </div>
 
@@ -306,14 +321,14 @@ export function CommanderDetail({
           available.length > 0 && (
             <div>
               <div style={{ fontSize: 10.5, color: "#b8a070", marginBottom: 5 }}>
-                소지품 — 탭하면 장착됩니다 (같은 슬롯은 교체)
+                소지품 — 탭하면 효과를 확인하고 장착합니다
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                 {available.map((itemId) => {
                   const s = slotOf(items[itemId]?.category);
                   const next = applyEquip(equippedIds, itemId, items);
                   return (
-                    <button key={itemId} type="button" onClick={() => equip(itemId)}
+                    <button key={itemId} type="button" onClick={() => setInfo({ id: itemId, from: "bag" })}
                       style={{ fontSize: 11, padding: "3px 7px", borderRadius: 10, fontFamily: "inherit",
                         border: `1px solid ${GOLD_DIM}66`, background: "rgba(255,255,255,0.05)",
                         color: PARCHMENT, cursor: "pointer",
@@ -363,6 +378,43 @@ export function CommanderDetail({
           >{canDeploy ? "출진 편성" : "출진 슬롯 가득"}</button>
         )}
       </div>
+
+      {/* ── 아이템 상세 팝업(효과 수치 + 장착/해제 확정) ── */}
+      {info && (() => {
+        const close = (): void => setInfo(null);
+        if (info.from === "bag") {
+          const nextItems = applyEquip(equippedIds, info.id, items);
+          const changed = nextItems !== equippedIds;
+          if (!changed) {
+            return <ItemInfoPopup itemId={info.id} onClose={close} note="이미 장착 중인 장비입니다" />;
+          }
+          const delta =
+            unitStats(unit.commanderId, unit.classId, unit.level, [...nextItems]).power - stats.power;
+          const s = slotOf(items[info.id]?.category);
+          const evict = s && view[s].length >= SLOT_CAP[s] ? view[s][0] : null;
+          const note = [
+            s ? `${SLOT_LABEL[s]} 슬롯` : null,
+            evict ? `${items[evict]?.name ?? evict} 교체` : null,
+            delta === 0 ? "전력 변화 없음" : `전력 ${delta > 0 ? "+" : ""}${delta}`,
+          ].filter(Boolean).join(" · ");
+          return (
+            <ItemInfoPopup
+              itemId={info.id} onClose={close} note={note}
+              actionLabel={evict ? "교체 장착" : "장착"}
+              onAction={() => equip(info.id)}
+            />
+          );
+        }
+        // 장착 중(slot) — 배치 시에만 해제 행동
+        return (
+          <ItemInfoPopup
+            itemId={info.id} onClose={close}
+            actionLabel={deployed ? "해제" : undefined}
+            onAction={deployed ? () => unequip(info.id) : undefined}
+            note={deployed ? "해제한 장비는 소지품으로 돌아갑니다" : "출진 편성 후 변경할 수 있습니다"}
+          />
+        );
+      })()}
     </div>
   );
 }
