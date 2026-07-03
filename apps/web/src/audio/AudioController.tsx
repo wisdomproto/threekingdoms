@@ -13,16 +13,9 @@ import { usePathname } from "next/navigation";
 import { audio } from "./engine";
 import { SFX, playSfx } from "./sfx";
 import { preloadSfxFiles } from "./sfx";
-import { playBgm, resumeBgm, preloadBgmFiles, type BgmTrackId } from "./bgm";
+import { playBgm, resumeBgm, preloadBgmFiles } from "./bgm";
 import { loadAudioManifest } from "./manifest";
-
-/** 경로 → BGM 트랙. /battle=전투, /scene=씬 드론, /=타이틀, 그 외 막간=메뉴. */
-function bgmForPath(path: string): BgmTrackId {
-  if (path.startsWith("/battle")) return "battle";
-  if (path.startsWith("/scene")) return "scene";
-  if (path === "/") return "title";
-  return "menu";
-}
+import { bgmForPath } from "./bgmRoute";
 
 export function AudioController(): React.ReactElement {
   const pathname = usePathname();
@@ -65,8 +58,11 @@ export function AudioController(): React.ReactElement {
   }, []);
 
   // (3) 경로 → BGM. 미해제 시 desired만 저장되고 첫 제스처가 resumeBgm으로 켠다.
+  // stage 쿼리는 window.location에서 직접 읽는다 — useSearchParams는 layout 전역 아일랜드에
+  // Suspense 경계를 요구(Next 15 CSR bailout)하고, BGM 선택은 어차피 클라이언트 전용.
+  // 전투 진입은 항상 /prep 경유라 pathname 변화가 곧 stage 변화 시점이다.
   useEffect(() => {
-    playBgm(bgmForPath(pathname));
+    playBgm(bgmForPath(pathname, window.location.search));
   }, [pathname]);
 
   return <AudioControl />;
