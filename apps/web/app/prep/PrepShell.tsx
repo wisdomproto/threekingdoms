@@ -111,7 +111,8 @@ export function PrepShell(): React.ReactElement {
         display: "flex",
         flexDirection: "column",
         minHeight: "100dvh",
-        paddingBottom: 64,
+        // 페이지 캔버스도 먹빛 — 패널 밖 여백이 흰 벌판으로 뜨지 않게(2026-07-03).
+        background: "linear-gradient(to bottom, #14100a, #0d0a06)",
       }}
     >
       {/* 헤더 — 먹빛 바 + 청동 타이틀 + 출진 카운터(레퍼런스 우상단 플라크) */}
@@ -195,8 +196,11 @@ export function PrepShell(): React.ReactElement {
         })}
       </div>
 
-      {/* 탭 콘텐츠 (비활성 탭 언마운트) */}
-      <div style={{ flex: 1, padding: 16, width: "100%", maxWidth: CONTENT_MAX, margin: "0 auto", boxSizing: "border-box" }}>
+      {/* 탭 콘텐츠 (비활성 탭 언마운트) — flex 컬럼: 편성 보드가 남은 높이를 채운다 */}
+      <div style={{
+        flex: 1, padding: 16, width: "100%", maxWidth: CONTENT_MAX, margin: "0 auto",
+        boxSizing: "border-box", display: "flex", flexDirection: "column",
+      }}>
         {activeTab === "formation" ? (
           <Formation
             key={refreshKey}

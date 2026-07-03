@@ -183,7 +183,8 @@ export function Formation({
       display: "grid",
       gridTemplateColumns: narrow ? "minmax(0,1fr)" : "minmax(0,1fr) 336px",
       gap: 14,
-      alignItems: "start",
+      // 컬럼을 세로로 늘여 패널이 "보드"로 서게(기본 stretch) — 남는 양피지는 워터마크가 채운다.
+      flex: 1,
     }}>
       {/* ━━ 좌: 장수 선택 그리드 ━━ */}
       <div style={{ minWidth: 0, position: "relative" }}>
@@ -193,7 +194,7 @@ export function Formation({
           display: "flex", alignItems: "center", justifyContent: "center",
           pointerEvents: "none", userSelect: "none",
           fontSize: "min(240px, 40vw)", fontWeight: 900, lineHeight: 1,
-          color: "rgba(90, 70, 40, 0.06)", letterSpacing: "0.1em",
+          color: "rgba(90, 70, 40, 0.08)", letterSpacing: "0.1em",
         }}>出陣</span>
         <Ribbon seal="將" title={`장수 선택 — ${chapter}장 편성`}>
           {(["role", "power", "level", "new"] as SortKey[]).map((k) => {
@@ -304,8 +305,9 @@ export function Formation({
         </div>
       </div>
 
-      {/* ━━ 우: 선택된 장수 상세 (넓은 화면 — sticky 컬럼) ━━ */}
+      {/* ━━ 우: 선택된 장수 상세 (넓은 화면 — 컬럼은 늘고, 내용만 sticky) ━━ */}
       {!narrow && (
+        <div>
         <div style={{ position: "sticky", top: 8 }}>
           <Ribbon seal="詳" title="선택된 장수 상세" />
           {detailPanel ?? (
@@ -316,6 +318,7 @@ export function Formation({
               장수를 선택하세요
             </div>
           )}
+        </div>
         </div>
       )}
 
