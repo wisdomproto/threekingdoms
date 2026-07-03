@@ -37,6 +37,8 @@ import {
   getSerendipity,
   getSerendipityPity,
   pullSerendipity,
+  reduceApplyRosterProgress,
+  healStartItems,
 } from "../metaStore";
 import { PULL_COST } from "../serendipity";
 
@@ -279,5 +281,53 @@ describe("공개 API (node 비브라우저 — 메모리 캐시 폴백)", () => 
     expect(r.find((u) => u.commanderId === "관우")!.equipped).toEqual(["청룡언월도"]);
     const withProg = { ...fresh, rosterProgress: { 유비: { level: 1, exp: 0, equipped: ["청강검"] } } };
     expect(selectRoster(withProg, gameData.rosters, 1).find((u) => u.commanderId === "유비")!.equipped).toEqual(["청강검"]);
+  });
+});
+
+describe("시작 장비 회귀·치유 (2026-07-03)", () => {
+  const ROSTERS: Record<string, RosterEntry> = {
+    유비: { commanderId: "유비", classId: "lord", joinChapter: 1, role: "lord", startItems: ["쌍고검"] },
+    간옹: { commanderId: "간옹", classId: "strategist", joinChapter: 1, role: "caster", startItems: [] },
+  };
+
+  it("applyRosterProgress가 신규 엔트리를 만들 때 startItems를 승계(회귀 수정)", () => {
+    const s = reduceApplyRosterProgress(initialMeta(), [{ commanderId: "유비", level: 2, exp: 30 }], ROSTERS);
+    expect(s.rosterProgress["유비"]!.equipped).toEqual(["쌍고검"]);
+    // startItems 없는 장수는 종전대로 빈 장비
+    const s2 = reduceApplyRosterProgress(initialMeta(), [{ commanderId: "간옹", level: 2, exp: 10 }], ROSTERS);
+    expect(s2.rosterProgress["간옹"]!.equipped).toEqual([]);
+  });
+
+  it("기존 진행 엔트리의 장비는 그대로 보존(레벨/exp만 갱신)", () => {
+    const base = {
+      ...initialMeta(),
+      rosterProgress: { 유비: { level: 1, exp: 0, equipped: ["청강검"] } },
+    };
+    const s = reduceApplyRosterProgress(base, [{ commanderId: "유비", level: 3, exp: 5 }], ROSTERS);
+    expect(s.rosterProgress["유비"]!.equipped).toEqual(["청강검"]);
+    expect(s.rosterProgress["유비"]!.level).toBe(3);
+  });
+
+  it("healStartItems: 회귀로 빈 equipped를 복구 + 인벤토리 시드 + 1회성 플래그", () => {
+    const broken = {
+      ...initialMeta(),
+      rosterProgress: { 유비: { level: 4, exp: 80, equipped: [] } },
+    };
+    const healed = healStartItems(broken, ROSTERS);
+    expect(healed.rosterProgress["유비"]!.equipped).toEqual(["쌍고검"]);
+    expect(healed.inventory).toContain("쌍고검");
+    expect(healed.startItemsHealed).toBe(true);
+    // 재실행 no-op(같은 참조) — 치유 후 의도적 해제를 로드가 되돌리지 않는다
+    const unequipped = {
+      ...healed,
+      rosterProgress: { 유비: { level: 4, exp: 80, equipped: [] } },
+    };
+    expect(healStartItems(unequipped, ROSTERS)).toBe(unequipped);
+  });
+
+  it("healStartItems: 인벤토리에 이미 있으면 중복 추가 없음", () => {
+    const s = { ...initialMeta(), inventory: ["쌍고검"] };
+    const healed = healStartItems(s, ROSTERS);
+    expect(healed.inventory.filter((i) => i === "쌍고검").length).toBe(1);
   });
 });

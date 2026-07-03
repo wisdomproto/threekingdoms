@@ -60,6 +60,11 @@ export interface MetaState {
   departedCharacters: string[];
   /** 2회차 카운터(§11). 0=1회차(첫 플레이), 1=2회차, …. startNewGame()이 증가시킨다. */
   playthroughCount: number;
+  /**
+   * 시작 장비 치유(healStartItems) 완료 여부 — 1회성 마이그레이션 플래그.
+   * true면 재실행 안 함(치유 후 유저가 의도적으로 해제한 장비를 로드가 되돌리지 않게).
+   */
+  startItemsHealed?: boolean;
 }
 
 /** 상점 골드 충전 광고 일일 캡(§13 "소액·일일 캡"). 하루 최대 시청 횟수. */
@@ -257,14 +262,49 @@ export function reduceSetEquipped(s: MetaState, commanderId: string, items: stri
 export function reduceApplyRosterProgress(
   s: MetaState,
   progress: readonly { commanderId: string; level: number; exp: number }[],
+  rosters: Record<string, RosterEntry> = gameData.rosters,
 ): MetaState {
   if (progress.length === 0) return s;
   const rp: Record<string, RosterProgress> = { ...s.rosterProgress };
   for (const p of progress) {
-    const prev = rp[p.commanderId] ?? { level: DEFAULT_LEVEL, exp: 0, equipped: [] };
+    // 신규 진행 엔트리는 시작 장비(startItems)를 승계해 생성 — []로 만들면 selectRoster의
+    // `equipped ?? startItems` 기본이 영영 덮여 첫 결산 후 유비 쌍고검 등 기본 장비가
+    // 증발하는 회귀가 된다(2026-07-03 발견 — 레벨 영속(06-28) 때 들어온 버그).
+    const prev = rp[p.commanderId] ?? {
+      level: DEFAULT_LEVEL,
+      exp: 0,
+      equipped: [...(rosters[p.commanderId]?.startItems ?? [])],
+    };
     rp[p.commanderId] = { ...prev, level: p.level, exp: p.exp };
   }
   return { ...s, rosterProgress: rp };
+}
+
+/**
+ * 시작 장비 치유(1회성 마이그레이션, 순수). 위 회귀로 equipped가 []가 된 기존 세이브를 복구하고,
+ * startItems를 인벤토리에도 1개씩 채운다(없으면) — 인벤토리에 없으면 편성에서 해제 시 아이템이
+ * UI에서 사라지는(available = 보유−장착) 손실이 있어서다. startItemsHealed 플래그로 재실행을
+ * 막는다 — 치유 후 유저가 *의도적으로* 해제한 장비를 다음 로드가 되돌리면 안 된다.
+ */
+export function healStartItems(
+  s: MetaState,
+  rosters: Record<string, RosterEntry> = gameData.rosters,
+): MetaState {
+  if (s.startItemsHealed) return s;
+  const inventory = [...s.inventory];
+  const rp: Record<string, RosterProgress> = { ...s.rosterProgress };
+  for (const entry of Object.values(rosters)) {
+    const si = entry.startItems;
+    if (!si || si.length === 0) continue;
+    for (const item of si) {
+      if (!inventory.includes(item)) inventory.push(item);
+    }
+    const p = rp[entry.commanderId];
+    if (p && p.equipped.length === 0) {
+      rp[entry.commanderId] = { ...p, equipped: [...si] };
+    }
+  }
+  return { ...s, inventory, rosterProgress: rp, startItemsHealed: true };
 }
 
 /**
@@ -328,14 +368,14 @@ function readLegacyGold(): number {
 }
 
 function loadFromStorage(): MetaState {
-  if (!hasStorage()) return memory ?? initialMeta();
+  if (!hasStorage()) return memory ?? healPersist(initialMeta());
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw == null) {
       // v1 키가 없으면 신규 — 단, 결산이 먼저 쌓은 legacy gold가 있으면 흡수.
       const base = initialMeta();
       base.gold = readLegacyGold();
-      return base;
+      return healPersist(base);
     }
     const parsed = JSON.parse(raw) as Partial<MetaState>;
     const state: MetaState = {
@@ -363,14 +403,23 @@ function loadFromStorage(): MetaState {
         typeof parsed.playthroughCount === "number" && parsed.playthroughCount >= 0
           ? Math.floor(parsed.playthroughCount)
           : 0,
+      // 시작 장비 치유 플래그 — 구버전/미치유 세이브는 false → 아래 healPersist가 1회 복구.
+      startItemsHealed: parsed.startItemsHealed === true,
     };
     // legacy gold가 v1보다 크면(결산이 v1 밖에서 누적했을 수 있음) 더 큰 값 채택.
     const legacy = readLegacyGold();
     if (legacy > state.gold) state.gold = legacy;
-    return state;
+    return healPersist(state);
   } catch {
-    return memory ?? initialMeta();
+    return memory ?? healPersist(initialMeta());
   }
+}
+
+/** 로드 직후 시작 장비 치유(1회) — 바뀌었으면 즉시 저장해 다음 로드부터 재실행을 막는다. */
+function healPersist(s: MetaState): MetaState {
+  const healed = healStartItems(s);
+  if (healed !== s) saveToStorage(healed);
+  return healed;
 }
 
 function isAdGoldCap(v: unknown): v is AdGoldCap {
