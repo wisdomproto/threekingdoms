@@ -9,7 +9,7 @@
  */
 import {
   getAttackableTargets, getMovableTiles, getStrategyTargets, unitAt,
-  flankingCount, flankMultiplier, canUltimate,
+  flankingCount, flankMultiplier, canUltimate, camp,
 } from "@tk/engine";
 import type { Action, BattleContext, BattleState, Coord } from "@tk/engine";
 
@@ -24,14 +24,16 @@ function castableStrategies(
 }
 
 /**
- * 유닛이 들고 있는 사용 가능한 소모품(supplyItem/attackItem) id 목록 — 중복 보유 dedupe.
- * weapon/book/horse/treasure 등 비소모성은 제외(useItem이 거부하는 category). 도구 버튼 표시 조건.
+ * 이 유닛이 쓸 수 있는 소모품(supplyItem/attackItem) id 목록 — 중복 보유 dedupe.
+ * 원작 창고(§7): 소모품은 유닛 개별 소지가 아니라 **진영(camp) 공유 풀**에 있으므로,
+ * 유닛의 진영 풀(battle.sharedItems)을 본다 — 아무 아군이나 부대 창고에서 꺼내 쓸 수 있다.
  */
 export function usableItems(ctx: BattleContext, battle: BattleState, unitId: string): string[] {
   const u = battle.units.find((x) => x.id === unitId);
   if (!u) return [];
+  const team = camp(u.side) === "hostile" ? "hostile" : "friendly";
   const out: string[] = [];
-  for (const id of u.items) {
+  for (const id of battle.sharedItems[team]) {
     if (out.includes(id)) continue;
     const item = ctx.data.items[id];
     if (item && (item.category === "supplyItem" || item.category === "attackItem")) out.push(id);

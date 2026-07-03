@@ -11,7 +11,7 @@ import {
 import { nextRandom } from "./rng";
 import { hasStatus, applyStatus, tickStatuses } from "./status";
 import { findDuelTrigger } from "./events";
-import { spawnUnit } from "./createBattle";
+import { spawnUnit, drainConsumables } from "./createBattle";
 
 function getUnit(state: BattleState, id: string): UnitState {
   const u = state.units.find((u) => u.id === id);
@@ -339,11 +339,14 @@ function applyReinforcements(ctx: BattleContext, state: BattleState): { state: B
       (r.trigger.kind === "turn" && next.turn >= r.trigger.turn) ||
       (r.trigger.kind === "unitDefeated" && isRetreated(next, r.trigger.unitId));
     if (!fire) continue;
-    const spawned = r.units.map((p) => spawnUnit(ctx.data, { ...p, side: r.side }));
+    // 증원 유닛 소모품도 진영 공유 풀로 분리(정규 배치와 동일 — 원작 창고 §7).
+    const pool = { friendly: [...next.sharedItems.friendly], hostile: [...next.sharedItems.hostile] };
+    const spawned = r.units.map((p) => drainConsumables(ctx.data, spawnUnit(ctx.data, { ...p, side: r.side }), pool));
     next = {
       ...next,
       units: [...next.units, ...spawned],
       spawnedReinforcements: [...next.spawnedReinforcements, r.id],
+      sharedItems: pool,
     };
     events.push({
       type: "reinforcementArrived", reinforcementId: r.id, side: r.side,
@@ -618,11 +621,13 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
       assertCanAct(state, unit, false);
       const item = ctx.data.items[action.itemId];
       if (!item) throw new Error(`unknown item: ${action.itemId}`);
-      if (!unit.items.includes(action.itemId)) {
-        throw new Error(`${unit.id} does not have item ${action.itemId}`);
-      }
       if (item.category !== "supplyItem" && item.category !== "attackItem") {
         throw new Error(`item ${action.itemId} is not usable (category ${item.category})`);
+      }
+      // 원작 창고(§7): 소모품은 유닛 개별 소지가 아니라 진영(camp) 공유 풀에서 꺼내 쓴다.
+      const team = camp(unit.side) === "hostile" ? "hostile" : "friendly";
+      if (!state.sharedItems[team].includes(action.itemId)) {
+        throw new Error(`army pool (${team}) has no item ${action.itemId}`);
       }
       // target 생략 시 시전자 자신
       const tgtCoord = action.target ?? { x: unit.x, y: unit.y };
@@ -645,11 +650,12 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
         amount = Math.min(item.power, tgt.troops); // 실제 가한 피해(병력이 더 적으면 그만큼)
       }
 
-      // itemId 1개 소모 — 첫 번째 매칭만 제거 (중복 소지 지원)
-      const remaining = [...getUnit(next, unit.id).items];
-      const idx = remaining.indexOf(action.itemId);
-      if (idx >= 0) remaining.splice(idx, 1);
-      next = replaceUnit(next, { ...getUnit(next, unit.id), items: remaining, acted: true });
+      // itemId 1개 소모 — 진영 공유 풀에서 첫 매칭만 제거(중복 보유 지원). 유닛은 행동 소비.
+      const pool = [...next.sharedItems[team]];
+      const idx = pool.indexOf(action.itemId);
+      if (idx >= 0) pool.splice(idx, 1);
+      next = { ...next, sharedItems: { ...next.sharedItems, [team]: pool } };
+      next = replaceUnit(next, { ...getUnit(next, unit.id), acted: true });
 
       events.push({
         type: "itemUsed", unitId: unit.id, itemId: action.itemId, target: action.target, amount,

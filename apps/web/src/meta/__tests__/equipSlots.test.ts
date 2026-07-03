@@ -1,10 +1,10 @@
 /**
- * 장비 슬롯 규칙(§10 3슬롯 v1 — 무기1/말1/보물1 + 소모품2) 순수 로직 테스트.
- * 종전 무제한 리스트에서 무기 보정이 중첩되던 구멍(2026-07-03 지적)의 회귀 가드.
+ * 장비 슬롯 규칙(§10 지정 장착 3슬롯 — 무기1/말1/보물1) 순수 로직 테스트.
+ * 원작 충실(2026-07-03 §7): 소모품은 장착하지 않고 부대 공유 창고행 → slotOf=null(장착 불가).
  */
 import { describe, it, expect } from "vitest";
 import type { Item } from "@tk/data";
-import { slotOf, buildSlotView, applyEquip, SLOT_CAP } from "../equipSlots";
+import { slotOf, buildSlotView, applyEquip } from "../equipSlots";
 
 const ITEMS: Record<string, Item> = {
   쌍고검: { id: "쌍고검", name: "쌍고검", category: "weapon", power: 255, bonusPercent: 0 },
@@ -22,11 +22,13 @@ describe("slotOf", () => {
     expect(slotOf("weapon")).toBe("arms");
     expect(slotOf("book")).toBe("arms");
   });
-  it("horse → 말, treasure → 보물, 소모품 2종 → 파우치", () => {
+  it("horse → 말, treasure → 보물", () => {
     expect(slotOf("horse")).toBe("mount");
     expect(slotOf("treasure")).toBe("relic");
-    expect(slotOf("supplyItem")).toBe("pouch");
-    expect(slotOf("attackItem")).toBe("pouch");
+  });
+  it("소모품(supplyItem/attackItem)은 장착 불가(null) — 부대 공유 창고행", () => {
+    expect(slotOf("supplyItem")).toBeNull();
+    expect(slotOf("attackItem")).toBeNull();
   });
 });
 
@@ -48,18 +50,13 @@ describe("applyEquip — 슬롯 규칙", () => {
     expect([...eq].sort()).toEqual(["무술교본", "쌍고검", "적로"].sort());
   });
 
-  it(`소모품 파우치는 ${SLOT_CAP.pouch}칸 — 초과 시 가장 오래된 것 교체`, () => {
-    let eq: readonly string[] = [];
-    eq = applyEquip(eq, "상약", ITEMS);
-    eq = applyEquip(eq, "한방약", ITEMS);
-    expect(eq).toEqual(["상약", "한방약"]);
-    eq = applyEquip(eq, "폭탄", ITEMS); // 상약(가장 오래됨)이 빠진다
-    expect(eq).toEqual(["한방약", "폭탄"]);
+  it("소모품은 장착되지 않는다(부대 공유 창고행 — 동일 참조 반환)", () => {
+    const eq = ["쌍고검"];
+    expect(applyEquip(eq, "상약", ITEMS)).toBe(eq);
+    expect(applyEquip(eq, "폭탄", ITEMS)).toBe(eq);
   });
 
-  it("같은 소모품 2개는 허용, 파우치 외 동일 id 중복은 무시", () => {
-    const two = applyEquip(["상약"], "상약", ITEMS);
-    expect(two).toEqual(["상약", "상약"]);
+  it("동일 id 중복 장착은 무시(변화 없음)", () => {
     const same = applyEquip(["쌍고검", "적로"], "쌍고검", ITEMS);
     expect(same).toEqual(["쌍고검", "적로"]); // 변화 없음
   });
@@ -71,11 +68,11 @@ describe("applyEquip — 슬롯 규칙", () => {
 });
 
 describe("buildSlotView", () => {
-  it("슬롯별 분류 + 캡 초과분은 overflow(구버전 세이브 관용)", () => {
-    const v = buildSlotView(["쌍고검", "청룡언월도", "적로", "상약", "한방약", "폭탄"], ITEMS);
+  it("슬롯별 분류 + 무기 초과·소모품은 overflow(구버전 세이브 관용)", () => {
+    const v = buildSlotView(["쌍고검", "청룡언월도", "적로", "상약", "폭탄"], ITEMS);
     expect(v.arms).toEqual(["쌍고검"]);
     expect(v.mount).toEqual(["적로"]);
-    expect(v.pouch).toEqual(["상약", "한방약"]);
-    expect(v.overflow).toEqual(["청룡언월도", "폭탄"]); // 무기 초과 1 + 파우치 초과 1
+    // 소모품(상약·폭탄)은 슬롯 없음 → overflow, 무기 초과(청룡언월도)도 overflow
+    expect(v.overflow).toEqual(["청룡언월도", "상약", "폭탄"]);
   });
 });

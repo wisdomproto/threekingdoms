@@ -38,16 +38,32 @@ function damaged(s: BattleState, id: string, troops: number): BattleState {
   return { ...s, units: s.units.map((u) => (u.id === id ? { ...u, troops } : u)) };
 }
 
-describe("useItem: supplyItem (회복약)", () => {
-  it("대상 아군 병력을 power만큼 회복 + 아이템 1개 소모 + acted + itemUsed 이벤트", () => {
+describe("useItem: supplyItem (회복약) — 부대 공유 창고", () => {
+  it("스폰 시 소모품은 유닛이 아니라 진영(friendly) 공유 풀로 모인다", () => {
+    const s = createBattle(ctx, 1);
+    expect(get(s, "간옹").items).toEqual([]); // 소모품이 드레인됨(간옹은 장비 없음)
+    expect(s.sharedItems.friendly).toEqual(["쌀", "쌀", "폭탄"]);
+    expect(s.sharedItems.hostile).toEqual([]); // 적은 소모품 없음
+  });
+
+  it("대상 아군 병력을 power만큼 회복 + 풀에서 1개 소모 + acted + itemUsed 이벤트", () => {
     const s = damaged(createBattle(ctx, 1), "유봉", 50); // maxTroops 100, 현재 50
     const before = get(s, "유봉").troops; // 50
     const r = applyAction(ctx, s, { type: "useItem", unitId: "간옹", itemId: "쌀", target: { x: 3, y: 4 } });
     expect(get(r.state, "유봉").troops).toBe(before + 40); // 쌀 power 40 (50→90, 상한 100 미만)
-    expect(get(r.state, "간옹").items).toEqual(["쌀", "폭탄"]); // 쌀 1개만 소모
+    expect(r.state.sharedItems.friendly).toEqual(["쌀", "폭탄"]); // 풀에서 쌀 1개만 소모
     expect(get(r.state, "간옹").acted).toBe(true);
     const evt = r.events.find((e) => e.type === "itemUsed");
     expect(evt).toMatchObject({ type: "itemUsed", unitId: "간옹", itemId: "쌀", target: { x: 3, y: 4 }, amount: 40 });
+  });
+
+  it("공유 풀의 도구는 아무 아군이나 꺼내 쓸 수 있다(원작 창고 — 소지자 개념 없음)", () => {
+    const s = damaged(createBattle(ctx, 1), "유봉", 50);
+    // 유봉은 스폰 시 아이템 0개였지만, 부대 창고의 쌀을 자신에게 쓸 수 있다
+    const r = applyAction(ctx, s, { type: "useItem", unitId: "유봉", itemId: "쌀", target: { x: 3, y: 4 } });
+    expect(get(r.state, "유봉").troops).toBe(90); // 50 + 40
+    expect(r.state.sharedItems.friendly).toEqual(["쌀", "폭탄"]);
+    expect(get(r.state, "유봉").acted).toBe(true);
   });
 
   it("회복은 maxTroops를 넘지 않는다 (amount = 실제 회복량)", () => {
@@ -61,7 +77,7 @@ describe("useItem: supplyItem (회복약)", () => {
     const s = createBattle(ctx, 1);
     // 간옹 troops 80, maxTroops 80 → 회복량 0이지만 소모·acted는 정상
     const r = applyAction(ctx, s, { type: "useItem", unitId: "간옹", itemId: "쌀" });
-    expect(get(r.state, "간옹").items).toEqual(["쌀", "폭탄"]);
+    expect(r.state.sharedItems.friendly).toEqual(["쌀", "폭탄"]);
     expect(r.events.find((e) => e.type === "itemUsed")).toMatchObject({ target: undefined, amount: 0 });
   });
 
@@ -70,6 +86,7 @@ describe("useItem: supplyItem (회복약)", () => {
     const a = applyAction(ctx, s, { type: "useItem", unitId: "간옹", itemId: "쌀", target: { x: 3, y: 4 } });
     const b = applyAction(ctx, s, { type: "useItem", unitId: "간옹", itemId: "쌀", target: { x: 3, y: 4 } });
     expect(a.state.units).toEqual(b.state.units);
+    expect(a.state.sharedItems).toEqual(b.state.sharedItems);
     expect(a.events).toEqual(b.events);
   });
 
@@ -78,19 +95,20 @@ describe("useItem: supplyItem (회복약)", () => {
     expect(() => applyAction(ctx, s, { type: "useItem", unitId: "간옹", itemId: "쌀", target: { x: 2, y: 5 } })).toThrow();
   });
 
-  it("소지하지 않은 아이템은 에러", () => {
+  it("부대 창고에 없는 도구는 에러", () => {
     const s = createBattle(ctx, 1);
-    expect(() => applyAction(ctx, s, { type: "useItem", unitId: "유봉", itemId: "쌀", target: { x: 3, y: 4 } })).toThrow();
+    // 차(supplyItem)는 이 부대 창고에 없음 → 사용 불가
+    expect(() => applyAction(ctx, s, { type: "useItem", unitId: "간옹", itemId: "차", target: { x: 3, y: 4 } })).toThrow();
   });
 });
 
 describe("useItem: attackItem (공격아이템)", () => {
-  it("대상 적 병력을 power 고정 감소 (반격 없음) + 소모 + acted", () => {
+  it("대상 적 병력을 power 고정 감소 (반격 없음) + 풀에서 소모 + acted", () => {
     const s = createBattle(ctx, 1);
     const before = get(s, "화웅").troops; // 120
     const r = applyAction(ctx, s, { type: "useItem", unitId: "간옹", itemId: "폭탄", target: { x: 2, y: 5 } });
     expect(get(r.state, "화웅").troops).toBe(before - 50); // 폭탄 power 50 고정
-    expect(get(r.state, "간옹").items).toEqual(["쌀", "쌀"]); // 폭탄 소모
+    expect(r.state.sharedItems.friendly).toEqual(["쌀", "쌀"]); // 풀에서 폭탄 소모
     expect(get(r.state, "간옹").acted).toBe(true);
     // 반격(counter) 없음
     expect(r.events.some((e) => e.type === "damageDealt" && e.counter)).toBe(false);

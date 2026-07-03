@@ -80,7 +80,13 @@ export function PrepShell(): React.ReactElement {
   const onPurchase = useCallback(() => setRefreshKey((k) => k + 1), []);
 
   const onSortie = useCallback(() => {
-    writeSortie({ stageId, members: selected });
+    // 부대 공유 소지품(원작 창고 §7) — 인벤토리의 소모품 전량을 friendly 풀로 들고 나간다.
+    const inv = getMeta().inventory;
+    const sharedItems = inv.filter((id) => {
+      const c = gameData.items[id]?.category;
+      return c === "supplyItem" || c === "attackItem";
+    });
+    writeSortie({ stageId, members: selected, sharedItems });
     const showAd = shouldShowInterstitial(getMeta().clearedStages.length, stageId);
     setTransition({ showAd });
   }, [stageId, selected]);

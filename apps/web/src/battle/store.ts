@@ -44,6 +44,8 @@ export interface BattleStoreOptions {
    * 미등록이면 무시.
    */
   onPreviewCancel?: (unitId: string, to: Coord) => void;
+  /** 플레이어 부대 창고 소모품(원작 창고 §7) — friendly 공유 풀로 주입(편성에서 전달). */
+  sharedItems?: string[];
 }
 
 /**
@@ -149,7 +151,7 @@ export class BattleStore {
     this.ctx = ctx;
     this.seed = seed;
     this.opts = opts;
-    this.committed = createBattle(ctx, seed);
+    this.committed = createBattle(ctx, seed, { sharedItems: opts.sharedItems });
     this.settled = this.committed;
     this.player = new EventPlayer({
       presenter: opts.presenter ?? createInstantPresenter(),

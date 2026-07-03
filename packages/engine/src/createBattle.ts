@@ -1,5 +1,27 @@
 import type { GameData, StageUnit } from "@tk/data";
-import type { BattleContext, BattleState, UnitState } from "./types";
+import type { BattleContext, BattleState, SharedItems, UnitState } from "./types";
+import { camp } from "./types";
+
+/** 소모품(전투 중 「도구」로 쓰는 것) 카테고리 판정 — supplyItem(회복)/attackItem(공격). */
+export function isConsumable(category: string): boolean {
+  return category === "supplyItem" || category === "attackItem";
+}
+
+/**
+ * 스폰된 유닛의 소모품을 진영(camp) 풀로 옮긴다(원작 창고 §7). 소모품은 passive 효과가 없어
+ * (전 31종 effects:null) 스탯 산정은 이미 spawnUnit에서 끝나므로, items에서 빼도 무손실.
+ * 반환 유닛의 items는 장비(무기/병법서/말/보물)만 남는다. pool은 제자리 변형(누적).
+ */
+export function drainConsumables(data: GameData, unit: UnitState, pool: SharedItems): UnitState {
+  const keep: string[] = [];
+  const team = camp(unit.side) === "hostile" ? "hostile" : "friendly";
+  for (const id of unit.items) {
+    const item = data.items[id];
+    if (item && isConsumable(item.category)) pool[team].push(id);
+    else keep.push(id);
+  }
+  return { ...unit, items: keep };
+}
 
 /**
  * 단일 StageUnit → UnitState 초기화. createBattle과 증원 스폰(maybeAdvancePhase)이 공유한다 —
@@ -66,12 +88,26 @@ export function spawnUnit(data: GameData, p: StageUnit): UnitState {
   };
 }
 
-export function createBattle(ctx: BattleContext, seed: number): BattleState {
+/** createBattle 옵션 — sharedItems = 플레이어 부대 창고(편성에서 주입할 공유 소모품). */
+export interface CreateBattleOptions {
+  /** 플레이어(friendly) 부대 창고 소모품 id 목록. 비소모 id는 무시. 미지정=stage 유닛 소지분만. */
+  sharedItems?: string[];
+}
+
+export function createBattle(ctx: BattleContext, seed: number, opts?: CreateBattleOptions): BattleState {
   const { data, stage } = ctx;
-  const units: UnitState[] = stage.units.map((p) => spawnUnit(data, p));
+  const sharedItems: SharedItems = { friendly: [], hostile: [] };
+  // 스폰 후 각 유닛 소모품을 진영 풀로 분리(원작 창고). stage 적 유닛의 소모품 → hostile 풀.
+  const units: UnitState[] = stage.units.map((p) => drainConsumables(data, spawnUnit(data, p), sharedItems));
+  // 편성 창고(플레이어 부대) 소모품 주입 — friendly 풀에. 비소모 id는 방어적으로 배제.
+  for (const id of opts?.sharedItems ?? []) {
+    const item = data.items[id];
+    if (item && isConsumable(item.category)) sharedItems.friendly.push(id);
+  }
   return {
     // rngState = 전투 시드(시드 고정 확률 — 같은 시드+행동열이면 동일 재현, 리플레이/세이브스컴 방지).
     turn: 1, phase: "player", status: "ongoing", units, rngState: seed, firedEvents: [],
     duelHistory: [], metStrategyConditions: [], spawnedReinforcements: [], pendingRewards: [], combo: 0, levelUps: [],
+    sharedItems,
   };
 }

@@ -185,15 +185,17 @@ export function CommanderDetail({
   // 소지품 효과 수치를 볼 수 없고, 장착 슬롯 탭이 확인 없이 즉시 해제되던 문제의 해법.
   const [info, setInfo] = useState<{ id: string; from: "slot" | "bag" } | null>(null);
 
+  // 장착 가능 소지품 = 장비(무기/말/보물)만. 소모품은 부대 공유 창고행(장착 불가, slotOf=null).
   const available = useMemo(() => {
     const owned = new Map<string, number>();
     for (const it of inventory) owned.set(it, (owned.get(it) ?? 0) + 1);
     const out: string[] = [];
     for (const [itemId, n] of owned) {
+      if (slotOf(items[itemId]?.category) == null) continue; // 소모품·미매핑 제외
       if (n - (equippedCount.get(itemId) ?? 0) > 0) out.push(itemId);
     }
     return out;
-  }, [inventory, equippedCount]);
+  }, [inventory, equippedCount, items]);
 
   const unequip = (itemId: string): void => {
     const n = [...equippedIds];
@@ -294,7 +296,7 @@ export function CommanderDetail({
 
         {/* ── 장비 슬롯(§10: 무기1·말1·보물1 + 소모품2) ── */}
         <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-          {(["arms", "mount", "relic", "pouch"] as EquipSlot[]).map((s) => (
+          {(["arms", "mount", "relic"] as EquipSlot[]).map((s) => (
             <SlotGroup key={s} slot={s} ids={view[s]} interactive={deployed}
               onInfo={(id) => setInfo({ id, from: "slot" })} onUnequip={unequip} />
           ))}
@@ -321,7 +323,7 @@ export function CommanderDetail({
           available.length > 0 && (
             <div>
               <div style={{ fontSize: 10.5, color: "#b8a070", marginBottom: 5 }}>
-                소지품 — 탭하면 효과를 확인하고 장착합니다
+                장비 소지품 — 탭하면 효과 확인 후 장착 (소모품은 부대 창고행)
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                 {available.map((itemId) => {

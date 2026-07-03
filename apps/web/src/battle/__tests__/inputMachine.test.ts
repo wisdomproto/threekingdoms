@@ -296,7 +296,10 @@ describe("animating / enemyTurn — drained 분기", () => {
 
 describe("전이 전수 — 모든 (상태, 이벤트) 조합이 던지지 않고 허용 전이표를 따른다", () => {
   const sel = select(nearState, GUANYU);
-  const menu = reduceInput(sel, { type: "tapTile", coord: { x: 49, y: 15 } }, ctx, nearState).next;
+  // 부대 공유 풀(원작 창고 §7)에 소모품이 있으면 도구 메뉴 진입 가능 — 결정론 위해 풀을 명시.
+  // (usableItems가 유닛 items가 아닌 진영 sharedItems를 읽으므로, 아무 아군이나 부대 창고를 본다.)
+  const nearPool: BattleState = { ...nearState, sharedItems: { friendly: ["쌀"], hostile: [] } };
+  const menu = reduceInput(sel, { type: "tapTile", coord: { x: 49, y: 15 } }, ctx, nearPool).next;
   const ts = reduceInput(menu, { type: "menuAttack" }, ctx, nearState).next;
   // 계략 상태는 합성 — 픽스처 유닛(관우)은 책략이 없어 전이는 대부분 noop(시전 불가).
   // strategyTarget의 castTiles에 빈 평지 탭 좌표를 넣어 commit→animating 경로만 활성화.
@@ -348,7 +351,7 @@ describe("전이 전수 — 모든 (상태, 이벤트) 조합이 던지지 않�
   const table: Record<InputState["kind"], Record<UiEvent["type"], InputState["kind"]>> = {
     idle: { tapTile: "idle", cancel: "idle", menuAttack: "idle", menuUltimate: "idle", menuStrategy: "idle", selectStrategy: "idle", menuItem: "idle", selectItem: "idle", menuWait: "idle", menuCancel: "idle", endTurnPressed: "confirmEndTurn", endTurnConfirm: "idle", autoStart: "autoTurn", drained: "idle" },
     selected: { tapTile: "idle", cancel: "idle", menuAttack: "selected", menuUltimate: "selected", menuStrategy: "selected", selectStrategy: "selected", menuItem: "selected", selectItem: "selected", menuWait: "selected", menuCancel: "selected", endTurnPressed: "selected", endTurnConfirm: "selected", autoStart: "selected", drained: "selected" },
-    postMoveMenu: { tapTile: "postMoveMenu", cancel: "selected", menuAttack: "targetSelect", menuUltimate: "postMoveMenu", menuStrategy: "postMoveMenu", selectStrategy: "postMoveMenu", menuItem: "postMoveMenu", selectItem: "postMoveMenu", menuWait: "animating", menuCancel: "selected", endTurnPressed: "postMoveMenu", endTurnConfirm: "postMoveMenu", autoStart: "postMoveMenu", drained: "postMoveMenu" },
+    postMoveMenu: { tapTile: "postMoveMenu", cancel: "selected", menuAttack: "targetSelect", menuUltimate: "postMoveMenu", menuStrategy: "postMoveMenu", selectStrategy: "postMoveMenu", menuItem: "itemMenu", selectItem: "postMoveMenu", menuWait: "animating", menuCancel: "selected", endTurnPressed: "postMoveMenu", endTurnConfirm: "postMoveMenu", autoStart: "postMoveMenu", drained: "postMoveMenu" },
     targetSelect: { tapTile: "targetSelect", cancel: "postMoveMenu", menuAttack: "targetSelect", menuUltimate: "targetSelect", menuStrategy: "targetSelect", selectStrategy: "targetSelect", menuItem: "targetSelect", selectItem: "targetSelect", menuWait: "targetSelect", menuCancel: "postMoveMenu", endTurnPressed: "targetSelect", endTurnConfirm: "targetSelect", autoStart: "targetSelect", drained: "targetSelect" },
     strategyMenu: { tapTile: "strategyMenu", cancel: "postMoveMenu", menuAttack: "strategyMenu", menuUltimate: "strategyMenu", menuStrategy: "strategyMenu", selectStrategy: "strategyMenu", menuItem: "strategyMenu", selectItem: "strategyMenu", menuWait: "strategyMenu", menuCancel: "postMoveMenu", endTurnPressed: "strategyMenu", endTurnConfirm: "strategyMenu", autoStart: "strategyMenu", drained: "strategyMenu" },
     strategyTarget: { tapTile: "animating", cancel: "strategyMenu", menuAttack: "strategyTarget", menuUltimate: "strategyTarget", menuStrategy: "strategyTarget", selectStrategy: "strategyTarget", menuItem: "strategyTarget", selectItem: "strategyTarget", menuWait: "strategyTarget", menuCancel: "strategyMenu", endTurnPressed: "strategyTarget", endTurnConfirm: "strategyTarget", autoStart: "strategyTarget", drained: "strategyTarget" },

@@ -13,6 +13,8 @@
  * 불가침(CLAUDE.md §10/§13): 확률 강화·랜덤 스탯 없음. 장비는 "지정 장착"만.
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { gameData } from "@tk/data";
+import { isConsumable } from "@tk/engine";
 import type { RosterUnit } from "../metaStore";
 import { getMeta, setEquipped } from "../metaStore";
 import type { SortieMember } from "../sortie";
@@ -20,6 +22,7 @@ import { unitStats } from "../unitStats";
 import { sortRoster, type SortKey } from "../rosterSort";
 import { CommanderPortrait } from "../../ui/CommanderPortrait";
 import { CommanderDetail, type StatMax } from "./CommanderDetail";
+import { ArmyPouch } from "./ArmyPouch";
 import {
   PARCHMENT, PARCHMENT_WARM, INK_PANEL, WOOD, GOLD, GOLD_BRIGHT, GOLD_DIM,
   GOLD_GLOW, MUTED_TEXT, SEAL_RED, SERIF, ROLE_LABEL, ROLE_COLOR, ROLE_ICON, commanderName, className,
@@ -108,6 +111,12 @@ export function Formation({
 
   const [inventory, setInventory] = useState<string[]>([]);
   useEffect(() => { setInventory(getMeta().inventory); }, []);
+
+  // 부대 공유 소모품(원작 창고 §7) — 장착하지 않고 전투 중 「도구」로 쓴다. 재고 표시용.
+  const armyConsumables = useMemo(
+    () => inventory.filter((id) => isConsumable(gameData.items[id]?.category ?? "")),
+    [inventory],
+  );
 
   const [sortKey, setSortKey] = useState<SortKey>("role");
 
@@ -325,6 +334,11 @@ export function Formation({
         </div>
         </div>
       )}
+
+      {/* ━━ 부대 소지품(창고) — 전폭 스트립. 소모품은 부대 공유(원작 창고 §7) ━━ */}
+      <div style={{ gridColumn: "1 / -1" }}>
+        <ArmyPouch consumables={armyConsumables} />
+      </div>
 
       {/* ━━ 좁은 화면: 상세 바텀시트 ━━ */}
       {narrow && focusId && detailPanel && (

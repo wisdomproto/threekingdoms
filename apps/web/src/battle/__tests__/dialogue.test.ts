@@ -33,6 +33,7 @@ function makeState(p: {
     spawnedReinforcements: [],
     pendingRewards: [],
     levelUps: [],
+    sharedItems: { friendly: [], hostile: [] },
   };
 }
 

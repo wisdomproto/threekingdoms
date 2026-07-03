@@ -27,10 +27,15 @@ export interface SortieMember {
   troops?: number;
 }
 
-/** 출진 1건. stageId + 편성된 player 유닛 목록. */
+/** 출진 1건. stageId + 편성된 player 유닛 목록 + 부대 공유 소지품(원작 창고 §7). */
 export interface SortiePayload {
   stageId: string;
   members: SortieMember[];
+  /**
+   * 부대 창고 소모품 id 목록(supplyItem/attackItem) — 전투 friendly 공유 풀로 주입.
+   * 소모품은 유닛에 장착하지 않고 부대 전체가 공유(원작 창고). 미지정=빈 풀.
+   */
+  sharedItems?: string[];
 }
 
 function hasSession(): boolean {

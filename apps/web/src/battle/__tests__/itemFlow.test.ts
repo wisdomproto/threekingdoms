@@ -62,7 +62,7 @@ describe("도구 UI 전체 경로", () => {
 
     const guan = store.committedState.units.find((u) => u.id === "관우")!;
     expect(guan.troops).toBe(guan0.troops);                         // 만피 → 클램프(피해 아님)
-    expect(guan.items).toEqual(["폭탄"]);                           // 쌀 1개 소모
+    expect(store.committedState.sharedItems.friendly).toEqual(["폭탄"]); // 부대 창고에서 쌀 1개 소모
     expect(guan.acted).toBe(true);
     expect(store.actionLog.some((a) => a.type === "useItem")).toBe(true);
   });
@@ -82,10 +82,9 @@ describe("도구 UI 전체 경로", () => {
 
     await store.whenIdle();
 
-    const guan = store.committedState.units.find((u) => u.id === "관우")!;
     const hua1 = store.committedState.units.find((u) => u.id === "화웅")!;
     expect(hua1.troops).toBe(hua0.troops - 50);                     // 폭탄 power50 고정
-    expect(guan.items).toEqual(["쌀"]);                             // 폭탄 1개 소모
+    expect(store.committedState.sharedItems.friendly).toEqual(["쌀"]); // 부대 창고에서 폭탄 1개 소모
     expect(store.actionLog.some((a) => a.type === "useItem")).toBe(true);
   });
 

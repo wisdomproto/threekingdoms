@@ -19,6 +19,16 @@ export function areFoes(a: Side, b: Side): boolean {
   return camp(a) !== camp(b);
 }
 
+/**
+ * 부대 공유 소지품 풀(원작 창고 §7 인벤토리 공유). 소모품(supplyItem/attackItem)은 유닛이
+ * 개별 소지하지 않고 진영(camp) 단위 풀에 모여, 전투 중 「도구」(useItem)로 아무 아군이나 꺼내 쓴다.
+ * 결정론(난수 없음) — 같은 풀+행동열이면 동일 재현(리플레이/밸런스 sim 무영향).
+ */
+export interface SharedItems {
+  friendly: string[]; // player·ally 부대 창고
+  hostile: string[];  // enemy 부대 창고
+}
+
 export interface UnitState {
   id: string;            // commanderId
   classId: string;
@@ -88,6 +98,8 @@ export interface BattleState {
   combo?: number;
   /** 이번 전투에서 레벨업한 유닛 기록 — 결산 연출(레벨업 팝) 전달용. 결정론적 누적. */
   levelUps: { unitId: string; newLevel: number }[];
+  /** 부대 공유 소지품 풀(§7 원작 창고). 소모품은 유닛이 아닌 진영 풀에 모여 useItem으로 소비. */
+  sharedItems: SharedItems;
 }
 
 export type Action =

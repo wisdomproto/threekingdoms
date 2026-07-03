@@ -124,8 +124,10 @@ function activeUnitId(ui: InputState): string | null {
  * stage를 고르고 player 슬롯을 편성으로 override한다. 없으면 사수관을 기존 그대로 로드
  * (override 진입점이 no-op → 전투 테스트/직접 /battle 진입 회귀 없음).
  */
-function makeCtx(): BattleContext {
+function makeCtx(): { ctx: BattleContext; sharedItems: string[] } {
   const sortie = readSortie();
+  // 부대 창고 소모품(원작 창고 §7) — friendly 공유 풀로 주입할 목록. 편성이 없으면 빈 풀.
+  const sharedItems = sortie?.sharedItems ?? [];
   const stageId = sortie?.stageId ?? "05-sishuiguan";
   const baseStage = gameData.stages[stageId] ?? gameData.stages["05-sishuiguan"];
   const map = baseStage ? gameData.maps[baseStage.mapId] : undefined;
@@ -157,10 +159,10 @@ function makeCtx(): BattleContext {
         ];
       }),
     );
-    return { data: { ...gameData, commanders: scaledCommanders }, stage, map };
+    return { ctx: { data: { ...gameData, commanders: scaledCommanders }, stage, map }, sharedItems };
   }
 
-  return { data: gameData, stage, map };
+  return { ctx: { data: gameData, stage, map }, sharedItems };
 }
 
 interface Session {
@@ -170,7 +172,7 @@ interface Session {
 }
 
 function createSession(): Session {
-  const ctx = makeCtx();
+  const { ctx, sharedItems } = makeCtx();
   const delegate = new PresenterDelegate();
   const store = new BattleStore(ctx, SEED, {
     presenter: delegate,
@@ -180,6 +182,8 @@ function createSession(): Session {
     // 원작 UX §수정명세: 프리뷰 워크·취소를 현재 렌더러에 위임
     onPreviewWalk: (unitId, from, to) => delegate.previewWalk(unitId, from, to),
     onPreviewCancel: (unitId, to) => delegate.previewCancel(unitId, to),
+    // 부대 창고 소모품(§7) → friendly 공유 풀
+    sharedItems,
   });
   return { ctx, store, delegate };
 }

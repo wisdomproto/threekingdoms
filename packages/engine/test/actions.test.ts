@@ -508,8 +508,8 @@ describe("레벨업 추적 (결산 연출용)", () => {
     if (levelUpEvts.length > 0) {
       // 레벨업 발생 시 state.levelUps에도 동일하게 기록
       expect(state.levelUps.length).toBe(levelUpEvts.length);
-      expect(state.levelUps[0].unitId).toBe("관우");
-      expect(state.levelUps[0].newLevel).toBe((levelUpEvts[0] as { newLevel: number }).newLevel);
+      expect(state.levelUps[0]!.unitId).toBe("관우");
+      expect(state.levelUps[0]!.newLevel).toBe((levelUpEvts[0] as { newLevel: number }).newLevel);
     } else {
       // 레벨업 없으면 levelUps는 빈 배열
       expect(state.levelUps).toEqual([]);
