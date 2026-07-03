@@ -19,6 +19,7 @@ import { assetUrl } from "../../assetUrl";
 import { unitStats } from "../unitStats";
 import { sortRoster, type SortKey } from "../rosterSort";
 import { ItemIcon } from "../../ui/ItemIcon";
+import { applyEquip, buildSlotView, slotOf, SLOT_LABEL, SLOT_CAP, type EquipSlot } from "../equipSlots";
 
 export interface FormationProps {
   roster: RosterUnit[];
@@ -175,12 +176,13 @@ function toMember(u: RosterUnit, items: string[]): SortieMember {
   return { commanderId: u.commanderId, classId: u.classId, level: u.level, exp: u.exp, items: [...items] };
 }
 
-function PowerDelta({ commanderId, classId, level, currentItems, candidateItem }: {
+function PowerDelta({ commanderId, classId, level, currentItems, nextItems }: {
   commanderId: string; classId: string; level: number;
-  currentItems: string[]; candidateItem: string;
+  currentItems: string[]; nextItems: readonly string[];
 }): React.ReactElement {
+  // 슬롯 교체 결과(applyEquip)를 그대로 비교 — 종전 "그냥 추가" 가정은 교체 시 델타가 틀렸다.
   const base = unitStats(commanderId, classId, level, currentItems).power;
-  const next = unitStats(commanderId, classId, level, [...currentItems, candidateItem]).power;
+  const next = unitStats(commanderId, classId, level, [...nextItems]).power;
   const delta = next - base;
   if (delta === 0) return <></>;
   return (
@@ -190,12 +192,55 @@ function PowerDelta({ commanderId, classId, level, currentItems, candidateItem }
   );
 }
 
-/** 장비 패널 — 선택된 슬롯 탭 시 펼침. */
+/** 장착 슬롯 1칸 — 채워짐(금테 칩 + ✕ 해제) / 비어 있음(점선 프레임). */
+function SlotBox({ slot, ids, onUnequip }: {
+  slot: EquipSlot; ids: string[]; onUnequip: (itemId: string) => void;
+}): React.ReactElement {
+  const items = gameData.items;
+  const cap = SLOT_CAP[slot];
+  const cells: (string | null)[] = [...ids];
+  while (cells.length < cap) cells.push(null);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 3, alignItems: "stretch" }}>
+      <span style={{ fontSize: 9.5, letterSpacing: "0.2em", color: GOLD_DIM, textAlign: "center" }}>
+        {SLOT_LABEL[slot]}
+      </span>
+      {cells.map((id, i) =>
+        id ? (
+          <button
+            key={`${id}-${i}`} type="button" onClick={() => onUnequip(id)}
+            title={`${items[id]?.name ?? id} 해제`}
+            style={{ fontSize: 11, padding: "3px 8px", borderRadius: 8,
+              border: `1.5px solid ${GOLD}`, background: GOLD_GLOW,
+              color: PARCHMENT, cursor: "pointer", fontWeight: 700,
+              display: "inline-flex", alignItems: "center", gap: 4, justifyContent: "center" }}
+          >
+            <ItemIcon itemId={id} category={items[id]?.category} size={18} />
+            {items[id]?.name ?? id}
+            <span style={{ color: GOLD_DIM, marginLeft: 2 }}>✕</span>
+          </button>
+        ) : (
+          <span
+            key={`empty-${i}`}
+            style={{ fontSize: 10, padding: "5px 8px", borderRadius: 8, textAlign: "center",
+              border: `1px dashed ${GOLD_DIM}66`, color: DIM_TEXT, minWidth: 64 }}
+          >
+            비어 있음
+          </span>
+        ),
+      )}
+    </div>
+  );
+}
+
+/** 장비 패널 — 슬롯제(§10: 무기1·말1·보물1 + 소모품2). 위=장착 슬롯 프레임, 아래=소지품.
+ *  소지품을 탭하면 해당 슬롯에 장착(차 있으면 교체) — "가진 것 vs 낄 수 있는 것" 구분 명확화(2026-07-03). */
 function EquipPanel({ member, inventory, equippedCount, onEquip }: {
   member: SortieMember; inventory: string[]; equippedCount: Map<string, number>;
   onEquip: (items: string[]) => void;
 }): React.ReactElement {
   const items = gameData.items;
+  const view = buildSlotView(member.items, items);
   const ownedCount = useMemo(() => {
     const c = new Map<string, number>();
     for (const it of inventory) c.set(it, (c.get(it) ?? 0) + 1);
@@ -209,6 +254,17 @@ function EquipPanel({ member, inventory, equippedCount, onEquip }: {
     return out;
   }, [ownedCount, equippedCount]);
   const power = unitStats(member.commanderId, member.classId, member.level, member.items).power;
+
+  const unequip = (itemId: string): void => {
+    const n = member.items.slice();
+    const i = n.indexOf(itemId);
+    if (i >= 0) { n.splice(i, 1); onEquip(n); }
+  };
+  const equip = (itemId: string): void => {
+    const next = applyEquip(member.items, itemId, items);
+    if (next !== member.items) onEquip([...next]);
+  };
+
   return (
     <div style={{
       background: "rgba(26,18,8,0.92)",
@@ -216,48 +272,66 @@ function EquipPanel({ member, inventory, equippedCount, onEquip }: {
       borderRadius: 8,
       padding: "10px 12px",
     }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
         <span style={{ fontSize: 13, fontWeight: 700, color: PARCHMENT }}>{commanderName(member.commanderId)}</span>
         <span style={{ fontSize: 11, color: MUTED_TEXT }}>
           전력 <strong style={{ color: GOLD }}>{power}</strong>
         </span>
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: available.length > 0 ? 6 : 0 }}>
-        {member.items.length === 0 ? (
-          <span style={{ fontSize: 11, color: DIM_TEXT }}>장비 없음</span>
-        ) : (
-          member.items.map((itemId, idx) => (
-            <button
-              key={`${itemId}-${idx}`} type="button"
-              onClick={() => { const n = member.items.slice(); n.splice(idx, 1); onEquip(n); }}
-              style={{ fontSize: 11, padding: "2px 6px", borderRadius: 10,
-                border: `1px solid ${GOLD}77`, background: GOLD_GLOW,
-                color: PARCHMENT, cursor: "pointer",
-                display: "inline-flex", alignItems: "center", gap: 4 }}
-            >
-              <ItemIcon itemId={itemId} category={items[itemId]?.category} size={18} />
-              {items[itemId]?.name ?? itemId}
-              <span style={{ color: GOLD_DIM, marginLeft: 2 }}>✕</span>
-            </button>
-          ))
-        )}
+
+      {/* ── 장착 슬롯(고정 프레임) — 무기/말/보물 + 소모품×2 ── */}
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-start", marginBottom: 8 }}>
+        {(["arms", "mount", "relic", "pouch"] as EquipSlot[]).map((s) => (
+          <SlotBox key={s} slot={s} ids={view[s]} onUnequip={unequip} />
+        ))}
       </div>
-      {available.length > 0 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-          <span style={{ fontSize: 10, color: DIM_TEXT, alignSelf: "center", marginRight: 2 }}>장착:</span>
-          {available.map((itemId) => (
-            <button key={itemId} type="button"
-              onClick={() => onEquip([...member.items, itemId])}
-              style={{ fontSize: 11, padding: "2px 6px", borderRadius: 10,
-                border: `1px solid rgba(200,164,64,0.2)`, background: "rgba(255,255,255,0.04)",
+      {view.overflow.length > 0 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 8, alignItems: "center" }}>
+          <span style={{ fontSize: 10, color: "#a04020" }}>슬롯 초과(구버전 장착) — 탭해서 해제:</span>
+          {view.overflow.map((id, i) => (
+            <button key={`${id}-${i}`} type="button" onClick={() => unequip(id)}
+              style={{ fontSize: 11, padding: "2px 6px", borderRadius: 8,
+                border: "1px solid #a0402088", background: "rgba(160,64,32,0.12)",
                 color: PARCHMENT, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4 }}
             >
-              <ItemIcon itemId={itemId} category={items[itemId]?.category} size={18} />
-              {items[itemId]?.name ?? itemId}
-              <PowerDelta commanderId={member.commanderId} classId={member.classId}
-                level={member.level} currentItems={member.items} candidateItem={itemId} />
+              <ItemIcon itemId={id} category={items[id]?.category} size={16} />
+              {items[id]?.name ?? id} ✕
             </button>
           ))}
+        </div>
+      )}
+
+      {/* ── 소지품 — 탭하면 장착(같은 슬롯은 교체) ── */}
+      {available.length > 0 && (
+        <div style={{ borderTop: `1px solid ${GOLD}33`, paddingTop: 7 }}>
+          <div style={{ fontSize: 10, color: DIM_TEXT, marginBottom: 4 }}>
+            소지품 — 탭하면 장착됩니다 (같은 슬롯은 교체)
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+            {available.map((itemId) => {
+              const s = slotOf(items[itemId]?.category);
+              const next = applyEquip(member.items, itemId, items);
+              return (
+                <button key={itemId} type="button"
+                  onClick={() => equip(itemId)}
+                  style={{ fontSize: 11, padding: "2px 6px", borderRadius: 10,
+                    border: `1px solid rgba(200,164,64,0.2)`, background: "rgba(255,255,255,0.04)",
+                    color: PARCHMENT, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 4 }}
+                >
+                  <ItemIcon itemId={itemId} category={items[itemId]?.category} size={18} />
+                  {items[itemId]?.name ?? itemId}
+                  {s && (
+                    <span style={{ fontSize: 9, color: GOLD_DIM, border: `1px solid ${GOLD_DIM}55`,
+                      borderRadius: 6, padding: "0 4px" }}>
+                      {SLOT_LABEL[s]}
+                    </span>
+                  )}
+                  <PowerDelta commanderId={member.commanderId} classId={member.classId}
+                    level={member.level} currentItems={member.items} nextItems={next} />
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
