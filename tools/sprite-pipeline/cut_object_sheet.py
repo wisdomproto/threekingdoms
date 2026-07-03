@@ -54,6 +54,12 @@ KEYMAPS = {
         "boat_sampan", "raft_ferry", "pier", "pontoon",
         "ships_linked", "ship_burnt",
     ],
+    # K-9 거점·다리(2026-07-04 §10 지형 회복 시각화) — village/barracks/depot 지형 + bridge 세그먼트.
+    # ObjectLayer 요청 키(village_hut/camp_tent/depot_store/bridge_v/bridge_h) + 예비 변형.
+    "k9": [
+        "village_hut", "camp_tent", "depot_store", "bridge_v",
+        "bridge_h", "village_hut2",
+    ],
 }
 # 고립 벽(mask 0)용 wall_single 은 시트에 없음 → wall_end 복사로 폴백
 FALLBACK_COPY = {"wall_single": "wall_end"}

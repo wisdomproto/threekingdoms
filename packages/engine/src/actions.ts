@@ -1,7 +1,7 @@
 import type { Side, Objective, FailCondition } from "@tk/data";
 import type { Action, ActionResult, BattleContext, BattleEvent, BattleState, UnitState } from "./types";
 import { areFoes, camp } from "./types";
-import { getMovableTiles, unitAt } from "./movement";
+import { getMovableTiles, terrainAt, unitAt } from "./movement";
 import {
   computeDamage, distance, getAttackableTargets,
   strategyDamage, strategyAoeCells, getStrategyTargets, expForNextLevel,
@@ -139,6 +139,38 @@ function healTroops(
   const troops = Math.min(target.maxTroops, target.troops + Math.max(0, amount));
   const healed = troops - target.troops;
   return { state: replaceUnit(state, { ...target, troops }), healed };
+}
+
+/**
+ * 지형 회복(§10 원작 재현 — 촌락=병력10%+책략치 / 병영=병력10%, terrains.json
+ * healTroopsRatio·healMp 소비. 종전엔 데이터만 있고 엔진이 안 읽던 휴면 필드, 2026-07-04).
+ * 페이즈 시작 진영의 생존 유닛만. 결정론 — 난수 없음.
+ * 병력 회복은 troopsHealed 이벤트로 서술(드레인 정합 계약 — 회복/도구와 동일).
+ * MP 회복(healMp)은 이벤트 없이 상태만(전용 이벤트 타입 없음 — 표시는 스냅샷이 따른다).
+ */
+function applyTerrainHeal(
+  ctx: BattleContext, state: BattleState, side: Side,
+): { state: BattleState; events: BattleEvent[] } {
+  let next = state;
+  const events: BattleEvent[] = [];
+  for (const u of state.units) {
+    if (u.side !== side || u.retreated) continue;
+    const t = terrainAt(ctx, u.x, u.y);
+    const ratio = t.healTroopsRatio ?? 0;
+    let cur = getUnit(next, u.id);
+    if (ratio > 0 && cur.troops > 0 && cur.troops < cur.maxTroops) {
+      const amt = Math.max(1, Math.floor(cur.maxTroops * ratio));
+      const h = healTroops(next, cur, amt);
+      next = h.state;
+      if (h.healed > 0) events.push({ type: "troopsHealed", unitId: u.id, amount: h.healed });
+      cur = getUnit(next, u.id);
+    }
+    if (t.healMp && cur.maxMp > 0 && cur.mp < cur.maxMp) {
+      const mpAmt = Math.max(1, Math.floor(cur.maxMp * (ratio || 0.1)));
+      next = replaceUnit(next, { ...cur, mp: Math.min(cur.maxMp, cur.mp + mpAmt) });
+    }
+  }
+  return { state: next, events };
 }
 
 /**
@@ -315,10 +347,16 @@ function maybeAdvancePhase(ctx: BattleContext, state: BattleState): { state: Bat
   const combo = nextPhase === "player" ? 0 : state.combo;
   // 상태이상 틱(Phase D) — 새 페이즈 진영 유닛에 중독 피해 + 만료 처리(페이즈 시작 1회).
   const advanced: BattleState = { ...state, phase: nextPhase, turn: nextTurn, units, combo };
-  const ticked = tickStatuses(ctx, advanced, nextPhase);
+  // 지형 회복(촌락/병영 §10 원작) → 상태이상 틱 순서 — 페이즈 시작 회복 후 중독이 깎는다(결정론).
+  const healed = applyTerrainHeal(ctx, advanced, nextPhase);
+  const ticked = tickStatuses(ctx, healed.state, nextPhase);
   return {
     state: ticked.state,
-    events: [{ type: "phaseChanged", phase: nextPhase, turn: nextTurn }, ...ticked.events],
+    events: [
+      { type: "phaseChanged", phase: nextPhase, turn: nextTurn },
+      ...healed.events,
+      ...ticked.events,
+    ],
   };
 }
 

@@ -58,11 +58,9 @@ export function AudioController(): React.ReactElement {
   }, []);
 
   // (3) 경로 → BGM. 미해제 시 desired만 저장되고 첫 제스처가 resumeBgm으로 켠다.
-  // stage 쿼리는 window.location에서 직접 읽는다 — useSearchParams는 layout 전역 아일랜드에
-  // Suspense 경계를 요구(Next 15 CSR bailout)하고, BGM 선택은 어차피 클라이언트 전용.
-  // 전투 진입은 항상 /prep 경유라 pathname 변화가 곧 stage 변화 시점이다.
+  // 보스곡(battleBoss)은 여기가 아니라 전투 중 교전 트리거(BattleRenderer)가 켠다.
   useEffect(() => {
-    playBgm(bgmForPath(pathname, window.location.search));
+    playBgm(bgmForPath(pathname));
   }, [pathname]);
 
   return <AudioControl />;

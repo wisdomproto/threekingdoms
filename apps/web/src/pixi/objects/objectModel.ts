@@ -14,9 +14,12 @@ export const DECO_OBJECT_MAP: Record<string, string> = {
   mountain: "rock_cluster", // 산지 = 바위 무리
   cliff: "rock_cliff",      // 절벽 = 바위 노두
   forest: "tree_leafy",     // 숲 = 활엽수(종전 데코 없던 바닥에 나무 액센트)
-  village: "supply_cart",   // 마을/취락 = 보급 수레(전용 건물 오브젝트 생기면 교체)
-  depot: "supply_cart",     // 보급소 = 보급 수레
-  barracks: "camp_gate",    // 병영 = 진영문
+  // 거점 3종(지형 회복 §10 — "여기 서면 회복"이 읽혀야 한다). K-9 아트 미보유 시 옛 데코
+  // (hut/camp/storehouse) 폴백. 종전 수레/진영문 대용은 "벌판에 성문이 떠 있는" 오독을
+  // 낳아 교정(2026-07-04 전장 오브젝트 검토).
+  village: "village_hut",   // 마을/취락 = 민가
+  depot: "depot_store",     // 보물창고 = 창고
+  barracks: "camp_tent",    // 병영 = 군막
 };
 
 /** deco 지형의 우선 오브젝트 키(없으면 undefined → 옛 데코 폴백). */

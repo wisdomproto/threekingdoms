@@ -30,7 +30,8 @@ import { UnitLayer } from "./layers/UnitLayer";
 import { FxLayer } from "./layers/FxLayer";
 import { threatTiles } from "../battle/threatRange";
 import { chooseMenuPreferRight } from "../battle/menuPlacement";
-import { playSfx, SFX } from "../audio";
+import { playBgm, playSfx, SFX } from "../audio";
+import { bossUnitId } from "../battle/bossOf";
 
 type Ev<T extends BattleEvent["type"]> = Extract<BattleEvent, { type: T }>;
 
@@ -684,9 +685,25 @@ export class BattleRenderer implements Presenter {
     view.snapTo(to.x, to.y);
   }
 
+  /** 보스 BGM 교전 트리거(2026-07-04) — 적 메인 장수(bossOf)와 아군이 처음 맞붙는 순간
+   *  battleBoss로 전환(전투당 1회). 라우트 진입은 항상 battle로 시작(bgmRoute)해 긴장을 아낀다. */
+  private bossBgmFired = false;
+  private maybeBossBgm(aId: string, bId: string): void {
+    if (this.bossBgmFired) return;
+    const boss = bossUnitId(this.ctx.stage);
+    if (!boss) return;
+    const other = aId === boss ? bId : bId === boss ? aId : null;
+    if (!other) return;
+    const u = this.store?.committedState.units.find((x) => x.id === other);
+    if (u?.side !== "player") return; // "우리 출진 캐릭터랑" — 아군 교전만
+    this.bossBgmFired = true;
+    playBgm("battleBoss");
+  }
+
   async damageDealt(e: Ev<"damageDealt">): Promise<void> {
     const s = this.scene;
     if (!s) return;
+    this.maybeBossBgm(e.attackerId, e.defenderId);
     const attacker = s.units.view(e.attackerId);
     const defender = s.units.view(e.defenderId);
     attacker.faceToward({ x: defender.gridX, y: defender.gridY });
@@ -835,6 +852,7 @@ export class BattleRenderer implements Presenter {
   async duelTriggered(e: Ev<"duelTriggered">): Promise<void> {
     const s = this.scene;
     if (!s) return;
+    this.maybeBossBgm(e.attackerId, e.defenderId); // 보스와의 일기토도 교전
     // 일기토 발동 — 큰 화면 흔들림 1회로 무게감(§4 "특히 일기토/큰 피해").
     this.triggerShake(SHAKE_PX_BIG);
     // 풀스크린 컷인(React 오버레이)이 등록돼 있으면 그 완주를 기다린다 — 배너는 헤드리스 폴백.
@@ -872,6 +890,7 @@ export class BattleRenderer implements Presenter {
   async ultimate(e: Ev<"ultimate">): Promise<void> {
     const s = this.scene;
     if (!s) return;
+    this.maybeBossBgm(e.attackerId, e.defenderId); // 필살로 보스와 첫 접전하는 경우
     // 필살 발동(데미지 직전) — 큰 흔들림 + 대상 플래시 + 「필살!」 배너(일기토급 무게).
     const attacker = this.ctx.data.commanders[e.attackerId]?.name ?? e.attackerId;
     const defender = s.units.view(e.defenderId);

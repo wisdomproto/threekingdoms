@@ -85,6 +85,31 @@ export class ObjectLayer extends Container {
     return terrainAt(this.ctx, gx, gy).id === "wall";
   }
 
+  private isRiver(gx: number, gy: number): boolean {
+    const { width, height } = this.ctx.map;
+    if (gx < 0 || gy < 0 || gx >= width || gy >= height) return false;
+    return terrainAt(this.ctx, gx, gy).id === "river";
+  }
+
+  /** 다리(K-9 탑다운) — 강 방향으로 상판 방향 자동 판정: 좌/우가 강이면 남북 상판(bridge_v),
+   *  위/아래가 강이면 동서 상판(bridge_h). 아트 미보유 시 기존 동작(addDeco — painted 숨김/
+   *  타일맵 도하 표식)으로 폴백. 칸 채움 세그먼트라 여러 칸 다리가 이어 붙는다. */
+  private addBridge(chunk: Chunk, gx: number, gy: number, tx: number, ty: number): void {
+    const vertical = this.isRiver(gx - 1, gy) || this.isRiver(gx + 1, gy);
+    const key = vertical ? "bridge_v" : "bridge_h";
+    const tex = this.textures.getObject(key);
+    if (!tex || tex.width === 0) {
+      this.addDeco(chunk, "bridge", gx, gy, tx, ty);
+      return;
+    }
+    const sp = new Sprite(tex);
+    sp.anchor.set(0.5, 0.5);
+    sp.width = sp.height = TILE_SIZE;
+    sp.position.set(tx * TILE_SIZE + TILE_SIZE / 2, ty * TILE_SIZE + TILE_SIZE / 2);
+    chunk.container.addChild(sp);
+    chunk.sprites.push(sp);
+  }
+
   private build(chunk: Chunk): void {
     for (const s of chunk.sprites) s.destroy();
     chunk.sprites.length = 0;
@@ -92,6 +117,7 @@ export class ObjectLayer extends Container {
       const kind = objectKind(terrainId);
       if (kind === "wall") this.addWall(chunk, gx, gy, tx, ty);
       else if (kind === "gate") this.addGate(chunk, gx, gy, tx, ty);
+      else if (terrainId === "bridge") this.addBridge(chunk, gx, gy, tx, ty);
       else this.addDeco(chunk, terrainId, gx, gy, tx, ty);
     }
     // 스테이지 정밀 데코(§5.2) — 이 청크에 속한 칸만. 지형 자동 데코 위에 얹는다(순수 시각).
