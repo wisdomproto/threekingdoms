@@ -196,42 +196,47 @@ export function PrepShell(): React.ReactElement {
         })}
       </div>
 
-      {/* 탭 콘텐츠 (비활성 탭 언마운트) — flex 컬럼: 편성 보드가 남은 높이를 채운다 */}
+      {/* 탭 콘텐츠 + 출진 바 = 한 클러스터. 남은 높이에서 세로 중앙(auto 마진 — 내용이 넘치면
+          마진이 0으로 접혀 스크롤 안전). 더는 보드를 늘여 양피지 벌판을 만들지 않는다(2026-07-03). */}
       <div style={{
-        flex: 1, padding: 16, width: "100%", maxWidth: CONTENT_MAX, margin: "0 auto",
-        boxSizing: "border-box", display: "flex", flexDirection: "column",
+        flex: 1, minHeight: 0, overflowY: "auto",
+        width: "100%", maxWidth: CONTENT_MAX, margin: "0 auto",
+        padding: 16, boxSizing: "border-box",
+        display: "flex", flexDirection: "column",
       }}>
-        {activeTab === "formation" ? (
-          <Formation
-            key={refreshKey}
-            roster={roster}
-            maxSlots={maxSlots}
-            selected={selected}
-            onChange={setSelected}
-            chapter={chapter}
-            focusId={focusId}
-            onFocus={setFocusId}
-          />
-        ) : (
-          <Shop
-            shop={gameData.shops.ch1!}
-            items={gameData.items}
-            gold={gold}
-            chapter={chapter}
-            onPurchase={onPurchase}
-          />
-        )}
-      </div>
+        <div style={{ margin: "auto 0", display: "flex", flexDirection: "column", gap: 8 }}>
+          {activeTab === "formation" ? (
+            <Formation
+              key={refreshKey}
+              roster={roster}
+              maxSlots={maxSlots}
+              selected={selected}
+              onChange={setSelected}
+              chapter={chapter}
+              focusId={focusId}
+              onFocus={setFocusId}
+            />
+          ) : (
+            <Shop
+              shop={gameData.shops.ch1!}
+              items={gameData.items}
+              gold={gold}
+              chapter={chapter}
+              onPurchase={onPurchase}
+            />
+          )}
 
-      {/* 고정 출진 바 — 슬롯 칩 탭 = 편성 탭으로 전환 + 상세 포커스 */}
-      <SortieBar
-        summary={summary}
-        maxSlots={maxSlots}
-        members={selected}
-        onSortie={onSortie}
-        onRemove={(id) => setSelected(selected.filter((m) => m.commanderId !== id))}
-        onFocus={(id) => { setActiveTab("formation"); setFocusId(id); }}
-      />
+          {/* 출진 바 — 보드 바로 아래(레퍼런스 풋터). 슬롯 칩 탭 = 편성 탭 전환 + 상세 포커스 */}
+          <SortieBar
+            summary={summary}
+            maxSlots={maxSlots}
+            members={selected}
+            onSortie={onSortie}
+            onRemove={(id) => setSelected(selected.filter((m) => m.commanderId !== id))}
+            onFocus={(id) => { setActiveTab("formation"); setFocusId(id); }}
+          />
+        </div>
+      </div>
     </main>
   );
 }

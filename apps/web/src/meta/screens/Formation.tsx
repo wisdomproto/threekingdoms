@@ -189,8 +189,6 @@ export function Formation({
       display: "grid",
       gridTemplateColumns: narrow ? "minmax(0,1fr)" : "minmax(0,1fr) 336px",
       gap: 14,
-      // 컬럼을 세로로 늘여 패널이 "보드"로 서게(기본 stretch) — 남는 양피지는 워터마크가 채운다.
-      flex: 1,
     }}>
       {/* ━━ 좌: 장수 선택 그리드 ━━ */}
       <div style={{ minWidth: 0, position: "relative" }}>
@@ -226,8 +224,8 @@ export function Formation({
 
         <div style={{
           display: "grid",
-          // 카드가 레퍼런스만큼 큼직하게(≈140~170px) — 104px 자동 채움은 카드가 잘게 흩어졌다(2026-07-03).
-          gridTemplateColumns: "repeat(auto-fill, minmax(132px, 1fr))",
+          // 레퍼런스 밀도(≈4열) — 5명뿐인 1장도 2줄로 앉아 좌측 컬럼이 빈 벌판이 안 된다(2026-07-03).
+          gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))",
           gap: 10,
           alignContent: "start",
         }}>

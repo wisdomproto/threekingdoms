@@ -36,22 +36,17 @@ export function SortieBar({
   return (
     <div
       style={{
-        position: "sticky",
-        bottom: 0,
-        left: 0,
-        right: 0,
+        // 보드 바로 아래 붙는 풋터(레퍼런스) — 종전엔 뷰포트 바닥에 sticky로 떨어져 있었다(2026-07-03).
         background: `linear-gradient(to bottom, ${C.bar}, rgba(8,7,5,0.97))`,
-        borderTop: `1px solid ${GOLD_DIM}88`,
-        boxShadow: "0 -6px 20px rgba(0,0,0,0.45)",
-        padding: "8px 12px",
-        zIndex: 20,
+        border: `1px solid ${GOLD_DIM}88`,
+        borderRadius: 8,
+        boxShadow: "0 4px 16px rgba(0,0,0,0.35)",
+        padding: "8px 14px",
         fontFamily: SERIF,
       }}
     >
     <div
       style={{
-        maxWidth: 1240,
-        margin: "0 auto",
         display: "flex",
         alignItems: "center",
         gap: 10,
