@@ -28,6 +28,10 @@ export interface SortieBarProps {
   onFocus: (commanderId: string) => void;
 }
 
+// 출진 슬롯 칩 크기 — 40×52는 초상·글자가 안 보일 만큼 작았다(2026-07-03). 레퍼런스 카드 비례로 격상.
+const SLOT_W = 60;
+const SLOT_H = 82;
+
 export function SortieBar({
   summary, maxSlots, members, onSortie, onRemove, onFocus,
 }: SortieBarProps): React.ReactElement {
@@ -55,25 +59,26 @@ export function SortieBar({
     >
       {/* ── 출진 슬롯 칩 ── */}
       <span style={{
-        fontSize: 10, fontWeight: 700, color: GOLD_DIM, letterSpacing: "0.18em",
-        writingMode: "vertical-rl", textOrientation: "upright", flexShrink: 0, lineHeight: 1,
+        fontSize: 12, fontWeight: 700, color: GOLD, letterSpacing: "0.22em",
+        writingMode: "vertical-rl", textOrientation: "upright", flexShrink: 0, lineHeight: 1.1,
       }}>
         출진슬롯
       </span>
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
         {Array.from({ length: maxSlots }, (_, i) => {
           const m = members[i];
           if (!m) {
             return (
               <div key={`empty-${i}`} style={{
-                position: "relative", width: 40, height: 52, borderRadius: 5,
-                border: `1.5px dashed ${GOLD_DIM}55`,
+                position: "relative", width: SLOT_W, height: SLOT_H, borderRadius: 6,
+                border: `1.5px dashed ${GOLD_DIM}66`,
                 background: "rgba(0,0,0,0.35)",
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
-                <span style={{ fontSize: 16, color: GOLD_DIM, opacity: 0.45, lineHeight: 1 }}>+</span>
+                <span style={{ fontSize: 26, color: GOLD_DIM, opacity: 0.5, lineHeight: 1 }}>+</span>
                 <span style={{
-                  position: "absolute", top: 1, left: 3, fontSize: 8, color: GOLD_DIM, opacity: 0.6,
+                  position: "absolute", top: 2, left: 5, fontSize: 11, fontWeight: 800,
+                  color: GOLD_DIM, opacity: 0.7,
                 }}>{i + 1}</span>
               </div>
             );
@@ -86,19 +91,19 @@ export function SortieBar({
               onClick={() => onFocus(m.commanderId)}
               title={name}
               style={{
-                position: "relative", width: 40, height: 52, borderRadius: 5, padding: 0,
-                border: `1.5px solid ${GOLD}aa`,
+                position: "relative", width: SLOT_W, height: SLOT_H, borderRadius: 6, padding: 0,
+                border: `2px solid ${GOLD}`,
                 overflow: "hidden", cursor: "pointer",
                 background: "#171208",
-                boxShadow: `inset 0 0 6px rgba(200,164,64,0.15)`,
+                boxShadow: `inset 0 0 8px rgba(200,164,64,0.18), 0 2px 8px rgba(0,0,0,0.4)`,
               }}
             >
               <CommanderPortrait commanderId={m.commanderId} name={name} />
               {/* 번호 */}
               <span style={{
-                position: "absolute", top: 0, left: 0, padding: "0 3px",
-                fontSize: 8, fontWeight: 800, color: "#f0e2c8",
-                background: "rgba(10,8,4,0.75)", borderBottomRightRadius: 4, lineHeight: "11px",
+                position: "absolute", top: 0, left: 0, padding: "1px 5px 2px",
+                fontSize: 11, fontWeight: 800, color: "#f0e2c8",
+                background: "rgba(10,8,4,0.8)", borderBottomRightRadius: 5, lineHeight: 1,
               }}>{i + 1}</span>
               {/* 해제 ✕ */}
               <span
@@ -106,17 +111,17 @@ export function SortieBar({
                 aria-label={`${name} 편성 해제`}
                 onClick={(e) => { e.stopPropagation(); onRemove(m.commanderId); }}
                 style={{
-                  position: "absolute", top: 0, right: 0, padding: "0 3px",
-                  fontSize: 9, color: "rgba(255,235,210,0.8)",
-                  background: "rgba(10,8,4,0.75)", borderBottomLeftRadius: 4,
-                  cursor: "pointer", lineHeight: "11px",
+                  position: "absolute", top: 0, right: 0, padding: "1px 5px 3px",
+                  fontSize: 13, color: "rgba(255,235,210,0.85)",
+                  background: "rgba(10,8,4,0.8)", borderBottomLeftRadius: 5,
+                  cursor: "pointer", lineHeight: 1,
                 }}
               >✕</span>
               {/* 이름 */}
               <span style={{
                 position: "absolute", left: 0, right: 0, bottom: 0,
-                fontSize: 8, fontWeight: 700, color: "#e8d9b0", textAlign: "center",
-                background: "rgba(8,6,3,0.8)", lineHeight: "12px",
+                fontSize: 11, fontWeight: 700, color: "#f0e2c8", textAlign: "center",
+                background: "rgba(8,6,3,0.85)", lineHeight: "17px",
                 overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
               }}>{name}</span>
             </button>
