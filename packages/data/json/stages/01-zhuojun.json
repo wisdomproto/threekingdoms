@@ -3,42 +3,179 @@
   "name": "탁군 의용군",
   "mapId": "zhuojun",
   "turnLimit": 20,
-  "camera": { "zoom": 1.6, "focus": [8, 12] },
+  "camera": {
+    "zoom": 1.6,
+    "focus": [
+      8,
+      12
+    ]
+  },
   "decorations": [
-    { "cell": [4, 8], "kind": "banner_command" },
-    { "cell": [3, 12], "kind": "campfire" },
-    { "cell": [3, 14], "kind": "supply_cart" },
-    { "cell": [21, 10], "kind": "shrub" },
-    { "cell": [22, 13], "kind": "campfire" },
-    { "cell": [25, 10], "kind": "pennants", "flip": true },
-    { "cell": [26, 12], "kind": "debris_cart" },
-    { "cell": [35, 10], "kind": "banner_command" },
-    { "cell": [34, 12], "kind": "campfire" },
-    { "cell": [32, 8], "kind": "pennants" },
-    { "cell": [30, 11], "kind": "debris_weapons" },
-    { "cell": [12, 6], "kind": "shrub" },
-    { "cell": [18, 14], "kind": "shrub", "flip": true },
-    { "cell": [26, 17], "kind": "shrub" },
-    { "cell": [9, 18], "kind": "shrub" }
+    {
+      "cell": [
+        4,
+        8
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        3,
+        12
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        3,
+        14
+      ],
+      "kind": "supply_cart"
+    },
+    {
+      "cell": [
+        21,
+        10
+      ],
+      "kind": "shrub"
+    },
+    {
+      "cell": [
+        22,
+        13
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        25,
+        10
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        26,
+        12
+      ],
+      "kind": "debris_cart"
+    },
+    {
+      "cell": [
+        35,
+        10
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        34,
+        12
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        32,
+        8
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        30,
+        11
+      ],
+      "kind": "debris_weapons"
+    },
+    {
+      "cell": [
+        12,
+        6
+      ],
+      "kind": "shrub"
+    },
+    {
+      "cell": [
+        18,
+        14
+      ],
+      "kind": "shrub",
+      "flip": true
+    },
+    {
+      "cell": [
+        26,
+        17
+      ],
+      "kind": "shrub"
+    },
+    {
+      "cell": [
+        9,
+        18
+      ],
+      "kind": "shrub"
+    }
   ],
-  "reward": { "gold": 120, "exp": 0, "treasures": [] },
+  "reward": {
+    "gold": 120,
+    "exp": 0,
+    "treasures": []
+  },
   "levelCap": 6,
   "scenario": {
     "intro": {
       "bg": "01-zhuojun-intro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "황건의 무리가 탁군까지 들이닥쳤소. 의병을 모아 고향을 지킬 때요." },
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "방금 도원에서 의를 맺지 않았소! 첫 싸움부터 시원하게 쓸어버립시다, 형님!" },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "정원지가 이끄는 선봉이라 들었다. 수는 많으나 오합지졸, 진을 흩트리면 무너진다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "가자. 우리의 이름이 오늘 여기서 시작된다." }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "황건의 무리가 탁군까지 들이닥쳤소. 의병을 모아 고향을 지킬 때요."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "방금 도원에서 의를 맺지 않았소! 첫 싸움부터 시원하게 쓸어버립시다, 형님!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "정원지가 이끄는 선봉이라 들었다. 수는 많으나 오합지졸, 진을 흩트리면 무너진다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "가자. 우리의 이름이 오늘 여기서 시작된다."
+        }
       ]
     },
     "outro": {
       "bg": "01-zhuojun-outro",
       "lines": [
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "크하하! 황건 따위, 별것 아니구려!" },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "교만은 금물이다, 아우. 큰 싸움은 이제부터다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "그래도... 첫 승이다. 백성들이 웃는구나. 이거면 됐다." }
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "크하하! 황건 따위, 별것 아니구려!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "교만은 금물이다, 아우. 큰 싸움은 이제부터다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "그래도... 첫 승이다. 백성들이 웃는구나. 이거면 됐다."
+        }
       ]
     }
   },
@@ -58,7 +195,9 @@
       "classId": "lightCavalry",
       "level": 1,
       "troops": 100,
-      "items": ["청룡언월도"],
+      "items": [
+        "청룡언월도"
+      ],
       "side": "player",
       "x": 5,
       "y": 9
@@ -68,7 +207,9 @@
       "classId": "lightCavalry",
       "level": 1,
       "troops": 100,
-      "items": ["사모"],
+      "items": [
+        "사모"
+      ],
       "side": "player",
       "x": 5,
       "y": 13
@@ -114,15 +255,91 @@
       "y": 11
     }
   ],
-  "objectives": [{ "kind": "defeatAll" }],
-  "failConditions": [{ "kind": "unitRetreated", "unitId": "유비" }],
+  "objectives": [
+    {
+      "kind": "defeatAll"
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    }
+  ],
   "dialogue": [
     {
       "id": "01-zhuojun_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "의병들이여, 황건을 몰아낸다! 정원지의 깃발을 꺾어라!" },
-      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "와아아! 한 놈도 남기지 말고 쓸어버리자!" }
+        {
+          "speaker": "정원지",
+          "side": "enemy",
+          "text": "웬 잡졸들이냐. 짚신이나 삼던 것들이 창을 들었구나!"
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "잡졸? 연인 장익덕의 사모가 네놈 목부터 물어주마!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "의병들이여 — 등 뒤가 곧 고향이다. 물러설 땅은 없다, 진격하라!"
+        }
+      ]
+    },
+    {
+      "id": "01-zhuojun_turn3",
+      "trigger": {
+        "kind": "turn",
+        "n": 3
+      },
+      "lines": [
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "적진이 흐트러진다. 지금이다 — 몰아붙여라!"
+        },
+        {
+          "speaker": "정원지",
+          "side": "enemy",
+          "text": "무, 무엇이냐 이 기세는...!"
+        }
+      ]
+    },
+    {
+      "id": "01-zhuojun_retreat_정원지",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "정원지"
+      },
+      "lines": [
+        {
+          "speaker": "정원지",
+          "side": "enemy",
+          "text": "이런 촌구석에... 이런 자들이 있었단 말이냐...!"
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "크하하! 꽁무니 빼는 꼴 좀 보시오, 형님!"
+        }
+      ]
+    },
+    {
+      "id": "01-zhuojun_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "끝났다. ...모두, 잘 싸워 주었다."
+        }
       ]
     }
   ],

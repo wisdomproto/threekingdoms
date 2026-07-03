@@ -3,38 +3,154 @@
   "name": "동탁 추격전",
   "mapId": "dongzhuo-chase",
   "turnLimit": 16,
-  "camera": { "zoom": 1.4, "focus": [18, 16] },
+  "camera": {
+    "zoom": 1.4,
+    "focus": [
+      18,
+      16
+    ]
+  },
   "decorations": [
-    { "cell": [19, 3], "kind": "pennants" },
-    { "cell": [18, 6], "kind": "debris_cart" },
-    { "cell": [23, 8], "kind": "debris_cart", "flip": true },
-    { "cell": [16, 9], "kind": "debris_pile" },
-    { "cell": [24, 10], "kind": "supply_cart" },
-    { "cell": [21, 13], "kind": "debris_weapons" },
-    { "cell": [14, 11], "kind": "debris_pile" },
-    { "cell": [10, 15], "kind": "reeds" },
-    { "cell": [30, 15], "kind": "reeds", "flip": true },
-    { "cell": [25, 18], "kind": "reeds" },
-    { "cell": [35, 19], "kind": "reeds", "flip": true },
-    { "cell": [18, 30], "kind": "campfire" },
-    { "cell": [19, 33], "kind": "banner_command" }
+    {
+      "cell": [
+        19,
+        3
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        18,
+        6
+      ],
+      "kind": "debris_cart"
+    },
+    {
+      "cell": [
+        23,
+        8
+      ],
+      "kind": "debris_cart",
+      "flip": true
+    },
+    {
+      "cell": [
+        16,
+        9
+      ],
+      "kind": "debris_pile"
+    },
+    {
+      "cell": [
+        24,
+        10
+      ],
+      "kind": "supply_cart"
+    },
+    {
+      "cell": [
+        21,
+        13
+      ],
+      "kind": "debris_weapons"
+    },
+    {
+      "cell": [
+        14,
+        11
+      ],
+      "kind": "debris_pile"
+    },
+    {
+      "cell": [
+        10,
+        15
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        30,
+        15
+      ],
+      "kind": "reeds",
+      "flip": true
+    },
+    {
+      "cell": [
+        25,
+        18
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        35,
+        19
+      ],
+      "kind": "reeds",
+      "flip": true
+    },
+    {
+      "cell": [
+        18,
+        30
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        19,
+        33
+      ],
+      "kind": "banner_command"
+    }
   ],
-  "reward": { "gold": 600, "exp": 0, "treasures": [] },
+  "reward": {
+    "gold": 600,
+    "exp": 0,
+    "treasures": []
+  },
   "levelCap": 16,
   "scenario": {
     "intro": {
       "bg": "08-dongzhuo-chase-intro",
       "lines": [
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "동탁이 장안으로 달아납니다. 추격대가 길목을 끊으면 잡을 수 있습니다." },
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "복병이 있을지 모르니 조심하라더니, 흥! 내가 앞장서겠소." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "관문을 점령해 퇴로를 막는다. 기병은 나를 따르라 — 속전속결이다." }
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "동탁이 장안으로 달아납니다. 추격대가 길목을 끊으면 잡을 수 있습니다."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "복병이 있을지 모르니 조심하라더니, 흥! 내가 앞장서겠소."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "관문을 점령해 퇴로를 막는다. 기병은 나를 따르라 — 속전속결이다."
+        }
       ]
     },
     "outro": {
       "bg": "08-dongzhuo-chase-outro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "관문은 우리 손에 들어왔으나, 동탁의 본대는 빠져나갔다." },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "연합은 곧 흩어질 겁니다, 형님. 제후들의 동상이몽이 끝났습니다." }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "관문은 우리 손에 들어왔으나, 동탁의 본대는 빠져나갔다."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "연합은 곧 흩어질 겁니다, 형님. 제후들의 동상이몽이 끝났습니다."
+        }
       ]
     }
   },
@@ -54,7 +170,9 @@
       "classId": "lightCavalry",
       "level": 7,
       "troops": 140,
-      "items": ["청룡언월도"],
+      "items": [
+        "청룡언월도"
+      ],
       "side": "player",
       "x": 16,
       "y": 31
@@ -64,7 +182,9 @@
       "classId": "lightCavalry",
       "level": 7,
       "troops": 140,
-      "items": ["사모"],
+      "items": [
+        "사모"
+      ],
       "side": "player",
       "x": 20,
       "y": 31
@@ -84,7 +204,10 @@
       "classId": "strategist",
       "level": 7,
       "troops": 100,
-      "items": ["쌀", "폭탄"],
+      "items": [
+        "쌀",
+        "폭탄"
+      ],
       "side": "player",
       "x": 22,
       "y": 32
@@ -181,17 +304,30 @@
     }
   ],
   "objectives": [
-    { "kind": "captureTile", "x": 18, "y": 1, "side": "player" }
+    {
+      "kind": "captureTile",
+      "x": 18,
+      "y": 1,
+      "side": "player"
+    }
   ],
   "failConditions": [
-    { "kind": "unitRetreated", "unitId": "유비" },
-    { "kind": "turnLimitExceeded" }
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
   ],
   "reinforcements": [
     {
       "id": "ambush_west_forest",
       "side": "enemy",
-      "trigger": { "kind": "unitDefeated", "unitId": "송겸" },
+      "trigger": {
+        "kind": "unitDefeated",
+        "unitId": "송겸"
+      },
       "units": [
         {
           "commanderId": "서상",
@@ -218,7 +354,10 @@
     {
       "id": "ambush_east_forest",
       "side": "enemy",
-      "trigger": { "kind": "unitDefeated", "unitId": "이숙" },
+      "trigger": {
+        "kind": "unitDefeated",
+        "unitId": "이숙"
+      },
       "units": [
         {
           "commanderId": "여건",
@@ -247,24 +386,103 @@
     {
       "id": "duel_zhangfei_lijue_reward",
       "description": "장비가 이각과 일기토를 벌여 추격로를 뚫으면 [검술지침서]를 노획한다.",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_lijue" },
-      "reward": { "treasures": ["검술지침서"], "gold": 200 }
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhangfei_lijue"
+      },
+      "reward": {
+        "treasures": [
+          "검술지침서"
+        ],
+        "gold": 200
+      }
     }
   ],
   "dialogue": [
     {
       "id": "08-dongzhuo-chase_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "관문을 점령해 퇴로를 끊는다! 기병은 나를 따르라." }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "동탁이 멀지 않다. 복병을 경계하며 — 서둘러라!"
+        },
+        {
+          "speaker": "이각",
+          "side": "enemy",
+          "text": "여기까지다. 승상께서 가신 길, 너희는 밟지 못한다!"
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "비켜라! 네놈들 상대할 시간도 아깝다!"
+        }
+      ]
+    },
+    {
+      "id": "08-dongzhuo-chase_turn8",
+      "trigger": {
+        "kind": "turn",
+        "n": 8
+      },
+      "lines": [
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "시간이 없다. 잔적에 얽매이지 마라 — 뚫고 나간다!"
+        }
       ]
     },
     {
       "id": "duel_zhangfei_lijue_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_lijue" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhangfei_lijue"
+      },
       "lines": [
-      { "speaker": "이각", "side": "enemy", "portraitId": "이각", "text": "동탁공을 쫓는 자, 누구냐!" },
-      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "장익덕이다! 길을 비켜라!" }
+        {
+          "speaker": "이각",
+          "side": "enemy",
+          "portraitId": "이각",
+          "text": "동탁공을 쫓는 자, 누구냐!"
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "장익덕이다! 길을 비켜라!"
+        }
+      ]
+    },
+    {
+      "id": "08-dongzhuo-chase_retreat_이각",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "이각"
+      },
+      "lines": [
+        {
+          "speaker": "이각",
+          "side": "enemy",
+          "text": "곽사, 뒤를 부탁한다...!"
+        }
+      ]
+    },
+    {
+      "id": "08-dongzhuo-chase_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "...여기까지인가. 허나 동탁의 간담은 서늘하게 해주었다."
+        }
       ]
     }
   ],
@@ -272,8 +490,15 @@
     {
       "id": "duel_zhangfei_lijue",
       "type": "duel",
-      "trigger": { "kind": "attack", "attackerId": "장비", "defenderId": "이각" },
-      "outcome": { "winnerId": "장비", "loserRetreats": false },
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "장비",
+        "defenderId": "이각"
+      },
+      "outcome": {
+        "winnerId": "장비",
+        "loserRetreats": false
+      },
       "once": true
     }
   ]

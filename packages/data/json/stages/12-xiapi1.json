@@ -3,24 +3,64 @@
   "name": "하비 1차 (탈출전)",
   "mapId": "xiapi1",
   "turnLimit": 18,
-  "camera": { "zoom": 1.6, "focus": [30, 15] },
-  "reward": { "gold": 200, "exp": 0, "treasures": [] },
+  "camera": {
+    "zoom": 1.6,
+    "focus": [
+      30,
+      15
+    ]
+  },
+  "reward": {
+    "gold": 200,
+    "exp": 0,
+    "treasures": []
+  },
   "levelCap": 22,
   "scenario": {
     "intro": {
       "bg": "12-xiapi1-intro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "소패가 떨어졌다. 여포의 추격이 코앞이다 — 흩어지지 말고 하비로 빠져나간다!" },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "형님, 제가 후미를 맡겠습니다. 먼저 가십시오." },
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "젠장, 이렇게 쫓기다니! ...형님, 살아서 다시 봅시다!" },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "반드시 살아남는다. 가족도, 아우들도 — 한 명도 잃지 않는다. 하비로!" }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "소패가 떨어졌다. 여포의 추격이 코앞이다 — 흩어지지 말고 하비로 빠져나간다!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "형님, 제가 후미를 맡겠습니다. 먼저 가십시오."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "젠장, 이렇게 쫓기다니! ...형님, 살아서 다시 봅시다!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "반드시 살아남는다. 가족도, 아우들도 — 한 명도 잃지 않는다. 하비로!"
+        }
       ]
     },
     "outro": {
       "bg": "12-xiapi1-outro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "...겨우 빠져나왔구나. 흩어진 식솔들은 어찌 됐을까." },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "반드시 다시 모일 겁니다, 형님. 살아 있는 한." }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "...겨우 빠져나왔구나. 흩어진 식솔들은 어찌 됐을까."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "반드시 다시 모일 겁니다, 형님. 살아 있는 한."
+        }
       ]
     }
   },
@@ -40,7 +80,9 @@
       "classId": "lightCavalry",
       "level": 18,
       "troops": 255,
-      "items": ["청룡언월도"],
+      "items": [
+        "청룡언월도"
+      ],
       "side": "player",
       "x": 33,
       "y": 14
@@ -50,7 +92,9 @@
       "classId": "lightCavalry",
       "level": 18,
       "troops": 255,
-      "items": ["사모"],
+      "items": [
+        "사모"
+      ],
       "side": "player",
       "x": 33,
       "y": 16
@@ -60,7 +104,9 @@
       "classId": "strategist",
       "level": 16,
       "troops": 180,
-      "items": ["쌀"],
+      "items": [
+        "쌀"
+      ],
       "side": "player",
       "x": 30,
       "y": 17
@@ -70,7 +116,10 @@
       "classId": "guardCavalry",
       "level": 24,
       "troops": 360,
-      "items": ["방천화극", "적토마"],
+      "items": [
+        "방천화극",
+        "적토마"
+      ],
       "side": "enemy",
       "x": 36,
       "y": 4
@@ -117,17 +166,34 @@
     }
   ],
   "objectives": [
-    { "kind": "reachTile", "unitId": "유비", "x": 0, "y": 15 },
-    { "kind": "reachTile", "unitId": "관우", "x": 0, "y": 14, "optional": true }
+    {
+      "kind": "reachTile",
+      "unitId": "유비",
+      "x": 0,
+      "y": 15
+    },
+    {
+      "kind": "reachTile",
+      "unitId": "관우",
+      "x": 0,
+      "y": 14,
+      "optional": true
+    }
   ],
   "failConditions": [
-    { "kind": "unitRetreated", "unitId": "유비" }
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    }
   ],
   "reinforcements": [
     {
       "id": "reinf_lubu_pursuit_t4",
       "side": "enemy",
-      "trigger": { "kind": "turn", "turn": 4 },
+      "trigger": {
+        "kind": "turn",
+        "turn": 4
+      },
       "units": [
         {
           "commanderId": "조성",
@@ -155,17 +221,74 @@
   "dialogue": [
     {
       "id": "12-xiapi1_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "흩어지지 마라! 하비로 빠져나간다!" }
+        {
+          "speaker": "진궁",
+          "side": "enemy",
+          "text": "성은 이미 우리 손에 있다. 유비 — 그대가 돌아갈 곳은 없다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "...가족을 성에 두고 왔다. 허나 지금은, 살아서 훗날을 기약한다."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "형님, 길은 제가 엽니다. 뒤만 따르십시오."
+        }
+      ]
+    },
+    {
+      "id": "12-xiapi1_turn4",
+      "trigger": {
+        "kind": "turn",
+        "n": 4
+      },
+      "lines": [
+        {
+          "speaker": "장요",
+          "side": "enemy",
+          "text": "포위를 좁혀라. ...허나 무의미한 살생은 하지 마라."
+        }
       ]
     },
     {
       "id": "duel_zhangfei_zhangliao_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_zhangliao" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhangfei_zhangliao"
+      },
       "lines": [
-      { "speaker": "장요", "side": "enemy", "portraitId": "장요", "text": "퇴로를 끊어라!" },
-      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "내 사모가 길을 연다! 형님, 먼저 가시오!" }
+        {
+          "speaker": "장요",
+          "side": "enemy",
+          "portraitId": "장요",
+          "text": "퇴로를 끊어라!"
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "내 사모가 길을 연다! 형님, 먼저 가시오!"
+        }
+      ]
+    },
+    {
+      "id": "12-xiapi1_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "...빠져나왔다. 반드시 — 반드시 되찾으러 온다."
+        }
       ]
     }
   ],
@@ -173,8 +296,15 @@
     {
       "id": "duel_zhangfei_zhangliao",
       "type": "duel",
-      "trigger": { "kind": "attack", "attackerId": "장비", "defenderId": "장요" },
-      "outcome": { "winnerId": "장비", "loserRetreats": false },
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "장비",
+        "defenderId": "장요"
+      },
+      "outcome": {
+        "winnerId": "장비",
+        "loserRetreats": false
+      },
       "once": true
     }
   ]

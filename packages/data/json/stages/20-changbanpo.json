@@ -22,16 +22,51 @@
     "intro": {
       "bg": "20-changbanpo-intro",
       "lines": [
-        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "...주공과 흩어졌다. 아두 공자가, 감부인이 이 난군 속에 계신다." },
-        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "조자룡, 단기필마로 적진을 뚫는다. 공자를 반드시 주공께 돌려드린다 — 목숨을 걸고!" }
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "...주공과 흩어졌다. 아두 공자가, 감부인이 이 난군 속에 계신다."
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "조자룡, 단기필마로 적진을 뚫는다. 공자를 반드시 주공께 돌려드린다 — 목숨을 걸고!"
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "text": "난군 십만... 두렵지 않다. 두려운 것은 단 하나 — 늦는 것이다."
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "text": "창 한 자루, 말 한 필. ...그것이면 족하다."
+        }
       ]
     },
     "outro": {
       "bg": "20-changbanpo-outro",
       "lines": [
-        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "주공! 아두 공자, 무사히 모셨습니다!" },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "이 핏덩이 하나 때문에 하마터면 명장을 잃을 뻔했다!" },
-        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "주공...! 이 한 몸, 주공을 위해 백 번이라도 바치겠습니다." }
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "주공! 아두 공자, 무사히 모셨습니다!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "이 핏덩이 하나 때문에 하마터면 명장을 잃을 뻔했다!"
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "주공...! 이 한 몸, 주공을 위해 백 번이라도 바치겠습니다."
+        }
       ]
     }
   },
@@ -253,17 +288,102 @@
   "dialogue": [
     {
       "id": "20-changbanpo_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "아두 공자, 감부인... 반드시 찾아낸다! 단기필마, 돌격!" }
+        {
+          "speaker": "조순",
+          "side": "enemy",
+          "text": "홀몸의 적장이다! 에워싸라 — 공을 세울 기회다!"
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "text": "상산 조자룡이다. 공자의 길을 막는 자는, 누구든 벤다."
+        }
+      ]
+    },
+    {
+      "id": "20-changbanpo_turn4",
+      "trigger": {
+        "kind": "turn",
+        "n": 4
+      },
+      "lines": [
+        {
+          "speaker": "하후돈",
+          "side": "enemy",
+          "text": "저 한 놈을 못 잡아 이 소란이냐! 조공께서 보고 계신다!"
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "text": "포위가 두터워진다... 허나 멈추면 끝이다. 뚫는다!"
+        }
+      ]
+    },
+    {
+      "id": "20-changbanpo_turn8",
+      "trigger": {
+        "kind": "turn",
+        "n": 8
+      },
+      "lines": [
+        {
+          "speaker": "조운",
+          "side": "player",
+          "text": "적이 또 늘어난다 — 공자, 조금만 더 견디십시오...!"
+        }
       ]
     },
     {
       "id": "duel_zhaoyun_xiahouen_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_xiahouen" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhaoyun_xiahouen"
+      },
       "lines": [
-      { "speaker": "하후은", "side": "enemy", "portraitId": "하후은", "text": "혼자서 무얼 하겠다고!" },
-      { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "공자를 품에 안고도, 네놈들 백을 벤다. 그 검, 내가 받아가마." }
+        {
+          "speaker": "하후은",
+          "side": "enemy",
+          "portraitId": "하후은",
+          "text": "혼자서 무얼 하겠다고!"
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "공자를 품에 안고도, 네놈들 백을 벤다. 그 검, 내가 받아가마."
+        }
+      ]
+    },
+    {
+      "id": "20-changbanpo_retreat_조순",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "조순"
+      },
+      "lines": [
+        {
+          "speaker": "조순",
+          "side": "enemy",
+          "text": "괴, 괴물이냐, 저자는...!"
+        }
+      ]
+    },
+    {
+      "id": "20-changbanpo_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "조운",
+          "side": "player",
+          "text": "혈로가 열렸다... 공자, 주공께 갑니다. 꼭 안겨 계십시오."
+        }
       ]
     }
   ],

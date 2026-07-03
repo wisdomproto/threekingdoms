@@ -3,24 +3,64 @@
   "name": "강하 방어전",
   "mapId": "jiangxia",
   "turnLimit": 35,
-  "camera": { "zoom": 1.6, "focus": [30, 20] },
-  "reward": { "gold": 1400, "exp": 0, "treasures": [] },
+  "camera": {
+    "zoom": 1.6,
+    "focus": [
+      30,
+      20
+    ]
+  },
+  "reward": {
+    "gold": 1400,
+    "exp": 0,
+    "treasures": []
+  },
   "levelCap": 44,
   "scenario": {
     "intro": {
       "bg": "23-jiangxia-intro",
       "lines": [
-        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "손권을 설득했습니다. 조조의 백만 대군에 맞서 손유연합이 섰습니다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "허나 조조의 선봉이 벌써 강하를 노리오. 주유 도독의 본대가 올 때까지 버텨야 하오." },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "수상전입니다. 배를 묶어 진을 치고, 장무의 선봉을 꺾읍시다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "적벽의 결전까지, 이 강하를 사수하라!" }
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "portraitId": "제갈량",
+          "text": "손권을 설득했습니다. 조조의 백만 대군에 맞서 손유연합이 섰습니다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "허나 조조의 선봉이 벌써 강하를 노리오. 주유 도독의 본대가 올 때까지 버텨야 하오."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "수상전입니다. 배를 묶어 진을 치고, 장무의 선봉을 꺾읍시다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "적벽의 결전까지, 이 강하를 사수하라!"
+        }
       ]
     },
     "outro": {
       "bg": "23-jiangxia-outro",
       "lines": [
-        { "speaker": "주유", "side": "ally", "portraitId": "주유", "text": "과연 제갈공명의 군세로군. ...허나 이 적벽의 주인은 나, 주유요." },
-        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "도독의 화공, 이 제갈량이 동남풍으로 돕지요." }
+        {
+          "speaker": "주유",
+          "side": "ally",
+          "portraitId": "주유",
+          "text": "과연 제갈공명의 군세로군. ...허나 이 적벽의 주인은 나, 주유요."
+        },
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "portraitId": "제갈량",
+          "text": "도독의 화공, 이 제갈량이 동남풍으로 돕지요."
+        }
       ]
     }
   },
@@ -30,7 +70,9 @@
       "classId": "lord",
       "level": 38,
       "troops": 320,
-      "items": ["옥새"],
+      "items": [
+        "옥새"
+      ],
       "side": "player",
       "x": 50,
       "y": 19
@@ -40,7 +82,10 @@
       "classId": "lightCavalry",
       "level": 39,
       "troops": 350,
-      "items": ["청룡언월도", "적토마"],
+      "items": [
+        "청룡언월도",
+        "적토마"
+      ],
       "side": "player",
       "x": 40,
       "y": 14
@@ -50,7 +95,9 @@
       "classId": "lightCavalry",
       "level": 39,
       "troops": 350,
-      "items": ["사모"],
+      "items": [
+        "사모"
+      ],
       "side": "player",
       "x": 40,
       "y": 22
@@ -60,7 +107,9 @@
       "classId": "lightCavalry",
       "level": 38,
       "troops": 340,
-      "items": ["삼첨도"],
+      "items": [
+        "삼첨도"
+      ],
       "side": "player",
       "x": 38,
       "y": 18
@@ -70,7 +119,10 @@
       "classId": "strategist",
       "level": 37,
       "troops": 250,
-      "items": ["둔갑천서", "농무서"],
+      "items": [
+        "둔갑천서",
+        "농무서"
+      ],
       "side": "player",
       "x": 48,
       "y": 21
@@ -100,7 +152,10 @@
       "classId": "sorcerer",
       "level": 34,
       "troops": 220,
-      "items": ["상약", "쌀"],
+      "items": [
+        "상약",
+        "쌀"
+      ],
       "side": "player",
       "x": 50,
       "y": 17
@@ -130,7 +185,9 @@
       "classId": "heavyCavalry",
       "level": 40,
       "troops": 400,
-      "items": ["적로"],
+      "items": [
+        "적로"
+      ],
       "side": "enemy",
       "x": 22,
       "y": 14
@@ -187,17 +244,30 @@
     }
   ],
   "objectives": [
-    { "kind": "surviveTurns", "turns": 35 },
-    { "kind": "defeatUnit", "unitId": "장무", "optional": true }
+    {
+      "kind": "surviveTurns",
+      "turns": 35
+    },
+    {
+      "kind": "defeatUnit",
+      "unitId": "장무",
+      "optional": true
+    }
   ],
   "failConditions": [
-    { "kind": "unitRetreated", "unitId": "유비" }
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    }
   ],
   "reinforcements": [
     {
       "id": "wu_pursuit_wave",
       "side": "enemy",
-      "trigger": { "kind": "turn", "turn": 8 },
+      "trigger": {
+        "kind": "turn",
+        "turn": 8
+      },
       "units": [
         {
           "commanderId": "학맹",
@@ -226,32 +296,127 @@
     {
       "id": "jiangxia_duel_order_dilu",
       "description": "허자장의 충고대로 장비 vs 진손 → 조운 vs 장무 순서로 일기토를 성사시키면 명마 [적로]를 얻는다.",
-      "trigger": { "kind": "duelsInOrder", "duelIds": ["duel_zhangfei_chensun", "duel_zhaoyun_zhangwu"] },
-      "reward": { "treasures": ["적로"], "gold": 400 }
+      "trigger": {
+        "kind": "duelsInOrder",
+        "duelIds": [
+          "duel_zhangfei_chensun",
+          "duel_zhaoyun_zhangwu"
+        ]
+      },
+      "reward": {
+        "treasures": [
+          "적로"
+        ],
+        "gold": 400
+      }
     }
   ],
   "dialogue": [
     {
       "id": "23-jiangxia_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "강하를 사수한다! 주유 도독이 올 때까지 버텨라." }
+        {
+          "speaker": "장무",
+          "side": "enemy",
+          "text": "강하의 물길은 우리 앞마당이다! 수적(水賊)의 맛을 보여주마!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "도적이 물을 믿고 날뛰는구나. — 물은 죄가 없다. 죄는 너희에게 있다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "강하를 얻어야 조조에 맞설 발판이 선다. 밀어붙여라!"
+        }
+      ]
+    },
+    {
+      "id": "23-jiangxia_turn8",
+      "trigger": {
+        "kind": "turn",
+        "n": 8
+      },
+      "lines": [
+        {
+          "speaker": "진손",
+          "side": "enemy",
+          "text": "형제들, 배를 돌려라! 놈들의 뒤를 쳐라!"
+        }
       ]
     },
     {
       "id": "duel_zhangfei_chensun_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_chensun" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhangfei_chensun"
+      },
       "lines": [
-      { "speaker": "진손", "side": "enemy", "portraitId": "진손", "text": "강하는 못 넘는다!" },
-      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "물 위에서도 내 사모는 무뎌지지 않는다!" }
+        {
+          "speaker": "진손",
+          "side": "enemy",
+          "portraitId": "진손",
+          "text": "강하는 못 넘는다!"
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "물 위에서도 내 사모는 무뎌지지 않는다!"
+        }
       ]
     },
     {
       "id": "duel_zhaoyun_zhangwu_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_zhangwu" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhaoyun_zhangwu"
+      },
       "lines": [
-      { "speaker": "장무", "side": "enemy", "portraitId": "장무", "text": "선봉을 꺾어주마!" },
-      { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "선봉이 꺾이면, 본대도 무너진다." }
+        {
+          "speaker": "장무",
+          "side": "enemy",
+          "portraitId": "장무",
+          "text": "선봉을 꺾어주마!"
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "선봉이 꺾이면, 본대도 무너진다."
+        }
+      ]
+    },
+    {
+      "id": "23-jiangxia_retreat_장무",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "장무"
+      },
+      "lines": [
+        {
+          "speaker": "장무",
+          "side": "enemy",
+          "text": "물 위에서 지다니... 있을 수 없는 일이다...!"
+        }
+      ]
+    },
+    {
+      "id": "23-jiangxia_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "강하가 우리 손에... 이제 오(吳)와 손을 잡을 차례다."
+        }
       ]
     }
   ],
@@ -259,15 +424,29 @@
     {
       "id": "duel_zhangfei_chensun",
       "type": "duel",
-      "trigger": { "kind": "attack", "attackerId": "장비", "defenderId": "진손" },
-      "outcome": { "winnerId": "장비", "loserRetreats": true },
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "장비",
+        "defenderId": "진손"
+      },
+      "outcome": {
+        "winnerId": "장비",
+        "loserRetreats": true
+      },
       "once": true
     },
     {
       "id": "duel_zhaoyun_zhangwu",
       "type": "duel",
-      "trigger": { "kind": "attack", "attackerId": "조운", "defenderId": "장무" },
-      "outcome": { "winnerId": "조운", "loserRetreats": true },
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "조운",
+        "defenderId": "장무"
+      },
+      "outcome": {
+        "winnerId": "조운",
+        "loserRetreats": true
+      },
       "once": true
     }
   ]

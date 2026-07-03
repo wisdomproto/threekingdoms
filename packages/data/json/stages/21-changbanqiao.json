@@ -22,15 +22,45 @@
     "intro": {
       "bg": "21-changbanqiao-intro",
       "lines": [
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "형님은 먼저 가시오! 이 장판교는 — 이 장익덕이 막는다!" },
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "스무 기로 수만을 막는다고? 흥, 다리 하나면 충분하다. 조조 놈들, 한 발짝도 못 넘는다!" }
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "형님은 먼저 가시오! 이 장판교는 — 이 장익덕이 막는다!"
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "스무 기로 수만을 막는다고? 흥, 다리 하나면 충분하다. 조조 놈들, 한 발짝도 못 넘는다!"
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "다리 하나, 나 하나. — 조조 백만 대군이라도 여기서는 외나무다리다."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "(자룡이 강을 건널 때까지... 한 발짝도 못 넘긴다.)"
+        }
       ]
     },
     "outro": {
       "bg": "21-changbanqiao-outro",
       "lines": [
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "연인 장익덕이 여기 있다! 누가 감히 죽기를 각오하고 덤비겠느냐!" },
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "...하후걸이 낙마했다? 으하하! 내 고함 한 방에 조조 대군이 물러가는구나!" }
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "연인 장익덕이 여기 있다! 누가 감히 죽기를 각오하고 덤비겠느냐!"
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "...하후걸이 낙마했다? 으하하! 내 고함 한 방에 조조 대군이 물러가는구나!"
+        }
       ]
     }
   },
@@ -241,17 +271,93 @@
   "dialogue": [
     {
       "id": "21-changbanqiao_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "장판교는 이 장익덕이 막는다! 한 발짝도 못 넘는다!" }
+        {
+          "speaker": "조조",
+          "side": "enemy",
+          "text": "저것이 장비인가. ...관우가 말했었지. 백만 군중에서 상장의 목을 따는 아우가 있다고."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "연인 장익덕이 여기 있다!! 죽고 싶은 놈부터 나와라!!"
+        },
+        {
+          "speaker": "문빙",
+          "side": "enemy",
+          "text": "...누, 누가 먼저 갈 테냐."
+        }
+      ]
+    },
+    {
+      "id": "21-changbanqiao_turn2",
+      "trigger": {
+        "kind": "turn",
+        "n": 2
+      },
+      "lines": [
+        {
+          "speaker": "조조",
+          "side": "enemy",
+          "text": "...복병이 있을지 모른다. 서두르지 마라."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "왜 안 오느냐!! 이 겁쟁이들아!!"
+        }
+      ]
+    },
+    {
+      "id": "21-changbanqiao_turn4",
+      "trigger": {
+        "kind": "turn",
+        "n": 4
+      },
+      "lines": [
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "(조금만... 조금만 더 시간을 벌면 된다...!)"
+        }
       ]
     },
     {
       "id": "duel_zhangfei_xuchu_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_xuchu" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhangfei_xuchu"
+      },
       "lines": [
-      { "speaker": "허저", "side": "enemy", "portraitId": "허저", "text": "다리 위 외톨이 하나!" },
-      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "외톨이? 으하하! 연인 장익덕의 고함을 들어봤느냐!" }
+        {
+          "speaker": "허저",
+          "side": "enemy",
+          "portraitId": "허저",
+          "text": "다리 위 외톨이 하나!"
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "외톨이? 으하하! 연인 장익덕의 고함을 들어봤느냐!"
+        }
+      ]
+    },
+    {
+      "id": "21-changbanqiao_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "크하하!! 조조군이 멈췄다! — 다리를 끊고 물러난다!"
+        }
       ]
     }
   ],

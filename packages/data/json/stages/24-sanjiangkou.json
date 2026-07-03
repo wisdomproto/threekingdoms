@@ -22,16 +22,41 @@
     "intro": {
       "bg": "24-sanjiangkou-intro",
       "lines": [
-        { "speaker": "주유", "side": "ally", "portraitId": "주유", "text": "삼강구에서 조조의 수군을 시험해 보겠소. 채모와 장윤이 수군을 조련했다지." },
-        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "북방의 군사는 물에 약합니다. 한 번 흔들어 두면, 적벽에서 무너집니다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "동오의 수군과 발을 맞춘다. 채모의 선단을 친다 — 수상전이다." }
+        {
+          "speaker": "주유",
+          "side": "ally",
+          "portraitId": "주유",
+          "text": "삼강구에서 조조의 수군을 시험해 보겠소. 채모와 장윤이 수군을 조련했다지."
+        },
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "portraitId": "제갈량",
+          "text": "북방의 군사는 물에 약합니다. 한 번 흔들어 두면, 적벽에서 무너집니다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "동오의 수군과 발을 맞춘다. 채모의 선단을 친다 — 수상전이다."
+        }
       ]
     },
     "outro": {
       "bg": "24-sanjiangkou-outro",
       "lines": [
-        { "speaker": "주유", "side": "ally", "portraitId": "주유", "text": "...공명, 그대의 재주가 두렵소. 동오를 위해서라도, 그대는 살려둘 수 없겠군." },
-        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "도독, 지금은 조조가 먼저입니다. 우리 일은 그 뒤에 논하시지요." }
+        {
+          "speaker": "주유",
+          "side": "ally",
+          "portraitId": "주유",
+          "text": "...공명, 그대의 재주가 두렵소. 동오를 위해서라도, 그대는 살려둘 수 없겠군."
+        },
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "portraitId": "제갈량",
+          "text": "도독, 지금은 조조가 먼저입니다. 우리 일은 그 뒤에 논하시지요."
+        }
       ]
     }
   },
@@ -350,17 +375,93 @@
   "dialogue": [
     {
       "id": "24-sanjiangkou_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "주유", "side": "ally", "portraitId": "주유", "text": "채모의 수군을 시험한다! 발을 맞춰라." }
+        {
+          "speaker": "채모",
+          "side": "enemy",
+          "text": "형주 수군의 힘, 오나라 애송이들에게 가르쳐주마!"
+        },
+        {
+          "speaker": "주유",
+          "side": "ally",
+          "text": "채모... 배신의 값을 받으러 왔다. 오군, 닻을 올려라!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "물 위의 싸움은 처음이다 — 주유 도독의 지휘를 보고 배운다!"
+        }
+      ]
+    },
+    {
+      "id": "24-sanjiangkou_turn5",
+      "trigger": {
+        "kind": "turn",
+        "n": 5
+      },
+      "lines": [
+        {
+          "speaker": "주유",
+          "side": "ally",
+          "text": "바람이 좋다. 지금이다 — 뱃머리를 돌려라!"
+        }
       ]
     },
     {
       "id": "duel_huanggai_caimao_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_huanggai_caimao" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_huanggai_caimao"
+      },
       "lines": [
-      { "speaker": "채모", "side": "enemy", "portraitId": "채모", "text": "동오의 늙은이가 감히!" },
-      { "speaker": "황개", "side": "ally", "portraitId": "황개", "text": "늙은 몸이라도, 강물의 이치는 안다." }
+        {
+          "speaker": "채모",
+          "side": "enemy",
+          "portraitId": "채모",
+          "text": "동오의 늙은이가 감히!"
+        },
+        {
+          "speaker": "황개",
+          "side": "ally",
+          "portraitId": "황개",
+          "text": "늙은 몸이라도, 강물의 이치는 안다."
+        }
+      ]
+    },
+    {
+      "id": "24-sanjiangkou_retreat_채모",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "채모"
+      },
+      "lines": [
+        {
+          "speaker": "채모",
+          "side": "enemy",
+          "text": "오군이 이 정도였다니... 후퇴, 후퇴다!"
+        }
+      ]
+    },
+    {
+      "id": "24-sanjiangkou_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "주유",
+          "side": "ally",
+          "text": "첫 물싸움 치고는 나쁘지 않군, 유황숙의 군사들."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "물 위의 싸움... 배웠다. 다음은 더 잘 싸운다."
+        }
       ]
     }
   ],

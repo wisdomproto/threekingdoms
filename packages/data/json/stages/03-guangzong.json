@@ -3,38 +3,153 @@
   "name": "광종 전투",
   "mapId": "guangzong",
   "turnLimit": 25,
-  "camera": { "zoom": 1.5, "focus": [40, 16] },
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      40,
+      16
+    ]
+  },
   "decorations": [
-    { "cell": [46, 15], "kind": "banner_command" },
-    { "cell": [42, 16], "kind": "campfire" },
-    { "cell": [46, 19], "kind": "supply_cart" },
-    { "cell": [42, 13], "kind": "pennants" },
-    { "cell": [30, 15], "kind": "debris_siege" },
-    { "cell": [18, 12], "kind": "debris_weapons" },
-    { "cell": [17, 20], "kind": "debris_cart", "flip": true },
-    { "cell": [9, 7], "kind": "pennants" },
-    { "cell": [5, 10], "kind": "brazier" },
-    { "cell": [4, 11], "kind": "campfire" },
-    { "cell": [5, 24], "kind": "shrub" },
-    { "cell": [9, 26], "kind": "debris_pile" }
+    {
+      "cell": [
+        46,
+        15
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        42,
+        16
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        46,
+        19
+      ],
+      "kind": "supply_cart"
+    },
+    {
+      "cell": [
+        42,
+        13
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        30,
+        15
+      ],
+      "kind": "debris_siege"
+    },
+    {
+      "cell": [
+        18,
+        12
+      ],
+      "kind": "debris_weapons"
+    },
+    {
+      "cell": [
+        17,
+        20
+      ],
+      "kind": "debris_cart",
+      "flip": true
+    },
+    {
+      "cell": [
+        9,
+        7
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        5,
+        10
+      ],
+      "kind": "brazier"
+    },
+    {
+      "cell": [
+        4,
+        11
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        5,
+        24
+      ],
+      "kind": "shrub"
+    },
+    {
+      "cell": [
+        9,
+        26
+      ],
+      "kind": "debris_pile"
+    }
   ],
-  "reward": { "gold": 250, "exp": 0, "treasures": ["무술교본"] },
+  "reward": {
+    "gold": 250,
+    "exp": 0,
+    "treasures": [
+      "무술교본"
+    ]
+  },
   "levelCap": 8,
   "scenario": {
     "intro": {
       "bg": "03-guangzong-intro",
       "lines": [
-        { "speaker": "공손찬", "side": "ally", "portraitId": "공손찬", "text": "현덕! 오랜만일세. 노식 장군을 도와 광종의 장보를 치러 왔네." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "백규 형님! 함께라면 든든하오." },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "장보는 요술을 부린다 합니다. 성벽에 의지해 농성 중이니 단숨에 몰아쳐야 합니다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "성문을 열어젖히고 장보를 잡는다. 요술에 현혹되지 마라." }
+        {
+          "speaker": "공손찬",
+          "side": "ally",
+          "portraitId": "공손찬",
+          "text": "현덕! 오랜만일세. 노식 장군을 도와 광종의 장보를 치러 왔네."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "백규 형님! 함께라면 든든하오."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "장보는 요술을 부린다 합니다. 성벽에 의지해 농성 중이니 단숨에 몰아쳐야 합니다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "성문을 열어젖히고 장보를 잡는다. 요술에 현혹되지 마라."
+        }
       ]
     },
     "outro": {
       "bg": "03-guangzong-outro",
       "lines": [
-        { "speaker": "공손찬", "side": "ally", "portraitId": "공손찬", "text": "역시 자네들이군. 노식 장군께 자네 공을 전하겠네." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "황건의 머리가 하나 떨어졌소. 이제 장각만 남았구려." }
+        {
+          "speaker": "공손찬",
+          "side": "ally",
+          "portraitId": "공손찬",
+          "text": "역시 자네들이군. 노식 장군께 자네 공을 전하겠네."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "황건의 머리가 하나 떨어졌소. 이제 장각만 남았구려."
+        }
       ]
     }
   },
@@ -54,7 +169,9 @@
       "classId": "lightCavalry",
       "level": 2,
       "troops": 105,
-      "items": ["청룡언월도"],
+      "items": [
+        "청룡언월도"
+      ],
       "side": "player",
       "x": 44,
       "y": 15
@@ -64,7 +181,9 @@
       "classId": "lightCavalry",
       "level": 2,
       "troops": 105,
-      "items": ["사모"],
+      "items": [
+        "사모"
+      ],
       "side": "player",
       "x": 44,
       "y": 17
@@ -74,7 +193,9 @@
       "classId": "strategist",
       "level": 2,
       "troops": 80,
-      "items": ["폭탄"],
+      "items": [
+        "폭탄"
+      ],
       "side": "player",
       "x": 45,
       "y": 16
@@ -140,13 +261,26 @@
       "y": 9
     }
   ],
-  "objectives": [{ "kind": "defeatUnit", "unitId": "장보" }],
-  "failConditions": [{ "kind": "unitRetreated", "unitId": "유비" }],
+  "objectives": [
+    {
+      "kind": "defeatUnit",
+      "unitId": "장보"
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    }
+  ],
   "reinforcements": [
     {
       "id": "yellowturban_sally",
       "side": "enemy",
-      "trigger": { "kind": "turn", "turn": 4 },
+      "trigger": {
+        "kind": "turn",
+        "turn": 4
+      },
       "units": [
         {
           "commanderId": "보병대",
@@ -175,17 +309,89 @@
     {
       "id": "seize_barracks",
       "description": "성내 병영을 점거하면 군량을 확보한다",
-      "trigger": { "kind": "unitReachedTile", "unitId": "장비", "x": 7, "y": 7 },
-      "reward": { "treasures": ["콩"], "gold": 100 }
+      "trigger": {
+        "kind": "unitReachedTile",
+        "unitId": "장비",
+        "x": 7,
+        "y": 7
+      },
+      "reward": {
+        "treasures": [
+          "콩"
+        ],
+        "gold": 100
+      }
     }
   ],
   "dialogue": [
     {
       "id": "03-guangzong_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "공손찬", "side": "ally", "portraitId": "공손찬", "text": "성문을 부숴라! 장보를 끌어내!" },
-      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "요술에 흔들리지 마라. 진을 굳게!" }
+        {
+          "speaker": "장보",
+          "side": "enemy",
+          "text": "성벽은 높고 너희 목숨은 하나뿐이다. 물러가라, 한실의 개들!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "성이 높다 한들, 지키는 자의 마음이 낮으면 무너지는 법."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "북을 울려라. 광종성을 연다!"
+        }
+      ]
+    },
+    {
+      "id": "03-guangzong_turn4",
+      "trigger": {
+        "kind": "turn",
+        "n": 4
+      },
+      "lines": [
+        {
+          "speaker": "장보",
+          "side": "enemy",
+          "text": "황건의 형제들이여, 관군의 등을 쳐라!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "적 증원이다! 대열을 흩트리지 마라!"
+        }
+      ]
+    },
+    {
+      "id": "03-guangzong_retreat_장보",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "장보"
+      },
+      "lines": [
+        {
+          "speaker": "장보",
+          "side": "enemy",
+          "text": "형님... 광종이, 무너집니다..."
+        }
+      ]
+    },
+    {
+      "id": "03-guangzong_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "성문이 열렸다. ...장각과의 결착이 머지않았다."
+        }
       ]
     }
   ],

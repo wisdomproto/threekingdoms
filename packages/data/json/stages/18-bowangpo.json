@@ -3,25 +3,70 @@
   "name": "박망파",
   "mapId": "bowangpo",
   "turnLimit": 30,
-  "camera": { "zoom": 1.2, "focus": [22, 14] },
-  "reward": { "gold": 1400, "exp": 0, "treasures": [] },
+  "camera": {
+    "zoom": 1.2,
+    "focus": [
+      22,
+      14
+    ]
+  },
+  "reward": {
+    "gold": 1400,
+    "exp": 0,
+    "treasures": []
+  },
   "levelCap": 32,
   "scenario": {
     "intro": {
       "bg": "18-bowangpo-intro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "와룡 선생을 삼고초려 끝에 모셨소. 군사, 첫 싸움이오. 박망파에서 하후돈을 막아야 하오." },
-        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "걱정 마십시오. 좁은 길과 마른 숲 — 화공에 더없이 좋은 자리입니다. 하후돈을 끌어들이지요." },
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "흥, 책상물림 서생이 뭘 안다고. 정말 이길 수 있겠소?" },
-        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "장군, 보고 나서 말씀하셔도 늦지 않습니다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "군사의 말을 따른다. 적을 골짜기로 유인하라." }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "와룡 선생을 삼고초려 끝에 모셨소. 군사, 첫 싸움이오. 박망파에서 하후돈을 막아야 하오."
+        },
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "portraitId": "제갈량",
+          "text": "걱정 마십시오. 좁은 길과 마른 숲 — 화공에 더없이 좋은 자리입니다. 하후돈을 끌어들이지요."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "흥, 책상물림 서생이 뭘 안다고. 정말 이길 수 있겠소?"
+        },
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "portraitId": "제갈량",
+          "text": "장군, 보고 나서 말씀하셔도 늦지 않습니다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "군사의 말을 따른다. 적을 골짜기로 유인하라."
+        }
       ]
     },
     "outro": {
       "bg": "18-bowangpo-outro",
       "lines": [
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "...불바다가 됐구려. 하후돈의 대군이 통째로! 와룡 선생, 내가 잘못 봤소." },
-        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "과찬이십니다. 이제 시작일 뿐입니다 — 조조의 본대가 곧 남하합니다." }
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "...불바다가 됐구려. 하후돈의 대군이 통째로! 와룡 선생, 내가 잘못 봤소."
+        },
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "portraitId": "제갈량",
+          "text": "과찬이십니다. 이제 시작일 뿐입니다 — 조조의 본대가 곧 남하합니다."
+        }
       ]
     }
   },
@@ -31,7 +76,9 @@
       "classId": "lord",
       "level": 24,
       "troops": 230,
-      "items": ["옥새"],
+      "items": [
+        "옥새"
+      ],
       "side": "player",
       "x": 9,
       "y": 16
@@ -41,7 +88,9 @@
       "classId": "strategist",
       "level": 22,
       "troops": 180,
-      "items": ["둔갑천서"],
+      "items": [
+        "둔갑천서"
+      ],
       "side": "player",
       "x": 8,
       "y": 17
@@ -51,7 +100,10 @@
       "classId": "lightCavalry",
       "level": 25,
       "troops": 240,
-      "items": ["청룡언월도", "적토마"],
+      "items": [
+        "청룡언월도",
+        "적토마"
+      ],
       "side": "player",
       "x": 11,
       "y": 15
@@ -61,7 +113,9 @@
       "classId": "lightCavalry",
       "level": 24,
       "troops": 235,
-      "items": ["사모"],
+      "items": [
+        "사모"
+      ],
       "side": "player",
       "x": 12,
       "y": 18
@@ -71,7 +125,9 @@
       "classId": "lightCavalry",
       "level": 24,
       "troops": 230,
-      "items": ["적로"],
+      "items": [
+        "적로"
+      ],
       "side": "player",
       "x": 13,
       "y": 14
@@ -81,7 +137,9 @@
       "classId": "sorcerer",
       "level": 21,
       "troops": 160,
-      "items": ["상약"],
+      "items": [
+        "상약"
+      ],
       "side": "player",
       "x": 8,
       "y": 19
@@ -91,7 +149,9 @@
       "classId": "heavyCavalry",
       "level": 26,
       "troops": 260,
-      "items": ["근위개"],
+      "items": [
+        "근위개"
+      ],
       "side": "enemy",
       "x": 31,
       "y": 14
@@ -138,24 +198,37 @@
     }
   ],
   "objectives": [
-    { "kind": "defeatUnit", "unitId": "하후돈" }
+    {
+      "kind": "defeatUnit",
+      "unitId": "하후돈"
+    }
   ],
   "failConditions": [
-    { "kind": "unitRetreated", "unitId": "유비" },
-    { "kind": "turnLimitExceeded" }
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
   ],
   "reinforcements": [
     {
       "id": "huoshao_liufeng_guanping",
       "side": "player",
-      "trigger": { "kind": "turn", "turn": 4 },
+      "trigger": {
+        "kind": "turn",
+        "turn": 4
+      },
       "units": [
         {
           "commanderId": "유봉",
           "classId": "footman",
           "level": 20,
           "troops": 150,
-          "items": ["폭탄"],
+          "items": [
+            "폭탄"
+          ],
           "side": "player",
           "x": 22,
           "y": 13
@@ -165,7 +238,9 @@
           "classId": "lightCavalry",
           "level": 20,
           "troops": 150,
-          "items": ["폭탄"],
+          "items": [
+            "폭탄"
+          ],
           "side": "player",
           "x": 22,
           "y": 12
@@ -175,7 +250,10 @@
     {
       "id": "xiahoudun_rearguard",
       "side": "enemy",
-      "trigger": { "kind": "turn", "turn": 6 },
+      "trigger": {
+        "kind": "turn",
+        "turn": 6
+      },
       "units": [
         {
           "commanderId": "하후연",
@@ -204,24 +282,127 @@
     {
       "id": "duel_guanyu_lidian_reward",
       "description": "관우가 이전과 일기토를 벌여 적 선봉을 깨면 [가죽방패](근위개)를 노획한다.",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_lidian" },
-      "reward": { "treasures": ["근위개"], "gold": 300 }
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_guanyu_lidian"
+      },
+      "reward": {
+        "treasures": [
+          "근위개"
+        ],
+        "gold": 300
+      }
     }
   ],
   "dialogue": [
     {
       "id": "18-bowangpo_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "하후돈을 마른 골짜기로 유인하라. 불을 기다린다." }
+        {
+          "speaker": "하후돈",
+          "side": "enemy",
+          "text": "제갈량? 밭이나 갈던 촌부가 군사(軍師)라니, 웃음도 아깝다!"
+        },
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "text": "바람의 길과 불의 길은 이미 정해두었습니다. — 주공, 적을 골짜기로."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "군사의 첫 계략이다. 한 치의 어긋남 없이 움직여라!"
+        }
+      ]
+    },
+    {
+      "id": "18-bowangpo_turn4",
+      "trigger": {
+        "kind": "turn",
+        "n": 4
+      },
+      "lines": [
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "복병, 지금입니다! 퇴로를 끊는다!"
+        }
+      ]
+    },
+    {
+      "id": "18-bowangpo_turn6",
+      "trigger": {
+        "kind": "turn",
+        "n": 6
+      },
+      "lines": [
+        {
+          "speaker": "하후돈",
+          "side": "enemy",
+          "text": "후군은 무얼 하느냐! 전부 밀어 넣어라!"
+        }
       ]
     },
     {
       "id": "duel_guanyu_lidian_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_lidian" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_guanyu_lidian"
+      },
       "lines": [
-      { "speaker": "이전", "side": "enemy", "portraitId": "이전", "text": "복병이다! 물러서면 안 된다!" },
-      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "이미 늦었다. 골짜기가 곧 불바다가 되리라." }
+        {
+          "speaker": "이전",
+          "side": "enemy",
+          "portraitId": "이전",
+          "text": "복병이다! 물러서면 안 된다!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "이미 늦었다. 골짜기가 곧 불바다가 되리라."
+        }
+      ]
+    },
+    {
+      "id": "18-bowangpo_retreat_하후돈",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "하후돈"
+      },
+      "lines": [
+        {
+          "speaker": "하후돈",
+          "side": "enemy",
+          "text": "촌부의 불장난에... 이 하후돈이...!"
+        },
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "text": "불은 계산대로 탔습니다. 남은 것은 바람이 거둘 것입니다."
+        }
+      ]
+    },
+    {
+      "id": "18-bowangpo_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "그 촌부 선생... 물건이구려, 형님!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "와룡이 날개를 폈다. 이제부터가 시작이다."
+        }
       ]
     }
   ],
@@ -229,8 +410,15 @@
     {
       "id": "duel_guanyu_lidian",
       "type": "duel",
-      "trigger": { "kind": "attack", "attackerId": "관우", "defenderId": "이전" },
-      "outcome": { "winnerId": "관우", "loserRetreats": false },
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "관우",
+        "defenderId": "이전"
+      },
+      "outcome": {
+        "winnerId": "관우",
+        "loserRetreats": false
+      },
       "once": true
     }
   ]

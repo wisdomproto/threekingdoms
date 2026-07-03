@@ -22,16 +22,41 @@
     "intro": {
       "bg": "10-xuzhou-intro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "서주의 도겸 공이 조조에게 포위됐소. 부친의 원수를 갚는다며 서주를 도륙하고 있다지." },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "조조의 복수전입니다. 성을 지키며 원군을 기다리면, 조조도 군량 탓에 물러갈 겁니다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "열닷새를 버틴다. 하후돈을 막아내면 도겸 공을 구할 수 있다 — 수성이다!" }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "서주의 도겸 공이 조조에게 포위됐소. 부친의 원수를 갚는다며 서주를 도륙하고 있다지."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "조조의 복수전입니다. 성을 지키며 원군을 기다리면, 조조도 군량 탓에 물러갈 겁니다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "열닷새를 버틴다. 하후돈을 막아내면 도겸 공을 구할 수 있다 — 수성이다!"
+        }
       ]
     },
     "outro": {
       "bg": "10-xuzhou-outro",
       "lines": [
-        { "speaker": "도겸", "side": "ally", "portraitId": "도겸", "text": "현덕... 이 늙은이가 부탁하오. 서주를, 이 백성들을 그대에게 맡기고 싶소." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "당치 않습니다. 허나... 백성을 버릴 수는 없지요." }
+        {
+          "speaker": "도겸",
+          "side": "ally",
+          "portraitId": "도겸",
+          "text": "현덕... 이 늙은이가 부탁하오. 서주를, 이 백성들을 그대에게 맡기고 싶소."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "당치 않습니다. 허나... 백성을 버릴 수는 없지요."
+        }
       ]
     }
   },
@@ -236,17 +261,88 @@
   "dialogue": [
     {
       "id": "10-xuzhou_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "성을 지킨다! 원군이 올 때까지 버텨라." }
+        {
+          "speaker": "하후돈",
+          "side": "enemy",
+          "text": "서주는 조공의 원수의 땅이다. 성도 사람도 남기지 말라는 군령이시다!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "학살을 군령이라 부르지 마라! 서주의 백성은 우리가 지킨다!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "조조군의 창끝이 매섭습니다. 형님 — 한 발도 물릴 수 없습니다."
+        }
+      ]
+    },
+    {
+      "id": "10-xuzhou_turn6",
+      "trigger": {
+        "kind": "turn",
+        "n": 6
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "도겸 공의 원군이다! 기세를 올려라!"
+        }
       ]
     },
     {
       "id": "duel_guanyu_yujin_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_yujin" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_guanyu_yujin"
+      },
       "lines": [
-      { "speaker": "우금", "side": "enemy", "portraitId": "우금", "text": "서주는 조조공의 복수가 닿는 땅!" },
-      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "복수에 백성을 끌어들이는 건 대장부가 아니다." }
+        {
+          "speaker": "우금",
+          "side": "enemy",
+          "portraitId": "우금",
+          "text": "서주는 조조공의 복수가 닿는 땅!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "복수에 백성을 끌어들이는 건 대장부가 아니다."
+        }
+      ]
+    },
+    {
+      "id": "10-xuzhou_retreat_하후돈",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "하후돈"
+      },
+      "lines": [
+        {
+          "speaker": "하후돈",
+          "side": "enemy",
+          "text": "유비... 그 이름, 조공께 전해두마."
+        }
+      ]
+    },
+    {
+      "id": "10-xuzhou_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "서주가... 지켜졌다. 백성들이 우리를 보고 있다."
+        }
       ]
     }
   ],

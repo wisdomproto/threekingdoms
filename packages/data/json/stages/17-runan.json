@@ -3,26 +3,76 @@
   "name": "여남 전투",
   "mapId": "runan",
   "turnLimit": 35,
-  "camera": { "zoom": 1.2, "focus": [10, 28] },
-  "reward": { "gold": 1600, "exp": 0, "treasures": [] },
+  "camera": {
+    "zoom": 1.2,
+    "focus": [
+      10,
+      28
+    ]
+  },
+  "reward": {
+    "gold": 1600,
+    "exp": 0,
+    "treasures": []
+  },
   "levelCap": 35,
   "scenario": {
     "intro": {
       "bg": "17-runan-intro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "여남에서 황건 잔당과 손잡고 조조의 후방을 친다. ...헌데 운장의 소식이 끊긴 지 오래다." },
-        { "speaker": "관평", "side": "player", "portraitId": "관평", "text": "아버님께서... 관우 장군께서 조조 진영을 떠나 주공을 찾아 오신다는 소문이!" },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "운장이...! 정말이냐. 오관을 뚫고 온다면, 반드시 길에서 만나야 한다." },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "...형님! 천 리를 달려, 다섯 관문을 넘어 — 돌아왔습니다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "운장...! 살아 있었구나. 살아 있었어!" }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "여남에서 황건 잔당과 손잡고 조조의 후방을 친다. ...헌데 운장의 소식이 끊긴 지 오래다."
+        },
+        {
+          "speaker": "관평",
+          "side": "player",
+          "portraitId": "관평",
+          "text": "아버님께서... 관우 장군께서 조조 진영을 떠나 주공을 찾아 오신다는 소문이!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "운장이...! 정말이냐. 오관을 뚫고 온다면, 반드시 길에서 만나야 한다."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "...형님! 천 리를 달려, 다섯 관문을 넘어 — 돌아왔습니다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "운장...! 살아 있었구나. 살아 있었어!"
+        }
       ]
     },
     "outro": {
       "bg": "17-runan-outro",
       "lines": [
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "형님! 운장 형님! 으하하, 다시 뭉쳤구려!" },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "한실의 녹을 먹었으나 마음은 늘 형님께 있었습니다. 이제 다시는 떨어지지 않겠습니다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "삼형제가 다시 한자리에. ...이거면 천하가 두렵지 않다." }
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "형님! 운장 형님! 으하하, 다시 뭉쳤구려!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "한실의 녹을 먹었으나 마음은 늘 형님께 있었습니다. 이제 다시는 떨어지지 않겠습니다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "삼형제가 다시 한자리에. ...이거면 천하가 두렵지 않다."
+        }
       ]
     }
   },
@@ -32,7 +82,9 @@
       "classId": "lord",
       "level": 24,
       "troops": 336,
-      "items": ["적로"],
+      "items": [
+        "적로"
+      ],
       "side": "player",
       "x": 5,
       "y": 30
@@ -42,7 +94,10 @@
       "classId": "heavyCavalry",
       "level": 25,
       "troops": 270,
-      "items": ["청룡언월도", "적토마"],
+      "items": [
+        "청룡언월도",
+        "적토마"
+      ],
       "side": "player",
       "x": 4,
       "y": 31
@@ -52,7 +107,9 @@
       "classId": "heavyCavalry",
       "level": 24,
       "troops": 260,
-      "items": ["사모"],
+      "items": [
+        "사모"
+      ],
       "side": "player",
       "x": 6,
       "y": 31
@@ -62,7 +119,9 @@
       "classId": "guardCavalry",
       "level": 24,
       "troops": 255,
-      "items": ["삼첨도"],
+      "items": [
+        "삼첨도"
+      ],
       "side": "player",
       "x": 5,
       "y": 32
@@ -72,7 +131,10 @@
       "classId": "strategist",
       "level": 22,
       "troops": 180,
-      "items": ["손자의병법서", "쌀"],
+      "items": [
+        "손자의병법서",
+        "쌀"
+      ],
       "side": "player",
       "x": 3,
       "y": 29
@@ -82,7 +144,9 @@
       "classId": "sorcerer",
       "level": 21,
       "troops": 170,
-      "items": ["상약"],
+      "items": [
+        "상약"
+      ],
       "side": "player",
       "x": 7,
       "y": 30
@@ -179,17 +243,30 @@
     }
   ],
   "objectives": [
-    { "kind": "reachTile", "unitId": "유비", "x": 61, "y": 21 }
+    {
+      "kind": "reachTile",
+      "unitId": "유비",
+      "x": 61,
+      "y": 21
+    }
   ],
   "failConditions": [
-    { "kind": "unitRetreated", "unitId": "유비" },
-    { "kind": "turnLimitExceeded" }
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
   ],
   "reinforcements": [
     {
       "id": "caoren_pursuit",
       "side": "enemy",
-      "trigger": { "kind": "turn", "turn": 6 },
+      "trigger": {
+        "kind": "turn",
+        "turn": 6
+      },
       "units": [
         {
           "commanderId": "하후돈",
@@ -218,24 +295,108 @@
     {
       "id": "duel_zhaoyun_xuchu_reward",
       "description": "조운이 허저와 일기토를 벌여 추격을 저지하면 [근위개]를 노획한다.",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_xuchu" },
-      "reward": { "treasures": ["근위개"], "gold": 400 }
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhaoyun_xuchu"
+      },
+      "reward": {
+        "treasures": [
+          "근위개"
+        ],
+        "gold": 400
+      }
     }
   ],
   "dialogue": [
     {
       "id": "17-runan_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "운장이 오관을 넘어 온다! 길에서 만나야 한다 — 전진!" }
+        {
+          "speaker": "허저",
+          "side": "enemy",
+          "text": "여남의 잔당들, 그리고 유비! 오늘로 끝을 내주마!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "아우들과 다시 만난 이 날 — 물러설 수는 없다!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "형님 곁에 다시 섰습니다. 이 청룡도, 두 번 다시 헤어지지 않습니다."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "삼형제가 다시 모였다! 천하에 두려울 게 뭐냐!"
+        }
+      ]
+    },
+    {
+      "id": "17-runan_turn6",
+      "trigger": {
+        "kind": "turn",
+        "n": 6
+      },
+      "lines": [
+        {
+          "speaker": "조인",
+          "side": "enemy",
+          "text": "포위하라! 이번에야말로 유비의 목을 조공께 바친다!"
+        }
       ]
     },
     {
       "id": "duel_zhaoyun_xuchu_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_xuchu" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhaoyun_xuchu"
+      },
       "lines": [
-      { "speaker": "허저", "side": "enemy", "portraitId": "허저", "text": "또 너냐, 상산의 조자룡!" },
-      { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "주공께 가는 길, 누구도 못 막는다." }
+        {
+          "speaker": "허저",
+          "side": "enemy",
+          "portraitId": "허저",
+          "text": "또 너냐, 상산의 조자룡!"
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "주공께 가는 길, 누구도 못 막는다."
+        }
+      ]
+    },
+    {
+      "id": "17-runan_retreat_허저",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "허저"
+      },
+      "lines": [
+        {
+          "speaker": "허저",
+          "side": "enemy",
+          "text": "칫... 삼형제가 다 모이니 성가시군...!"
+        }
+      ]
+    },
+    {
+      "id": "17-runan_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "우리 셋이 함께라면 — 어떤 난세도 두렵지 않다."
+        }
       ]
     }
   ],
@@ -243,8 +404,15 @@
     {
       "id": "duel_zhaoyun_xuchu",
       "type": "duel",
-      "trigger": { "kind": "attack", "attackerId": "조운", "defenderId": "허저" },
-      "outcome": { "winnerId": "조운", "loserRetreats": true },
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "조운",
+        "defenderId": "허저"
+      },
+      "outcome": {
+        "winnerId": "조운",
+        "loserRetreats": true
+      },
       "once": true
     }
   ]

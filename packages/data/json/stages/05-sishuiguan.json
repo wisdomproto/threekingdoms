@@ -3,38 +3,154 @@
   "name": "사수관 전투",
   "mapId": "sishuiguan",
   "turnLimit": 30,
-  "camera": { "zoom": 1.7, "focus": [50, 15] },
+  "camera": {
+    "zoom": 1.7,
+    "focus": [
+      50,
+      15
+    ]
+  },
   "decorations": [
-    { "cell": [49, 13], "kind": "banner_command" },
-    { "cell": [52, 17], "kind": "campfire" },
-    { "cell": [48, 15], "kind": "pennants", "flip": true },
-    { "cell": [53, 12], "kind": "supply_cart" },
-    { "cell": [22, 16], "kind": "debris_weapons" },
-    { "cell": [25, 18], "kind": "debris_cart", "flip": true },
-    { "cell": [13, 12], "kind": "pennants" },
-    { "cell": [15, 17], "kind": "brazier" },
-    { "cell": [6, 20], "kind": "reeds" },
-    { "cell": [4, 21], "kind": "reeds", "flip": true },
-    { "cell": [9, 24], "kind": "reeds" }
+    {
+      "cell": [
+        49,
+        13
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        52,
+        17
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        48,
+        15
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        53,
+        12
+      ],
+      "kind": "supply_cart"
+    },
+    {
+      "cell": [
+        22,
+        16
+      ],
+      "kind": "debris_weapons"
+    },
+    {
+      "cell": [
+        25,
+        18
+      ],
+      "kind": "debris_cart",
+      "flip": true
+    },
+    {
+      "cell": [
+        13,
+        12
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        15,
+        17
+      ],
+      "kind": "brazier"
+    },
+    {
+      "cell": [
+        6,
+        20
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        4,
+        21
+      ],
+      "kind": "reeds",
+      "flip": true
+    },
+    {
+      "cell": [
+        9,
+        24
+      ],
+      "kind": "reeds"
+    }
   ],
-  "reward": { "gold": 300, "exp": 0, "treasures": ["무술교본"] },
+  "reward": {
+    "gold": 300,
+    "exp": 0,
+    "treasures": [
+      "무술교본"
+    ]
+  },
   "levelCap": 12,
   "scenario": {
     "intro": {
       "bg": "05-sishuiguan-intro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "사수관이라... 적장 화웅이 연합군의 장수들을 연이어 베었다 들었소." },
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "형님! 그깟 화웅 따위, 이 장비가 단숨에 목을 따오리다!" },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "아우, 고정하게. 적장의 무위가 만만치 않다 하니 가벼이 볼 일이 아니다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "제후들은 술잔만 기울일 뿐 누구도 나서지 못하는구나. ...우리가 길을 트자." }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "사수관이라... 적장 화웅이 연합군의 장수들을 연이어 베었다 들었소."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "형님! 그깟 화웅 따위, 이 장비가 단숨에 목을 따오리다!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "아우, 고정하게. 적장의 무위가 만만치 않다 하니 가벼이 볼 일이 아니다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "제후들은 술잔만 기울일 뿐 누구도 나서지 못하는구나. ...우리가 길을 트자."
+        }
       ]
     },
     "outro": {
       "bg": "05-sishuiguan-outro",
       "lines": [
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "화웅의 목, 여기 가져왔습니다. 술이 식기 전에 말입니다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "천하가 오늘 이 이름을 기억하게 될 것이다 — 관운장." },
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "크하하! 다음 관문은 이 장비에게 맡기시오, 형님!" }
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "화웅의 목, 여기 가져왔습니다. 술이 식기 전에 말입니다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "천하가 오늘 이 이름을 기억하게 될 것이다 — 관운장."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "크하하! 다음 관문은 이 장비에게 맡기시오, 형님!"
+        }
       ]
     }
   },
@@ -54,7 +170,9 @@
       "classId": "lightCavalry",
       "level": 1,
       "troops": 105,
-      "items": ["청룡언월도"],
+      "items": [
+        "청룡언월도"
+      ],
       "side": "player",
       "x": 50,
       "y": 15
@@ -64,7 +182,9 @@
       "classId": "lightCavalry",
       "level": 1,
       "troops": 105,
-      "items": ["사모"],
+      "items": [
+        "사모"
+      ],
       "side": "player",
       "x": 50,
       "y": 16
@@ -74,7 +194,10 @@
       "classId": "strategist",
       "level": 1,
       "troops": 80,
-      "items": ["쌀", "폭탄"],
+      "items": [
+        "쌀",
+        "폭탄"
+      ],
       "side": "player",
       "x": 52,
       "y": 15
@@ -130,32 +253,97 @@
       "y": 14
     }
   ],
-  "objectives": [{ "kind": "defeatUnit", "unitId": "화웅" }],
-  "failConditions": [{ "kind": "unitRetreated", "unitId": "유비" }],
+  "objectives": [
+    {
+      "kind": "defeatUnit",
+      "unitId": "화웅"
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    }
+  ],
   "dialogue": [
     {
       "id": "intro_sishuiguan",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-        { "speaker": "원술", "side": "ally", "text": "한낱 짚신 장수 형제가 관문을 넘겠다고? 제후들의 술자리에 끼어들 자리는 없다." },
-        { "speaker": "유비", "side": "player", "text": "공을 다투러 온 것이 아니오. 화웅의 목을 베어 연합의 길을 트면 그뿐." },
-        { "speaker": "관우", "side": "player", "text": "형님, 저 자는 제게 맡기십시오. 술이 식기 전에 돌아오겠습니다." }
+        {
+          "speaker": "원술",
+          "side": "ally",
+          "text": "한낱 짚신 장수 형제가 관문을 넘겠다고? 제후들의 술자리에 끼어들 자리는 없다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "공을 다투러 온 것이 아니오. 화웅의 목을 베어 연합의 길을 트면 그뿐."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "형님, 저 자는 제게 맡기십시오. 술이 식기 전에 돌아오겠습니다."
+        }
+      ]
+    },
+    {
+      "id": "05-sishuiguan_turn3",
+      "trigger": {
+        "kind": "turn",
+        "n": 3
+      },
+      "lines": [
+        {
+          "speaker": "화웅",
+          "side": "enemy",
+          "text": "연합군 놈들, 겨우 이 정도냐! 나 화웅의 칼은 아직 마르지도 않았다!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "...곧, 마를 일조차 없어질 것이다."
+        }
       ]
     },
     {
       "id": "duel_guanyu_huaxiong_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_huaxiong" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_guanyu_huaxiong"
+      },
       "lines": [
-        { "speaker": "화웅", "side": "enemy", "text": "이름 없는 졸개가 감히 내 앞을 막아서느냐!" },
-        { "speaker": "관우", "side": "player", "text": "이름은 벤 뒤에 알려주마. 청룡언월도가 네 마지막 스승이 될 것이다." }
+        {
+          "speaker": "화웅",
+          "side": "enemy",
+          "text": "이름 없는 졸개가 감히 내 앞을 막아서느냐!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "이름은 벤 뒤에 알려주마. 청룡언월도가 네 마지막 스승이 될 것이다."
+        }
       ]
     },
     {
       "id": "outro_sishuiguan_victory",
-      "trigger": { "kind": "battleEnd", "result": "victory" },
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
       "lines": [
-        { "speaker": "관우", "side": "player", "text": "약속대로, 술은 아직 따뜻합니다." },
-        { "speaker": "유비", "side": "player", "text": "오늘 이 이름, 천하가 기억하게 될 것이다." }
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "약속대로, 술은 아직 따뜻합니다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "오늘 이 이름, 천하가 기억하게 될 것이다."
+        }
       ]
     }
   ],
@@ -163,8 +351,15 @@
     {
       "id": "duel_guanyu_huaxiong",
       "type": "duel",
-      "trigger": { "kind": "attack", "attackerId": "관우", "defenderId": "화웅" },
-      "outcome": { "winnerId": "관우", "loserRetreats": true },
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "관우",
+        "defenderId": "화웅"
+      },
+      "outcome": {
+        "winnerId": "관우",
+        "loserRetreats": true
+      },
       "once": true
     }
   ]

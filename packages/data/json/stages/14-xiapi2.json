@@ -22,17 +22,47 @@
     "intro": {
       "bg": "14-xiapi2-intro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "조조와 손잡고 하비를 친다. 여포를 끝낼 마지막 기회요." },
-        { "speaker": "제갈량", "side": "player", "portraitId": "제갈량", "text": "...아직 제가 합류하기 전 일이나, 기록을 보니 수공입니다. 사수와 기수를 터 하비를 잠근다지요." },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "진궁의 계략이 여포를 묶고 있습니다. 물이 차오르면 여포의 기병도 무용지물." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "여포를 사로잡는다. 은혜를 원수로 갚은 값을 치르게 하라." }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "조조와 손잡고 하비를 친다. 여포를 끝낼 마지막 기회요."
+        },
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "portraitId": "제갈량",
+          "text": "...아직 제가 합류하기 전 일이나, 기록을 보니 수공입니다. 사수와 기수를 터 하비를 잠근다지요."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "진궁의 계략이 여포를 묶고 있습니다. 물이 차오르면 여포의 기병도 무용지물."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "여포를 사로잡는다. 은혜를 원수로 갚은 값을 치르게 하라."
+        }
       ]
     },
     "outro": {
       "bg": "14-xiapi2-outro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "여포가 사로잡혔다... 조조가 그를 살려둘까." },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "살려둘 리 없습니다. 한때 천하제일의 맹장도, 신의 없는 자의 최후는 저러하군요." }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "여포가 사로잡혔다... 조조가 그를 살려둘까."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "살려둘 리 없습니다. 한때 천하제일의 맹장도, 신의 없는 자의 최후는 저러하군요."
+        }
       ]
     }
   },
@@ -341,17 +371,107 @@
   "dialogue": [
     {
       "id": "14-xiapi2_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "여포를 사로잡는다! 물이 차오른다, 서둘러라." }
+        {
+          "speaker": "여포",
+          "side": "enemy",
+          "text": "물이 성을 삼켜도, 이 여포는 삼키지 못한다!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "...끝을 내러 왔다, 여포. 이번에는 물러서지 않는다."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "수공으로 성의 이빨은 뽑혔습니다. 남은 것은 — 저 사내 하나."
+        }
+      ]
+    },
+    {
+      "id": "14-xiapi2_turn12",
+      "trigger": {
+        "kind": "turn",
+        "n": 12
+      },
+      "lines": [
+        {
+          "speaker": "진궁",
+          "side": "enemy",
+          "text": "최후까지 싸운다. 그것이 내가 고른 주공에 대한 예다."
+        }
+      ]
+    },
+    {
+      "id": "14-xiapi2_turn13",
+      "trigger": {
+        "kind": "turn",
+        "n": 13
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "조조군이 합류했다. ...이 싸움, 오늘 끝난다."
+        }
       ]
     },
     {
       "id": "duel_guanyu_zhangliao_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_zhangliao" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_guanyu_zhangliao"
+      },
       "lines": [
-      { "speaker": "장요", "side": "enemy", "portraitId": "장요", "text": "여포공이 무너지는구나..." },
-      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "신의 없는 주인을 따른 죄다. 그대는 다르길 바라네." }
+        {
+          "speaker": "장요",
+          "side": "enemy",
+          "portraitId": "장요",
+          "text": "여포공이 무너지는구나..."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "신의 없는 주인을 따른 죄다. 그대는 다르길 바라네."
+        }
+      ]
+    },
+    {
+      "id": "14-xiapi2_retreat_여포",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "여포"
+      },
+      "lines": [
+        {
+          "speaker": "여포",
+          "side": "enemy",
+          "text": "...하하. 천하제일이 물과 머릿수에 지는군. ...유비, 네 눈을 기억해두마."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "...끝났다. 저 사내의 시대가."
+        }
+      ]
+    },
+    {
+      "id": "14-xiapi2_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "여포가 무너졌다... 서주에, 길고 길었던 바람이 멎는다."
+        }
       ]
     }
   ],

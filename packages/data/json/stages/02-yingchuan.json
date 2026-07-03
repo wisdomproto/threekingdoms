@@ -4,23 +4,116 @@
   "mapId": "yingchuan",
   "turnLimit": 25,
   "camera": {
-  "decorations": [
-    { "cell": [38, 13], "kind": "banner_command" },
-    { "cell": [39, 17], "kind": "pennants" },
-    { "cell": [36, 17], "kind": "campfire" },
-    { "cell": [18, 14], "kind": "brazier" },
-    { "cell": [24, 14], "kind": "brazier", "flip": true },
-    { "cell": [25, 17], "kind": "campfire" },
-    { "cell": [10, 14], "kind": "reeds" },
-    { "cell": [15, 17], "kind": "reeds", "flip": true },
-    { "cell": [30, 14], "kind": "reeds" },
-    { "cell": [35, 17], "kind": "reeds", "flip": true },
-    { "cell": [19, 29], "kind": "banner_command" },
-    { "cell": [23, 28], "kind": "campfire" },
-    { "cell": [18, 31], "kind": "supply_cart" },
-    { "cell": [36, 20], "kind": "debris_cart" },
-    { "cell": [41, 20], "kind": "debris_pile" }
-  ],
+    "decorations": [
+      {
+        "cell": [
+          38,
+          13
+        ],
+        "kind": "banner_command"
+      },
+      {
+        "cell": [
+          39,
+          17
+        ],
+        "kind": "pennants"
+      },
+      {
+        "cell": [
+          36,
+          17
+        ],
+        "kind": "campfire"
+      },
+      {
+        "cell": [
+          18,
+          14
+        ],
+        "kind": "brazier"
+      },
+      {
+        "cell": [
+          24,
+          14
+        ],
+        "kind": "brazier",
+        "flip": true
+      },
+      {
+        "cell": [
+          25,
+          17
+        ],
+        "kind": "campfire"
+      },
+      {
+        "cell": [
+          10,
+          14
+        ],
+        "kind": "reeds"
+      },
+      {
+        "cell": [
+          15,
+          17
+        ],
+        "kind": "reeds",
+        "flip": true
+      },
+      {
+        "cell": [
+          30,
+          14
+        ],
+        "kind": "reeds"
+      },
+      {
+        "cell": [
+          35,
+          17
+        ],
+        "kind": "reeds",
+        "flip": true
+      },
+      {
+        "cell": [
+          19,
+          29
+        ],
+        "kind": "banner_command"
+      },
+      {
+        "cell": [
+          23,
+          28
+        ],
+        "kind": "campfire"
+      },
+      {
+        "cell": [
+          18,
+          31
+        ],
+        "kind": "supply_cart"
+      },
+      {
+        "cell": [
+          36,
+          20
+        ],
+        "kind": "debris_cart"
+      },
+      {
+        "cell": [
+          41,
+          20
+        ],
+        "kind": "debris_pile"
+      }
+    ],
     "zoom": 1.5,
     "focus": [
       22,
@@ -268,10 +361,33 @@
       },
       "lines": [
         {
+          "speaker": "관해",
+          "side": "enemy",
+          "text": "영천도 곧 황천(黃天)의 땅이 된다! 관군 나부랭이들을 쓸어라!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "바람이 마르고 풀이 높다. ...불이 잘 붙겠군."
+        },
+        {
           "speaker": "유비",
           "side": "player",
-          "portraitId": "유비",
-          "text": "조조의 화공에 휘말리지 마라 — 관해의 본대만 친다!"
+          "text": "화공이 열어준 길을 놓치지 마라. 진격!"
+        }
+      ]
+    },
+    {
+      "id": "02-yingchuan_turn4",
+      "trigger": {
+        "kind": "turn",
+        "n": 4
+      },
+      "lines": [
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "불길이 적진을 삼킨다! 지금 몰아치자, 형님!"
         }
       ]
     },
@@ -293,6 +409,39 @@
           "side": "player",
           "portraitId": "관우",
           "text": "졸개의 칼맛이 어떤지, 똑똑히 새겨라."
+        }
+      ]
+    },
+    {
+      "id": "02-yingchuan_retreat_관해",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "관해"
+      },
+      "lines": [
+        {
+          "speaker": "관해",
+          "side": "enemy",
+          "text": "하늘이... 황천이 우리를 버렸단 말인가...!"
+        }
+      ]
+    },
+    {
+      "id": "02-yingchuan_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "불길이 사그라든다... 이겼다."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "저쪽 관군의 장수 — 조조라 했던가. 눈빛이 예사롭지 않았습니다."
         }
       ]
     }

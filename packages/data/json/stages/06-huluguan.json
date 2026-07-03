@@ -4,21 +4,103 @@
   "mapId": "huluguan",
   "turnLimit": 20,
   "camera": {
-  "decorations": [
-    { "cell": [13, 6], "kind": "pennants" },
-    { "cell": [18, 6], "kind": "pennants", "flip": true },
-    { "cell": [15, 10], "kind": "brazier" },
-    { "cell": [20, 9], "kind": "banner_command" },
-    { "cell": [14, 20], "kind": "debris_weapons" },
-    { "cell": [18, 22], "kind": "debris_cart", "flip": true },
-    { "cell": [12, 25], "kind": "debris_pile" },
-    { "cell": [10, 29], "kind": "reeds" },
-    { "cell": [20, 33], "kind": "reeds", "flip": true },
-    { "cell": [12, 43], "kind": "banner_command" },
-    { "cell": [17, 41], "kind": "campfire" },
-    { "cell": [10, 44], "kind": "pennants", "flip": true },
-    { "cell": [6, 38], "kind": "supply_cart" }
-  ],
+    "decorations": [
+      {
+        "cell": [
+          13,
+          6
+        ],
+        "kind": "pennants"
+      },
+      {
+        "cell": [
+          18,
+          6
+        ],
+        "kind": "pennants",
+        "flip": true
+      },
+      {
+        "cell": [
+          15,
+          10
+        ],
+        "kind": "brazier"
+      },
+      {
+        "cell": [
+          20,
+          9
+        ],
+        "kind": "banner_command"
+      },
+      {
+        "cell": [
+          14,
+          20
+        ],
+        "kind": "debris_weapons"
+      },
+      {
+        "cell": [
+          18,
+          22
+        ],
+        "kind": "debris_cart",
+        "flip": true
+      },
+      {
+        "cell": [
+          12,
+          25
+        ],
+        "kind": "debris_pile"
+      },
+      {
+        "cell": [
+          10,
+          29
+        ],
+        "kind": "reeds"
+      },
+      {
+        "cell": [
+          20,
+          33
+        ],
+        "kind": "reeds",
+        "flip": true
+      },
+      {
+        "cell": [
+          12,
+          43
+        ],
+        "kind": "banner_command"
+      },
+      {
+        "cell": [
+          17,
+          41
+        ],
+        "kind": "campfire"
+      },
+      {
+        "cell": [
+          10,
+          44
+        ],
+        "kind": "pennants",
+        "flip": true
+      },
+      {
+        "cell": [
+          6,
+          38
+        ],
+        "kind": "supply_cart"
+      }
+    ],
     "zoom": 1.4,
     "focus": [
       15,
@@ -37,18 +119,53 @@
     "intro": {
       "bg": "06-huluguan-intro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "동탁이 호로관에 여포를 세웠소. 천하의 맹장이라더니, 제후들이 줄줄이 꺾였다지." },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "여포라... 인중여포 마중적토. 셋이 함께라야 승산이 있겠습니다, 형님." },
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "흥, 잘난 척하는 그 여포 놈! 내가 먼저 맛을 보여주리다!" },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "삼형제가 한 몸으로 움직인다. 여포를 에워싸 빈틈을 친다 — 협공이다." }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "동탁이 호로관에 여포를 세웠소. 천하의 맹장이라더니, 제후들이 줄줄이 꺾였다지."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "여포라... 인중여포 마중적토. 셋이 함께라야 승산이 있겠습니다, 형님."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "흥, 잘난 척하는 그 여포 놈! 내가 먼저 맛을 보여주리다!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "삼형제가 한 몸으로 움직인다. 여포를 에워싸 빈틈을 친다 — 협공이다."
+        }
       ]
     },
     "outro": {
       "bg": "06-huluguan-outro",
       "lines": [
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "헉헉... 과연 여포, 사람이 아니구려. 셋이서 겨우 물렸소." },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "놓쳤으나 기세는 꺾었다. 동탁이 낙양을 불태우고 달아날 것이다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "...천하가 무너지는 소리가 들리는구나. 쫓자." }
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "헉헉... 과연 여포, 사람이 아니구려. 셋이서 겨우 물렸소."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "놓쳤으나 기세는 꺾었다. 동탁이 낙양을 불태우고 달아날 것이다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "...천하가 무너지는 소리가 들리는구나. 쫓자."
+        }
       ]
     }
   },
@@ -276,17 +393,98 @@
   "dialogue": [
     {
       "id": "06-huluguan_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "삼형제, 흩어지지 마라! 여포를 에워싼다!" }
+        {
+          "speaker": "여포",
+          "side": "enemy",
+          "text": "호로관 앞에 선 것들이 너희냐. ...셋이 덤벼도 좋다, 마침 지루하던 참이다."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "저 오만한 낯짝! 형님들, 저놈은 셋이서 잡읍시다!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "천하제일이라는 여포다. 흩어지면 죽는다 — 함께 싸운다!"
+        }
+      ]
+    },
+    {
+      "id": "06-huluguan_turn5",
+      "trigger": {
+        "kind": "turn",
+        "n": 5
+      },
+      "lines": [
+        {
+          "speaker": "여포",
+          "side": "enemy",
+          "text": "동탁의 개들아, 구경만 할 셈이냐. 나와라!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "적 증원 — 허나 여포만 꺾으면 관문은 열린다!"
+        }
       ]
     },
     {
       "id": "duel_zhangfei_lubu_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhangfei_lubu" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhangfei_lubu"
+      },
       "lines": [
-      { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "여포! 이 장익덕과 한판 붙자!" },
-      { "speaker": "여포", "side": "enemy", "portraitId": "여포", "text": "하룻강아지로군. 물러서라, 죽기 전에." }
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "여포! 이 장익덕과 한판 붙자!"
+        },
+        {
+          "speaker": "여포",
+          "side": "enemy",
+          "portraitId": "여포",
+          "text": "하룻강아지로군. 물러서라, 죽기 전에."
+        }
+      ]
+    },
+    {
+      "id": "06-huluguan_retreat_여포",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "여포"
+      },
+      "lines": [
+        {
+          "speaker": "여포",
+          "side": "enemy",
+          "text": "...재미있는 놈들이다. 이 여포를 물러서게 하다니. 기억해두마 — 삼형제."
+        }
+      ]
+    },
+    {
+      "id": "06-huluguan_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "우리가... 여포를 밀어냈다! 크하하하!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "호로관이 열렸다. 낙양까지, 한걸음이다."
+        }
       ]
     }
   ],

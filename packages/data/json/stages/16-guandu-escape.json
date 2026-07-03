@@ -20,16 +20,41 @@
     "intro": {
       "bg": "16-guandu-escape-intro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "의대조가 발각됐소. 조조가 우리를 잡으러 온다 — 원소에게로 몸을 피한다!" },
-        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "주공, 조인의 추격이 빠릅니다. 제가 길을 열겠습니다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "관도를 가로질러 북으로 간다. 흩어지면 끝이다 — 나를 따르라!" }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "의대조가 발각됐소. 조조가 우리를 잡으러 온다 — 원소에게로 몸을 피한다!"
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "주공, 조인의 추격이 빠릅니다. 제가 길을 열겠습니다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "관도를 가로질러 북으로 간다. 흩어지면 끝이다 — 나를 따르라!"
+        }
       ]
     },
     "outro": {
       "bg": "16-guandu-escape-outro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "또 쫓기는 신세로구나... 운장과 익덕은 무사할까." },
-        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "반드시 다시 만날 겁니다. 살아만 계시면." }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "또 쫓기는 신세로구나... 운장과 익덕은 무사할까."
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "반드시 다시 만날 겁니다. 살아만 계시면."
+        }
       ]
     }
   },
@@ -297,17 +322,93 @@
   "dialogue": [
     {
       "id": "16-guandu-escape_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "관도를 가로질러 북으로! 흩어지면 끝이다." }
+        {
+          "speaker": "조인",
+          "side": "enemy",
+          "text": "원소에게 붙었던 죄 — 여기서 갚아라, 유비!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "천하가 뒤집히는 싸움터다. 휘말리면 끝 — 길을 연다!"
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "text": "주공, 제가 앞장서겠습니다. 창끝이 향하는 곳이 곧 길입니다."
+        }
+      ]
+    },
+    {
+      "id": "16-guandu-escape_turn5",
+      "trigger": {
+        "kind": "turn",
+        "n": 5
+      },
+      "lines": [
+        {
+          "speaker": "허저",
+          "side": "enemy",
+          "text": "도망치는 등짝은 베기 쉽지!"
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "text": "뒤는 제게 맡기고 달리십시오!"
+        }
       ]
     },
     {
       "id": "duel_zhaoyun_xuchu_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_xuchu" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhaoyun_xuchu"
+      },
       "lines": [
-      { "speaker": "허저", "side": "enemy", "portraitId": "허저", "text": "어딜 달아나느냐!" },
-      { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "달아나는 게 아니라 — 길을 여는 것이다." }
+        {
+          "speaker": "허저",
+          "side": "enemy",
+          "portraitId": "허저",
+          "text": "어딜 달아나느냐!"
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "달아나는 게 아니라 — 길을 여는 것이다."
+        }
+      ]
+    },
+    {
+      "id": "16-guandu-escape_retreat_조인",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "조인"
+      },
+      "lines": [
+        {
+          "speaker": "조인",
+          "side": "enemy",
+          "text": "쥐새끼처럼 빠르구나...!"
+        }
+      ]
+    },
+    {
+      "id": "16-guandu-escape_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "관도를 벗어났다... 여남으로. 흩어진 형제들이 기다린다."
+        }
       ]
     }
   ],

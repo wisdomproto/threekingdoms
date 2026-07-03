@@ -3,37 +3,145 @@
   "name": "반하 전투",
   "mapId": "banhe",
   "turnLimit": 18,
-  "camera": { "zoom": 1.4, "focus": [22, 17] },
+  "camera": {
+    "zoom": 1.4,
+    "focus": [
+      22,
+      17
+    ]
+  },
   "decorations": [
-    { "cell": [24, 5], "kind": "pennants" },
-    { "cell": [26, 6], "kind": "banner_command" },
-    { "cell": [21, 8], "kind": "brazier" },
-    { "cell": [8, 14], "kind": "reeds" },
-    { "cell": [20, 14], "kind": "reeds", "flip": true },
-    { "cell": [33, 17], "kind": "reeds" },
-    { "cell": [40, 17], "kind": "reeds", "flip": true },
-    { "cell": [16, 31], "kind": "banner_command" },
-    { "cell": [23, 31], "kind": "campfire" },
-    { "cell": [10, 31], "kind": "supply_cart" },
-    { "cell": [7, 22], "kind": "debris_cart" }
+    {
+      "cell": [
+        24,
+        5
+      ],
+      "kind": "pennants"
+    },
+    {
+      "cell": [
+        26,
+        6
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        21,
+        8
+      ],
+      "kind": "brazier"
+    },
+    {
+      "cell": [
+        8,
+        14
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        20,
+        14
+      ],
+      "kind": "reeds",
+      "flip": true
+    },
+    {
+      "cell": [
+        33,
+        17
+      ],
+      "kind": "reeds"
+    },
+    {
+      "cell": [
+        40,
+        17
+      ],
+      "kind": "reeds",
+      "flip": true
+    },
+    {
+      "cell": [
+        16,
+        31
+      ],
+      "kind": "banner_command"
+    },
+    {
+      "cell": [
+        23,
+        31
+      ],
+      "kind": "campfire"
+    },
+    {
+      "cell": [
+        10,
+        31
+      ],
+      "kind": "supply_cart"
+    },
+    {
+      "cell": [
+        7,
+        22
+      ],
+      "kind": "debris_cart"
+    }
   ],
-  "reward": { "gold": 650, "exp": 0, "treasures": [] },
+  "reward": {
+    "gold": 650,
+    "exp": 0,
+    "treasures": []
+  },
   "levelCap": 17,
   "scenario": {
     "intro": {
       "bg": "09-banhe-intro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "반동탁연합이 깨졌소. 이제 제후들끼리 땅을 다투는 난세요." },
-        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "원소의 군세가 공손찬 공을 압박합니다. 반하에서 막아야 합니다." },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "국의의 진이 까다롭습니다. 궁병을 앞세워 진을 흩트립시다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "백규 형님을 위해서다. 반하를 건너 적을 친다." }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "반동탁연합이 깨졌소. 이제 제후들끼리 땅을 다투는 난세요."
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "원소의 군세가 공손찬 공을 압박합니다. 반하에서 막아야 합니다."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "국의의 진이 까다롭습니다. 궁병을 앞세워 진을 흩트립시다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "백규 형님을 위해서다. 반하를 건너 적을 친다."
+        }
       ]
     },
     "outro": {
       "bg": "09-banhe-outro",
       "lines": [
-        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "...주공. 제 이름은 조운, 자는 자룡입니다. 공손찬 공 밑에 있으나, 주공의 인덕을 보았습니다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "자룡... 언젠가 그대와 한 깃발 아래 서고 싶구나." }
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "...주공. 제 이름은 조운, 자는 자룡입니다. 공손찬 공 밑에 있으나, 주공의 인덕을 보았습니다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "자룡... 언젠가 그대와 한 깃발 아래 서고 싶구나."
+        }
       ]
     }
   },
@@ -53,7 +161,9 @@
       "classId": "lightCavalry",
       "level": 8,
       "troops": 150,
-      "items": ["청룡언월도"],
+      "items": [
+        "청룡언월도"
+      ],
       "side": "player",
       "x": 20,
       "y": 30
@@ -63,7 +173,9 @@
       "classId": "lightCavalry",
       "level": 8,
       "troops": 150,
-      "items": ["사모"],
+      "items": [
+        "사모"
+      ],
       "side": "player",
       "x": 24,
       "y": 30
@@ -83,7 +195,10 @@
       "classId": "strategist",
       "level": 8,
       "troops": 105,
-      "items": ["쌀", "폭탄"],
+      "items": [
+        "쌀",
+        "폭탄"
+      ],
       "side": "player",
       "x": 26,
       "y": 28
@@ -170,17 +285,27 @@
     }
   ],
   "objectives": [
-    { "kind": "defeatAll" }
+    {
+      "kind": "defeatAll"
+    }
   ],
   "failConditions": [
-    { "kind": "unitRetreated", "unitId": "유비" },
-    { "kind": "turnLimitExceeded" }
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
   ],
   "reinforcements": [
     {
       "id": "yuanshao_relief",
       "side": "enemy",
-      "trigger": { "kind": "turn", "turn": 6 },
+      "trigger": {
+        "kind": "turn",
+        "turn": 6
+      },
       "units": [
         {
           "commanderId": "공손월",
@@ -209,24 +334,108 @@
     {
       "id": "duel_zhaoyun_juyi_reward",
       "description": "조운이 적장 국의와 일기토를 벌여 반하의 선봉을 꺾으면 [마술지침서]를 노획한다.",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_juyi" },
-      "reward": { "treasures": ["마술지침서"], "gold": 200 }
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhaoyun_juyi"
+      },
+      "reward": {
+        "treasures": [
+          "마술지침서"
+        ],
+        "gold": 200
+      }
     }
   ],
   "dialogue": [
     {
       "id": "09-banhe_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "반하를 건넌다! 백규 형님을 돕자." }
+        {
+          "speaker": "국의",
+          "side": "enemy",
+          "text": "공손찬의 백마는 오늘 반하에 잠긴다! 활을 들어라!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "공손찬 님께 진 빚, 오늘 갚는다. 전군, 강을 등지지 마라!"
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "원소군이든 뭐든, 오는 놈은 전부 사모 밥이다!"
+        }
+      ]
+    },
+    {
+      "id": "09-banhe_turn6",
+      "trigger": {
+        "kind": "turn",
+        "n": 6
+      },
+      "lines": [
+        {
+          "speaker": "봉기",
+          "side": "enemy",
+          "text": "본대가 도착했다! 밀어붙여라!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "적 증원 — 당황하지 마라, 하나씩 벤다!"
+        }
       ]
     },
     {
       "id": "duel_zhaoyun_juyi_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_zhaoyun_juyi" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_zhaoyun_juyi"
+      },
       "lines": [
-      { "speaker": "국의", "side": "enemy", "portraitId": "국의", "text": "원소군의 선등사석을 뚫겠다고?" },
-      { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "사석진도, 한 점을 뚫으면 무너진다." }
+        {
+          "speaker": "국의",
+          "side": "enemy",
+          "portraitId": "국의",
+          "text": "원소군의 선등사석을 뚫겠다고?"
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "사석진도, 한 점을 뚫으면 무너진다."
+        }
+      ]
+    },
+    {
+      "id": "09-banhe_retreat_국의",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "국의"
+      },
+      "lines": [
+        {
+          "speaker": "국의",
+          "side": "enemy",
+          "text": "이런 무명 잡군에게... 이 국의가...!"
+        }
+      ]
+    },
+    {
+      "id": "09-banhe_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "버텨냈다... 공손찬 님의 깃발이 다시 선다."
+        }
       ]
     }
   ],
@@ -234,8 +443,15 @@
     {
       "id": "duel_zhaoyun_juyi",
       "type": "duel",
-      "trigger": { "kind": "attack", "attackerId": "조운", "defenderId": "국의" },
-      "outcome": { "winnerId": "조운", "loserRetreats": false },
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "조운",
+        "defenderId": "국의"
+      },
+      "outcome": {
+        "winnerId": "조운",
+        "loserRetreats": false
+      },
       "once": true
     }
   ]

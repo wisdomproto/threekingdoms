@@ -4,20 +4,96 @@
   "mapId": "zhangjue",
   "turnLimit": 34,
   "camera": {
-  "decorations": [
-    { "cell": [11, 10], "kind": "brazier" },
-    { "cell": [12, 11], "kind": "brazier", "flip": true },
-    { "cell": [17, 10], "kind": "pennants" },
-    { "cell": [33, 11], "kind": "pennants", "flip": true },
-    { "cell": [7, 12], "kind": "reeds" },
-    { "cell": [36, 12], "kind": "reeds", "flip": true },
-    { "cell": [30, 15], "kind": "reeds" },
-    { "cell": [21, 29], "kind": "banner_command" },
-    { "cell": [23, 26], "kind": "campfire" },
-    { "cell": [17, 24], "kind": "supply_cart" },
-    { "cell": [24, 20], "kind": "debris_cart" },
-    { "cell": [19, 22], "kind": "debris_pile", "flip": true }
-  ],
+    "decorations": [
+      {
+        "cell": [
+          11,
+          10
+        ],
+        "kind": "brazier"
+      },
+      {
+        "cell": [
+          12,
+          11
+        ],
+        "kind": "brazier",
+        "flip": true
+      },
+      {
+        "cell": [
+          17,
+          10
+        ],
+        "kind": "pennants"
+      },
+      {
+        "cell": [
+          33,
+          11
+        ],
+        "kind": "pennants",
+        "flip": true
+      },
+      {
+        "cell": [
+          7,
+          12
+        ],
+        "kind": "reeds"
+      },
+      {
+        "cell": [
+          36,
+          12
+        ],
+        "kind": "reeds",
+        "flip": true
+      },
+      {
+        "cell": [
+          30,
+          15
+        ],
+        "kind": "reeds"
+      },
+      {
+        "cell": [
+          21,
+          29
+        ],
+        "kind": "banner_command"
+      },
+      {
+        "cell": [
+          23,
+          26
+        ],
+        "kind": "campfire"
+      },
+      {
+        "cell": [
+          17,
+          24
+        ],
+        "kind": "supply_cart"
+      },
+      {
+        "cell": [
+          24,
+          20
+        ],
+        "kind": "debris_cart"
+      },
+      {
+        "cell": [
+          19,
+          22
+        ],
+        "kind": "debris_pile",
+        "flip": true
+      }
+    ],
     "zoom": 1.5,
     "focus": [
       10,
@@ -36,19 +112,59 @@
     "intro": {
       "bg": "04-zhangjue-intro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "태평도의 괴수 장각. 이 자만 쓰러뜨리면 황건의 난도 끝이오." },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "요술사들이 장각을 호위하고 있습니다. 환술에 군세가 흔들릴 수 있으니 진을 굳게." },
-        { "speaker": "장비", "side": "player", "portraitId": "장비", "text": "환술이고 뭐고, 내 장팔사모 앞에선 다 헛것이오!" },
-        { "speaker": "미축", "side": "player", "portraitId": "미축", "text": "주공, 무리는 금물입니다. 병사들의 사기를 살피며 나아가시지요." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "장각을 향해 곧장 친다. 난세의 첫 매듭을 우리 손으로 짓자." }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "태평도의 괴수 장각. 이 자만 쓰러뜨리면 황건의 난도 끝이오."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "요술사들이 장각을 호위하고 있습니다. 환술에 군세가 흔들릴 수 있으니 진을 굳게."
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "환술이고 뭐고, 내 장팔사모 앞에선 다 헛것이오!"
+        },
+        {
+          "speaker": "미축",
+          "side": "player",
+          "portraitId": "미축",
+          "text": "주공, 무리는 금물입니다. 병사들의 사기를 살피며 나아가시지요."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "장각을 향해 곧장 친다. 난세의 첫 매듭을 우리 손으로 짓자."
+        }
       ]
     },
     "outro": {
       "bg": "04-zhangjue-outro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "장각이 쓰러졌다... 황건의 난이 끝났구나." },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "허나 천하는 더 어지러워질 것입니다, 형님. 조정엔 십상시가, 변방엔 야심가들이..." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "알고 있다. 허나 오늘만큼은 — 백성의 짐을 하나 덜었다. 그걸로 족하다." }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "장각이 쓰러졌다... 황건의 난이 끝났구나."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "허나 천하는 더 어지러워질 것입니다, 형님. 조정엔 십상시가, 변방엔 야심가들이..."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "알고 있다. 허나 오늘만큼은 — 백성의 짐을 하나 덜었다. 그걸로 족하다."
+        }
       ]
     }
   },
@@ -279,17 +395,103 @@
   "dialogue": [
     {
       "id": "04-zhangjue_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "장각을 향해 곧장 친다! 환술은 무시하라." }
+        {
+          "speaker": "장각",
+          "side": "enemy",
+          "text": "하늘이 한실을 버린 지 오래다. 백성의 분노가 곧 나의 군세이니라!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "백성을 앞세워 백성을 태우는 자가, 하늘을 입에 담지 마라!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "요술에 현혹되지 마라. 목을 베면 술법도 끝난다."
+        }
+      ]
+    },
+    {
+      "id": "04-zhangjue_turn6",
+      "trigger": {
+        "kind": "turn",
+        "n": 6
+      },
+      "lines": [
+        {
+          "speaker": "장각",
+          "side": "enemy",
+          "text": "황천의 군세는 마르지 않는다. 나오라, 나의 형제들이여!"
+        },
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "끝이 없구나! ...좋다, 전부 상대해주마!"
+        }
       ]
     },
     {
       "id": "duel_guanyu_youbi_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_youbi" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_guanyu_youbi"
+      },
       "lines": [
-      { "speaker": "유벽", "side": "enemy", "portraitId": "유벽", "text": "태평도의 분노를 받아라!" },
-      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "분노로는 청룡언월도를 못 이긴다." }
+        {
+          "speaker": "유벽",
+          "side": "enemy",
+          "portraitId": "유벽",
+          "text": "태평도의 분노를 받아라!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "분노로는 청룡언월도를 못 이긴다."
+        }
+      ]
+    },
+    {
+      "id": "04-zhangjue_retreat_장각",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "장각"
+      },
+      "lines": [
+        {
+          "speaker": "장각",
+          "side": "enemy",
+          "text": "황천은... 오지 않는가... 백성들의 하늘은, 어디에..."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "...그 물음만은, 베어도 사라지지 않는구나."
+        }
+      ]
+    },
+    {
+      "id": "04-zhangjue_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "난의 우두머리가 쓰러졌습니다. 황건은 곧 흩어질 것입니다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "허나 세상은 아직 어둡다. ...가자, 다음 싸움터로."
+        }
       ]
     }
   ],

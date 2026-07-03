@@ -3,37 +3,147 @@
   "name": "낙양 진입",
   "mapId": "luoyang",
   "turnLimit": 28,
-  "camera": { "zoom": 1.5, "focus": [10, 8] },
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      10,
+      8
+    ]
+  },
   "decorations": [
-    { "cell": [10, 7], "kind": "debris_cart" },
-    { "cell": [17, 10], "kind": "debris_pile", "flip": true },
-    { "cell": [25, 8], "kind": "debris_weapons" },
-    { "cell": [15, 5], "kind": "brazier" },
-    { "cell": [30, 15], "kind": "brazier", "flip": true },
-    { "cell": [36, 10], "kind": "brazier" },
-    { "cell": [33, 21], "kind": "debris_pile" },
-    { "cell": [3, 17], "kind": "supply_cart" },
-    { "cell": [43, 25], "kind": "debris_cart", "flip": true },
-    { "cell": [16, 9], "kind": "pennants", "flip": true },
-    { "cell": [8, 21], "kind": "campfire" }
+    {
+      "cell": [
+        10,
+        7
+      ],
+      "kind": "debris_cart"
+    },
+    {
+      "cell": [
+        17,
+        10
+      ],
+      "kind": "debris_pile",
+      "flip": true
+    },
+    {
+      "cell": [
+        25,
+        8
+      ],
+      "kind": "debris_weapons"
+    },
+    {
+      "cell": [
+        15,
+        5
+      ],
+      "kind": "brazier"
+    },
+    {
+      "cell": [
+        30,
+        15
+      ],
+      "kind": "brazier",
+      "flip": true
+    },
+    {
+      "cell": [
+        36,
+        10
+      ],
+      "kind": "brazier"
+    },
+    {
+      "cell": [
+        33,
+        21
+      ],
+      "kind": "debris_pile"
+    },
+    {
+      "cell": [
+        3,
+        17
+      ],
+      "kind": "supply_cart"
+    },
+    {
+      "cell": [
+        43,
+        25
+      ],
+      "kind": "debris_cart",
+      "flip": true
+    },
+    {
+      "cell": [
+        16,
+        9
+      ],
+      "kind": "pennants",
+      "flip": true
+    },
+    {
+      "cell": [
+        8,
+        21
+      ],
+      "kind": "campfire"
+    }
   ],
-  "reward": { "gold": 500, "exp": 0, "treasures": [] },
+  "reward": {
+    "gold": 500,
+    "exp": 0,
+    "treasures": []
+  },
   "levelCap": 14,
   "scenario": {
     "intro": {
       "bg": "07-luoyang-intro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "낙양이 불타고 있소. 동탁이 천도를 핑계로 도성을 약탈하는구나." },
-        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "주공, 백성들이 길에 쓰러져 있습니다. 한시가 급합니다." },
-        { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "동탁의 본대가 아직 성안에 있습니다. 불길을 헤치고 들이칩시다." },
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "한 명이라도 더 구한다. 동탁을 막아라!" }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "낙양이 불타고 있소. 동탁이 천도를 핑계로 도성을 약탈하는구나."
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "주공, 백성들이 길에 쓰러져 있습니다. 한시가 급합니다."
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "동탁의 본대가 아직 성안에 있습니다. 불길을 헤치고 들이칩시다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "한 명이라도 더 구한다. 동탁을 막아라!"
+        }
       ]
     },
     "outro": {
       "bg": "07-luoyang-outro",
       "lines": [
-        { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "동탁은 달아났고, 낙양은 잿더미가 됐다... 우리가 한발 늦었구나." },
-        { "speaker": "조운", "side": "player", "portraitId": "조운", "text": "주공의 잘못이 아닙니다. 살릴 수 있는 이들을 살렸습니다." }
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "동탁은 달아났고, 낙양은 잿더미가 됐다... 우리가 한발 늦었구나."
+        },
+        {
+          "speaker": "조운",
+          "side": "player",
+          "portraitId": "조운",
+          "text": "주공의 잘못이 아닙니다. 살릴 수 있는 이들을 살렸습니다."
+        }
       ]
     }
   },
@@ -53,7 +163,9 @@
       "classId": "lightCavalry",
       "level": 6,
       "troops": 135,
-      "items": ["청룡언월도"],
+      "items": [
+        "청룡언월도"
+      ],
       "side": "player",
       "x": 2,
       "y": 7
@@ -63,7 +175,9 @@
       "classId": "lightCavalry",
       "level": 6,
       "troops": 135,
-      "items": ["사모"],
+      "items": [
+        "사모"
+      ],
       "side": "player",
       "x": 1,
       "y": 8
@@ -83,7 +197,10 @@
       "classId": "strategist",
       "level": 6,
       "troops": 95,
-      "items": ["쌀", "폭탄"],
+      "items": [
+        "쌀",
+        "폭탄"
+      ],
       "side": "player",
       "x": 3,
       "y": 8
@@ -153,7 +270,9 @@
       "classId": "strategist",
       "level": 6,
       "troops": 100,
-      "items": ["낙석서"],
+      "items": [
+        "낙석서"
+      ],
       "side": "enemy",
       "x": 38,
       "y": 18
@@ -169,16 +288,28 @@
       "y": 24
     }
   ],
-  "objectives": [{ "kind": "defeatAll" }],
+  "objectives": [
+    {
+      "kind": "defeatAll"
+    }
+  ],
   "failConditions": [
-    { "kind": "unitRetreated", "unitId": "유비" },
-    { "kind": "turnLimitExceeded" }
+    {
+      "kind": "unitRetreated",
+      "unitId": "유비"
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
   ],
   "reinforcements": [
     {
       "id": "fire_rear_guard",
       "side": "enemy",
-      "trigger": { "kind": "turn", "turn": 5 },
+      "trigger": {
+        "kind": "turn",
+        "turn": 5
+      },
       "units": [
         {
           "commanderId": "조잠",
@@ -207,24 +338,108 @@
     {
       "id": "duel_guanyu_xurong_reward",
       "description": "관우가 서영과 일기토를 벌여 불타는 대로를 뚫으면 [궁술지침서]를 노획한다.",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_xurong" },
-      "reward": { "treasures": ["궁술지침서"], "gold": 200 }
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_guanyu_xurong"
+      },
+      "reward": {
+        "treasures": [
+          "궁술지침서"
+        ],
+        "gold": 200
+      }
     }
   ],
   "dialogue": [
     {
       "id": "07-luoyang_battle_start",
-      "trigger": { "kind": "battleStart" },
+      "trigger": {
+        "kind": "battleStart"
+      },
       "lines": [
-      { "speaker": "유비", "side": "player", "portraitId": "유비", "text": "불길을 헤치고 동탁을 막아라! 백성을 먼저 구하라." }
+        {
+          "speaker": "이각",
+          "side": "enemy",
+          "text": "낙양은 이미 불바다다! 잿더미를 밟고 죽어라, 연합군!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "도성을 태우고 달아나는 것이 동탁의 대답인가... 용서할 수 없다."
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "불길 속에 백성이 있다. 길을 열며 나아간다!"
+        }
+      ]
+    },
+    {
+      "id": "07-luoyang_turn5",
+      "trigger": {
+        "kind": "turn",
+        "n": 5
+      },
+      "lines": [
+        {
+          "speaker": "곽사",
+          "side": "enemy",
+          "text": "시가지로 끌어들여라! 불과 칼로 맞아주마!"
+        }
       ]
     },
     {
       "id": "duel_guanyu_xurong_dialogue",
-      "trigger": { "kind": "duelOccurred", "duelId": "duel_guanyu_xurong" },
+      "trigger": {
+        "kind": "duelOccurred",
+        "duelId": "duel_guanyu_xurong"
+      },
       "lines": [
-      { "speaker": "서영", "side": "enemy", "portraitId": "서영", "text": "낙양은 동탁공의 것이다!" },
-      { "speaker": "관우", "side": "player", "portraitId": "관우", "text": "잿더미를 두고 무슨 소유를 논하느냐." }
+        {
+          "speaker": "서영",
+          "side": "enemy",
+          "portraitId": "서영",
+          "text": "낙양은 동탁공의 것이다!"
+        },
+        {
+          "speaker": "관우",
+          "side": "player",
+          "portraitId": "관우",
+          "text": "잿더미를 두고 무슨 소유를 논하느냐."
+        }
+      ]
+    },
+    {
+      "id": "07-luoyang_retreat_동탁",
+      "trigger": {
+        "kind": "unitRetreated",
+        "unitId": "동탁"
+      },
+      "lines": [
+        {
+          "speaker": "동탁",
+          "side": "enemy",
+          "text": "장안으로! 옥새와 천자만 있으면 천하는 여전히 내 것이다!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "동탁이 달아난다...! 놓치지 마라!"
+        }
+      ]
+    },
+    {
+      "id": "07-luoyang_victory",
+      "trigger": {
+        "kind": "battleEnd",
+        "result": "victory"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "불은 잡았다. 허나 낙양은... 이미 폐허구나."
+        }
       ]
     }
   ],
@@ -232,8 +447,15 @@
     {
       "id": "duel_guanyu_xurong",
       "type": "duel",
-      "trigger": { "kind": "attack", "attackerId": "관우", "defenderId": "서영" },
-      "outcome": { "winnerId": "관우", "loserRetreats": false },
+      "trigger": {
+        "kind": "attack",
+        "attackerId": "관우",
+        "defenderId": "서영"
+      },
+      "outcome": {
+        "winnerId": "관우",
+        "loserRetreats": false
+      },
       "once": true
     }
   ]
