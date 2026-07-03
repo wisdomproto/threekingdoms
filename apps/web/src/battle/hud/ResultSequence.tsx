@@ -144,7 +144,38 @@ const KEYFRAME_CSS = `
   0%, 100% { filter: drop-shadow(0 0 6px var(--glow)); }
   50% { filter: drop-shadow(0 0 16px var(--glow)); }
 }
+@keyframes tkRaysSpin {
+  0%   { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+@keyframes tkTitleShine {
+  0%   { transform: translateX(-130%) skewX(-18deg); }
+  100% { transform: translateX(230%) skewX(-18deg); }
+}
+@keyframes tkPetalFall {
+  0%   { transform: translateY(-6vh) translateX(0) rotate(0deg); opacity: 0; }
+  8%   { opacity: var(--po); }
+  50%  { transform: translateY(48vh) translateX(3vw) rotate(200deg); }
+  92%  { opacity: var(--po); }
+  100% { transform: translateY(104vh) translateX(-2vw) rotate(390deg); opacity: 0; }
+}
 `;
+
+/** 승리 꽃가루(금빛 잔광) — 결정론 고정 배열(난수 없음). 순수 표현. */
+const PETALS: { l: number; d: number; dur: number; s: number; o: number; c: string }[] = [
+  { l: 6,  d: 0.0, dur: 7.2, s: 13, o: 0.8, c: "#ffd76a" },
+  { l: 14, d: 2.1, dur: 8.4, s: 10, o: 0.55, c: "#e8b34a" },
+  { l: 22, d: 0.9, dur: 6.6, s: 15, o: 0.75, c: "#ffe08a" },
+  { l: 30, d: 3.4, dur: 9.0, s: 9,  o: 0.5, c: "#d98a3a" },
+  { l: 38, d: 1.5, dur: 7.8, s: 12, o: 0.7, c: "#ffd76a" },
+  { l: 46, d: 4.2, dur: 6.9, s: 11, o: 0.6, c: "#ffe9b0" },
+  { l: 54, d: 0.4, dur: 8.8, s: 14, o: 0.8, c: "#f4c65a" },
+  { l: 62, d: 2.8, dur: 7.4, s: 10, o: 0.55, c: "#e8b34a" },
+  { l: 70, d: 1.1, dur: 6.4, s: 13, o: 0.75, c: "#ffd76a" },
+  { l: 78, d: 3.9, dur: 8.1, s: 9,  o: 0.5, c: "#ffe08a" },
+  { l: 86, d: 0.7, dur: 7.0, s: 12, o: 0.7, c: "#f4c65a" },
+  { l: 94, d: 2.4, dur: 9.3, s: 11, o: 0.6, c: "#d98a3a" },
+];
 
 /** 순차 등장 단계 — 한 칸씩 위로 올라오며 페이드 인(스킵 시 즉시). */
 function Reveal({
@@ -481,10 +512,50 @@ export function ResultSequence({
         style={{
           position: "absolute",
           inset: 0,
-          background: `radial-gradient(85% 62% at 50% 36%, ${jackpot ? "rgba(255,224,138,0.20)" : "rgba(255,205,110,0.14)"} 0%, transparent 65%)`,
+          background: `radial-gradient(85% 62% at 50% 36%, ${jackpot ? "rgba(255,224,138,0.30)" : "rgba(255,205,110,0.22)"} 0%, transparent 65%)`,
           pointerEvents: "none",
         }}
       />
+
+      {/* 회전 서광(god-rays) — 패널 뒤 느린 금빛 광선. "우울" 정적의 해독제(2026-07-04). */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "40%",
+          width: "160vmax",
+          height: "160vmax",
+          pointerEvents: "none",
+          opacity: jackpot ? 0.16 : 0.11,
+          background:
+            "repeating-conic-gradient(from 0deg, rgba(255,215,106,0.9) 0deg 7deg, transparent 7deg 24deg)",
+          WebkitMaskImage: "radial-gradient(closest-side, #000 0%, transparent 68%)",
+          maskImage: "radial-gradient(closest-side, #000 0%, transparent 68%)",
+          animation: "tkRaysSpin 36s linear infinite",
+        }}
+      />
+
+      {/* 금빛 꽃가루 — 승리 상시 잔광(결정론 배열, 순수 표현) */}
+      <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
+        {PETALS.map((p, i) => (
+          <span
+            key={i}
+            style={{
+              position: "absolute",
+              left: `${p.l}%`,
+              top: 0,
+              fontSize: p.s,
+              color: p.c,
+              textShadow: `0 0 6px ${p.c}88`,
+              animation: `tkPetalFall ${p.dur}s linear ${p.d}s infinite`,
+              ["--po" as string]: p.o,
+            }}
+          >
+            ✦
+          </span>
+        ))}
+      </div>
 
       {/* 잭팟 플래시(S) — 화면 전체 1회 번쩍 */}
       {flash && (
@@ -500,42 +571,68 @@ export function ResultSequence({
         />
       )}
 
-      <h1
-        style={{
-          fontSize: 42,
-          margin: 0,
-          fontWeight: 800,
-          color: jackpot ? JACKPOT_GOLD : "#ffd76a",
-          letterSpacing: "0.18em",
-          textIndent: "0.18em",
-          // 승리도 항상 금빛 발광 — 종전엔 잭팟(S)만 빛나 일반 승리가 밋밋했다
-          textShadow: jackpot
-            ? `0 0 18px ${JACKPOT_GOLD}88`
-            : "0 0 14px rgba(255,215,106,0.5), 0 2px 10px rgba(0,0,0,0.6)",
-          animation: jackpot ? "tkPulseGlow 1.8s ease-in-out infinite" : "none",
-          ["--glow" as string]: `${JACKPOT_GOLD}99`,
-        }}
-      >
-        {jackpot ? "대승" : "승리"}
-      </h1>
+      {/* 표제 — 크게 + 샤인 스윕(금박이 훑고 지나가는 광). overflow 래퍼로 스윕을 가둔다. */}
+      <div style={{ position: "relative", overflow: "hidden", padding: "4px 18px" }}>
+        <h1
+          style={{
+            fontSize: 58,
+            margin: 0,
+            fontWeight: 900,
+            color: jackpot ? JACKPOT_GOLD : "#ffd76a",
+            letterSpacing: "0.22em",
+            textIndent: "0.22em",
+            lineHeight: 1.1,
+            // 승리도 항상 금빛 발광 — 종전엔 잭팟(S)만 빛나 일반 승리가 밋밋했다
+            textShadow: jackpot
+              ? `0 0 24px ${JACKPOT_GOLD}aa, 0 3px 14px rgba(0,0,0,0.7)`
+              : "0 0 18px rgba(255,215,106,0.6), 0 3px 12px rgba(0,0,0,0.65)",
+            animation: jackpot ? "tkPulseGlow 1.8s ease-in-out infinite" : "none",
+            ["--glow" as string]: `${JACKPOT_GOLD}99`,
+          }}
+        >
+          {jackpot ? "대승" : "승리"}
+        </h1>
+        {!skipped && (
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              width: "45%",
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,240,200,0.55), transparent)",
+              mixBlendMode: "screen",
+              animation: "tkTitleShine 2.6s ease-in-out 400ms infinite",
+              pointerEvents: "none",
+            }}
+          />
+        )}
+      </div>
 
       <div
         style={{
           ...PANEL_FRAME,
-          background: "rgba(30, 24, 15, 0.93)", // 웜 잉크(종전 한색 남빛 카드가 우울 톤의 절반)
-          padding: "20px 28px",
-          minWidth: 280,
-          maxWidth: 360,
+          // 승리판 = 진홍→금 그라디언트(출정 버튼 붉은 판 계열) — 종전 암갈 단색 내부가
+          // "거대한 어두운 상자"로 읽히던 우울의 본체(2026-07-04 재지적).
+          background: jackpot
+            ? "linear-gradient(168deg, rgba(96,32,18,0.94) 0%, rgba(64,40,14,0.94) 55%, rgba(46,28,12,0.95) 100%)"
+            : "linear-gradient(168deg, rgba(78,28,16,0.93) 0%, rgba(52,34,14,0.94) 60%, rgba(40,26,12,0.95) 100%)",
+          boxShadow: "inset 0 0 40px rgba(255,205,110,0.10)",
+          padding: "18px 28px",
+          minWidth: 300,
+          maxWidth: 380,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 16,
+          gap: 14,
           position: "relative",
         }}
       >
         {/* 1. 등급 + 별 (한 칸씩 펀치-인) */}
         <Reveal show={step >= STEP.STARS}>
-          <div style={{ display: "flex", gap: 6, fontSize: 34, lineHeight: 1 }}>
+          <div style={{ display: "flex", gap: 10, fontSize: 46, lineHeight: 1 }}>
             {[0, 1, 2, 3].map((i) => {
               const filled = i < summary.stars;
               const punched = i < starsShown; // 이 별이 "꽂혔는지"
@@ -544,15 +641,16 @@ export function ResultSequence({
                 <span
                   key={i}
                   style={{
-                    color: filled && punched ? litColor : "#4a4030",
+                    color: filled && punched ? litColor : "#6a5638",
                     display: "inline-block",
                     // 펀치-인: 꽂히는 순간 keyframe, 스킵 시 애니메이션 없이 즉시.
                     animation:
                       filled && punched && !skipped ? "tkStarPunch 360ms ease-out both" : "none",
                     textShadow:
                       filled && punched
-                        ? `0 0 ${jackpot ? 14 : 8}px ${litColor}${jackpot ? "aa" : "66"}`
+                        ? `0 0 ${jackpot ? 18 : 12}px ${litColor}${jackpot ? "aa" : "77"}`
                         : "none",
+                    opacity: filled ? 1 : 0.45,
                   }}
                 >
                   ★
@@ -560,26 +658,47 @@ export function ResultSequence({
               );
             })}
           </div>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 2 }}>
+            {/* 등급 = 붉은 인장(도장 쾅) — 편성/씬의 인장 문법과 통일 */}
             <span
               key={`grade-${starsShown >= summary.stars}`}
               style={{
-                fontSize: 44,
-                fontWeight: 800,
-                color: jackpot ? JACKPOT_GOLD : gradeColor,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 64,
+                height: 64,
+                borderRadius: 10,
+                transform: "rotate(-4deg)",
+                background: "linear-gradient(135deg, #9a2f1e, #641c10)",
+                border: "2px solid rgba(0,0,0,0.45)",
+                boxShadow: `0 4px 14px rgba(0,0,0,0.5), 0 0 ${jackpot ? 26 : 14}px ${jackpot ? JACKPOT_GOLD + "66" : "rgba(255,205,110,0.25)"}, inset 0 0 12px rgba(0,0,0,0.4)`,
+                fontSize: 40,
+                fontWeight: 900,
+                color: jackpot ? JACKPOT_GOLD : "#ffe2a8",
+                textShadow: "0 2px 6px rgba(0,0,0,0.7)",
                 // 마지막 별이 꽂힌 뒤 등급 스탬프.
                 animation:
                   starsShown >= summary.stars && !skipped
                     ? "tkGradeStamp 420ms cubic-bezier(0.2,1.2,0.3,1) both"
                     : "none",
-                textShadow: jackpot ? `0 0 16px ${JACKPOT_GOLD}aa` : "none",
               }}
             >
               {summary.grade}
             </span>
-            <span style={{ fontSize: 15, color: "#b3a78c" }}>{summary.score}점</span>
+            <span style={{ fontSize: 17, color: "#e6d3ac", fontWeight: 700 }}>{summary.score}점</span>
           </div>
-          <div style={{ fontSize: 12, color: "#b3a78c" }}>
+          <div
+            style={{
+              fontSize: 12,
+              color: "#d8c49a",
+              padding: "3px 14px",
+              borderRadius: 12,
+              border: "1px solid rgba(255,215,106,0.28)",
+              background: "rgba(0,0,0,0.25)",
+              marginTop: 2,
+            }}
+          >
             {summary.turnsUsed}턴 / 제한 {summary.turnLimit}턴
             {summary.playerRetreats > 0 ? ` · 퇴각 ${summary.playerRetreats}` : ""}
           </div>
