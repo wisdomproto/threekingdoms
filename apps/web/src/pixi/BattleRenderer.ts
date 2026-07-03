@@ -502,8 +502,12 @@ export class BattleRenderer implements Presenter {
 
   /**
    * 호버/탭 조회 해석 (Tier 1-2): 칸 → 유닛 → store.setInspected.
-   * **선택 가능한 내 아군**(미행동·아군 페이즈)은 조회에서 제외 — 선택 플로우를 가로채지 않게.
    * 좌표가 null이거나 유닛이 없으면 조회 해제(null). committed(엔진 진실) 기준으로 해석.
+   *
+   * 모든 유닛이 조회 대상 — 종전엔 "선택 가능한 아군(미행동)"을 제외했는데(선택 플로우
+   * 가로채기 우려), 이 채널은 표시 전용이라(inputMachine 무관) 클릭 선택을 방해하지 않고,
+   * 정작 출진한 내 유닛만 호버 스탯 팝업이 안 뜨는 결과가 됐다(2026-07-03 피드백).
+   * 선택된 유닛과의 중복 표시는 InspectPopup이 activeId 비교로 이미 걸러낸다.
    */
   private resolveInspect(coord: Coord | null): void {
     const store = this.store;
@@ -514,18 +518,7 @@ export class BattleRenderer implements Presenter {
     }
     const battle = store.committedState;
     const u = battle.units.find((x) => !x.retreated && x.x === coord.x && x.y === coord.y);
-    if (!u) {
-      store.setInspected(null);
-      return;
-    }
-    // 선택 가능한 아군은 선택 흐름 우선 — 조회로 가로채지 않는다(팝업은 적/행동완료 아군에 의미).
-    const selectableAlly =
-      u.side === "player" &&
-      !u.acted &&
-      !u.retreated &&
-      battle.phase === "player" &&
-      battle.status === "ongoing";
-    store.setInspected(selectableAlly ? null : u.id);
+    store.setInspected(u ? u.id : null);
   }
 
   /**
