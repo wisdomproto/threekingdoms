@@ -1721,42 +1721,65 @@ async function fetchAsset(gamePath) {
   return null;
 }
 
-/** 페이지 로드 시 R2/로컬에서 전 카드 이미지 자동 로드 → 인메모리 스토어 + DOM 렌더. */
+/** 페이지 로드 시 R2/로컬에서 전 카드 이미지 자동 로드 → 인메모리 스토어 + DOM 렌더.
+ *  ⚠️ 카드 단위 병렬 풀(동시 10) + 점진 렌더 — 종전 "한 장씩 직렬 await"는 카드가 수백 장이
+ *  되자(S 포즈시트 109 + 씬 54 …) 분 단위로 걸려, 섹션 순서상 S *뒤*인 초상/아이템/씬/오디오가
+ *  "안 보이는" 것처럼 하염없이 늦던 버그(2026-07-03). 진행 카운터로 로드 중임을 드러낸다. */
 async function loadFromR2() {
-  document.getElementById('progress').textContent = '🔄 R2에서 로드 중…';
+  const progressEl = document.getElementById('progress');
   let loaded = 0;
-  for (const section of SECTIONS) {
-    for (const item of section.items) {
-      const paths = cardGamePaths(item);
-      const isAudioCard = !!(item.bgmTrack || item.sfxKey);
-      if (paths.length) {
-        for (const gp of paths) {
-          const blob = await fetchAsset(gp);
-          if (blob) {
-            const rec = { card: item.id, blob, name: gp.split('/').pop(), pick: 0, at: 0, gamePath: gp };
-            imAdd(rec);
-            loaded++;
-            if (isAudioCard) break; // 확장자 여러 개 중 첫 히트만
-          }
+
+  /** 카드 1장 로드 — 동작은 종전 직렬 버전과 동일(오디오는 확장자 첫 히트만). */
+  async function runCard(item) {
+    const paths = cardGamePaths(item);
+    const isAudioCard = !!(item.bgmTrack || item.sfxKey);
+    if (paths.length) {
+      for (const gp of paths) {
+        const blob = await fetchAsset(gp);
+        if (blob) {
+          imAdd({ card: item.id, blob, name: gp.split('/').pop(), pick: 0, at: 0, gamePath: gp });
+          loaded++;
+          if (isAudioCard) break; // 확장자 여러 개 중 첫 히트만
         }
-      } else {
-        try {
-          const listRes = await fetch(`/list-dir?path=assets/_board_dump/${item.id}`, { cache: 'no-store' });
-          if (listRes.ok) {
-            const { files = [] } = await listRes.json();
-            for (const fname of files) {
-              const blob = await fetchAsset(`assets/_board_dump/${item.id}/${fname}`);
-              if (blob) {
-                const rec = { card: item.id, blob, name: fname, pick: 0, at: 0, gamePath: `assets/_board_dump/${item.id}/${fname}` };
-                imAdd(rec);
-                loaded++;
-              }
+      }
+    } else {
+      try {
+        const listRes = await fetch(`/list-dir?path=assets/_board_dump/${item.id}`, { cache: 'no-store' });
+        if (listRes.ok) {
+          const { files = [] } = await listRes.json();
+          for (const fname of files) {
+            const blob = await fetchAsset(`assets/_board_dump/${item.id}/${fname}`);
+            if (blob) {
+              imAdd({ card: item.id, blob, name: fname, pick: 0, at: 0, gamePath: `assets/_board_dump/${item.id}/${fname}` });
+              loaded++;
             }
           }
-        } catch { /* 파일 없음 */ }
-      }
+        }
+      } catch { /* 파일 없음 */ }
     }
   }
+
+  const queue = [];
+  for (const section of SECTIONS) for (const item of section.items) queue.push(item);
+  const total = queue.length;
+  let done = 0;
+  progressEl.textContent = `🔄 R2에서 로드 중… 0/${total}`;
+
+  const CONCURRENCY = 10;
+  await Promise.all(
+    Array.from({ length: CONCURRENCY }, async () => {
+      while (queue.length) {
+        const item = queue.shift();
+        try { await runCard(item); } catch { /* 카드 1장 실패가 전체를 멈추지 않게 */ }
+        done++;
+        if (done % 15 === 0 || done === total) {
+          progressEl.textContent = `🔄 R2에서 로드 중… ${done}/${total}`;
+          loadImagesForCurrentTab(); // 점진 렌더 — 보고 있는 탭부터 채워진다
+        }
+      }
+    }),
+  );
+
   loadImagesForCurrentTab();
   updateProgress();
   if (loaded > 0) toast(`📥 R2에서 ${loaded}장 로드됨`);
