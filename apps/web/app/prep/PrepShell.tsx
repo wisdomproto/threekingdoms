@@ -7,7 +7,7 @@
  *  - stageId: ?stage= 쿼리(없으면 M1 기본 사수관).
  *  - activeTab: "formation" | "shop" (기본 편성).
  *  - selected: SortieMember[] (Formation onChange로 갱신).
- *  - gold/roster: metaStore에서 로드(구매/장착 후 재조회 트리거).
+ *  - gold/roster: metaStore에서 로드(구매=refreshKey 재조회, 장착/해제=onEquip 즉시 동기).
  * maxSlots = 그 stage의 player 슬롯 수(좌표 재사용 상한, sortie.ts 계약).
  *
  * useSearchParams를 쓰므로 부모 page.tsx가 Suspense로 감싼다.
@@ -20,7 +20,7 @@ import { Formation } from "../../src/meta/screens/Formation";
 import { Shop } from "../../src/meta/screens/Shop";
 import { SortieBar } from "../../src/meta/screens/SortieBar";
 import { LoadingTransition } from "../../src/meta/screens/LoadingTransition";
-import { getMeta, getRoster, type RosterUnit } from "../../src/meta/metaStore";
+import { getMeta, getRoster, setEquipped, type RosterUnit } from "../../src/meta/metaStore";
 import { writeSortie, type SortieMember } from "../../src/meta/sortie";
 import { sortieSummary } from "../../src/meta/sortieSummary";
 import { shouldShowInterstitial } from "../../src/meta/interstitialPolicy";
@@ -55,8 +55,9 @@ export function PrepShell(): React.ReactElement {
     [stage],
   );
 
-  // meta는 SSR에서 비어있고 클라 마운트 후 채워진다(하이드레이션 일치). 구매/장착 후엔
-  // refreshKey를 올려 gold/roster를 재로드 — Shop이 onPurchase로 알려준다.
+  // meta는 SSR에서 비어있고 클라 마운트 후 채워진다(하이드레이션 일치). 구매 후엔 refreshKey를
+  // 올려 gold/roster를 재로드(Formation은 key라 리마운트) — Shop이 onPurchase로 알려준다.
+  // 장착/해제는 onEquip이 리마운트 없이 동기한다(팝업·스크롤 보존).
   const [refreshKey, setRefreshKey] = useState(0);
   const [roster, setRoster] = useState<RosterUnit[]>([]);
   const [gold, setGold] = useState(0);
@@ -78,6 +79,15 @@ export function PrepShell(): React.ReactElement {
   const [transition, setTransition] = useState<{ showAd: boolean } | null>(null);
 
   const onPurchase = useCallback(() => setRefreshKey((k) => k + 1), []);
+
+  // 장비 변경은 리마운트 없이 3곳을 함께 동기: 스토어(영속)·roster(재배치·장착 집계)·출진 멤버.
+  // roster를 빼먹으면 배치 해제→재배치가 옛 장비 스냅샷을 부활시키고, 해제한 장비는
+  // 옛 집계에 물려 선택 팝업에서 사라진다(2026-07-03 "해제 무기 실종" 실체).
+  const onEquip = useCallback((commanderId: string, items: string[]) => {
+    setEquipped(commanderId, items);
+    setRoster((rs) => rs.map((u) => (u.commanderId === commanderId ? { ...u, equipped: [...items] } : u)));
+    setSelected((sel) => sel.map((m) => (m.commanderId === commanderId ? { ...m, items: [...items] } : m)));
+  }, []);
 
   const onSortie = useCallback(() => {
     // 부대 공유 소지품(원작 창고 §7) — 인벤토리의 소모품 전량을 friendly 풀로 들고 나간다.
@@ -221,6 +231,7 @@ export function PrepShell(): React.ReactElement {
               chapter={chapter}
               focusId={focusId}
               onFocus={setFocusId}
+              onEquip={onEquip}
             />
           ) : (
             <Shop

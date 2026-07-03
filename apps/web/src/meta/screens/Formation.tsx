@@ -16,7 +16,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { gameData } from "@tk/data";
 import { isConsumable } from "@tk/engine";
 import type { RosterUnit } from "../metaStore";
-import { getMeta, setEquipped } from "../metaStore";
+import { getMeta } from "../metaStore";
 import type { SortieMember } from "../sortie";
 import { unitStats } from "../unitStats";
 import { sortRoster, type SortKey } from "../rosterSort";
@@ -37,6 +37,8 @@ export interface FormationProps {
   /** 상세 패널 대상(셸 소유 — 하단 슬롯 칩 탭과 공유) */
   focusId: string | null;
   onFocus: (commanderId: string | null) => void;
+  /** 장비 변경 — 셸이 스토어·roster·출진 멤버 3곳을 한 번에 동기(스냅샷 갈라짐 방지) */
+  onEquip: (commanderId: string, items: string[]) => void;
 }
 
 /** 상세 패널을 우측 컬럼(넓음) ↔ 바텀시트(좁음)로 가르는 기준 */
@@ -105,7 +107,7 @@ function toMember(u: RosterUnit, items: string[]): SortieMember {
 }
 
 export function Formation({
-  roster, maxSlots, selected, onChange, chapter, focusId, onFocus,
+  roster, maxSlots, selected, onChange, chapter, focusId, onFocus, onEquip,
 }: FormationProps): React.ReactElement {
   const narrow = useNarrow();
 
@@ -171,11 +173,6 @@ export function Formation({
     }
   }, [selectedIds, focusId, selected.length, maxSlots, deploy, undeploy, onFocus]);
 
-  const updateEquip = useCallback((commanderId: string, items: string[]) => {
-    setEquipped(commanderId, items);
-    onChange(selected.map((m) => (m.commanderId === commanderId ? { ...m, items: [...items] } : m)));
-  }, [onChange, selected]);
-
   // 넓은 화면은 항상 무언가 보여준다(빈 패널 방지); 바텀시트는 명시 탭에만 열린다.
   const wideFocusId = focusId ?? selected[0]?.commanderId ?? sortedRoster[0]?.commanderId ?? null;
   const detailId = narrow ? focusId : wideFocusId;
@@ -189,7 +186,7 @@ export function Formation({
       statMax={statMax}
       inventory={inventory}
       equippedCount={equippedCount}
-      onEquip={(items) => updateEquip(detailUnit.commanderId, items)}
+      onEquip={(items) => onEquip(detailUnit.commanderId, items)}
       onClose={narrow ? () => onFocus(null) : undefined}
     />
   );
