@@ -690,39 +690,43 @@ export function ResultSequence({
           )}
         </Reveal>
 
-        {/* 4. 경험치 바 (+레벨업 팝) */}
+        {/* 4. 경험치 바 (+레벨업 팝) — exp는 스테이지 클리어 *보너스*(reward.exp)라 0이 기본.
+            실제 성장 경험치는 전투 중 행동으로 이미 적립돼 레벨업 뱃지가 보여준다.
+            0인데 "+0" 게이지를 그리면 버그처럼 읽혀(2026-07-03) 보너스가 있을 때만 표시. */}
         <Reveal show={step >= STEP.EXP}>
-          <div style={{ width: 220, position: "relative" }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                fontSize: 12,
-                color: "#b3a78c",
-                marginBottom: 4,
-              }}
-            >
-              <span>경험치</span>
-              <span>+{summary.exp}</span>
-            </div>
-            <div
-              style={{
-                height: 12,
-                borderRadius: 6,
-                background: "rgba(58, 65, 74, 0.7)",
-                overflow: "hidden",
-              }}
-            >
+          {summary.exp > 0 && (
+            <div style={{ width: 220, position: "relative" }}>
               <div
                 style={{
-                  height: "100%",
-                  width: `${expFilled ? expPct : 0}%`,
-                  background: "linear-gradient(90deg, #6abf69, #9ee37d)",
-                  transition: skipped ? "none" : "width 700ms ease",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  fontSize: 12,
+                  color: "#b3a78c",
+                  marginBottom: 4,
                 }}
-              />
+              >
+                <span>보너스 경험치</span>
+                <span>+{summary.exp}</span>
+              </div>
+              <div
+                style={{
+                  height: 12,
+                  borderRadius: 6,
+                  background: "rgba(58, 65, 74, 0.7)",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    height: "100%",
+                    width: `${expFilled ? expPct : 0}%`,
+                    background: "linear-gradient(90deg, #6abf69, #9ee37d)",
+                    transition: skipped ? "none" : "width 700ms ease",
+                  }}
+                />
+              </div>
             </div>
-          </div>
+          )}
           {/* 레벨업 팝 뱃지 — 레벨업한 아군마다 한 칸씩 순차 등장 */}
           {summary.levelUps.length > 0 && (
             <div

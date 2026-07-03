@@ -12,6 +12,7 @@
 import { Application, Container, Graphics, Sprite, Texture } from "pixi.js";
 import type { Side } from "@tk/data";
 import type { BattleContext, BattleEvent, BattleState, Coord } from "@tk/engine";
+import { camp } from "@tk/engine";
 import type { Presenter, PresentedSnapshot } from "../battle/eventPlayer";
 import type { InputState, UiEvent } from "../battle/inputMachine";
 import { findPath } from "../battle/path";
@@ -784,10 +785,14 @@ export class BattleRenderer implements Presenter {
     if (!s) return;
     // 격파/퇴각 VFX (§11): 유닛 위치에 흰빛+연두 파편 버스트를 retreat 모션과 병행.
     // 순수 표현 — 게임 상태 불변, FxLayer가 TweenRunner로 배속(timeScale)을 존중한다.
+    // 코인팝(§12 전리품 도파민)은 **적(hostile) 격파에만** — 아군/우군 퇴각에 금화가 튀면
+    // 상실의 순간이 보상처럼 읽힌다(2026-07-03 지적). 아군은 파편 버스트만.
     const view = s.units.view(e.unitId);
     const burstAt = gridToWorld({ x: view.gridX, y: view.gridY });
+    const side = this.store?.committedState.units.find((u) => u.id === e.unitId)?.side;
+    const coin = side != null && camp(side) === "hostile";
     playSfx(SFX.defeat);
-    await Promise.all([view.play("retreat"), s.fx.retreatBurst(burstAt)]);
+    await Promise.all([view.play("retreat"), s.fx.retreatBurst(burstAt, { coin })]);
   }
 
   /**

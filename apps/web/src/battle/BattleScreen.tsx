@@ -221,6 +221,10 @@ export default function BattleScreen(): React.ReactElement {
     [ctx],
   );
   const [introDone, setIntroDone] = useState(!hasOpeningDialogue);
+  // 결산 게이트(2026-07-03 "이긴 화면이 대사 중에 계속 떠 있다") — battleEnd 대사가 있는
+  // 스테이지는 그 대사가 다 재생된 뒤에 ResultSequence를 띄운다. 순서: 승패 확정 → 마무리
+  // 대사(탭 진행) → 결산. 해당 결과의 battleEnd 대사가 없으면(패배 등) 즉시 통과.
+  const [endDialogueDone, setEndDialogueDone] = useState(false);
 
   useEffect(() => {
     const el = mountRef.current;
@@ -282,6 +286,15 @@ export default function BattleScreen(): React.ReactElement {
   useEffect(() => {
     if (battleWon) adLifecycle.happytime();
   }, [battleWon]);
+  // 결산 게이트 판정 — 종료된 결과에 맞는 battleEnd 대사가 없으면 대기 없이 결산으로.
+  const status = snap.vm.status;
+  useEffect(() => {
+    if (status === "ongoing") return;
+    const has = (ctx.stage.dialogue ?? []).some(
+      (d) => d.trigger.kind === "battleEnd" && (!d.trigger.result || d.trigger.result === status),
+    );
+    if (!has) setEndDialogueDone(true);
+  }, [status, ctx]);
   // 자동전투는 클리어한 스테이지에서만 활성화(§15 "배속/자동전투 클리어 스테이지 한정").
   const stageId = ctx.stage.id;
   const isCleared = useMemo(() => getMeta().clearedStages.includes(stageId), [stageId]);
@@ -360,17 +373,23 @@ export default function BattleScreen(): React.ReactElement {
             const unit = store.committedState.units.find((u) => u.id === speaker);
             if (unit) delegate.target?.focusOn({ x: unit.x, y: unit.y }, 500);
           }}
-          onQueueDrained={() => setIntroDone(true)}
+          onQueueDrained={() => {
+            // 전투 중 드레인=개전 나레이션 완료 신호, 종료 후 드레인=마무리 대사 완료 → 결산 개방.
+            if (store.committedState.status !== "ongoing") setEndDialogueDone(true);
+            else setIntroDone(true);
+          }}
         />
       )}
       <EndTurnConfirm ui={snap.ui} dispatch={dispatch} />
-      <ResultSequence
-        ui={snap.ui}
-        vm={snap.vm}
-        reward={ctx.stage.reward}
-        items={ctx.data.items}
-        stageId={ctx.stage.id}
-      />
+      {endDialogueDone && (
+        <ResultSequence
+          ui={snap.ui}
+          vm={snap.vm}
+          reward={ctx.stage.reward}
+          items={ctx.data.items}
+          stageId={ctx.stage.id}
+        />
+      )}
       {/* 부트 장막 — 에셋 준비 전 전장을 가린다(입력도 차단). 준비/타임아웃 시 즉시 걷힘. */}
       {!boot.ready && (
         <div

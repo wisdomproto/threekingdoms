@@ -205,14 +205,18 @@ export class FxLayer {
    * 격파/퇴각 버스트 (§11) — 중심 섬광 + 파편(흰빛/연두) 방사 흩어짐 + 페이드.
    * 월드 공간(카메라 변환 하). 순수 표현: 게임 상태 불변, TweenRunner 경유라 배속(timeScale) 존중.
    * 즉사 아님(설계 §10 퇴각만) — 톤은 "소멸"이되 잔혹X.
+   * coin=true(기본)면 코인팝 이미지(§12 도파민 — **적 격파 전용**). 아군/우군 퇴각은 coin=false로
+   * 호출해 파편 버스트만 — 아군이 쓰러졌는데 금화가 튀던 문제(2026-07-03) 방지.
    */
-  retreatBurst(at: WorldPoint): Promise<void> {
-    const img = this.playFxSprite(FX.coin, { x: at.x, y: at.y - 4 }, RETREAT_MS, (t, s) => {
-      const e = 1 - (1 - t) * (1 - t);              // ease-out
-      s.position.y = at.y - 4 - 18 * e;             // 튀어오름
-      s.scale.set(0.6 + e * 0.7);
-      s.alpha = t < 0.5 ? 1 : 1 - (t - 0.5) / 0.5;
-    });
+  retreatBurst(at: WorldPoint, opts?: { coin?: boolean }): Promise<void> {
+    const img = (opts?.coin ?? true)
+      ? this.playFxSprite(FX.coin, { x: at.x, y: at.y - 4 }, RETREAT_MS, (t, s) => {
+          const e = 1 - (1 - t) * (1 - t);              // ease-out
+          s.position.y = at.y - 4 - 18 * e;             // 튀어오름
+          s.scale.set(0.6 + e * 0.7);
+          s.alpha = t < 0.5 ? 1 : 1 - (t - 0.5) / 0.5;
+        })
+      : null;
     if (img) return img;
     // ── 폴백: 기존 흰/연두 파편 ──
     const root = new Container();
