@@ -165,5 +165,428 @@
     ],
     "source": "_posesheet.png",
     "method": "cut_posesheet.py"
+  },
+  "heavyCavalry_player": {
+    "poses": [
+      "front_attack",
+      "front_idle",
+      "front_move"
+    ],
+    "source": "_posesheet.png",
+    "method": "cut_posesheet.py"
+  },
+  "heavyCavalry_enemy": {
+    "poses": [
+      "front_attack",
+      "front_idle",
+      "front_move"
+    ],
+    "source": "_posesheet.png",
+    "method": "cut_posesheet.py"
+  },
+  "bandit_player": {
+    "poses": [
+      "front_attack",
+      "front_idle",
+      "front_move"
+    ],
+    "source": "_posesheet.png",
+    "method": "cut_posesheet.py"
+  },
+  "bandit_enemy": {
+    "poses": [
+      "front_attack",
+      "front_idle",
+      "front_move"
+    ],
+    "source": "_posesheet.png",
+    "method": "cut_posesheet.py"
+  },
+  "lord_player": {
+    "poses": [
+      "front_attack",
+      "front_idle",
+      "front_move"
+    ],
+    "source": "_posesheet.png",
+    "method": "cut_posesheet.py"
+  },
+  "lord_enemy": {
+    "poses": [
+      "front_attack",
+      "front_idle",
+      "front_move"
+    ],
+    "source": "_posesheet.png",
+    "method": "cut_posesheet.py"
+  },
+  "감녕": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "고순": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "공손찬": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "공융": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "곽사": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "관평": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "관해": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "노숙": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "도겸": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "동탁": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "두습": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "미방": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "서황": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "손건": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "손권": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "악진": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "왕보": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "요화": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "우금": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "원술": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "위속": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "이각": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "이전": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "장각": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "장보": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "장합": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "정보": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "제갈량": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "조루": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "조운": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "조인": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "조홍": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "주유": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "주창": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "진궁": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "진등": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "하후연": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "한당": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "허저": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "황개": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
+  },
+  "후성": {
+    "poses": [
+      "front_idle",
+      "front_move",
+      "front_attack"
+    ],
+    "source": "_posesheet.png",
+    "method": "rebuild_manifest.py"
   }
 }
