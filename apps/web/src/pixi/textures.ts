@@ -88,6 +88,7 @@ const OBJECT_FILES: Record<string, string> = {
   // K-5/K-6 데코 오브젝트 (objectModel.DECO_OBJECT_MAP가 지형→이 키로 매핑). 미보유 시 옛 데코 폴백.
   rock_cluster: "rock_cluster.png", rock_cliff: "rock_cliff.png", tree_leafy: "tree_leafy.png",
   supply_cart: "supply_cart.png", camp_gate: "camp_gate.png",
+  rock_boulder: "rock_boulder.png", // 산지 혼합 바위(decoVariant MOUNTAIN_MIX_KEY)
   // 정밀 데코 바닥 소품(@tk/data DECORATION_KINDS와 1:1) — 여기 미등록 키는 getObject=null로
   // 조용히 생략된다("수레만 보이던" 2026-06-30 버그). 새 kind 추가 시 이 레지스트리도 함께.
   banner_command: "banner_command.png", pennants: "pennants.png", signal_flag: "signal_flag.png",

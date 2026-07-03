@@ -11,7 +11,7 @@ import { TILE_SIZE } from "../projection";
 import type { TextureResolver } from "../textures";
 import type { WorldRect } from "./TerrainLayer";
 import { wallTile } from "../objects/autotile";
-import { objectKind, decoObjectKey } from "../objects/objectModel";
+import { objectKind, decoObjectKey, decoVariant } from "../objects/objectModel";
 
 const CHUNK_TILES = 16;
 const N = 1, E = 2, S = 4, W = 8;
@@ -83,7 +83,7 @@ export class ObjectLayer extends Container {
       const kind = objectKind(terrainId);
       if (kind === "wall") this.addWall(chunk, gx, gy, tx, ty);
       else if (kind === "gate") this.addGate(chunk, gx, gy, tx, ty);
-      else this.addDeco(chunk, terrainId, tx, ty);
+      else this.addDeco(chunk, terrainId, gx, gy, tx, ty);
     }
     // 스테이지 정밀 데코(§5.2) — 이 청크에 속한 칸만. 지형 자동 데코 위에 얹는다(순수 시각).
     const ox = chunk.x / TILE_SIZE, oy = chunk.y / TILE_SIZE;
@@ -125,15 +125,22 @@ export class ObjectLayer extends Container {
     chunk.sprites.push(sp);
   }
 
-  private addDeco(chunk: Chunk, terrainId: string, tx: number, ty: number): void {
+  private addDeco(chunk: Chunk, terrainId: string, gx: number, gy: number, tx: number, ty: number): void {
     // 새 K-5/K-6 오브젝트 우선(decoObjectKey), 미보유 시 옛 DECO_FILES 폴백.
-    const objKey = decoObjectKey(terrainId);
-    const tex = (objKey ? this.textures.getObject(objKey) : null) ?? this.textures.getDeco(terrainId);
+    // 유기적 변형(decoVariant — 반전/크기/오프셋/산지 바위 혼합, (gx,gy) 결정론)으로
+    // 정격자 도장 반복을 깬다. 변형 키 텍스처 미보유면 기본 키로 폴백.
+    const baseKey = decoObjectKey(terrainId);
+    const v = decoVariant(terrainId, gx, gy);
+    const tex =
+      (v ? this.textures.getObject(v.key) : null) ??
+      (baseKey ? this.textures.getObject(baseKey) : null) ??
+      this.textures.getDeco(terrainId);
     if (!tex || tex.width === 0) return;
-    this.placeDeco(chunk, tex, tx, ty);
+    this.placeDeco(chunk, tex, tx, ty, v?.flip, v?.scale ?? 1, v?.dx ?? 0, v?.dy ?? 0);
   }
 
-  /** 데코 스프라이트 1개 배치(그림자 타원 + 바닥 앵커 빌보드) — 지형 자동 데코·정밀 데코 공용. */
+  /** 데코 스프라이트 1개 배치(그림자 타원 + 바닥 앵커 빌보드) — 지형 자동 데코·정밀 데코 공용.
+   *  dxTile/dyTile = 칸 내 오프셋(타일 비율, 자연물 지터용 — 기본 0). */
   private placeDeco(
     chunk: Chunk,
     tex: Texture,
@@ -141,10 +148,12 @@ export class ObjectLayer extends Container {
     ty: number,
     flip?: boolean,
     scaleMul = 1,
+    dxTile = 0,
+    dyTile = 0,
   ): void {
     const s = ((TILE_SIZE * 1.18) / tex.width) * scaleMul;
-    const cx = tx * TILE_SIZE + TILE_SIZE / 2;
-    const cy = ty * TILE_SIZE + TILE_SIZE - 1;
+    const cx = tx * TILE_SIZE + TILE_SIZE / 2 + dxTile * TILE_SIZE;
+    const cy = ty * TILE_SIZE + TILE_SIZE - 1 + dyTile * TILE_SIZE;
     const shadow = new Graphics();
     shadow.ellipse(0, 0, tex.width * s * 0.32, TILE_SIZE * 0.16).fill({ color: 0x000000, alpha: 0.18 });
     shadow.position.set(cx, cy - 2);

@@ -210,6 +210,13 @@ export default function BattleScreen(): React.ReactElement {
   // 타임아웃(15s) 폴백 = §13 무손실 — 파일 누락/네트워크 행이 게임을 인질 잡지 않는다
   // (장막만 걷히고, 밑에서는 기존 점진 로드가 계속 채운다).
   const [boot, setBoot] = useState({ pct: 0, ready: false });
+  // 개전 나레이션(battleStart 대사) 종료 후에 승리조건 배너를 띄운다(2026-07-03 피드백 —
+  // "나레이션 끝나고 목표가 딱"). 개전 대사가 없는 스테이지는 장막 걷히는 즉시.
+  const hasOpeningDialogue = useMemo(
+    () => (ctx.stage.dialogue ?? []).some((d) => d.trigger.kind === "battleStart"),
+    [ctx],
+  );
+  const [introDone, setIntroDone] = useState(!hasOpeningDialogue);
 
   useEffect(() => {
     const el = mountRef.current;
@@ -291,8 +298,8 @@ export default function BattleScreen(): React.ReactElement {
     >
       <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
       <TurnBanner ui={snap.ui} vm={snap.vm} dispatch={dispatch} stageName={ctx.stage.name} />
-      {/* 승리조건 배너/개전 대사는 장막이 걷힌 뒤 마운트 — 안 보이는 채 연출이 지나가지 않게 */}
-      {boot.ready && (
+      {/* 승리조건 배너 = 장막 걷힘 + 개전 나레이션 종료 후 — "나레이션 끝나고 목표가 딱" 시퀀스 */}
+      {boot.ready && introDone && (
         <ObjectiveBanner
           vm={snap.vm}
           stage={ctx.stage}
@@ -344,6 +351,7 @@ export default function BattleScreen(): React.ReactElement {
             const unit = store.committedState.units.find((u) => u.id === speaker);
             if (unit) delegate.target?.focusOn({ x: unit.x, y: unit.y }, 500);
           }}
+          onQueueDrained={() => setIntroDone(true)}
         />
       )}
       <EndTurnConfirm ui={snap.ui} dispatch={dispatch} />

@@ -246,12 +246,15 @@ export function DialogueOverlay({
   store,
   dialogue,
   onLineChange,
+  onQueueDrained,
 }: {
   store: BattleStore;
   /** stage.dialogue (없으면 오버레이 자체가 no-op) */
   dialogue?: readonly StageDialogue[];
   /** 새 대사 줄 표시될 때 호출 — 카메라 pan 등 외부 연출용 */
   onLineChange?: (speaker: string) => void;
+  /** 재생 중이던 대사 큐가 비워질 때마다 호출 — 개전 나레이션 뒤 목표 배너 시퀀싱용(BattleScreen) */
+  onQueueDrained?: () => void;
 }): React.ReactElement | null {
   const [queue, dispatch] = useReducer(queueReducer, { lines: [], playedIds: new Set<string>() });
   // 디렉터 전이 추적 — 직전 디렉터 스냅샷(결정론 상태의 read-only 슬라이스)
@@ -286,6 +289,22 @@ export function DialogueOverlay({
     // onLineChange는 렌더 사이클마다 새 함수 참조가 올 수 있어 의존성에서 제외
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSpeaker]);
+
+  // 큐 드레인 감지 — "재생 중(>0) → 비움(0)" 전이에만 통지(마운트 시 빈 큐는 제외).
+  const hadLinesRef = useRef(false);
+  const queueLen = queue.lines.length;
+  useEffect(() => {
+    if (queueLen > 0) {
+      hadLinesRef.current = true;
+      return;
+    }
+    if (hadLinesRef.current) {
+      hadLinesRef.current = false;
+      onQueueDrained?.();
+    }
+    // onQueueDrained도 렌더마다 새 참조 가능 — 의존성 제외(onLineChange와 동일 규약)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queueLen]);
 
   if (!dialogue || queue.lines.length === 0) return null;
 

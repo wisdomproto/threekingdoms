@@ -23,3 +23,57 @@ export const DECO_OBJECT_MAP: Record<string, string> = {
 export function decoObjectKey(terrainId: string): string | undefined {
   return DECO_OBJECT_MAP[terrainId];
 }
+
+// ── 지형 자동 데코의 유기적 변형(하이브리드 플랜 Chunk 3 #4) ─────────────────
+// 같은 스프라이트가 정격자에 도장처럼 반복돼 "어색"하던 문제(2026-07-03 피드백)를
+// (gx,gy) 해시 시드의 **결정론** 변형(좌우 반전·크기·칸 내 오프셋·산지 바위 2종 혼합)으로 푼다.
+// 순수 시각 — 지형/통행 판정 불변. 렌더마다 동일(리플레이/스크린샷 안정).
+// 정밀 배치(stage.decorations)는 손으로 놓은 그대로 — 변형을 적용하지 않는다.
+
+export interface DecoVariant {
+  /** 그릴 오브젝트 키(변형 키 미보유 시 호출측이 기본 키로 폴백) */
+  key: string;
+  flip: boolean;
+  /** 기본 스케일 배수 (0.88~1.14) */
+  scale: number;
+  /** 칸 내 오프셋(타일 비율, 자연물만 ±0.12 — 구조물은 0) */
+  dx: number;
+  dy: number;
+}
+
+/** 산지 혼합 바위(1/3 확률로 큰 바위) — OBJECT_FILES에 함께 등록돼 있어야 한다. */
+const MOUNTAIN_MIX_KEY = "rock_boulder";
+/** 오프셋까지 흔드는 자연물 지형(구조물·수레는 제자리 유지) */
+const NATURE_TERRAIN = new Set(["mountain", "forest", "cliff"]);
+
+/** (terrain,gx,gy) → 32bit 정수 해시(결정론). 시각 전용 — 게임 RNG와 무관. */
+function cellHash(terrainId: string, gx: number, gy: number): number {
+  let h = 0x811c9dc5;
+  const s = `${terrainId}:${gx}:${gy}`;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+/** 0..1 균등 파생(비트 시프트별 독립 사용) */
+function unit(h: number, shift: number): number {
+  return ((h >>> shift) & 0x3ff) / 0x3ff;
+}
+
+export function decoVariant(terrainId: string, gx: number, gy: number): DecoVariant | undefined {
+  const base = DECO_OBJECT_MAP[terrainId];
+  if (!base) return undefined;
+  const h = cellHash(terrainId, gx, gy);
+  const nature = NATURE_TERRAIN.has(terrainId);
+  const key = terrainId === "mountain" && h % 3 === 0 ? MOUNTAIN_MIX_KEY : base;
+  return {
+    key,
+    flip: (h & 1) === 1,
+    scale: 0.88 + unit(h, 2) * 0.26,
+    // 구조물은 정확히 0 — 음수 방향 곱의 -0 잔재도 남기지 않는다(직렬화/비교 안전)
+    dx: nature ? (unit(h, 12) * 2 - 1) * 0.12 : 0,
+    dy: nature ? (unit(h, 22) * 2 - 1) * 0.12 : 0,
+  };
+}
