@@ -92,6 +92,7 @@ const OBJECT_FILES: Record<string, string> = {
   // K-9 거점·다리(2026-07-04 — 지형 회복 §10과 함께 거점 식별 강화). 미보유 시 폴백:
   // 거점=옛 데코(hut/camp/storehouse), 다리=기존 동작(painted 숨김/타일 도하 표식).
   village_hut: "village_hut.png", camp_tent: "camp_tent.png", depot_store: "depot_store.png",
+  village_hut2: "village_hut2.png", // 마을 혼합 변형(decoVariant VILLAGE_MIX_KEY)
   bridge_v: "bridge_v.png", bridge_h: "bridge_h.png",
   // 정밀 데코 바닥 소품(@tk/data DECORATION_KINDS와 1:1) — 여기 미등록 키는 getObject=null로
   // 조용히 생략된다("수레만 보이던" 2026-06-30 버그). 새 kind 추가 시 이 레지스트리도 함께.

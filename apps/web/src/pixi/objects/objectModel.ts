@@ -57,6 +57,8 @@ const DECO_TINT: Record<string, number> = {
 
 /** 산지 혼합 바위(1/3 확률로 큰 바위) — OBJECT_FILES에 함께 등록돼 있어야 한다. */
 const MOUNTAIN_MIX_KEY = "rock_boulder";
+/** 마을 혼합 민가(마당 딸린 변형, 1/2) — 하비2 등 마을 수십 칸의 도장 반복 방지(K-9). */
+const VILLAGE_MIX_KEY = "village_hut2";
 /** 오프셋까지 흔드는 자연물 지형(구조물·수레는 제자리 유지) */
 const NATURE_TERRAIN = new Set(["mountain", "forest", "cliff"]);
 
@@ -81,7 +83,10 @@ export function decoVariant(terrainId: string, gx: number, gy: number): DecoVari
   if (!base) return undefined;
   const h = cellHash(terrainId, gx, gy);
   const nature = NATURE_TERRAIN.has(terrainId);
-  const key = terrainId === "mountain" && h % 3 === 0 ? MOUNTAIN_MIX_KEY : base;
+  const key =
+    terrainId === "mountain" && h % 3 === 0 ? MOUNTAIN_MIX_KEY
+    : terrainId === "village" && h % 2 === 0 ? VILLAGE_MIX_KEY
+    : base;
   return {
     key,
     flip: (h & 1) === 1,
