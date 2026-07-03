@@ -428,9 +428,48 @@ function loadFromStorage(): MetaState {
   }
 }
 
-/** 로드 직후 시작 장비 치유(1회) — 바뀌었으면 즉시 저장해 다음 로드부터 재실행을 막는다. */
+/**
+ * 장착⊆인벤 불변식 복구(매 로드 멱등, 2026-07-04 "해제하면 아예 사라짐" 근본 수정).
+ * 모델: 인벤토리 = 전체 보유, 장착 = 그중 사용 표시(available = 보유 − 장착) — 장착이 인벤에
+ * 없으면 해제 순간 어디에도 없는 아이템이 된다(재장착 불가). 두 보장으로 부족분을 추가:
+ *  (A) 아이템별 인벤 수량 ≥ 로스터 전체 장착 수량(progress 없는 장수는 startItems 폴백 —
+ *      selectRoster와 동일 규칙).
+ *  (B) 인벤 수량 ≥ 시작 장비(startItems) 수량 — 판매 메커닉이 없어 시작 장비는 정당하게
+ *      소멸할 수 없다. **이미 잃어버린 세이브**(장착 해제 후 소멸)도 이 보장이 복구한다.
+ * 이탈 장수(departedCharacters)는 제외(이탈 시 장비 반환·장착 초기화 완료). 추가만 하고
+ * 절대 제거하지 않으므로 의도적 해제(인벤에 남음)를 되돌리지 않는다 — 플래그 불필요.
+ */
+export function healEquipInventory(
+  s: MetaState,
+  rosters: Record<string, RosterEntry> = gameData.rosters,
+): MetaState {
+  const departed = new Set(s.departedCharacters ?? []);
+  // (A) 로스터 전체 장착 총량 / (B) 시작 장비 총량 — 아이템별 **글로벌 max**가 요구 수량.
+  // (per-entry 합산은 "유비가 해제한 쌍고검을 관우가 장착 중"에서 유령 복제를 만든다 —
+  //  장착 1 + 시작 1을 따로 세면 2가 되지만 실물은 1개.)
+  const equippedTotal = new Map<string, number>();
+  const startTotal = new Map<string, number>();
+  for (const entry of Object.values(rosters)) {
+    if (departed.has(entry.commanderId)) continue;
+    const p = s.rosterProgress[entry.commanderId];
+    const equipped = p ? p.equipped : (entry.startItems ?? []); // selectRoster 폴백 규칙과 동일
+    for (const it of equipped) equippedTotal.set(it, (equippedTotal.get(it) ?? 0) + 1);
+    for (const it of entry.startItems ?? []) startTotal.set(it, (startTotal.get(it) ?? 0) + 1);
+  }
+  const owned = new Map<string, number>();
+  for (const it of s.inventory) owned.set(it, (owned.get(it) ?? 0) + 1);
+  const add: string[] = [];
+  for (const it of new Set([...equippedTotal.keys(), ...startTotal.keys()])) {
+    const need = Math.max(equippedTotal.get(it) ?? 0, startTotal.get(it) ?? 0);
+    for (let i = owned.get(it) ?? 0; i < need; i++) add.push(it);
+  }
+  if (add.length === 0) return s;
+  return { ...s, inventory: [...s.inventory, ...add] };
+}
+
+/** 로드 직후 치유 체인 — 시작 장비(1회) + 장착⊆인벤 불변식(멱등). 바뀌었으면 즉시 저장. */
 function healPersist(s: MetaState): MetaState {
-  const healed = healStartItems(s);
+  const healed = healEquipInventory(healStartItems(s));
   if (healed !== s) saveToStorage(healed);
   return healed;
 }

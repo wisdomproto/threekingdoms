@@ -40,6 +40,7 @@ import {
   pullSerendipity,
   reduceApplyRosterProgress,
   healStartItems,
+  healEquipInventory,
 } from "../metaStore";
 import { PULL_COST } from "../serendipity";
 
@@ -193,6 +194,53 @@ describe("광고 공개 API (node 메모리 캐시)", () => {
     setAdFree(true);
     reset();
     expect(isAdFree()).toBe(false);
+  });
+});
+
+describe("healEquipInventory — 장착⊆인벤 불변식(2026-07-04 '해제하면 소멸' 근본 수정)", () => {
+  const rosters: Record<string, RosterEntry> = {
+    유비: { commanderId: "유비", classId: "footman", joinChapter: 1, role: "lord", startItems: ["쌍고검"] },
+    관우: { commanderId: "관우", classId: "lightCavalry", joinChapter: 1, role: "melee", startItems: ["청룡언월도"] },
+    서서: { commanderId: "서서", classId: "strategist", joinChapter: 3, role: "caster", startItems: ["병서"] },
+  };
+  const prog = (equipped: string[]) => ({ level: 1, exp: 0, equipped });
+
+  it("(A) 장착돼 있는데 인벤에 없으면 부족분 추가 — 해제해도 소지품에 남게", () => {
+    const s = { ...initialMeta(), rosterProgress: { 유비: prog(["쌍고검"]) } };
+    const healed = healEquipInventory(s, rosters);
+    // 유비 장착 1 + 관우/서서 progress 없음(startItems 폴백) → 각 1부씩 보장
+    expect(healed.inventory.filter((x) => x === "쌍고검").length).toBe(1);
+    expect(healed.inventory).toContain("청룡언월도");
+  });
+
+  it("(B) 이미 잃어버린 시작 장비(장착 해제 후 소멸 세이브)도 복구된다", () => {
+    // 유비가 쌍고검을 해제했는데 인벤에 없던 버그 세이브: equipped=[] & 인벤에도 없음
+    const s = { ...initialMeta(), rosterProgress: { 유비: prog([]), 관우: prog(["청룡언월도"]) },
+      inventory: ["청룡언월도"] };
+    const healed = healEquipInventory(s, rosters);
+    expect(healed.inventory).toContain("쌍고검"); // startItems 존재 보장이 복구
+  });
+
+  it("불변식이 이미 만족이면 동일 참조(멱등 — 의도적 해제를 되돌리지 않음)", () => {
+    const s = { ...initialMeta(),
+      rosterProgress: { 유비: prog([]), 관우: prog(["청룡언월도"]), 서서: prog([]) },
+      inventory: ["쌍고검", "청룡언월도", "병서"] }; // 해제분도 인벤에 남아 있는 정상 상태
+    expect(healEquipInventory(s, rosters)).toBe(s);
+  });
+
+  it("공유 이동(유비 해제→관우 장착, 실물 1개)에 유령 복제를 만들지 않는다", () => {
+    const s = { ...initialMeta(),
+      rosterProgress: { 유비: prog([]), 관우: prog(["청룡언월도", "쌍고검"]), 서서: prog([]) },
+      inventory: ["쌍고검", "청룡언월도", "병서"] };
+    // 쌍고검: 장착 1 · 시작 1 → max 1 = 보유 1 → 추가 없음(동일 참조)
+    expect(healEquipInventory(s, rosters)).toBe(s);
+  });
+
+  it("이탈 장수는 제외(이탈 시 장비 반환·장착 초기화 완료)", () => {
+    const s = { ...initialMeta(),
+      rosterProgress: { 유비: prog(["쌍고검"]), 서서: prog([]) },
+      inventory: ["쌍고검", "청룡언월도", "병서"], departedCharacters: ["서서"] };
+    expect(healEquipInventory(s, rosters)).toBe(s); // 서서 병서 재요구 없음
   });
 });
 
