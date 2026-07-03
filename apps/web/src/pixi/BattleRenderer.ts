@@ -296,6 +296,8 @@ export class BattleRenderer implements Presenter {
         mapBg.visible = true;
         terrain.visible = false; // 타일 끄고 그림으로
         // objects 레이어는 painted 배경과 무관하게 항상 표시(설계 §3) — terrain만 끈다.
+        // 단 painted가 이미 그린 지형 요소와 겹치는 레거시 데코(다리)는 레이어가 스스로 숨긴다.
+        objects.setPaintedMode(true);
         // gridOverlay.visible = true; // 정합 확인용 — 확정되어 기본 OFF (새 맵 검증 시 재활성)
       })
       .catch((e) => console.warn("[BattleRenderer] loadMapBackground 예외:", e))

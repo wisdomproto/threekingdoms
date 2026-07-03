@@ -27,6 +27,8 @@ export class ObjectLayer extends Container {
   private readonly state = new Map<string, string>();
   /** 스테이지 정밀 데코(§5.2) — 청크 rebuild 때마다 소속 칸 기준으로 얹는다. */
   private readonly decorations: readonly Decoration[];
+  /** painted 배경 표시 중 — 배경이 이미 그린 지형 요소(도하 등)와 겹치는 레거시 데코를 숨긴다. */
+  private paintedMode = false;
 
   constructor(ctx: BattleContext, textures: TextureResolver) {
     super();
@@ -60,6 +62,13 @@ export class ObjectLayer extends Container {
 
   /** loadObjects()/loadDecos() 완료 후 호출 — 텍스처 적용 재생성. */
   rebake(): void { for (const c of this.chunks) this.build(c); }
+
+  /** painted 배경 켜짐/꺼짐 통지(BattleRenderer) — 다리 등 레거시 중복 데코 표시 갱신. */
+  setPaintedMode(on: boolean): void {
+    if (this.paintedMode === on) return;
+    this.paintedMode = on;
+    this.rebake();
+  }
 
   /** 성문/성벽 상태 변경(관문돌파·화공 이벤트) — 해당 칸 청크만 재생성. */
   setObjectState(gx: number, gy: number, st: string): void {
@@ -126,6 +135,11 @@ export class ObjectLayer extends Container {
   }
 
   private addDeco(chunk: Chunk, terrainId: string, gx: number, gy: number, tx: number, ty: number): void {
+    // 레거시 아이소(쿼터뷰) 시절 다리 스프라이트 — painted 배경은 도하를 이미 그려서 이중 묘사 +
+    // 시점 충돌(탑다운 강 위에 3/4 뷰 다리)이 된다(2026-07-03 피드백). painted에선 숨기고,
+    // 타일 폴백 맵에선 도하 표식으로 유지. K-7 탑다운 다리 아트가 오면 DECO_OBJECT_MAP에
+    // bridge 매핑을 추가하고 이 예외를 제거한다.
+    if (this.paintedMode && terrainId === "bridge") return;
     // 새 K-5/K-6 오브젝트 우선(decoObjectKey), 미보유 시 옛 DECO_FILES 폴백.
     // 유기적 변형(decoVariant — 반전/크기/오프셋/산지 바위 혼합, (gx,gy) 결정론)으로
     // 정격자 도장 반복을 깬다. 변형 키 텍스처 미보유면 기본 키로 폴백.
