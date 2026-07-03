@@ -231,6 +231,19 @@ export function reduceApplyPull(s: MetaState, outcome: PullOutcome): MetaState |
   return next;
 }
 
+/**
+ * 무료 뽑기 적용(§13 리워드 광고 "기연 뽑기 +1회") — 포인트 **미차감**, pity 갱신 + 보상 적립.
+ * 광고 완주가 곧 비용이라 serendipity 포인트를 쓰지 않는다(항상 성공). §13 가드: 기연은 밸런스 sim
+ * 밖(§14)이고 §13이 명시 승인한 리워드 지점이므로 "광고=랜덤 전투력" 불가침선과 상충하지 않는다.
+ */
+export function reduceApplyFreePull(s: MetaState, outcome: PullOutcome): MetaState {
+  let next: MetaState = { ...s, serendipityPity: outcome.nextPity };
+  const reward: SerendipityReward = outcome.reward;
+  if (reward.kind === "gold") next = reduceAddGold(next, reward.amount);
+  else next = reduceAddItem(next, reward.itemId);
+  return next;
+}
+
 export function reduceMarkCleared(
   s: MetaState,
   stageId: string,
@@ -530,6 +543,17 @@ export function pullSerendipity(rng: () => number): { reward: SerendipityReward;
   const next = reduceApplyPull(s, outcome);
   if (next === null) return null;
   saveToStorage(next);
+  return { reward: outcome.reward, wasRare: outcome.wasRare };
+}
+
+/**
+ * 무료 기연 뽑기(§13 리워드 광고 "기연 뽑기 +1회") — 포인트 미차감, 항상 성공.
+ * 광고 완주 콜백(RewardedAdButton onReward)에서 호출한다. pity·보상은 유료 뽑기와 동일하게 영속.
+ */
+export function pullSerendipityFree(rng: () => number): { reward: SerendipityReward; wasRare: boolean } {
+  const s = loadFromStorage();
+  const outcome = rollSerendipity(s.serendipityPity, rng);
+  saveToStorage(reduceApplyFreePull(s, outcome));
   return { reward: outcome.reward, wasRare: outcome.wasRare };
 }
 

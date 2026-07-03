@@ -13,10 +13,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { gameData } from "@tk/data";
 import type { ItemEffects } from "@tk/data";
-import { getSerendipity, getSerendipityPity, pullSerendipity } from "../metaStore";
+import { getSerendipity, getSerendipityPity, pullSerendipity, pullSerendipityFree } from "../metaStore";
 import { PULL_COST, PITY_CAP, pickFlavor, isSerendipityTreasure } from "../serendipity";
 import type { SerendipityReward } from "../serendipity";
 import { PANEL_FRAME } from "../../battle/hud/frames";
+import { RewardedAdButton } from "../RewardedAdButton";
 
 const INK = "#1a1714";
 const INK_DEEP = "#0d0b09";
@@ -80,17 +81,25 @@ export function SerendipityScreen(): React.ReactElement {
   const canPull = points >= PULL_COST;
   const toPity = Math.max(0, PITY_CAP - pity); // 천장까지 남은 횟수
 
-  const onPull = () => {
-    const result = pullSerendipity(() => Math.random());
-    if (!result) return; // 포인트 부족(버튼 비활성과 이중 가드)
-    // 차감/적립은 이미 영속됨 — 표시값 즉시 갱신.
+  // 뽑기 결과 → 연출(플레이버 가림 → 보상 공개) + 표시값 갱신. 유료/광고 무료 뽑기 공용.
+  const present = (result: { reward: SerendipityReward; wasRare: boolean }) => {
     setPoints(getSerendipity());
     setPity(getSerendipityPity());
-    // 플레이버 먼저(가림) → 짧게 후 보상 공개.
     setView({ flavor: pickFlavor(Math.random()), reward: result.reward, rare: result.wasRare, revealed: false });
     window.setTimeout(() => {
       setView((v) => (v ? { ...v, revealed: true } : v));
     }, 650);
+  };
+
+  const onPull = () => {
+    const result = pullSerendipity(() => Math.random());
+    if (!result) return; // 포인트 부족(버튼 비활성과 이중 가드) — 차감/적립은 이미 영속됨.
+    present(result);
+  };
+
+  // §13 리워드 광고 "기연 뽑기 +1회" — 광고 완주 시 포인트 없이 1회 뽑기(무손실 opt-in).
+  const onAdPull = () => {
+    present(pullSerendipityFree(() => Math.random()));
   };
 
   return (
@@ -208,9 +217,15 @@ export function SerendipityScreen(): React.ReactElement {
         >
           기연 청하기 <span style={{ fontSize: 13, color: canPull ? RARE_PURPLE : "#4a4338" }}>({PULL_COST} 기연)</span>
         </button>
+
+        {/* §13 리워드 광고 — 광고 보고 기연 1회(포인트 무소모). adFree면 버튼 자체가 숨겨짐. */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 12 }}>
+          <RewardedAdButton placement="qiyuan_extra" label="광고 보고 기연 +1회" onReward={onAdPull} />
+        </div>
+
         {!canPull && (
           <p style={{ fontSize: 12, color: BRONZE_DIM, textAlign: "center", marginTop: 10 }}>
-            스테이지를 클리어하면 등급에 따라 기연이 쌓입니다.
+            스테이지를 클리어하면 등급에 따라 기연이 쌓입니다. 광고로도 기연을 청할 수 있습니다.
           </p>
         )}
       </div>

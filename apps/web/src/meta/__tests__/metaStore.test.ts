@@ -33,6 +33,7 @@ import {
   recordAdGold,
   reduceAddSerendipity,
   reduceApplyPull,
+  reduceApplyFreePull,
   addSerendipity,
   getSerendipity,
   getSerendipityPity,
@@ -110,6 +111,22 @@ describe("기연 reducer (§12 — 포인트·천장·뽑기)", () => {
     expect(next.serendipity).toBe(5 - PULL_COST);
     expect(next.serendipityPity).toBe(0);
     expect(next.inventory).toEqual(["qiyuan-charm"]);
+  });
+
+  it("applyFreePull(광고 §13)은 포인트 미차감 + pity 갱신 + 보상 적립 (포인트 0에서도 성공)", () => {
+    const s = { ...initialMeta(), serendipity: 0, serendipityPity: 4 };
+    const next = reduceApplyFreePull(s, { reward: { kind: "gold", amount: 80 }, nextPity: 5, wasRare: false });
+    expect(next.serendipity).toBe(0); // 무소모 — 포인트 그대로
+    expect(next.serendipityPity).toBe(5);
+    expect(next.gold).toBe(80);
+  });
+
+  it("applyFreePull(rare item)도 인벤토리 적립 + pity 리셋, 포인트 불변", () => {
+    const s = { ...initialMeta(), serendipity: 2, serendipityPity: 9 };
+    const next = reduceApplyFreePull(s, { reward: { kind: "item", itemId: "qiyuan-relic" }, nextPity: 0, wasRare: true });
+    expect(next.serendipity).toBe(2);
+    expect(next.serendipityPity).toBe(0);
+    expect(next.inventory).toEqual(["qiyuan-relic"]);
   });
 });
 
