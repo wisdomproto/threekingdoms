@@ -39,7 +39,18 @@ export interface DecoVariant {
   /** 칸 내 오프셋(타일 비율, 자연물만 ±0.12 — 구조물은 0) */
   dx: number;
   dy: number;
+  /** 웜 멀티플라이 틴트(0xRRGGBB) — 미지정 시 원색.
+   *  바위류의 차가운 회색조 + 스프라이트에 박힌 흰 바닥 카펫(아트와 픽셀 연결이라 수술 불가,
+   *  2026-07-03)을 렌더에서 완화: 흰색×틴트=땅색 근사라 카펫이 배경에 흡수된다. */
+  tint?: number;
 }
+
+/** 지형별 웜 틴트 — 황토 painted 전장과 온도 정합(값은 데이터 1곳, 재생성 아트가 오면 제거 검토). */
+const DECO_TINT: Record<string, number> = {
+  mountain: 0xd9c9a8, // 바위: 강한 웜(흰 카펫 흡수 + 한색 보정)
+  cliff: 0xd9c9a8,
+  forest: 0xefe6d0, // 나무: 약한 웜(잿빛 잎 온도만 살짝)
+};
 
 /** 산지 혼합 바위(1/3 확률로 큰 바위) — OBJECT_FILES에 함께 등록돼 있어야 한다. */
 const MOUNTAIN_MIX_KEY = "rock_boulder";
@@ -75,5 +86,6 @@ export function decoVariant(terrainId: string, gx: number, gy: number): DecoVari
     // 구조물은 정확히 0 — 음수 방향 곱의 -0 잔재도 남기지 않는다(직렬화/비교 안전)
     dx: nature ? (unit(h, 12) * 2 - 1) * 0.12 : 0,
     dy: nature ? (unit(h, 22) * 2 - 1) * 0.12 : 0,
+    tint: DECO_TINT[terrainId],
   };
 }

@@ -136,11 +136,11 @@ export class ObjectLayer extends Container {
       (baseKey ? this.textures.getObject(baseKey) : null) ??
       this.textures.getDeco(terrainId);
     if (!tex || tex.width === 0) return;
-    this.placeDeco(chunk, tex, tx, ty, v?.flip, v?.scale ?? 1, v?.dx ?? 0, v?.dy ?? 0);
+    this.placeDeco(chunk, tex, tx, ty, v?.flip, v?.scale ?? 1, v?.dx ?? 0, v?.dy ?? 0, v?.tint);
   }
 
   /** 데코 스프라이트 1개 배치(그림자 타원 + 바닥 앵커 빌보드) — 지형 자동 데코·정밀 데코 공용.
-   *  dxTile/dyTile = 칸 내 오프셋(타일 비율, 자연물 지터용 — 기본 0). */
+   *  dxTile/dyTile = 칸 내 오프셋(타일 비율, 자연물 지터용 — 기본 0). tint = 웜 멀티플라이(선택). */
   private placeDeco(
     chunk: Chunk,
     tex: Texture,
@@ -150,6 +150,7 @@ export class ObjectLayer extends Container {
     scaleMul = 1,
     dxTile = 0,
     dyTile = 0,
+    tint?: number,
   ): void {
     const s = ((TILE_SIZE * 1.18) / tex.width) * scaleMul;
     const cx = tx * TILE_SIZE + TILE_SIZE / 2 + dxTile * TILE_SIZE;
@@ -163,6 +164,7 @@ export class ObjectLayer extends Container {
     deco.anchor.set(0.5, 1);
     deco.scale.set(flip ? -s : s, s);
     deco.position.set(cx, cy);
+    if (tint !== undefined) deco.tint = tint; // 웜 멀티플라이 — 흰 카펫을 땅색으로 흡수(§objectModel)
     chunk.container.addChild(deco);
     chunk.sprites.push(deco);
   }

@@ -58,4 +58,12 @@ describe("decoVariant (유기적 변형 — Chunk 3 #4)", () => {
     }
     expect(flips).toEqual(new Set([true, false]));
   });
+
+  it("웜 틴트: 바위/숲(한색·흰 카펫 완화)만, 구조물은 원색", () => {
+    expect(decoVariant("mountain", 1, 1)!.tint).toBeDefined();
+    expect(decoVariant("cliff", 1, 1)!.tint).toBeDefined();
+    expect(decoVariant("forest", 1, 1)!.tint).toBeDefined();
+    expect(decoVariant("village", 1, 1)!.tint).toBeUndefined();
+    expect(decoVariant("barracks", 1, 1)!.tint).toBeUndefined();
+  });
 });
