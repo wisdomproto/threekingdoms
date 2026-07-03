@@ -34,6 +34,36 @@ export function effectText(item: Item): string {
     const verb = item.category === "supplyItem" ? "회복" : "피해";
     return `${verb} ${item.power}`;
   }
+  const parts = specialEffectParts(item);
+  if (item.bonusPercent > 0) parts.push(`+${item.bonusPercent}%`);
+  return parts.length ? parts.join(" · ") : "고유 효과";
+}
+
+/**
+ * 효과를 줄 단위 배열로(아이템 상세 팝업 — 한 줄 한 효과, 진열 요약보다 풀어씀).
+ * 빈 배열 = 표기할 효과 없음(호출측이 "고유 효과" 표시).
+ */
+export function effectLines(item: Item): string[] {
+  if (isConsumable(item)) {
+    const verb = item.category === "supplyItem" ? "회복" : "피해";
+    return [`${verb} ${item.power}`, "소모성 — 사용하면 없어진다"];
+  }
+  const parts = specialEffectParts(item);
+  if (item.bonusPercent > 0) {
+    // 팝업에선 보정 대상을 풀어쓴다(무기=부대 공격력, 병법서=정신력)
+    parts.push(
+      item.category === "weapon"
+        ? `부대 공격력 +${item.bonusPercent}%`
+        : item.category === "book"
+          ? `정신력 +${item.bonusPercent}%`
+          : `+${item.bonusPercent}%`,
+    );
+  }
+  return parts;
+}
+
+/** 전투 특성(effects) 문구화 — effectText(요약)·effectLines(상세) 공용 빌더. */
+function specialEffectParts(item: Item): string[] {
   const parts: string[] = [];
   const e = item.effects;
   if (e) {
@@ -51,8 +81,7 @@ export function effectText(item: Item): string {
     if (e.lifestealPercent) parts.push(`흡혈 ${e.lifestealPercent}%`);
     if (e.inflictStatus) parts.push(`${STATUS_LABEL[e.inflictStatus.kind]} 부여 ${e.inflictStatus.chance}%`);
   }
-  if (item.bonusPercent > 0) parts.push(`+${item.bonusPercent}%`);
-  return parts.length ? parts.join(" · ") : "고유 효과";
+  return parts;
 }
 
 const CATEGORY_ORDER: Item["category"][] = ["weapon", "treasure", "horse", "book", "supplyItem", "attackItem"];

@@ -17,7 +17,7 @@ import type { CSSProperties } from "react";
 import type { Shop as ShopData, Item } from "@tk/data";
 import { getMeta, spendGold, addItem, addGold, canWatchGoldAd, recordAdGold } from "../metaStore";
 import { RewardedAdButton } from "../RewardedAdButton";
-import { buildShopRows, buildShopGroups, type ShopRow } from "./shopItemView";
+import { buildShopRows, buildShopGroups, effectLines, type ShopRow } from "./shopItemView";
 import { ItemIcon } from "../../ui/ItemIcon";
 
 /**
@@ -69,6 +69,9 @@ export function Shop({
   // 구매 시 보유 수량(owned)이 바뀌므로 로컬 리프레시 토큰으로 재계산을 강제.
   // gold는 props(부모가 onPurchase 후 재조회)로 내려오므로 affordable은 자동 갱신.
   const [tick, setTick] = useState(0);
+  // 아이템 상세 팝업(2026-07-03 피드백 — "이미지 누르면 크게 + 수치 설명").
+  // id로 들고 rows에서 파생 — 구매 후에도 보유/잔액이 최신으로 따라온다.
+  const [detailId, setDetailId] = useState<string | null>(null);
 
   const rows = useMemo<ShopRow[]>(() => {
     const inventory = getMeta().inventory;
@@ -126,23 +129,149 @@ export function Shop({
               <div style={groupHeaderStyle}>{group.label}</div>
               <ul style={listStyle}>
                 {group.rows.map((row) => (
-                  <ShopRowView key={row.itemId} row={row} onBuy={() => handleBuy(row)} />
+                  <ShopRowView
+                    key={row.itemId}
+                    row={row}
+                    onBuy={() => handleBuy(row)}
+                    onDetail={() => setDetailId(row.itemId)}
+                  />
                 ))}
               </ul>
             </div>
           ))
         )}
       </div>
+
+      {(() => {
+        const row = detailId ? rows.find((r) => r.itemId === detailId) : undefined;
+        return row ? (
+          <ItemDetailPopup
+            row={row}
+            item={items[row.itemId]}
+            onBuy={() => handleBuy(row)}
+            onClose={() => setDetailId(null)}
+          />
+        ) : null;
+      })()}
     </section>
+  );
+}
+
+/** 아이템 상세 팝업 — 큰 아이콘 + 효과 줄별 풀이 + 가격/보유 + 구매. 배경 탭 = 닫기. */
+function ItemDetailPopup({
+  row,
+  item,
+  onBuy,
+  onClose,
+}: {
+  row: ShopRow;
+  item: Item | undefined;
+  onBuy: () => void;
+  onClose: () => void;
+}): React.ReactElement {
+  const lines = item ? effectLines(item) : [];
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${row.name} 상세`}
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 70,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20,
+        boxSizing: "border-box",
+        background: "rgba(10, 8, 5, 0.62)",
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: "min(340px, 90vw)",
+          borderRadius: 10,
+          overflow: "hidden",
+          border: `2px solid ${C.woodMid}`,
+          background: `linear-gradient(150deg, ${C.parchmentWarm} 0%, ${C.parchment} 100%)`,
+          boxShadow: "0 14px 44px rgba(0,0,0,0.55)",
+          color: C.darkText,
+        }}
+      >
+        {/* 헤더 — 이름 + 분류 */}
+        <div style={{ ...titleBarStyle, padding: "9px 14px" }}>
+          <h3 style={{ ...titleStyle, fontSize: 15 }}>{row.name}</h3>
+          <span style={{ ...badgeStyle, background: "rgba(0,0,0,0.25)", color: C.gold, border: `1px solid ${C.gold}66` }}>
+            {row.categoryLabel}
+          </span>
+        </div>
+
+        <div style={{ padding: "16px 16px 14px", display: "flex", flexDirection: "column", gap: 12 }}>
+          {/* 큰 아이콘 */}
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <ItemIcon
+              itemId={row.itemId}
+              category={row.category}
+              size={96}
+              style={{ borderRadius: 10, border: `1px solid ${C.goldDim}66`, boxShadow: "0 4px 14px rgba(0,0,0,0.18)" }}
+            />
+          </div>
+
+          {/* 효과 줄별 풀이 */}
+          <ul style={{ listStyle: "none", margin: 0, padding: "2px 2px 0", display: "flex", flexDirection: "column", gap: 5 }}>
+            {(lines.length ? lines : ["고유 효과"]).map((line) => (
+              <li key={line} style={{ fontSize: 13, color: C.darkText, display: "flex", gap: 7, alignItems: "baseline" }}>
+                <span style={{ color: C.gold, fontSize: 11 }}>◆</span>
+                {line}
+              </li>
+            ))}
+          </ul>
+
+          {/* 가격/보유 + 행동 */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: `1px solid ${C.parchmentDark}`, paddingTop: 11 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <span style={priceStyle}>
+                {row.price.toLocaleString()}
+                <span style={{ fontSize: 11, marginLeft: 2 }}>金</span>
+              </span>
+              {row.owned > 0 && <span style={ownedTagStyle}>보유 ×{row.owned}</span>}
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                type="button"
+                onClick={onClose}
+                style={{ ...buyBtnStyle(true), background: `${C.parchmentDark}88`, color: C.mutedText, border: `1px solid ${C.parchmentShadow}` }}
+              >
+                닫기
+              </button>
+              <button
+                type="button"
+                onClick={onBuy}
+                disabled={!row.affordable}
+                style={buyBtnStyle(row.affordable)}
+                aria-label={`${row.name} 구매`}
+              >
+                {row.affordable ? "구매" : "자금 부족"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
 function ShopRowView({
   row,
   onBuy,
+  onDetail,
 }: {
   row: ShopRow;
   onBuy: () => void;
+  /** 아이콘/이름 영역 탭 → 상세 팝업(큰 아이콘 + 효과 풀이) */
+  onDetail: () => void;
 }): React.ReactElement {
   const rowStyle: CSSProperties = {
     display: "flex",
@@ -155,28 +284,47 @@ function ShopRowView({
   };
   return (
     <li style={rowStyle}>
-      <ItemIcon
-        itemId={row.itemId}
-        category={row.category}
-        size={44}
-        style={{ borderRadius: 6, border: `1px solid ${C.goldDim}55` }}
-      />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 6, flexWrap: "wrap" }}>
-          <span style={{ color: C.darkText, fontWeight: 700, fontSize: 14 }}>{row.name}</span>
-          <span style={badgeStyle}>{row.categoryLabel}</span>
-          {row.owned > 0 && (
-            <span style={ownedTagStyle}>보유{row.owned > 1 ? ` ×${row.owned}` : ""}</span>
-          )}
+      <button
+        type="button"
+        onClick={onDetail}
+        aria-label={`${row.name} 상세 보기`}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          flex: 1,
+          minWidth: 0,
+          background: "none",
+          border: "none",
+          padding: 0,
+          textAlign: "left",
+          cursor: "pointer",
+          font: "inherit",
+        }}
+      >
+        <ItemIcon
+          itemId={row.itemId}
+          category={row.category}
+          size={44}
+          style={{ borderRadius: 6, border: `1px solid ${C.goldDim}55`, flexShrink: 0 }}
+        />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 6, flexWrap: "wrap" }}>
+            <span style={{ color: C.darkText, fontWeight: 700, fontSize: 14 }}>{row.name}</span>
+            <span style={badgeStyle}>{row.categoryLabel}</span>
+            {row.owned > 0 && (
+              <span style={ownedTagStyle}>보유{row.owned > 1 ? ` ×${row.owned}` : ""}</span>
+            )}
+          </div>
+          <div style={{ color: C.mutedText, fontSize: 11, marginTop: 2 }}>
+            {row.effect}
+            {/* 소모성 표기는 분류 배지가 이미 "소모품"인 supplyItem엔 중복이라 생략(공격 아이템 등에만) */}
+            {row.consumable && row.category !== "supplyItem" && (
+              <span style={{ marginLeft: 5, opacity: 0.7 }}>· 소모성</span>
+            )}
+          </div>
         </div>
-        <div style={{ color: C.mutedText, fontSize: 11, marginTop: 2 }}>
-          {row.effect}
-          {/* 소모성 표기는 분류 배지가 이미 "소모품"인 supplyItem엔 중복이라 생략(공격 아이템 등에만) */}
-          {row.consumable && row.category !== "supplyItem" && (
-            <span style={{ marginLeft: 5, opacity: 0.7 }}>· 소모성</span>
-          )}
-        </div>
-      </div>
+      </button>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
         <span style={priceStyle} aria-label="가격">
           {row.price.toLocaleString()}

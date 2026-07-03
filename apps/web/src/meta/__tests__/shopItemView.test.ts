@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from "vitest";
 import type { Item, Shop } from "@tk/data";
-import { buildShopRows, effectText, buildShopGroups, type ShopRow } from "../screens/shopItemView";
+import { buildShopRows, effectText, effectLines, buildShopGroups, type ShopRow } from "../screens/shopItemView";
 
 /** rows에서 itemId로 한 행을 꺼낸다(없으면 테스트 실패 — undefined 전파 방지). */
 function row(rows: ShopRow[], itemId: string): ShopRow {
@@ -95,5 +95,34 @@ describe("buildShopGroups (Phase F)", () => {
     expect(g.map((x) => x.category)).toEqual(["weapon", "horse", "supplyItem"]);
     expect(g[0]!.rows.map((r) => r.itemId)).toEqual(["a"]);
     expect(g[0]!.label).toBe("무기");
+  });
+});
+
+describe("effectLines (아이템 상세 팝업 — 줄 단위 풀이)", () => {
+  const mk = (over: Partial<Item>): Item =>
+    ({ id: "x", name: "x", category: "weapon", power: 255, bonusPercent: 0, ...over }) as Item;
+
+  it("무기: 보정을 풀어쓰고(부대 공격력) 특성은 한 줄씩", () => {
+    const lines = effectLines(mk({ bonusPercent: 12, effects: { noCounter: true } }));
+    expect(lines).toEqual(["무반격", "부대 공격력 +12%"]);
+  });
+
+  it("병법서: 정신력 표기", () => {
+    expect(effectLines(mk({ category: "book", bonusPercent: 15 }))).toEqual(["정신력 +15%"]);
+  });
+
+  it("소모품: 위력 + 소모성 안내 2줄", () => {
+    const lines = effectLines(mk({ category: "supplyItem", power: 30 }));
+    expect(lines[0]).toBe("회복 30");
+    expect(lines[1]).toContain("소모성");
+  });
+
+  it("효과 없는 보물은 빈 배열(호출측이 '고유 효과' 표시)", () => {
+    expect(effectLines(mk({ category: "treasure" }))).toEqual([]);
+  });
+
+  it("effectText(진열 요약)는 종전 콤팩트 표기 유지 — 두 표기 공존", () => {
+    expect(effectText(mk({ bonusPercent: 10 }))).toBe("+10%");
+    expect(effectText(mk({ category: "supplyItem", power: 30 }))).toBe("회복 30");
   });
 });
