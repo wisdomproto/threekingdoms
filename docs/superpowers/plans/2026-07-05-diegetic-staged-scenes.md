@@ -1,5 +1,7 @@
 # 디에게틱 막간 스테이지 씬 Implementation Plan (v2 2026-07-09)
 
+> ✅ **구현 완료 (2026-07-10)** — Tasks 1~11 전부 배송(subagent-driven, 청크별 스펙+품질 2단 리뷰, 최종 통합 리뷰 READY). 잔여 = **Task 12 에셋 생성 게이트**(길중: 보드 SA 삼형제 3장 + 01 복숭아밭 staged 1장 → 경쟁작 비교 판정 → 마퀴 10개 롤아웃). 실행 편차 1건: ActorStage 컴포넌트는 `apps/web/src/scene/parts/ActorStage.tsx`(Windows 대소문자 무구분 FS에서 헬퍼 `actorStage.ts`와 TS1149 충돌 — scene/ 직하 불가). 라이브 검증 완료(초상 폴백·선행 스캔·근경 전환·VN 회귀 없음).
+
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 마퀴(★) 막간 씬을 "원경 establishing → 근경 무대 전환 + 씬 전용 SD 도보 배우"의 디에게틱 스테이지로 연출한다. 나머지 씬은 기존 VN 그대로.
