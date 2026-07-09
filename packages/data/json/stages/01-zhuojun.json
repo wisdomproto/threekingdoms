@@ -134,7 +134,8 @@
           "sprite": "guanyu",
           "portrait": "관우",
           "x": 28,
-          "y": 70
+          "y": 70,
+          "facing": "right"
         },
         {
           "id": "liubei",
