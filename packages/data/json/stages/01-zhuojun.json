@@ -128,6 +128,30 @@
   "scenario": {
     "intro": {
       "bg": "01-zhuojun-intro",
+      "actors": [
+        {
+          "id": "guanyu",
+          "sprite": "guanyu",
+          "portrait": "관우",
+          "x": 28,
+          "y": 70
+        },
+        {
+          "id": "liubei",
+          "sprite": "liubei",
+          "portrait": "유비",
+          "x": 50,
+          "y": 74
+        },
+        {
+          "id": "zhangfei",
+          "sprite": "zhangfei",
+          "portrait": "장비",
+          "x": 72,
+          "y": 71,
+          "facing": "left"
+        }
+      ],
       "lines": [
         {
           "text": "후한 말 — 창천이 기울고, 누런 두건을 두른 무리가 들불처럼 천하를 뒤덮었다. 사람들은 그것을 황건의 난이라 불렀다."
@@ -138,31 +162,39 @@
         {
           "speaker": "의병",
           "side": "player",
-          "text": "그, 급보요! 황건적 선봉 정원지가 오만 무리를 이끌고 탁군으로 몰려오고 있소!"
+          "text": "그, 급보요! 황건적 선봉 정원지가 오만 무리를 이끌고 탁군으로 몰려오고 있소!",
+          "bg": "01-zhuojun-staged",
+          "enter": ["guanyu", "liubei", "zhangfei"]
         },
         {
           "speaker": "장비",
           "side": "player",
           "portraitId": "장비",
-          "text": "오만이든 십만이든! 도원의 술이 깨기도 전에 손님이 오는구려, 형님!"
+          "text": "오만이든 십만이든! 도원의 술이 깨기도 전에 손님이 오는구려, 형님!",
+          "actor": "zhangfei",
+          "emote": "!"
         },
         {
           "speaker": "관우",
           "side": "player",
           "portraitId": "관우",
-          "text": "수는 많으나 오합지졸이다. 선두의 진만 흩어놓으면 제 발에 밟혀 무너질 무리."
+          "text": "수는 많으나 오합지졸이다. 선두의 진만 흩어놓으면 제 발에 밟혀 무너질 무리.",
+          "actor": "guanyu"
         },
         {
           "speaker": "유비",
           "side": "player",
           "portraitId": "유비",
-          "text": "...뒤를 보아라, 아우들아. 어머니들이 밥을 짓고 아이들이 뛰노는 땅이다. 물러설 곳은 처음부터 없었다."
+          "text": "...뒤를 보아라, 아우들아. 어머니들이 밥을 짓고 아이들이 뛰노는 땅이다. 물러설 곳은 처음부터 없었다.",
+          "actor": "liubei",
+          "emote": "..."
         },
         {
           "speaker": "유비",
           "side": "player",
           "portraitId": "유비",
-          "text": "의병들이여, 창을 들어라. 우리의 이름이 오늘 여기서 시작된다!"
+          "text": "의병들이여, 창을 들어라. 우리의 이름이 오늘 여기서 시작된다!",
+          "actor": "liubei"
         },
         {
           "text": "유비, 관우, 장비 — 아직 천하가 그 이름을 모르는 세 사람이, 첫 전장을 향해 달려나갔다."
