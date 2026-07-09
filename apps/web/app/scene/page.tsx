@@ -10,6 +10,7 @@ import { Suspense, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { stages } from "@tk/data";
 import { ScenePlayer } from "../../src/scene/ScenePlayer";
+import { StagedScenePlayer } from "../../src/scene/StagedScenePlayer";
 import { nextStageId } from "../../src/meta/campaign";
 import { useFadeNav } from "../../src/ui/useFadeNav";
 
@@ -44,9 +45,11 @@ function SceneRoute(): React.ReactElement | null {
   }, [scene, router, target]);
 
   if (!scene) return null;
+  // actors 있는 씬 = 디에게틱 스테이지(마퀴 ★), 없으면 기존 VN 플레이어.
+  const Player = scene.actors?.length ? StagedScenePlayer : ScenePlayer;
   return (
     <>
-      <ScenePlayer scene={scene} title={stage?.name} onComplete={() => fadeTo(target())} />
+      <Player scene={scene} title={stage?.name} onComplete={() => fadeTo(target())} />
       {overlay}
     </>
   );
