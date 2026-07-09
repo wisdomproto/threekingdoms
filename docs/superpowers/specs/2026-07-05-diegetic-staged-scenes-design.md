@@ -62,8 +62,10 @@ v2 재검토에서 C(VN++ 선회)·"현 에셋으로 프로토타입 먼저"도 
   facing=screen-left(§4 규약 동일 — 코드 미러 기준). 경쟁작 도원결의와 동형.
 - **물량**: 마퀴 11개 등장인물 유니크 = **유비·관우·장비·조운·제갈량·여포·조조(+주유 게스트) ≈ 7~8명.**
   전원 §4 ★ 풀제작 등급이라 투자 철학 정합.
-- **저장**: `/assets/scene-actors/{key}.png` (key = 전투 스프라이트 폴더명과 동일 영문:
-  `liubei`·`guanyu`·`zhangfei`·`zhaoyun`·`zhugeliang`·`lvbu`·`caocao`…) + R2.
+- **저장**: `/assets/scene-actors/{key}.png` + R2. key = **scene-actors 전용 영문 로마자 키**
+  (전투 스프라이트 폴더와 무관한 독립 네임스페이스 — 결정 4와 동일 취지. 전투 폴더는 영문/한국어
+  혼재(`liubei` vs `조운`)라 "동일 키" 전제 금지). 8명 키 확정:
+  `liubei`·`guanyu`·`zhangfei`·`zhaoyun`·`zhugeliang`·`lvbu`·`caocao`·`zhouyu`.
 - **생성**: §4 SD 포즈시트 파이프라인 변형 — **MOUNT_BY_NAME 주입 제거**, 프롬프트를
   "civil/standing, no mount, no combat stance"로. 초상 시트처럼 **여러 명 한 시트→슬라이스**
   (스타일 일관 + 호출 절감). 에셋보드에 「씬 배우」 카드 신설(붙여넣기→자동 컷→로컬+R2,
@@ -99,8 +101,8 @@ StageActor = {
   sprite: string;               // /assets/scene-actors/{sprite}.png 의 {sprite} (영문 키)
   portrait?: string;            // 폴백② 초상 키(한국어 commanderId, 예 "유비"). 미지정=폴백② 생략
   x: number;                    // 0~100 가로 위치(%)
-  y?: number;                   // 0~100 바닥선(기본 하단 1/3)
-  facing?: "left" | "right";    // 스프라이트 미러(기본 데이터 그대로)
+  y?: number;                   // 0~100 바닥선 — 화면 상단 기준 %(CSS top). 기본 72(하단 1/3)
+  facing?: "left" | "right";    // 기본 "left"(에셋 원본 = screen-left). "right" = scaleX(-1)
   scale?: number;               // 기본 1
 }
 
@@ -116,7 +118,10 @@ emote?: "..." | "!" | "?";      // 말하는 배우 위 말풍선 마크
    슬롯 그대로 쓰고 배우만 얹음.
 2. **화자↔배우 연결 = `line.actor` id 매칭** (이름 문자열 커플링 회피). 기존 `line.speaker`/
    `portraitId`는 하단 대사창 표시용으로 유지 — 스테이지 씬도 대사창은 VN과 동일.
-3. **enter/exit 최소 스펙.** 배우는 씬 시작부터 상주가 기본. 필요한 비트만 등장/퇴장 표시.
+3. **enter/exit 최소 스펙 + 선행 스캔 규칙.** `enter` 미저작 배우는 씬 시작부터 상주.
+   단, **씬 lines 어딘가의 `enter`에 나열된 배우는 그 줄 전까지 숨김**(lines 선행 스캔) —
+   "원경 establishing 동안 미등장 → 근경 전환 줄에 첫 등장" 저작 문법(데이터 흐름 절)이 이 규칙으로
+   성립한다. exit 후 enter 재등장 지원.
 4. **`StageActor.sprite` = 씬 배우 키(v2 변경).** v1은 전투 스프라이트 폴더(`sprites/{id}/front_idle`)를
    직접 가리켰으나 그 에셋이 탈것 탄 전투 유닛이라 폐기. 이제 `/assets/scene-actors/` 전용 키.
    전투 리졸버(`spriteCandidates`/`COMMANDER_SPRITE_MAP`)와 무관 — 마퀴 손저작.
@@ -164,14 +169,16 @@ emote?: "..." | "!" | "?";      // 말하는 배우 위 말풍선 마크
   대신 자체 `<img>` + onError로 후보 URL을 순차 소진:
   ① `/assets/scene-actors/{sprite}.png` (씬 도보 포즈)
   → ② `/assets/ui/portraits/{portrait}.webp` (`portrait` 저작 시에만 — 한국어 키)
-  → ③ **CSS 실루엣**(어두운 라운드 실루엣 박스 + 이니셜, ActorStage가 직접 렌더).
+  → ③ **CSS 실루엣** — `ActorSprite` 자신이 렌더(체인 소유 일원화). 어두운 라운드 실루엣 박스 +
+  이니셜(= `portrait` 있으면 그 첫 글자, 없으면 `id` 첫 글자).
 - 미생성 마퀴 캐릭터도 무언가는 무대에 섬 — 드롭인 원칙 유지, 무붕괴.
 
 **순수 헬퍼** (`apps/web/src/scene/actorStage.ts` — 테스트 대상):
 - `actorSpriteCandidates(actor): string[]` → `[씬 포즈 URL, (portrait 있으면) 초상 URL]`(assetUrl 경유).
   ③ 실루엣은 URL 아닌 렌더 폴백이라 이 배열엔 없음.
 - `visibleActorIds(lines, idx, actors): Set<string>` → idx까지 `enter`/`exit` 누적한 등장 배우 집합.
-  (배우 기본 상주 + enter 추가 + exit 제거.)
+  (선행 스캔: lines 어딘가 `enter`에 나열된 배우는 그 줄 전까지 숨김. 그 외 배우는 상주.
+  이후 idx까지 enter 추가·exit 제거 누적 — 결정 3과 동일 규칙.)
 
 **라우트 배선** (`apps/web/app/scene/page.tsx`): 한 줄 분기
 `const Player = scene.actors?.length ? StagedScenePlayer : ScenePlayer;`
@@ -191,7 +198,7 @@ stage.scenario.intro (ScenarioScene, actors 포함)
 ```
 
 저작 문법 표준: **원경 establishing 동안은 배우 미등장(내레이션), 근경 전환 줄에 첫 enter** —
-"풍경→무대 진입" 시퀀스. (배우 기본 상주 규칙은 유지 — 이 문법을 쓰려면 첫 배우들에 enter 저작.)
+"풍경→무대 진입" 시퀀스. (결정 3의 선행 스캔 규칙이 이를 보장 — enter 저작된 배우는 그 줄 전까지 숨김.)
 전투 밖 컷신 → 엔진/결정론 무관(§2-1). 순수 표현.
 
 ## 저작 (마퀴 후보 ~11 + 에셋 물량)
