@@ -6,6 +6,9 @@
  * - z = y 오름차순(작을수록 뒤), 동률은 배열 순서(뒤가 앞).
  * - 등장/퇴장 = 상시 마운트 + opacity/translateX CSS transition(비가시 = 투명 + 측면 오프셋
  *   + pointerEvents none). 마운트/언마운트 방식 대신 — 재등장 시 슬라이드 복귀가 공짜.
+ *   저작 규칙: line 0의 enter는 마운트 시점에 이미 visible이라 등장 트랜지션 없음(상주와 동일 취급).
+ * - 컨테이너 zIndex: 0 = 스태킹 컨텍스트 생성 — 배우 랭크(1..N)를 이 안에 가둬, 형제
+ *   (오프닝 페이드·SkipBar·대사 패널)와의 페인팅 순서가 DOM 순서로 결정되게 한다.
  * - 스포트라이트 = speakingId 배우 밝기↑·scale 1.05·bob, 나머지는 어둡게.
  *   speakingId 미지정/미등장이면 아무도 강조하지 않음(no-op — 크래시 금지).
  * - 이미지 폴백 사다리 = ActorSprite(씬 포즈 → 초상 → CSS 실루엣). AssetImage 미사용.
@@ -114,7 +117,7 @@ export function ActorStage({
   const spotlightId = speakingId && visibleIds.has(speakingId) ? speakingId : undefined;
 
   return (
-    <div aria-hidden style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
+    <div aria-hidden style={{ position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", overflow: "hidden" }}>
       <style>{KEYFRAMES}</style>
       {actors.map((actor) => {
         const visible = visibleIds.has(actor.id);
@@ -164,6 +167,7 @@ export function ActorStage({
               <div style={{ position: "relative", animation: speaking ? "tkActorBob 1.6s ease-in-out infinite" : undefined }}>
                 {speaking && emote && (
                   <div
+                    key={emote} // 같은 배우가 연속 줄에서 emote만 바꿔도("!"→"?") 요소 재생성 → 팝인 재생
                     style={{
                       position: "absolute",
                       bottom: "100%",

@@ -5,9 +5,10 @@
  * ScenePlayer(VN)와 같은 진행 훅·표현 조각을 공유하고, 배경 위에 ActorStage(배우 레이어)를
  * 얹는다. 라우트가 scene.actors?.length로 이 플레이어를 고른다(§5 막간 씬 v3).
  *
- * ⚠ 오프닝 페이드: SceneBackground의 페이드-투-블랙은 자기 내부에 렌더되므로, 뒤에 그리는
- * 배우가 오프닝 420ms 동안 페이드 *위에* 칠해진다 — 배우까지 덮는 동일 오버레이를
- * ActorStage 뒤에 한 번 더 렌더(전용 keyframe, 입력 비차단). VN ScenePlayer는 불변.
+ * ⚠ 오프닝 페이드: ActorStage는 z-index 격리(컨테이너 zIndex: 0으로 배우 랭크 1..N을 내부에
+ * 가둠)라 형제와의 페인팅은 DOM 순서를 따르는데, SceneBackground *내부*의 페이드-투-블랙은
+ * ActorStage보다 DOM 앞이라 오프닝 420ms 동안 배우가 페이드 위에 칠해진다 — 배우까지 덮는
+ * 동일 오버레이를 ActorStage 뒤에 한 번 더 렌더(전용 keyframe, 입력 비차단). VN ScenePlayer는 불변.
  */
 import type { ScenarioScene } from "@tk/data";
 import { useSceneProgression } from "./useSceneProgression";
