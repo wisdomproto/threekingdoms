@@ -38,4 +38,12 @@ describe("visibleActorIds (선행 스캔 규칙)", () => {
   it("exit 후 enter 재등장", () => {
     expect(visibleActorIds(lines, 3, actors).has("liubei")).toBe(true);
   });
+  it("같은 줄에 exit+enter 동시면 enter가 이긴다(exit 먼저 처리 — 재등장 우선)", () => {
+    // zhangfei가 enter에 나열되므로 선행 스캔으로 0줄엔 숨김 → 처리 순서가 뒤집히면(enter 후 exit) 1줄에서도 안 보임.
+    const sameLine: ScenarioLine[] = [
+      { text: "0" },
+      { text: "1 재등장", exit: ["zhangfei"], enter: ["zhangfei"] },
+    ];
+    expect(visibleActorIds(sameLine, 1, actors).has("zhangfei")).toBe(true);
+  });
 });
