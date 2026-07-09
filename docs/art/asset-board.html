@@ -966,7 +966,8 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
   }
 
   /* 마퀴(★) 스테이지 근경 무대 배경 — 디에게틱 막간(StagedScenePlayer)이 캐릭터 스프라이트를
-     세우는 지면. 기존 씬 카드 배선 재사용(sceneCard: webp 변환 + assets/scenes/{saveName} 저장·복원). */
+     세우는 지면. 기존 씬 카드 배선 재사용(sceneCard: webp 변환 + assets/scenes/{saveName} 저장·복원).
+     ⚠ 게임 스테이지 JSON `scenario.actors[]` 보유 스테이지와 수동 동기 — staged 씬 추가/제거 시 여기도 갱신. */
   const STAGED_PLACES = {
     '01': 'A peach orchard in full bloom, petals drifting on the breeze',
     '05': 'An army camp before a mountain-pass gate',
@@ -1011,7 +1012,7 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
 */
 (function() {
   const ACTOR_STYLE = 'Art style: detailed painterly chibi (SD, ~2.5 heads) character, East Asian ink-wash + soft cel shading, crisp readable silhouette, muted earth tones with gold/jade accents, clean even lighting, NO baked ground shadow — the SAME rendering style as the game\'s battle-map SD units, but a single standing figure for a story interlude scene.';
-  const ACTOR_NEGATIVE = 'Avoid: mount, horse, chariot, weapon, combat stance, ground shadow, text, labels, watermark, UI, frame, busy background, multiple figures, photorealistic, anime-cel, Koei-style.';
+  const ACTOR_NEGATIVE = 'Avoid: mount, horse, chariot, weapon, combat stance, ground shadow, text, labels, watermark, UI, frame, busy background, white background, checkerboard background, solid black background, multiple figures, photorealistic, anime-cel, Koei-style.';
   const SCENE_ACTORS = [
     { key: 'liubei',     name: '유비',   desc: 'Liu Bei as a humble young man in plain hanfu robes with a straw-woven belt, gentle dignified face, standing calmly' },
     { key: 'guanyu',     name: '관우',   desc: 'Guan Yu with his magnificent long black beard, deep-green civilian robe, standing tall with quiet gravity, unarmed' },
