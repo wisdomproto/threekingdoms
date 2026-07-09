@@ -965,10 +965,40 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
     }
   }
 
+  /* 마퀴(★) 스테이지 근경 무대 배경 — 디에게틱 막간(StagedScenePlayer)이 캐릭터 스프라이트를
+     세우는 지면. 기존 씬 카드 배선 재사용(sceneCard: webp 변환 + assets/scenes/{saveName} 저장·복원). */
+  const STAGED_PLACES = {
+    '01': 'A peach orchard in full bloom, petals drifting on the breeze',
+    '05': 'An army camp before a mountain-pass gate',
+    '06': 'Open ground before the towering Hulao gate',
+    '14': 'The top of Xiapi\'s city wall by the gatehouse',
+    '17': 'A country road through Runan fields',
+    '18': 'The courtyard of a thatched hermitage',
+    '20': 'A war-torn open field, scattered debris',
+    '21': 'The foot of a wooden bridge over a river',
+    '22': 'A river ferry crossing, moored boats',
+    '26': 'A riverside war camp, banners',
+    '27': 'A narrow mountain trail between cliffs',
+  };
+  for (const st of stageList) {
+    const place = STAGED_PLACES[st.num];
+    if (!place) continue;
+    const saveName = `${st.num}-${st.id}-staged.webp`;
+    sceneItems.push({
+      id: `N-${st.num}s`,
+      title: `${st.num} ${st.name} · staged(근경 무대)`,
+      saveName,
+      sceneCard: true,
+      note: `저장: <code>apps/web/public/assets/scenes/${saveName}</code> · 디에게틱 막간 무대 — 캐릭터 스프라이트가 설 지면`,
+      prompt: `Close-range ground-level stage composition for character sprites to stand on: solid walkable ground occupying the bottom third of the frame, eye-level or slightly elevated camera, middle-ground scenery, NO distant aerial or panoramic view. No people, no text. ${place}. Mood/context: ${st.intro.en}\n\n${SCENE_STYLE}`,
+      _neg: SCENE_NEGATIVE,
+    });
+  }
+
   SECTIONS.push({
     id: 'N',
-    title: 'N. 시나리오 씬 배경 (54장 — 27스테이지 × intro/outro)',
-    desc: '각 스테이지 막간 씬의 풀스크린 배경 이미지. 인물·텍스트 없음(ScenePlayer가 초상·대사를 위에 얹음). 전투 establishing은 <b>야외 풍경</b>, 군략 회의·궁정·밀담은 <b>실내</b>(군막/궁정/밀실 — 원작 다양성, 현재 9씬). 생성 후 ⬇ 저장 → apps/web/public/assets/scenes/ 에 배치하면 게임 막간 씬에 즉시 반영. 16:9 webp 변환 적용.',
+    title: 'N. 시나리오 씬 배경 (54장 + staged 11 — 27스테이지 × intro/outro)',
+    desc: '각 스테이지 막간 씬의 풀스크린 배경 이미지. 인물·텍스트 없음(ScenePlayer가 초상·대사를 위에 얹음). 전투 establishing은 <b>야외 풍경</b>, 군략 회의·궁정·밀담은 <b>실내</b>(군막/궁정/밀실 — 원작 다양성, 현재 9씬). 마퀴 11스테이지엔 <b>staged(근경 무대)</b> 변형 추가 — 디에게틱 막간에서 캐릭터 스프라이트가 설 지면 위주의 근경 구도. 생성 후 ⬇ 저장 → apps/web/public/assets/scenes/ 에 배치하면 게임 막간 씬에 즉시 반영. 16:9 webp 변환 적용.',
     items: sceneItems,
   });
 })();
