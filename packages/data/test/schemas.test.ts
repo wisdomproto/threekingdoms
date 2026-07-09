@@ -330,5 +330,18 @@ describe("staged scene actors", () => {
         lines: [{ text: "a" }],
       }),
     ).toThrow();
+    // x/y 0~100 범위 밖 거부, scale 0/음수 거부(의도치 않은 반전 방지)
+    expect(() =>
+      ScenarioSceneSchema.parse({
+        actors: [{ id: "a", sprite: "a", x: 500 }],
+        lines: [{ text: "a" }],
+      }),
+    ).toThrow();
+    expect(() =>
+      ScenarioSceneSchema.parse({
+        actors: [{ id: "a", sprite: "a", x: 50, scale: 0 }],
+        lines: [{ text: "a" }],
+      }),
+    ).toThrow();
   });
 });

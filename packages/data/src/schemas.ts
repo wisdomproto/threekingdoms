@@ -527,7 +527,7 @@ export const ScenarioLineSchema = z.object({
   actor: z.string().optional(),          // 이 줄을 말하는 배우 id(스포트라이트). 미매칭/미등장=no-op.
   enter: z.array(z.string()).optional(), // 이 줄에서 등장하는 배우 id (선행 스캔: 나열된 배우는 첫 enter 전 숨김)
   exit: z.array(z.string()).optional(),  // 이 줄에서 퇴장하는 배우 id
-  emote: z.enum(["...", "!", "?"]).optional(), // 말하는 배우 위 말풍선 마크
+  emote: z.enum(["...", "!", "?"]).optional(), // 말하는 배우 위 말풍선 마크 — 반각 3점 "..."(씬 텍스트의 전각 "…" 아님)
 });
 export type ScenarioLine = z.infer<typeof ScenarioLineSchema>;
 
@@ -536,10 +536,10 @@ export const StageActorSchema = z.object({
   id: z.string(),                               // 씬 내 안정 참조
   sprite: z.string(),                           // scene-actors 전용 영문 키
   portrait: z.string().optional(),              // 폴백② 초상 키(한국어 commanderId). 미지정=폴백② 생략
-  x: z.number(),                                // 0~100 가로 위치(%)
-  y: z.number().optional(),                     // 0~100 바닥선(화면 상단 기준 %, CSS top). 미지정=72
+  x: z.number().min(0).max(100),                // 0~100 가로 위치(%)
+  y: z.number().min(0).max(100).optional(),     // 0~100 바닥선(화면 상단 기준 %, CSS top). 미지정=72
   facing: z.enum(["left", "right"]).optional(), // 기본 "left"(원본 screen-left). "right"=scaleX(-1)
-  scale: z.number().optional(),
+  scale: z.number().positive().optional(),      // 0/음수 = 의도치 않은 반전이라 거부
 });
 export type StageActor = z.infer<typeof StageActorSchema>;
 
