@@ -295,3 +295,40 @@ describe("스키마 v2 (원작 모델)", () => {
       effects: { lifestealPercent: 150 } })).toThrow(); // 0~100 초과 거부
   });
 });
+
+describe("staged scene actors", () => {
+  it("actors 배열(portrait 포함)과 line.actor/enter/exit/emote를 파싱한다", () => {
+    const parsed = ScenarioSceneSchema.parse({
+      bg: "01-zhuojun-intro",
+      actors: [
+        { id: "liubei", sprite: "liubei", portrait: "유비", x: 50, y: 74 },
+        { id: "guanyu", sprite: "guanyu", x: 30, facing: "right", scale: 1.1 },
+      ],
+      lines: [
+        { text: "복숭아밭에 셋이 모였다." },
+        { speaker: "유비", portraitId: "유비", actor: "liubei", text: "우리 셋이…", emote: "..." },
+        { speaker: "관우", actor: "guanyu", enter: ["guanyu"], exit: ["liubei"], text: "형님." },
+      ],
+    });
+    expect(parsed.actors).toHaveLength(2);
+    expect(parsed.actors?.[0]?.portrait).toBe("유비");
+    expect(parsed.actors?.[1]?.facing).toBe("right");
+    expect(parsed.lines[1]?.actor).toBe("liubei");
+    expect(parsed.lines[2]?.enter).toEqual(["guanyu"]);
+  });
+
+  it("actors 없는 기존 VN 씬도 그대로 유효하다(하위호환)", () => {
+    const parsed = ScenarioSceneSchema.parse({ bg: "x", lines: [{ text: "a" }] });
+    expect(parsed.actors).toBeUndefined();
+  });
+
+  it("emote·facing은 허용된 값만 받는다", () => {
+    expect(() => ScenarioSceneSchema.parse({ lines: [{ text: "a", emote: "wat" }] })).toThrow();
+    expect(() =>
+      ScenarioSceneSchema.parse({
+        actors: [{ id: "a", sprite: "a", x: 0, facing: "up" }],
+        lines: [{ text: "a" }],
+      }),
+    ).toThrow();
+  });
+});
