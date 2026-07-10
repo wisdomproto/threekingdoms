@@ -109,13 +109,15 @@ Unlike the battle maps, standing structures ARE allowed here: draw buildings, wa
 The painting must continue all the way to the image edges (for seamless tiling with neighboring map sections).`;
 
 // 활성 맵의 타일 박스 크기(manifest.box)를 프롬프트 첫 줄에 자동 주입 — 맵 바꿔도 숫자 수동 수정 불필요.
-// 맵 id 가 scene- 으로 시작하면 씬 맵 변형(SCENE_CHUNK_PROMPT)을 쓴다.
+// 맵 id 가 scene- 으로 시작하면 씬 맵 변형(SCENE_CHUNK_PROMPT)을 쓴다 — head 첫 줄도 같이 분기
+// (모델은 첫 줄을 가장 강하게 따르므로 head 가 "top-down"이면 본문 3/4 지시를 눌러 top-down 회귀).
 function promptFor(st) {
   const b = st && st.box;
-  const head = (b && b.length === 2)
-    ? `This image is ONE ${b[0]}×${b[1]}-tile section of a larger top-down battlefield map; each cell of the faint grid overlay = exactly one game tile.\n`
-    : '';
   const isScene = !!(st && String(st.mapId || '').startsWith('scene-'));
+  const mapKind = isScene ? 'elevated three-quarter view scene map' : 'top-down battlefield map';
+  const head = (b && b.length === 2)
+    ? `This image is ONE ${b[0]}×${b[1]}-tile section of a larger ${mapKind}; each cell of the faint grid overlay = exactly one game tile.\n`
+    : '';
   return head + (isScene ? SCENE_CHUNK_PROMPT : CHUNK_PROMPT);
 }
 

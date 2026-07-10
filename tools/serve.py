@@ -124,8 +124,19 @@ def _run_cut(sid, flip, poses=None, grid=None):
     호출 — cut_posesheet 가 front_ 접두를 붙이므로 poses 는 **bare 이름**이어야 한다.
     flip=True 면 좌우 반전(screen-right→left). 결과 {ok, cells, flip, output} 반환.
     """
-    pose_args = [p for p in (poses or []) if isinstance(p, str) and re.match(r"^[a-z][a-z0-9_]*$", p)]
-    grid_arg = grid if isinstance(grid, str) and re.match(r"^\d+x\d+$", grid) else "3x3"
+    pose_args = []
+    for p in (poses or []):
+        # bare-name 계약을 코드로: front_/back_ 접두는 컷터가 접두를 또 붙여 front_front_idle.png 이 됨.
+        if not isinstance(p, str) or not re.match(r"^[a-z][a-z0-9_]*$", p) or re.match(r"^(front|back)_", p):
+            return {"ok": False, "error": f"pose 이름 불량: {p!r} (bare 소문자 이름만 — front_/back_ 접두 금지)"}
+        pose_args.append(p)
+    if grid is None:
+        grid_arg = "3x3"  # 미지정 = 종전 9칸 시트 기본(하위호환)
+    elif isinstance(grid, str) and re.match(r"^\d+x\d+$", grid):
+        grid_arg = grid
+    else:
+        # 제공됐는데 형식 불량이면 무음 3x3 폴백 금지 — 1×3 시트가 9조각 쓰레기로 컷되는 무음 파괴 방지.
+        return {"ok": False, "error": f"grid 형식 불량: {grid!r} (예: '1x3')"}
     cmd = [sys.executable, CUT_SCRIPT, sid] + pose_args + [f"--grid={grid_arg}"] + (["--flip"] if flip else [])
     env = {**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}
     try:

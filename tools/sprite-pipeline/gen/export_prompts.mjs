@@ -44,7 +44,10 @@ const sandbox = {
   localStorage: { getItem: () => null, setItem: noop, removeItem: noop },
   indexedDB: { open: () => ({}) }, CSS: { escape: (x) => x },
   console, setTimeout: noop, clearTimeout: noop, fetch: async () => ({ ok: false }),
-  URL: { createObjectURL: () => "", revokeObjectURL: noop }, location: { href: "", reload: noop },
+  URL: { createObjectURL: () => "", revokeObjectURL: noop },
+  // protocol/origin: 보드 SAVE_ENDPOINT 가 location.protocol.startsWith('http') 로 분기 — 없으면 여기서
+  // throw 해 buildPrompt 정의 전에 평가가 죽는다(헤드리스 캡처 전멸).
+  location: { href: "", protocol: "file:", origin: "", reload: noop },
 };
 sandbox.window = sandbox;
 vm.createContext(sandbox);

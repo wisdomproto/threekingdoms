@@ -2343,8 +2343,10 @@ board.addEventListener('click', async e => {
     const item = findItem(ps.dataset.posesheet);
     if (item.footKey) {
       /* 도보 씬 시트(FS): 고정 키 카드 — sprites/{key}-foot/ 에 1×3 컷(idle/move/kneel, bare 이름 —
-         cut_posesheet 가 front_ 접두를 붙인다: "front_idle"을 넘기면 front_front_idle.png 이 됨). */
-      const frecs = imAll().filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
+         cut_posesheet 가 front_ 접두를 붙인다: "front_idle"을 넘기면 front_front_idle.png 이 됨).
+         ⚠ at > 0 필터: 이 카드의 R2 복원본(at:0)은 시트가 아니라 *컷 결과 포즈 PNG*(cardGamePaths) —
+         그걸 시트로 보내면 1×3 재컷 쓰레기가 정상 포즈를 로컬+R2에서 덮어씀. 새로 붙여넣은 것만 전송. */
+      const frecs = imAll().filter(r => r.card === item.id && r.at > 0).sort((a, b) => b.at - a.at);
       if (!frecs.length) { flashBtn(ps, '✗ 시트 없음', false); setCardStatus(ps, '✗ 먼저 이 카드에 1×3 도보 시트 이미지를 붙여넣으세요(클릭→Ctrl+V).'); return; }
       const fflip = !!document.querySelector(`input[data-flip="${CSS.escape(item.id)}"]`)?.checked;
       await sheetSend(ps, `assets/sprites/${item.footKey}-foot/_posesheet.png`, frecs[0].blob, `${item.title}`,
