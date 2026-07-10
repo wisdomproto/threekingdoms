@@ -32,9 +32,15 @@ describe("collectRequiredAssets", () => {
     expect(intro.stageId).toBe("05-sishuiguan");
   });
 
-  it("맵 배경: 스테이지별 mapId 수집(중복 제거)", () => {
+  it("맵 배경: 스테이지별 mapId 수집(중복 제거 — 키는 맵 id, 씬 파트가 스테이지당 여러 맵 추가 가능)", () => {
     expect(req.maps.some((m) => m.stageId === "05-sishuiguan" && m.mapId === "sishuiguan")).toBe(true);
-    const mapIds = req.maps.map((m) => m.stageId);
+    const mapIds = req.maps.map((m) => m.mapId);
     expect(new Set(mapIds).size).toBe(mapIds.length);
+  });
+
+  it("씬 맵(막간 v4): 01 MapScene 파트의 씬 맵 3장 수집", () => {
+    for (const id of ["scene-01-street", "scene-01-tavern", "scene-01-orchard"]) {
+      expect(req.maps.some((m) => m.stageId === "01-zhuojun" && m.mapId === id), id).toBe(true);
+    }
   });
 });

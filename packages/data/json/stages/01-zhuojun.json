@@ -126,49 +126,314 @@
   },
   "levelCap": 6,
   "scenario": {
-    "intro": {
-      "bg": "01-zhuojun-intro",
-      "lines": [
-        {
-          "text": "후한 말 — 창천이 기울고, 누런 두건을 두른 무리가 들불처럼 천하를 뒤덮었다. 사람들은 그것을 황건의 난이라 불렀다."
-        },
-        {
-          "text": "탁군의 복숭아밭. 세 사내가 하늘에 맹세를 올린 지 사흘째 되던 날 — 마을 어귀에서 흙먼지가 치솟았다."
-        },
-        {
-          "speaker": "의병",
-          "side": "player",
-          "text": "그, 급보요! 황건적 선봉 정원지가 오만 무리를 이끌고 탁군으로 몰려오고 있소!"
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "오만이든 십만이든! 도원의 술이 깨기도 전에 손님이 오는구려, 형님!"
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "수는 많으나 오합지졸이다. 선두의 진만 흩어놓으면 제 발에 밟혀 무너질 무리."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "...뒤를 보아라, 아우들아. 어머니들이 밥을 짓고 아이들이 뛰노는 땅이다. 물러설 곳은 처음부터 없었다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "의병들이여, 창을 들어라. 우리의 이름이 오늘 여기서 시작된다!"
-        },
-        {
-          "text": "유비, 관우, 장비 — 아직 천하가 그 이름을 모르는 세 사람이, 첫 전장을 향해 달려나갔다."
-        }
-      ]
-    },
+    "intro": [
+      {
+        "bg": "01-zhuojun-intro",
+        "lines": [
+          {
+            "text": "후한 말 — 창천이 기울고, 누런 두건을 두른 무리가 들불처럼 천하를 뒤덮었다. 사람들은 그것을 황건의 난이라 불렀다."
+          },
+          {
+            "text": "유주 탁군. 저잣거리에 나붙은 방(榜) 한 장이, 세 사내를 한자리로 불러 모으고 있었다."
+          }
+        ]
+      },
+      {
+        "map": "scene-01-street",
+        "label": "탁군 · 거리",
+        "units": [
+          { "id": "liubei", "sprite": "liubei-foot", "cell": [2, 5], "facing": "right" },
+          { "id": "gwanbyeong", "sprite": "footman_player", "cell": [5, 4], "facing": "left" },
+          { "id": "baekseong", "sprite": "bandit_player", "cell": [3, 4], "facing": "right" },
+          { "id": "zhangfei", "sprite": "zhangfei-foot", "cell": [7, 9], "hidden": true }
+        ],
+        "lines": [
+          {
+            "text": "탁군 저잣거리. 담벼락에 갓 붙은 방 앞으로 사람들이 하나둘 모여들었다."
+          },
+          {
+            "bubble": { "id": "baekseong", "mark": "..." },
+            "speaker": "백성",
+            "side": "player",
+            "text": "황건적이 벌써 이웃 군까지 넘어왔다는구먼… 관군만으론 어림도 없다던데."
+          },
+          {
+            "bubble": { "id": "gwanbyeong", "mark": "!" },
+            "speaker": "관병",
+            "side": "player",
+            "text": "방을 보라! 군에서 황건적을 칠 의병을 모집한다! 뜻있는 장정은 이름을 올리라!"
+          },
+          {
+            "move": [{ "id": "liubei", "to": [4, 5] }],
+            "bubble": { "id": "liubei", "mark": "..." },
+            "speaker": "유비",
+            "portraitId": "유비",
+            "side": "player",
+            "text": "…나라가 이 지경인데, 나는 짚신이나 삼으며 한숨만 쉬는구나."
+          },
+          {
+            "enter": [{ "id": "zhangfei", "from": [7, 9], "to": [7, 5] }],
+            "bubble": { "id": "zhangfei", "mark": "!" },
+            "speaker": "장비",
+            "portraitId": "장비",
+            "side": "player",
+            "text": "방 앞에서 한숨만 내리쉬는 양반일세! 사내대장부가 나랏일에 힘쓸 생각은 않고, 어찌 탄식뿐이시오?"
+          },
+          {
+            "speaker": "유비",
+            "portraitId": "유비",
+            "side": "player",
+            "text": "그대는 뉘시오? 목소리에 우레가 실렸구려."
+          },
+          {
+            "move": [{ "id": "zhangfei", "to": [5, 5] }],
+            "speaker": "장비",
+            "portraitId": "장비",
+            "side": "player",
+            "text": "연인 장비, 자는 익덕이오! 돼지 잡고 술을 팔아 먹고사나, 가슴엔 천하가 들어 있소!"
+          },
+          {
+            "speaker": "유비",
+            "portraitId": "유비",
+            "side": "player",
+            "text": "한실 종친, 탁군의 유비 현덕이오. 큰 뜻은 품었으나 빈손이라 부끄럽소."
+          },
+          {
+            "bubble": { "id": "zhangfei", "mark": "!" },
+            "speaker": "장비",
+            "portraitId": "장비",
+            "side": "player",
+            "text": "빈손이면 어떻소! 재물은 내게 좀 있소. 뜻이 맞으면 고을 장정을 모아 봅시다 — 우선 저기 주점에서 목이나 축이며 이야기합시다!"
+          },
+          {
+            "exit": [
+              { "id": "liubei", "to": [7, 9] },
+              { "id": "zhangfei", "to": [8, 9] }
+            ],
+            "text": "두 사람은 어깨를 나란히 하고 저잣거리 모퉁이 주점으로 향했다."
+          }
+        ]
+      },
+      {
+        "map": "scene-01-tavern",
+        "label": "탁군 · 주점",
+        "decorations": [
+          { "cell": [3, 3], "kind": "table" },
+          { "cell": [3, 2], "kind": "stool" },
+          { "cell": [3, 4], "kind": "carpet" },
+          { "cell": [11, 2], "kind": "counter" },
+          { "cell": [10, 1], "kind": "stool" },
+          { "cell": [13, 1], "kind": "screen" }
+        ],
+        "units": [
+          { "id": "liubei", "sprite": "liubei-foot", "cell": [2, 3], "facing": "right" },
+          { "id": "zhangfei", "sprite": "zhangfei-foot", "cell": [4, 3], "facing": "left" },
+          { "id": "sulkkun", "sprite": "bandit_player", "cell": [10, 2], "facing": "right" },
+          { "id": "guanyu", "sprite": "guanyu-foot", "cell": [6, 9], "hidden": true }
+        ],
+        "lines": [
+          {
+            "bubble": { "id": "zhangfei", "mark": "!" },
+            "speaker": "장비",
+            "portraitId": "장비",
+            "side": "player",
+            "text": "자, 드시오! 뜻을 세운 날엔 술이 달아야 하는 법이오!"
+          },
+          {
+            "speaker": "유비",
+            "portraitId": "유비",
+            "side": "player",
+            "text": "고맙소. …허나 장정을 모은들, 이끌 사람이 우리 둘뿐이라면 갈 길이 멀구려."
+          },
+          {
+            "enter": [{ "id": "guanyu", "from": [6, 9], "to": [6, 6] }],
+            "text": "그때, 문이 열리며 유난히 키 큰 사내가 들어섰다. 대춧빛 얼굴에 가슴까지 드리운 수염 — 눈빛이 칼날 같았다."
+          },
+          {
+            "move": [{ "id": "guanyu", "to": [9, 3] }],
+            "face": [{ "id": "guanyu", "dir": "right" }],
+            "speaker": "관우",
+            "portraitId": "관우",
+            "side": "player",
+            "text": "주인장, 술 한 사발만 주시오. 급히 마시고 가야 하오 — 의병에 이름을 올리러 가는 길이니."
+          },
+          {
+            "face": [{ "id": "zhangfei", "dir": "right" }],
+            "bubble": { "id": "zhangfei", "mark": "!" },
+            "speaker": "장비",
+            "portraitId": "장비",
+            "side": "player",
+            "text": "호오, 의병이라 하셨소? 여기도 같은 길을 가려는 사람이 둘이나 있소! 통성명이나 합시다!"
+          },
+          {
+            "face": [{ "id": "guanyu", "dir": "left" }],
+            "speaker": "관우",
+            "portraitId": "관우",
+            "side": "player",
+            "text": "하동의 관우, 자는 운장이오. 위세를 믿고 사람을 짓밟는 자를 베고, 강호를 떠돈 지 대여섯 해요."
+          },
+          {
+            "speaker": "유비",
+            "portraitId": "유비",
+            "side": "player",
+            "text": "탁군의 유비 현덕이오. …그대의 눈은 어지러운 세상을 베려는 눈이구려. 우리와 함께 대의를 도모하지 않겠소?"
+          },
+          {
+            "move": [{ "id": "guanyu", "to": [5, 3] }],
+            "speaker": "관우",
+            "portraitId": "관우",
+            "side": "player",
+            "text": "…술자리의 빈말이 아니라면, 이 관우, 목숨으로 값하겠소."
+          },
+          {
+            "bubble": { "id": "zhangfei", "mark": "!" },
+            "speaker": "장비",
+            "portraitId": "장비",
+            "side": "player",
+            "text": "됐소, 결정 났소! 그럼 이 잔이 맹세의 첫 잔이오 — 쭉 드시오!"
+          },
+          {
+            "text": "세 사람의 웃음소리가 밤늦도록 주점 문턱을 넘었다. 이튿날, 장비가 두 사람을 제 집 뒤뜰 복숭아밭으로 이끌었다."
+          }
+        ]
+      },
+      {
+        "map": "scene-01-orchard",
+        "label": "탁군 · 복숭아밭",
+        "decorations": [
+          { "cell": [7, 3], "kind": "brazier" }
+        ],
+        "units": [
+          { "id": "liubei", "sprite": "liubei-foot", "cell": [7, 9], "hidden": true },
+          { "id": "guanyu", "sprite": "guanyu-foot", "cell": [7, 9], "hidden": true },
+          { "id": "zhangfei", "sprite": "zhangfei-foot", "cell": [7, 9], "hidden": true },
+          { "id": "jeonryeong", "sprite": "footman_player", "cell": [7, 9], "hidden": true }
+        ],
+        "lines": [
+          {
+            "enter": [{ "id": "liubei", "from": [7, 9], "to": [7, 4] }],
+            "text": "복숭아꽃이 만발한 장비네 뒤뜰. 꽃잎 지는 사이로, 향과 술을 차린 단이 세 사람을 기다리고 있었다."
+          },
+          {
+            "enter": [
+              { "id": "guanyu", "from": [7, 9], "to": [5, 5] },
+              { "id": "zhangfei", "from": [7, 9], "to": [9, 5] }
+            ],
+            "bubble": { "id": "zhangfei", "mark": "!" },
+            "speaker": "장비",
+            "portraitId": "장비",
+            "side": "player",
+            "text": "형님들, 이쪽이오! 복사꽃 아래 향과 술을 차려 두었소!"
+          },
+          {
+            "face": [{ "id": "guanyu", "dir": "right" }],
+            "speaker": "유비",
+            "portraitId": "유비",
+            "side": "player",
+            "text": "(두 사람을 번갈아 바라본다) 맹세에 앞서 — 이 유비, 다짐 하나를 먼저 세우고 싶소.",
+            "choice": {
+              "prompt": "유비의 다짐은 —",
+              "options": [
+                {
+                  "label": "백성을 하늘로 삼겠소",
+                  "react": [
+                    {
+                      "speaker": "관우",
+                      "portraitId": "관우",
+                      "side": "player",
+                      "text": "…그 마음이면 족하오. 칼은 저희 둘이 들겠소."
+                    },
+                    {
+                      "speaker": "장비",
+                      "portraitId": "장비",
+                      "side": "player",
+                      "bubble": { "id": "zhangfei", "mark": "!" },
+                      "text": "좋소! 백성 울리는 놈들은 이 장비가 먼저 요절을 내주겠소!"
+                    }
+                  ]
+                },
+                {
+                  "label": "이 난세를 끝내는 칼이 되겠소",
+                  "react": [
+                    {
+                      "speaker": "장비",
+                      "portraitId": "장비",
+                      "side": "player",
+                      "bubble": { "id": "zhangfei", "mark": "!" },
+                      "text": "크하하, 시원한 말씀이오! 그 칼의 자루가 되어 드리리다!"
+                    },
+                    {
+                      "speaker": "관우",
+                      "portraitId": "관우",
+                      "side": "player",
+                      "text": "칼은 베기 위함이 아니라 지키기 위함 — 형님은 이미 그것을 아는 분이구려."
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "pose": [
+              { "id": "liubei", "pose": "kneel" },
+              { "id": "guanyu", "pose": "kneel" },
+              { "id": "zhangfei", "pose": "kneel" }
+            ],
+            "text": "세 사람은 향을 사르고, 하늘을 우러러 나란히 무릎을 꿇었다."
+          },
+          {
+            "speaker": "유비",
+            "portraitId": "유비",
+            "side": "player",
+            "text": "하늘이여 굽어살피소서. 유비·관우·장비, 성은 다르나 오늘로써 형제가 되었나이다. 마음을 하나로 하여, 위로는 기우는 나라를 붙들고 아래로는 도탄에 빠진 백성을 구하겠나이다."
+          },
+          {
+            "speaker": "관우",
+            "portraitId": "관우",
+            "side": "player",
+            "text": "한날한시에 나기를 구하지 않았으나, 한날한시에 죽기를 원하나이다. 이 언약을 저버리는 자는 하늘과 사람이 함께 버리소서."
+          },
+          {
+            "bubble": { "id": "zhangfei", "mark": "!" },
+            "speaker": "장비",
+            "portraitId": "장비",
+            "side": "player",
+            "text": "이 장비, 두 형님을 하늘같이 받들겠소! 복사꽃이 천 번을 져도 이 맹세만은 지지 않소!"
+          },
+          {
+            "pose": [
+              { "id": "liubei", "pose": "idle" },
+              { "id": "guanyu", "pose": "idle" },
+              { "id": "zhangfei", "pose": "idle" }
+            ],
+            "text": "도원(桃園)의 맹세 — 뒷날 천하가 오래도록 기억할 결의가, 이 작은 꽃밭에서 맺어졌다."
+          },
+          {
+            "enter": [{ "id": "jeonryeong", "from": [7, 9], "to": [7, 6] }],
+            "bubble": { "id": "jeonryeong", "mark": "!" },
+            "speaker": "의병",
+            "side": "player",
+            "text": "그, 급보요! 황건적 선봉 정원지가 오만 무리를 이끌고 탁군으로 몰려오고 있소!"
+          },
+          {
+            "bubble": { "id": "zhangfei", "mark": "!" },
+            "speaker": "장비",
+            "portraitId": "장비",
+            "side": "player",
+            "text": "오만이든 십만이든! 도원의 술이 깨기도 전에 손님이 오는구려, 형님!"
+          },
+          {
+            "speaker": "유비",
+            "portraitId": "유비",
+            "side": "player",
+            "text": "아우들아 — 맹세를 세운 바로 그 하늘 아래서, 첫 싸움이 우리를 부른다. 의병들이여, 창을 들어라!"
+          },
+          {
+            "text": "유비, 관우, 장비 — 아직 천하가 그 이름을 모르는 세 사람이, 첫 전장을 향해 달려나갔다."
+          }
+        ]
+      }
+    ],
     "outro": {
       "bg": "01-zhuojun-outro",
       "lines": [

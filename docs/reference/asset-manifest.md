@@ -3,7 +3,7 @@
 캠페인 루프에 필요한 이미지 목록. ⬜ = 미보유(placeholder 표시 중) · ✅ = 보유. 파일을 경로에 넣으면 자동 반영.
 경로 규약: 초상 `apps/web/public/assets/ui/portraits/{id}.webp` · 씬 배경 `.../assets/scenes/{bgId}.webp` · 맵 `.../assets/maps/{stageId}.webp`.
 
-요약: 초상 107/114 · 씬 배경 38/54 · 맵 0/27
+요약: 초상 107/115 · 씬 배경 38/54 · 맵 0/30
 
 ## 1. 초상 (portraits)
 
@@ -11,6 +11,7 @@
 
 | 보유 | id | 이름 | 최초 등장 | 경로 |
 |--|--|--|--|--|
+| ⬜ | 관병 | 관병 | 01-zhuojun | ui/portraits/관병.webp |
 | ✅ | 관우 | 관우 | 01-zhuojun | ui/portraits/관우.webp |
 | ✅ | 궁병대 | 궁병대 | 01-zhuojun | ui/portraits/궁병대.webp |
 | ⬜ | 백성 | 백성 | 01-zhuojun | ui/portraits/백성.webp |
@@ -194,6 +195,9 @@
 | 보유 | 스테이지 | mapId | 경로 |
 |--|--|--|--|
 | ⬜ | 01-zhuojun | zhuojun | maps/01-zhuojun.webp |
+| ⬜ | 01-zhuojun | scene-01-street | maps/01-zhuojun.webp |
+| ⬜ | 01-zhuojun | scene-01-tavern | maps/01-zhuojun.webp |
+| ⬜ | 01-zhuojun | scene-01-orchard | maps/01-zhuojun.webp |
 | ⬜ | 02-yingchuan | yingchuan | maps/02-yingchuan.webp |
 | ⬜ | 03-guangzong | guangzong | maps/03-guangzong.webp |
 | ⬜ | 04-zhangjue | zhangjue | maps/04-zhangjue.webp |
