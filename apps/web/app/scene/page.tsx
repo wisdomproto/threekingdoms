@@ -3,13 +3,16 @@
  * /scene?stage=ID&type=intro|outro|outroDefeat — 막간 시나리오 씬 라우트(캠페인 루프).
  *
  * 흐름: stages → (intro 씬) → /prep(상점·편성) → /battle → 결산 → (outro/outroDefeat 씬) → 다음.
- * 시나리오 없는 스테이지/타입은 **빈 씬 가드**로 즉시 다음 단계로(점진적 콘텐츠). 씬이 있으면
- * 완료 시 **페이드-투-블랙** 전환으로 다음 화면을 잇는다(시네마틱).
+ * 막간 v4: 씬 슬롯 = 단일 VN(하위호환) 또는 파트 배열(VN | MapScene) — normalizeSceneSlot로
+ * 정규화해 파트를 순차 재생(VN=ScenePlayer, 맵=MapScenePlayer). key={pi} 리마운트 = 각 플레이어의
+ * 오프닝 페이드가 파트 전환 연출을 겸한다. 시나리오 없는 스테이지/타입은 **빈 씬 가드**로 즉시
+ * 다음 단계로(점진적 콘텐츠). 마지막 파트 완료 시 **페이드-투-블랙** 전환으로 다음 화면을 잇는다.
  */
-import { Suspense, useCallback, useEffect } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { stages } from "@tk/data";
+import { normalizeSceneSlot, stages } from "@tk/data";
 import { ScenePlayer } from "../../src/scene/ScenePlayer";
+import { MapScenePlayer } from "../../src/scene/MapScenePlayer";
 import { nextStageId } from "../../src/meta/campaign";
 import { useFadeNav } from "../../src/ui/useFadeNav";
 
@@ -23,7 +26,13 @@ function SceneRoute(): React.ReactElement | null {
   const type: SceneType = raw === "outro" ? "outro" : raw === "outroDefeat" ? "outroDefeat" : "intro";
 
   const stage = stages[stageId];
-  const scene = stage?.scenario?.[type];
+  const slot = stage?.scenario?.[type];
+  const parts = useMemo(() => (slot ? normalizeSceneSlot(slot) : []), [slot]);
+  // 파트 인덱스 — 씬 식별(outro→다음 intro 등)이 바뀌면 처음부터.
+  const [pi, setPi] = useState(0);
+  useEffect(() => {
+    setPi(0);
+  }, [stageId, type]);
   // resetKey = 현재 씬 식별 → outro→다음 intro(/scene→/scene)로 바뀌면 페이드 자동 해제.
   const { fadeTo, overlay } = useFadeNav(`${stageId}:${type}`);
 
@@ -40,13 +49,22 @@ function SceneRoute(): React.ReactElement | null {
 
   // 빈 씬(미작성)은 즉시 건너뜀(페이드 없이 — 보여줄 씬이 없으므로).
   useEffect(() => {
-    if (!scene) router.push(target());
-  }, [scene, router, target]);
+    if (parts.length === 0) router.push(target());
+  }, [parts.length, router, target]);
 
-  if (!scene) return null;
+  if (parts.length === 0) return null;
+  const part = parts[Math.min(pi, parts.length - 1)]!;
+  const next = (): void => {
+    if (pi >= parts.length - 1) fadeTo(target());
+    else setPi((i) => i + 1);
+  };
   return (
     <>
-      <ScenePlayer scene={scene} title={stage?.name} onComplete={() => fadeTo(target())} />
+      {"map" in part ? (
+        <MapScenePlayer key={pi} scene={part} title={stage?.name} onComplete={next} />
+      ) : (
+        <ScenePlayer key={pi} scene={part} title={stage?.name} onComplete={next} />
+      )}
       {overlay}
     </>
   );

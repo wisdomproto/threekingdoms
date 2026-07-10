@@ -538,14 +538,6 @@ export const ScenarioSceneSchema = z.object({
 });
 export type ScenarioScene = z.infer<typeof ScenarioSceneSchema>;
 
-/** 스테이지 막간 시나리오 — intro(전투 전)·outro(승리 후)·outroDefeat(패배 후, 선택). 전부 optional. */
-export const StageScenarioSchema = z.object({
-  intro: ScenarioSceneSchema.optional(),
-  outro: ScenarioSceneSchema.optional(),
-  outroDefeat: ScenarioSceneSchema.optional(),
-});
-export type StageScenario = z.infer<typeof StageScenarioSchema>;
-
 /**
  * 정밀 데코 배치 (§3-1 하이브리드 Chunk 3 — 스테이지별 "장소감").
  * 순수 시각 — 지형/통행/전투 판정 불변(ObjectLayer가 그리기만 한다).
@@ -642,6 +634,18 @@ export const SceneSlotSchema = z.union([z.array(ScenePartSchema), ScenarioSceneS
 export type SceneSlot = z.infer<typeof SceneSlotSchema>;
 /** 슬롯 정규화 — 단일 VN(기존 27씬)을 1파트 배열로. 소비자(page/sim)는 항상 배열로 다룬다. */
 export const normalizeSceneSlot = (s: SceneSlot): ScenePart[] => (Array.isArray(s) ? s : [s]);
+
+/**
+ * 스테이지 막간 시나리오 — intro(전투 전)·outro(승리 후)·outroDefeat(패배 후, 선택). 전부 optional.
+ * 슬롯 = SceneSlot(막간 v4): 단일 VN(기존 27씬 하위호환) 또는 파트 배열(VN | MapScene).
+ * 소비자는 normalizeSceneSlot로 항상 배열로 정규화해 다룬다(page.tsx 순차 재생·sim 매니페스트).
+ */
+export const StageScenarioSchema = z.object({
+  intro: SceneSlotSchema.optional(),
+  outro: SceneSlotSchema.optional(),
+  outroDefeat: SceneSlotSchema.optional(),
+});
+export type StageScenario = z.infer<typeof StageScenarioSchema>;
 
 export const StageSchema = z.object({
   id: z.string(),

@@ -5,6 +5,7 @@
  * "모든 에셋은 생성 출력물"(§2-7) — 이 목록이 길중의 "이 이미지 만들어주세요" 요청서가 된다.
  */
 import type { Stage, Commander } from "@tk/data";
+import { normalizeSceneSlot } from "@tk/data";
 
 export interface PortraitReq {
   id: string; // commanderId(=portraitId 규약)
@@ -60,14 +61,30 @@ export function collectRequiredAssets(
     for (const u of st.units) notePortrait(u.commanderId, st.id);
     // 전투 내 대사 초상
     for (const d of st.dialogue ?? []) for (const l of d.lines) notePortrait(l.portraitId ?? l.speaker, st.id);
-    // 막간 시나리오 — 씬 배경 + 화자 초상
+    // 막간 시나리오 — 슬롯(단일 VN 또는 파트 배열, v4)을 정규화해 파트별 수집.
+    //  VN 파트 = 씬 배경 + 화자 초상 / MapScene 파트 = painted 맵 요구(/assets/maps/{map}.webp) + 화자 초상.
     const sc = st.scenario;
     if (sc) {
       for (const type of ["intro", "outro", "outroDefeat"] as const) {
-        const scene = sc[type];
-        if (!scene) continue;
-        if (scene.bg) scenes.push({ bgId: scene.bg, stageId: st.id, type, firstLine: scene.lines[0]?.text ?? "" });
-        for (const l of scene.lines) notePortrait(l.portraitId ?? l.speaker, st.id);
+        const slot = sc[type];
+        if (!slot) continue;
+        for (const part of normalizeSceneSlot(slot)) {
+          if ("map" in part) {
+            // 어드벤처 맵 파트 — 씬 맵 painted 배경 요구(맵 id 키, 중복 제거)
+            if (!seenMap.has(part.map)) {
+              seenMap.add(part.map);
+              maps.push({ stageId: st.id, mapId: part.map });
+            }
+            for (const l of part.lines) {
+              notePortrait(l.portraitId ?? l.speaker, st.id);
+              for (const opt of l.choice?.options ?? [])
+                for (const r of opt.react ?? []) notePortrait(r.portraitId ?? r.speaker, st.id);
+            }
+            continue;
+          }
+          if (part.bg) scenes.push({ bgId: part.bg, stageId: st.id, type, firstLine: part.lines[0]?.text ?? "" });
+          for (const l of part.lines) notePortrait(l.portraitId ?? l.speaker, st.id);
+        }
       }
     }
   }
