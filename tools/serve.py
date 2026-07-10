@@ -115,13 +115,18 @@ def _rebuild_audio_manifest():
     return {"ok": True, "sfx": len(manifest["sfx"]), "bgm": len(manifest["bgm"]), "r2": r2_ok}
 
 
-def _run_cut(sid, flip):
-    """저장된 _posesheet.png 를 cut_posesheet.py 로 자동 컷(고정 3×3 + 선택 flip).
+def _run_cut(sid, flip, poses=None, grid=None):
+    """저장된 _posesheet.png 를 cut_posesheet.py 로 자동 컷(고정 격자 + 선택 flip).
 
-    9칸 시트를 front_{idle,move,attack}.png(등급1 루트) + t2/t3 로 잘라 게임에 즉시 반영한다.
+    기본(poses/grid 미지정) = 종전과 동일하게 9칸 시트를 --grid=3x3 으로
+    front_{idle,move,attack}.png(등급1 루트) + t2/t3 로 잘라 게임에 즉시 반영한다.
+    도보 씬 시트(막간 v4, sprites/{key}-foot/)는 poses=["idle","move","kneel"]·grid="1x3" 로
+    호출 — cut_posesheet 가 front_ 접두를 붙이므로 poses 는 **bare 이름**이어야 한다.
     flip=True 면 좌우 반전(screen-right→left). 결과 {ok, cells, flip, output} 반환.
     """
-    cmd = [sys.executable, CUT_SCRIPT, sid, "--grid=3x3"] + (["--flip"] if flip else [])
+    pose_args = [p for p in (poses or []) if isinstance(p, str) and re.match(r"^[a-z][a-z0-9_]*$", p)]
+    grid_arg = grid if isinstance(grid, str) and re.match(r"^\d+x\d+$", grid) else "3x3"
+    cmd = [sys.executable, CUT_SCRIPT, sid] + pose_args + [f"--grid={grid_arg}"] + (["--flip"] if flip else [])
     env = {**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}
     try:
         p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
@@ -352,7 +357,8 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
             parts = rel.split("/")
             sid = parts[2] if len(parts) >= 4 else None
             if sid:
-                cut = _run_cut(sid, bool(payload.get("flip")))
+                cut = _run_cut(sid, bool(payload.get("flip")),
+                               payload.get("poses"), payload.get("grid"))
                 resp["cut"] = cut
                 sys.stdout.write(f"[save-asset] cut {sid} flip={bool(payload.get('flip'))} → ok={cut.get('ok')} cells={cut.get('cells')}\n")
 

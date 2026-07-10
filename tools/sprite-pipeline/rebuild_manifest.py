@@ -28,7 +28,8 @@ import os, sys, json
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SPRITES = os.path.join(ROOT, "apps", "web", "public", "assets", "sprites")
 MANIFEST = os.path.join(SPRITES, "manifest.json")
-POSE_ORDER = ["front_idle", "front_move", "front_attack", "back_idle", "back_move", "back_attack"]
+POSE_ORDER = ["front_idle", "front_move", "front_attack", "back_idle", "back_move", "back_attack",
+              "front_kneel"]  # kneel = 막간 v4 도보 씬 의식 포즈(sprites/{key}-foot/)
 
 
 def poses_in(dirpath):

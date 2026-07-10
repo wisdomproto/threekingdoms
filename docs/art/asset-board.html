@@ -1130,6 +1130,43 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
   });
 })();
 
+/* ───────────────────────── FS. 도보 씬 시트 (막간 v4 어드벤처 씬 배우) ─────────────────────────
+   전투 SD는 탈것 탑승(말/전차/사륜거)이라 씬 맵을 "걷는" 배우로 못 쓴다 → 도보 전용 3포즈 시트를
+   별도 폴더 sprites/{key}-foot/ 로 컷(front_idle/front_move/front_kneel — kneel = 도원결의 의식 포즈).
+   📤 넘기기 → serve.py 가 cut_posesheet.py 를 poses=idle,move,kneel · --grid=1x3 로 실행 + manifest 등록.
+   스펙: docs/superpowers/specs/2026-07-10-adventure-map-scenes-design.md */
+(function() {
+  /* S-pose buildPrompt 의 SD 스타일 어휘 재사용(도보 씬 배우용 — 탈것/무기 문법만 제거). */
+  const FOOT_STYLE = 'Art style: detailed painterly chibi (SD, ~2.5 heads) map unit for a top-down tactical RPG, East Asian ink-wash + soft cel shading, crisp readable silhouette, muted earth tones with gold/jade accents, clean even lighting, NO baked ground shadow.';
+  const FOOT_NEG = 'Avoid: any mount, horse, chariot, cart or vehicle; any weapon (no blade, spear, halberd, bow); any combat stance; baked ground shadow; text, labels, watermark, UI, frame; white background, checkerboard background, solid-black background (the background must be fully TRANSPARENT); different characters, faces or outfits between cells; photorealistic, anime-cel, Koei-style.';
+  /* [key(영문 폴더), 표시명, 도보 정체성(무기 없는 평상 복식)] — 초상 시트 인상 묘사 재사용. */
+  const FOOT_ACTORS = [
+    ['liubei',     '유비',   'LIU BEI — a benevolent warlord with a kind resolute face, long thin mustache and large earlobes, in a plain dark-red and white robe'],
+    ['guanyu',     '관우',   'GUAN YU — a towering dignified man with a very long flowing black beard to the chest, ruddy red face and narrow phoenix eyes, in a deep green robe'],
+    ['zhangfei',   '장비',   'ZHANG FEI — a burly wild man with a short bristling black beard, fierce round glaring eyes and dark skin, in rough dark clothes with leopard-pattern accents'],
+    ['zhaoyun',    '조운',   'ZHAO YUN — a handsome youthful clean-shaven man with bright valiant eyes, in plain white-and-silver traveling clothes'],
+    ['zhugeliang', '제갈량', 'ZHUGE LIANG — a serene young scholar-strategist in a flowing white crane-feather robe and dark Taoist headband, holding a white feather fan (a fan, not a weapon)'],
+    ['lvbu',       '여포',   'LU BU — a tall imposing peerless warrior with an arrogant handsome face, golden pheasant-tail plumed headdress, in crimson-and-gold attire, unarmed'],
+    ['caocao',     '조조',   'CAO CAO — a shrewd warlord with narrow piercing eyes and a short trimmed beard, in a dark crimson-and-black robe'],
+    ['zhouyu',     '주유',   'ZHOU YU — an elegant brilliant young commander, refined and handsome with a calm confident expression, in a fine red-and-teal robe'],
+  ];
+  SECTIONS.push({
+    id: 'FS',
+    title: 'FS. 도보 씬 시트 (막간 v4 — 걷는 씬 배우, 1×3)',
+    desc: '어드벤처 씬 맵에서 <b>걸어다니는</b> 배우용 도보 SD. 전투 SD는 탈것 탑승이라 별도 시트가 필요. 프롬프트 복사 → 가로 1×3 시트(대기/걷기/한쪽 무릎 꿇기, 투명배경) 생성 → 붙여넣기 → <b>📤 시트 넘기기</b> → <code>sprites/{key}-foot/front_{idle,move,kneel}.png</code> 자동 컷 + manifest 등록(씬이 즉시 사용). 무기·탈것 없음, 평상 복식.',
+    items: FOOT_ACTORS.map(([key, nm, ident]) => ({
+      id: `FS-${key}`,
+      title: `${nm} 도보 씬 시트 (${key}-foot)`,
+      poseSheet: true,
+      footKey: key,
+      _neg: FOOT_NEG,
+      _style: FOOT_STYLE,
+      note: `저장: <code>sprites/${key}-foot/_posesheet.png</code> → 자동 컷 <code>front_idle · front_move · front_kneel</code>. 시트가 화면 오른쪽을 보면 「좌우 반전」 체크 후 넘기기.`,
+      prompt: `A single SD pose sheet of ${ident}, ONE image containing a single HORIZONTAL row of exactly 3 cells on a fully TRANSPARENT background, cells evenly spaced with clear transparent gaps and NO overlap. The SAME character in all 3 cells — identical face, hair, outfit and identity in every cell. He is ON FOOT in every cell — NO mount, NO horse, NO chariot, NO weapon, NO combat stance; plain period attire for a story scene. CELL 1 = standing IDLE at rest, arms relaxed; CELL 2 = mid-stride WALKING, one foot forward; CELL 3 = KNEELING on one knee in a solemn oath pose (one knee on the ground, head slightly bowed). All three figures share the SAME ground baseline (feet and kneeling knee on one line) and the SAME scale. Every cell in 3/4 SIDE view FACING SCREEN-LEFT (profile turned left, NOT facing camera). No baked ground shadow, no text or labels. Each cell a complete finished chibi (SD, ~2.5 heads).`,
+    })),
+  });
+})();
+
 /* ───────────────────────── I. 초상 시트 (진영·챕터별 그룹) ─────────────────────────
    캐릭터를 Claude가 진영/챕터로 묶어 "그룹 한 장 생성" 카드로 제공. 그리드 좌→우·위→아래
    순서가 멤버 순서와 1:1 → 📤 넘기면 그 순서대로 슬라이스해 /assets/ui/portraits/{이름}.webp.
@@ -1713,7 +1750,12 @@ function buildPrompt(item) {
     }
   }
   const parts = [];
-  if (item.poseSheet) {
+  if (item.footKey) {
+    /* 도보 씬 시트(FS): 프롬프트 자체 완결(정체성 포함) + SD 스타일 + 도보 전용 네거티브. 탈것/무기 주입 없음. */
+    parts.push(body);
+    if (item._style) parts.push(item._style);
+    parts.push(item._neg || '');
+  } else if (item.poseSheet) {
     /* 포즈 시트: SD 유닛 스타일 + 병종별 탈것(MOUNT_BY_NAME→POSE_MOUNT) 주입. COMMON(정면 등) 래퍼 회피. */
     parts.push(body);
     const _ci = (varState[item.id] || {})['캐릭터'] || 0;
@@ -1757,7 +1799,7 @@ function buildPrompt(item) {
 const TAB_DEFS = [
   { id: 'pose',    label: '① SD 포즈시트',  secs: ['S'] },
   { id: 'portrait',label: '② 초상시트',     secs: ['I'] },
-  { id: 'scene',   label: '③ 시나리오 씬',  secs: ['N'] },
+  { id: 'scene',   label: '③ 시나리오 씬',  secs: ['N', 'FS'] },
   { id: 'duel',    label: '⚔ 일기토',       secs: ['DUEL'] },
   { id: 'item',    label: '④ 아이템',       secs: ['ITEMS'] },
   { id: 'ui',      label: 'UI',             secs: ['D','L'] },
@@ -1798,6 +1840,7 @@ function cardGamePaths(item) {
   if (item.duelPair) return [`assets/duels/${item.duelPair}.webp`];
   if (item.portraitSheet && item.portraitGroup) return [`assets/ui/portraits/_sheet_${item.portraitGroup}.png`];
   if (item.itemSheet && item.itemGroup) return [`assets/ui/items/_sheet_${item.itemGroup}.png`];
+  if (item.footKey) return ['idle', 'move', 'kneel'].map(p => `assets/sprites/${item.footKey}-foot/front_${p}.png`);
   if (item.poseSheet && item.charId) return [`assets/sprites/${item.charId}/_posesheet.png`];
   if (item.bgmTrack) return ['mp3','webm','ogg','m4a','wav'].map(e => `assets/audio/bgm/${item.bgmTrack}.${e}`);
   if (item.sfxKey)   return ['mp3','webm','ogg','m4a','wav'].map(e => `assets/audio/sfx/${item.sfxKey}.${e}`);
@@ -2008,7 +2051,7 @@ async function sheetSend(btn, path, blob, label, opts = {}) {
   try {
     const b64 = await blobToB64(blob);
     const body = { path, b64, contentType: blob.type || 'image/png' };
-    if (opts.cut) { body.cut = true; body.flip = !!opts.flip; }
+    if (opts.cut) { body.cut = true; body.flip = !!opts.flip; if (opts.poses) body.poses = opts.poses; if (opts.grid) body.grid = opts.grid; }
     if (opts.slice) { body.slice = true; body.group = opts.group; body.members = opts.members; body.grid = opts.grid; }
     const r = await fetch(SAVE_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const j = await r.json().catch(() => ({}));
@@ -2298,6 +2341,16 @@ board.addEventListener('click', async e => {
   const ps = e.target.closest('button[data-posesheet]');
   if (ps) {
     const item = findItem(ps.dataset.posesheet);
+    if (item.footKey) {
+      /* 도보 씬 시트(FS): 고정 키 카드 — sprites/{key}-foot/ 에 1×3 컷(idle/move/kneel, bare 이름 —
+         cut_posesheet 가 front_ 접두를 붙인다: "front_idle"을 넘기면 front_front_idle.png 이 됨). */
+      const frecs = imAll().filter(r => r.card === item.id).sort((a, b) => b.at - a.at);
+      if (!frecs.length) { flashBtn(ps, '✗ 시트 없음', false); setCardStatus(ps, '✗ 먼저 이 카드에 1×3 도보 시트 이미지를 붙여넣으세요(클릭→Ctrl+V).'); return; }
+      const fflip = !!document.querySelector(`input[data-flip="${CSS.escape(item.id)}"]`)?.checked;
+      await sheetSend(ps, `assets/sprites/${item.footKey}-foot/_posesheet.png`, frecs[0].blob, `${item.title}`,
+        { cut: true, flip: fflip, poses: ['idle', 'move', 'kneel'], grid: '1x3' });
+      return;
+    }
     const idx = (varState[item.id] || {})['캐릭터'] || 0;
     const sel = (item.roster || [])[idx];
     if (!sel) { flashBtn(ps, '✗ 캐릭터 선택', false); toast('캐릭터를 먼저 선택하세요', true); return; }
