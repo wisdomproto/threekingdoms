@@ -44,7 +44,17 @@ export function findScenePath(walkable: Walkable, from: Cell, to: Cell): Cell[] 
   return [from]; // 도달 불가 — 출발지 유지(무붕괴)
 }
 
-/** idx까지 액션 누적한 유닛 상태. 줄 내 정렬 = exit→move/face→enter→pose(스펙 계약). id 미매칭 = no-op. */
+/** 걸음 파생 facing(F-1) — net x-델타로 갱신. dx=0(순수 세로/제자리)은 불변. */
+function faceByDelta(s: SceneUnitState, dx: number): void {
+  if (dx !== 0) s.facing = dx > 0 ? "right" : "left";
+}
+
+/**
+ * idx까지 액션 누적한 유닛 상태. 줄 내 정렬 = exit→move→enter→face→pose(스펙 계약). id 미매칭 = no-op.
+ * facing: move(현재 칸→목적지)·enter(from→to)의 **net x-델타**로 파생 — 라이브 걸음(moveAlong이
+ * x걸음마다 facing을 덮음)과 스킵 상태가 수렴한다(F-1). face는 enter **뒤** = 같은 줄 face가
+ * 걸음 파생 facing을 교정하는 최종 발언권.
+ */
 export function sceneUnitStates(
   scene: MapScene, lineIdx: number, walkable: Walkable,
 ): ReadonlyMap<string, Readonly<SceneUnitState>> {
@@ -58,9 +68,22 @@ export function sceneUnitStates(
     if (!l) continue;
     // exit는 nearestWalkable 미적용이 의도 — 화면 밖/벽 너머로의 퇴장 목적지 허용(숨겨진 뒤라 통행성 무의미)
     l.exit?.forEach(({ id, to }) => { const s = st.get(id); if (s) { s.cell = to; s.hidden = true; } });
-    l.move?.forEach(({ id, to }) => { const s = st.get(id); if (s) s.cell = nearestWalkable(walkable, to); });
+    l.move?.forEach(({ id, to }) => {
+      const s = st.get(id);
+      if (!s) return;
+      const goal = nearestWalkable(walkable, to);
+      faceByDelta(s, goal[0] - s.cell[0]);
+      s.cell = goal;
+    });
+    l.enter?.forEach(({ id, from, to }) => {
+      const s = st.get(id);
+      if (!s) return;
+      const goal = nearestWalkable(walkable, to);
+      faceByDelta(s, goal[0] - from[0]); // 걸어 들어온 방향 = from→to
+      s.cell = goal;
+      s.hidden = false;
+    });
     l.face?.forEach(({ id, dir }) => { const s = st.get(id); if (s) s.facing = dir; });
-    l.enter?.forEach(({ id, to }) => { const s = st.get(id); if (s) { s.cell = nearestWalkable(walkable, to); s.hidden = false; } });
     l.pose?.forEach(({ id, pose }) => { const s = st.get(id); if (s) s.pose = pose; });
   }
   return st;

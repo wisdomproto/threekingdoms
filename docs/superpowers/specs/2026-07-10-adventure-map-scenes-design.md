@@ -152,7 +152,10 @@ ReactLine = Pick<MapSceneLine, "speaker" | "portraitId" | "side" | "text" | "bub
 - `apps/web/src/scene/map/interpreter.ts` (순수, vitest 대상):
   - `sceneUnitStates(scene, lineIdx): Map<id, {cell, facing, pose, hidden}>` — idx까지 액션 누적한
     유닛 상태(선행 스캔 불필요 — hidden 초기값+enter/exit 명시라 v3보다 단순).
-  - `lineActions(line): Action[]` — 한 줄의 실행 큐(정렬: exit→move/face→enter→pose).
+  - `lineActions(line): Action[]` — 한 줄의 실행 큐(정렬: exit→move→enter→face→pose + move/enter는
+    net x-델타로 facing 파생, dx=0 불변). 사유(F-1): 라이브 걸음(moveAlong)이 x걸음마다 facing을
+    덮으므로 인터프리터도 파생해야 라이브 종료 상태와 스킵 상태가 수렴 — face는 enter 뒤 =
+    같은 줄 face가 걸음 파생 facing을 교정하는 최종 발언권.
   - 목적지 보정(`nearestWalkable`), 경로(BFS — 기존 경로 유틸 재사용 가능하면 재사용).
 - `apps/web/src/scene/map/SceneStage.ts` (Pixi 조립, BattleRenderer 불변):
   - 맵 로드(painted+타일 폴백) → ObjectLayer(데코) → 유닛 스폰(UnitView, 병력바·SP바 숨김)

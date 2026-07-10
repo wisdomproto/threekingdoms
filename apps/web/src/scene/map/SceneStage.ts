@@ -228,9 +228,11 @@ export class SceneStage {
   }
 
   /**
-   * 한 줄의 액션을 순차 실행 — 정렬 = 인터프리터 계약과 동일(exit→move→face→enter→pose).
+   * 한 줄의 액션을 순차 실행 — 정렬 = 인터프리터 계약과 동일(exit→move→enter→face→pose).
    * 미매칭 id·도달 불가 경로 = no-op(무붕괴). 탭 스킵(skipToState)이 끼어들면 타일 경계에서
    * 끊고 조용히 종료(플레이어는 자체 토큰으로 이중 전이를 거른다).
+   * 종료 시 그 줄의 인터프리터 target facing을 전 유닛에 재보증(F-1) — moveAlong이 걸음
+   * x방향으로 덮은 facing을 인터프리터 상태로 수렴시킨다(라이브 종료 == 스킵 == 인터프리터).
    */
   async runLineActions(line: MapSceneLine, target: ReadonlyMap<string, SceneUnitState>): Promise<void> {
     const gen = ++this.actionGen; // 새 줄 = 이전 잔여 걷기 무효화
@@ -247,9 +249,6 @@ export class SceneStage {
       await this.walk(gen, id, v, to);
       if (this.actionGen !== gen) return;
     }
-    for (const { id, dir } of line.face ?? []) {
-      this.views.get(id)?.setFacing(dir === "right" ? 1 : -1);
-    }
     for (const { id, from, to } of line.enter ?? []) {
       const v = this.views.get(id);
       if (!v) continue;
@@ -258,12 +257,17 @@ export class SceneStage {
       await this.walk(gen, id, v, to);
       if (this.actionGen !== gen) return;
     }
+    // face = enter 뒤(같은 줄 face가 걸음 파생 facing을 교정하는 최종 발언권 — 인터프리터 미러)
+    for (const { id, dir } of line.face ?? []) {
+      this.views.get(id)?.setFacing(dir === "right" ? 1 : -1);
+    }
     for (const { id, pose } of line.pose ?? []) {
+      this.views.get(id)?.setPose(pose);
+    }
+    // 종료 재보증(F-1): 라이브 걸음이 남긴 facing을 이 줄의 인터프리터 상태로 수렴.
+    for (const [id, t] of target) {
       const v = this.views.get(id);
-      if (!v) continue;
-      v.setPose(pose);
-      const t = target.get(id);
-      if (t) v.setFacing(t.facing === "right" ? 1 : -1); // setPose가 텍스처 재적용 — facing 재보증
+      if (v) v.setFacing(t.facing === "right" ? 1 : -1);
     }
   }
 

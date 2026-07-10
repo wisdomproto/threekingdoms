@@ -59,6 +59,36 @@ describe("sceneUnitStates", () => {
   });
 });
 
+describe("걸음 파생 facing (F-1 — 라이브 걸음과 스킵 상태 수렴)", () => {
+  it("move: net x-델타 +x → facing right", () => {
+    const s2: MapScene = { ...scene, lines: [{ move: [{ id: "a", to: [3, 0] }] }] };
+    expect(sceneUnitStates(s2, 0, walkable).get("a")!.facing).toBe("right");
+  });
+  it("enter: from→to net -x → facing left (초기 facing 덮음)", () => {
+    const s2: MapScene = {
+      ...scene,
+      units: [{ id: "b", sprite: "s", cell: [4, 4], facing: "right", hidden: true }],
+      lines: [{ enter: [{ id: "b", from: [4, 0], to: [1, 0] }] }],
+    };
+    expect(sceneUnitStates(s2, 0, walkable).get("b")!.facing).toBe("left");
+  });
+  it("같은 줄 enter+face — face가 최종 발언권(enter 파생 facing 교정)", () => {
+    const s2: MapScene = {
+      ...scene,
+      lines: [{ enter: [{ id: "b", from: [0, 1], to: [4, 1] }], face: [{ id: "b", dir: "left" }] }],
+    };
+    expect(sceneUnitStates(s2, 0, walkable).get("b")!.facing).toBe("left");
+  });
+  it("dx=0 move(순수 세로 이동) → facing 불변", () => {
+    const s2: MapScene = {
+      ...scene,
+      units: [{ id: "a", sprite: "s", cell: [0, 0], facing: "right" }],
+      lines: [{ move: [{ id: "a", to: [0, 3] }] }],
+    };
+    expect(sceneUnitStates(s2, 0, walkable).get("a")!.facing).toBe("right");
+  });
+});
+
 describe("findScenePath", () => {
   it("벽(2,2)을 우회하는 BFS 최단 경로(연속 인접 셀)", () => {
     const p = findScenePath(walkable, [0, 2], [4, 2]);

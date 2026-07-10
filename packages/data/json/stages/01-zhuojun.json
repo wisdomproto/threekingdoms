@@ -319,6 +319,7 @@
               { "id": "guanyu", "from": [7, 9], "to": [5, 5] },
               { "id": "zhangfei", "from": [7, 9], "to": [9, 5] }
             ],
+            "face": [{ "id": "zhangfei", "dir": "left" }],
             "bubble": { "id": "zhangfei", "mark": "!" },
             "speaker": "장비",
             "portraitId": "장비",
