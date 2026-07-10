@@ -566,6 +566,12 @@ export const DECORATION_KINDS = [
   "debris_siege",   // 공성 잔해
   "shrub",          // 수풀
   "reeds",          // 갈대(물가)
+  // ── 실내 씬 소품 (막간 v4 MapScene — 주막/군막 등 실내 무대) ──
+  "table",          // 탁자
+  "carpet",         // 깔개/융단
+  "screen",         // 병풍
+  "counter",        // 주안상/계산대
+  "stool",          // 걸상
 ] as const;
 
 export const DecorationSchema = z.object({
@@ -577,6 +583,65 @@ export const DecorationSchema = z.object({
   scale: z.number().positive().max(3).optional(),
 });
 export type Decoration = z.infer<typeof DecorationSchema>;
+
+/** 막간 v4 — 어드벤처 맵 씬(스펙 2026-07-10). 씬 슬롯 = 단일 VN(하위호환) 또는 파트 배열. */
+const SceneCellSchema = z.tuple([z.number().int().min(0), z.number().int().min(0)]);
+export const SceneUnitSchema = z.object({
+  id: z.string(),                                   // 씬 내 안정 참조
+  sprite: z.string(),                               // 스프라이트 폴더 키 직접 저작("liubei-foot")
+  cell: SceneCellSchema,
+  facing: z.enum(["left", "right"]).optional(),     // 기본 left(코드 미러 규약)
+  hidden: z.boolean().optional(),                   // true = enter로 걸어 들어오기 전
+});
+const SceneBubbleSchema = z.object({ id: z.string(), mark: z.enum(["...", "!", "?"]) });
+/** choice.react 전용 — 대사·말풍선만(액션 금지 = strict). 분기 없음 결정과 정합·스킵 상태 결정성 보장. */
+const ReactLineSchema = z.object({
+  speaker: z.string().optional(),
+  portraitId: z.string().optional(),
+  side: SideSchema.optional(),
+  text: z.string().optional(),
+  bubble: SceneBubbleSchema.optional(),
+}).strict();
+export const MapSceneLineSchema = z.object({
+  // 액션(대사 전 순차 실행 — 정렬: exit→move/face→enter→pose)
+  move: z.array(z.object({ id: z.string(), to: SceneCellSchema })).optional(),
+  face: z.array(z.object({ id: z.string(), dir: z.enum(["left", "right"]) })).optional(),
+  enter: z.array(z.object({ id: z.string(), from: SceneCellSchema, to: SceneCellSchema })).optional(),
+  exit: z.array(z.object({ id: z.string(), to: SceneCellSchema })).optional(),
+  pose: z.array(z.object({ id: z.string(), pose: z.string() })).optional(),
+  // 대사(액션 후 표시. text 없으면 액션 비트 = 자동 진행)
+  speaker: z.string().optional(),
+  portraitId: z.string().optional(),
+  side: SideSchema.optional(),
+  text: z.string().optional(),
+  bubble: SceneBubbleSchema.optional(),
+  // 두루마리 선택지(분기 없음 — react 재생 후 다음 줄 합류. text와 병존 시 타자기 완료 후 표시)
+  choice: z.object({
+    prompt: z.string().optional(),
+    options: z.array(z.object({ label: z.string(), react: z.array(ReactLineSchema).optional() })).min(2),
+  }).optional(),
+});
+export const MapSceneSchema = z.object({
+  map: z.string(),                                  // 씬 맵 id(maps/scene-*.json — index.ts 레지스트리 등록 필요)
+  label: z.string().optional(),                     // 좌상단 장소 라벨
+  units: z.array(SceneUnitSchema).min(1),
+  decorations: z.array(DecorationSchema).optional(),// 씬 소품(실내 탁자 등)
+  lines: z.array(MapSceneLineSchema).min(1),
+});
+export type MapScene = z.infer<typeof MapSceneSchema>;
+export type SceneUnit = z.infer<typeof SceneUnitSchema>;
+export type MapSceneLine = z.infer<typeof MapSceneLineSchema>;
+/**
+ * ⚠ MapScene을 union 앞에 + VN 폴백은 strict — 비-strict ScenarioScene이 폴백이면
+ * *불량* MapScene(react 액션 위반 등)이 map/units를 벗겨먹힌 채 VN으로 조용히 강등된다(오파싱).
+ * strict라 파트 배열 안의 VN은 bg/lines 외 키 금지(기존 27 단일 VN 씬 경로는 비-strict 유지).
+ */
+export const ScenePartSchema = z.union([MapSceneSchema, ScenarioSceneSchema.strict()]);
+export type ScenePart = z.infer<typeof ScenePartSchema>;
+export const SceneSlotSchema = z.union([z.array(ScenePartSchema), ScenarioSceneSchema]);
+export type SceneSlot = z.infer<typeof SceneSlotSchema>;
+/** 슬롯 정규화 — 단일 VN(기존 27씬)을 1파트 배열로. 소비자(page/sim)는 항상 배열로 다룬다. */
+export const normalizeSceneSlot = (s: SceneSlot): ScenePart[] => (Array.isArray(s) ? s : [s]);
 
 export const StageSchema = z.object({
   id: z.string(),

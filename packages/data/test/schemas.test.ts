@@ -3,6 +3,7 @@ import {
   CommanderSchema, UnitClassSchema, TerrainSchema, ItemSchema,
   CombatConfigSchema, BattleMapSchema, StageSchema, StageEventSchema,
   StageDialogueSchema, ScenarioSceneSchema,
+  SceneSlotSchema, normalizeSceneSlot,
 } from "../src/schemas";
 
 describe("스키마 v2 (원작 모델)", () => {
@@ -293,5 +294,45 @@ describe("스키마 v2 (원작 모델)", () => {
     expect(e.effects).toMatchObject({ rangeBonus: 1, lifestealPercent: 50 });
     expect(() => ItemSchema.parse({ id: "x", name: "x", category: "weapon", power: 0, bonusPercent: 0,
       effects: { lifestealPercent: 150 } })).toThrow(); // 0~100 초과 거부
+  });
+});
+
+describe("scene slot v4 (parts array)", () => {
+  const vn = { bg: "x", lines: [{ text: "a" }] };
+  const mapPart = {
+    map: "scene-01-street",
+    label: "탁군 · 거리",
+    units: [
+      { id: "liubei", sprite: "liubei-foot", cell: [3, 5] },
+      { id: "zhangfei", sprite: "zhangfei-foot", cell: [10, 5], facing: "left", hidden: true },
+    ],
+    lines: [
+      { move: [{ id: "liubei", to: [5, 5] }], text: "무슨 소란이지?", speaker: "유비", portraitId: "유비",
+        bubble: { id: "liubei", mark: "..." } },
+      { enter: [{ id: "zhangfei", from: [14, 5], to: [6, 5] }] },
+      { speaker: "장비", text: "같이 하겠소?", choice: { prompt: "대답은?",
+        options: [{ label: "함께 갑시다", react: [{ speaker: "장비", text: "좋소!" }] }, { label: "글쎄..." }] } },
+    ],
+  };
+  it("단일 VN 객체(기존 27씬)와 파트 배열 둘 다 유효하다", () => {
+    expect(() => SceneSlotSchema.parse(vn)).not.toThrow();
+    expect(() => SceneSlotSchema.parse([vn, mapPart])).not.toThrow();
+  });
+  it("MapScene이 VN으로 오파싱되지 않는다(map/units 보존)", () => {
+    const arr = SceneSlotSchema.parse([mapPart]);
+    expect((arr as any)[0].map).toBe("scene-01-street");
+    expect((arr as any)[0].units).toHaveLength(2);
+  });
+  it("react 줄에 액션 필드는 거부된다", () => {
+    const bad = { ...mapPart, lines: [{ text: "q", choice: { options: [
+      { label: "a", react: [{ text: "r", move: [{ id: "liubei", to: [1, 1] }] }] }, { label: "b" }] } }] };
+    expect(() => SceneSlotSchema.parse([bad])).toThrow();
+  });
+  it("decorations를 씬 소품으로 받는다(실내 kind 포함)", () => {
+    expect(() => SceneSlotSchema.parse([{ ...mapPart, decorations: [{ cell: [2, 2], kind: "table" }] }])).not.toThrow();
+  });
+  it("normalizeSceneSlot: 단일 객체 → 1파트 배열", () => {
+    expect(normalizeSceneSlot(SceneSlotSchema.parse(vn))).toHaveLength(1);
+    expect(normalizeSceneSlot(SceneSlotSchema.parse([vn, mapPart]))).toHaveLength(2);
   });
 });
