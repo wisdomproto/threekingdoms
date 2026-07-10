@@ -52,9 +52,11 @@ export function collectRequiredAssets(
   };
 
   for (const st of ordered) {
-    // 맵(스테이지별 1개)
-    if (!seenMap.has(st.id)) {
-      seenMap.add(st.id);
+    // 맵(스테이지별 1개) — 중복 키 = **맵 id**(씬 파트의 map 키와 네임스페이스 통일).
+    // 씬 파트가 기존 전투 맵을 재사용해도 MapReq 행이 중복되지 않는다(종전 st.id 키잉은
+    // 스테이지 id가 원래 유일해 사실상 무의미했음).
+    if (!seenMap.has(st.mapId)) {
+      seenMap.add(st.mapId);
       maps.push({ stageId: st.id, mapId: st.mapId });
     }
     // 전투 유닛 초상

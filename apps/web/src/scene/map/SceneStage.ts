@@ -335,6 +335,9 @@ export class SceneStage {
   }
 
   destroy(): void {
+    // 진행 중 걷기 체인 무효화 — tweens.destroy가 resolve한 walk 루프가 microtask에서 재개될 때
+    // gen 불일치 → applySnapFor로 빠지고(views.clear() 후라 no-op) 파괴된 UnitView 접근이 없다.
+    this.actionGen++;
     this.destroyRequested = true;
     const b = this.booted;
     if (!b) return; // init 진행 중이면 init 내부 가드가 마무리

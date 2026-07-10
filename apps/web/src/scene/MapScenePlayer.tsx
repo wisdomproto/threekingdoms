@@ -143,9 +143,15 @@ function MapSceneInner({
     let alive = true;
     actionsDoneRef.current = false;
     if (line.bubble) stage.setBubble(line.bubble.id, line.bubble.mark);
-    void stage.runLineActions(line, statesAt(idx)).then(() => {
-      if (alive) finishActions();
-    });
+    void stage
+      .runLineActions(line, statesAt(idx))
+      .then(() => {
+        if (alive) finishActions();
+      })
+      .catch(() => {
+        // 액션 실패(파괴 경합 등)에도 진행은 계속 — unhandled rejection·phase 잔류 방지
+        if (alive) finishActions();
+      });
     return () => {
       alive = false;
       if (line.bubble) stage.setBubble(line.bubble.id, null);
