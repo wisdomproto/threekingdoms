@@ -16,6 +16,17 @@ export function actorSpriteCandidates(actor: StageActor): string[] {
 }
 
 /**
+ * 배우 플립북 프레임 URL — [기본, _2, _3]. 존재 여부는 런타임 프로브(ActorSprite).
+ * 경쟁작 원본은 막간 캐릭터가 실제로 움직이므로(팔 포함 — 길중 실플레이 확인, 2026-07-10)
+ * 정지 1장 + CSS로는 부족 — 같은 시트에서 컷한 2~3프레임을 번갈아 재생한다.
+ * _2가 없으면 기존 정지 연출 그대로(하위호환).
+ */
+export function actorFrameUrls(actor: StageActor): string[] {
+  const base = `/assets/scene-actors/${actor.sprite}`;
+  return [assetUrl(`${base}.png`), assetUrl(`${base}_2.png`), assetUrl(`${base}_3.png`)];
+}
+
+/**
  * idx까지의 등장 배우 id 집합. 규칙(스펙 v2 결정 3):
  * - 선행 스캔: lines 어딘가 enter에 나열된 배우는 첫 enter 전까지 숨김.
  * - enter 미나열 배우는 처음부터 상주.

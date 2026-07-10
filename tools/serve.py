@@ -17,7 +17,9 @@ CUT_SCRIPT = os.path.join(ROOT, "tools", "sprite-pipeline", "cut_posesheet.py")
 STITCH_SCRIPT = os.path.join(ROOT, "tools", "sprite-pipeline", "stitch_chunks.py")
 GEN_DIR = os.path.join(ROOT, "tools", "sprite-pipeline", "gen")  # slice_portraits.py 위치
 CHUNKS_DIR = os.path.join(ROOT, "docs", "art", "chunks")
-PORT = 8080
+# 포트: argv[1] > TK_SERVE_PORT 환경변수 > 8080. (8080이 타 프로젝트에 점유될 때 대체 포트 실행용
+#  — 보드 SAVE_ENDPOINT는 동오리진이라 포트를 따라온다.)
+PORT = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1].isdigit() else int(os.environ.get("TK_SERVE_PORT", "8080"))
 
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
@@ -371,6 +373,14 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
             resp["slice"] = sl
             sys.stdout.write(f"[save-asset] slice {group} → ok={sl.get('ok')} count={sl.get('count')} r2={sl.get('r2')}\n")
 
+        # ⑥ 씬 배우 플립북 분할 (payload.frames) — assets/scene-actors/{key}.png 저장 직후
+        #    투명 세로 갭으로 최대 3프레임 분할: 1번은 {key}.png 덮어쓰기, 나머지 {key}_2/_3.png.
+        #    단일 인물이면 분할 없이 유지 + 이전 세대 _2/_3 잔재 제거(옛 프레임 섞임 방지).
+        if payload.get("frames") and re.match(r"assets/scene-actors/[\w-]+\.png$", rel):
+            fr = _split_actor_frames(dest, rel)
+            resp["frames"] = fr
+            sys.stdout.write(f"[save-asset] actor frames {rel} → {fr}\n")
+
         self._json(200, resp)
 
 
@@ -403,6 +413,75 @@ def _run_slice_sheet(sheet_path, out_dir, members, grid, rel_dir=None):
                 except Exception:  # noqa: BLE001
                     pass
         return {"ok": True, "count": len(saved), "saved": saved, "missing": missing, "r2": r2_up}
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "error": str(e)}
+
+
+def _split_actor_frames(dest, rel):
+    """씬 배우 시트 → 투명 세로 갭 기준 프레임 분할(최대 3, ActorSprite 플립북 소비).
+
+    같은 시트에서 컷하므로 프레임 간 캐릭터 동일성·발끝 기준선이 보장된다(세로는 안 자름 — 높이 공유).
+    1구간이면 단일 이미지로 판단해 분할 없이 두고, 이전 세대 _2/_3 잔재를 로컬+R2에서 제거한다
+    (단일 재붙여넣기 시 옛 프레임이 섞여 도는 사고 방지). 반환 {ok, frames, r2} 또는 {ok:False, error}.
+    """
+    try:
+        from PIL import Image
+    except ImportError:
+        return {"ok": False, "error": "PIL(Pillow) 없음"}
+    base_dest, base_rel = dest[:-4], rel[:-4]  # ".png" 제거
+    try:
+        im = Image.open(dest).convert("RGBA")
+        w, h = im.size
+        px = im.getchannel("A").load()
+        # 열 점유 스캔(알파>16 픽셀 존재, 세로 4px 샘플링) → 연속 구간 추출
+        occupied = []
+        for x in range(w):
+            occupied.append(any(px[x, y] > 16 for y in range(0, h, 4)))
+        segs = []
+        x = 0
+        while x < w:
+            if occupied[x]:
+                s = x
+                while x < w and occupied[x]:
+                    x += 1
+                segs.append([s, x])
+            else:
+                x += 1
+        # 좁은 갭(<8px)은 같은 인물로 병합, 노이즈 구간(폭<5%w) 제거, 최대 3프레임
+        merged = []
+        for s in segs:
+            if merged and s[0] - merged[-1][1] < 8:
+                merged[-1][1] = s[1]
+            else:
+                merged.append(s)
+        merged = [s for s in merged if s[1] - s[0] >= w * 0.05][:3]
+
+        stale = [f"{base_dest}_{n}.png" for n in (2, 3)]
+        if len(merged) <= 1:
+            removed = 0
+            for i, path in enumerate(stale):
+                if os.path.isfile(path):
+                    os.remove(path)
+                    _r2_delete(f"{base_rel}_{i + 2}.png")
+                    removed += 1
+            return {"ok": True, "frames": 1, "r2": 0, "stale_removed": removed}
+
+        r2n = 0
+        pad = 2
+        for i, (s, e) in enumerate(merged):
+            crop = im.crop((max(0, s - pad), 0, min(w, e + pad), h))
+            out = dest if i == 0 else f"{base_dest}_{i + 1}.png"
+            out_rel = rel if i == 0 else f"{base_rel}_{i + 1}.png"
+            crop.save(out)
+            with open(out, "rb") as f:
+                ok, _info = _r2_upload(out_rel, f.read(), "image/png")
+            if ok:
+                r2n += 1
+        # 2프레임 분할인데 옛 _3이 남아 있으면 제거
+        if len(merged) < 3 and os.path.isfile(f"{base_dest}_3.png"):
+            os.remove(f"{base_dest}_3.png")
+            _r2_delete(f"{base_rel}_3.png")
+        return {"ok": True, "frames": len(merged), "r2": r2n}
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "error": str(e)}
 

@@ -11,8 +11,8 @@
     {
       "name": "tools",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["tools/serve.py"],
-      "port": 8080,
+      "runtimeArgs": ["tools/serve.py", "8081"],
+      "port": 8081,
       "autoPort": false
     }
   ]

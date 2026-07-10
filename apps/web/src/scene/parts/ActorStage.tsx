@@ -18,7 +18,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { StageActor } from "@tk/data";
-import { actorSpriteCandidates } from "../actorStage";
+import { actorFrameUrls, actorSpriteCandidates } from "../actorStage";
 import { BRONZE_GOLD, PARCHMENT } from "./tokens";
 
 /** 스프라이트 표시 높이(눈으로 튜닝 예정). scale은 이 위에 transform으로 곱한다. */
@@ -32,23 +32,62 @@ const KEYFRAMES = `
 `;
 
 /**
- * 배우 스프라이트 — 폴백 체인 소유(씬 포즈 → 초상 → CSS 실루엣).
+ * 배우 스프라이트 — 폴백 체인 소유(씬 포즈 → 초상 → CSS 실루엣) + 플립북.
  * ⚠ onError 레이스 방어(레포 공통 함정): React가 핸들러를 붙이기 전에 빠른 404가 끝나면
  * onError를 놓친다 — 마운트 후 `complete && naturalWidth === 0`을 직접 감지(ItemIcon과 동형).
+ *
+ * 플립북(2026-07-10): 경쟁작 원본은 막간 캐릭터가 실제로 움직임(팔 포함) — 정지 1장+CSS로는
+ * 부족해 `{key}_2.png`(+`_3`)를 프로브, 있으면 프레임 순환 재생(화자는 빠르게). 프레임은
+ * 같은 시트에서 컷돼 발끝 기준선을 공유(serve.py 자동 분할). _2 없으면 종전 정지 그대로.
  */
-function ActorSprite({ actor, flipped }: { actor: StageActor; flipped: boolean }): React.ReactElement {
+function ActorSprite({ actor, flipped, speaking }: { actor: StageActor; flipped: boolean; speaking: boolean }): React.ReactElement {
   const candidates = useMemo(() => actorSpriteCandidates(actor), [actor]);
   const [ci, setCi] = useState(0);
   const imgRef = useRef<HTMLImageElement>(null);
+  // 플립북 추가 프레임(_2/_3) — 프리로드로 존재 확인된 URL만.
+  const [extraFrames, setExtraFrames] = useState<string[]>([]);
+  const [fi, setFi] = useState(0);
 
   useEffect(() => {
     setCi(0); // 배우(에셋 키) 교체 시 사다리 처음부터 재시도
   }, [candidates]);
 
   useEffect(() => {
+    let alive = true;
+    setExtraFrames([]);
+    setFi(0);
+    const extras = actorFrameUrls(actor).slice(1);
+    Promise.all(
+      extras.map(
+        (url) =>
+          new Promise<string | null>((res) => {
+            const im = new Image();
+            im.onload = () => res(url);
+            im.onerror = () => res(null);
+            im.src = url;
+          }),
+      ),
+    ).then((loaded) => {
+      if (alive) setExtraFrames(loaded.filter((u): u is string => u !== null));
+    });
+    return () => {
+      alive = false;
+    };
+  }, [actor]);
+
+  // 플립북은 1단(씬 포즈)이 살아 있을 때만 — 초상/실루엣 폴백은 애니 없음.
+  const animating = ci === 0 && extraFrames.length > 0;
+  useEffect(() => {
+    if (!animating) return;
+    const t = setInterval(() => setFi((i) => i + 1), speaking ? 420 : 780);
+    return () => clearInterval(t);
+  }, [animating, speaking]);
+
+  useEffect(() => {
+    if (animating) return; // 순환 프레임은 프리로드 검증済 — 사다리 감지는 정지 표시에서만
     const img = imgRef.current;
     if (img && img.complete && img.naturalWidth === 0) setCi((i) => i + 1);
-  }, [ci, candidates]);
+  }, [ci, candidates, animating]);
 
   if (ci >= candidates.length) {
     // 폴백 최종단: 어두운 라운드 박스 + 머리글자(초상 키 우선 — 한국어 이름 첫 글자).
@@ -74,13 +113,15 @@ function ActorSprite({ actor, flipped }: { actor: StageActor; flipped: boolean }
     );
   }
 
+  const frames = [candidates[0], ...extraFrames];
   return (
     <img
       ref={imgRef}
-      src={candidates[ci]}
+      src={animating ? frames[fi % frames.length] : candidates[ci]}
       alt={actor.id}
       draggable={false}
-      onError={() => setCi((i) => i + 1)}
+      // 순환 중 프레임 오류(디스크에서 지워진 경우 등)는 플립북만 끄고 정지 1장으로 강등.
+      onError={() => (animating ? setExtraFrames([]) : setCi((i) => i + 1))}
       style={{
         height: SPRITE_HEIGHT,
         width: "auto",
@@ -190,7 +231,7 @@ export function ActorStage({
                     {emote}
                   </div>
                 )}
-                <ActorSprite actor={actor} flipped={actor.facing === "right"} />
+                <ActorSprite actor={actor} flipped={actor.facing === "right"} speaking={speaking} />
               </div>
             </div>
           </div>

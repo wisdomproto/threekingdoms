@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { actorSpriteCandidates, visibleActorIds } from "../actorStage";
+import { actorFrameUrls, actorSpriteCandidates, visibleActorIds } from "../actorStage";
 import type { StageActor, ScenarioLine } from "@tk/data";
 
 const a = (id: string, portrait?: string): StageActor => ({ id, sprite: id, portrait, x: 50 });
@@ -13,6 +13,19 @@ describe("actorSpriteCandidates", () => {
   });
   it("portrait 미저작이면 씬 포즈 1개만(실루엣은 URL 아님)", () => {
     expect(actorSpriteCandidates(a("zhouyu"))).toHaveLength(1);
+  });
+});
+
+describe("actorFrameUrls (플립북)", () => {
+  it("기본·_2·_3 프레임 URL을 순서대로 낸다", () => {
+    const f = actorFrameUrls(a("liubei"));
+    expect(f[0]).toContain("/assets/scene-actors/liubei.png");
+    expect(f[1]).toContain("/assets/scene-actors/liubei_2.png");
+    expect(f[2]).toContain("/assets/scene-actors/liubei_3.png");
+    expect(f).toHaveLength(3);
+  });
+  it("frame 1 URL은 폴백 사다리 1단과 동일하다", () => {
+    expect(actorFrameUrls(a("guanyu"))[0]).toBe(actorSpriteCandidates(a("guanyu"))[0]);
   });
 });
 

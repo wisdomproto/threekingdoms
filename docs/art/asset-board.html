@@ -1012,7 +1012,7 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
 */
 (function() {
   const ACTOR_STYLE = 'Art style: detailed painterly chibi (SD, ~2.5 heads) character, East Asian ink-wash + soft cel shading, crisp readable silhouette, muted earth tones with gold/jade accents, clean even lighting, NO baked ground shadow — the SAME rendering style as the game\'s battle-map SD units, but a single standing figure for a story interlude scene.';
-  const ACTOR_NEGATIVE = 'Avoid: mount, horse, chariot, weapon, combat stance, ground shadow, text, labels, watermark, UI, frame, busy background, white background, checkerboard background, solid black background, multiple figures, photorealistic, anime-cel, Koei-style.';
+  const ACTOR_NEGATIVE = 'Avoid: mount, horse, chariot, weapon, combat stance, ground shadow, text, labels, watermark, UI, frame, busy background, white background, checkerboard background, solid black background, different characters between cells, photorealistic, anime-cel, Koei-style.';
   const SCENE_ACTORS = [
     { key: 'liubei',     name: '유비',   desc: 'Liu Bei as a humble young man in plain hanfu robes with a straw-woven belt, gentle dignified face, standing calmly' },
     { key: 'guanyu',     name: '관우',   desc: 'Guan Yu with his magnificent long black beard, deep-green civilian robe, standing tall with quiet gravity, unarmed' },
@@ -1029,7 +1029,7 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
     sceneActorCard: true,
     actorKey: a.key,
     note: `저장: <code>assets/scene-actors/${a.key}.png</code> (PNG 알파 유지)`,
-    prompt: `Single full-body SD character, standing idle in a relaxed natural pose. ${a.desc}. No mount, no weapon, no combat stance — plain everyday attire for a story interlude. Transparent background, NO ground shadow baked in. FACING SCREEN-LEFT: body and gaze angled toward the viewer's left (mirrored in code for the other direction).\n\n${ACTOR_STYLE}`,
+    prompt: `ONE image containing a horizontal row of exactly 3 cells on a fully transparent background, cells evenly spaced with clear transparent gaps and NO overlap. The SAME full-body SD character in all 3 cells — identical face, outfit, hair and identity in every cell. The 3 cells are subtle IDLE ANIMATION FRAMES of the character standing and talking: cell 1 = arms relaxed at rest, cell 2 = slight breathing shift with one hand gently raised mid-gesture, cell 3 = small head tilt with the gesture hand moved — differences stay subtle so the frames loop naturally as an idle/talk animation. All 3 figures share the SAME ground baseline (feet aligned) and the SAME scale. ${a.desc}. No mount, no weapon, no combat stance — plain everyday attire for a story interlude. Transparent background, NO ground shadow baked in. FACING SCREEN-LEFT in every cell: body and gaze angled toward the viewer's left (mirrored in code for the other direction).\n\n${ACTOR_STYLE}`,
     _neg: ACTOR_NEGATIVE,
   }));
   SECTIONS.push({
@@ -1568,7 +1568,11 @@ async function saveRecToDisk(rec) {
 }
 
 /* ─────────── 게임 바로 적용 (로컬 서버 POST /save-asset → public/ + R2) ─────────── */
-const SAVE_ENDPOINT = 'http://localhost:8080/save-asset';
+/* serve.py로 열었으면 같은 오리진(포트 무관 — 8080 점유 시 대체 포트 지원), file:// 직접 열기만 :8080 가정.
+   /delete-asset·/rebuild-audio-manifest는 원래 상대 경로라 자동 동오리진 — 이 상수만 절대였던 것 통일. */
+const SAVE_ENDPOINT = location.protocol.startsWith('http')
+  ? location.origin + '/save-asset'
+  : 'http://localhost:8080/save-asset';
 function blobToB64(blob) {
   return new Promise((res, rej) => {
     const r = new FileReader();
@@ -1824,7 +1828,8 @@ function buildPrompt(item) {
 const TAB_DEFS = [
   { id: 'pose',    label: '① SD 포즈시트',  secs: ['S'] },
   { id: 'portrait',label: '② 초상시트',     secs: ['I'] },
-  { id: 'scene',   label: '③ 시나리오 씬',  secs: ['N','SA'] },
+  { id: 'scene',   label: '③ 시나리오 씬',  secs: ['N'] },
+  { id: 'actor',   label: '🎭 씬 배우',     secs: ['SA'] },
   { id: 'duel',    label: '⚔ 일기토',       secs: ['DUEL'] },
   { id: 'item',    label: '④ 아이템',       secs: ['ITEMS'] },
   { id: 'ui',      label: 'UI',             secs: ['D','L'] },
@@ -2196,11 +2201,14 @@ async function addImageToCard(cardId, blob) {
   updateProgress();
   const tileFile = tileTarget(item, cardId);
   if (item && item.sceneActorCard && item.actorKey) {
-    /* SA 씬 배우(디에게틱 막간): assets/scene-actors/{key}.png — 알파 보존 PNG 드롭인 */
+    /* SA 씬 배우(디에게틱 막간): assets/scene-actors/{key}.png — 알파 보존 PNG 드롭인.
+       frames: serve.py가 투명 세로 갭으로 최대 3프레임 자동 분할({key}.png/_2/_3 — ActorSprite 플립북).
+       단일 인물이면 분할 없이 그대로(1프레임 = 정지 하위호환). */
     rec.gamePath = `assets/scene-actors/${name}`;
     try {
-      const res = await applyToGame(rec.gamePath, finalBlob);
-      toast(`🎭 ${name} → 씬 배우 적용 완료${res.r2 ? ' (+R2)' : ''}. 게임 새로고침하면 보입니다`);
+      const res = await applyToGame(rec.gamePath, finalBlob, { frames: true });
+      const fr = res.frames && res.frames.frames > 1 ? ` · ${res.frames.frames}프레임 분할` : '';
+      toast(`🎭 ${name} → 씬 배우 적용 완료${fr}${res.r2 ? ' (+R2)' : ''}. 게임 새로고침하면 보입니다`);
     } catch (e) {
       toast(`${name} 저장됨 (게임 적용 실패: ${e.message} — :8080 서버 켜졌는지 확인)`);
     }
