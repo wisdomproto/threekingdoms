@@ -335,4 +335,22 @@ describe("scene slot v4 (parts array)", () => {
     expect(normalizeSceneSlot(SceneSlotSchema.parse(vn))).toHaveLength(1);
     expect(normalizeSceneSlot(SceneSlotSchema.parse([vn, mapPart]))).toHaveLength(2);
   });
+  it("MapScene 줄의 오타 키는 거부된다(mvoe → 침묵 무동작 비트 방지)", () => {
+    const typoLine = { ...mapPart, lines: [{ mvoe: [{ id: "liubei", to: [5, 5] }], text: "출발" }] };
+    expect(() => SceneSlotSchema.parse([typoLine])).toThrow();
+  });
+  it("MapScene 본체의 오타 키는 거부된다(decoration → 소품 침묵 소실 방지)", () => {
+    const typoPart = { ...mapPart, decoration: [{ cell: [2, 2], kind: "table" }] };
+    expect(() => SceneSlotSchema.parse([typoPart])).toThrow();
+  });
+  it("계약 잠금: 배열 안 VN 파트는 여분 키 거부 / 최상위 단일 VN(레거시)은 허용", () => {
+    // 배열 안 VN 파트 = strict — 불량 MapScene의 VN 침묵 강등 차단
+    expect(() => SceneSlotSchema.parse([{ ...vn, extra: 1 }])).toThrow();
+    // 최상위 단일 VN = 기존 27씬 하위호환 경로 — 비-strict 유지
+    expect(() => SceneSlotSchema.parse({ ...vn, extra: 1 })).not.toThrow();
+  });
+  it("choice.options 1개짜리는 거부된다(min 2)", () => {
+    const oneOption = { ...mapPart, lines: [{ text: "q", choice: { options: [{ label: "only" }] } }] };
+    expect(() => SceneSlotSchema.parse([oneOption])).toThrow();
+  });
 });

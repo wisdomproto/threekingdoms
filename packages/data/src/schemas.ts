@@ -620,14 +620,14 @@ export const MapSceneLineSchema = z.object({
     prompt: z.string().optional(),
     options: z.array(z.object({ label: z.string(), react: z.array(ReactLineSchema).optional() })).min(2),
   }).optional(),
-});
+}).strict(); // 오타 키(mvoe 등)가 벗겨져 침묵 무동작 비트가 되는 것 차단 — 신규 스키마라 레거시 비용 0
 export const MapSceneSchema = z.object({
   map: z.string(),                                  // 씬 맵 id(maps/scene-*.json — index.ts 레지스트리 등록 필요)
   label: z.string().optional(),                     // 좌상단 장소 라벨
   units: z.array(SceneUnitSchema).min(1),
   decorations: z.array(DecorationSchema).optional(),// 씬 소품(실내 탁자 등)
   lines: z.array(MapSceneLineSchema).min(1),
-});
+}).strict(); // 본체 오타 키(decoration 등)의 침묵 소실 차단
 export type MapScene = z.infer<typeof MapSceneSchema>;
 export type SceneUnit = z.infer<typeof SceneUnitSchema>;
 export type MapSceneLine = z.infer<typeof MapSceneLineSchema>;
