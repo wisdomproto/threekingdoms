@@ -1,0 +1,23 @@
+{
+  "id": "scene-01-orchard",
+  "name": "탁군 · 복숭아밭",
+  "width": 15,
+  "height": 10,
+  "tileLegend": {
+    ".": "plain",
+    "g": "grass",
+    "f": "forest"
+  },
+  "tiles": [
+    "fffffffffffffff",
+    "fgggggggggggggf",
+    "fgg.........ggf",
+    "fg...........gf",
+    "fg....g.g....gf",
+    "fg...........gf",
+    "fg...........gf",
+    "fgg.........ggf",
+    "fgggg.....ggggf",
+    "fffffgg.ggfffff"
+  ]
+}

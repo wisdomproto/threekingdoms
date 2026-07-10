@@ -44,6 +44,10 @@ import sanjiangkouJson from "../json/maps/sanjiangkou.json";
 import wulinJson from "../json/maps/wulin.json";
 import chibiJson from "../json/maps/chibi.json";
 import huarongdaoJson from "../json/maps/huarongdao.json";
+// ── 씬 맵 (막간 v4 어드벤처 맵 씬 — id 규약 scene-{stage}-{장소}) ──────────
+import scene01StreetJson from "../json/maps/scene-01-street.json";
+import scene01TavernJson from "../json/maps/scene-01-tavern.json";
+import scene01OrchardJson from "../json/maps/scene-01-orchard.json";
 // ── 스테이지 (27, 챕터 순) ─────────────────────────────────────────────────
 import stage01Json from "../json/stages/01-zhuojun.json";
 import stage02Json from "../json/stages/02-yingchuan.json";
@@ -136,6 +140,10 @@ export const gameData: GameData = {
     wulin: loadJson(BattleMapSchema, wulinJson, "maps/wulin.json"),
     chibi: loadJson(BattleMapSchema, chibiJson, "maps/chibi.json"),
     huarongdao: loadJson(BattleMapSchema, huarongdaoJson, "maps/huarongdao.json"),
+    // 씬 맵 (막간 v4 — 전투 스테이지가 아니라 MapScene 파트 전용 소형 무대)
+    "scene-01-street": loadJson(BattleMapSchema, scene01StreetJson, "maps/scene-01-street.json"),
+    "scene-01-tavern": loadJson(BattleMapSchema, scene01TavernJson, "maps/scene-01-tavern.json"),
+    "scene-01-orchard": loadJson(BattleMapSchema, scene01OrchardJson, "maps/scene-01-orchard.json"),
   },
   stages: {
     "01-zhuojun": loadJson(StageSchema, stage01Json, "stages/01-zhuojun.json"),
