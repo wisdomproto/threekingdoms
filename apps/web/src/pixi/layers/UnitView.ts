@@ -66,6 +66,12 @@ export interface UnitViewInit {
   tier?: number;
 }
 
+/** UnitView 생성 옵션 — 씬 모드(막간 v4)용. 기존 호출부(UnitLayer)는 미지정 = 전투 기본. */
+export interface UnitViewOpts {
+  /** false = 병력 바·SP 바 생성/갱신 생략(막간 씬 유닛 — 전투 수치 없음). 기본 true. */
+  bars?: boolean;
+}
+
 export class UnitView extends Container {
   readonly unitId: string;
   gridX: number;
@@ -112,8 +118,11 @@ export class UnitView extends Container {
   /**
    * 현재 포즈 — 미러 부호 보정용. 생성된 SD 아트가 idle/move=좌향인데 attack 포즈만
    * 우향으로 그려져 있어(관우·장비·화웅 등 일관), 포즈별로 미러 기준 방향이 다르다.
+   * string 완화(막간 v4) — 씬 커스텀 포즈(kneel 등). 미보유 포즈는 getSprite 폴백 체인이 idle로.
    */
-  private pose: "idle" | "move" | "attack" = "idle";
+  private pose: string = "idle";
+  /** false = 병력/SP 바 미표시·미갱신(씬 모드). 생성자 opts로 고정. */
+  private readonly bars: boolean;
 
   /** 스프라이트 기본 스케일(텍스처 높이 맞춤). 호흡은 이 값에 곱한다. */
   private baseScale = 1;
@@ -144,8 +153,9 @@ export class UnitView extends Container {
   /** idle 클립 duration(초) 캐시 — 0이면 정적 포즈. */
   private skelIdleDuration = 1;
 
-  constructor(init: UnitViewInit, textures: TextureResolver, tweens: TweenRunner) {
+  constructor(init: UnitViewInit, textures: TextureResolver, tweens: TweenRunner, opts?: UnitViewOpts) {
     super();
+    this.bars = opts?.bars ?? true;
     this.unitId = init.id;
     this.unitSide = init.side;
     this.gridX = init.x;
@@ -180,19 +190,18 @@ export class UnitView extends Container {
     this.spriteBase.visible = false;
     this.addChild(this.spriteBase);
 
-    // ── 병력 바 (배경 + 채움) ──
+    // ── 병력 바 (배경 + 채움) ── (씬 모드 bars=false면 미부착 — 생성만 해 필드 불변식 유지)
     this.barBg = new Graphics();
     this.barBg.rect(0, 0, BAR_WIDTH, BAR_HEIGHT).fill(0x222222);
-    this.addChild(this.barBg);
     this.barFill = new Graphics();
-    this.addChild(this.barFill);
 
     // ── 필살 게이지 SP 바 (병력 바 아래, 파랑 — 가득 차면 발광 펄스) ──
     this.spBarBg = new Graphics();
     this.spBarBg.rect(0, 0, BAR_WIDTH, SP_BAR_HEIGHT).fill(0x16202e);
-    this.addChild(this.spBarBg);
     this.spBarFill = new Graphics();
-    this.addChild(this.spBarFill);
+    if (this.bars) {
+      this.addChild(this.barBg, this.barFill, this.spBarBg, this.spBarFill);
+    }
     this.sp = init.sp ?? 0;
     this.maxSp = init.maxSp ?? 0;
 
@@ -294,7 +303,7 @@ export class UnitView extends Container {
    * 지정된 뷰+포즈 텍스처를 spriteBase에 적용.
    * 텍스처가 없으면 폴백(fallbackBase)을 표시.
    */
-  private applySpriteTexture(view: "front" | "back", pose: "idle" | "move" | "attack"): void {
+  private applySpriteTexture(view: "front" | "back", pose: string): void {
     if (this.skeletonView) return; // 스켈레톤 경로 — 스프라이트 포즈 텍스처 미사용
     this.pose = pose; // 미러 부호는 포즈에 따라 다름 (applyScale) — 폴백 경로에서도 추적
     if (this.spriteCands.length === 0) return; // 후보 없음 → 항상 색사각 폴백
@@ -480,6 +489,15 @@ export class UnitView extends Container {
     this.applyFacing();
   }
 
+  /**
+   * 커스텀 포즈 스왑(막간 v4 씬 — kneel 등 자유 포즈 키). 현재 뷰(front/back) 유지.
+   * 미보유 포즈 텍스처는 getSprite 폴백 체인(view idle → front 동일 포즈 → front idle)이
+   * idle로 받친다 — 조용한 색사각 강등 없음. 전투 경로(play/moveAlong)는 이 메서드를 안 쓴다.
+   */
+  setPose(pose: string): void {
+    this.applySpriteTexture(this.view, pose);
+  }
+
   faceToward(target: Coord): void {
     if (target.x !== this.gridX) this.setFacing(target.x > this.gridX ? 1 : -1);
   }
@@ -497,6 +515,7 @@ export class UnitView extends Container {
   }
 
   private redrawBar(): void {
+    if (!this.bars) return; // 씬 모드 — 바 미표시·미갱신
     const ratio = this.maxTroops > 0 ? this.troops / this.maxTroops : 0;
     this.barFill.clear();
     if (ratio > 0) {
@@ -511,6 +530,7 @@ export class UnitView extends Container {
 
   /** 필살 게이지 바 — 파랑(가득=밝은 시안 + 발광 테두리). maxSp=0이면 숨김. */
   private redrawSpBar(): void {
+    if (!this.bars) return; // 씬 모드 — spReady도 false 유지(tickIdle 펄스 미발동)
     this.spBarFill.clear();
     const has = this.maxSp > 0;
     this.spBarBg.visible = has;

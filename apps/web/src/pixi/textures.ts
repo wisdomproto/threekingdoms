@@ -135,8 +135,12 @@ const GROUND_FILES: Record<string, string> = {
 };
 const GROUND_SIZE = 576; // 48 × 12 — 서브렉트가 깔끔히 wrap
 
-/** 스프라이트 포즈 키: "{view}_{pose}" */
-export type SpritePose = "front_idle" | "front_move" | "front_attack" | "back_idle" | "back_move" | "back_attack";
+/**
+ * 스프라이트 포즈 키: "{view}_{pose}". 코어 6종(front/back × idle/move/attack)이 표준이고,
+ * 막간 v4 씬 커스텀 포즈(front_kneel 등)는 manifest에 있으면 그대로 로드된다 — string 완화.
+ * 미보유 포즈는 getSprite 폴백 체인이 idle로 받친다(조용한 색사각 금지).
+ */
+export type SpritePose = string;
 
 // assetUrl로 베이스를 한 번만 해석 → 이하 `${SPRITE_BASE}/...` 조합이 자동으로 R2/CDN을 탄다.
 const SPRITE_BASE = assetUrl("/assets/sprites");
@@ -672,11 +676,12 @@ export class TextureResolver {
 
   /**
    * 스프라이트 텍스처 조회. 미보유 시 null (폴백: 색 사각형 — 설계 §필수).
-   * view: "front"|"back", pose: "idle"|"move"|"attack"
+   * view: "front"|"back", pose: "idle"|"move"|"attack" + 씬 커스텀 포즈("kneel" 등 — 막간 v4).
    * 폴백 순서: 정확한 키 → 같은 뷰 idle → **front 동일 포즈 → front idle** → null.
    * 즉 **back 프레임은 선택**(없으면 front로 대체) — 위로 이동해도 깨지지 않고 정면을 유지한다.
+   * 미보유 커스텀 포즈도 같은 체인으로 idle에 안착(조용한 색사각 강등 없음).
    */
-  getSprite(spriteId: string, view: "front" | "back", pose: "idle" | "move" | "attack"): Texture | null {
+  getSprite(spriteId: string, view: "front" | "back", pose: string): Texture | null {
     const poseMap = this.sprites.get(spriteId);
     if (!poseMap) return null;
     return (
