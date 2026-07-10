@@ -101,6 +101,10 @@ const OBJECT_FILES: Record<string, string> = {
   debris_pile: "debris_pile.png", debris_cart: "debris_cart.png",
   debris_weapons: "debris_weapons.png", debris_siege: "debris_siege.png",
   shrub: "shrub.png", reeds: "reeds.png",
+  // 실내 씬 소품(막간 v4 MapScene — DECORATION_KINDS 실내 확장과 1:1). 아트 미생성 시
+  // getObject=null → 해당 소품만 조용히 생략(painted가 가구를 그릴 수 있으므로 무붕괴 드롭인).
+  table: "table.png", carpet: "carpet.png", screen: "screen.png",
+  counter: "counter.png", stool: "stool.png",
 };
 const OBJECT_BASE = assetUrl("/assets/objects");
 
