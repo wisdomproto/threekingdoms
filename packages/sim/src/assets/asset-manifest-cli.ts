@@ -23,12 +23,14 @@ const mark = (ok: boolean) => (ok ? "✅" : "⬜");
 let s = "";
 s += "# 에셋 매니페스트 (생성 요청서)\n\n";
 s += "캠페인 루프에 필요한 이미지 목록. ⬜ = 미보유(placeholder 표시 중) · ✅ = 보유. 파일을 경로에 넣으면 자동 반영.\n";
-s += "경로 규약: 초상 `apps/web/public/assets/ui/portraits/{id}.webp` · 씬 배경 `.../assets/scenes/{bgId}.webp` · 맵 `.../assets/maps/{stageId}.webp`.\n\n";
+s += "경로 규약: 초상 `apps/web/public/assets/ui/portraits/{id}.webp` · 씬 배경 `.../assets/scenes/{bgId}.webp` · 맵 `.../assets/maps/{mapId}.webp`.\n\n";
 
 // 요약
 const pHave = req.portraits.filter((p) => has(`ui/portraits/${p.id}.webp`)).length;
 const sHave = req.scenes.filter((sc) => has(`scenes/${sc.bgId}.webp`)).length;
-const mHave = req.maps.filter((m) => has(`maps/${m.stageId}.webp`) || has(`maps/${m.stageId}.png`)).length;
+// 맵 파일 키 = **mapId** (loadMapBackground(map.id) — 전투/씬 공통. 종전 stageId 키잉은
+// 실파일(zhuojun.webp 등)과 어긋나 보유 0 오표기 + 씬 맵 행이 전투맵 경로로 오도되던 버그).
+const mHave = req.maps.filter((m) => has(`maps/${m.mapId}.webp`) || has(`maps/${m.mapId}.png`)).length;
 s += `요약: 초상 ${pHave}/${req.portraits.length} · 씬 배경 ${sHave}/${req.scenes.length} · 맵 ${mHave}/${req.maps.length}\n\n`;
 
 s += "## 1. 초상 (portraits)\n\n";
@@ -50,8 +52,8 @@ s += "\n## 3. 맵 배경 (maps)\n\n";
 s += "전투 painted 배경(톱다운, §3-1). 격자 데이터에 맞춘 img2img 출력.\n\n";
 s += "| 보유 | 스테이지 | mapId | 경로 |\n|--|--|--|--|\n";
 for (const m of req.maps) {
-  const ok = has(`maps/${m.stageId}.webp`) || has(`maps/${m.stageId}.png`);
-  s += `| ${mark(ok)} | ${m.stageId} | ${m.mapId} | maps/${m.stageId}.webp |\n`;
+  const ok = has(`maps/${m.mapId}.webp`) || has(`maps/${m.mapId}.png`);
+  s += `| ${mark(ok)} | ${m.stageId} | ${m.mapId} | maps/${m.mapId}.webp |\n`;
 }
 
 mkdirSync(dirname(outPath), { recursive: true });

@@ -1,9 +1,9 @@
 # 에셋 매니페스트 (생성 요청서)
 
 캠페인 루프에 필요한 이미지 목록. ⬜ = 미보유(placeholder 표시 중) · ✅ = 보유. 파일을 경로에 넣으면 자동 반영.
-경로 규약: 초상 `apps/web/public/assets/ui/portraits/{id}.webp` · 씬 배경 `.../assets/scenes/{bgId}.webp` · 맵 `.../assets/maps/{stageId}.webp`.
+경로 규약: 초상 `apps/web/public/assets/ui/portraits/{id}.webp` · 씬 배경 `.../assets/scenes/{bgId}.webp` · 맵 `.../assets/maps/{mapId}.webp`.
 
-요약: 초상 107/115 · 씬 배경 38/54 · 맵 0/30
+요약: 초상 107/115 · 씬 배경 54/54 · 맵 27/30
 
 ## 1. 초상 (portraits)
 
@@ -137,22 +137,22 @@
 | ✅ | 01-zhuojun-outro | 01-zhuojun | outro | 싸움이 끝나자 마을 사람들이 하나둘 성문 밖으로 나왔다. 누군가 세 사람… |
 | ✅ | 02-yingchuan-intro | 02-yingchuan | intro | 탁군의 승전보가 마르기도 전, 남쪽 하늘에 연기 기둥이 올랐다. 영천 —… |
 | ✅ | 02-yingchuan-outro | 02-yingchuan | outro | 불길이 사그라든 벌판에 황건의 깃발이 재가 되어 날렸다. 관군 진영에서 … |
-| ⬜ | 03-guangzong-intro | 03-guangzong | intro | 영천의 불길이 잦아들 무렵, 북쪽 길에서 흰 말갈기의 기병대가 달려왔다.… |
-| ⬜ | 03-guangzong-outro | 03-guangzong | outro | 성문이 열리자 갇혀 있던 백성들이 쏟아져 나왔다. 장보의 향불은 꺼졌고,… |
-| ⬜ | 04-zhangjue-intro | 04-zhangjue | intro | 장보가 꺾이자 황건의 기세는 눈에 띄게 시들었다. 이제 난의 심장 — 스… |
-| ⬜ | 04-zhangjue-outro | 04-zhangjue | outro | 대현량사 장각이 쓰러지자, 그 많던 누런 두건들은 바람 빠진 깃발처럼 흩… |
-| ⬜ | 05-sishuiguan-intro | 05-sishuiguan | intro | 역적 동탁을 친다 — 격문이 천하를 돌자 열여덟 갈래 제후의 연합군이 모… |
-| ⬜ | 05-sishuiguan-outro | 05-sishuiguan | outro | 화웅의 목이 진영에 닿았을 때, 데워 둔 술은 아직 식지 않았다. |
-| ⬜ | 06-huluguan-intro | 06-huluguan | intro | 사수관이 뚫리자 동탁은 낙양의 마지막 방패, 호로관에 최강의 패를 세웠다… |
-| ⬜ | 06-huluguan-outro | 06-huluguan | outro | 여포가 말머리를 돌려 관 안으로 사라지자, 연합군 진영에서 뒤늦은 함성이… |
-| ⬜ | 07-luoyang-intro | 07-luoyang | intro | 호로관의 기세가 꺾이자 동탁은 어린 천자를 끌고 장안 천도를 선포했다. … |
-| ⬜ | 07-luoyang-outro | 07-luoyang | outro | 불은 사흘을 탔다. 사백 년 도읍이 숯이 되는 동안, 구해낸 백성들은 잿… |
-| ⬜ | 08-dongzhuo-chase-intro | 08-dongzhuo-chase | intro | 불타는 낙양을 뒤로하고 동탁의 행렬은 서쪽 장안으로 길게 늘어졌다. 제후… |
-| ⬜ | 08-dongzhuo-chase-outro | 08-dongzhuo-chase | outro | 관문에는 우리 깃발이 올랐다. 허나 동탁의 본대는 이미 계곡 저편 — 추… |
-| ⬜ | 09-banhe-intro | 09-banhe | intro | 반동탁연합은 결국 제 무게를 못 이기고 무너졌다. 제후들은 저마다 땅을 … |
-| ⬜ | 09-banhe-outro | 09-banhe | outro | 국의의 선봉이 꺾이자 원소군은 강 너머로 물러났다. 공손찬 진영에 안도의… |
-| ⬜ | 10-xuzhou-intro | 10-xuzhou | intro | 조조가 아버지의 원수를 갚겠다며 서주로 창끝을 돌렸다. 지나는 성마다 도… |
-| ⬜ | 10-xuzhou-outro | 10-xuzhou | outro | 보름째 아침, 조조군의 진영이 비어 있었다. 군량이 다한 것이다 — 서주… |
+| ✅ | 03-guangzong-intro | 03-guangzong | intro | 영천의 불길이 잦아들 무렵, 북쪽 길에서 흰 말갈기의 기병대가 달려왔다.… |
+| ✅ | 03-guangzong-outro | 03-guangzong | outro | 성문이 열리자 갇혀 있던 백성들이 쏟아져 나왔다. 장보의 향불은 꺼졌고,… |
+| ✅ | 04-zhangjue-intro | 04-zhangjue | intro | 장보가 꺾이자 황건의 기세는 눈에 띄게 시들었다. 이제 난의 심장 — 스… |
+| ✅ | 04-zhangjue-outro | 04-zhangjue | outro | 대현량사 장각이 쓰러지자, 그 많던 누런 두건들은 바람 빠진 깃발처럼 흩… |
+| ✅ | 05-sishuiguan-intro | 05-sishuiguan | intro | 역적 동탁을 친다 — 격문이 천하를 돌자 열여덟 갈래 제후의 연합군이 모… |
+| ✅ | 05-sishuiguan-outro | 05-sishuiguan | outro | 화웅의 목이 진영에 닿았을 때, 데워 둔 술은 아직 식지 않았다. |
+| ✅ | 06-huluguan-intro | 06-huluguan | intro | 사수관이 뚫리자 동탁은 낙양의 마지막 방패, 호로관에 최강의 패를 세웠다… |
+| ✅ | 06-huluguan-outro | 06-huluguan | outro | 여포가 말머리를 돌려 관 안으로 사라지자, 연합군 진영에서 뒤늦은 함성이… |
+| ✅ | 07-luoyang-intro | 07-luoyang | intro | 호로관의 기세가 꺾이자 동탁은 어린 천자를 끌고 장안 천도를 선포했다. … |
+| ✅ | 07-luoyang-outro | 07-luoyang | outro | 불은 사흘을 탔다. 사백 년 도읍이 숯이 되는 동안, 구해낸 백성들은 잿… |
+| ✅ | 08-dongzhuo-chase-intro | 08-dongzhuo-chase | intro | 불타는 낙양을 뒤로하고 동탁의 행렬은 서쪽 장안으로 길게 늘어졌다. 제후… |
+| ✅ | 08-dongzhuo-chase-outro | 08-dongzhuo-chase | outro | 관문에는 우리 깃발이 올랐다. 허나 동탁의 본대는 이미 계곡 저편 — 추… |
+| ✅ | 09-banhe-intro | 09-banhe | intro | 반동탁연합은 결국 제 무게를 못 이기고 무너졌다. 제후들은 저마다 땅을 … |
+| ✅ | 09-banhe-outro | 09-banhe | outro | 국의의 선봉이 꺾이자 원소군은 강 너머로 물러났다. 공손찬 진영에 안도의… |
+| ✅ | 10-xuzhou-intro | 10-xuzhou | intro | 조조가 아버지의 원수를 갚겠다며 서주로 창끝을 돌렸다. 지나는 성마다 도… |
+| ✅ | 10-xuzhou-outro | 10-xuzhou | outro | 보름째 아침, 조조군의 진영이 비어 있었다. 군량이 다한 것이다 — 서주… |
 | ✅ | 11-xiaopei-intro | 11-xiaopei | intro | 서주는 지켜냈다. 허나 평온은 짧았다 — 갈 곳 잃은 맹수, 여포를 거두… |
 | ✅ | 11-xiaopei-outro | 11-xiaopei | outro | 열이틀의 공방 끝에 고순의 함진영이 물러났다. 성벽은 곳곳이 무너졌으나 … |
 | ✅ | 12-xiapi1-intro | 12-xiapi1 | intro | 소패는 끝내 버티지 못했다. 성벽 한 귀퉁이가 무너지던 밤 — 유비군은 … |
@@ -194,33 +194,33 @@
 
 | 보유 | 스테이지 | mapId | 경로 |
 |--|--|--|--|
-| ⬜ | 01-zhuojun | zhuojun | maps/01-zhuojun.webp |
-| ⬜ | 01-zhuojun | scene-01-street | maps/01-zhuojun.webp |
-| ⬜ | 01-zhuojun | scene-01-tavern | maps/01-zhuojun.webp |
-| ⬜ | 01-zhuojun | scene-01-orchard | maps/01-zhuojun.webp |
-| ⬜ | 02-yingchuan | yingchuan | maps/02-yingchuan.webp |
-| ⬜ | 03-guangzong | guangzong | maps/03-guangzong.webp |
-| ⬜ | 04-zhangjue | zhangjue | maps/04-zhangjue.webp |
-| ⬜ | 05-sishuiguan | sishuiguan | maps/05-sishuiguan.webp |
-| ⬜ | 06-huluguan | huluguan | maps/06-huluguan.webp |
-| ⬜ | 07-luoyang | luoyang | maps/07-luoyang.webp |
-| ⬜ | 08-dongzhuo-chase | dongzhuo-chase | maps/08-dongzhuo-chase.webp |
-| ⬜ | 09-banhe | banhe | maps/09-banhe.webp |
-| ⬜ | 10-xuzhou | xuzhou | maps/10-xuzhou.webp |
-| ⬜ | 11-xiaopei | xiaopei | maps/11-xiaopei.webp |
-| ⬜ | 12-xiapi1 | xiapi1 | maps/12-xiapi1.webp |
-| ⬜ | 13-yuanshu | yuanshu | maps/13-yuanshu.webp |
-| ⬜ | 14-xiapi2 | xiapi2 | maps/14-xiapi2.webp |
-| ⬜ | 15-xutian | xutian | maps/15-xutian.webp |
-| ⬜ | 16-guandu-escape | guandu-escape | maps/16-guandu-escape.webp |
-| ⬜ | 17-runan | runan | maps/17-runan.webp |
-| ⬜ | 18-bowangpo | bowangpo | maps/18-bowangpo.webp |
-| ⬜ | 19-xinye | xinye | maps/19-xinye.webp |
-| ⬜ | 20-changbanpo | changbanpo | maps/20-changbanpo.webp |
-| ⬜ | 21-changbanqiao | changbanqiao | maps/21-changbanqiao.webp |
-| ⬜ | 22-hanjin | hanjin | maps/22-hanjin.webp |
-| ⬜ | 23-jiangxia | jiangxia | maps/23-jiangxia.webp |
-| ⬜ | 24-sanjiangkou | sanjiangkou | maps/24-sanjiangkou.webp |
-| ⬜ | 25-wulin | wulin | maps/25-wulin.webp |
-| ⬜ | 26-chibi | chibi | maps/26-chibi.webp |
-| ⬜ | 27-huarongdao | huarongdao | maps/27-huarongdao.webp |
+| ✅ | 01-zhuojun | zhuojun | maps/zhuojun.webp |
+| ⬜ | 01-zhuojun | scene-01-street | maps/scene-01-street.webp |
+| ⬜ | 01-zhuojun | scene-01-tavern | maps/scene-01-tavern.webp |
+| ⬜ | 01-zhuojun | scene-01-orchard | maps/scene-01-orchard.webp |
+| ✅ | 02-yingchuan | yingchuan | maps/yingchuan.webp |
+| ✅ | 03-guangzong | guangzong | maps/guangzong.webp |
+| ✅ | 04-zhangjue | zhangjue | maps/zhangjue.webp |
+| ✅ | 05-sishuiguan | sishuiguan | maps/sishuiguan.webp |
+| ✅ | 06-huluguan | huluguan | maps/huluguan.webp |
+| ✅ | 07-luoyang | luoyang | maps/luoyang.webp |
+| ✅ | 08-dongzhuo-chase | dongzhuo-chase | maps/dongzhuo-chase.webp |
+| ✅ | 09-banhe | banhe | maps/banhe.webp |
+| ✅ | 10-xuzhou | xuzhou | maps/xuzhou.webp |
+| ✅ | 11-xiaopei | xiaopei | maps/xiaopei.webp |
+| ✅ | 12-xiapi1 | xiapi1 | maps/xiapi1.webp |
+| ✅ | 13-yuanshu | yuanshu | maps/yuanshu.webp |
+| ✅ | 14-xiapi2 | xiapi2 | maps/xiapi2.webp |
+| ✅ | 15-xutian | xutian | maps/xutian.webp |
+| ✅ | 16-guandu-escape | guandu-escape | maps/guandu-escape.webp |
+| ✅ | 17-runan | runan | maps/runan.webp |
+| ✅ | 18-bowangpo | bowangpo | maps/bowangpo.webp |
+| ✅ | 19-xinye | xinye | maps/xinye.webp |
+| ✅ | 20-changbanpo | changbanpo | maps/changbanpo.webp |
+| ✅ | 21-changbanqiao | changbanqiao | maps/changbanqiao.webp |
+| ✅ | 22-hanjin | hanjin | maps/hanjin.webp |
+| ✅ | 23-jiangxia | jiangxia | maps/jiangxia.webp |
+| ✅ | 24-sanjiangkou | sanjiangkou | maps/sanjiangkou.webp |
+| ✅ | 25-wulin | wulin | maps/wulin.webp |
+| ✅ | 26-chibi | chibi | maps/chibi.webp |
+| ✅ | 27-huarongdao | huarongdao | maps/huarongdao.webp |
