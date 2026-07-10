@@ -28,6 +28,8 @@ export function findScenePath(walkable: Walkable, from: Cell, to: Cell): Cell[] 
   const prev = new Map<string, Cell | null>([[key(from), null]]);
   const q: Cell[] = [from];
   while (q.length) {
+    // 저작 실수 무붕괴: 무계(unbounded) walkable에서 도달 불가면 BFS가 영원히 확장 — 탐색 상한에서 포기
+    if (prev.size > 4096) return [from];
     const cur = q.shift()!;
     if (cur[0] === goal[0] && cur[1] === goal[1]) {
       const path: Cell[] = [];
@@ -43,7 +45,9 @@ export function findScenePath(walkable: Walkable, from: Cell, to: Cell): Cell[] 
 }
 
 /** idx까지 액션 누적한 유닛 상태. 줄 내 정렬 = exit→move/face→enter→pose(스펙 계약). id 미매칭 = no-op. */
-export function sceneUnitStates(scene: MapScene, lineIdx: number, walkable: Walkable): Map<string, SceneUnitState> {
+export function sceneUnitStates(
+  scene: MapScene, lineIdx: number, walkable: Walkable,
+): ReadonlyMap<string, Readonly<SceneUnitState>> {
   const st = new Map<string, SceneUnitState>();
   for (const u of scene.units) {
     st.set(u.id, { cell: u.cell, facing: u.facing ?? "left", pose: "idle", hidden: u.hidden ?? false });
@@ -52,6 +56,7 @@ export function sceneUnitStates(scene: MapScene, lineIdx: number, walkable: Walk
   for (let i = 0; i <= upto; i++) {
     const l = scene.lines[i];
     if (!l) continue;
+    // exit는 nearestWalkable 미적용이 의도 — 화면 밖/벽 너머로의 퇴장 목적지 허용(숨겨진 뒤라 통행성 무의미)
     l.exit?.forEach(({ id, to }) => { const s = st.get(id); if (s) { s.cell = to; s.hidden = true; } });
     l.move?.forEach(({ id, to }) => { const s = st.get(id); if (s) s.cell = nearestWalkable(walkable, to); });
     l.face?.forEach(({ id, dir }) => { const s = st.get(id); if (s) s.facing = dir; });

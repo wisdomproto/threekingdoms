@@ -44,6 +44,13 @@ describe("sceneUnitStates", () => {
   it("idx가 범위를 넘어도 마지막 줄 상태로 클램프", () => {
     expect(sceneUnitStates(scene, 99, walkable).get("a")!.pose).toBe("kneel");
   });
+  it("같은 줄 같은 id의 exit+enter 혼합 = 정렬 계약(exit 먼저→enter 나중 = 최종 visible)", () => {
+    const s2: MapScene = {
+      ...scene,
+      lines: [{ exit: [{ id: "a", to: [0, 4] }], enter: [{ id: "a", from: [4, 0], to: [4, 1] }] }],
+    };
+    expect(sceneUnitStates(s2, 0, walkable).get("a")).toMatchObject({ cell: [4, 1], hidden: false });
+  });
   it("통행 불가 목적지는 인접 통행 칸으로 보정", () => {
     const s2: MapScene = { ...scene, lines: [{ move: [{ id: "a", to: [2, 2] }] }] };
     const cell = sceneUnitStates(s2, 0, walkable).get("a")!.cell;
@@ -66,6 +73,14 @@ describe("findScenePath", () => {
     const boxed = (c: readonly [number, number]) => c[0] === 0 && c[1] === 0;
     expect(findScenePath(boxed, [0, 0], [3, 3])).toEqual([[0, 0]]);
   });
+  it("최단성 잠금 — 벽(2,2) 우회 경로는 정확히 7칸", () => {
+    expect(findScenePath(walkable, [0, 2], [4, 2]).length).toBe(7);
+  });
+  it("무계 predicate + 도달 불가 = 탐색 상한에서 무붕괴 종료(무한 루프 없음)", () => {
+    // y=1 벽으로 위아래가 분리된 '무한' 평면 — 상한 없으면 BFS가 영원히 확장
+    const halves = (c: readonly [number, number]) => c[1] !== 1;
+    expect(findScenePath(halves, [0, 0], [0, 2])).toEqual([[0, 0]]);
+  });
   it("목적지가 벽이면 보정된 인접 칸까지의 경로", () => {
     const p = findScenePath(walkable, [0, 2], [2, 2]);
     const last = p[p.length - 1]!;
@@ -83,5 +98,8 @@ describe("nearestWalkable", () => {
     const b = nearestWalkable(walkable, [2, 2]);
     expect(a).toEqual(b);
     expect(walkable(a)).toBe(true);
+  });
+  it("전부 막힘 = 원좌표 그대로 반환(무붕괴)", () => {
+    expect(nearestWalkable(() => false, [3, 3])).toEqual([3, 3]);
   });
 });
