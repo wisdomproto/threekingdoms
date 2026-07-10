@@ -48,6 +48,7 @@ MapScene = {
   map: string;                   // 씬 맵 id ("scene-01-street" — maps/scene-*.json)
   label?: string;                // 좌상단 장소 라벨 ("탁군 · 거리")
   units: SceneUnit[];            // 씬 등장 유닛(초기 배치)
+  decorations?: Decoration[];    // 씬 소품(실내 탁자·카펫 등 — StageSchema.decorations와 동일 스키마)
   lines: MapSceneLine[];         // 진행 스크립트 (min 1)
 }
 
@@ -75,9 +76,14 @@ MapSceneLine = {
   // ── 선택지(두루마리 — 분기 없음) ──
   choice?: {
     prompt?: string;             // 상단 질문(생략 가능)
-    options: { label: string; react?: MapSceneLine[] }[];  // 선택 → react 줄들 재생 후 다음 줄
+    options: { label: string; react?: ReactLine[] }[];     // 선택 → react 줄들 재생 후 다음 줄
   };
 }
+
+// react 줄 = 대사·말풍선만(액션·choice 금지 — zod로 강제). 근거: ①분기 없음 결정과 정합
+// ②순수 인터프리터가 "어떤 옵션을 골랐나"를 입력받지 않아도 유닛 상태가 결정됨(리뷰 #1)
+// ③스킵 시 미선택 react를 무시해도 상태 비결정이 없음.
+ReactLine = Pick<MapSceneLine, "speaker" | "portraitId" | "side" | "text" | "bubble">;
 ```
 
 **계약 확정:**
@@ -86,8 +92,13 @@ MapSceneLine = {
 - **id 미매칭 = no-op**(크래시 금지 — v2 계약 계승). move 목적지가 통행 불가/점유 칸이면
   가장 가까운 인접 통행 칸으로 보정(저작 실수 무붕괴).
 - **choice는 분기 없음**: 어떤 옵션이든 react 재생 후 같은 다음 줄로 합류. 저장 없음.
-- **스킵 버튼** = 파트 잔여 줄 전부 종료 상태 적용 후 다음 파트(또는 onComplete). VN 파트 스킵과 동일 UX.
+  한 줄에 text와 choice가 같이 있으면 **text 타자기 완료 → choice 표시** 순서.
+- **스킵 버튼** = 파트 잔여 줄 전부 종료 상태 적용 후 다음 파트(또는 onComplete). 미선택 choice의
+  react는 적용하지 않음(react가 액션 불가라 상태 비결정 없음). VN 파트 스킵과 동일 UX.
 - 파트 전환 = 페이드 아웃/인(기존 씬 전환 문법).
+- **SceneSlot zod 판별 = `map` 키 우선**: 단순 union에 VN을 먼저 두면 MapScene이 비-strict
+  ScenarioScene으로 *조용히 오파싱*되어 map/units가 벗겨진다 — MapScene을 union 앞에 두거나
+  map 존재를 먼저 검사. "MapScene이 VN으로 오파싱되지 않음" 테스트 필수(§테스트).
 
 ### v3 필드 정리 (삭제)
 
@@ -104,15 +115,28 @@ MapSceneLine = {
   결정 번복이라 기각 — 씬 맵 프롬프트에 "elevated 3/4 view, front facades visible" 지시가 핵심.
 - **전용 소형 맵 신규 저작**(~15×10, 원본 문법): 거리·주점(실내)·과수원·(후속) 성루·나루터 등.
 - 포맷 = 기존 BattleMap JSON 그대로, id 규약 `scene-{stage}-{장소}` (`maps/scene-01-street.json`).
-  stage-editor 맵 단독 모드로 칠하고, painted 배경은 기존 청크 파이프라인(export_chunks → 보드
-  붙여넣기 stitch)로 생성. 데코(`decorations`)·오브젝트 레이어 그대로 동작(주점 탁자 = 데코/오브젝트).
-- 실내 맵은 지형 범례 재사용(벽=wall, 바닥=평지) — 신규 지형 불필요. 통행 데이터가 이동 경로의 진실.
+  ⚠ **맵 레지스트리 등록 필요**: `gameData.maps`는 `packages/data/src/index.ts`의 정적 import
+  수동 레지스트리 — 신규 씬 맵마다 등록 1줄(리뷰 #2). 롤아웃 목표는 "데이터+에셋+맵 등록 1줄"로 정정.
+- painted 배경 = 기존 청크 파이프라인(export_chunks → 보드 stitch) **재사용하되 씬 전용 프롬프트
+  변형 필수**(리뷰 #6): 기존 `CHUNK_PROMPT`는 엄격 top-down·구조물 금지 — 씬 맵은 정반대
+  ("elevated 3/4 view, front facades visible, 실내 가구 허용") 지시가 핵심이라 보드에 씬 맵용
+  프롬프트 분기를 신설.
+- **씬 소품 = `MapScene.decorations`**(데이터 모델 참조). `DECORATION_KINDS`는 야외 화이트리스트라
+  **실내 kind 신설**(table·carpet·screen·counter 등) + ⚠ `textures.ts OBJECT_FILES` 등록 필수
+  (미등록 키는 조용히 생략 — §3-1에서 두 번 밟은 함정, 리뷰 #3).
+- 실내 맵 지형 = 벽=wall·바닥=평지 재사용(통행 데이터가 이동 경로의 진실). 단 **SceneStage는
+  지형 구동 오브젝트(성벽 오토타일·성문)를 끈다**(리뷰 #5) — ObjectLayer가 wall에 성곽 아트를
+  얹으면 주점 벽이 성벽이 됨. 씬 맵의 벽·건물은 painted가 그리고, 격자는 통행만 담당.
 - 카메라 = **맵 전체 fit**(소형이라 한 화면). 팬/줌 연출은 YAGNI(후속).
 
 ## 도보 SD (에셋)
 
 - **규약**: `sprites/{key}-foot/` — 기존 스프라이트 폴더 문법(front_idle/front_move + 의식 포즈
-  `front_kneel` 등). `rebuild_manifest.py`가 디렉터리 스캔이라 **자동 등록**(코드 무변경).
+  `front_kneel` 등). ⚠ **의식 포즈는 "코드 무변경"이 아님 — 3지점 확장 필요**(리뷰 #4):
+  ① `rebuild_manifest.py`의 `POSE_ORDER`가 idle/move/attack 고정 화이트리스트라 kneel이 조용히
+  누락 — 포즈 목록 확장. ② `UnitView` pose 타입이 `"idle"|"move"|"attack"` 유니온 — 커스텀 포즈
+  스왑 API 확장. ③ 보드 📤 자동 컷 경로가 기본 3포즈 매핑이라 kneel 칸이 `front_attack.png`로
+  오명명 — 도보 시트 카드가 serve.py에 포즈 인자를 전달하는 배선 추가.
 - **물량**: 마퀴 등장 8명(유비·관우·장비·조운·제갈량·여포·조조·주유) × idle/move (+의식 포즈는
   비트 필요분만 — 도원결의 무릎 3명 등). 무명 조연(농민·점원)은 **기존 도보 병종 제네릭 재사용**
   (footman/civilian 계열 — 백성 스프라이트 보유).
@@ -166,13 +190,13 @@ scenario.intro (ScenePart[])
   과수원(맹세·무릎 포즈·선택지 1개)**. 대사·연출 전부 우리 창작(§5 챕터 톤) — 원본 밀도만 참고.
 - 필요 에셋: 씬 맵 3장(거리·주점·과수원 — 지형 저작+painted) + 삼형제 도보 시트 3장(idle/move/kneel).
 - **게이트**: 길중이 원본 프롤로그 영상과 나란히 판정. 통과 → 1장(02~04) → 마퀴 순 롤아웃.
-- 이후 롤아웃은 데이터+에셋 저작만(코드 무변경)이 목표.
+- 이후 롤아웃 = 데이터+에셋 저작 + 맵 레지스트리 등록 1줄(index.ts — 리뷰 #2 정정). 그 외 코드 무변경이 목표.
 
 ## 테스트
 
 - **인터프리터**(순수) vitest: 상태 누적(초기 hidden·enter·exit·move·pose), id 미매칭 no-op,
-  목적지 보정, 액션 정렬. 스키마 zod: 파트 배열/단일 하위호환, MapScene 파싱, choice 구조,
-  v3 필드 거부(제거 확인).
+  목적지 보정, 액션 정렬. 스키마 zod: 파트 배열/단일 하위호환, MapScene 파싱, choice 구조
+  (react에 액션 필드 거부), **MapScene이 VN으로 오파싱되지 않음**(union 판별), v3 필드 거부(제거 확인).
 - **시각 = 길중 눈** + 프리뷰 DOM 검증 한계(Pixi는 hidden rAF 정지 — 대사창·선택지 DOM만 확인 가능,
   걷기·말풍선은 실기기).
 
@@ -186,11 +210,14 @@ scenario.intro (ScenePart[])
 
 ## 파일 요약 (신규/변경/삭제)
 
-- `packages/data/src/schemas.ts` — SceneSlot 배열화·MapScene/SceneUnit/MapSceneLine 신설·v3 필드 삭제
+- `packages/data/src/schemas.ts` — SceneSlot 배열화·MapScene/SceneUnit/MapSceneLine/ReactLine 신설·v3 필드 삭제·`DECORATION_KINDS` 실내 kind 확장
+- `packages/data/src/index.ts` — 씬 맵 레지스트리 등록(맵당 1줄)
 - `apps/web/src/scene/map/{interpreter.ts, SceneStage.ts}` + `MapScenePlayer.tsx` (신규)
 - `apps/web/src/scene/{StagedScenePlayer,parts/ActorStage}.tsx`·`actorStage.ts` (삭제)
 - `apps/web/app/scene/page.tsx` — 파트 순차 재생
-- `tools/serve.py` — 플립북 분할 제거 / `docs/art/asset-board.html` — SA·staged 카드 → 도보 시트 카드
+- `apps/web/src/pixi/layers/UnitView.ts` — 씬 모드(병력/SP바 숨김)·커스텀 포즈 스왑 / `textures.ts` — 실내 데코 OBJECT_FILES
+- `tools/serve.py` — 플립북 분할 제거·도보 시트 포즈 인자 / `tools/sprite-pipeline/rebuild_manifest.py` — POSE_ORDER 확장
+- `docs/art/asset-board.html` — SA·staged 카드 삭제 → 도보 시트 카드·씬 맵 청크 프롬프트 변형
 - `packages/data/json/maps/scene-01-*.json` ×3 + `stages/01-zhuojun.json` 재저작
 - `sprites/{liubei,guanyu,zhangfei}-foot/` (에셋 — 생성 게이트)
 
