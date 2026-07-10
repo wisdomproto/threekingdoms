@@ -1,4 +1,4 @@
-/** 막간 씬 공용 색 토큰 + 캐럿 점멸 keyframe (ScenePlayer/StagedScenePlayer 공유). */
+/** 막간 씬 공용 색 토큰 + 캐럿 점멸 keyframe (ScenePlayer 표현 조각 공유). */
 
 export const PARCHMENT = "#e8dcc0";
 export const BRONZE_GOLD = "#cdab6e";

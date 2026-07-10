@@ -523,25 +523,8 @@ export const ScenarioLineSchema = z.object({
   portraitId: z.string().optional(),
   text: z.string(),
   bg: z.string().optional(),
-  // 디에게틱 스테이지 씬(스펙 v2) — 전부 선택, 하위호환. actors 없는 VN 씬엔 무의미.
-  actor: z.string().optional(),          // 이 줄을 말하는 배우 id(스포트라이트). 미매칭/미등장=no-op.
-  enter: z.array(z.string()).optional(), // 이 줄에서 등장하는 배우 id (선행 스캔: 나열된 배우는 첫 enter 전 숨김)
-  exit: z.array(z.string()).optional(),  // 이 줄에서 퇴장하는 배우 id
-  emote: z.enum(["...", "!", "?"]).optional(), // 말하는 배우 위 말풍선 마크 — 반각 3점 "..."(씬 텍스트의 전각 "…" 아님)
 });
 export type ScenarioLine = z.infer<typeof ScenarioLineSchema>;
-
-/** 디에게틱 스테이지 배우(스펙 v2). sprite = /assets/scene-actors/{sprite}.png 전용 영문 키(전투 폴더와 무관). */
-export const StageActorSchema = z.object({
-  id: z.string(),                               // 씬 내 안정 참조
-  sprite: z.string(),                           // scene-actors 전용 영문 키
-  portrait: z.string().optional(),              // 폴백② 초상 키(한국어 commanderId). 미지정=폴백② 생략
-  x: z.number().min(0).max(100),                // 0~100 가로 위치(%)
-  y: z.number().min(0).max(100).optional(),     // 0~100 바닥선(화면 상단 기준 %, CSS top). 미지정=72
-  facing: z.enum(["left", "right"]).optional(), // 기본 "left"(원본 screen-left). "right"=scaleX(-1)
-  scale: z.number().positive().optional(),      // 0/음수 = 의도치 않은 반전이라 거부
-});
-export type StageActor = z.infer<typeof StageActorSchema>;
 
 /**
  * 막간 시나리오 씬 (전투 밖 컷신 — §5 스토리). 풀스크린 배경 + 화자 초상 대사 + 내레이션.
@@ -551,7 +534,6 @@ export type StageActor = z.infer<typeof StageActorSchema>;
  */
 export const ScenarioSceneSchema = z.object({
   bg: z.string().optional(),
-  actors: z.array(StageActorSchema).optional(), // 존재 = 디에게틱 스테이지 씬(스펙 v2). 미지정 = 기존 VN 씬.
   lines: z.array(ScenarioLineSchema).min(1),
 });
 export type ScenarioScene = z.infer<typeof ScenarioSceneSchema>;

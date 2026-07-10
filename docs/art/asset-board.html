@@ -965,78 +965,11 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
     }
   }
 
-  /* 마퀴(★) 스테이지 근경 무대 배경 — 디에게틱 막간(StagedScenePlayer)이 캐릭터 스프라이트를
-     세우는 지면. 기존 씬 카드 배선 재사용(sceneCard: webp 변환 + assets/scenes/{saveName} 저장·복원).
-     ⚠ 게임 스테이지 JSON `scenario.actors[]` 보유 스테이지와 수동 동기 — staged 씬 추가/제거 시 여기도 갱신. */
-  const STAGED_PLACES = {
-    '01': 'A peach orchard in full bloom, petals drifting on the breeze',
-    '05': 'An army camp before a mountain-pass gate',
-    '06': 'Open ground before the towering Hulao gate',
-    '14': 'The top of Xiapi\'s city wall by the gatehouse',
-    '17': 'A country road through Runan fields',
-    '18': 'The courtyard of a thatched hermitage',
-    '20': 'A war-torn open field, scattered debris',
-    '21': 'The foot of a wooden bridge over a river',
-    '22': 'A river ferry crossing, moored boats',
-    '26': 'A riverside war camp, banners',
-    '27': 'A narrow mountain trail between cliffs',
-  };
-  for (const st of stageList) {
-    const place = STAGED_PLACES[st.num];
-    if (!place) continue;
-    const saveName = `${st.num}-${st.id}-staged.webp`;
-    sceneItems.push({
-      id: `N-${st.num}s`,
-      title: `${st.num} ${st.name} · staged(근경 무대)`,
-      saveName,
-      sceneCard: true,
-      note: `저장: <code>apps/web/public/assets/scenes/${saveName}</code> · 디에게틱 막간 무대 — 캐릭터 스프라이트가 설 지면`,
-      prompt: `Close-range ground-level stage composition for character sprites to stand on: solid walkable ground occupying the bottom third of the frame, eye-level or slightly elevated camera, middle-ground scenery, NO distant aerial or panoramic view. No people, no text. ${place}. Mood/context: ${st.intro.en}\n\n${SCENE_STYLE}`,
-      _neg: SCENE_NEGATIVE,
-    });
-  }
-
   SECTIONS.push({
     id: 'N',
-    title: 'N. 시나리오 씬 배경 (54장 + staged 11 — 27스테이지 × intro/outro)',
-    desc: '각 스테이지 막간 씬의 풀스크린 배경 이미지. 인물·텍스트 없음(ScenePlayer가 초상·대사를 위에 얹음). 전투 establishing은 <b>야외 풍경</b>, 군략 회의·궁정·밀담은 <b>실내</b>(군막/궁정/밀실 — 원작 다양성, 현재 9씬). 마퀴 11스테이지엔 <b>staged(근경 무대)</b> 변형 추가 — 디에게틱 막간에서 캐릭터 스프라이트가 설 지면 위주의 근경 구도. 생성 후 ⬇ 저장 → apps/web/public/assets/scenes/ 에 배치하면 게임 막간 씬에 즉시 반영. 16:9 webp 변환 적용.',
+    title: 'N. 시나리오 씬 배경 (54장 — 27스테이지 × intro/outro)',
+    desc: '각 스테이지 막간 씬의 풀스크린 배경 이미지. 인물·텍스트 없음(ScenePlayer가 초상·대사를 위에 얹음). 전투 establishing은 <b>야외 풍경</b>, 군략 회의·궁정·밀담은 <b>실내</b>(군막/궁정/밀실 — 원작 다양성, 현재 9씬). 생성 후 ⬇ 저장 → apps/web/public/assets/scenes/ 에 배치하면 게임 막간 씬에 즉시 반영. 16:9 webp 변환 적용.',
     items: sceneItems,
-  });
-})();
-
-/* ───────────────────────── SA. 씬 배우 (디에게틱 막간 스테이지 — 스펙 v2 E-1) ───────────────────────── */
-/*
-  탈것·전투장비 없는 맨몸/평상 차림 standing idle 전신 SD 1장. 투명 배경, facing=screen-left.
-  전투 SD와 같은 화풍이되 mount/시그니처 무기 주입 없음. 붙여넣기 = PNG 그대로
-  assets/scene-actors/{key}.png 저장(알파 보존 — webp 변환 금지).
-*/
-(function() {
-  const ACTOR_STYLE = 'Art style: detailed painterly chibi (SD, ~2.5 heads) character, East Asian ink-wash + soft cel shading, crisp readable silhouette, muted earth tones with gold/jade accents, clean even lighting, NO baked ground shadow — the SAME rendering style as the game\'s battle-map SD units, but a single standing figure for a story interlude scene.';
-  const ACTOR_NEGATIVE = 'Avoid: mount, horse, chariot, weapon, combat stance, ground shadow, text, labels, watermark, UI, frame, busy background, white background, checkerboard background, solid black background, different characters between cells, photorealistic, anime-cel, Koei-style.';
-  const SCENE_ACTORS = [
-    { key: 'liubei',     name: '유비',   desc: 'Liu Bei as a humble young man in plain hanfu robes with a straw-woven belt, gentle dignified face, standing calmly' },
-    { key: 'guanyu',     name: '관우',   desc: 'Guan Yu with his magnificent long black beard, deep-green civilian robe, standing tall with quiet gravity, unarmed' },
-    { key: 'zhangfei',   name: '장비',   desc: 'Zhang Fei with bristling whiskers, rough dark tunic, burly frame, standing with arms crossed, unarmed' },
-    { key: 'zhaoyun',    name: '조운',   desc: 'Zhao Yun as a young gallant man in a plain white-silver tunic, upright posture, unarmed' },
-    { key: 'zhugeliang', name: '제갈량', desc: 'Zhuge Liang in a scholar\'s crane-feather robe holding a feather fan, serene, standing' },
-    { key: 'lvbu',       name: '여포',   desc: 'Lu Bu in a crimson-and-gold tunic with twin pheasant-tail plumes, imposing, standing, unarmed' },
-    { key: 'caocao',     name: '조조',   desc: 'Cao Cao in a dark noble robe with subtle gold trim, sharp calculating gaze, standing composed' },
-    { key: 'zhouyu',     name: '주유',   desc: 'Zhou Yu as an elegant young Wu commander in a refined red-and-white robe, standing gracefully, unarmed' },
-  ];
-  const actorItems = SCENE_ACTORS.map(a => ({
-    id: `SA-${a.key}`,
-    title: `${a.name} 씬 배우`,
-    sceneActorCard: true,
-    actorKey: a.key,
-    note: `저장: <code>assets/scene-actors/${a.key}.png</code> (PNG 알파 유지)`,
-    prompt: `ONE image containing a horizontal row of exactly 3 cells on a fully transparent background, cells evenly spaced with clear transparent gaps and NO overlap. The SAME full-body SD character in all 3 cells — identical face, outfit, hair and identity in every cell. The 3 cells are subtle IDLE ANIMATION FRAMES of the character standing and talking: cell 1 = arms relaxed at rest, cell 2 = slight breathing shift with one hand gently raised mid-gesture, cell 3 = small head tilt with the gesture hand moved — differences stay subtle so the frames loop naturally as an idle/talk animation. All 3 figures share the SAME ground baseline (feet aligned) and the SAME scale. ${a.desc}. No mount, no weapon, no combat stance — plain everyday attire for a story interlude. Transparent background, NO ground shadow baked in. FACING SCREEN-LEFT in every cell: body and gaze angled toward the viewer's left (mirrored in code for the other direction).\n\n${ACTOR_STYLE}`,
-    _neg: ACTOR_NEGATIVE,
-  }));
-  SECTIONS.push({
-    id: 'SA',
-    title: 'SA. 씬 배우 (8명 — 디에게틱 막간 스테이지)',
-    desc: '디에게틱 막간 씬(StagedScenePlayer)에 세우는 <b>맨몸 standing idle 전신 SD</b>. 탈것·무기·전투장비 없음, 투명 배경, facing=screen-left. 붙여넣으면 <b>PNG 그대로</b> assets/scene-actors/{key}.png 로컬+R2 저장(알파 보존 — webp 변환 안 함). 미생성 캐릭터는 게임이 front 포즈→초상→실루엣으로 폴백.',
-    items: actorItems,
   });
 })();
 
@@ -1800,10 +1733,6 @@ function buildPrompt(item) {
     /* 씬 카드: 프롬프트 안에 SCENE_STYLE 이미 포함됨 — 앞에 prefix 추가 없이 body만, 마지막에 네거티브 */
     parts.push(body);
     parts.push(item._neg || SCENE_NEGATIVE);
-  } else if (item.sceneActorCard) {
-    /* 씬 배우 카드: 프롬프트 안에 ACTOR 스타일 이미 포함 — body + 네거티브만 */
-    parts.push(body);
-    if (item._neg) parts.push(item._neg);
   } else if (item.vfx) {
     parts.push(VFX_PREFIX);
     parts.push(body);
@@ -1829,7 +1758,6 @@ const TAB_DEFS = [
   { id: 'pose',    label: '① SD 포즈시트',  secs: ['S'] },
   { id: 'portrait',label: '② 초상시트',     secs: ['I'] },
   { id: 'scene',   label: '③ 시나리오 씬',  secs: ['N'] },
-  { id: 'actor',   label: '🎭 씬 배우',     secs: ['SA'] },
   { id: 'duel',    label: '⚔ 일기토',       secs: ['DUEL'] },
   { id: 'item',    label: '④ 아이템',       secs: ['ITEMS'] },
   { id: 'ui',      label: 'UI',             secs: ['D','L'] },
@@ -1843,7 +1771,9 @@ const TAB_DEFS = [
 const SECID_TO_TAB = {};
 for (const tab of TAB_DEFS) for (const sid of tab.secs) SECID_TO_TAB[sid] = tab.id;
 
+/* 저장된 탭 id가 제거된 탭(예: 옛 'actor')이면 첫 탭으로 폴백 — 빈 보드 방지. */
 let activeTab = localStorage.getItem('ab_tab') || TAB_DEFS[0].id;
+if (!TAB_DEFS.some(t => t.id === activeTab)) activeTab = TAB_DEFS[0].id;
 
 function renderTabs() {
   const tabbar = document.getElementById('tabbar');
@@ -1865,7 +1795,6 @@ function cardGamePaths(item) {
   if (item.tile) { const a = Array.isArray(item.tile) ? item.tile : [item.tile]; return a.map(t => `assets/tiles/${t}`); }
   if (item.objectSheet) return [`assets/objects/_sheet_${item.objectSheet}.png`];
   if (item.sceneCard && item.saveName) return [`assets/scenes/${item.saveName}`];
-  if (item.sceneActorCard && item.actorKey) return [`assets/scene-actors/${item.actorKey}.png`];
   if (item.duelPair) return [`assets/duels/${item.duelPair}.webp`];
   if (item.portraitSheet && item.portraitGroup) return [`assets/ui/portraits/_sheet_${item.portraitGroup}.png`];
   if (item.itemSheet && item.itemGroup) return [`assets/ui/items/_sheet_${item.itemGroup}.png`];
@@ -2171,10 +2100,7 @@ async function addImageToCard(cardId, blob) {
   const fixedWebpName = item && item.sceneCard && item.saveName
     ? item.saveName
     : (item && item.duelPair ? `${item.duelPair}.webp` : null);
-  if (item && item.sceneActorCard && item.actorKey) {
-    /* SA 씬 배우: PNG 원본 그대로(알파 보존 — webp 변환 금지), 고정 파일명 {actorKey}.png */
-    name = `${item.actorKey}.png`;
-  } else if (fixedWebpName) {
+  if (fixedWebpName) {
     /* 씬/일기토 카드: webp 변환 + 고정 파일명 ({stageId}-intro.webp | {쌍}.webp) */
     name = fixedWebpName;
     try {
@@ -2200,19 +2126,7 @@ async function addImageToCard(cardId, blob) {
   document.querySelector(`#card-${CSS.escape(cardId)} .drop`).appendChild(thumbNode(rec));
   updateProgress();
   const tileFile = tileTarget(item, cardId);
-  if (item && item.sceneActorCard && item.actorKey) {
-    /* SA 씬 배우(디에게틱 막간): assets/scene-actors/{key}.png — 알파 보존 PNG 드롭인.
-       frames: serve.py가 투명 세로 갭으로 최대 3프레임 자동 분할({key}.png/_2/_3 — ActorSprite 플립북).
-       단일 인물이면 분할 없이 그대로(1프레임 = 정지 하위호환). */
-    rec.gamePath = `assets/scene-actors/${name}`;
-    try {
-      const res = await applyToGame(rec.gamePath, finalBlob, { frames: true });
-      const fr = res.frames && res.frames.frames > 1 ? ` · ${res.frames.frames}프레임 분할` : '';
-      toast(`🎭 ${name} → 씬 배우 적용 완료${fr}${res.r2 ? ' (+R2)' : ''}. 게임 새로고침하면 보입니다`);
-    } catch (e) {
-      toast(`${name} 저장됨 (게임 적용 실패: ${e.message} — :8080 서버 켜졌는지 확인)`);
-    }
-  } else if (item && item.sceneCard) {
+  if (item && item.sceneCard) {
     rec.gamePath = `assets/scenes/${name}`;
     try {
       const res = await applyToGame(rec.gamePath, finalBlob);

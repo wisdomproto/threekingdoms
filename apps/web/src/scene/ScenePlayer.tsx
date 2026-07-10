@@ -10,7 +10,7 @@
  *  - speaker 없는 줄 = **내레이션** — 초상·화자명 없는 중앙 서술 박스(정세·이동·시간 경과).
  *  - line.bg = 그 줄부터 배경 전환(회의→행군→전장). 미지정 줄은 직전 배경 유지.
  *
- * 진행 로직 = useSceneProgression / 표현 조각 = parts/ (StagedScenePlayer와 공유).
+ * 진행 로직 = useSceneProgression / 표현 조각 = parts/.
  */
 import type { ScenarioScene } from "@tk/data";
 import { useSceneProgression } from "./useSceneProgression";
