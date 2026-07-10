@@ -98,13 +98,25 @@ Identify every region by its EXACT fill hex color (tile interiors; the faint gri
 Painterly continuous terrain, blend region edges naturally. ABSOLUTELY NO walls, gates, buildings, tents, watchtowers, bridges, fences, crates or any standing object — ONLY flat ground/terrain (structures are added afterward as separate top-down game objects). Strict top-down view, flat with NO isometric angle and NO 3D height. The input image carries a faint dark tile-grid overlay — use it ONLY as a precise spatial alignment guide so every terrain region lands exactly on its tiles, but do NOT reproduce it: render smooth continuous terrain with NO visible grid lines, NO hard outlines around regions, NO text, NO characters, NO UI.
 The painting must continue all the way to the image edges (for seamless tiling with neighboring map sections).`;
 
+/* 씬 맵(scene-*) 전용 변형 — 막간 v4 어드벤처 씬(docs/superpowers/specs/2026-07-10-adventure-map-scenes-design.md):
+   전투맵의 "엄격 top-down·구조물 절대 금지"만 뒤집는다 — RPG쯔꾸르 문법의 높은 3/4 각(단 top-down 아님),
+   건물 정면 파사드·실내 가구 허용. 색→지형 hex 매핑·격자 정렬 지시·이음새 지시는 CHUNK_PROMPT와 동일 유지. */
+const SCENE_CHUNK_PROMPT =
+`Elevated three-quarter view (high camera angle, but NOT strict top-down) scene map for a story sequence in a tactics game, traditional East Asian ink-wash painting (수묵 담채), muted earth tones, soft brush texture and paper grain, LOW contrast so game units read clearly on top.
+Repaint this color-block layout EXACTLY (keep every region's position, shape and size):
+Identify every region by its EXACT fill hex color (tile interiors; the faint grid lines are slightly darker shades of the same colors — ignore them when color-matching): #D9CF9D (pale tan) = open dry-dirt ground / village street; #A8C686 (light green) = grassland meadow; #4A6E46 (dark green) = trees / orchard foliage; #8C7A5E (brown) = bare rocky ground; #5A5048 (dark grey-brown) = rocky cliff / ravine; #C7B58F (khaki) = dry cracked wasteland; #6A9EC9 (blue) = calm water; #6E6E76 (grey) = stone wall or paved courtyard — walls drawn WITH their front facade visible; #7A6A52 (dark taupe) = gateway — a gate structure with a visible front facade; #E0B87A, #CF9E6A, #C9A86E (orange-tan) = building / interior floor — buildings with visible front facades and roofs, and interior furniture (tables, mats, counters, shelves, jars) ARE allowed and encouraged; #B08A5A (tan-brown) = water beneath a small footbridge (bridge allowed).
+Unlike the battle maps, standing structures ARE allowed here: draw buildings, walls, gates and furniture in the elevated 3/4 RPG style — front facades and interiors visible, the ground plane staying aligned to the grid. NO people, NO characters anywhere. The input image carries a faint dark tile-grid overlay — use it ONLY as a precise spatial alignment guide so every region lands exactly on its tiles, but do NOT reproduce it: NO visible grid lines, NO hard outlines around regions, NO text, NO UI.
+The painting must continue all the way to the image edges (for seamless tiling with neighboring map sections).`;
+
 // 활성 맵의 타일 박스 크기(manifest.box)를 프롬프트 첫 줄에 자동 주입 — 맵 바꿔도 숫자 수동 수정 불필요.
+// 맵 id 가 scene- 으로 시작하면 씬 맵 변형(SCENE_CHUNK_PROMPT)을 쓴다.
 function promptFor(st) {
   const b = st && st.box;
   const head = (b && b.length === 2)
     ? `This image is ONE ${b[0]}×${b[1]}-tile section of a larger top-down battlefield map; each cell of the faint grid overlay = exactly one game tile.\n`
     : '';
-  return head + CHUNK_PROMPT;
+  const isScene = !!(st && String(st.mapId || '').startsWith('scene-'));
+  return head + (isScene ? SCENE_CHUNK_PROMPT : CHUNK_PROMPT);
 }
 
 const STAGES = window.CHUNK_STAGES || {};
