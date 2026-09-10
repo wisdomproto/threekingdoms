@@ -1,0 +1,32 @@
+{
+  "sfx": {
+    "cancel": "sfx/cancel.mp3",
+    "chest": "sfx/chest.mp3",
+    "click": "sfx/click.mp3",
+    "coin": "sfx/coin.mp3",
+    "combo": "sfx/combo.mp3",
+    "confirm": "sfx/confirm.mp3",
+    "crit": "sfx/crit.mp3",
+    "defeat": "sfx/defeat.mp3",
+    "duel": "sfx/duel.mp3",
+    "flank": "sfx/flank.mp3",
+    "hit": "sfx/hit.mp3",
+    "levelup": "sfx/levelup.mp3",
+    "lose": "sfx/lose.mp3",
+    "phase": "sfx/phase.mp3",
+    "pierce": "sfx/pierce.mp3",
+    "reinforce": "sfx/reinforce.mp3",
+    "slash": "sfx/slash.mp3",
+    "spell": "sfx/spell.mp3",
+    "star": "sfx/star.mp3",
+    "ultimate": "sfx/ultimate.mp3",
+    "victory": "sfx/victory.mp3"
+  },
+  "bgm": {
+    "battle": "bgm/battle.mp3",
+    "battleBoss": "bgm/battleBoss.mp3",
+    "menu": "bgm/menu.mp3",
+    "scene": "bgm/scene.mp3",
+    "title": "bgm/title.mp3"
+  }
+}
