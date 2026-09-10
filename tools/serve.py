@@ -216,7 +216,7 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
                 if not os.path.isdir(d):
                     continue
                 files = os.listdir(d)
-                if any(f.startswith("front_") and f.endswith(".png") for f in files) \
+                if any(f.startswith("front_") and f.endswith((".webp", ".png")) for f in files) \
                         or "manifest.json" in files:
                     sprites.append(name)
         po_dir = os.path.join(PUBLIC, "assets", "ui", "portraits")
@@ -342,6 +342,19 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
         except Exception as e:  # noqa: BLE001
             self._json(400, {"ok": False, "error": f"base64 디코드 실패: {e}"})
             return
+
+        # ⓪ 타일/오브젝트는 런타임이 .webp 만 읽는다(to_webp.py 전환) — 붙여넣은 PNG 를 무손실 webp 로 저장
+        base = rel.rsplit("/", 1)[-1]
+        if (rel.startswith("assets/tiles/") or rel.startswith("assets/objects/"))                 and rel.endswith(".png") and not base.startswith("_"):
+            try:
+                from PIL import Image
+                import io as _io
+                buf = _io.BytesIO()
+                Image.open(_io.BytesIO(data)).save(buf, "WEBP", lossless=True, method=6)
+                data, rel, ctype = buf.getvalue(), rel[:-4] + ".webp", "image/webp"
+            except Exception as e:  # noqa: BLE001 — PIL 없으면 PNG 그대로(게임은 못 읽음, 로그로 알림)
+                sys.stdout.write(f"[save-asset] webp 전환 실패({e}) — PNG 그대로 저장: {rel}
+")
 
         # ① 로컬에 쓰기 — assets→public/(dev 즉시 반영), 청크→repo docs/art/chunks/(중간산출물)
         dest = os.path.join(ROOT, *rel.split("/")) if is_chunk else os.path.join(PUBLIC, *rel.split("/"))

@@ -33,7 +33,8 @@ POSE_ORDER = ["front_idle", "front_move", "front_attack", "back_idle", "back_mov
 
 
 def poses_in(dirpath):
-    return [p for p in POSE_ORDER if os.path.isfile(os.path.join(dirpath, p + ".png"))]
+    return [p for p in POSE_ORDER
+            if os.path.isfile(os.path.join(dirpath, p + ".webp")) or os.path.isfile(os.path.join(dirpath, p + ".png"))]
 
 
 def main():

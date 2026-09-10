@@ -25,6 +25,9 @@
 """
 import sys, os, json
 from PIL import Image
+
+# 컷 결과 webp 품질 (PNG 대비 ≈12% — Poki 초기 로드 8MB). 외곽선이 뭉개지면 올린다.
+WEBP_QUALITY = 90
 from bg_remove import clean_bg, needs_bg_cleanup, drop_small_components, trim_alpha
 
 # Derive ROOT from this file's location: sprite-pipeline → tools → repo root

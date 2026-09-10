@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""맵 오브젝트 시트(K-4 성곽 등) → /assets/objects/{key}.png 고정격자 컷.
+"""맵 오브젝트 시트(K-4 성곽 등) → /assets/objects/{key}.webp 고정격자 컷.
 
 설계: docs/superpowers/specs/2026-06-21-hybrid-map-rendering-design.md (Chunk 3 컷 도구).
 에셋보드 「K. 지형」의 오브젝트 시트(top-down, 한 장 N조각)를 고정 RxC 격자로 잘라
@@ -119,17 +119,17 @@ def cut(sheet_path, keys, grid=None):
     os.makedirs(OBJECTS, exist_ok=True)
     saved = []
     for key, cell in zip(keys, crops):
-        out = os.path.join(OBJECTS, f"{key}.png")
-        cell.save(out)
+        out = os.path.join(OBJECTS, f"{key}.webp")
+        cell.save(out, "WEBP", lossless=True, method=6)  # 오토타일 이음새 보존 = 무손실
         saved.append((key, cell.size))
-        print(f"  → {key}.png  {cell.size}")
+        print(f"  → {key}.webp  {cell.size}")
     # 폴백 복사 (고립 벽 등 시트에 없는 키)
     for dst, src in FALLBACK_COPY.items():
-        src_path = os.path.join(OBJECTS, f"{src}.png")
+        src_path = os.path.join(OBJECTS, f"{src}.webp")
         if os.path.exists(src_path):
-            Image.open(src_path).save(os.path.join(OBJECTS, f"{dst}.png"))
+            Image.open(src_path).save(os.path.join(OBJECTS, f"{dst}.webp"), "WEBP", lossless=True, method=6)
             saved.append((f"{dst}(={src})", None))
-            print(f"  → {dst}.png  (폴백: {src} 복사)")
+            print(f"  → {dst}.webp  (폴백: {src} 복사)")
     return saved
 
 

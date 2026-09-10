@@ -6,10 +6,10 @@
  *   getSprite(spriteId, pose) → Texture | null (null = 폴백 색 사각형 유지 필수)
  * v0.2(지형 타일): loadTiles()로 tiles-manifest.json v2를 읽어 지형 이미지 타일을 비동기 로드.
  *   manifest v2 형식: { terrainId: { kind: "macro"|"tile", size: 6|1, count: N } }
- *   - kind="macro": terrainId_macro_{n}.png (288×288). getTerrain(id, x, y)에서
+ *   - kind="macro": terrainId_macro_{n}.webp (288×288). getTerrain(id, x, y)에서
  *     (x%6, y%6) 기반 서브렉트 Texture를 반환 — 인접 타일이 같은 매크로를 공유해 이어진 지도처럼 보임.
  *     캐시 키: "${id}:macro:${n}:${mx}:${my}" (지형당 최대 6×6×count개).
- *   - kind="tile": terrainId_{n}.png (96×96). 기존 변형 해시 방식 유지.
+ *   - kind="tile": terrainId_{n}.webp (96×96). 기존 변형 해시 방식 유지.
  *   getTerrain 시그니처: (terrainId, x, y) — variant 해시는 내부에서 처리.
  *   미보유 지형/로드 전엔 기존 단색 베이크 반환 (폴백 유지 필수).
  *   외곽선: macro 지형은 없음(이어짐이 핵심), tile 지형은 alpha 0.25로 완화.
@@ -71,40 +71,40 @@ type TilesManifest = Record<string, TileManifestEntry>;
  */
 const DECO_FILES: Record<string, string> = {
   // forest는 캐노피 바닥(E-3)이 곧 숲 — 나무 데코 없음.
-  mountain: "mountain.png", // 바위 바닥(E-2) 위 봉우리 액센트 (희소 배치, TerrainLayer DECO_DENSITY)
-  gate: "gate.png",
-  village: "hut.png",
-  barracks: "camp.png",
-  depot: "storehouse.png",
-  bridge: "bridge.png",
+  mountain: "mountain.webp", // 바위 바닥(E-2) 위 봉우리 액센트 (희소 배치, TerrainLayer DECO_DENSITY)
+  gate: "gate.webp",
+  village: "hut.webp",
+  barracks: "camp.webp",
+  depot: "storehouse.webp",
+  bridge: "bridge.webp",
 };
 
 /** 맵 구조물 오브젝트 텍스처 (ObjectLayer). 성벽 세그먼트(오토타일) + 성문 상태. /assets/objects/.
  *  미보유 키는 로드 실패 → null, ObjectLayer가 스킵(아트는 후속 컷 도구로 채움). */
 const OBJECT_FILES: Record<string, string> = {
-  wall_single: "wall_single.png", wall_end: "wall_end.png", wall_straight: "wall_straight.png",
-  wall_corner: "wall_corner.png", wall_tee: "wall_tee.png", wall_cross: "wall_cross.png",
-  gate_closed: "gate_closed.png", gate_open: "gate_open.png", gate_destroyed: "gate_destroyed.png",
+  wall_single: "wall_single.webp", wall_end: "wall_end.webp", wall_straight: "wall_straight.webp",
+  wall_corner: "wall_corner.webp", wall_tee: "wall_tee.webp", wall_cross: "wall_cross.webp",
+  gate_closed: "gate_closed.webp", gate_open: "gate_open.webp", gate_destroyed: "gate_destroyed.webp",
   // K-5/K-6 데코 오브젝트 (objectModel.DECO_OBJECT_MAP가 지형→이 키로 매핑). 미보유 시 옛 데코 폴백.
-  rock_cluster: "rock_cluster.png", rock_cliff: "rock_cliff.png", tree_leafy: "tree_leafy.png",
-  supply_cart: "supply_cart.png", camp_gate: "camp_gate.png",
-  rock_boulder: "rock_boulder.png", // 산지 혼합 바위(decoVariant MOUNTAIN_MIX_KEY)
+  rock_cluster: "rock_cluster.webp", rock_cliff: "rock_cliff.webp", tree_leafy: "tree_leafy.webp",
+  supply_cart: "supply_cart.webp", camp_gate: "camp_gate.webp",
+  rock_boulder: "rock_boulder.webp", // 산지 혼합 바위(decoVariant MOUNTAIN_MIX_KEY)
   // K-9 거점·다리(2026-07-04 — 지형 회복 §10과 함께 거점 식별 강화). 미보유 시 폴백:
   // 거점=옛 데코(hut/camp/storehouse), 다리=기존 동작(painted 숨김/타일 도하 표식).
-  village_hut: "village_hut.png", camp_tent: "camp_tent.png", depot_store: "depot_store.png",
-  village_hut2: "village_hut2.png", // 마을 혼합 변형(decoVariant VILLAGE_MIX_KEY)
-  bridge_v: "bridge_v.png", bridge_h: "bridge_h.png",
+  village_hut: "village_hut.webp", camp_tent: "camp_tent.webp", depot_store: "depot_store.webp",
+  village_hut2: "village_hut2.webp", // 마을 혼합 변형(decoVariant VILLAGE_MIX_KEY)
+  bridge_v: "bridge_v.webp", bridge_h: "bridge_h.webp",
   // 정밀 데코 바닥 소품(@tk/data DECORATION_KINDS와 1:1) — 여기 미등록 키는 getObject=null로
   // 조용히 생략된다("수레만 보이던" 2026-06-30 버그). 새 kind 추가 시 이 레지스트리도 함께.
-  banner_command: "banner_command.png", pennants: "pennants.png", signal_flag: "signal_flag.png",
-  campfire: "campfire.png", brazier: "brazier.png",
-  debris_pile: "debris_pile.png", debris_cart: "debris_cart.png",
-  debris_weapons: "debris_weapons.png", debris_siege: "debris_siege.png",
-  shrub: "shrub.png", reeds: "reeds.png",
+  banner_command: "banner_command.webp", pennants: "pennants.webp", signal_flag: "signal_flag.webp",
+  campfire: "campfire.webp", brazier: "brazier.webp",
+  debris_pile: "debris_pile.webp", debris_cart: "debris_cart.webp",
+  debris_weapons: "debris_weapons.webp", debris_siege: "debris_siege.webp",
+  shrub: "shrub.webp", reeds: "reeds.webp",
   // 실내 씬 소품(막간 v4 MapScene — DECORATION_KINDS 실내 확장과 1:1). 아트 미생성 시
   // getObject=null → 해당 소품만 조용히 생략(painted가 가구를 그릴 수 있으므로 무붕괴 드롭인).
-  table: "table.png", carpet: "carpet.png", screen: "screen.png",
-  counter: "counter.png", stool: "stool.png",
+  table: "table.webp", carpet: "carpet.webp", screen: "screen.webp",
+  counter: "counter.webp", stool: "stool.webp",
 };
 const OBJECT_BASE = assetUrl("/assets/objects");
 
@@ -121,21 +121,21 @@ const FX_BASE = assetUrl("/assets/fx");
  * 미등록 지형은 단색 베이크 폴백.
  */
 const GROUND_FILES: Record<string, string> = {
-  plain: "ground_plain.png",
-  grass: "ground_grass.png",
-  waste: "ground_waste.png",
-  mountain: "ground_mountain.png", // E-2 바위 스크리
-  forest: "ground_forest.png", // E-3 캐노피
-  river: "ground_river.png", // E-4 강물 (파일 없으면 단색 폴백 — loadGround 파일별 내성)
+  plain: "ground_plain.webp",
+  grass: "ground_grass.webp",
+  waste: "ground_waste.webp",
+  mountain: "ground_mountain.webp", // E-2 바위 스크리
+  forest: "ground_forest.webp", // E-3 캐노피
+  river: "ground_river.webp", // E-4 강물 (파일 없으면 단색 폴백 — loadGround 파일별 내성)
   // 전용 바닥 미보유 지형 — 기존 텍스처 재사용으로 회색 단색 폴백 제거(리뷰 P0).
-  wall: "ground_mountain.png", // 성벽 = 돌
-  fort: "ground_mountain.png", // 요새 = 돌
-  cliff: "ground_mountain.png", // 절벽 = 돌
-  gate: "ground_plain.png", // 관문 바닥(데코=문) = 흙
-  barracks: "ground_plain.png", // 병영(데코=막사) = 흙
-  village: "ground_plain.png", // 촌락(데코=오두막)
-  depot: "ground_plain.png", // 창고(데코=곳간)
-  bridge: "ground_plain.png", // 다리 — 물 텍스처(E-4) 전까지 흙
+  wall: "ground_mountain.webp", // 성벽 = 돌
+  fort: "ground_mountain.webp", // 요새 = 돌
+  cliff: "ground_mountain.webp", // 절벽 = 돌
+  gate: "ground_plain.webp", // 관문 바닥(데코=문) = 흙
+  barracks: "ground_plain.webp", // 병영(데코=막사) = 흙
+  village: "ground_plain.webp", // 촌락(데코=오두막)
+  depot: "ground_plain.webp", // 창고(데코=곳간)
+  bridge: "ground_plain.webp", // 다리 — 물 텍스처(E-4) 전까지 흙
 };
 const GROUND_SIZE = 576; // 48 × 12 — 서브렉트가 깔끔히 wrap
 
@@ -276,7 +276,7 @@ export class TextureResolver {
     for (const [spriteId, entry] of Object.entries(manifest)) {
       if (onlySpriteIds && !onlySpriteIds.has(spriteId)) continue;
       for (const pose of entry.poses) {
-        const url = `${this.spriteBase}/${spriteId}/${pose}.png`;
+        const url = `${this.spriteBase}/${spriteId}/${pose}.webp`;
         loadQueue.push({ spriteId, pose, url });
       }
     }
@@ -314,8 +314,8 @@ export class TextureResolver {
 
   /**
    * tiles-manifest.json v2 { terrainId: { kind, size, count } } 를 로드.
-   * - kind="macro": {terrainId}_macro_{n}.png (288×288) 로드 → 서브렉트는 온디맨드.
-   * - kind="tile": {terrainId}_{n}.png (96×96) 로드 → 기존 외곽선 합성 베이크.
+   * - kind="macro": {terrainId}_macro_{n}.webp (288×288) 로드 → 서브렉트는 온디맨드.
+   * - kind="tile": {terrainId}_{n}.webp (96×96) 로드 → 기존 외곽선 합성 베이크.
    * 실패 시 조용히 폴백(단색 베이크) 유지 — mount는 계속 진행.
    */
   /** 특징 지형 오브젝트 데코 로드 (실패해도 베이스 유지 — throw 안 함). */
@@ -548,8 +548,8 @@ export class TextureResolver {
     for (const [terrainId, meta] of Object.entries(normalizedManifest)) {
       for (let n = 0; n < meta.count; n++) {
         const url = meta.kind === "macro"
-          ? `${this.tileBase}/${terrainId}_macro_${n}.png`
-          : `${this.tileBase}/${terrainId}_${n}.png`;
+          ? `${this.tileBase}/${terrainId}_macro_${n}.webp`
+          : `${this.tileBase}/${terrainId}_${n}.webp`;
         loadQueue.push({ terrainId, variant: n, url, kind: meta.kind });
       }
     }

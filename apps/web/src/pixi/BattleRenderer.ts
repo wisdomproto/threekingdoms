@@ -11,6 +11,7 @@
  */
 import { Application, Container, Graphics, Sprite, Texture } from "pixi.js";
 import type { Side } from "@tk/data";
+import { spriteCandidates } from "./spriteMap";
 import type { BattleContext, BattleEvent, BattleState, Coord } from "@tk/engine";
 import { camp } from "@tk/engine";
 import type { Presenter, PresentedSnapshot } from "../battle/eventPlayer";
@@ -244,13 +245,22 @@ export class BattleRenderer implements Presenter {
         Math.min(1, spriteFrac * 0.85 + bootState.tiles * 0.1 + bootState.mapBg * 0.05),
       );
     };
+    // 이 전투가 실제로 쓰는 스프라이트만(초기 배치 + 스테이지 증원, 후보 사다리 전부 = 폴백 보존).
+    // 종전 매니페스트 전 종(174키) 로드는 Poki 초기 로드 8MB를 뚫었다. 승급분은 unitPromoted에서 추가.
+    const neededSprites = new Set<string>();
+    const needUnit = (commanderId: string, classId: string, side: Side): void => {
+      const tier = this.ctx.data.unitClasses[classId]?.tier ?? 1;
+      for (const id of spriteCandidates(commanderId, classId, side, tier)) neededSprites.add(id);
+    };
+    for (const u of store.settledState.units) needUnit(u.id, u.classId, u.side);
+    for (const r of this.ctx.stage.reinforcements ?? []) for (const u of r.units) needUnit(u.commanderId, u.classId, u.side);
     const spritesBoot = textures
       .loadSprites((done, total) => {
         bootState.spritesDone = done;
         bootState.spritesTotal = total;
         scheduleRefresh();
         emitBoot();
-      })
+      }, neededSprites)
       .then(() => units.refreshSprites())
       .catch((e) => console.warn("[BattleRenderer] loadSprites 예외 (폴백 유지):", e));
     // 자체 컷아웃 리그(§4) — spriteId에 스켈레톤이 있으면 베이크 스프라이트를 리그로 격상.
@@ -817,6 +827,12 @@ export class BattleRenderer implements Presenter {
     playSfx(SFX.levelup);
     if (view) {
       view.setClass(e.toClassId, tier);
+      // 새 티어 코스메틱(t2/t3)은 부트 세트에 없다 — 도착 즉시 교체(없으면 현재 스프라이트 유지 = 무회귀).
+      const side = this.store?.settledState.units.find((u) => u.id === e.unitId)?.side;
+      if (side) {
+        void s.textures.loadSprites(undefined, new Set(spriteCandidates(e.unitId, e.toClassId, side, tier)))
+          .then(() => s.units.refreshSprites());
+      }
       void s.fx.impactFlash(gridToWorld({ x: view.gridX, y: view.gridY }), true); // 금빛 폭발
     }
     await s.fx.banner(`승급! ${name} — ${from} → ${to}`, DUEL_BANNER_MS);

@@ -195,6 +195,7 @@ function apply(): void {
 export function playBgm(id: BgmTrackId): void {
   desiredId = id;
   apply();
+  void loadBgmFile(id); // 파일은 요청 시점에 그 트랙만 (부팅 일괄 preload 금지 — Poki 8MB)
 }
 
 /** 현재 BGM 정지(페이드아웃). 씬 등 무음 구간용. */
@@ -210,27 +211,41 @@ export function resumeBgm(): void {
   apply();
 }
 
-/** 매니페스트 BGM 파일을 디코드해 적재(드롭인). preload 실패 키는 절차적 폴백. */
-export async function preloadBgmFiles(manifest: AudioManifest): Promise<void> {
+/** 진행 중인 트랙 파일 로드(중복 fetch 방지). */
+const inflight = new Map<string, Promise<void>>();
+
+/** 트랙 파일 1개를 fetch→decode해 적재. 도착 시 그 트랙이 desired면 절차적→파일로 재전환.
+ *  실패(404/디코드)는 절차적 폴백 유지. 같은 id 동시 요청은 하나로 합친다. */
+function loadBgmFile(id: BgmTrackId): Promise<void> {
   const ctx = audio.context();
-  if (!ctx) return;
-  fileManifest = manifest.bgm;
-  await Promise.all(
-    Object.entries(fileManifest).map(async ([id, path]) => {
-      try {
-        const res = await fetch(resolveAudioPath(path));
-        if (!res.ok) return;
-        const arr = await res.arrayBuffer();
-        const buf = await ctx.decodeAudioData(arr);
-        fileBuffers.set(id, buf);
-      } catch {
-        // 폴백 = 절차적 드론.
+  const path = fileManifest[id];
+  if (!ctx || !path || fileBuffers.has(id)) return Promise.resolve();
+  const running = inflight.get(id);
+  if (running) return running;
+  const p = (async () => {
+    try {
+      const res = await fetch(resolveAudioPath(path));
+      if (!res.ok) return;
+      const buf = await ctx.decodeAudioData(await res.arrayBuffer());
+      fileBuffers.set(id, buf);
+      if (desiredId === id) {
+        currentId = null; // apply가 동일 id 가드를 통과하도록
+        apply();
       }
-    }),
-  );
-  // 이미 절차적으로 재생 중인 트랙에 파일이 도착했으면 그 트랙만 파일로 재전환.
-  if (currentId && fileBuffers.has(currentId)) {
-    currentId = null; // apply가 동일 id 가드를 통과하도록
-    apply();
-  }
+    } catch {
+      // 폴백 = 절차적 드론.
+    } finally {
+      inflight.delete(id);
+    }
+  })();
+  inflight.set(id, p);
+  return p;
+}
+
+/** 매니페스트 등록(드롭인). 파일은 **현재 요청된 트랙만** 즉시 로드하고 나머지는 playBgm 시점에
+ *  개별 로드한다 — 종전 5곡 일괄 fetch+decode(≈12MB, PCM 10배)는 첫 화면 전에 Poki 초기 로드
+ *  8MB를 넘겼다. 절차적 폴백은 그대로(파일 도착 전엔 드론). */
+export async function preloadBgmFiles(manifest: AudioManifest): Promise<void> {
+  fileManifest = manifest.bgm;
+  if (desiredId) await loadBgmFile(desiredId);
 }

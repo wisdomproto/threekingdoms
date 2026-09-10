@@ -44,7 +44,7 @@ function battleAssetUrls(stageId: string): string[] {
     for (const sid of spriteCandidates(u.commanderId, u.classId, u.side)) {
       if (seen.has(sid)) continue;
       seen.add(sid);
-      urls.push(assetUrl(`/assets/sprites/${sid}/front_idle.png`));
+      urls.push(assetUrl(`/assets/sprites/${sid}/front_idle.webp`));
     }
   }
   return urls;
