@@ -146,7 +146,7 @@ const GROUND_SIZE = 576; // 48 × 12 — 서브렉트가 깔끔히 wrap
  */
 export type SpritePose = string;
 
-// assetUrl로 베이스를 한 번만 해석 → 이하 `${SPRITE_BASE}/...` 조합이 자동으로 R2/CDN을 탄다.
+// assetUrl로 베이스를 한 번만 해석 → 이하 `${this.spriteBase}/...` 조합이 자동으로 R2/CDN을 탄다.
 const SPRITE_BASE = assetUrl("/assets/sprites");
 const TILE_BASE = assetUrl("/assets/tiles");
 
@@ -202,7 +202,15 @@ export class TextureResolver {
   /** Pixi Renderer 참조 — 타일 텍스처 베이크에 필요 */
   private readonly renderer: Renderer;
 
-  constructor(renderer: Renderer) {
+  private readonly spriteBase: string;
+  private readonly tileBase: string;
+  private readonly objectBase: string;
+  private readonly fxBase: string;
+  constructor(renderer: Renderer, private readonly localAssets = false) {
+    this.spriteBase = localAssets ? "/assets/sprites" : SPRITE_BASE;
+    this.tileBase = localAssets ? "/assets/tiles" : TILE_BASE;
+    this.objectBase = localAssets ? "/assets/objects" : OBJECT_BASE;
+    this.fxBase = localAssets ? "/assets/fx" : FX_BASE;
     this.renderer = renderer;
     // 지형 14종 단색 폴백 — 바닥 텍스처(getGround) 미보유 지형에만 보인다.
     // 평평한 단색만. 빗금/삼각형 장식은 "미완성"으로 보여 제거(리뷰 P2). 그리드는 HighlightLayer 담당.
@@ -250,10 +258,10 @@ export class TextureResolver {
    *   실제 등장하는 소수 유닛(예: 삼형제)도 색사각으로 남았다. 매니페스트 선두가 삼형제라
    *   점진 적용 시 첫 라운드(수백 ms)에 바로 표시된다.
    */
-  async loadSprites(onProgress?: (done: number, total: number) => void): Promise<void> {
+  async loadSprites(onProgress?: (done: number, total: number) => void, onlySpriteIds?: ReadonlySet<string>): Promise<void> {
     let manifest: Manifest;
     try {
-      const res = await fetch(`${SPRITE_BASE}/manifest.json`);
+      const res = await fetch(`${this.spriteBase}/manifest.json`);
       if (!res.ok) {
         console.warn(`[TextureResolver] manifest.json 로드 실패 (${res.status}) — 색 사각형 폴백 유지`);
         return;
@@ -266,8 +274,9 @@ export class TextureResolver {
 
     const loadQueue: Array<{ spriteId: string; pose: string; url: string }> = [];
     for (const [spriteId, entry] of Object.entries(manifest)) {
+      if (onlySpriteIds && !onlySpriteIds.has(spriteId)) continue;
       for (const pose of entry.poses) {
-        const url = `${SPRITE_BASE}/${spriteId}/${pose}.png`;
+        const url = `${this.spriteBase}/${spriteId}/${pose}.png`;
         loadQueue.push({ spriteId, pose, url });
       }
     }
@@ -312,11 +321,11 @@ export class TextureResolver {
   /** 특징 지형 오브젝트 데코 로드 (실패해도 베이스 유지 — throw 안 함). */
   private async loadDecos(): Promise<void> {
     const entries = Object.entries(DECO_FILES);
-    const urls = entries.map(([, f]) => `${TILE_BASE}/${f}`);
+    const urls = entries.map(([, f]) => `${this.tileBase}/${f}`);
     try {
       const loaded = await Assets.load<Texture>(urls);
       for (const [terrainId, f] of entries) {
-        const tex = loaded[`${TILE_BASE}/${f}`];
+        const tex = loaded[`${this.tileBase}/${f}`];
         if (tex) this.decoTex.set(terrainId, tex);
       }
       console.info(`[TextureResolver] 지형 데코 로드 완료: ${this.decoTex.size}종`);
@@ -336,7 +345,7 @@ export class TextureResolver {
    */
   async loadMapBackground(stageId: string): Promise<Texture | null> {
     for (const ext of ["webp", "png"]) {
-      const url = assetUrl(`/assets/maps/${stageId}.${ext}`);
+      const url = this.localAssets ? `/assets/maps/${stageId}.${ext}` : assetUrl(`/assets/maps/${stageId}.${ext}`);
       try {
         const head = await fetch(url, { method: "HEAD" });
         if (!head.ok) continue;
@@ -431,7 +440,7 @@ export class TextureResolver {
     const entries = Object.entries(GROUND_FILES);
     await Promise.all(entries.map(async ([terrainId, f]) => {
       try {
-        const tex = await Assets.load<Texture>(`${TILE_BASE}/${f}`);
+        const tex = await Assets.load<Texture>(`${this.tileBase}/${f}`);
         if (tex) this.groundTex.set(terrainId, tex);
       } catch { /* 파일 없음 → 그 지형은 단색 폴백 */ }
     }));
@@ -479,7 +488,7 @@ export class TextureResolver {
     await Promise.allSettled(
       Object.entries(OBJECT_FILES).map(async ([key, f]) => {
         try {
-          const tex = await Assets.load<Texture>(`${OBJECT_BASE}/${f}`);
+          const tex = await Assets.load<Texture>(`${this.objectBase}/${f}`);
           if (tex) this.objectTex.set(key, tex);
         } catch {
           // 미보유 파일 = 그 키만 스킵(아트 미생성 단계 정상)
@@ -492,11 +501,11 @@ export class TextureResolver {
   /** fx 텍스처 로드 (실패해도 빈 맵 유지 — throw 안 함, 전부 폴백). */
   private async loadFx(): Promise<void> {
     const entries = Object.entries(FX_FILES);
-    const urls = entries.map(([, f]) => `${FX_BASE}/${f}`);
+    const urls = entries.map(([, f]) => `${this.fxBase}/${f}`);
     try {
       const loaded = await Assets.load<Texture>(urls);
       for (const [key, f] of entries) {
-        const tex = loaded[`${FX_BASE}/${f}`];
+        const tex = loaded[`${this.fxBase}/${f}`];
         if (tex) this.fxTex.set(key, tex);
       }
       console.info(`[TextureResolver] fx 로드 완료: ${this.fxTex.size}종`);
@@ -512,7 +521,7 @@ export class TextureResolver {
     await this.loadGround();
     let manifest: TilesManifest;
     try {
-      const res = await fetch(`${TILE_BASE}/tiles-manifest.json`);
+      const res = await fetch(`${this.tileBase}/tiles-manifest.json`);
       if (!res.ok) {
         console.warn(`[TextureResolver] tiles-manifest.json 로드 실패 (${res.status}) — 단색 폴백 유지`);
         return;
@@ -539,8 +548,8 @@ export class TextureResolver {
     for (const [terrainId, meta] of Object.entries(normalizedManifest)) {
       for (let n = 0; n < meta.count; n++) {
         const url = meta.kind === "macro"
-          ? `${TILE_BASE}/${terrainId}_macro_${n}.png`
-          : `${TILE_BASE}/${terrainId}_${n}.png`;
+          ? `${this.tileBase}/${terrainId}_macro_${n}.png`
+          : `${this.tileBase}/${terrainId}_${n}.png`;
         loadQueue.push({ terrainId, variant: n, url, kind: meta.kind });
       }
     }

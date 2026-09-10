@@ -582,7 +582,7 @@ export const SceneUnitSchema = z.object({
   id: z.string(),                                   // 씬 내 안정 참조
   sprite: z.string(),                               // 스프라이트 폴더 키 직접 저작("liubei-foot")
   cell: SceneCellSchema,
-  facing: z.enum(["left", "right"]).optional(),     // 기본 left(코드 미러 규약)
+  facing: z.enum(["left", "right", "up", "down"]).optional(),
   hidden: z.boolean().optional(),                   // true = enter로 걸어 들어오기 전
 });
 const SceneBubbleSchema = z.object({ id: z.string(), mark: z.enum(["...", "!", "?"]) });
@@ -597,7 +597,7 @@ const ReactLineSchema = z.object({
 export const MapSceneLineSchema = z.object({
   // 액션(대사 전 순차 실행 — 정렬: exit→move/face→enter→pose)
   move: z.array(z.object({ id: z.string(), to: SceneCellSchema })).optional(),
-  face: z.array(z.object({ id: z.string(), dir: z.enum(["left", "right"]) })).optional(),
+  face: z.array(z.object({ id: z.string(), dir: z.enum(["left", "right", "up", "down"]) })).optional(),
   enter: z.array(z.object({ id: z.string(), from: SceneCellSchema, to: SceneCellSchema })).optional(),
   exit: z.array(z.object({ id: z.string(), to: SceneCellSchema })).optional(),
   pose: z.array(z.object({ id: z.string(), pose: z.string() })).optional(),

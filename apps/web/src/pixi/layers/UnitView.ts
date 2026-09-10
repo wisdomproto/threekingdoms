@@ -70,9 +70,16 @@ export interface UnitViewInit {
 export interface UnitViewOpts {
   /** false = 병력 바·SP 바 생성/갱신 생략(막간 씬 유닛 — 전투 수치 없음). 기본 true. */
   bars?: boolean;
+  spriteHeight?: number;
 }
 
 export class UnitView extends Container {
+  private externalSceneArt = false;
+  /** Scene actors can replace artwork while retaining the proven movement carrier. */
+  useExternalSceneArt(): void {
+    this.externalSceneArt = true;
+    for (const child of this.children) child.visible = false;
+  }
   readonly unitId: string;
   gridX: number;
   gridY: number;
@@ -123,6 +130,7 @@ export class UnitView extends Container {
   private pose: string = "idle";
   /** false = 병력/SP 바 미표시·미갱신(씬 모드). 생성자 opts로 고정. */
   private readonly bars: boolean;
+  private readonly spriteHeight: number;
 
   /** 스프라이트 기본 스케일(텍스처 높이 맞춤). 호흡은 이 값에 곱한다. */
   private baseScale = 1;
@@ -156,6 +164,7 @@ export class UnitView extends Container {
   constructor(init: UnitViewInit, textures: TextureResolver, tweens: TweenRunner, opts?: UnitViewOpts) {
     super();
     this.bars = opts?.bars ?? true;
+    this.spriteHeight = opts?.spriteHeight ?? SPRITE_DISPLAY_H;
     this.unitId = init.id;
     this.unitSide = init.side;
     this.gridX = init.x;
@@ -304,6 +313,7 @@ export class UnitView extends Container {
    * 텍스처가 없으면 폴백(fallbackBase)을 표시.
    */
   private applySpriteTexture(view: "front" | "back", pose: string): void {
+    if (this.externalSceneArt) return;
     if (this.skeletonView) return; // 스켈레톤 경로 — 스프라이트 포즈 텍스처 미사용
     this.pose = pose; // 미러 부호는 포즈에 따라 다름 (applyScale) — 폴백 경로에서도 추적
     if (this.spriteCands.length === 0) return; // 후보 없음 → 항상 색사각 폴백
@@ -319,7 +329,7 @@ export class UnitView extends Container {
     // 텍스처 높이를 SPRITE_DISPLAY_H에 맞게 스케일
     const src = tex.source;
     const srcH = src ? src.height : tex.height;
-    this.baseScale = srcH > 0 ? SPRITE_DISPLAY_H / srcH : 1;
+    this.baseScale = srcH > 0 ? this.spriteHeight / srcH : 1;
 
     this.spriteBase.texture = tex;
     this.spriteBase.visible = true;
@@ -404,7 +414,7 @@ export class UnitView extends Container {
     if (this.skeletonView) {
       // 스켈레톤도 발 기준(원점=발끝, feetY=타일 하단). 바/라벨은 스프라이트 경로와 동일 위치.
       const feetY = TILE_SIZE / 2;
-      const headY = feetY - SPRITE_DISPLAY_H;
+      const headY = feetY - this.spriteHeight;
       this.barBg.position.set(-BAR_WIDTH / 2, feetY + 2);
       this.barFill.position.set(-BAR_WIDTH / 2, feetY + 2);
       this.spBarBg.position.set(-BAR_WIDTH / 2, feetY + 2 + BAR_HEIGHT + 1);
@@ -418,7 +428,7 @@ export class UnitView extends Container {
       // 유닛이 위 칸에 뜨지 않고 자기 칸 안에 서도록 한다. anchor=(0.5,1.0)이므로 발=spriteBase.y.
       const feetY = TILE_SIZE / 2;
       this.spriteBase.position.set(0, feetY);
-      const headY = feetY - SPRITE_DISPLAY_H;
+      const headY = feetY - this.spriteHeight;
       this.barBg.position.set(-BAR_WIDTH / 2, feetY + 2);          // 발 아래 2px
       this.barFill.position.set(-BAR_WIDTH / 2, feetY + 2);
       this.spBarBg.position.set(-BAR_WIDTH / 2, feetY + 2 + BAR_HEIGHT + 1);   // SP 바 = 병력 바 아래

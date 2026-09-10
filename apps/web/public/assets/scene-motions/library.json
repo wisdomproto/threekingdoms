@@ -1,0 +1,771 @@
+{
+  "version": 1,
+  "actors": {
+    "liubei-foot": {
+      "name": "유비",
+      "clips": {
+        "down.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 0,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 800
+            }
+          ]
+        },
+        "down.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 1,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 130
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 0,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 80
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 2,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 130
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 0,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 80
+            }
+          ]
+        },
+        "up.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 3,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 800
+            }
+          ]
+        },
+        "up.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 4,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 150
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 3,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 80
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 5,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 130
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 3,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 80
+            }
+          ]
+        },
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 1,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 140
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 110
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 2,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 140
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 110
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 400
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 3,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 900
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 600
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 4,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 900
+            }
+          ]
+        },
+        "left.kneel": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 4,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 300
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 5,
+              "row": 0,
+              "columns": 6,
+              "rows": 3,
+              "ms": 1200
+            }
+          ]
+        },
+        "left.sit": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-seated.png",
+              "columns": 2,
+              "rows": 2,
+              "col": 0,
+              "row": 0,
+              "ms": 800
+            }
+          ]
+        },
+        "left.sit-talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-seated.png",
+              "columns": 2,
+              "rows": 2,
+              "col": 1,
+              "row": 0,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "guanyu-foot": {
+      "name": "관우",
+      "clips": {
+        "down.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 0,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 800
+            }
+          ]
+        },
+        "down.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 1,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 130
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 0,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 80
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 2,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 130
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 0,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 80
+            }
+          ]
+        },
+        "up.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 3,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 800
+            }
+          ]
+        },
+        "up.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 4,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 130
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 3,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 80
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 5,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 130
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 3,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 80
+            }
+          ]
+        },
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 1,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 140
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 110
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 2,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 140
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 110
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 400
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 3,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 900
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 600
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 4,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 900
+            }
+          ]
+        },
+        "left.kneel": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 4,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 300
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 5,
+              "row": 1,
+              "columns": 6,
+              "rows": 3,
+              "ms": 1200
+            }
+          ]
+        }
+      }
+    },
+    "zhangfei-foot": {
+      "name": "장비",
+      "clips": {
+        "down.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 0,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 800
+            }
+          ]
+        },
+        "down.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 1,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 130
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 0,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 80
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 2,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 130
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 0,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 80
+            }
+          ]
+        },
+        "up.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 3,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 800
+            }
+          ]
+        },
+        "up.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 4,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 130
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 3,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 80
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 5,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 130
+            },
+            {
+              "image": "/assets/scene-motions/brothers-directions.png",
+              "col": 3,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 80
+            }
+          ]
+        },
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 1,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 140
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 110
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 2,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 140
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 110
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 400
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 3,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 900
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 600
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 0,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 4,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 900
+            }
+          ]
+        },
+        "left.kneel": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 4,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 300
+            },
+            {
+              "image": "/assets/scene-motions/brothers-gestures.png",
+              "col": 5,
+              "row": 2,
+              "columns": 6,
+              "rows": 3,
+              "ms": 1200
+            }
+          ]
+        },
+        "left.sit": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-seated.png",
+              "columns": 2,
+              "rows": 2,
+              "col": 0,
+              "row": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.sit-talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-seated.png",
+              "columns": 2,
+              "rows": 2,
+              "col": 1,
+              "row": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "innkeeper-scene": {
+      "name": "주인장",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/townspeople.png",
+              "col": 0,
+              "row": 0,
+              "columns": 2,
+              "rows": 1,
+              "ms": 1000
+            }
+          ]
+        }
+      }
+    },
+    "civilian-scene": {
+      "name": "백성",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/townspeople.png",
+              "col": 1,
+              "row": 0,
+              "columns": 2,
+              "rows": 1,
+              "ms": 1000
+            }
+          ]
+        }
+      }
+    }
+  }
+}

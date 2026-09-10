@@ -29,12 +29,17 @@ function SceneRoute(): React.ReactElement | null {
   const slot = stage?.scenario?.[type];
   const parts = useMemo(() => (slot ? normalizeSceneSlot(slot) : []), [slot]);
   // 파트 인덱스 — 씬 식별(outro→다음 intro 등)이 바뀌면 처음부터.
-  const [pi, setPi] = useState(0);
+  // Authoring preview may start at a chosen part; normal campaign URLs have no part parameter.
+  const requestedPart = Number(params.get("part") ?? 0);
+  const startPart = process.env.NODE_ENV === "development" && Number.isInteger(requestedPart)
+    ? Math.max(0, Math.min(requestedPart, parts.length - 1)) : 0;
+  const [pi, setPi] = useState(startPart);
+  const [replay, setReplay] = useState(0);
   useEffect(() => {
-    setPi(0);
-  }, [stageId, type]);
+    setPi(startPart);
+  }, [stageId, type, startPart]);
   // resetKey = 현재 씬 식별 → outro→다음 intro(/scene→/scene)로 바뀌면 페이드 자동 해제.
-  const { fadeTo, overlay } = useFadeNav(`${stageId}:${type}`);
+  const { fadeTo, overlay } = useFadeNav(`${stageId}:${type}:${replay}`);
 
   // 다음 단계 목적지. intro→상점, outro→다음 스테이지 intro(없으면 전장 선택),
   // outroDefeat(패배 후)→전장 선택(같은 스테이지 재도전).
@@ -54,6 +59,7 @@ function SceneRoute(): React.ReactElement | null {
 
   if (parts.length === 0) return null;
   const part = parts[Math.min(pi, parts.length - 1)]!;
+  const playerKey = `${stageId}:${type}:${replay}:${pi}`;
   const next = (): void => {
     if (pi >= parts.length - 1) fadeTo(target());
     else setPi((i) => i + 1);
@@ -61,10 +67,16 @@ function SceneRoute(): React.ReactElement | null {
   return (
     <>
       {"map" in part ? (
-        <MapScenePlayer key={pi} scene={part} title={stage?.name} onComplete={next} />
+        <MapScenePlayer key={playerKey} scene={part} title={stage?.name} onComplete={next} />
       ) : (
-        <ScenePlayer key={pi} scene={part} title={stage?.name} onComplete={next} />
+        <ScenePlayer key={playerKey} scene={part} title={stage?.name} onComplete={next} />
       )}
+      <button type="button" onClick={() => { setPi(0); setReplay(n => n + 1); }}
+        style={{ position: "fixed", top: "calc(12px + env(safe-area-inset-top))", right: 132, zIndex: 20,
+          background: "rgba(20,17,14,0.8)", color: "#d8ba7b", border: "1px solid #6f5a34",
+          borderRadius: 4, padding: "4px 12px", fontSize: 12, cursor: "pointer" }}>
+        처음부터 ↺
+      </button>
       {overlay}
     </>
   );

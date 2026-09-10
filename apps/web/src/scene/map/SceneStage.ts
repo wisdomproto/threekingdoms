@@ -23,9 +23,11 @@ import { TerrainLayer } from "../../pixi/layers/TerrainLayer";
 import { UnitView } from "../../pixi/layers/UnitView";
 import { playSfx, SFX } from "../../audio";
 import { findScenePath, type Cell, type SceneUnitState, type Walkable } from "./interpreter";
+import { ActorView, SCENE_ACTOR_HEIGHT } from "./ActorView";
+import { MOTION_URL, validateLibrary } from "../motions";
 
 /** 스프라이트 표시 높이(UnitView SPRITE_DISPLAY_H와 동일 산식) — 말풍선 머리 위 배치용. */
-const SPRITE_H = Math.round(TILE_SIZE * 1.25);
+
 /** 말풍선 청동 톤 — battle/hud/frames.ts HUD 토큰(HUD_INK/HUD_BRONZE_DIM/HUD_PARCHMENT)의 hex 대응. */
 const BUBBLE_INK = 0x18140d;
 const BUBBLE_BRONZE = 0x6f5a34;
@@ -44,8 +46,12 @@ export class SceneStage {
   private booted: Booted | null = null;
   private destroyRequested = false;
   private readonly views = new Map<string, UnitView>();
+  private readonly actors = new Map<string, ActorView>();
   private readonly bubbles = new Map<string, Container>();
   private walkable: Walkable = () => false;
+  private cinematic = false;
+  private cameraActor: string | null = null;
+  private cameraSpeaker: string | null = null;
   private mapW = 0;
   private mapH = 0;
   /** skipToState/새 줄 시작이 올린다 — 진행 중 걷기 체인 무효화(타일 경계에서 끊김). */
@@ -60,6 +66,7 @@ export class SceneStage {
   async init(parent: HTMLElement, scene: MapScene, map: BattleMap, walkable: Walkable): Promise<void> {
     if (this.booted) throw new Error("SceneStage: 이미 init됨");
     this.walkable = walkable;
+    this.cinematic = scene.map === "scene-01-tavern" || scene.map === "scene-01-orchard";
     this.mapW = map.width;
     this.mapH = map.height;
 
@@ -83,7 +90,7 @@ export class SceneStage {
     app.canvas.style.touchAction = "none";
 
     const tweens = new TweenRunner(app.ticker);
-    const textures = new TextureResolver(app.renderer);
+    const textures = new TextureResolver(app.renderer, process.env.NODE_ENV === "development");
     const world = new Container();
     world.sortableChildren = true;
 
@@ -125,7 +132,7 @@ export class SceneStage {
         },
         textures,
         tweens,
-        { bars: false },
+        { bars: false, spriteHeight: SCENE_ACTOR_HEIGHT },
       );
       view.setFacing(u.facing === "right" ? 1 : -1);
       view.visible = !(u.hidden ?? false);
@@ -155,7 +162,7 @@ export class SceneStage {
       });
     };
     void textures
-      .loadSprites(() => scheduleRefresh())
+      .loadSprites(() => scheduleRefresh(), new Set(scene.units.map(u => u.sprite)))
       .then(() => scheduleRefresh())
       .catch((e) => console.warn("[SceneStage] loadSprites 예외 (폴백 유지):", e));
     // painted 배경 — /assets/maps/{scene.map}.webp 규약(맵 id 키).
@@ -175,6 +182,8 @@ export class SceneStage {
     // ── idle 호흡 틱 ──
     const tick = (): void => {
       for (const v of this.views.values()) v.tickIdle(app.ticker.deltaMS);
+      for (const a of this.actors.values()) a.tick(app.ticker.deltaMS);
+      this.updateCamera(app.ticker.deltaMS);
     };
     app.ticker.add(tick);
 
@@ -190,20 +199,54 @@ export class SceneStage {
 
     this.booted = { app, tweens, textures, world, resizeObserver, tick };
     this.fit();
+    // Await scene actors before allowing dialogue to advance: never play their entrance unseen.
+    try {
+      const response = await fetch(MOTION_URL, { cache: "no-store" });
+      const library: unknown = await response.json();
+      if (validateLibrary(library)) await Promise.all(scene.units.map(async u => {
+        const motion = library.actors[u.sprite]; if (!motion) return;
+        const actor = new ActorView(motion, scene.map === "scene-01-tavern" ? { x: u.id === "zhangfei" ? -22 : 0, y: 8 } : undefined); await actor.load();
+        if (this.destroyRequested) { actor.destroy({ children: true }); return; }
+        const view = this.views.get(u.id)!;
+        // Retain UnitView as the position/bubble carrier, replacing just its artwork.
+        view.useExternalSceneArt();
+        view.addChild(actor); this.actors.set(u.id, actor);
+        actor.setState("idle", u.facing ?? "left");
+      }));
+    } catch (e) { console.warn("[SceneStage] 동작 이미지 로드 실패", e); }
   }
 
-  /** 카메라 = 맵 전체 화면 fit(레터박스 중앙 정렬). 씬 맵은 ~15×10이라 팬/줌 불필요. */
-  private fit(): void {
+  /** Frame the actors, keeping the lower dialogue area clear and map edges covered. */
+  private fit(): void { this.updateCamera(0, true); }
+
+  private updateCamera(ms: number, snap = false): void {
     const b = this.booted;
     if (!b) return;
-    const sw = b.app.screen.width;
-    const sh = b.app.screen.height;
-    const ww = this.mapW * TILE_SIZE;
-    const wh = this.mapH * TILE_SIZE;
-    if (ww <= 0 || wh <= 0 || sw <= 0 || sh <= 0) return;
-    const scale = Math.min(sw / ww, sh / wh);
+    const sw = b.app.screen.width, sh = b.app.screen.height;
+    const ww = this.mapW * TILE_SIZE, wh = this.mapH * TILE_SIZE;
+    if (Math.min(sw, sh, ww, wh) <= 0) return;
+    const scale = Math.min(sw / ww, sh / wh) * (this.cinematic ? 2.1 : 1);
+    let x = ww / 2, y = wh / 2;
+    if (this.cinematic) {
+      const followed = this.views.get(this.cameraActor ?? "");
+      const speaker = this.views.get(this.cameraSpeaker ?? "");
+      const heroes = ["liubei", "guanyu", "zhangfei"]
+        .map(id => this.views.get(id)).filter((v): v is UnitView => !!v?.visible);
+      const anchor = followed?.visible ? followed : speaker?.visible ? speaker : heroes[0];
+      const subjects = followed?.visible ? [followed] : anchor
+        ? [anchor, ...heroes.filter(v => v !== anchor && Math.hypot(v.x-anchor.x, v.y-anchor.y) < TILE_SIZE*4)] : [];
+      if (subjects.length) {
+        x = subjects.reduce((n,v) => n+v.x,0)/subjects.length;
+        y = subjects.reduce((n,v) => n+v.y,0)/subjects.length - 8;
+      } else { x = TILE_SIZE*7.5; y = TILE_SIZE*8; }
+    }
+    const clamp = (pos: number, viewport: number, size: number) => size <= viewport
+      ? (viewport-size)/2 : Math.max(viewport-size, Math.min(0,pos));
+    const tx = clamp(sw/2-x*scale, sw, ww*scale);
+    const ty = clamp(sh*(this.cinematic ? 0.43 : 0.5)-y*scale, sh, wh*scale);
+    const blend = snap ? 1 : 1-Math.exp(-Math.min(ms,100)/220);
     b.world.scale.set(scale);
-    b.world.position.set((sw - ww * scale) / 2, (sh - wh * scale) / 2);
+    b.world.position.set(b.world.x+(tx-b.world.x)*blend, b.world.y+(ty-b.world.y)*blend);
   }
 
   /** 씬 소품 배치 — ObjectLayer.placeDeco 문법(그림자 타원 + 바닥 앵커). 미보유 키 = 조용히 생략. */
@@ -235,12 +278,16 @@ export class SceneStage {
    * x방향으로 덮은 facing을 인터프리터 상태로 수렴시킨다(라이브 종료 == 스킵 == 인터프리터).
    */
   async runLineActions(line: MapSceneLine, target: ReadonlyMap<string, SceneUnitState>): Promise<void> {
+    this.cameraSpeaker = ({ "유비": "liubei", "관우": "guanyu", "장비": "zhangfei", "주인장": "innkeeper", "의병": "jeonryeong" } as Record<string,string>)[line.speaker ?? ""] ?? line.bubble?.id ?? line.enter?.at(-1)?.id ?? line.move?.at(-1)?.id ?? null;
     const gen = ++this.actionGen; // 새 줄 = 이전 잔여 걷기 무효화
     for (const { id, to } of line.exit ?? []) {
       const v = this.views.get(id);
       if (!v) continue;
       await this.walk(gen, id, v, to);
       if (this.actionGen !== gen) return;
+      this.cameraActor = null;
+      const state = target.get(id);
+      if (state) this.actors.get(id)?.setState(state.pose, state.facing);
       v.visible = false;
     }
     for (const { id, to } of line.move ?? []) {
@@ -248,6 +295,9 @@ export class SceneStage {
       if (!v) continue;
       await this.walk(gen, id, v, to);
       if (this.actionGen !== gen) return;
+      this.cameraActor = null;
+      const state = target.get(id);
+      if (state) this.actors.get(id)?.setState(state.pose, state.facing);
     }
     for (const { id, from, to } of line.enter ?? []) {
       const v = this.views.get(id);
@@ -256,6 +306,9 @@ export class SceneStage {
       v.visible = true;
       await this.walk(gen, id, v, to);
       if (this.actionGen !== gen) return;
+      this.cameraActor = null;
+      const state = target.get(id);
+      if (state) this.actors.get(id)?.setState(state.pose, state.facing);
     }
     // face = enter 뒤(같은 줄 face가 걸음 파생 facing을 교정하는 최종 발언권 — 인터프리터 미러)
     for (const { id, dir } of line.face ?? []) {
@@ -268,6 +321,7 @@ export class SceneStage {
     for (const [id, t] of target) {
       const v = this.views.get(id);
       if (v) v.setFacing(t.facing === "right" ? 1 : -1);
+      this.actors.get(id)?.setState(t.pose, t.facing);
     }
   }
 
@@ -277,13 +331,15 @@ export class SceneStage {
    * (잔여 트윈이 스냅 위치를 덮었을 수 있으므로).
    */
   private async walk(gen: number, id: string, v: UnitView, to: Cell): Promise<void> {
+    this.cameraActor = id;
     const path = findScenePath(this.walkable, [v.gridX, v.gridY], to);
     for (let i = 1; i < path.length; i++) {
       const from = path[i - 1]!;
       const step = path[i]!;
+      this.actors.get(id)?.setState("move", step[0] !== from[0] ? (step[0] > from[0] ? "right" : "left") : (step[1] > from[1] ? "down" : "up"));
       await v.moveAlong(
         [{ x: from[0], y: from[1] }, { x: step[0], y: step[1] }],
-        undefined,
+        260,
         () => playSfx(SFX.step),
       );
       if (this.actionGen !== gen) {
@@ -296,6 +352,7 @@ export class SceneStage {
   /** 인터프리터 상태를 즉시 적용(탭 스킵/최종 상태) — 걷기 중단·순간 배치·포즈·표시 강제. */
   skipToState(states: ReadonlyMap<string, SceneUnitState>): void {
     this.actionGen++;
+    this.cameraActor = null;
     this.lastSnap = states;
     for (const id of this.views.keys()) this.applySnapFor(id);
   }
@@ -307,6 +364,7 @@ export class SceneStage {
     v.snapTo(s.cell[0], s.cell[1]);
     v.setFacing(s.facing === "right" ? 1 : -1);
     v.setPose(s.pose);
+    this.actors.get(id)?.setState(s.pose, s.facing);
     v.visible = !s.hidden;
   }
 
@@ -332,8 +390,9 @@ export class SceneStage {
     g.roundRect(-w / 2, -h / 2, w, h, 7).stroke({ width: 1.5, color: BUBBLE_BRONZE });
     const bubble = new Container();
     bubble.addChild(g, label);
-    // 컨테이너 원점 = 타일 중심. 발 = +TILE/2, 머리 = 발 - 스프라이트 높이 → 그 위 여백.
-    bubble.position.set(0, TILE_SIZE / 2 - SPRITE_H - 14);
+    // Include the bubble half-height AND tail; its bottom stays 12px above the actor's head.
+    const headY = TILE_SIZE / 2 - SCENE_ACTOR_HEIGHT;
+    bubble.position.set(0, headY - h / 2 - 6 - 12);
     v.addChild(bubble);
     this.bubbles.set(id, bubble);
   }
@@ -347,6 +406,7 @@ export class SceneStage {
     if (!b) return; // init 진행 중이면 init 내부 가드가 마무리
     this.booted = null;
     this.views.clear();
+    this.actors.clear();
     this.bubbles.clear();
     b.resizeObserver.disconnect();
     b.app.ticker.remove(b.tick);

@@ -3,7 +3,7 @@
 import type { MapScene } from "@tk/data";
 
 export type Cell = readonly [number, number];
-export type SceneUnitState = { cell: Cell; facing: "left" | "right"; pose: string; hidden: boolean };
+export type SceneUnitState = { cell: Cell; facing: "left" | "right" | "up" | "down"; pose: string; hidden: boolean };
 export type Walkable = (c: Cell) => boolean;
 
 export function nearestWalkable(walkable: Walkable, to: Cell): Cell {
@@ -44,9 +44,10 @@ export function findScenePath(walkable: Walkable, from: Cell, to: Cell): Cell[] 
   return [from]; // 도달 불가 — 출발지 유지(무붕괴)
 }
 
-/** 걸음 파생 facing(F-1) — net x-델타로 갱신. dx=0(순수 세로/제자리)은 불변. */
-function faceByDelta(s: SceneUnitState, dx: number): void {
+/** Four-way facing; explicit face actions override the direction derived from movement. */
+function faceByDelta(s: SceneUnitState, dx: number, dy: number): void {
   if (dx !== 0) s.facing = dx > 0 ? "right" : "left";
+  else if (dy !== 0) s.facing = dy > 0 ? "down" : "up";
 }
 
 /**
@@ -72,14 +73,14 @@ export function sceneUnitStates(
       const s = st.get(id);
       if (!s) return;
       const goal = nearestWalkable(walkable, to);
-      faceByDelta(s, goal[0] - s.cell[0]);
+      faceByDelta(s, goal[0] - s.cell[0], goal[1] - s.cell[1]);
       s.cell = goal;
     });
     l.enter?.forEach(({ id, from, to }) => {
       const s = st.get(id);
       if (!s) return;
       const goal = nearestWalkable(walkable, to);
-      faceByDelta(s, goal[0] - from[0]); // 걸어 들어온 방향 = from→to
+      faceByDelta(s, goal[0] - from[0], goal[1] - from[1]);
       s.cell = goal;
       s.hidden = false;
     });

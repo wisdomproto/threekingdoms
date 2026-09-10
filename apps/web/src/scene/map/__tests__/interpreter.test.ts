@@ -79,13 +79,15 @@ describe("걸음 파생 facing (F-1 — 라이브 걸음과 스킵 상태 수렴
     };
     expect(sceneUnitStates(s2, 0, walkable).get("b")!.facing).toBe("left");
   });
-  it("dx=0 move(순수 세로 이동) → facing 불변", () => {
+  it("세로 이동은 정면/뒷모습으로 바뀌고 스킵도 같은 방향을 유지", () => {
     const s2: MapScene = {
       ...scene,
       units: [{ id: "a", sprite: "s", cell: [0, 0], facing: "right" }],
       lines: [{ move: [{ id: "a", to: [0, 3] }] }],
     };
-    expect(sceneUnitStates(s2, 0, walkable).get("a")!.facing).toBe("right");
+    expect(sceneUnitStates(s2, 0, walkable).get("a")!.facing).toBe("down");
+    s2.lines.push({ move: [{ id: "a", to: [0, 1] }] });
+    expect(sceneUnitStates(s2, 1, walkable).get("a")!.facing).toBe("up");
   });
 });
 
