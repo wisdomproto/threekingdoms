@@ -55,3 +55,6 @@ tools/sprite-pipeline/gen/prompts.json
 # 리그 작업물 — 원본 시트(소스·재생성 가능, 런타임 미사용)·렌더 프리뷰는 추적 안 함
 apps/web/public/assets/skeletons/*/_source.png
 tools/sprite-pipeline/out/
+
+# 생성 원본 시트·프리뷰 샘플(대용량, 재생성 가능) — 슬라이스 결과만 public/assets 에 추적
+docs/art/samples/

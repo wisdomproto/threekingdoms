@@ -69,6 +69,7 @@
 <body>
 <header>
   <h1>캐릭터 에디터</h1>
+  <button class="btn bronze" onclick="window.open('http://localhost:3000/motion-editor?character='+encodeURIComponent((['liubei','guanyu','zhangfei'].includes(selId)?selId:'liubei')+'-foot'),'_blank')">동작 · 방향 편집 ↗</button>
   <button class="btn" id="openFiles">파일 열기</button>
   <button class="btn" id="paste">JSON 붙여넣기</button>
   <div class="sep"></div>
