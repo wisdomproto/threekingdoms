@@ -1,4 +1,4 @@
-> **문서 상태**: 2026-09-11 반입(원본 `three_kingdoms_web_srpg_design_guide.md`). **UX·디자인 규칙의 SSOT** — 아직 코드에 적용되지 않은 규칙이 많다. 현행과의 주요 차이: ① 전투 HUD는 청동 크롬 토큰(`apps/web/src/battle/hud/frames.ts`) — §6·§11은 P1 "HUD 충돌 정리"에서 적용 ② 에디터는 정적 HTML이 JSON을 직접 노출 — §4·5(Project Bar·Inspector 언어·Event builder)는 P1~P2 ③ 대화 UX는 타자기 + 건너뛰기만 — LOG/AUTO/속도는 P2 ④ 입문/Classic 공격 확정 분리 미구현(P2). 새 UI를 짤 때는 이 문서의 토큰·터치 타깃·QA 체크리스트를 먼저 적용한다.
+> **문서 상태**: 2026-09-11 반입, 같은 날 **v2**로 갱신(원본 `three_kingdoms_web_srpg_design_guide_v2.md` — 말미에 **Character Studio / Skin / Rig 디자인 가이드** 추가). **UX·디자인 규칙의 SSOT** — 아직 코드에 적용되지 않은 규칙이 많다. 현행과의 주요 차이: ① 전투 HUD는 청동 크롬 토큰(`apps/web/src/battle/hud/frames.ts`) — §6·§11은 P1 "HUD 충돌 정리"에서 적용 ② 에디터는 정적 HTML이 JSON을 직접 노출 — §4·5(Project Bar·Inspector 언어·Event builder)는 P1~P2 ③ 대화 UX는 타자기 + 건너뛰기만 — LOG/AUTO/속도는 P2 ④ 입문/Classic 공격 확정 분리 미구현(P2) ⑤ Character Studio는 미구현 — 현행은 `tools/rig-editor.html`(본·슬롯·클립 편집, Preview) + `/motion-editor`(씬 배우 클립)로, Studio 레이아웃·Progressive Complexity(Basic/Advanced)는 P2 Foundation부터. 새 UI를 짤 때는 이 문서의 토큰·터치 타깃·QA 체크리스트를 먼저 적용한다.
 
 # 삼국지 웹 SRPG 플랫폼 --- DESIGN GUIDE
 
@@ -503,3 +503,109 @@ Publish 후 버전, 공개 시각, URL, 변경사항, Rollback 가능 여부를 
 
 > **Creator는 개발툴이 아니라 누구나 이야기를 게임으로 만드는
 > 창작도구처럼 느껴져야 한다.**
+
+------------------------------------------------------------------------
+
+# Character Studio / Skin / Rig 디자인 가이드
+
+## Character Studio Layout
+
+``` text
+┌─────────────────────────────────────────────────────────┐
+│ 관우 / Character Studio       저장됨 ✓       ▶ Preview │
+├───────────┬───────────────────────────┬─────────────────┤
+│ Category  │       LIVE PREVIEW        │ Inspector       │
+│ Appearance│                           │                 │
+│ Equipment │                           │                 │
+│ Animation │                           │                 │
+│ Skills    │                           │                 │
+│ Skins     │                           │                 │
+├───────────┴───────────────────────────┴─────────────────┤
+│ Timeline / Events                                      │
+└─────────────────────────────────────────────────────────┘
+```
+
+## Progressive Complexity
+
+**Basic:** Body Template, 무기/갑옷/투구/말, 기본 Animation Archetype,
+Preview.\
+**Advanced:** Rig, Bone, Socket, Timeline, Animation Override, Skill
+Presentation, VFX marker.
+
+초보자에게 bone hierarchy를 처음부터 보여주지 않는다.
+
+## Rig Editor UX
+
+Preview 위에서 bone/socket을 직접 선택한다. Bone, selected bone, socket,
+attachment, timeline marker를 시각적으로 구분한다. Zoom/Pan, facing
+preview, draw order, reset transform, Undo/Redo를 제공한다.
+
+## Equipment Visual UX
+
+Helmet / Armor / Weapon / Shield / Cape / Mount 슬롯을 시각화한다. 선택
+즉시 Live Preview에 반영한다. **장비 능력치와 외형 설정은 분리된
+탭**으로 제공한다.
+
+## Animation Editor UX
+
+Timeline 기본 Track: - Animation - VFX - Sound - Camera - Gameplay Event
+
+`HIT` marker는 특별히 구분한다. 실제 피해 계산은 편집기가 아니라
+Gameplay Skill이 담당한다.
+
+## Skill Presentation Editor UX
+
+목표는 **필살기 연출을 코딩 없이 만드는 것**이다.
+
+Preset 후보: - Quick Slash - Heavy Strike - Charge - Projectile - AoE
+Burst - Cinematic Ultimate
+
+Preset 후 Animation/VFX/Camera/Sound/Cut-in/Timing만 교체해도 기본
+연출이 완성되게 한다.
+
+## Skin Editor UX
+
+``` text
+무신 관우
+✓ Portrait
+✓ Body
+✓ Armor
+✓ Weapon
+✓ Idle Animation
+✓ Attack Animation
+✓ Skill Presentation
+✓ VFX
+✓ Cut-in
+✓ Voice
+— Gameplay Stats unchanged
+```
+
+Presentation-only Skin에는 능력치 변경 없음 표시.
+
+## Character Preview
+
+Idle, Walk, Attack, Hit, Critical, Skill, Victory, Death, Mounted를 즉시
+테스트한다. Background/Facing/Speed/Loop/Hit pause/Low-quality mobile
+preview도 제공 가능하다.
+
+## Asset Browser
+
+Character, Weapon, Armor, Animation, VFX, Sound, Skin, Creator, Package,
+License로 필터링한다. 카드에는 Preview, 이름, 타입, 호환 Rig/Weapon
+Archetype, Package, License를 표시한다.
+
+## Character Presentation QA
+
+-   [ ] 장비 교체 시 attachment 정상
+-   [ ] 좌/우 facing socket 정상
+-   [ ] draw order 정상
+-   [ ] fallback animation 존재
+-   [ ] HIT marker와 판정 타이밍 연결
+-   [ ] animation이 없어도 gameplay 진행
+-   [ ] skin이 gameplay 결과를 의도치 않게 변경하지 않음
+-   [ ] 모바일 성능 예산 확인
+-   [ ] 누락 요소는 base skin으로 fallback
+-   [ ] Preview와 Battle Renderer 결과 일치
+-   [ ] Basic Creator는 rig를 몰라도 제작 가능
+-   [ ] Advanced Creator는 세부 제어 가능
+-   [ ] Presentation 편집도 Undo/Redo 지원

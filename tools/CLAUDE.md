@@ -8,6 +8,7 @@
 - **파이프라인** `tools/sprite-pipeline/`: `cut_posesheet.py`(9칸 → `front_*.webp` q90, `--flip`/`--grid`) · `cut_object_sheet.py`(무손실 webp) · `cut_fx_sheet.py`(png, additive) · `slice_portraits.py` · `bg_remove.py`(흰/체커/글로우/검정) · `rebuild_manifest.py`(webp/png 인식) · `export_layout.py`/`export_chunks.py`/`stitch_chunks.py`(painted 맵) · `to_webp.py`(일회 전환, 멱등) · `gen/`(Gemini 자동 생성 — paid tier, `.env.gemini`; `gen_assets.py --only {scene,portrait,sd,duel,objsheet}`).
 - **R2**: `upload-assets.py`(크기+ETag 변경분, `--dry-run`, `--delete`=오펀 정리) · `sync-from-r2.py`(R2 → 로컬). 자격증명 `.env.r2`.
 - **규약**: 런타임 이미지는 webp(fx·bg 제외) — 보드가 붙여넣은 타일/오브젝트 PNG는 serve.py가 저장 시 webp로 트랜스코드. 원본 시트(`_posesheet.png`, `_sheet_*`)는 png·미추적, `docs/art/samples/` 미추적, 스프라이트 폴더 gitignore(R2가 원본), `sprites/manifest.json`은 추적. SD facing = screen-left 고정.
+- **Character Studio 씨앗**: `tools/rig-editor.html`(본·슬롯·무기 어태치먼트·idle/move/attack/hit 클립 → `{name}.skeleton.json`) + `tools/sprite-pipeline/rig_render.py`(비전 자동튜닝) + `/motion-editor`. master-plan v2 Character Studio(Identity/Appearance/Rig/Equipment/Animation/Skills/VFX/Skins)는 P2 Foundation — Basic(템플릿 선택)/Advanced(본 직접 편집) 구분을 여기서 시작.
 - **방향**: 현 도구는 "개발자용 내부 툴"(master-plan §16) → P0 round-trip 무손실(에디터가 모르는 필드 보존) → P1 Project Store·Autosave·Undo → P2 챕터 중심 Creator·Story Editor. 새 기능은 **유저에게 공개할 도구** 기준으로 짓는다(내부 전용 하드코딩 금지). 생성(Gemini) 파이프라인은 운영자 도구로 남고 결과는 에셋팩으로 축적(master-plan §20).
 
 ## 4. 에셋 파이프라인

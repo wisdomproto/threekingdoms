@@ -9,6 +9,7 @@
 - **오디오**: manifest 드롭인(파일 없으면 절차적 신스). BGM은 `playBgm` 시점에 그 트랙만 지연 로드 — 부팅 일괄 preload 금지. 보스 BGM = 교전 트리거(`bossOf`).
 - **광고**: `AdService` 어댑터(stub/poki/crazygames/gd, `NEXT_PUBLIC_AD_PROVIDER`), 리워드 4지점 + 전면 1, adFree·타임아웃 폴백 = 진행 무손실.
 - **씬**: `stage.scenario` 슬롯 = VN 또는 파트 배열(MapScene). `ScenePlayer` / `MapScenePlayer`(SceneStage·interpreter), 빈 씬 가드. 배우 모션 = `/motion-editor` ↔ `assets/scene-motions/library.json`(POST `/api/scene-motions`, dev 전용).
+- **Presentation 분리**(master-plan v2): 엔진은 의미 이벤트만, 연출(애니·VFX·카메라·컷인·음성)은 Presentation 데이터. 출시는 베이크 프레임, 리그는 `UnitView.renderMode='skeleton'` 드롭인 — 그 인터페이스가 VisualProfile/RigProfile/AnimationSet(P1 Architecture)의 착지점. **스킨은 전투 계산을 바꾸지 않는다.** Studio Preview와 Battle Renderer는 같은 렌더러 재사용 원칙.
 - **HUD**: `battle/hud/frames.ts` 토큰(청동), 컬러 이모지 금지. design-guide §6·7(장식 최소·모바일 하단 패널·입문 공격 확정)은 **P1 "HUD 충돌 정리"**에서 적용 — 그 전까지 현행 토큰 유지.
 - **초기 로드 예산 = Poki 8MB**: 프리로드를 추가하기 전에 `next build` + 실제 네트워크 바이트로 측정(scene-motions 9MB PNG가 현재 최대 항목).
 - **결산(ResultSequence)이 메타 영속 책임**: 새 진행 데이터 = ①UnitVM 노출 ②metaStore reducer ③결산 저장 호출 3종 세트. `/battle?stage=__lab`(실험실)은 메타 불가침.

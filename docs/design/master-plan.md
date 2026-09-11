@@ -1,4 +1,4 @@
-> **문서 상태**: 2026-09-11 반입(원본 `three_kingdoms_web_srpg_master_plan.md`). **제품 방향의 SSOT.** 게임 규칙의 SSOT는 `game-design.md`(구 기획 문서 v1.0 절 번호 보존). 둘이 충돌하면 이 문서가 우선하되, 금지 목록·법적 라인(game-design §1·§15)은 유지한다. 구 SSOT와의 충돌 조항과 결정은 맨 아래 **부록 A**.
+> **문서 상태**: 2026-09-11 반입, 같은 날 **v2**로 갱신(원본 `three_kingdoms_web_srpg_master_plan_v2.md` — 말미에 **Character Presentation System** 추가: Gameplay/Presentation 분리·2D 리그·장비 비주얼·스킨·Character Studio·P1~P4 우선순위). **제품 방향의 SSOT.** 게임 규칙의 SSOT는 `game-design.md`(구 기획 문서 v1.0 절 번호 보존). 둘이 충돌하면 이 문서가 우선하되, 금지 목록·법적 라인(game-design §1·§15)은 유지한다. 구 SSOT와의 충돌 조항과 결정은 맨 아래 **부록 A**.
 
 # 삼국지 웹 SRPG 플랫폼 --- 마스터 기획 및 제품 방향
 
@@ -429,6 +429,174 @@ AI로 시나리오 초안, 캐릭터 디자인, 초상화, 스프라이트, 배�
 
 ------------------------------------------------------------------------
 
+# Character Presentation System
+
+현대 게임처럼 장비·스킨에 따라 캐릭터 외형, 애니메이션, 스킬 연출, VFX,
+컷인, 음성이 달라질 수 있도록 **Gameplay와 Presentation을 분리**한다.
+
+``` text
+Character
+├─ GameplayProfile
+├─ VisualProfile
+├─ RigProfile
+├─ EquipmentVisual
+├─ AnimationSet
+├─ SkillPresentation
+├─ Skin
+└─ VFXProfile
+```
+
+## 2D Rig / Skeleton
+
+``` text
+root
+├─ torso
+│  ├─ head
+│  ├─ arm_L
+│  └─ arm_R
+├─ leg_L
+├─ leg_R
+├─ weapon_socket
+├─ shield_socket
+├─ cape_socket
+├─ helmet_socket
+└─ mount_socket
+```
+
+실제 리깅 런타임은 추후 결정해도 데이터 모델과 에셋 규격은 교체 가능하게
+유지한다.
+
+## Modular Equipment Visuals
+
+Weapon, Armor, Helmet, Cape, Shield, Mount, Accessory가 능력치뿐 아니라
+실제 외형을 선택적으로 변경한다. 장비는 socket에 연결하고 필요하면 전용
+Animation Set을 지정한다.
+
+## Weapon Animation Archetypes
+
+`SWORD`, `SPEAR`, `POLEARM`, `BOW` 등 공용 Animation Set을 제공한다. 각
+세트는 idle/move/attack/critical 등을 가진다. 유명 장수는
+`GUAN_YU_POLEARM` 같은 Unique Set으로 override 가능하다.
+
+## Animation State Machine
+
+Idle, Move, Attack, Hit, Critical, Skill, Guard, Victory, Death,
+Mount/Dismount 등을 기본 상태 후보로 둔다. Gameplay Engine은 의미
+이벤트를 발생시키고 Presentation Layer가 animation/VFX/camera/sound를
+재생한다.
+
+## Skill Presentation
+
+피해·범위·상태이상은 Gameplay 데이터에 두고
+Animation/VFX/Camera/Cut-in/Voice는 Presentation 데이터에 둔다. 같은
+스킬도 기본 스킨, 적토마 스킨, 전설 스킨에서 서로 다른 연출을 사용할 수
+있다.
+
+**Presentation Skin이 전투 계산을 강제로 변경하지 않는 것을 기본
+원칙으로 한다.**
+
+## Skin Types
+
+-   Cosmetic Skin --- 외형만 변경
+-   Equipment Visual --- 실제 장비 외형 변경
+-   Legendary Presentation Skin --- 외형 + Animation + VFX + Skill
+    Presentation + Cut-in + Voice 변경
+
+## Character Studio
+
+``` text
+Character Studio
+├─ Identity
+├─ Gameplay
+├─ Appearance
+├─ Rig
+├─ Equipment
+├─ Animation
+├─ Skills
+├─ VFX
+├─ Cut-ins
+├─ Voice
+└─ Skins
+```
+
+### Rig Editor
+
+Bone hierarchy, pivot, parent/child, sprite attachment, socket, draw
+order, facing preview. 기본 제작자는 Rig Template을 선택하고 Advanced
+Creator만 직접 수정한다.
+
+### Equipment Visual Editor
+
+장비 슬롯/socket, Animation Archetype, Unique Override를 지정하고
+Idle/Attack/Critical/Skill을 즉시 Preview한다.
+
+### Animation Editor
+
+Timeline에서 keyframe, bone transform, sprite swap, HIT event,
+VFX/SFX/Camera marker를 편집한다.
+
+### Skill Presentation Editor
+
+``` text
+0.00 Animation
+0.15 Camera Zoom
+0.30 VFX
+0.52 HIT EVENT
+0.52 Impact VFX
+0.55 SFX
+0.70 Camera Shake
+1.20 Return Camera
+```
+
+실제 피해 계산은 Engine이 담당한다.
+
+### Skin Editor
+
+Portrait, body parts, equipment visuals, animation overrides, skill
+presentation, VFX, cut-in, voice를 Skin Package로 묶는다.
+
+## Asset Package / Marketplace
+
+공유·판매 가능한 패키지 후보: - Character Parts / Portrait - Weapon /
+Armor - Rig Template - Animation Pack - VFX Pack - Skill Presentation -
+Cut-in - BGM/SFX - Complete Skin
+
+패키지는 ID, dependency, license, metadata를 가진다.
+
+## Runtime 원칙
+
+-   Gameplay determinism 유지
+-   Unique Animation → Weapon Archetype → Generic Animation fallback
+-   전용 VFX/Voice/Cut-in이 없어도 게임 진행 가능
+-   texture atlas, lazy loading, pooling, skin on-demand loading,
+    low-quality mode 고려
+-   **Character Studio Preview와 Battle Renderer는 가능한 한 같은 렌더러
+    재사용**
+
+## 구현 우선순위 추가
+
+### P1 Architecture
+
+Gameplay/Presentation 분리 인터페이스,
+VisualProfile/RigProfile/AnimationSet 모델, Asset Package 규격,
+fallback.
+
+### P2 Foundation
+
+기본 Rig Template, Equipment socket, Weapon Archetype Animation,
+Character Studio Preview.
+
+### P3 Advanced
+
+Skill Presentation Editor, Skin Editor, VFX/Camera/Cut-in timeline,
+Mount.
+
+### P4 Economy
+
+Skin/Animation/VFX Package 공유 및 Marketplace.
+
+------------------------------------------------------------------------
+
 ## 부록 A. 구 SSOT(기획 문서 v1.0)와의 충돌·결정 정리 (2026-09-11)
 
 | # | 구 문서 | 이 문서 | 결정 |
@@ -442,5 +610,6 @@ AI로 시나리오 초안, 캐릭터 디자인, 초상화, 스프라이트, 배�
 | 7 | 전투 HUD 청동 크롬(`frames.ts` 토큰, 2026-06-30) | design-guide §6·§11 "장식 프레임 최소·역사적 재질 얇게·현대적 가독" | **design-guide가 상위.** 적용은 P1 "HUD 충돌 정리"에서 토큰 재정의로(별도 스펙). 그 전까지 현행 유지 — 출시 트랙을 막지 않는다. |
 | 8 | §14 커뮤니티 레이어(리더보드·리플레이, v1.5) | §10 DISCOVER·CREATOR·REMIX | **유지, P3.** 리플레이 = 시드 재현(구 §2-1)이 그대로 기반. |
 | 9 | §15 출시 게이트(에셋 커버리지 + 포털 제출) | §22 P0 데이터 안전성 | **병행.** 출시 트랙(에셋 게이트 닫힘 → 배포 → 포털)과 P0(에디터 round-trip)는 독립 — 출시가 P0를 기다리지 않는다. |
+| 10 | §4 프레임 애니메이션 정책(2026-06-16): v1 = **베이크 완성 포즈 프레임**, 컷아웃 리그(`skeleton.ts`·`rig-editor.html`·`rig_render.py`)는 v1.5+ 드롭인 · §13 무기 스킨 BM | Character Presentation System: Gameplay/Presentation 분리, 2D 리그(root/torso/head/arm/leg + weapon/shield/cape/helmet/mount socket), 장비 비주얼·Weapon Archetype Animation·Skin·Character Studio | **출시는 베이크 프레임 유지(무회귀).** Presentation 모델은 **P1 Architecture = 데이터 계약부터**(VisualProfile/RigProfile/AnimationSet, fallback 사다리 Unique → Archetype → Generic) — 현행 `UnitView.renderMode('skeleton')` 드롭인·`skeleton.json`(본+슬롯+무기 어태치먼트)이 착지점이고, 문서대로 리깅 런타임은 추후 결정. 기존 리그 도구는 Character Studio(P2 Foundation)의 씨앗. **Presentation Skin은 전투 계산을 바꾸지 않는다** = 구 §13 코스메틱·불가침선과 동일 원칙. |
 
-**미결(길중 결정 필요)**: ① 공식 콘텐츠 2탄(진시황 / TROIA / DAVID) ② Story Editor 착수 시점(P2 vs P3 — 모션코믹이 비전의 절반이라 앞당길 근거 있음) ③ 저작도구 공개 형태(Project Store가 로컬 JSON인지 Supabase인지).
+**미결(길중 결정 필요)**: ① 공식 콘텐츠 2탄(진시황 / TROIA / DAVID) ② Story Editor 착수 시점(P2 vs P3 — 모션코믹이 비전의 절반이라 앞당길 근거 있음) ③ 저작도구 공개 형태(Project Store가 로컬 JSON인지 Supabase인지) ④ 리깅 런타임(자체 컷아웃 확장 vs Spine 도입 — Presentation 데이터 계약은 어느 쪽이든 교체 가능하게).
