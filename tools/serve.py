@@ -189,9 +189,11 @@ def _validate_data():
     env = {**os.environ, "CI": "1", "NO_COLOR": "1"}  # ANSI 제거
     try:
         p = subprocess.run([pnpm, "--filter", "@tk/data", "test"], cwd=ROOT, shell=False,
-                           capture_output=True, text=True, errors="replace", env=env, timeout=120)
+                           capture_output=True, text=True, encoding="utf-8", errors="replace", env=env, timeout=120)
     except subprocess.TimeoutExpired:
         return {"ok": False, "error": "timeout(120s)"}
+    except OSError as e:
+        return {"ok": False, "error": f"실행 실패: {e}"}
     tail = "\n".join(((p.stdout or "") + "\n" + (p.stderr or "")).strip().splitlines()[-60:])
     return {"ok": p.returncode == 0, "code": p.returncode, "output": tail}
 
