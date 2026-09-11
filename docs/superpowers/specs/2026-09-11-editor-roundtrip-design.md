@@ -26,7 +26,7 @@
 | `tools/editor/stage-io.js` (신규, ESM, DOM 무관) | `loadStage(obj) → model`, `serializeStage(model) → obj`, `loadMap(obj) → model`, `serializeMap(model) → obj`. 원본 보관 `WeakMap`은 모듈 내부. |
 | `tools/editor/stage-io.d.ts` (신규) | 테스트(TS)용 최소 선언 |
 | `packages/data/test/editor-roundtrip.test.ts` (신규) | 회귀 게이트 (§6) |
-| `tools/stage-editor.html` (수정) | 인라인 `loadStageObject`/`serializeStage`/`loadMapObject`/`serializeMap` 제거 → `<script type="module">`에서 모듈 import. 저장 차단 제거, 검증 3단 표시, 「Publish 검사」 버튼 |
+| `tools/stage-editor.html` (수정) | 인라인 `loadStageObject`/`serializeStage`/`loadMapObject`/`serializeMap` 제거 → `<script type="module">`에서 모듈 import. `pushUndo`/`doUndo`가 `cloneUnits` 사용. **저장 차단 제거 3지점**: `saveStageFile`/`saveMapFile`의 검증 가드, `refreshValidation`의 `saveStage.disabled`/`saveMap.disabled`, `setMapOnlyMode`의 `saveStage.disabled = on \|\| validate().length > 0`(`on`만 남김). 배너 문구 "저장 차단" → "테스트 불가". 검증 3단 표시, 「Publish 검사」 버튼 |
 | `tools/serve.py` (수정) | `POST /validate-data` |
 
 모듈은 serve.py(기본 :8080, launch 설정 `tools`는 8081) 아래에서 같은 출처로 로드된다. `file://`로 열면 module import가 막히므로 안내 문구 1줄. 에디터 HTML에 인라인 `onclick=` 핸들러는 0건(확인됨)이라 스크립트 전체를 `type="module"`로 바꿔도 전역 참조 파손이 없다.
@@ -36,7 +36,9 @@
 ## 4. 로드·저장 규칙
 
 ### 4-1. 원본 보관
-`const ORIG = new WeakMap<object, object>()`. `loadStage`가 만드는 **모델 객체와 배열 원소**(top-level stage, unit, event, reinforcement, reinforcement.unit, strategyCondition)마다 `ORIG.set(modelEl, origEl)`. 맵도 동일(`loadMap` 모델 → 원본).
+`const ORIG = new WeakMap<object, object>()`. `loadStage`가 만드는 **모델 객체와 배열 원소**(top-level stage, unit, event, reinforcement, reinforcement.unit, strategyCondition)마다 `ORIG.set(modelEl, origEl)`.
+
+**맵은 ORIG를 쓰지 않는다.** 에디터의 맵 상태는 전역(`W H mapId mapName loadedLegend tiles`)이라 저장까지 살아남는 모델 객체가 없고, 실데이터 30개 맵은 전부 소유 키 6개(`id name width height tileLegend tiles`)만 그 순서로 가진다. 따라서 `loadMap(obj)`은 `{ id, name, width, height, tileLegend: { ...obj.tileLegend }, tiles }`를 반환하고(HTML이 전역에 풀어 씀), `serializeMap({ id, name, width, height, tileLegend, tiles })`은 그 순서로 새 객체를 만든다. 원본 `tileLegend`는 미사용 키까지 그대로 들고 간다(21개 맵에 미사용 범례가 있음). "사용 중인 문자가 범례에 없으면 TERRAINS에서 보충"하는 현행 로직은 `serializeMap` 안에 둔다(어느 맵도 범례 밖 문자를 쓰지 않아 round-trip 안전). 맵의 무손실은 §6 테스트가 보증한다.
 
 **중첩 소유 객체**(`camera`·`reward`·event `trigger`/`outcome`·reinforcement `trigger`·strategy `trigger`/`reward`)는 로드 시 `{ ...orig }` **얕은 복사로 모델에 두고, 저장 시 모델 객체를 그대로 쓴다** — 필드 단위 재조립·`!!` 강제 변환 금지. (실데이터 02·04·06은 `camera`가 `{decorations, zoom, focus}` 순서로 미지 키를 품고 있다 — 재조립하면 소실.) UI가 kind 변경 시 `r.trigger = {...}`로 통째 교체하는 것은 편집이라 무방.
 
@@ -68,7 +70,9 @@ out = { ...ORIG.get(model), ...pickOwned(model) }
 
 ### 4-5. 존재 규칙 (no-op 저장의 동일성)
 - 소유 키 값이 `null`/`undefined`면 **원본 유무와 무관하게 키 삭제**(`camera`·`reward`·`levelCap`·`victory`·`defeat` 해제 = 삭제. 원본에 있던 키를 비웠는데 `null`이 기록되면 스키마 실패).
-- 빈 배열: 원본에 그 키가 있었으면 쓴다(`[]` 유지), 없었으면 생략. **예외 = `units`·`events`는 스키마 필수라 항상 쓴다**(새 스테이지의 빈 배열도).
+- 같은 규칙을 **중첩 소유 객체의 1단계 필드**에도 적용한다: UI가 `stage.camera = { zoom: 1.5, focus: null }`·`camera.focus = null`을 만들므로 저장 시 `null`/`undefined` 필드는 제거한다(`focus: null` → 키 없음). 실데이터엔 중첩 `null`이 없어 no-op 동일성에 영향 없음. UI 코드는 손대지 않는다.
+- 빈 배열: 원본에 그 키가 있었으면 쓴다(`[]` 유지), 없었으면 생략. **예외 = 스키마 필수 배열은 항상 쓴다**: 스테이지 `units`·`events`, 증원 `units`(UI가 `units: []`로 새 증원을 만든다).
+- 새 원소(ORIG 없음)의 키 순서 = §4-3 목록 순서(`pickOwned`가 그 순서로 만든다). 기존 원소는 스프레드가 원본 순서를 보존.
 - 그 외 값은 원본 유무와 무관하게 쓴다.
 
 ## 5. 검증 3단
@@ -83,13 +87,13 @@ Publish 검사는 **레포의 `packages/data/json/*` 저장본**을 검사한다
 
 ## 6. 테스트 (`packages/data/test/editor-roundtrip.test.ts`)
 1. **round-trip 동일성**: `readdirSync`로 `stages/*.json`·`maps/*.json`을 열거(신규 파일 자동 포함, `decorations.test.ts`와 같은 방식)해 각각 `JSON.stringify(serialize(load(x))) === JSON.stringify(x)` — 구조 + 키 순서. (원문 텍스트 비교는 하지 않는다: 맵 9개가 2-space 규격과 다르다.)
-2. **편집 의미론**: 유닛 `x` 변경 → 그 필드만 바뀌고 `scenario`·유닛 미지 필드·`camera` 안의 미지 키 보존 / `camera=null`·`victory=null` → 키 삭제 / 새 이벤트 → `type:'duel'`·`once:true` / 유닛 삭제 → 원소 제거 / `turnLimit` 없는 입력 → 저장에도 없음 / `optional:false` 목표 보존 / **`cloneUnits`로 Undo 스냅샷 후 복원 → 저장해도 유닛 미지 필드 보존**.
+2. **편집 의미론**: 유닛 `x` 변경 → 그 필드만 바뀌고 `scenario`·유닛 미지 필드·`camera` 안의 미지 키 보존 / `camera=null`·`victory=null` → 키 삭제 / 새 이벤트 → `type:'duel'`·`once:true` / 유닛 삭제 → 원소 제거 / `turnLimit` 없는 입력 → 저장에도 없음 / `optional:false` 목표 보존 / camera `focus:null` 해제 후 저장 → `focus` 키 없음 / 새 증원(`units: []`) → `units` 기록 / **`cloneUnits`로 Undo 스냅샷 후 복원 → 저장해도 유닛 미지 필드 보존**.
 3. 기존 `pnpm test` 게이트(data 패키지)에 포함.
 
 ## 7. 에러 처리
 - 스키마상 유효하지 않은 원본도 로드된다(보존이 목적). 유효성은 Publish 단계가 말한다.
-- `/validate-data`: Windows에서 `pnpm`은 `pnpm.cmd`라 `shutil.which("pnpm")`로 실행 파일을 찾아 `subprocess.run([...], cwd=ROOT, shell=False)` (없으면 `ok:false` + "pnpm 미발견"). 타임아웃 120초, 동시 실행 1개(락, 진행 중이면 409), 출력 마지막 60줄만. 실패도 200 + `ok:false`.
-- 모듈 로드 실패(file://) → "serve.py(:8081)로 여세요".
+- `/validate-data`: `do_POST`의 엔드포인트 허용 목록(튜플)에 추가. Windows에서 `pnpm`은 `pnpm.cmd`라 `shutil.which("pnpm")`로 실행 파일을 찾아 `subprocess.run([...], cwd=ROOT, shell=False, capture_output=True, text=True, errors="replace", env={**os.environ, "CI": "1", "NO_COLOR": "1"})` (없으면 `ok:false` + "pnpm 미발견"; `errors="replace"`는 cp949 콘솔 + 한국어 vitest 출력 대비, `CI/NO_COLOR`는 ANSI 제거). 타임아웃 120초(`vitest run`은 비-watch), 동시 실행 1개 = 모듈 레벨 `threading.Lock().acquire(blocking=False)`(ThreadingHTTPServer는 동시 요청 가능), 진행 중이면 409. 출력 마지막 60줄만. 실패도 200 + `ok:false`.
+- 모듈 로드 실패(file://) → "serve.py로 여세요 (launch `tools` = :8081, 기본 :8080)".
 
 ## 8. 범위 밖 (후속)
 Playtest 실행 버튼(`__lab` 패턴의 `__draft` 주입, P1) · Autosave/Undo 확장(P1) · class/item/strategy 에디터 round-trip 테스트 · Project Store.
