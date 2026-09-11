@@ -9,7 +9,7 @@
   ② .env.r2 가 있으면 R2 버킷 key=<path> 로도 업로드(= 배포본 자동 동기화).
   시크릿(R2 키)은 이 서버에만 있고 에디터엔 노출되지 않는다.
 """
-import sys, os, json, base64, mimetypes, subprocess, re
+import sys, os, json, base64, mimetypes, subprocess, re, shutil, threading
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUBLIC = os.path.join(ROOT, "apps", "web", "public")
@@ -177,6 +177,25 @@ def _stitch_chunk(stage):
         return {"stitched": False, "have": have, "total": total, "error": str(e)}
 
 
+_VALIDATE_LOCK = threading.Lock()  # ThreadingHTTPServer 는 동시 요청 가능 — Publish 검사는 1개만
+
+
+def _validate_data():
+    """Publish 검사 = 레포의 packages/data/json/* 을 @tk/data 테스트(zod safeParse 전수)로 검증.
+    index.ts 의 loadJson 은 첫 실패 파일에서 throw 하므로 에러는 한 번에 1건이다."""
+    pnpm = shutil.which("pnpm")
+    if not pnpm:
+        return {"ok": False, "error": "pnpm 미발견 — PATH 확인"}
+    env = {**os.environ, "CI": "1", "NO_COLOR": "1"}  # ANSI 제거
+    try:
+        p = subprocess.run([pnpm, "--filter", "@tk/data", "test"], cwd=ROOT, shell=False,
+                           capture_output=True, text=True, errors="replace", env=env, timeout=120)
+    except subprocess.TimeoutExpired:
+        return {"ok": False, "error": "timeout(120s)"}
+    tail = "\n".join(((p.stdout or "") + "\n" + (p.stderr or "")).strip().splitlines()[-60:])
+    return {"ok": p.returncode == 0, "code": p.returncode, "output": tail}
+
+
 class NoCacheHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=ROOT, **kwargs)
@@ -286,7 +305,7 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self):  # noqa: N802
         endpoint = self.path.split("?")[0]
-        if endpoint not in ("/save-asset", "/delete-asset", "/rebuild-audio-manifest"):
+        if endpoint not in ("/save-asset", "/delete-asset", "/rebuild-audio-manifest", "/validate-data"):
             self._json(404, {"ok": False, "error": "unknown endpoint"})
             return
 
@@ -295,6 +314,16 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
                 self._json(200, _rebuild_audio_manifest())
             except Exception as e:  # noqa: BLE001
                 self._json(500, {"ok": False, "error": str(e)})
+            return
+
+        if endpoint == "/validate-data":
+            if not _VALIDATE_LOCK.acquire(blocking=False):
+                self._json(409, {"ok": False, "error": "Publish 검사가 이미 진행 중"})
+                return
+            try:
+                self._json(200, _validate_data())
+            finally:
+                _VALIDATE_LOCK.release()
             return
 
         try:
@@ -353,8 +382,7 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
                 Image.open(_io.BytesIO(data)).save(buf, "WEBP", lossless=True, method=6)
                 data, rel, ctype = buf.getvalue(), rel[:-4] + ".webp", "image/webp"
             except Exception as e:  # noqa: BLE001 — PIL 없으면 PNG 그대로(게임은 못 읽음, 로그로 알림)
-                sys.stdout.write(f"[save-asset] webp 전환 실패({e}) — PNG 그대로 저장: {rel}
-")
+                sys.stdout.write(f"[save-asset] webp 전환 실패({e}) — PNG 그대로 저장: {rel}\n")
 
         # ① 로컬에 쓰기 — assets→public/(dev 즉시 반영), 청크→repo docs/art/chunks/(중간산출물)
         dest = os.path.join(ROOT, *rel.split("/")) if is_chunk else os.path.join(PUBLIC, *rel.split("/"))
