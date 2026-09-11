@@ -1089,6 +1089,7 @@ function serializeMap() {
 function loadStageObject(obj) {
   if (!obj || typeof obj !== 'object') { toast('stage 객체가 아님', true); return false; }
   stage = loadStageModel(obj);
+  setMapOnlyMode(false);   // 맵 단독 모드에서 스테이지를 열면 stage 저장 버튼 재활성 (disabled 는 이 함수만 만진다)
   selUnit = null; undoStack.length = 0;
   renderAll(); renderTab(); refreshUnitList(); refreshValidation();
   toast(`스테이지 "${stage.id}" 로드`);
@@ -1270,14 +1271,16 @@ async function loadStageFromServer(stageId_) {
   stageHandle = null; mapHandle = null;
 }
 
-document.getElementById('publishCheck').onclick = async () => {
+document.getElementById('publishCheck').onclick = async function () {
   const out = document.getElementById('publishOut');
+  this.disabled = true;   // 더블클릭 → 서버 409 경쟁 방지
   out.style.display = ''; out.textContent = 'Publish 검사 중… (pnpm --filter @tk/data test, 5~15초)';
   try {
     const r = await fetch('/validate-data', { method: 'POST' });   // 본문 없음 — 서버가 body 를 읽지 않는다
     const j = await r.json();
     out.textContent = (j.ok ? '✓ Publish 검사 통과\n' : `✗ Publish 검사 실패${j.error ? ' — ' + j.error : ''} (첫 실패 파일만 표시됨)\n`) + (j.output || '');
   } catch (e) { out.textContent = '검사 요청 실패: ' + e.message + ' — serve.py로 여세요 (launch tools = :8081, 기본 :8080)'; }
+  finally { this.disabled = false; }
 };
 // 검증용 dev 훅 (모듈 스코프라 콘솔에서 안 보이므로) — 저장 버튼과 동일한 직렬화 경로를 노출
 window.__stageEditor = { serializeStage, serializeMap, getStage: () => stage };
