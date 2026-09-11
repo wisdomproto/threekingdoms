@@ -359,7 +359,7 @@ export type StageUnit = z.infer<typeof StageUnitSchema>;
 export const StageCameraSchema = z.object({
   zoom: z.number().positive().optional(),
   focus: z.tuple([z.number().int().min(0), z.number().int().min(0)]).optional(),
-});
+}).strict();
 export type StageCamera = z.infer<typeof StageCameraSchema>;
 
 /**
