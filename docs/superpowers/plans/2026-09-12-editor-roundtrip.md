@@ -50,7 +50,10 @@ function files(sub: string): Array<[string, Json]> {
   return readdirSync(dir).filter((f) => f.endsWith(".json")).sort()
     .map((f) => [f, JSON.parse(readFileSync(join(dir, f), "utf-8")) as Json]);
 }
-const same = (a: unknown, b: unknown) => expect(JSON.stringify(a)).toBe(JSON.stringify(b)); // 구조 + 키 순서
+const same = (a: unknown, b: unknown) => {
+  expect(a).toEqual(b);                                   // 구조 — 실패 시 읽을 수 있는 diff
+  expect(JSON.stringify(a)).toBe(JSON.stringify(b));      // 키 순서까지
+};
 
 describe("에디터 round-trip — Load → 수정 없음 → Save 는 원본과 구조·키 순서까지 동일 (spec §6-1)", () => {
   const stages = files("stages");
@@ -160,7 +163,7 @@ describe("에디터 round-trip — 편집 의미론 (spec §6-2)", () => {
 - [ ] **Step 2: 실패 확인**
 
 Run: `pnpm --filter @tk/data test -- editor-roundtrip`
-Expected: FAIL — `Cannot find module '../../../tools/editor/stage-io.js'`
+Expected: FAIL — `Failed to load url ../../../tools/editor/stage-io.js` (모듈 부재)
 
 ### Task 2: `stage-io.js` + `.d.ts`
 
@@ -168,9 +171,9 @@ Expected: FAIL — `Cannot find module '../../../tools/editor/stage-io.js'`
 - Create: `tools/editor/stage-io.js`
 - Create: `tools/editor/stage-io.d.ts`
 
-- [ ] **Step 1: `TERRAINS` 표를 HTML에서 옮겨 온다**
+- [ ] **Step 1: `TERRAINS` 표 대조**
 
-`tools/stage-editor.html` 244~260행의 `const TERRAINS = [ ... ];` 블록을 **그대로** 복사(값 변경 금지)해 아래 모듈의 `export const TERRAINS = [...]` 자리에 넣는다. (HTML 쪽 삭제는 Task 4.)
+아래 모듈의 `TERRAINS` 14행은 `tools/stage-editor.html` 244~259행(`const TERRAINS = [ … ];`)을 그대로 옮긴 것이다 — 값이 HTML과 한 글자라도 다르면 HTML 쪽이 진실이니 모듈을 맞춘다. (HTML 쪽 삭제는 Task 4.)
 
 - [ ] **Step 2: 모듈 작성**
 
@@ -182,7 +185,20 @@ Expected: FAIL — `Cannot find module '../../../tools/editor/stage-io.js'`
 //  - null/undefined 소유 값 → 키 삭제(중첩 1단계 포함). 빈 배열은 원본에 있었을 때만(최상위), 필수 배열은 항상.
 
 export const TERRAINS = [
-  /* ← stage-editor.html 244~260행 블록의 배열 원소를 그대로 붙여 넣는다 */
+  ['.', 'plain',    [217,207,157]],
+  ['g', 'grass',    [168,198,134]],
+  ['f', 'forest',   [74,110,70]],
+  ['m', 'mountain', [140,122,94]],
+  ['w', 'waste',    [199,181,143]],
+  ['r', 'river',    [106,158,201]],
+  ['b', 'bridge',   [176,138,90]],
+  ['#', 'wall',     [110,110,118]],
+  ['c', 'cliff',    [90,80,72]],
+  ['F', 'fort',     [158,142,122]],
+  ['G', 'gate',     [122,106,82]],
+  ['v', 'village',  [224,184,122]],
+  ['B', 'barracks', [207,158,106]],
+  ['d', 'depot',    [201,168,110]],
 ];
 
 const ORIG = new WeakMap();
@@ -397,7 +413,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 236행 `<script>` 를 다음으로 교체(모듈은 자동 strict — 237행 `'use strict';` 는 삭제):
 
 ```html
-<div id="modfail" style="background:#5a1e1e;color:#ffd7d7;padding:8px 12px;font-size:13px">
+<div id="modfail" style="position:fixed;top:0;left:0;right:0;z-index:99;background:#5a1e1e;color:#ffd7d7;padding:8px 12px;font-size:13px">
   에디터 모듈을 불러오지 못했습니다 — <code>file://</code> 로 열면 동작하지 않습니다. serve.py로 여세요 (launch <code>tools</code> = :8081, 기본 :8080).
 </div>
 <script type="module">
@@ -411,7 +427,7 @@ document.getElementById('modfail').remove();
 
 (alias 를 쓰는 이유: HTML 에 이미 `serializeStage()`/`serializeMap()` 이라는 문자열 반환 래퍼가 있고, 그 이름을 호출하는 곳이 여럿이라 이름을 유지한다.)
 
-- [ ] **Step 2: 인라인 `TERRAINS` 삭제** — 244~260행 `const TERRAINS = [ ... ];` 블록 제거. 바로 아래 `const LEGEND = Object.fromEntries(TERRAINS.map(...))` 는 그대로(import 된 상수를 쓴다).
+- [ ] **Step 2: 인라인 `TERRAINS` 삭제** — **244~259행**(`const TERRAINS = [` 부터 닫는 `];` 까지)만 제거. **260행 `const BY_CHAR = …`와 261행 `const LEGEND = …`는 남긴다** — 둘 다 import 된 `TERRAINS`를 읽는다(`BY_CHAR`는 380·579·1223행에서 사용 — 지우면 첫 렌더에서 ReferenceError).
 
 - [ ] **Step 3: Undo 스냅샷** — `pushUndo` 의 `units: JSON.parse(JSON.stringify(stage.units))` → `units: cloneUnits(stage.units)`. (`doUndo` 는 그대로.)
 
@@ -421,6 +437,7 @@ document.getElementById('modfail').remove();
 ```js
 function serializeStage() { return JSON.stringify(serializeStageModel(stage), null, 2) + '\n'; }
 ```
+바로 위의 `serializeUnit(u)` 헬퍼(1091~1093)는 더 이상 쓰이지 않으니 삭제.
 
 `serializeMap()` (1137~1150) 본문을:
 ```js
@@ -470,7 +487,7 @@ function refreshValidation() {
 
 160행 `id="saveMap"` 버튼 바로 뒤에:
 ```html
-<button class="btn" id="publishCheck" title="레포에 저장된 packages/data/json/* 을 zod 로 전수 검사 (pnpm --filter @tk/data test)">Publish 검사</button>
+<button class="btn" id="publishCheck" title="레포에 저장된 packages/data/json/* 을 zod 로 전수 검사 (pnpm --filter @tk/data test). index.ts 에 등록되지 않은 새 스테이지/맵 파일은 검사 대상이 아님">Publish 검사</button>
 ```
 `id="valbanner"` 요소 바로 뒤에:
 ```html
@@ -493,10 +510,10 @@ document.getElementById('publishCheck').onclick = async () => {
 
 1. `http://localhost:8081/tools/stage-editor.html` 열기 → 빨간 `modfail` 배너가 **없어야** 함(모듈 로드 성공). 콘솔 에러 0.
 2. 스테이지 드롭다운에서 `02-yingchuan` 선택.
-3. 아무것도 수정하지 않고 「stage 저장」(붙여넣기 내보내기 또는 파일 저장) → 결과를 원본과 비교:
+3. 아무것도 수정하지 않고 「⬇ stage JSON」 → 저장 대화상자에서 **레포 밖 경로**(예: `C:/Users/101024/Downloads/rt-02.json`)에 저장한다(레포 파일 자체를 고르면 자기 자신과의 비교가 되어 무의미). 결과를 원본과 비교:
    `python -c "import json,sys;a=json.load(open(sys.argv[1],encoding='utf-8'));b=json.load(open(sys.argv[2],encoding='utf-8'));print('SAME' if json.dumps(a,ensure_ascii=False)==json.dumps(b,ensure_ascii=False) else 'DIFF')" <저장본> packages/data/json/stages/02-yingchuan.json` → `SAME` (camera 안의 decorations 까지 보존).
-4. 유닛 하나를 한 칸 옮기고 Ctrl+Z(Undo) 후 저장 → 다시 `SAME`.
-5. 검증 에러가 있는 상태(예: 유닛 좌표를 맵 밖으로 편집)에서도 저장 버튼이 활성이고 저장되며 토스트에 "테스트 불가 N건".
+4. 유닛 하나를 한 칸 옮기고 Ctrl+Z(Undo) 후 「⬇ stage JSON」으로 같은 레포 밖 경로에 다시 저장 → 다시 `SAME`.
+5. 검증 에러가 있는 상태(예: 유닛 좌표를 맵 밖으로 편집)에서도 「⬇ stage JSON」이 활성이고 저장되며 토스트에 "테스트 불가 N건".
 6. 「Publish 검사」 클릭 → 패널에 `✓ Publish 검사 통과` + vitest 요약.
 
 - [ ] **Step 8: 커밋**
