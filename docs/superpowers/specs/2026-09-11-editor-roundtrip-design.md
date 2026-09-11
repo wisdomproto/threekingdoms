@@ -41,7 +41,7 @@
 
 **맵은 ORIG를 쓰지 않는다.** 에디터의 맵 상태는 전역(`W H mapId mapName loadedLegend tiles`)이라 저장까지 살아남는 모델 객체가 없고, 실데이터 30개 맵은 전부 소유 키 6개(`id name width height tileLegend tiles`)만 그 순서로 가진다. 따라서 `loadMap(obj)`은 `{ id, name, width, height, tileLegend: { ...obj.tileLegend }, tiles }`를 반환하고(HTML이 전역에 풀어 씀), `serializeMap({ id, name, width, height, tileLegend, tiles })`은 그 순서로 새 객체를 만든다. 원본 `tileLegend`는 미사용 키까지 그대로 들고 간다(21개 맵에 미사용 범례가 있음). "사용 중인 문자가 범례에 없으면 TERRAINS에서 보충"하는 현행 로직은 `serializeMap` 안에 둔다(어느 맵도 범례 밖 문자를 쓰지 않아 round-trip 안전) — 그러려면 `TERRAINS` 표(현재 HTML 244행)를 **모듈로 옮겨 `export`** 하고 HTML이 import한다(UI 1줄, `cloneUnits`와 같은 급의 예외). 모듈 인터페이스의 `tiles`는 **`string[][]`**(`loadMap`이 split + W×H로 pad/truncate — 현행 HTML 동작, `serializeMap`이 행을 join)로 고정해 §6 테스트가 실제 경로를 탄다. 맵의 무손실은 §6 테스트가 보증한다.
 
-**중첩 소유 객체**(`camera`·`reward`·event `trigger`/`outcome`·reinforcement `trigger`·strategy `trigger`/`reward`)는 로드 시 `{ ...orig }` **얕은 복사로 모델에 두고, 저장 시 모델 객체를 그대로 쓴다** — 필드 단위 재조립·`!!` 강제 변환 금지. (실데이터 02·04·06은 `camera`가 `{decorations, zoom, focus}` 순서로 미지 키를 품고 있다 — 재조립하면 소실.) UI가 kind 변경 시 `r.trigger = {...}`로 통째 교체하는 것은 편집이라 무방.
+**중첩 소유 객체**(`camera`·`reward`·event `trigger`/`outcome`·reinforcement `trigger`·strategy `trigger`/`reward`)는 로드 시 `{ ...orig }` **얕은 복사로 모델에 두고, 저장 시 모델 객체를 그대로 쓴다** — 필드 단위 재조립·`!!` 강제 변환 금지. (스펙 작성 시점의 실데이터 02·04·06은 `camera`가 `{decorations, zoom, focus}` 순서로 미지 키를 품고 있었다 — 재조립하면 소실. 그 데이터 버그는 `24f6d42`에서 최상위로 옮겨졌지만, 규칙은 그대로 유효하며 테스트는 합성 데이터로 이 경로를 계속 검증한다.) UI가 kind 변경 시 `r.trigger = {...}`로 통째 교체하는 것은 편집이라 무방.
 
 **objectives·failConditions** 원소는 로드 `{ ...o }`, 저장 **그대로 통과**(현행의 kind별 재조립·`captureTile side:'player'` 주입·`optional` truthy 강제 제거 — 데이터에 `"optional": false`가 명시된 원소가 있다). 새 원소의 필드는 UI가 만든다.
 
