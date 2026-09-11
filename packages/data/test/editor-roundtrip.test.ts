@@ -33,7 +33,10 @@ describe("에디터 round-trip — Load → 수정 없음 → Save 는 원본과
 });
 
 describe("에디터 round-trip — 편집 의미론 (spec §6-2)", () => {
-  // 실데이터를 흉내 낸 최소 스테이지: 미지 키·미지 유닛 필드·camera 안의 미지 키·optional:false·once 없는 증원
+  // 최소 스테이지 — 실데이터 모양이 아니라 합성(synthetic) 데이터다. camera 안에 미지 키(decorations)를
+  // 일부러 넣어 그 경로를 exercise한다 — 실제 스테이지 02/04/06은 24f6d42에서 decorations를 camera 밖으로
+  // 뽑아 이제 이 모양을 안 쓰지만, 로드/저장이 여전히 이를 보존해야 한다는 계약은 유효하다.
+  // 그 외: 미지 유닛 필드·optional:false·once 없는 증원.
   const base = (): Json => JSON.parse(JSON.stringify({
     id: "t", name: "T", mapId: "m", turnLimit: 20,
     camera: { decorations: [{ cell: [1, 1], kind: "reeds" }], zoom: 1.5, focus: [3, 4] },
@@ -118,5 +121,18 @@ describe("에디터 round-trip — 편집 의미론 (spec §6-2)", () => {
     const model = loadMap(map);
     expect(model.tiles).toEqual([[".", ".", "g"], ["g", ".", "."]]);
     same(serializeMap(model), map);
+  });
+
+  it("맵: tileLegend=null → 사용된 문자만 TERRAINS 순서로 새 legend 생성", () => {
+    const model = loadMap({ id: "m", name: "M", width: 2, height: 1, tileLegend: null, tiles: [".g"] });
+    const out = serializeMap(model);
+    expect(out.tileLegend).toEqual({ ".": "plain", "g": "grass" });
+  });
+
+  it("맵: legend에 없는 문자를 tiles가 사용 → 원본 legend 키 순서 유지 + 누락 문자만 TERRAINS에서 뒤에 보충", () => {
+    const model = loadMap({ id: "m", name: "M", width: 2, height: 1, tileLegend: { ".": "plain" }, tiles: [".g"] });
+    const out = serializeMap(model);
+    expect(Object.keys(out.tileLegend as Json)).toEqual([".", "g"]);
+    expect(out.tileLegend).toEqual({ ".": "plain", "g": "grass" });
   });
 });

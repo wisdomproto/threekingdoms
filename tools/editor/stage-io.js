@@ -25,17 +25,32 @@ const ORIG = new WeakMap();
 const own = (model, orig) => { if (orig && typeof orig === "object") ORIG.set(model, orig); return model; };
 const isObj = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 
-/** 소유 키만 얕게 복사한 모델. 중첩 객체(trigger/outcome/camera/reward)는 { ...v } 로 복사해 UI가 필드를 바꿔도 원본이 오염되지 않게. */
+/**
+ * 소유 키만 복사한 모델. 격리 범위: 스칼라 값 그대로, 중첩 객체(trigger/outcome/camera/reward)는
+ * { ...v }로 얕은 복사하고 그 안의 배열 필드도 1단계 복제([...arr]) — UI가 필드나 그 배열의 원소를
+ * push/splice해도 원본이 오염되지 않는다. 그보다 깊은 구조(배열 안의 객체, 객체 안의 객체)는 여전히
+ * 원본과 참조를 공유한다(격리 미보장).
+ */
 function pickShallow(src, keys) {
   const m = {};
   for (const k of keys) {
     if (src[k] === undefined) continue;
-    m[k] = isObj(src[k]) ? { ...src[k] } : src[k];
+    if (isObj(src[k])) {
+      const v = { ...src[k] };
+      for (const f of Object.keys(v)) if (Array.isArray(v[f])) v[f] = [...v[f]];
+      m[k] = v;
+    } else {
+      m[k] = src[k];
+    }
   }
   return m;
 }
 
-/** 중첩 소유 객체의 1단계 null/undefined 필드 제거 (UI가 만드는 camera.focus=null 대응, spec §4-5) */
+/**
+ * 중첩 소유 객체의 1단계 null/undefined 필드 제거 (UI가 만드는 camera.focus=null 대응, spec §4-5).
+ * ⚠ 이 필드가 UI 소유가 아니라 미지 필드였어도 null이면 함께 지워진다 — spec §4-5가 받아들인 한계
+ * (실데이터엔 중첩 null이 없어 영향 없음). 미지 필드 보존이 문제되면 소유 필드 화이트리스트로 좁힐 것.
+ */
 function stripNulls(o) {
   const out = {};
   for (const [k, v] of Object.entries(o)) if (v !== null && v !== undefined) out[k] = v;
@@ -77,7 +92,7 @@ function merge(model, keys, always, sub = {}) {
   return out;
 }
 
-const loadUnit = (u) => own({ ...pickShallow(u, KEYS.unit), items: u.items ?? [] }, u);
+const loadUnit = (u) => own({ ...pickShallow(u, KEYS.unit), items: [...(u.items ?? [])] }, u);
 const serializeUnit = (u) => merge(u, KEYS.unit, ALWAYS.unit);
 const serializeEvent = (e) => merge(e, KEYS.event, new Set());
 const serializeReinf = (r) => merge(r, KEYS.reinf, ALWAYS.reinf, { units: serializeUnit });
