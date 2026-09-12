@@ -24,7 +24,7 @@ import { BattleRenderer } from "../pixi/BattleRenderer";
 import { readSortie, applySortieToStage } from "../meta/sortie";
 import { readLab, LAB_STAGE_ID } from "../lab/lab";
 import { editorUrlFor } from "../lab/editorLink";
-import { UnitPanel } from "./hud/UnitPanel";
+import { UnitPanel, activeUnitId } from "./hud/UnitPanel";
 import { InspectPopup } from "./hud/InspectPopup";
 import { AttackForecast } from "./hud/AttackForecast";
 import { ActionMenu } from "./hud/ActionMenu";
@@ -39,10 +39,10 @@ import { duelBanter } from "./duel/duelMedia";
 import { BattleControls } from "./hud/BattleControls";
 import { PauseMenu } from "./hud/PauseMenu";
 import { Minimap } from "./hud/Minimap";
+import { BottomPanel } from "./hud/BottomPanel";
 import { adLifecycle } from "../meta/adProviders";
-import { HUD_FONT, HUD_BRONZE, HUD_BRONZE_DIM, HUD_PARCHMENT } from "./hud/frames";
-import type { InputState } from "./inputMachine";
-import { unitPanelSide } from "./hudLayout";
+import { HUD_FONT, HUD_BRONZE, HUD_BRONZE_DIM, HUD_INK, HUD_PARCHMENT } from "./hud/frames";
+import { hudMode, unitPanelSide } from "./hudLayout";
 import { loadControls, saveControls } from "./controlSettings";
 import { canSuspend, clearSuspend, isResumable, readSuspend, writeSuspend } from "./suspend";
 import { firedDialogues, toDialogueSnapshot } from "./dialogue/director";
@@ -68,6 +68,24 @@ const LEFT_COL: React.CSSProperties = {
   pointerEvents: "none",
   overflow: "hidden",
   zIndex: 4,
+};
+
+/** 모바일(<768px, 스펙 2026-09-12): 좌 컬럼엔 목표 칩만 — 폭을 줄여 맵을 더 남긴다 */
+const LEFT_COL_MOBILE: React.CSSProperties = { ...LEFT_COL, width: "min(60vw, 260px)" };
+
+/** 모바일 우상단 ☰(48px, design-guide §2) — 배속·자동전투·기본 줌은 PauseMenu 「전투 제어」 행으로 */
+const MOBILE_MENU_BTN: React.CSSProperties = {
+  width: 48,
+  height: 48,
+  borderRadius: 8,
+  border: `1px solid ${HUD_BRONZE_DIM}`,
+  background: HUD_INK,
+  color: HUD_PARCHMENT,
+  fontSize: 22,
+  fontFamily: HUD_FONT,
+  cursor: "pointer",
+  pointerEvents: "auto",
+  touchAction: "manipulation",
 };
 
 type Ev<T extends BattleEvent["type"]> = Extract<BattleEvent, { type: T }>;
@@ -163,26 +181,6 @@ class PresenterDelegate implements Presenter {
   /** 프리뷰 취소 스냅 (원작 UX §수정명세-2) */
   previewCancel(unitId: string, to: Coord): void {
     this.target?.previewCancel(unitId, to);
-  }
-}
-
-/** 선택/조회 중인 유닛 id (미니맵 강조용) — UnitPanel과 동일 규칙 */
-function activeUnitId(ui: InputState): string | null {
-  switch (ui.kind) {
-    case "idle":
-      return ui.inspectedId ?? null;
-    case "selected":
-    case "postMoveMenu":
-    case "targetSelect":
-    case "strategyMenu":
-    case "strategyTarget":
-    case "itemMenu":
-    case "itemTarget":
-      return ui.unitId;
-    case "confirmAttack":
-      return ui.prior.unitId;
-    default:
-      return null;
   }
 }
 
@@ -484,6 +482,8 @@ export default function BattleScreen(): React.ReactElement {
     delegate.target?.setSpeed(next);
   }, [store, delegate]);
   const selectedId = activeUnitId(snap.ui);
+  // 모바일 HUD(스펙 2026-09-12): <768px면 하단 패널이 부유 메뉴·정보창·턴종료를 대신한다. 데스크톱 JSX는 불변.
+  const mobile = hudMode(viewport.width) === "mobile";
   // 원작(§7-A) 가림 회피: 활성 유닛이 화면 좌측 절반이면 UnitPanel을 우측 컬럼 슬롯으로.
   const panelSide = unitPanelSide(snap.ui.kind === "idle" ? snap.inspectAnchor : snap.menuAnchor, viewport.width);
   const unitPanel = <UnitPanel ui={snap.ui} vm={snap.vm} />;
@@ -499,23 +499,27 @@ export default function BattleScreen(): React.ReactElement {
       style={{ position: "fixed", inset: 0, overflow: "hidden", background: "#1b1f24" }}
     >
       <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
-      <TurnBanner ui={snap.ui} vm={snap.vm} dispatch={dispatch} stageName={ctx.stage.name} />
+      <TurnBanner ui={snap.ui} vm={snap.vm} dispatch={dispatch} stageName={ctx.stage.name} hideEndTurn={mobile} />
       {/* 승리조건 배너 = 장막 걷힘 + 개전 나레이션 종료 후 — "나레이션 끝나고 목표가 딱" 시퀀스 */}
       {boot.ready && introDone && <ObjectiveFlashLayer vm={snap.vm} display={display} />}
-      <div id="hudLeft" style={LEFT_COL}>
+      <div id="hudLeft" style={mobile ? LEFT_COL_MOBILE : LEFT_COL}>
         {boot.ready && introDone && <ObjectiveStrip display={display} />}
         {/* 확인 카드 중엔 정보창을 접는다 — 720p에서 카드 버튼이 컬럼 하단(overflow hidden)에 잘리던 문제 */}
-        {panelSide === "left" && snap.ui.kind !== "confirmAttack" && unitPanel}
-        <AttackForecast ui={snap.ui} ctx={ctx} committed={store.committedState} dispatch={dispatch} />
+        {!mobile && panelSide === "left" && snap.ui.kind !== "confirmAttack" && unitPanel}
+        {!mobile && <AttackForecast ui={snap.ui} ctx={ctx} committed={store.committedState} dispatch={dispatch} />}
       </div>
-      <InspectPopup inspectedId={snap.inspectedId} activeId={selectedId} vm={snap.vm} anchor={snap.inspectAnchor} viewport={viewport} />
-      <ActionMenu
-        ui={snap.ui}
-        dispatch={dispatch}
-        anchor={snap.menuAnchor}
-        viewport={viewport}
-        previewWalking={snap.previewWalking}
-      />
+      {!mobile && (
+        <InspectPopup inspectedId={snap.inspectedId} activeId={selectedId} vm={snap.vm} anchor={snap.inspectAnchor} viewport={viewport} />
+      )}
+      {!mobile && (
+        <ActionMenu
+          ui={snap.ui}
+          dispatch={dispatch}
+          anchor={snap.menuAnchor}
+          viewport={viewport}
+          previewWalking={snap.previewWalking}
+        />
+      )}
       <div
         id="hudRight"
         style={{
@@ -531,18 +535,36 @@ export default function BattleScreen(): React.ReactElement {
           pointerEvents: "none", // 미니맵/버튼은 각자 auto
         }}
       >
-        <Minimap map={ctx.map} units={snap.vm.units} selectedId={selectedId} viewport={snap.viewport} />
-        <BattleControls
-          auto={snap.autoBattle}
-          onToggleAuto={toggleAuto}
-          onResetCamera={resetCamera}
-          speed={snap.speed}
-          onCycleSpeed={cycleSpeed}
-          onOpenMenu={() => setPaused(true)}
-          canAutoFight={canAutoFight}
-        />
-        {panelSide === "right" && unitPanel}
+        {mobile ? (
+          <button type="button" data-testid="mobile-menu" aria-label="메뉴 열기" onClick={() => setPaused(true)} style={MOBILE_MENU_BTN}>
+            ☰
+          </button>
+        ) : (
+          <>
+            <Minimap map={ctx.map} units={snap.vm.units} selectedId={selectedId} viewport={snap.viewport} />
+            <BattleControls
+              auto={snap.autoBattle}
+              onToggleAuto={toggleAuto}
+              onResetCamera={resetCamera}
+              speed={snap.speed}
+              onCycleSpeed={cycleSpeed}
+              onOpenMenu={() => setPaused(true)}
+              canAutoFight={canAutoFight}
+            />
+            {panelSide === "right" && unitPanel}
+          </>
+        )}
       </div>
+      {mobile && (
+        <BottomPanel
+          ui={snap.ui}
+          vm={snap.vm}
+          ctx={ctx}
+          committed={store.committedState}
+          dispatch={dispatch}
+          previewWalking={snap.previewWalking}
+        />
+      )}
       {boot.ready && (
         <DialogueOverlay
           store={store}
@@ -649,6 +671,11 @@ export default function BattleScreen(): React.ReactElement {
         }
         confirmAttacks={controls.attackConfirm}
         onToggleConfirmAttacks={toggleConfirmAttacks}
+        mobileControls={
+          mobile
+            ? { speed: snap.speed, onCycleSpeed: cycleSpeed, auto: snap.autoBattle, onToggleAuto: toggleAuto, canAutoFight, onResetCamera: resetCamera }
+            : undefined
+        }
         editorUrl={
           process.env.NODE_ENV !== "production" && !sandbox
             ? editorUrlFor(ctx.stage.id, process.env.NEXT_PUBLIC_TOOLS_ORIGIN ?? "http://localhost:8081")
