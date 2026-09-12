@@ -198,6 +198,31 @@ def _validate_data():
     return {"ok": p.returncode == 0, "code": p.returncode, "output": tail}
 
 
+_DRAFT_DIR = os.path.join(PUBLIC, "_draft")          # next dev 가 /_draft/{id}.json 으로 서빙 (gitignore, R2 무관)
+_DRAFT_ID_RE = re.compile(r"^[A-Za-z0-9_-]+$")
+_DRAFT_MAX_BYTES = 5 * 1024 * 1024
+
+
+def _save_playtest_draft(payload):
+    """에디터 플레이테스트 스냅샷(spec 2026-09-12-editor-playtest-design §4·§5-2)을 원자적으로 저장한다.
+    반환 (http_code, body). 검증 실패 400, 쓰기 실패는 호출측에서 500."""
+    draft_id = payload.get("draftId")
+    if not isinstance(draft_id, str) or not _DRAFT_ID_RE.match(draft_id):
+        return 400, {"ok": False, "error": "draftId 형식 오류 ([A-Za-z0-9_-]+)"}
+    if payload.get("kind") != "tk-playtest-snapshot":
+        return 400, {"ok": False, "error": "kind 가 tk-playtest-snapshot 이 아님"}
+    if not isinstance(payload.get("stage"), dict) or not isinstance(payload.get("map"), dict):
+        return 400, {"ok": False, "error": "stage/map 누락"}
+    os.makedirs(_DRAFT_DIR, exist_ok=True)
+    dest = os.path.join(_DRAFT_DIR, draft_id + ".json")
+    tmp = dest + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False)
+    os.replace(tmp, dest)
+    sys.stdout.write(f"[playtest-draft] {draft_id}.json 저장\n")
+    return 200, {"ok": True, "draftId": draft_id, "url": f"/_draft/{draft_id}.json"}
+
+
 class NoCacheHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=ROOT, **kwargs)
@@ -307,7 +332,7 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self):  # noqa: N802
         endpoint = self.path.split("?")[0]
-        if endpoint not in ("/save-asset", "/delete-asset", "/rebuild-audio-manifest", "/validate-data"):
+        if endpoint not in ("/save-asset", "/delete-asset", "/rebuild-audio-manifest", "/validate-data", "/playtest-draft"):
             self._json(404, {"ok": False, "error": "unknown endpoint"})
             return
 
@@ -326,6 +351,23 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
                 self._json(200, _validate_data())
             finally:
                 _VALIDATE_LOCK.release()
+            return
+
+        if endpoint == "/playtest-draft":
+            length = int(self.headers.get("Content-Length", 0) or 0)
+            if length > _DRAFT_MAX_BYTES:
+                self._json(400, {"ok": False, "error": f"드래프트가 너무 큼 ({length} bytes > 5MB)"})
+                return
+            try:
+                payload = json.loads(self.rfile.read(length).decode("utf-8")) if length else {}
+            except Exception as e:  # noqa: BLE001
+                self._json(400, {"ok": False, "error": f"잘못된 요청: {e}"})
+                return
+            try:
+                code, body = _save_playtest_draft(payload)
+            except OSError as e:
+                code, body = 500, {"ok": False, "error": f"드래프트 쓰기 실패: {e}"}
+            self._json(code, body)
             return
 
         try:
