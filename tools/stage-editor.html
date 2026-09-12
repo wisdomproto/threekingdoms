@@ -122,6 +122,22 @@
   table.quick .lv .btn { padding:1px 6px; font-size:11px; } table.quick .lv .n { display:inline-block; min-width:22px; text-align:center; }
   table.quick input[type=number] { width:58px; background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:2px 4px; font-size:11.5px; }
   .quick-goal { background:var(--panel2); border:1px solid var(--line); border-radius:5px; padding:5px 7px; font-size:12.5px; }
+  /* Story Editor v1 (story-editor.js) — spec creator-ux-p2 §5 */
+  .lrow { display:flex; gap:5px; align-items:center; margin-bottom:5px; }
+  .lrow.head { justify-content:space-between; margin-bottom:6px; } .lrow.head h3 { margin:0; }
+  .lrow input[type=text],.lrow select,.lrow input[type=number] { flex:1; min-width:0; background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:4px 6px; font-size:12px; }
+  .lrow input[type=number] { flex:0 0 64px; } .lrow .dim { color:var(--dim); font-size:11px; }
+  .lbtns { display:inline-flex; gap:2px; margin-left:auto; } .lbtns .btn { padding:1px 6px; font-size:11px; }
+  .line { background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:6px; margin-bottom:6px; }
+  .line .narr { display:flex; gap:4px; align-items:center; font-size:11px; color:var(--dim); } .line .narr input { width:auto; }
+  .line textarea,.part textarea.json { width:100%; background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:5px 7px; font-size:12.5px; font-family:inherit; resize:none; line-height:1.45; }
+  .part textarea.json { height:220px; font-family:Consolas,monospace; font-size:11.5px; resize:vertical; margin:6px 0; }
+  .part .msg { color:var(--bad); font-size:10.5px; display:none; margin-bottom:4px; }
+  .thumb { flex:0 0 48px; width:48px; height:48px; border:1px solid var(--line); border-radius:5px; background:var(--panel2); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .thumb img { width:100%; height:100%; object-fit:cover; } .thumb .nogen { font-size:10px; color:var(--dim); }
+  .card.empty { text-align:center; color:var(--dim); padding:18px 9px; } .card.empty .btn { margin-top:8px; }
+  .dlg .when label { font-weight:bold; color:var(--acc); } .card details summary { cursor:pointer; color:var(--dim); font-size:11px; margin:4px 0; }
+  .story-sect { margin-top:12px; } .story-sect > summary { cursor:pointer; color:var(--dim); font-size:11.5px; padding:6px 0; border-top:1px solid var(--line); }
 </style>
 </head>
 <body>
@@ -318,7 +334,9 @@ import {
 } from './editor/stage-io.js';
 import { createHistory } from './editor/history.js';
 import { CHAPTERS, chapterOf } from './editor/chapters.js';
-import { slotParts, sceneCount } from './editor/story-model.js';
+import { slotParts, sceneCount, collectSceneBgs } from './editor/story-model.js';
+import { validateStory } from './editor/validate-story.js';
+import { renderSceneSlot, renderDialogueList } from './editor/story-editor.js';
 import { renderRail } from './editor/rail.js';
 import { renderQuick } from './editor/quick-edit.js';
 const GAME_ORIGIN = 'http://localhost:3000'; // next dev. 보드의 「🎮 게임 열기」와 같은 값
@@ -374,6 +392,9 @@ let pasteTarget = null;
 let railGroups = [];              // Chapter rail 모델 (loadRailStages 가 채움)
 let railCollapsed = localStorage.getItem('tk.editor.rail') === 'collapsed';
 let railKey = '';                 // 마지막 렌더 키 — 바뀔 때만 리렌더
+const repoStageCache = new Map(); // stageId → 레포 원본 JSON (rail fetch·loadStageFromServer·Publish 성공이 채움) — 씬 bg datalist·Publish diff 기준
+const repoMapCache = new Map();   // mapId → 레포 원본 맵 JSON
+const ASSET_BASE = '/apps/web/public';   // serve.py 가 레포 루트를 서빙 — 씬 썸네일·에셋 프로브
 const hasFS = 'showOpenFilePicker' in window;
 let stageHandle = null, mapHandle = null;
 
@@ -692,7 +713,9 @@ function renderTab() {
     else if (sub === 'adv') renderAdvTab(body);
   }
   else if (top === 'reward') renderRewardTab(body);
-  else body.innerHTML = '<div class="card">다음 단계에서 편집 UI</div>';   // story-intro · dialogue · story-outro — Chunk 4 (story-editor.js)
+  else if (top === 'story-intro') renderStoryTab(body, 'intro');
+  else if (top === 'story-outro') renderStoryTab(body, 'outro');
+  else if (top === 'dialogue') renderDialogueTab(body);
   refreshValidation();
 }
 
@@ -812,6 +835,28 @@ function renderQuickTab(b) {
     },
     onPlaytest: () => runPlaytest(),
   });
+}
+
+/* ── 이야기 탭 · 전투 중 대사 탭 (story-editor.js) — spec §5. 변형은 제자리 + commit=refreshValidation ── */
+const commanderName = (id) => (COMMANDERS.find(c => c.id === id) || {}).name || id;
+function storyCtx(key) {
+  const bgs = new Set(collectSceneBgs([...repoStageCache.values(), stage]));
+  return { stage, key, bgOptions: [...bgs].sort(), assetBase: ASSET_BASE, speakers: [...new Set(COMMANDERS.map(c => c.name))], commit: refreshValidation };
+}
+function renderStoryTab(b, key) {
+  const el = document.createElement('div'); b.appendChild(el);
+  renderSceneSlot(el, storyCtx(key));
+  if (key !== 'outro') return;
+  const det = document.createElement('details'); det.className = 'story-sect';   // 패배 후 이야기 — 접힌 섹션
+  const sum = document.createElement('summary'); sum.textContent = `패배 후 이야기 (outroDefeat) · ${slotParts((stage.scenario || {}).outroDefeat).length}장면 ▾`;
+  const inner = document.createElement('div'); det.appendChild(sum); det.appendChild(inner); b.appendChild(det);
+  renderSceneSlot(inner, storyCtx('outroDefeat'));
+}
+function renderDialogueTab(b) {
+  const seen = new Set(); const placed = [];
+  allPlacedUnits().forEach(({ u }) => { if (u.commanderId && !seen.has(u.commanderId)) { seen.add(u.commanderId); placed.push({ id: u.commanderId, name: commanderName(u.commanderId) }); } });
+  const duels = (stage.events || []).map(e => ({ id: e.id, label: `${commanderName(e.trigger.attackerId)} vs ${commanderName(e.trigger.defenderId)}` }));
+  renderDialogueList(b, { stage, placed, duels, speakers: [...new Set(COMMANDERS.map(c => c.name))], commit: refreshValidation });
 }
 
 function resizeGrid(nw, nh) {
@@ -1169,6 +1214,8 @@ function validate() {
   // 맵
   if (!mapId || !mapId.trim()) E('map.id 가 비어 있습니다.');
   if (tiles.length !== H || tiles.some(r => r.length !== W)) E('맵 tiles 크기 불일치.');
+  // 씬·전투 중 대사 (validate-story.js, spec §9)
+  errs.push(...validateStory(stage, { placedIds: allPlacedUnits().map(({ u }) => u.commanderId), duelIds: (stage.events || []).map(e => e.id) }));
   return errs;
 }
 function inBounds(x, y) { return Number.isInteger(x) && Number.isInteger(y) && x >= 0 && y >= 0 && x < W && y < H; }
@@ -1451,11 +1498,12 @@ async function loadStageFromServer(stageId_) {
   };
   const stageObj = await tryFetch(`/packages/data/json/stages/${stageId_}.json`);
   if (!stageObj) { console.info('스테이지 fetch 실패:', stageId_); toast('스테이지 로드 실패: ' + stageId_, true); return false; }
+  repoStageCache.set(stageId_, stageObj);
   // 연결된 mapId로 맵도 fetch
   const mapId_ = stageObj.mapId;
   if (mapId_) {
     const mapObj = await tryFetch(`/packages/data/json/maps/${mapId_}.json`);
-    if (mapObj) loadMapObject(mapObj);
+    if (mapObj) { repoMapCache.set(mapId_, mapObj); loadMapObject(mapObj); }
   }
   loadStageObject(stageObj);
   // 드롭다운 동기화
@@ -1470,7 +1518,7 @@ async function loadStageFromServer(stageId_) {
 const STAGE_IDS = Array.from(document.getElementById('stageSelect').options).map(o => o.value).filter(Boolean);   // 27 하드코딩 옵션이 id 출처
 async function loadRailStages() {   // 27 JSON 병렬 fetch → 이름·컷신 수 (실패 항목은 id 만)
   const entries = await Promise.all(STAGE_IDS.map(async id => {
-    try { const r = await fetch(`/packages/data/json/stages/${id}.json`, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); const s = await r.json(); return { id, name: s.name || id, scenes: sceneCount(s) }; }
+    try { const r = await fetch(`/packages/data/json/stages/${id}.json`, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); const s = await r.json(); repoStageCache.set(id, s); return { id, name: s.name || id, scenes: sceneCount(s) }; }
     catch { return { id, name: id, scenes: 0 }; }
   }));
   railGroups = CHAPTERS.map(ch => ({ chapter: ch.chapter, title: ch.title, stages: entries.filter(e => chapterOf(e.id) === ch.chapter) }));
