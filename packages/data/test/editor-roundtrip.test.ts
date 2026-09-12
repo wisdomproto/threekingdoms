@@ -135,4 +135,16 @@ describe("에디터 round-trip — 편집 의미론 (spec §6-2)", () => {
     expect(Object.keys(out.tileLegend as Json)).toEqual([".", "g"]);
     expect(out.tileLegend).toEqual({ ".": "plain", "g": "grass" });
   });
+
+  it("스냅샷(직렬화 문자열) → 복원(loadStage) → 직렬화 = 편집본, 유닛 미지 필드 보존 (Undo 복원 뒤 저장 무손실)", () => {
+    const m = loadStage(base()) as Json & { units: Json[] };
+    m.units[0]!.x = 7;
+    const snap = JSON.stringify({ stage: serializeStage(m) });
+    const restored = loadStage(JSON.parse(snap).stage);
+    const out = serializeStage(restored) as Json & { units: Json[] };
+    const want = base() as Json & { units: Json[] };
+    want.units[0]!.x = 7;
+    same(out, want);
+    expect(out.units[0]!.note).toBe("미지");
+  });
 });
