@@ -129,7 +129,9 @@ export interface ReinforcedUnit {
 export type BattleEvent =
   | { type: "unitMoved"; unitId: string; from: Coord; to: Coord }
   // crit = 회심(운 기반 시드 롤 — combat.crit) / guarded = 가드(통솔 기반 피해 반감 — combat.guard). 미설정=일반 타격(하위호환).
-  | { type: "damageDealt"; attackerId: string; defenderId: string; damage: number; counter: boolean; hit: boolean; crit?: boolean; guarded?: boolean }
+  | { type: "damageDealt"; attackerId: string; defenderId: string; damage: number; counter: boolean; hit: boolean; crit?: boolean; guarded?: boolean;
+      /** 비물리 피해 출처(책략/공격아이템) — 생략=무기 타격. 연출 분기용(칼 참격 대신 술법 임팩트). */
+      source?: "strategy" | "item" }
   | { type: "statusApplied"; unitId: string; kind: StatusKind; turns: number }
   | { type: "statusTick"; unitId: string; kind: StatusKind; damage: number }
   | { type: "statusExpired"; unitId: string; kind: StatusKind }

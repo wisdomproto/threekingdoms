@@ -112,6 +112,7 @@ describe("useItem: attackItem (공격아이템)", () => {
     expect(get(r.state, "간옹").acted).toBe(true);
     // 반격(counter) 없음
     expect(r.events.some((e) => e.type === "damageDealt" && e.counter)).toBe(false);
+    expect(r.events.some((e) => e.type === "damageDealt" && e.source === "item")).toBe(true);
     expect(r.events.find((e) => e.type === "itemUsed")).toMatchObject({ itemId: "폭탄", amount: 50 });
   });
 

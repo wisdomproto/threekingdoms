@@ -701,6 +701,8 @@ export class BattleRenderer implements Presenter {
   /** 보스 BGM 교전 트리거(2026-07-04) — 적 메인 장수(bossOf)와 아군이 처음 맞붙는 순간
    *  battleBoss로 전환(전투당 1회). 라우트 진입은 항상 battle로 시작(bgmRoute)해 긴장을 아낀다. */
   private bossBgmFired = false;
+  /** 직전 strategyCast 카테고리 — 뒤따르는 damageDealt(source=strategy) 임팩트 색을 맞추는 데 씀. */
+  private lastStrategyCategory = "special";
   private maybeBossBgm(aId: string, bId: string): void {
     if (this.bossBgmFired) return;
     const boss = bossUnitId(this.ctx.stage);
@@ -761,6 +763,18 @@ export class BattleRenderer implements Presenter {
       this.triggerShake(big ? SHAKE_PX_BIG : SHAKE_PX_HIT);
       s.tweens.hitstop(big ? HITSTOP_MS_BIG : HITSTOP_MS_HIT); // 묵직한 정지(배속 존중)
     };
+    if (e.source) {
+      // 책략/공격아이템(비물리): 시전자는 돌진·참격 없음 — 대상 칸에 술법 임팩트만.
+      // (종전엔 책략도 무기 타격과 같은 damageDealt라 캐스터가 칼로 베는 연출이 났다.)
+      const cat = e.source === "strategy" ? this.lastStrategyCategory : "special";
+      void s.tweens.delay(60).then(() => {
+        void s.fx.strategyEffect(cat, popupAt);
+        impact();
+      });
+      await Promise.all([defender.playHitFrom(fromDir, intensity), s.fx.damagePopup(popupAt, e.damage, e.counter, crit, guarded)]);
+      defender.setTroops(defender.troops - e.damage);
+      return;
+    }
     if (indirect) {
       // 발사(활시위 쉭) → 화살 비행 → 명중 순간 관통 톤 임팩트
       void s.tweens.delay(90).then(() => {
@@ -878,6 +892,7 @@ export class BattleRenderer implements Presenter {
     this.autoFocus(targetWorld, FOCUS_MS);
     const strat = this.ctx.data.strategies[e.strategyId];
     const name = strat?.name ?? e.strategyId;
+    this.lastStrategyCategory = strat?.category ?? "special";
     playSfx(SFX.spell);
     // 카테고리별 대표 VFX(불/물/바람/땅/회복/디버프/특수) — 대상 칸에 펼친다(데미지/회복은 후속 이벤트가 처리).
     if (strat?.category) void s.fx.strategyEffect(strat.category, targetWorld);

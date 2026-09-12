@@ -56,14 +56,14 @@ function assertCanAct(state: BattleState, unit: UnitState, forMove: boolean): vo
 /** 병력 차감 → 0이면 퇴각. 새 상태와 이벤트를 반환. hit=false(미스)는 호출측이 따로 emit하므로 기본 true. */
 function dealDamage(
   state: BattleState, attacker: UnitState, defender: UnitState, damage: number, counter: boolean, hit = true,
-  crit = false, guarded = false,
+  crit = false, guarded = false, source?: "strategy" | "item",
 ): { state: BattleState; events: BattleEvent[] } {
   const troops = Math.max(0, defender.troops - damage);
   const retreated = troops === 0;
   const events: BattleEvent[] = [
     {
       type: "damageDealt", attackerId: attacker.id, defenderId: defender.id, damage, counter, hit,
-      ...(crit ? { crit } : {}), ...(guarded ? { guarded } : {}),
+      ...(crit ? { crit } : {}), ...(guarded ? { guarded } : {}), ...(source ? { source } : {}),
     },
   ];
   if (retreated) events.push({ type: "unitRetreated", unitId: defender.id });
@@ -686,7 +686,7 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
           const wf = strat.category === "fire" ? w.firePercent / 100
             : strat.category === "water" ? w.waterPercent / 100 : 1;
           const dmg = Math.max(ctx.data.combat.minDamage, Math.floor(strategyDamage(caster, t, strat.power) * wf));
-          const hit = dealDamage(next, caster, getUnit(next, t.id), dmg, false);
+          const hit = dealDamage(next, caster, getUnit(next, t.id), dmg, false, true, false, false, "strategy");
           next = hit.state;
           events.push(...hit.events);
         }
@@ -734,7 +734,7 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
       } else {
         // attackItem: 적대 진영 troops를 power 고정 감소 (최소 0, 반격 없음)
         if (!areFoes(tgt.side, unit.side)) throw new Error(`attackItem target must be hostile`);
-        const hit = dealDamage(state, unit, tgt, item.power, false);
+        const hit = dealDamage(state, unit, tgt, item.power, false, true, false, false, "item");
         next = hit.state;
         events.push(...hit.events);
         amount = Math.min(item.power, tgt.troops); // 실제 가한 피해(병력이 더 적으면 그만큼)

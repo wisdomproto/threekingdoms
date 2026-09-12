@@ -56,6 +56,8 @@ describe("책략 (strategy) 액션", () => {
     expect(r.events.some((e) => e.type === "strategyCast")).toBe(true);
     expect(r.events.filter((e) => e.type === "damageDealt").length).toBe(2);
     expect(r.events.some((e) => e.type === "damageDealt" && e.counter)).toBe(false);
+    // 비물리 출처 표기 — 렌더러가 칼 참격 대신 술법 임팩트로 분기하는 근거
+    expect(r.events.every((e) => e.type !== "damageDealt" || e.source === "strategy")).toBe(true);
   });
 
   it("회복 책략은 회복량을 troopsHealed 이벤트로 서술한다 (자기서술 계약 — 드레인 정합)", () => {
