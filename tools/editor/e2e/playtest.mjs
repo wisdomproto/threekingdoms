@@ -6,6 +6,9 @@ const H = "window.__stageEditor";
 let t, g;
 try {
   t = await openEditor();
+  // ?nodraft=1: this script edits x and never reverts — an autosaved Draft would leak into later suites (draft-first load)
+  await t.eval("location.search = '?nodraft=1'; 'r'"); await sleep(1000);
+  if (!(await t.waitFor(`!!window.__stageEditor && window.__stageEditor.getStage().id === '05-sishuiguan'`, 60, 250))) throw new Error("editor did not reload");
   const editorUrl = await t.eval("location.href");
   const x0 = await t.eval(`${H}.getStage().units[0].x`);
   await t.eval(`(() => { const s = ${H}.getStage(); s.units[0].x += 1; ${H}.refreshValidation(); })()`);

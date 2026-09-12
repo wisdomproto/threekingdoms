@@ -26,6 +26,8 @@ let t, g;
 try {
   t = await openEditor();
   // profile dir persists across runs — rail collapse / recovery state from a previous run must not leak in
+  // stale Draft from an aborted earlier suite would be loaded draft-first and then *published* in step ⑥ — delete it first
+  await t.eval("fetch('/draft-delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stageId: '05-sishuiguan' }) }).catch(() => null)");
   await t.eval("localStorage.clear(); location.search = '?nodraft=1'; 'r'"); await sleep(1000);   // ?nodraft=1: this script owns publish/undo steps — autosave drafts must not leak into them if a step aborts
   if (!(await t.waitFor(EDITOR_READY))) throw new Error("editor did not reload");
 
