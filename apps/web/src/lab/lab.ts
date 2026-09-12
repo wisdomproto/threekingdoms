@@ -21,6 +21,8 @@ export interface LabPayload {
   sharedItems: string[];
   /** 전투 시드(시드확률 재현 테스트 — 같은 시드+행동열=같은 롤). */
   seed: number;
+  /** 에디터 플레이테스트(`/playtest`)가 연 전투일 때 에디터 탭 URL. 없으면 실험실 전투 → 종료 시 /lab. */
+  returnUrl?: string;
 }
 
 /**
@@ -108,4 +110,36 @@ export function readLab(): LabPayload | null {
   } catch {
     return null;
   }
+}
+
+export type ExitTarget = { kind: "close" } | { kind: "navigate"; to: string };
+
+/**
+ * 실험실/플레이테스트 전투의 종료 목적지 (순수). returnUrl 이 있으면 에디터가 연 탭이므로
+ * opener 가 살아 있을 때 닫아서 복귀하고, 없으면(탭 복사·새로고침) 그 URL 로 이동한다.
+ */
+export function exitTarget(
+  payload: Pick<LabPayload, "returnUrl"> | null | undefined,
+  hasOpener: boolean,
+): ExitTarget {
+  const returnUrl = payload?.returnUrl;
+  if (!returnUrl) return { kind: "navigate", to: "/lab" };
+  return hasOpener ? { kind: "close" } : { kind: "navigate", to: returnUrl };
+}
+
+/**
+ * 종료 실행 — 3지점(일시정지 나가기·승리 결산·패배 결산)과 착륙 페이지 「닫기」가 공유하는 유일한 부수효과 seam.
+ * close 는 브라우저가 조용히 거부할 수 있어 100ms 뒤 닫히지 않았으면 returnUrl 로 이동한다.
+ */
+export function leaveSandbox(
+  navigate: (to: string) => void,
+  payload: Pick<LabPayload, "returnUrl"> | null = readLab(),
+): void {
+  const hasOpener = typeof window !== "undefined" && window.opener != null;
+  const target = exitTarget(payload, hasOpener);
+  if (target.kind === "navigate") { navigate(target.to); return; }
+  window.close();
+  window.setTimeout(() => {
+    if (!window.closed && payload?.returnUrl) navigate(payload.returnUrl);
+  }, 100);
 }
