@@ -4,7 +4,7 @@ import { unitPanelSide } from "../hudLayout";
 
 describe("unitPanelSide", () => {
   it("앵커 없음 → left", () => expect(unitPanelSide(null, 800)).toBe("left"));
-  it("유닛이 좌측 절반 → right", () => expect(unitPanelSide({ x: 100, y: 0 }, 800)).toBe("right"));
-  it("유닛이 우측 절반 → left", () => expect(unitPanelSide({ x: 600, y: 0 }, 800)).toBe("left"));
-  it("뷰포트 0(미측정) → left", () => expect(unitPanelSide({ x: 100, y: 0 }, 0)).toBe("left"));
+  it("유닛이 좌측 절반 → right", () => expect(unitPanelSide({ x: 100 }, 800)).toBe("right"));
+  it("유닛이 우측 절반 → left", () => expect(unitPanelSide({ x: 600 }, 800)).toBe("left"));
+  it("뷰포트 0(미측정) → left", () => expect(unitPanelSide({ x: 100 }, 0)).toBe("left"));
 });
