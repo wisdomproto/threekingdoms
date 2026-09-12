@@ -34,6 +34,7 @@ import { useFadeNav } from "../../ui/useFadeNav";
 import { playSfx, SFX } from "../../audio";
 import { ItemIcon } from "../../ui/ItemIcon";
 import { ItemInfoPopup } from "../../ui/ItemInfoPopup";
+import { leaveSandbox, readLab } from "../../lab/lab";
 
 const OVERLAY_STYLE: React.CSSProperties = {
   position: "absolute",
@@ -273,6 +274,8 @@ export function ResultSequence({
   const victory = isOver && ui.result === "victory";
 
   // 결산 요약(승리 시에만 의미) — 순수 산출
+  // 플레이테스트(에디터가 연 탭)면 "에디터로", 실험실이면 "실험실로". 렌더마다 sessionStorage 를 읽지 않게 1회.
+  const sandboxLabel = useMemo(() => (readLab()?.returnUrl ? "에디터로 ▶" : "실험실로 ▶"), []);
   const summary = useMemo(
     () => (victory ? buildResultSummary(vm, reward, items) : null),
     [victory, vm, reward, items],
@@ -474,13 +477,13 @@ export function ResultSequence({
           <button type="button" style={BUTTON_STYLE} onClick={() => window.location.reload()}>
             다시 도전
           </button>
-          {/* outroDefeat 씬으로(없으면 씬 가드가 전장 선택으로). 샌드박스=실험실 복귀. */}
+          {/* outroDefeat 씬으로(없으면 씬 가드가 전장 선택으로). 샌드박스=leaveSandbox(에디터 탭 또는 /lab). */}
           <button
             type="button"
             style={BUTTON_STYLE}
-            onClick={() => fadeTo(sandbox ? "/lab" : stageId ? `/scene?stage=${stageId}&type=outroDefeat` : "/stages")}
+            onClick={() => (sandbox ? leaveSandbox(fadeTo) : fadeTo(stageId ? `/scene?stage=${stageId}&type=outroDefeat` : "/stages"))}
           >
-            {sandbox ? "실험실로 ▶" : "이야기 계속 ▶"}
+            {sandbox ? sandboxLabel : "이야기 계속 ▶"}
           </button>
         </div>
         {fadeOverlay}
@@ -951,13 +954,13 @@ export function ResultSequence({
             <button type="button" style={BUTTON_STYLE} onClick={() => window.location.reload()}>
               다시 도전
             </button>
-            {/* 캠페인 진행: outro 씬 → 다음 스테이지 intro(없으면 전장 선택). 샌드박스=실험실 복귀. */}
+            {/* 캠페인 진행: outro 씬 → 다음 스테이지 intro(없으면 전장 선택). 샌드박스=leaveSandbox(에디터 탭 또는 /lab). */}
             <button
               type="button"
               style={BUTTON_STYLE}
-              onClick={() => fadeTo(sandbox ? "/lab" : stageId ? `/scene?stage=${stageId}&type=outro` : "/stages")}
+              onClick={() => (sandbox ? leaveSandbox(fadeTo) : fadeTo(stageId ? `/scene?stage=${stageId}&type=outro` : "/stages"))}
             >
-              {sandbox ? "실험실로 ▶" : "다음으로 ▶"}
+              {sandbox ? sandboxLabel : "다음으로 ▶"}
             </button>
           </div>
         </div>

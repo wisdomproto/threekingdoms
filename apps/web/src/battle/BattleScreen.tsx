@@ -164,12 +164,13 @@ function activeUnitId(ui: InputState): string | null {
  * 실험실(/lab): URL이 stage=__lab이면 sessionStorage tk.lab 페이로드(스테이지·맵·공유풀·시드)로
  * ctx를 직접 구성 — 정규 스테이지 경로·2회차 강화와 완전 분리(메타 불가침은 결산 sandbox가 담당).
  */
-function makeCtx(): { ctx: BattleContext; sharedItems: string[]; seed?: number } {
+function makeCtx(): { ctx: BattleContext; sharedItems: string[]; seed?: number; sandbox: boolean } {
   if (typeof window !== "undefined" &&
       new URLSearchParams(window.location.search).get("stage") === LAB_STAGE_ID) {
     const lab = readLab();
     if (lab) {
-      return { ctx: { data: gameData, stage: lab.stage, map: lab.map }, sharedItems: lab.sharedItems, seed: lab.seed };
+      // 실험실·플레이테스트: 결산 sandbox(메타 불가침)·종료 복귀는 이 플래그가 결정 — 스테이지 id 비교 금지(플레이테스트 스냅샷은 실제 id 유지).
+      return { ctx: { data: gameData, stage: lab.stage, map: lab.map }, sharedItems: lab.sharedItems, seed: lab.seed, sandbox: true };
     }
   }
   const sortie = readSortie();
@@ -206,20 +207,21 @@ function makeCtx(): { ctx: BattleContext; sharedItems: string[]; seed?: number }
         ];
       }),
     );
-    return { ctx: { data: { ...gameData, commanders: scaledCommanders }, stage, map }, sharedItems };
+    return { ctx: { data: { ...gameData, commanders: scaledCommanders }, stage, map }, sharedItems, sandbox: false };
   }
 
-  return { ctx: { data: gameData, stage, map }, sharedItems };
+  return { ctx: { data: gameData, stage, map }, sharedItems, sandbox: false };
 }
 
 interface Session {
   ctx: BattleContext;
   store: BattleStore;
   delegate: PresenterDelegate;
+  sandbox: boolean;
 }
 
 function createSession(): Session {
-  const { ctx, sharedItems, seed } = makeCtx();
+  const { ctx, sharedItems, seed, sandbox } = makeCtx();
   const delegate = new PresenterDelegate();
   const store = new BattleStore(ctx, seed ?? SEED, {
     presenter: delegate,
@@ -232,13 +234,13 @@ function createSession(): Session {
     // 부대 창고 소모품(§7) → friendly 공유 풀
     sharedItems,
   });
-  return { ctx, store, delegate };
+  return { ctx, store, delegate, sandbox };
 }
 
 export default function BattleScreen(): React.ReactElement {
   const sessionRef = useRef<Session | null>(null);
   sessionRef.current ??= createSession();
-  const { ctx, store, delegate } = sessionRef.current;
+  const { ctx, store, delegate, sandbox } = sessionRef.current;
 
   const mountRef = useRef<HTMLDivElement | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -473,8 +475,8 @@ export default function BattleScreen(): React.ReactElement {
           vm={snap.vm}
           reward={ctx.stage.reward}
           items={ctx.data.items}
-          stageId={ctx.stage.id === LAB_STAGE_ID ? undefined : ctx.stage.id}
-          sandbox={ctx.stage.id === LAB_STAGE_ID}
+          stageId={sandbox ? undefined : ctx.stage.id}
+          sandbox={sandbox}
         />
       )}
       {/* 부트 장막 — 에셋 준비 전 전장을 가린다(입력도 차단). 준비/타임아웃 시 즉시 걷힘. */}
@@ -526,7 +528,7 @@ export default function BattleScreen(): React.ReactElement {
           </p>
         </div>
       )}
-      <PauseMenu open={paused} onClose={() => setPaused(false)} exitTo={ctx.stage.id === LAB_STAGE_ID ? "/lab" : "/stages"} />
+      <PauseMenu open={paused} onClose={() => setPaused(false)} sandbox={sandbox} />
     </div>
   );
 }
