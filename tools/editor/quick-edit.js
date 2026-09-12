@@ -30,7 +30,7 @@ export function renderQuick(el, { stage, commanders, classes, sides, onChange, o
     tr.dataset.commanderId = u.commanderId;
     const s = sides[u.side] || sides.enemy;
     const td = () => tr.appendChild(document.createElement("td"));
-    td().innerHTML = `<span class="dot" style="background:${s.raw}" title="${s.label}"></span>`;
+    { const dot = document.createElement("span"); dot.className = "dot"; dot.style.background = s.raw; dot.title = s.label; td().appendChild(dot); }
     td().textContent = nameOf(commanders, u.commanderId);
     td().textContent = nameOf(classes, u.classId);
     // Lv [−][n][+]

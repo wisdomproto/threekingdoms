@@ -182,14 +182,15 @@ _VALIDATE_LOCK = threading.Lock()  # ThreadingHTTPServer 는 동시 요청 가�
 
 
 def _validate_data():
-    """Publish 검사 = 레포의 packages/data/json/* 을 @tk/data 테스트(zod safeParse 전수)로 검증.
-    index.ts 의 loadJson 은 첫 실패 파일에서 throw 하므로 에러는 한 번에 1건이다."""
+    """Publish 검사 = 레포의 packages/data/json/* 을 `test/publish-gate.test.ts`(디스크 전수 zod + 참조 무결성)로
+    검증. 전체 스위트가 아니다 — 05 콘텐츠 회귀 테스트(data.test.ts 등)가 정당한 편집을 거부하면 안 되므로
+    (spec 2026-09-12-creator-ux-p2 §7). 미등록 신규 파일도 디스크에서 읽어 검사된다."""
     pnpm = shutil.which("pnpm")
     if not pnpm:
         return {"ok": False, "error": "pnpm 미발견 — PATH 확인"}
     env = {**os.environ, "CI": "1", "NO_COLOR": "1"}  # ANSI 제거
     try:
-        p = subprocess.run([pnpm, "--filter", "@tk/data", "test"], cwd=ROOT, shell=False,
+        p = subprocess.run([pnpm, "--filter", "@tk/data", "test", "publish-gate"], cwd=ROOT, shell=False,
                            capture_output=True, text=True, encoding="utf-8", errors="replace", env=env, timeout=120)
     except subprocess.TimeoutExpired:
         return {"ok": False, "error": "timeout(120s)"}
@@ -210,7 +211,7 @@ def _save_playtest_draft(payload):
     if not isinstance(payload, dict):
         return 400, {"ok": False, "error": "본문이 JSON 객체가 아님"}
     draft_id = payload.get("draftId")
-    if not isinstance(draft_id, str) or not _DRAFT_ID_RE.match(draft_id):
+    if not isinstance(draft_id, str) or not _DRAFT_ID_RE.fullmatch(draft_id):
         return 400, {"ok": False, "error": "draftId 형식 오류 ([A-Za-z0-9_-]+)"}
     if payload.get("kind") != "tk-playtest-snapshot":
         return 400, {"ok": False, "error": "kind 가 tk-playtest-snapshot 이 아님"}
@@ -236,10 +237,15 @@ def _rel(path):
 
 
 def _write_text_atomic(dest, txt):
-    tmp = dest + ".tmp"
-    with open(tmp, "w", encoding="utf-8", newline="\n") as f:  # Windows \r\n 변환 방지
-        f.write(txt)
-    os.replace(tmp, dest)
+    os.makedirs(_PUBLISH_BACKUP_DIR, exist_ok=True)
+    tmp = os.path.join(_PUBLISH_BACKUP_DIR, os.path.basename(dest) + ".tmp")  # 추적 디렉터리에 .tmp 잔류 금지
+    try:
+        with open(tmp, "w", encoding="utf-8", newline="\n") as f:  # Windows \r\n 변환 방지
+            f.write(txt)
+        os.replace(tmp, dest)
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
 
 
 def _restore(dest, backup, had_backup):
@@ -261,7 +267,7 @@ def _parse_publish_doc(txt, label):
     except ValueError as e:
         return None, f"{label} JSON 파싱 실패: {e}"
     doc_id = obj.get("id") if isinstance(obj, dict) else None
-    if not isinstance(doc_id, str) or not _DRAFT_ID_RE.match(doc_id):
+    if not isinstance(doc_id, str) or not _DRAFT_ID_RE.fullmatch(doc_id):
         return None, f"{label}.id 형식 오류 ([A-Za-z0-9_-]+)"
     return (obj, doc_id, txt if txt.endswith("\n") else txt + "\n"), None
 
@@ -322,6 +328,9 @@ def _publish_stage(payload):
     if not result.get("ok"):
         for dest, backup, key in written:
             _restore(dest, backup, had[key])
+        meta_path = os.path.join(_PUBLISH_BACKUP_DIR, stage_id + ".meta.json")
+        if os.path.exists(meta_path):
+            os.remove(meta_path)  # 반영된 적 없는 publish — 롤백 대상 아님
         sys.stdout.write(f"[publish-stage] {stage_id} 검사 실패 → 롤백\n")
         return 200, {"ok": False, "rolledBack": True, "output": result.get("output") or result.get("error", "")}
     sys.stdout.write(f"[publish-stage] {stage_id} → {', '.join(wrote)} (backup={had})\n")
@@ -331,7 +340,7 @@ def _publish_stage(payload):
 def _publish_rollback(payload):
     """마지막 publish 의 백업으로 되돌리고 전수 검사. 호출측이 _VALIDATE_LOCK 을 잡은 상태여야 한다."""
     stage_id = payload.get("stageId") if isinstance(payload, dict) else None
-    if not isinstance(stage_id, str) or not _DRAFT_ID_RE.match(stage_id):
+    if not isinstance(stage_id, str) or not _DRAFT_ID_RE.fullmatch(stage_id):
         return 400, {"ok": False, "error": "stageId 형식 오류 ([A-Za-z0-9_-]+)"}
     meta_path = os.path.join(_PUBLISH_BACKUP_DIR, stage_id + ".meta.json")
     if not os.path.exists(meta_path):
@@ -499,7 +508,7 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
                 fn = _publish_stage if endpoint == "/publish-stage" else _publish_rollback
                 try:
                     code, body = fn(payload)
-                except OSError as e:
+                except Exception as e:  # noqa: BLE001 — meta 손상(ValueError) 등도 JSON 500 으로
                     code, body = 500, {"ok": False, "error": f"publish 실패: {e}"}
                 self._json(code, body)
             finally:

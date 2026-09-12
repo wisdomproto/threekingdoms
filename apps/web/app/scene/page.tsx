@@ -32,6 +32,8 @@ function SceneRoute(): React.ReactElement | null {
   const isLab = stageId === LAB_STAGE_ID;
   const [lab, setLab] = useState<LabPayload | null | undefined>(isLab ? undefined : null);
   useEffect(() => { setLab(isLab ? readLab() : null); }, [isLab]);
+  // __lab 인데 세션 페이로드가 없으면(직접 URL 진입·세션 소실) /prep?stage=__lab 로 흘러가지 않게 실험실로.
+  useEffect(() => { if (isLab && lab === null) router.replace("/lab"); }, [isLab, lab, router]);
   const labPending = lab === undefined;
   const stage = lab?.stage ?? stages[stageId];
   const slot = stage?.scenario?.[type];
