@@ -8,7 +8,8 @@ import { describe, expect, it } from "vitest";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { BattleMapSchema, StageSchema } from "../src/schemas";
-import { gameData } from "../src/index";
+// gameData(index.ts) 를 import 하면 등록 JSON 하나만 깨져도 모듈 로드에서 throw 해 "전수 보고"가 죽는다 — 참조표도 디스크에서 읽는다.
+const readJson = (rel: string) => JSON.parse(readFileSync(join(__dirname, "..", "json", rel), "utf-8")) as Record<string, unknown>;
 
 const JSON_DIR = join(__dirname, "..", "json");
 const readDir = (sub: string) =>
@@ -17,6 +18,8 @@ const readDir = (sub: string) =>
 describe("publish gate — 레포 JSON 스키마 전수", () => {
   const maps = readDir("maps");
   const stages = readDir("stages");
+  const commanderIds = new Set(Object.keys(readJson("commanders.json")));
+  const classIds = new Set(Object.keys(readJson("unitClasses.json")));
 
   it("maps/*.json 전부 BattleMapSchema 통과", () => {
     const bad = maps.flatMap(({ file, obj }) => { const r = BattleMapSchema.safeParse(obj); return r.success ? [] : [`${file}: ${r.error.issues[0]?.path.join(".")} ${r.error.issues[0]?.message}`]; });
@@ -38,8 +41,8 @@ describe("publish gate — 레포 JSON 스키마 전수", () => {
       if (!mapIds.has(s.mapId)) bad.push(`${file}: mapId ${s.mapId} 없음`);
       const placed = [...s.units, ...(s.reinforcements ?? []).flatMap((x) => x.units)];
       for (const u of placed) {
-        if (!(u.commanderId in gameData.commanders)) bad.push(`${file}: commanderId ${u.commanderId} 없음`);
-        if (!(u.classId in gameData.unitClasses)) bad.push(`${file}: classId ${u.classId} 없음`);
+        if (!commanderIds.has(u.commanderId)) bad.push(`${file}: commanderId ${u.commanderId} 없음`);
+        if (!classIds.has(u.classId)) bad.push(`${file}: classId ${u.classId} 없음`);
       }
       const placedIds = new Set(placed.map((u) => u.commanderId));
       const duelIds = new Set(s.events.map((e) => e.id));

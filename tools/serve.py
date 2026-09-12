@@ -280,6 +280,12 @@ def _publish_targets(stage_id, with_map):
     return t
 
 
+def _drop_meta(stage_id):
+    meta_path = os.path.join(_PUBLISH_BACKUP_DIR, stage_id + ".meta.json")
+    if os.path.exists(meta_path):
+        os.remove(meta_path)
+
+
 def _publish_stage(payload):
     """레포 stages/{id}.json(+maps/{mapId}.json)에 쓰고 전수 검사, 실패면 백업 복원.
     호출측이 _VALIDATE_LOCK 을 잡은 상태여야 한다(spec 2026-09-12-creator-ux-p2 §7). 반환 (http_code, body)."""
@@ -322,15 +328,14 @@ def _publish_stage(payload):
     except OSError as e:
         for dest, backup, key in written:
             _restore(dest, backup, had[key])
+        _drop_meta(stage_id)
         return 500, {"ok": False, "error": f"쓰기 실패: {e}"}
 
     result = _validate_data()
     if not result.get("ok"):
         for dest, backup, key in written:
             _restore(dest, backup, had[key])
-        meta_path = os.path.join(_PUBLISH_BACKUP_DIR, stage_id + ".meta.json")
-        if os.path.exists(meta_path):
-            os.remove(meta_path)  # 반영된 적 없는 publish — 롤백 대상 아님
+        _drop_meta(stage_id)  # 반영된 적 없는 publish — 롤백 대상 아님
         sys.stdout.write(f"[publish-stage] {stage_id} 검사 실패 → 롤백\n")
         return 200, {"ok": False, "rolledBack": True, "output": result.get("output") or result.get("error", "")}
     sys.stdout.write(f"[publish-stage] {stage_id} → {', '.join(wrote)} (backup={had})\n")
