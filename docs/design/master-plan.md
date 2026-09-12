@@ -382,10 +382,10 @@ AI로 시나리오 초안, 캐릭터 디자인, 초상화, 스프라이트, 배�
 
 ### P2 --- Creator UX
 
--   챕터 중심 편집
--   Quick Edit
--   Story Editor
--   Publish UX
+-   ✅ 챕터 중심 편집 (2026-09-12, Project Bar·Chapter rail·전투 전/전투/대사/전투 후/보상 탭)
+-   ✅ Quick Edit (2026-09-12, 빠른 편집 탭 + 게임 ☰ ✏ 진입)
+-   ✅ Story Editor **v1** (2026-09-12, VN 씬·전투 중 대사 편집 + 씬 미리보기 왕복; 타임라인/모션코믹 = v2, 포맷 결정 후)
+-   ✅ Publish UX (2026-09-12, 체크리스트·변경사항·레포 쓰기+검사+롤백)
 
 ### P3 --- 플랫폼
 
@@ -615,4 +615,4 @@ Skin/Animation/VFX Package 공유 및 Marketplace.
 | 12 | Character Presentation "Studio Preview와 Battle Renderer는 가능한 한 같은 렌더러 재사용" | 벤치마크 §12.4 | 현황 정정: `rig-editor.html`은 Canvas2D, 전투는 Pixi `SkeletonView` — **같은 렌더러가 아니다.** 같은 렌더러는 *목표*(P2 Foundation). 그 전엔 포즈 계산·외형 조합·이벤트 시간 해석을 공유하고 동일 입력 캡처 비교로 차이를 잡는다. |
 | 13 | Character Presentation "armor socket" 하나 | 벤치마크 §7·§12.2 | 갑옷·망토는 **여러 본에 걸친 부착물 묶음**일 수 있다(Sulis 이미지 레이어). 게임 규칙의 `armor` 슬롯 하나 ≠ 표현의 부위 하나. 장비 호환성 메타(rigId/schemaVersion·slot·weaponArchetype·gripOffset/facing·animationSet·fallback)는 설계 예시이지 현 스키마가 아님. 말은 탑승자+말 합성 리그. |
 
-**미결(길중 결정 필요)**: ① 공식 콘텐츠 2탄(진시황 / TROIA / DAVID) ② Story Editor 착수 시점(P2 vs P3 — 모션코믹이 비전의 절반이라 앞당길 근거 있음) ③ 저작도구 공개 형태(Project Store가 로컬 JSON인지 Supabase인지) ④ 리깅 런타임(자체 컷아웃 확장 vs Spine 도입 — Presentation 데이터 계약은 어느 쪽이든 교체 가능하게) ⑤ GPL 부품(RPGAtlas 등) 코드 차용 여부 — 원하는 엔진 공개 정책과 라이선스 공개 범위를 먼저 결정(벤치마크 §13).
+**미결(길중 결정 필요)**: ① 공식 콘텐츠 2탄(진시황 / TROIA / DAVID) ② ~~Story Editor 착수 시점~~ → **v1(현행 VN·대사 편집)은 P2에서 착수·완료(2026-09-12)**; 남은 결정 = 모션코믹 **포맷**(타임라인 데이터 계약) — 그것이 정해지면 Story Editor v2 ③ 저작도구 공개 형태(Project Store가 로컬 JSON인지 Supabase인지) ④ 리깅 런타임(자체 컷아웃 확장 vs Spine 도입 — Presentation 데이터 계약은 어느 쪽이든 교체 가능하게) ⑤ GPL 부품(RPGAtlas 등) 코드 차용 여부 — 원하는 엔진 공개 정책과 라이선스 공개 범위를 먼저 결정(벤치마크 §13).

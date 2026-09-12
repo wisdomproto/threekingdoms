@@ -1,5 +1,7 @@
 # P2 Creator UX — 챕터 중심 셸 · Story Editor v1 · Quick Edit · Publish UX (2026-09-12)
 
+> **상태: 구현 완료 (2026-09-12)** — `feat/creator-ux-p2`. 리뷰 반영: Publish 게이트는 전체 스위트가 아니라 `test/publish-gate.test.ts`(디스크 전수 스키마 + 참조 무결성 — 05 콘텐츠 회귀 테스트가 정당한 편집을 막지 않게), scene 페이지 `readLab`은 마운트 효과(hydration), 맵 에셋 프로브 키 = `stage.mapId`, 씬 미리보기는 이야기 오류만 검사. E2E `tools/editor/e2e/creator.mjs`.
+
 > master-plan §14(EDIT↔PLAY 왕복·▶ 이 장 테스트·✏ 이 스테이지 편집), §15(Quick/Full), §16(챕터 중심 UX ①전투 전 이야기 ②전투 ③전투 후 이야기), §17(Story Editor), §22 P2. design-guide §4(Desktop Layout·Project Bar·Save states·Inspector language·Playtest 복귀), §5(Terrain palette·Character picker·Event builder·Empty states), §13(Publishing UX). 벤치마크 §10("현재 HTML 도구를 살리는 점진 통합 — UI 프레임워크 전환 자체를 목표로 삼지 않는다"), §11.2(이벤트 정의의 진실 = 단일 카탈로그). 목업 = docs/design/creator-shell-mockup.md. 부록 A #3(모션코믹 전환은 도구와 함께 — 도구 없이 포맷만 또 바꾸지 않는다), #11(같은 콘텐츠 계약 + 불변 Playtest 스냅샷).
 
 ## 1. 문제
