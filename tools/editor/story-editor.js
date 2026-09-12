@@ -4,19 +4,21 @@
 // renderLines(el, lines, opts) — 공용 줄 편집기. 모든 변형은 제자리 + commit()(= refreshValidation). 텍스트는 oninput(히스토리 병합).
 // 빈 문자열 필드(speaker/portraitId/bg/side)는 키 삭제 — 파일에 무의미한 "" 를 남기지 않는다.
 import { newSceneLine, newVnPart, newDialogueId, slotParts, isMapScene, isComicScene, describeTrigger } from "./story-model.js";
+import { renderComicPart, newComicPart } from "./comic-editor.js";   // 순환 import — comic-editor 가 h/btn/moveBtns/renderLines 를 되가져간다(top-level 호출 없음)
 
 const SIDE_OPTS = [["", "(자동)"], ["player", "아군"], ["ally", "우군"], ["enemy", "적군"]];
 const KINDS = [["battleStart", "전투가 시작되면"], ["turn", "N턴이 시작되면"], ["unitRetreated", "유닛이 퇴각하면"], ["duelOccurred", "일기토가 일어나면"], ["battleEnd", "전투가 끝나면"]];
 const SLOT_LABEL = { intro: "전투 전 이야기", outro: "전투 후 이야기", outroDefeat: "패배 후 이야기" };
 
-const h = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-const btn = (text, title, onclick) => { const b = h("button", "btn", text); if (title) b.title = title; b.onclick = onclick; return b; };
-const setOrDel = (obj, key, v) => { if (v === "" || v == null) delete obj[key]; else obj[key] = v; };
-function datalist(el, id, values) {
+export const h = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+export const btn = (text, title, onclick) => { const b = h("button", "btn", text); if (title) b.title = title; b.onclick = onclick; return b; };
+export const setOrDel = (obj, key, v) => { if (v === "" || v == null) delete obj[key]; else obj[key] = v; };
+export function datalist(el, id, values) {
   document.getElementById(id)?.remove();   // 같은 id 중복 방지(outro+outroDefeat 두 번 호출)
   const d = h("datalist"); d.id = id;
   for (const v of values) { const o = h("option"); o.value = v; d.appendChild(o); }
   el.appendChild(d);
+  return d;
 }
 function sel(opts, val, onchange) {
   const s = h("select");
@@ -24,7 +26,7 @@ function sel(opts, val, onchange) {
   s.value = val ?? ""; s.onchange = () => onchange(s.value);
   return s;
 }
-function moveBtns(arr, i, after) {   // ↑ ↓ ✕ — 구조 변형은 after() 가 재렌더
+export function moveBtns(arr, i, after) {   // ↑ ↓ ✕ — 구조 변형은 after() 가 재렌더
   const w = h("span", "lbtns");
   const up = btn("↑", "위로", () => { [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]; after(); }); up.disabled = i === 0;
   const dn = btn("↓", "아래로", () => { [arr[i + 1], arr[i]] = [arr[i], arr[i + 1]]; after(); }); dn.disabled = i === arr.length - 1;
@@ -135,10 +137,9 @@ export function renderSceneSlot(el, ctx) {
         catch (e) { err.textContent = "JSON 오류: " + e.message; err.style.display = "block"; }
       });
       det.append(ta, err, ap); card.appendChild(det);
-    } else if (isComicScene(part)) {   // 읽기 전용 — 편집 UI는 Chunk 3(renderComicPart). VN 카드의 `lines ??= []` 변형 금지(strict 스키마)
-      const pages = Array.isArray(part.pages) ? part.pages : [];
-      const panels = pages.reduce((n, pg) => n + (pg?.panels?.length ?? 0), 0);
-      card.appendChild(h("div", "dim", `만화 장면 (편집 UI 다음 단계) — 페이지 ${pages.length} · 칸 ${panels}`));   // .part .msg 는 숨김 클래스
+    } else if (isComicScene(part)) {   // 만화 파트 — VN 폴백 앞(VN 카드의 `lines ??= []` 는 strict 스키마를 깨뜨린다)
+      const body = h("div", "comic"); card.appendChild(body);
+      renderComicPart(body, part, { commit, assetBase });
     } else {
       const br = h("div", "lrow bgrow");
       const bg = h("input"); bg.type = "text"; bg.setAttribute("list", "tk-bgs"); bg.placeholder = "배경 키 (예: 05-sishuiguan-intro)"; bg.value = part.bg ?? "";
@@ -153,9 +154,10 @@ export function renderSceneSlot(el, ctx) {
     }
     el.appendChild(card);
   });
-  const add = h("button", "addbtn", "+ VN 장면 추가");
-  add.onclick = () => { if (arr) arr.push(newVnPart()); else setSlot([slot, newVnPart()]); again(); };   // 단일 VN → 배열 승격
-  el.appendChild(add);
+  const addPart = (mk) => () => { if (arr) arr.push(mk()); else setSlot([slot, mk()]); again(); };   // 단일 VN → 배열 승격
+  const add = h("button", "addbtn", "+ VN 장면 추가"); add.onclick = addPart(newVnPart);
+  const addComic = h("button", "addbtn", "+ 만화 장면 추가"); addComic.onclick = addPart(newComicPart); addComic.style.marginTop = "4px";
+  el.append(add, addComic);
 }
 
 /** 전투 중 대사 목록. placed=[{id,name}] duels=[{id,label}]. 카드 전부 삭제 → stage.dialogue = undefined(키 삭제). */

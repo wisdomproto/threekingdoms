@@ -9,3 +9,6 @@ export function clampRect(r: ArrayLike<number> | null | undefined): Rect;
 export function rectFromDrag(p0: Pt, p1: Pt, box: Box): Rect;
 export function newPage(): ComicPage;
 export function newComicPart(): ComicPart;
+export interface ComicPartCtx { commit: () => void; assetBase?: string }
+/** DOM 편집부 — 페이지 카드·썸네일 칸 드래그·칸 인스펙터. el 은 전용 컨테이너(스스로 재렌더). */
+export function renderComicPart(el: HTMLElement, part: ComicPart, ctx: ComicPartCtx): void;
