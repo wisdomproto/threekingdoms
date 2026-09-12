@@ -43,6 +43,8 @@ export const SFX = {
 } satisfies Record<string, SynthKey>;
 
 export type SfxKey = (typeof SFX)[keyof typeof SFX];
+/** 데이터 문자열(만화 칸 sfx 등) → 키 가드. 미지 키는 호출부가 무시. */
+export const isSfxKey = (k: string): k is SfxKey => (Object.values(SFX) as string[]).includes(k);
 
 /** 드롭인 파일 버퍼(preload로 채워짐). 키 존재 시 절차적보다 우선. */
 const fileBuffers = new Map<string, AudioBuffer>();

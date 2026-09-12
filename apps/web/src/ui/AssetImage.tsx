@@ -28,6 +28,8 @@ export function AssetImage({
   side,
   alt,
   style,
+  onLoad,
+  onError,
 }: {
   /** 이미지 경로(없거나 로드 실패 시 placeholder). */
   src?: string;
@@ -38,6 +40,9 @@ export function AssetImage({
   side?: string;
   alt?: string;
   style?: React.CSSProperties;
+  /** 자연 크기 수신(만화 지면 카메라 등). */
+  onLoad?: (w: number, h: number) => void;
+  onError?: () => void;
 }): React.ReactElement {
   const [failed, setFailed] = useState(false);
   // src가 바뀌면 로드 재시도.
@@ -48,7 +53,8 @@ export function AssetImage({
       <img
         src={src}
         alt={alt ?? label}
-        onError={() => setFailed(true)}
+        onError={() => { setFailed(true); onError?.(); }}
+        onLoad={(e) => onLoad?.(e.currentTarget.naturalWidth, e.currentTarget.naturalHeight)}
         style={{ objectFit: "cover", display: "block", width: "100%", height: "100%", ...style }}
       />
     );

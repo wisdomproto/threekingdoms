@@ -4,7 +4,7 @@
  *
  * 흐름: stages → (intro 씬) → /prep(상점·편성) → /battle → 결산 → (outro/outroDefeat 씬) → 다음.
  * 막간 v4: 씬 슬롯 = 단일 VN(하위호환) 또는 파트 배열(VN | MapScene) — normalizeSceneSlot로
- * 정규화해 파트를 순차 재생(VN=ScenePlayer, 맵=MapScenePlayer). key={pi} 리마운트 = 각 플레이어의
+ * 정규화해 파트를 순차 재생(VN=ScenePlayer, 맵=MapScenePlayer, 만화=ComicScenePlayer). key={pi} 리마운트 = 각 플레이어의
  * 오프닝 페이드가 파트 전환 연출을 겸한다. 시나리오 없는 스테이지/타입은 **빈 씬 가드**로 즉시
  * 다음 단계로(점진적 콘텐츠). 마지막 파트 완료 시 **페이드-투-블랙** 전환으로 다음 화면을 잇는다.
  */
@@ -13,6 +13,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { isComicScene, normalizeSceneSlot, stages } from "@tk/data";
 import { ScenePlayer } from "../../src/scene/ScenePlayer";
 import { MapScenePlayer } from "../../src/scene/MapScenePlayer";
+import { ComicScenePlayer } from "../../src/scene/ComicScenePlayer";
 import { nextStageId } from "../../src/meta/campaign";
 import { useFadeNav } from "../../src/ui/useFadeNav";
 import { readLab, leaveSandbox, LAB_STAGE_ID, type LabPayload } from "../../src/lab/lab";
@@ -84,7 +85,7 @@ function SceneRoute(): React.ReactElement | null {
   return (
     <>
       {isComicScene(part) ? (
-        null // TODO Chunk 2: ComicScenePlayer (story editor v2 — 페이지/칸 카메라 런타임)
+        <ComicScenePlayer key={playerKey} scene={part} title={stage?.name} onComplete={next} />
       ) : "map" in part ? (
         <MapScenePlayer key={playerKey} scene={part} title={stage?.name} onComplete={next} />
       ) : (

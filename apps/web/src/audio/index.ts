@@ -4,6 +4,6 @@
  */
 export { audio } from "./engine";
 export { DEFAULT_SETTINGS, type AudioSettings } from "./settings";
-export { SFX, playSfx, preloadSfxFiles, type SfxKey } from "./sfx";
-export { playBgm, stopBgm, resumeBgm, preloadBgmFiles, type BgmTrackId } from "./bgm";
+export { SFX, playSfx, preloadSfxFiles, isSfxKey, type SfxKey } from "./sfx";
+export { playBgm, stopBgm, resumeBgm, preloadBgmFiles, isBgmTrackId, type BgmTrackId } from "./bgm";
 export { loadAudioManifest, type AudioManifest } from "./manifest";

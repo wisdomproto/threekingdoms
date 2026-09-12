@@ -55,6 +55,8 @@ const TRACKS = {
 } satisfies Record<string, DroneSpec>;
 
 export type BgmTrackId = keyof typeof TRACKS;
+/** 데이터 문자열(만화 페이지 bgm 등) → 트랙 가드. */
+export const isBgmTrackId = (k: string): k is BgmTrackId => Object.prototype.hasOwnProperty.call(TRACKS, k);
 
 /** 드롭인 파일 버퍼(preload). */
 const fileBuffers = new Map<string, AudioBuffer>();
