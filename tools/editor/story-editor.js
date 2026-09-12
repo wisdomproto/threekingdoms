@@ -13,6 +13,7 @@ const h = (tag, cls, text) => { const e = document.createElement(tag); if (cls) 
 const btn = (text, title, onclick) => { const b = h("button", "btn", text); if (title) b.title = title; b.onclick = onclick; return b; };
 const setOrDel = (obj, key, v) => { if (v === "" || v == null) delete obj[key]; else obj[key] = v; };
 function datalist(el, id, values) {
+  document.getElementById(id)?.remove();   // 같은 id 중복 방지(outro+outroDefeat 두 번 호출)
   const d = h("datalist"); d.id = id;
   for (const v of values) { const o = h("option"); o.value = v; d.appendChild(o); }
   el.appendChild(d);

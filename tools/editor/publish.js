@@ -101,7 +101,8 @@ export function openPublishModal({ stage, stageText, mapText, repoStage, localEr
   if (!modal) { modal = el("div"); modal.id = "publishModal"; document.body.appendChild(modal); }
   modal.innerHTML = ""; modal.classList.add("on");
   const close = () => modal.classList.remove("on");
-  modal.onclick = (e) => { if (e.target === modal) close(); };
+  let busy = false;                       // Publish 진행 중엔 백드롭 클릭으로 닫히지 않게(결과·롤백 버튼 보존)
+  modal.onclick = (e) => { if (!busy && e.target === modal) close(); };
   const box = el("div", "pbox"); modal.appendChild(box);
   box.appendChild(el("h3", null, `${stage.name} → packages/data/json/stages/${stage.id}.json${mapText ? " (+ map)" : ""}`));
 
@@ -144,7 +145,7 @@ export function openPublishModal({ stage, stageText, mapText, repoStage, localEr
   const closeBtn = () => { const b = el("button", "btn", "닫기"); b.onclick = close; return b; };
 
   run.onclick = async () => {
-    run.disabled = true; cancel.disabled = true; run.textContent = "Publish 중… (전수 검사 5~15초)";
+    busy = true; run.disabled = true; cancel.disabled = true; run.textContent = "Publish 중… (전수 검사 5~15초)";
     let r;
     try { r = await postJson("/publish-stage", mapText ? { stage: stageText, map: mapText } : { stage: stageText }); }
     catch (e) { r = { ok: false, error: "요청 실패: " + e.message }; }
