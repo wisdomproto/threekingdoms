@@ -730,7 +730,7 @@ function bind() {
   document.getElementById('stageSelect').onchange = function() { if (this.value) pickStage(this.value); };
   document.getElementById('mapOnlySelect').onchange = async function() {
     const val = this.value;
-    if (!val) { setMapOnlyMode(false); return; }
+    if (!val) { setMapOnlyMode(false); if (STAGE_IDS.includes(stage.id)) await loadStageNoGuard(stage.id); return; }   // 하이브리드(옛 스테이지+외부 맵) 상태를 남기지 않는다
     // 스테이지 드롭다운 리셋
     document.getElementById('stageSelect').value = '';
     await loadMapOnlyFromServer(val);
@@ -872,7 +872,7 @@ function coordPickRow(parent, label, getX, getY, setXY) {
 
 /* ── 메타 탭 ── */
 function renderMetaTab(b) {
-  field(b, 'stage id', '파일명 기준. 예: 05-sishuiguan', inputText(stage.id, v => { stage.id = v.trim(); refreshValidation(); }));
+  field(b, 'stage id', '파일명 기준. 예: 05-sishuiguan', inputText(stage.id, v => { stage.id = v.trim(); refreshValidation(); applyDraftSeed(); }));
   field(b, 'name', '표시 이름', inputText(stage.name, v => { stage.name = v; refreshValidation(); }));
   field(b, 'mapId', 'map JSON의 id와 일치해야 함', inputText(stage.mapId, v => { stage.mapId = v.trim(); refreshValidation(); }));
   field(b, 'turnLimit', '턴 제한 (정수 ≥1)', inputNum(stage.turnLimit, v => { stage.turnLimit = v; refreshValidation(); }, { min: 1 }));
@@ -1572,6 +1572,7 @@ async function loadMapOnlyFromServer(mapId_) {
     if (!res.ok) throw new Error(res.status);
     const m = await res.json();
     loadMapObject(m);
+    draftRevision = null; draftAt = null; saver.reset();   // 이전 장의 디바운스/진행 중 저장이 맵 단독 모드에서 발사되지 않게
     // 스테이지 메타를 최소화 (mapId 동기화만)
     stage.mapId = m.id || mapId_;
     setMapOnlyMode(true);
@@ -1729,7 +1730,7 @@ async function openPublish() {
     probe: () => probeAssets(stage, ASSET_BASE),
     onPublished: () => {
       repoStageCache.set(stage.id, JSON.parse(stageText)); if (mapChanged) repoMapCache.set(mapId, JSON.parse(mapTxt));   // 다음 변경사항 비교 기준
-      draftRevision = null; draftAt = null; publishedAt = hhmm(new Date());
+      draftRevision = null; draftAt = null; publishedAt = hhmm(new Date()); saver.reset();   // 서버가 Draft 를 지웠다 — 옛 revision 으로 409 나지 않게 즉시
       if (history.current() === sentSnap) { history.markSaved(); clearRecovery(); }   // 검사 중 편집했으면 dirty 유지 → seedSaver 가 touch → 새 Draft
       updateSaveState(); seedSaver();   // 서버가 Draft 를 지웠다(draftDeleted) — index 갱신 후 reset({revision:null})
       toast(`Publish 완료 · ${stage.id}`);
