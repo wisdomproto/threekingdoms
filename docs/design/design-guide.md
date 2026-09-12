@@ -475,7 +475,7 @@ Publish 후 버전, 공개 시각, URL, 변경사항, Rollback 가능 여부를 
 -   Draft
 -   Edit ↔ Playtest 왕복
 -   HUD 충돌 정리
--   모바일 터치 타깃
+-   ✅ 모바일 터치 타깃 (2026-09-12, `battle/hud/BottomPanel`)
 
 ### P2
 

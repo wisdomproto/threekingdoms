@@ -1,5 +1,7 @@
 # 모바일 전투 HUD — 하단 패널 · 터치 타깃 (2026-09-12)
 
+> **상태: ✅ 구현 완료 (2026-09-12)** — `hudLayout.hudMode/bottomPanelState`, `hud/BottomPanel`, `BattleScreen` 분기, CDP e2e `tools/editor/e2e/battle-mobile.mjs`(`pnpm e2e:mobile`, 41 checks PASS).
+
 > design-guide §2 Touch targets(44/48/52), §3 Responsive(Mobile <768px), §6 Battle HUD Mobile("상단 최소 정보 / MAP / 하단 유닛 정보+큰 터치 버튼, 패널은 collapsed/expanded"), §7 Touch(Tap 선택·Second tap 확정), §14 Battle QA(모바일 버튼 충분히 큰가). master-plan §18 "모바일은 상단 최소 정보, 하단 유닛 정보+공격 예측, 큰 터치 버튼". design-guide §15 P1 "모바일 터치 타깃".
 
 ## 1. 문제
