@@ -88,43 +88,41 @@
   .chip { font-size:12px; padding:3px 8px; border-radius:10px; border:1px solid var(--dim); color:var(--dim); }
   .chip.ok { color:#8fd19e; border-color:#8fd19e; }
   .chip.warn { color:#e7c27a; border-color:#e7c27a; }
+  /* Project Bar — spec creator-ux-p2 §4 */
+  .badge { font-size:10px; padding:2px 7px; border-radius:9px; background:rgba(212,168,67,.18); color:var(--acc); border:1px solid rgba(212,168,67,.5); font-weight:bold; letter-spacing:.3px; }
+  .dd { position:relative; display:inline-flex; }
+  .split { display:inline-flex; } .split .btn:first-child { border-radius:6px 0 0 6px; } .split .btn:last-child { border-radius:0 6px 6px 0; border-left:none; padding:5px 7px; }
+  .menu { position:absolute; top:calc(100% + 4px); right:0; min-width:230px; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px; display:none; flex-direction:column; gap:4px; z-index:70; box-shadow:0 8px 24px rgba(0,0,0,.5); }
+  .menu.on { display:flex; }
+  .menu .btn { text-align:left; } .menu select { width:100%; }
+  .menu-sec { font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:.5px; padding:4px 4px 0; }
+  .menu-sec:not(:first-child) { border-top:1px solid var(--line); margin-top:2px; padding-top:6px; }
 </style>
 </head>
 <body>
 <header>
-  <h1>맵·스테이지 에디터</h1>
-  <select id="mapOnlySelect" style="background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:5px;padding:3px 7px;font-size:12px" title="맵 단독 편집 — 스테이지 없이 지형만">
-    <option value="">— 맵 단독 선택 —</option>
-    <option value="zhuojun">01 탁군 (zhuojun)</option>
-    <option value="yingchuan">02 영천 (yingchuan)</option>
-    <option value="guangzong">03 광종 (guangzong)</option>
-    <option value="zhangjue">04 장각 (zhangjue)</option>
-    <option value="sishuiguan">05 사수관 (sishuiguan)</option>
-    <option value="huluguan">06 호로관 (huluguan)</option>
-    <option value="luoyang">07 낙양 (luoyang)</option>
-    <option value="dongzhuo-chase">08 동탁추격 (dongzhuo-chase)</option>
-    <option value="banhe">09 반하 (banhe)</option>
-    <option value="xuzhou">10 서주 (xuzhou)</option>
-    <option value="xiaopei">11 소패 (xiaopei)</option>
-    <option value="xiapi1">12 하비1 (xiapi1)</option>
-    <option value="yuanshu">13 원술 (yuanshu)</option>
-    <option value="xiapi2">14 하비2 (xiapi2)</option>
-    <option value="xutian">15 허전 (xutian)</option>
-    <option value="guandu-escape">16 관도탈출 (guandu-escape)</option>
-    <option value="runan">17 여남 (runan)</option>
-    <option value="bowangpo">18 박망파 (bowangpo)</option>
-    <option value="xinye">19 신야 (xinye)</option>
-    <option value="changbanpo">20 장판파 (changbanpo)</option>
-    <option value="changbanqiao">21 장판교 (changbanqiao)</option>
-    <option value="hanjin">22 한진 (hanjin)</option>
-    <option value="jiangxia">23 강하 (jiangxia)</option>
-    <option value="sanjiangkou">24 삼강구 (sanjiangkou)</option>
-    <option value="wulin">25 오림 (wulin)</option>
-    <option value="chibi">26 적벽 (chibi)</option>
-    <option value="huarongdao">27 화용도 (huarongdao)</option>
-  </select>
-  <span style="font-size:11px;color:var(--dim);padding:0 2px">또는</span>
-  <select id="stageSelect" style="background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:5px;padding:3px 7px;font-size:12px" title="스테이지 선택 — 지형+유닛 모두 로드">
+  <h1 id="crumb">삼국지</h1>
+  <span class="badge">Draft</span>
+  <button class="btn" id="undo" title="되돌리기 (Ctrl+Z)">↶</button>
+  <button class="btn" id="redo" title="다시 하기 (Ctrl+Y / Ctrl+Shift+Z)">↷</button>
+  <span id="saveState" class="chip"></span>
+  <span style="margin-left:auto"></span>
+  <span class="dd">
+    <span class="split">
+      <button class="btn" id="playtestBtn" title="지금 편집 중인 스테이지+맵(미저장 포함)을 게임(:3000)에서 바로 실행 — 결산은 sandbox(메타 불변), 나가면 이 탭으로 복귀">▶ 이 장 테스트</button><button class="btn" id="playtestMenuBtn" title="이야기 미리보기">▾</button>
+    </span>
+    <div class="menu" id="playtestMenu">
+      <button class="btn" data-scene="intro">전투 전 이야기</button>
+      <button class="btn" data-scene="outro">전투 후 이야기</button>
+      <button class="btn" data-scene="outroDefeat">패배 후 이야기</button>
+    </div>
+  </span>
+  <button class="btn go" id="publishOpen" title="레포에 저장 (검사·변경사항·롤백)">Publish…</button>
+  <span class="dd">
+    <button class="btn" id="gearBtn" title="파일·도구">⚙▾</button>
+    <div class="menu" id="gearMenu">
+      <div class="menu-sec">스테이지 / 맵</div>
+      <select id="stageSelect" style="background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:5px;padding:3px 7px;font-size:12px" title="스테이지 선택 — 지형+유닛 모두 로드">
     <option value="">— 스테이지 선택 —</option>
     <option value="01-zhuojun">01 탁군 (zhuojun)</option>
     <option value="02-yingchuan">02 영천 (yingchuan)</option>
@@ -154,22 +152,49 @@
     <option value="26-chibi">26 적벽 (chibi)</option>
     <option value="27-huarongdao">27 화용도 (huarongdao)</option>
   </select>
-  <button class="btn" id="newStage">새로</button>
-  <button class="btn" id="openStage">스테이지 열기</button>
-  <button class="btn" id="openMap">맵 열기</button>
-  <button class="btn" id="pasteIn">붙여넣기</button>
-  <div class="sep"></div>
-  <button class="btn go" id="saveStage">⬇ stage JSON</button>
-  <button class="btn go" id="saveMap">⬇ map JSON</button>
-  <span id="saveState" class="chip"></span>
-  <button class="btn" id="publishCheck" title="레포에 저장된 packages/data/json/* 을 zod 로 전수 검사 (pnpm --filter @tk/data test). index.ts 에 등록되지 않은 새 스테이지/맵 파일은 검사 대상이 아님">Publish 검사</button>
-  <button class="btn" id="playtestBtn" title="지금 편집 중인 스테이지+맵(미저장 포함)을 게임(:3000)에서 바로 실행 — 결산은 sandbox(메타 불변), 나가면 이 탭으로 복귀">▶ 이 스테이지 테스트</button>
-  <button class="btn go" id="expBlock">⬇ 블록아웃 PNG</button>
-  <div class="sep"></div>
-  <label>셀px <input type="number" id="cellpx" min="6" max="40" value="15" style="width:44px"></label>
-  <button class="btn" id="undo" title="되돌리기 (Ctrl+Z)">↶</button>
-  <button class="btn" id="redo" title="다시 하기 (Ctrl+Y / Ctrl+Shift+Z)">↷</button>
-  <span id="dims" style="color:var(--dim); font-size:12px; margin-left:auto"></span>
+      <select id="mapOnlySelect" style="background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:5px;padding:3px 7px;font-size:12px" title="맵 단독 편집 — 스테이지 없이 지형만">
+    <option value="">— 맵 단독 선택 —</option>
+    <option value="zhuojun">01 탁군 (zhuojun)</option>
+    <option value="yingchuan">02 영천 (yingchuan)</option>
+    <option value="guangzong">03 광종 (guangzong)</option>
+    <option value="zhangjue">04 장각 (zhangjue)</option>
+    <option value="sishuiguan">05 사수관 (sishuiguan)</option>
+    <option value="huluguan">06 호로관 (huluguan)</option>
+    <option value="luoyang">07 낙양 (luoyang)</option>
+    <option value="dongzhuo-chase">08 동탁추격 (dongzhuo-chase)</option>
+    <option value="banhe">09 반하 (banhe)</option>
+    <option value="xuzhou">10 서주 (xuzhou)</option>
+    <option value="xiaopei">11 소패 (xiaopei)</option>
+    <option value="xiapi1">12 하비1 (xiapi1)</option>
+    <option value="yuanshu">13 원술 (yuanshu)</option>
+    <option value="xiapi2">14 하비2 (xiapi2)</option>
+    <option value="xutian">15 허전 (xutian)</option>
+    <option value="guandu-escape">16 관도탈출 (guandu-escape)</option>
+    <option value="runan">17 여남 (runan)</option>
+    <option value="bowangpo">18 박망파 (bowangpo)</option>
+    <option value="xinye">19 신야 (xinye)</option>
+    <option value="changbanpo">20 장판파 (changbanpo)</option>
+    <option value="changbanqiao">21 장판교 (changbanqiao)</option>
+    <option value="hanjin">22 한진 (hanjin)</option>
+    <option value="jiangxia">23 강하 (jiangxia)</option>
+    <option value="sanjiangkou">24 삼강구 (sanjiangkou)</option>
+    <option value="wulin">25 오림 (wulin)</option>
+    <option value="chibi">26 적벽 (chibi)</option>
+    <option value="huarongdao">27 화용도 (huarongdao)</option>
+  </select>
+      <button class="btn" id="newStage">새로</button>
+      <button class="btn" id="openStage">스테이지 열기</button>
+      <button class="btn" id="openMap">맵 열기</button>
+      <button class="btn" id="pasteIn">붙여넣기</button>
+      <div class="menu-sec">내보내기</div>
+      <button class="btn go" id="saveStage">⬇ stage JSON</button>
+      <button class="btn go" id="saveMap">⬇ map JSON</button>
+      <button class="btn go" id="expBlock">⬇ 블록아웃 PNG</button>
+      <div class="menu-sec">도구</div>
+      <button class="btn" id="publishCheck" title="레포에 저장된 packages/data/json/* 을 zod 로 전수 검사 (pnpm --filter @tk/data test). index.ts 에 등록되지 않은 새 스테이지/맵 파일은 검사 대상이 아님">Publish 검사 (레포 전수)</button>
+      <label>셀px <input type="number" id="cellpx" min="6" max="40" value="15" style="width:44px"> <span id="dims" style="color:var(--dim); font-size:12px; margin-left:auto"></span></label>
+    </div>
+  </span>
 </header>
 <main>
   <div id="left">
@@ -256,6 +281,8 @@ import {
   loadMap as loadMapModel, serializeMap as serializeMapModel,
 } from './editor/stage-io.js';
 import { createHistory } from './editor/history.js';
+import { chapterOf, chapterTitle } from './editor/chapters.js';
+import { slotParts } from './editor/story-model.js';
 const GAME_ORIGIN = 'http://localhost:3000'; // next dev. 보드의 「🎮 게임 열기」와 같은 값
 document.getElementById('modfail').remove();
 
@@ -334,6 +361,8 @@ async function init() {
   renderTab();
   refreshValidation();
   history.reset(snapshot());
+  const q = new URLSearchParams(location.search);   // ?stage=ID&quick=1 (spec §8)
+  await loadStageFromServer(q.get('stage') || '05-sishuiguan');
 }
 
 async function loadRefData() {
@@ -1129,6 +1158,7 @@ function checkRecovery() {  // 진입점 4곳의 꼬리에서 1회
   document.getElementById('recoveryDiscard').onclick = () => { clearRecovery(); bar.style.display = 'none'; updateSaveState(); };
 }
 function updateSaveState() {
+  updateCrumb();
   const chip = document.getElementById('saveState');
   const u = document.getElementById('undo'), r = document.getElementById('redo');
   if (u) u.disabled = !history.canUndo();
@@ -1380,7 +1410,8 @@ document.getElementById('publishCheck').onclick = async function () {
   } catch (e) { out.textContent = '검사 요청 실패: ' + e.message + ' — serve.py로 여세요 (launch tools = :8081, 기본 :8080)'; }
   finally { this.disabled = false; }
 };
-document.getElementById('playtestBtn').onclick = async function () {
+async function runPlaytest(scene) {   // scene: undefined=전투 | 'intro'|'outro'|'outroDefeat' = 씬 미리보기 (spec §6)
+  const btn = document.getElementById('playtestBtn');
   const errs = validate();
   if (errs.length) { toast(`테스트 불가 ${errs.length}건 — 배너의 오류를 먼저 고치세요`, true); return; }
   const stamp = Date.now();
@@ -1391,31 +1422,43 @@ document.getElementById('playtestBtn').onclick = async function () {
     map: serializeMapModel({ id: mapId, name: mapName, width: W, height: H, tileLegend: loadedLegend, tiles }),
     seed: 1, returnUrl: location.href, savedAt: new Date().toISOString(),
   };
-  this.disabled = true;
+  btn.disabled = true;
   try {
     const r = await fetch('/playtest-draft', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(snapshot) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !j.ok) { toast(`드래프트 저장 실패: ${j.error || r.status}`, true); return; }
     // noopener 금지 — window.opener 가 있어야 게임이 window.close() 로 이 탭에 복귀한다 (spec §6)
-    const w = window.open(`${GAME_ORIGIN}/playtest?draft=${encodeURIComponent(j.draftId)}`);
+    const w = window.open(`${GAME_ORIGIN}/playtest?draft=${encodeURIComponent(j.draftId)}${scene ? `&scene=${scene}` : ''}`);
     if (!w) toast('팝업이 차단됐습니다 — 이 사이트의 팝업을 허용하세요', true);
     else toast(`테스트 탭 열림 · ${j.draftId}`);
   } catch (e) {
     toast('테스트 요청 실패: ' + e.message + ' — serve.py로 여세요 (launch tools = :8081, 기본 :8080)', true);
-  } finally { this.disabled = false; }
-};
+  } finally { btn.disabled = false; }
+}
+document.getElementById('playtestBtn').onclick = () => runPlaytest();
+
+/* ── Project Bar 드롭다운 (▶ ▾ / ⚙▾) — body 클릭으로 닫힘 ── */
+function closeMenus() { document.querySelectorAll('.menu.on').forEach(m => m.classList.remove('on')); }
+function toggleMenu(id) { const m = document.getElementById(id); const on = m.classList.contains('on'); closeMenus(); if (!on) m.classList.add('on'); }
+document.addEventListener('click', e => { if (!e.target.closest('.dd')) closeMenus(); });
+document.getElementById('gearBtn').onclick = () => toggleMenu('gearMenu');
+document.querySelectorAll('#gearMenu button').forEach(b => b.addEventListener('click', closeMenus));
+document.getElementById('playtestMenuBtn').onclick = () => { refreshPlaytestMenu(); toggleMenu('playtestMenu'); };
+document.querySelectorAll('#playtestMenu [data-scene]').forEach(b => b.onclick = () => { closeMenus(); runPlaytest(b.dataset.scene); });
+function refreshPlaytestMenu() {   // 슬롯 없는 씬은 비활성
+  document.querySelectorAll('#playtestMenu [data-scene]').forEach(b => { b.disabled = mapOnlyMode || slotParts((stage.scenario || {})[b.dataset.scene]).length === 0; });
+}
+document.getElementById('publishOpen').onclick = () => toast('Publish 모달은 다음 단계');   // Chunk 4 가 배선
+function updateCrumb() {
+  const el = document.getElementById('crumb'); if (!el) return;
+  if (mapOnlyMode) { el.textContent = `맵 · ${mapName}`; return; }
+  const ch = chapterOf(stage.id);
+  el.textContent = ch ? `삼국지 / 제${ch}장 · ${stage.name}` : `삼국지 / ${stage.name}`;
+}
 // 검증용 dev 훅 (모듈 스코프라 콘솔에서 안 보이므로) — 저장 버튼과 동일한 직렬화 경로를 노출
-window.__stageEditor = { serializeStage, serializeMap, getStage: () => stage, history, snapshot, restore, refreshValidation, doUndo, doRedo };
+window.__stageEditor = { serializeStage, serializeMap, getStage: () => stage, history, snapshot, restore, refreshValidation, doUndo, doRedo, switchTab, getActiveTab: () => activeTab };
 
 init();
-
-/* ── 자동 로드: 기본 스테이지 05-sishuiguan (사수관) ── */
-(async function autoLoadDefault() {
-  const defaultStage = '05-sishuiguan';
-  await loadStageFromServer(defaultStage);
-  const sel = document.getElementById('stageSelect');
-  if (sel) sel.value = defaultStage;
-})();
 </script>
 </body>
 </html>
