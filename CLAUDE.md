@@ -13,6 +13,7 @@
 | [docs/design/game-design.md](docs/design/game-design.md) | 게임 설계 결정 §1·2·7~12·14~16 (철학·병종·일기토·성장·난이도·밸런스·도파민·범위·금지 목록) | 규칙·시스템 작업 |
 | [docs/design/scenario.md](docs/design/scenario.md) | §5 27스테이지 + 캠페인 루프·막간 씬 이력, §6 로스터 | 콘텐츠 작업 |
 | [docs/design/bm.md](docs/design/bm.md) | §13 광고·IAP·불가침선 | 수익·광고 |
+| [docs/design/oss-editor-benchmark.md](docs/design/oss-editor-benchmark.md) | 오픈소스 저작도구 벤치마크(LT-Maker·RPGAtlas·LDtk·Sulis) + 우선순위 §15 + 라이선스 체크리스트 | 저작도구 설계 시 |
 | [apps/web/CLAUDE.md](apps/web/CLAUDE.md) | §3 스택·렌더링 3레이어·오디오·배포 + 앱 배선 규칙 | apps/web 작업 시 자동 로드 |
 | [tools/CLAUDE.md](tools/CLAUDE.md) | §4 에셋 파이프라인·보드·serve.py·webp 규약 | tools 작업 시 |
 | [packages/CLAUDE.md](packages/CLAUDE.md) | engine/data/sim 계약(시드 RNG·이벤트 자기서술·밸런스 게이트) | packages 작업 시 |
