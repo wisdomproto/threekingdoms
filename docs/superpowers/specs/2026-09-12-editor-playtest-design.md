@@ -25,7 +25,7 @@
 | `apps/web/app/playtest/page.tsx` (신규) | 착륙 페이지(얇은 클라이언트 컴포넌트, `/lab/page.tsx`처럼 `dynamic(ssr:false)`): `?draft=` → fetch → `parsePlaytestSnapshot` → 성공 시 `writeLab` + `router.replace('/battle?stage=__lab')`, 실패 시 메시지 + 「닫기」 |
 | `apps/web/src/lab/lab.ts` (수정) | `LabPayload.returnUrl?`; 순수 `exitTarget(payload, hasOpener)`; 부수효과 래퍼 `leaveSandbox(navigate, payload = readLab())` = `exitTarget(payload, window.opener != null)` → `close`면 `window.close()` + 100ms 뒤 `window.closed`가 아니면 `navigate(returnUrl)` 폴백, `navigate`면 `navigate(to)` |
 | `apps/web/src/battle/BattleScreen.tsx` (수정) | `makeCtx()`가 `sandbox: boolean`(= `__lab` 분기 여부)을 반환; 476~477행 `stageId`/`sandbox` prop과 529행 종료 결정을 `ctx.stage.id === LAB_STAGE_ID` 대신 이 플래그로. sandbox면 `PauseMenu`에 `onExit={() => leaveSandbox(router.push)}` |
-| `apps/web/src/battle/hud/PauseMenu.tsx` (수정) | `onExit?: () => void` prop 추가 — 있으면 `router.push(exitTo)` 대신 호출(기본 동작 불변) |
+| `apps/web/src/battle/hud/PauseMenu.tsx` (수정) | `sandbox?: boolean` prop 추가 — true면 「나가기」가 `leaveSandbox((to) => router.push(to))`(router가 PauseMenu 안에 있음). 기본 동작 불변 |
 | `apps/web/src/battle/hud/ResultSequence.tsx` (수정) | 481·958행 `sandbox ? "/lab" : …` → `sandbox ? leaveSandbox(fadeTo) : fadeTo(…)`; sandbox 버튼 라벨 "실험실로 ▶" → `readLab()?.returnUrl`이 있으면 "에디터로 ▶"(`useMemo`로 1회 계산) |
 | `tools/stage-editor.html` (수정) | ▶ 이 스테이지 테스트 버튼(`#playtestBtn`, `#publishCheck` 옆·같은 핸들러 스타일) + `GAME_ORIGIN` 상수 |
 | `apps/web/src/lab/__tests__/playtest.test.ts` (신규) | §8 — `exitTarget`·`parsePlaytestSnapshot` 단위 테스트(node 환경, 기존 web 테스트 관례: jsdom 없음) |

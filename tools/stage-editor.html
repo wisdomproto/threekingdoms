@@ -159,6 +159,7 @@
   <button class="btn go" id="saveStage">⬇ stage JSON</button>
   <button class="btn go" id="saveMap">⬇ map JSON</button>
   <button class="btn" id="publishCheck" title="레포에 저장된 packages/data/json/* 을 zod 로 전수 검사 (pnpm --filter @tk/data test). index.ts 에 등록되지 않은 새 스테이지/맵 파일은 검사 대상이 아님">Publish 검사</button>
+  <button class="btn" id="playtestBtn" title="지금 편집 중인 스테이지+맵(미저장 포함)을 게임(:3000)에서 바로 실행 — 결산은 sandbox(메타 불변), 나가면 이 탭으로 복귀">▶ 이 스테이지 테스트</button>
   <button class="btn go" id="expBlock">⬇ 블록아웃 PNG</button>
   <div class="sep"></div>
   <label>셀px <input type="number" id="cellpx" min="6" max="40" value="15" style="width:44px"></label>
@@ -244,6 +245,7 @@ import {
   loadStage as loadStageModel, serializeStage as serializeStageModel, cloneUnits,
   loadMap as loadMapModel, serializeMap as serializeMapModel,
 } from './editor/stage-io.js';
+const GAME_ORIGIN = 'http://localhost:3000'; // next dev. 보드의 「🎮 게임 열기」와 같은 값
 document.getElementById('modfail').remove();
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1281,6 +1283,30 @@ document.getElementById('publishCheck').onclick = async function () {
     out.textContent = (j.ok ? '✓ Publish 검사 통과\n' : `✗ Publish 검사 실패${j.error ? ' — ' + j.error : ''} (첫 실패 파일만 표시됨)\n`) + (j.output || '');
   } catch (e) { out.textContent = '검사 요청 실패: ' + e.message + ' — serve.py로 여세요 (launch tools = :8081, 기본 :8080)'; }
   finally { this.disabled = false; }
+};
+document.getElementById('playtestBtn').onclick = async function () {
+  const errs = validate();
+  if (errs.length) { toast(`테스트 불가 ${errs.length}건 — 배너의 오류를 먼저 고치세요`, true); return; }
+  const stamp = Date.now();
+  const draftId = `${String(stage.id).replace(/[^A-Za-z0-9_-]/g, '_')}-${stamp}`;
+  const snapshot = {
+    kind: 'tk-playtest-snapshot', version: 1, draftId, revision: stamp,
+    stage: serializeStageModel(stage),
+    map: serializeMapModel({ id: mapId, name: mapName, width: W, height: H, tileLegend: loadedLegend, tiles }),
+    seed: 1, returnUrl: location.href, savedAt: new Date().toISOString(),
+  };
+  this.disabled = true;
+  try {
+    const r = await fetch('/playtest-draft', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(snapshot) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.ok) { toast(`드래프트 저장 실패: ${j.error || r.status}`, true); return; }
+    // noopener 금지 — window.opener 가 있어야 게임이 window.close() 로 이 탭에 복귀한다 (spec §6)
+    const w = window.open(`${GAME_ORIGIN}/playtest?draft=${encodeURIComponent(j.draftId)}`);
+    if (!w) toast('팝업이 차단됐습니다 — 이 사이트의 팝업을 허용하세요', true);
+    else toast(`테스트 탭 열림 · ${j.draftId}`);
+  } catch (e) {
+    toast('테스트 요청 실패: ' + e.message + ' — serve.py로 여세요 (launch tools = :8081, 기본 :8080)', true);
+  } finally { this.disabled = false; }
 };
 // 검증용 dev 훅 (모듈 스코프라 콘솔에서 안 보이므로) — 저장 버튼과 동일한 직렬화 경로를 노출
 window.__stageEditor = { serializeStage, serializeMap, getStage: () => stage };
