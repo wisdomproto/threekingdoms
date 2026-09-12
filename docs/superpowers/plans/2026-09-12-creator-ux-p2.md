@@ -72,16 +72,16 @@
   1. `stage_txt = payload.get("stage")`(str 필수, ≤5MB), `map_txt = payload.get("map")`(선택). 각각 `json.loads`로 파싱해 `id` 추출·`_ID_RE` 검사(맵은 `map.id`). 끝 개행 보장(`if not txt.endswith("\n"): txt += "\n"`).
   2. 대상 경로 계산 + 기존 파일 있으면 백업(`publish-backup/{id}.json` / `publish-backup/map-{mapId}.json`, `shutil.copyfile`). `had_backup` 기록.
   3. tmp→`os.replace` 쓰기(둘 다).
-  4. `_VALIDATE_LOCK` 획득(비차단 실패면 쓰기 전에 409 — **순서**: 락을 먼저 잡고 1~3 수행) → `_validate_data()`.
+  4. **락은 0단계**: 핸들러가 `_VALIDATE_LOCK.acquire(blocking=False)` 실패면 409, 성공 시 `try/finally`로 1~5 전 구간 보호(`/publish-rollback`도 동일). `map.id`도 `_ID_RE` + `stage.mapId == map.id` 검사. 백업 파일명 `{stageId}.json`/`{stageId}.map.json` + `{stageId}.meta.json`(`wrote`, `hadBackup`, `at`). 파일 쓰기는 `open(tmp, "w", encoding="utf-8", newline="\n")`. 맵 쓰기 실패 시 스테이지 복원. 그 다음 `_validate_data()`.
   5. 실패: 백업 있으면 복원(`os.replace(backup, dest)`), 없으면 새 파일 삭제 → `{ok:false, rolledBack:true, output}`. 성공: `{ok:true, wrote:[rel paths], backup: had_backup, at: iso}`. 백업 파일은 성공 시 **유지**(롤백용).
 - [ ] **Step 3** `_publish_rollback(payload)`: `stageId` 검사 → 백업 존재 확인(없으면 404) → 백업을 대상으로 `os.replace`(맵 백업도 있으면 함께) → `_validate_data()` → 결과 반환. 로그 stdout.
-- [ ] **Step 4** 수동 검증: `python - <<EOF`로 `urllib.request`를 써 05 파일 내용을 그대로 publish → `git status --porcelain packages/data/json` 빈 문자열; turnLimit 바꿔 publish → 변경 확인 → rollback → 원복·git 무변화. `python -m py_compile tools/serve.py`. 커밋 `feat(serve): publish-stage (backup→write→validate→rollback on failure) + publish-rollback`.
+- [ ] **Step 4** 수동 검증: `python - <<EOF`로 `urllib.request`를 써 05 파일 내용을 그대로 publish → `git status --porcelain packages/data/json` 출력이 publish 전과 동일(델타 0); turnLimit 바꿔 publish → 변경 확인 → rollback → 원복·git 무변화. `python -m py_compile tools/serve.py`. 커밋 `feat(serve): publish-stage (backup→write→validate→rollback on failure) + publish-rollback`.
 
 ### Task 7: 씬 미리보기 + ✏ 편집 진입
 
 - [ ] **Step 1** `PlaytestLanding.tsx`: `scene = parseSceneParam(params.get("scene"))`; `writeLab` 뒤 `router.replace(scene ? `/scene?stage=${LAB_STAGE_ID}&type=${scene}` : `/battle?stage=${LAB_STAGE_ID}`)`.
-- [ ] **Step 2** `app/scene/page.tsx`: `const lab = stageId === LAB_STAGE_ID ? readLab() : null; const stage = lab?.stage ?? stages[stageId];` `target()`은 lab이면 특별값 → `next()`에서 `lab ? leaveSandbox((to) => router.push(to)) : fadeTo(target())`; 빈 씬 가드도 lab이면 `leaveSandbox`. `readLab`/`leaveSandbox`/`LAB_STAGE_ID` import from `../../src/lab/lab`. (`useFadeNav`는 유지.)
-- [ ] **Step 3** PauseMenu `editorUrl?: string` prop → 「전투 그만두기」 위 `✏ 이 스테이지 편집`(`data-testid="pause-edit-stage"`, `window.open(editorUrl, "_blank", "noopener")`). BattleScreen: `editorUrl = process.env.NODE_ENV !== "production" && !sandbox ? editorUrlFor(ctx.stage.id, process.env.NEXT_PUBLIC_TOOLS_ORIGIN ?? "http://localhost:8080") : undefined`. `.env.local.example`에 `NEXT_PUBLIC_TOOLS_ORIGIN`.
+- [ ] **Step 2** `app/scene/page.tsx`: `const lab = useMemo(() => (stageId === LAB_STAGE_ID ? readLab() : null), [stageId]); const stage = lab?.stage ?? stages[stageId];` `target()`은 lab이면 특별값 → `next()`에서 `lab ? leaveSandbox((to) => router.push(to)) : fadeTo(target())`; 빈 씬 가드도 lab이면 `leaveSandbox`. `readLab`/`leaveSandbox`/`LAB_STAGE_ID` import from `../../src/lab/lab`. (`useFadeNav`는 유지.)
+- [ ] **Step 3** PauseMenu `editorUrl?: string` prop → 「전투 그만두기」 위 `✏ 이 스테이지 편집`(`data-testid="pause-edit-stage"`, `window.open(editorUrl, "_blank", "noopener")`). BattleScreen: `editorUrl = process.env.NODE_ENV !== "production" && !sandbox ? editorUrlFor(ctx.stage.id, process.env.NEXT_PUBLIC_TOOLS_ORIGIN ?? "http://localhost:8081") : undefined`. `.env.local.example`에 `NEXT_PUBLIC_TOOLS_ORIGIN=http://localhost:8081`(launch "tools" 포트).
 - [ ] **Step 4** typecheck/test green. 브라우저 스모크: `/battle` ☰ → 버튼 존재·href. 커밋 `feat(web): scene preview via playtest draft (__lab) + edit-this-stage link in pause menu`.
 
 ---
@@ -98,12 +98,12 @@
 ### Task 9: Chapter rail
 
 - [ ] **Step 1** `tools/editor/rail.js`: `renderRail(el, { groups: [{chapter,title,stages:[{id,name,scenes}]}], currentId, collapsed, onPick, onToggle })` — DOM만. 항목 `.rail-item`(`data-stage-id`), `.on` 현재, 부제 `컷신 N · 전투`, 하단 `[◂ 접기]/[▸]`. 접힘 = 44px, 장 번호만.
-- [ ] **Step 2** HTML: `<aside id="rail">`를 `#left` 앞에. 로드 시 `STAGE_IDS`(기존 `<option>`에서 추출 — `Array.from(stageSelect.options).map(o=>o.value).filter(Boolean)`)로 27 JSON 병렬 fetch(`/packages/data/json/stages/{id}.json`, 실패는 `{id, name:id, scenes:0}`) → `chapters.chapterOf`로 그룹 → `renderRail`. `onPick(id)` → 기존 `stageSelect.onchange` 로직 재사용(dirty confirm 포함) → `loadStageFromServer(id)`. 스테이지 로드 후 `currentId` 갱신(리렌더). `localStorage tk.editor.rail`.
+- [ ] **Step 2** HTML: `<aside id="rail">`를 `#left` 앞에. 로드 시 `STAGE_IDS`(기존 `<option>`에서 추출 — `Array.from(stageSelect.options).map(o=>o.value).filter(Boolean)`)로 27 JSON 병렬 fetch(`/packages/data/json/stages/{id}.json`, 실패는 `{id, name:id, scenes:0}`) → `chapters.chapterOf`로 그룹 → `renderRail`. `onPick(id)` → `loadStageFromServer(id)`. **`loadStageFromServer` 머리에 `if (history.isDirty() && !confirm('저장하지 않은 편집이 있습니다. 다른 장을 열까요?')) return;` 추가**(현재 confirm은 doNew에만 있다; rail·드롭다운 공통). 스테이지 로드 후 `currentId` 갱신(리렌더). `localStorage tk.editor.rail`.
 - [ ] **Step 3** 스모크 + 커밋 `feat(editor): chapter rail (5 chapters, scene counts, collapse)`.
 
 ### Task 10: 탭 재편 + 빠른 편집 + 보상
 
-- [ ] **Step 1** `.tabs` = 5탭(`data-tab`: `story-intro`, `battle`, `dialogue`, `story-outro`, `reward`); `battle` 탭 본문 상단에 서브탭 바(`data-sub`: `quick meta unit obj duel adv`). `activeTab` 문자열 `battle:quick` 등; `switchTab(t)`가 `t.split(":")`로 두 바의 `.on` 갱신. `renderTab()` 분기 확장. **기존 5 렌더 함수는 서브탭에서 그대로 호출.** `renderMetaTab`의 `reward` 카드 블록을 `renderRewardTab`으로 이동.
+- [ ] **Step 1** `.tabs` = 5탭(`data-tab`: `story-intro`, `battle`, `dialogue`, `story-outro`, `reward`); `battle` 탭 본문 상단에 서브탭 바(`data-sub`: `quick meta unit obj duel adv`). `activeTab` 문자열 `battle:quick` 등; `switchTab(t)`가 `t.split(":")`로 두 바의 `.on` 갱신. `renderTab()` 분기 확장. **기존 5 렌더 함수는 서브탭에서 그대로 호출.** 하드코딩 `switchTab('unit')` 4곳(≈479/489/606/953) → `'battle:unit'`; `setMapOnlyMode`(≈1295/1298) `'meta'` → `'battle:meta'`, 맵 단독 모드는 상단 `전투`만·서브탭 `메타`만 활성. `renderMetaTab`의 `reward` 카드 블록을 `renderRewardTab`으로 이동.
 - [ ] **Step 2** `tools/editor/quick-edit.js` `renderQuick(el, { stage, commanders, classes, sides, onChange, onPick(u), onPlaytest })`: 표 행(진영 점·이름·병종·`Lv [−][n][+]`·병력 input·`(x,y) 📍`) + 주 목표 문구 + turnLimit + `▶ 전투 테스트`. HTML 배선: `onChange` = `renderUnits(); refreshUnitList(); refreshValidation()`; `📍` = 기존 `coordPick` 패턴(`selUnit = u` 후 좌표 선택 → 재렌더).
 - [ ] **Step 3** 스모크(빠른 편집 Lv+ → 유닛 탭에서 반영·Undo) + 커밋 `feat(editor): tab regroup (story/battle/dialogue/story/reward), quick edit tab, reward tab`.
 
@@ -113,7 +113,7 @@
 
 ### Task 11: story-editor.js (씬 슬롯 + 대사)
 
-- [ ] **Step 1** `renderLines(el, lines, { narration: boolean, speakers: string[], commit, withBg })` — 줄 카드(내레이션 체크(withNarration)·화자 datalist·좌/우·초상·본문 textarea 자동높이·줄 bg(withBg)·↑↓✕) + `+ 줄 추가`. 제자리 변형 후 `commit()`.
+- [ ] **Step 1** `renderLines(el, lines, { narration: boolean, speakers: string[], commit, withBg })` — 줄 카드(내레이션 체크(withNarration)·화자 datalist·좌/우·초상·본문 textarea 자동높이·줄 bg(withBg)·↑↓✕) + `+ 줄 추가`(`newSceneLine`). 제자리 변형 후 `commit()`. 빈 문자열 필드(speaker/portraitId/bg/side)는 **키 삭제**; 내레이션 체크 = speaker·portraitId 삭제. 화자 입력 시 portraitId가 비어 있거나 이전 화자와 같았으면 화자로 동기.
 - [ ] **Step 2** `renderSceneSlot(el, { stage, key: "intro"|"outro"|"outroDefeat", label, bgOptions, assetBase, speakers, commit })`: 빈 상태 카드 → `[첫 장면 만들기]`; VN 파트 카드(배경 datalist + 썸네일 `${assetBase}/assets/scenes/{bg}.webp` onerror→"미생성") + `renderLines(withBg:true, narration:true)`; MapScene 카드(고급 JSON textarea + `적용`); 파트 `↑↓✕`, `+ VN 장면 추가`(단일 VN→배열 승격). 0파트→`delete stage.scenario[key]`, scenario 비면 `delete stage.scenario`.
 - [ ] **Step 3** `renderDialogueList(el, { stage, placed: [{id,name}], duels: [{id,label}], speakers, commit })`: 카드 머리 `describeTrigger`, WHEN 빌더, `renderLines(narration:false, withBg:false)`, `Advanced ▾`(id), `✕`, `+ 대사 추가`, 빈 상태.
 - [ ] **Step 4** HTML: `renderTab` 분기 `story-intro`/`story-outro`(outro + 접힌 `outroDefeat`)/`dialogue`. `bgOptions` = rail fetch 때 모은 27 JSON에서 `collectSceneBgs` + 현재 stage. `speakers` = commanders 이름. `validate()` 끝에 `validateStory(stage, { placedIds, duelIds })` 합류. `▶ ▾` 메뉴 항목 → 기존 playtest 핸들러를 `runPlaytest(scene)`로 리팩터(`scene` 있으면 URL에 `&scene=`; 메뉴 `disabled` = `slotParts(stage.scenario?.[key]).length === 0`).
@@ -122,8 +122,8 @@
 ### Task 12: Publish 모달
 
 - [ ] **Step 1** `publish.js` DOM: `openPublishModal({ stage, mapText, stageText, repoStage, repoMap, localErrors, probe, onPublished })` — 체크리스트(필수/승패/에셋(프로브 결과)/전수 "Publish 시 실행"), `변경사항 보기 ▾`(diffStage 사람 말 목록: `turnLimit 30 → 25`, `units 12 → 13`, `dialogue +1`, `scenario.intro 줄 6 → 8`; 맵 변경은 `맵 타일 변경됨`), `[취소] [Publish]`(오류면 disabled). Publish → `fetch('/publish-stage', {stage, map?})` → 결과 화면(성공: 경로·시각·`[롤백]`; 실패: 출력 + "자동 롤백됨") → `onPublished(result)`.
-- [ ] **Step 2** 에셋 프로브 `probeAssets(stage, base)`: `HEAD` `${base}/assets/maps/{stage.id}.webp`, 씬 bg들, 화자 초상(`/assets/ui/portraits/{speaker}.webp`, 화자 집합) → 누락 목록(`fetch(..., {method:"HEAD"})` — serve.py는 stdlib `SimpleHTTPRequestHandler`라 HEAD 지원). 실패(네트워크)는 "확인 불가" 경고 1건.
-- [ ] **Step 3** HTML: `#publishOpen` → `localErrors = validate()`(story 포함), `repoStage = fetch /packages/data/json/stages/{id}.json`(404면 null → "새 스테이지 — index.ts 등록 필요" 경고), `repoMap` 동일; `mapText`는 `serializeMap()`이 repoMap과 다를 때만 전달. 성공 시 `history.markSaved(); clearRecovery(); lastSavedAt=…; updateSaveState()`. 맵 단독 모드에선 Publish 비활성(맵만 publish는 범위 밖 — 안내).
+- [ ] **Step 2** 에셋 프로브 `probeAssets(stage, base)`: `HEAD` `${base}/assets/maps/{stage.id}.webp`, 씬 bg들, 초상(씬 줄 `portraitId`·전투 대사 `speaker` 집합 → `/assets/ui/portraits/{id}.webp`) → 누락 목록(`fetch(..., {method:"HEAD"})` — serve.py는 stdlib `SimpleHTTPRequestHandler`라 HEAD 지원). 실패(네트워크)는 "확인 불가" 경고 1건.
+- [ ] **Step 3** HTML: `#publishOpen` → `localErrors = validate()`(story 포함), `repoStage` = `loadStageFromServer`가 받은 원본 객체를 캐시(`repoStageCache`)해 재사용(없으면 fetch; 404면 null → 체크리스트에 "! 새 스테이지 — index.ts 등록 필요" 경고), `repoMap` 동일; `mapText`는 `serializeMap()`이 repoMap과 다를 때만 전달. 성공 시 `history.markSaved(); clearRecovery(); lastSavedAt=…; updateSaveState()`. 맵 단독 모드에선 Publish 비활성(맵만 publish는 범위 밖 — 안내).
 - [ ] **Step 4** 스모크: 05 무변경 Publish → 성공·`git status` 무변화; turnLimit 변경 Publish → 파일 반영 → 롤백 → 원복. 커밋 `feat(editor): publish modal — checklist, diff, repo write with validate + rollback`.
 
 ---
@@ -132,7 +132,7 @@
 
 ### Task 13: `tools/editor/e2e/creator.mjs`
 
-- [ ] 스펙 §11 ①~⑦ 구현(cdp.mjs 하네스: 자체 Chrome :9334 + serve.py :8095, next dev :3000 필요). 게임 origin은 에디터의 `GAME_ORIGIN`(3000). Publish 단계는 **05 무변경** → `execSync('git status --porcelain packages/data/json')` 빈 문자열 → turnLimit 변경 Publish → 파일의 turnLimit 확인 → `[롤백]` → 원복·git 무변화. 종료 시 `apps/web/public/_draft/publish-backup` 삭제. 루트 `package.json` `"e2e:creator"`. PASS까지 실행. 커밋 `test(editor): CDP e2e — creator shell, story editor, quick edit, publish/rollback`.
+- [ ] 스펙 §11 ①~⑦ 구현(cdp.mjs 하네스: 자체 Chrome :9334 + serve.py :8095, next dev :3000 필요). 게임 origin은 에디터의 `GAME_ORIGIN`(3000). Publish 단계는 사전 `execSync('git status --porcelain packages/data/json')` 기록 → **05 무변경** Publish → 같은 출력(델타 0) → turnLimit 변경 Publish → 파일의 turnLimit 확인 → `[롤백]` → 원복·git 무변화. 종료 시 `apps/web/public/_draft/publish-backup` 삭제. 루트 `package.json` `"e2e:creator"`. PASS까지 실행. 커밋 `test(editor): CDP e2e — creator shell, story editor, quick edit, publish/rollback`.
 
 ### Task 14: 문서
 
