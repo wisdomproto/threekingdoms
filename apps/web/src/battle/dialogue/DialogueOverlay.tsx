@@ -248,6 +248,7 @@ export function DialogueOverlay({
   dialogue,
   onLineChange,
   onQueueDrained,
+  initialPlayedIds,
 }: {
   store: BattleStore;
   /** stage.dialogue (없으면 오버레이 자체가 no-op) */
@@ -256,8 +257,16 @@ export function DialogueOverlay({
   onLineChange?: (speaker: string) => void;
   /** 재생 중이던 대사 큐가 비워질 때마다 호출 — 개전 나레이션 뒤 목표 배너 시퀀싱용(BattleScreen) */
   onQueueDrained?: () => void;
+  /**
+   * 재생 완료로 간주할 dialogue id(이어하기 복원, 스펙 §7) — 첫 구독(prev=null)이 battleStart·
+   * 지나간 turn/unitRetreated/duelOccurred를 레벨 트리거로 몽땅 발동시키는 걸 막는다. 마운트 시 1회만 읽음.
+   */
+  initialPlayedIds?: ReadonlySet<string>;
 }): React.ReactElement | null {
-  const [queue, dispatch] = useReducer(queueReducer, { lines: [], playedIds: new Set<string>() });
+  const [queue, dispatch] = useReducer(queueReducer, initialPlayedIds, (ids) => ({
+    lines: [],
+    playedIds: new Set<string>(ids ?? []),
+  }));
   // 디렉터 전이 추적 — 직전 디렉터 스냅샷(결정론 상태의 read-only 슬라이스)
   const prevSnapRef = useRef<DialogueSnapshot | null>(null);
 

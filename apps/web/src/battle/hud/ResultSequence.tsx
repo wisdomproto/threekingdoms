@@ -29,6 +29,7 @@ import { buildResultSummary } from "./resultSummary";
 import { addGold, markCleared, addItem, getMeta, addSerendipity, applyRosterProgress } from "../../meta/metaStore";
 import { clearReward } from "../../meta/serendipity";
 import { clearSortie } from "../../meta/sortie";
+import { clearSuspend } from "../suspend";
 import { RewardedAdButton } from "../../meta/RewardedAdButton";
 import { useFadeNav } from "../../ui/useFadeNav";
 import { playSfx, SFX } from "../../audio";
@@ -362,6 +363,7 @@ export function ResultSequence({
       // 획득 보물을 인벤토리에 적립 (편성 장착 + §10 보물 도감 수집 반영). 종전 누락 보완.
       for (const t of summary.treasures) addItem(t.id);
       clearSortie(); // 1회성 출진 페이로드 소비(새로고침 시 stale 편성 방지)
+      clearSuspend(); // 승리 = 중단 저장본도 소비(스펙 §7 — 패배는 남겨 세이브 지점 재도전)
     }
 
     const timers: ReturnType<typeof setTimeout>[] = [];

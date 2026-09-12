@@ -15,7 +15,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { gameData } from "@tk/data";
 import { getMeta, getPlaythroughCount } from "../meta/metaStore";
-import type { BattleContext, BattleEvent, BattleState, Coord } from "@tk/engine";
+import type { Action, BattleContext, BattleEvent, BattleState, Coord } from "@tk/engine";
 import { BattleStore } from "./store";
 import type { Presenter, PresentedSnapshot } from "./eventPlayer";
 import type { UiEvent } from "./inputMachine";
@@ -41,6 +41,9 @@ import { adLifecycle } from "../meta/adProviders";
 import { HUD_FONT, HUD_BRONZE, HUD_BRONZE_DIM, HUD_PARCHMENT } from "./hud/frames";
 import type { InputState } from "./inputMachine";
 import { unitPanelSide } from "./hudLayout";
+import { loadControls, saveControls } from "./controlSettings";
+import { canSuspend, clearSuspend, isResumable, readSuspend, writeSuspend } from "./suspend";
+import { firedDialogues, toDialogueSnapshot } from "./dialogue/director";
 
 /** 고정 시드 — dev 재현성 (seed + actionLog가 버그 재현 수단, 설계 §1 리플레이 기반) */
 const SEED = 20260612;
@@ -242,29 +245,78 @@ interface Session {
   store: BattleStore;
   delegate: PresenterDelegate;
   sandbox: boolean;
+  /** 중단 저장본에서 복원된 세션(스펙 §7) — 개전 게이트·대사 재생 억제의 근거 */
+  resumed: boolean;
 }
 
 function createSession(): Session {
   const { ctx, sharedItems, seed, sandbox } = makeCtx();
   const delegate = new PresenterDelegate();
-  const store = new BattleStore(ctx, seed ?? SEED, {
-    presenter: delegate,
-    dev: process.env.NODE_ENV !== "production",
-    onDevViolation: (m) => console.error(`[battle dev 단언] ${m}`),
-    onFocus: (c) => delegate.focus(c),
-    // 원작 UX §수정명세: 프리뷰 워크·취소를 현재 렌더러에 위임
-    onPreviewWalk: (unitId, from, to) => delegate.previewWalk(unitId, from, to),
-    onPreviewCancel: (unitId, to) => delegate.previewCancel(unitId, to),
-    // 부대 창고 소모품(§7) → friendly 공유 풀
-    sharedItems,
-  });
-  return { ctx, store, delegate, sandbox };
+  // 이어하기(스펙 §7): ?resume=1 + 저장본이 이 스테이지·회차와 맞으면 seed+actionLog를 엔진 fold로 복원.
+  // 새 출진(정규 경로)은 이전 저장본을 지운다 — 저장본은 다음 출진 전까지만 사는 세이브 지점.
+  const resume =
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).get("resume") === "1";
+  let battleSeed = seed ?? SEED;
+  let replayLog: readonly Action[] | undefined;
+  if (!sandbox && !resume) clearSuspend();
+  if (!sandbox && resume) {
+    const s = readSuspend();
+    if (
+      isResumable(s, { playthroughCount: getPlaythroughCount(), hasStage: (id) => id in gameData.stages }) &&
+      s.stageId === ctx.stage.id
+    ) {
+      battleSeed = s.seed;
+      replayLog = s.log;
+    }
+  }
+  const make = (log: readonly Action[] | undefined): BattleStore =>
+    new BattleStore(ctx, battleSeed, {
+      presenter: delegate,
+      dev: process.env.NODE_ENV !== "production",
+      onDevViolation: (m) => console.error(`[battle dev 단언] ${m}`),
+      onFocus: (c) => delegate.focus(c),
+      // 원작 UX §수정명세: 프리뷰 워크·취소를 현재 렌더러에 위임
+      onPreviewWalk: (unitId, from, to) => delegate.previewWalk(unitId, from, to),
+      onPreviewCancel: (unitId, to) => delegate.previewCancel(unitId, to),
+      // 부대 창고 소모품(§7) → friendly 공유 풀
+      sharedItems,
+      ...(log ? { replayLog: log } : {}),
+    });
+  let store: BattleStore;
+  try {
+    store = make(replayLog);
+  } catch (err) {
+    // 로그가 현재 데이터/엔진에 안 맞음(버전 차 등) — 저장본 폐기 후 새 전투로 폴백(§13 무손실)
+    console.warn("[battle] 저장본 복원 실패 — 새 전투로 시작", err);
+    clearSuspend();
+    replayLog = undefined;
+    battleSeed = seed ?? SEED;
+    store = make(undefined);
+  }
+  return { ctx, store, delegate, sandbox, resumed: replayLog !== undefined };
 }
 
 export default function BattleScreen(): React.ReactElement {
   const sessionRef = useRef<Session | null>(null);
   sessionRef.current ??= createSession();
-  const { ctx, store, delegate, sandbox } = sessionRef.current;
+  const { ctx, store, delegate, sandbox, resumed } = sessionRef.current;
+
+  // 조작 설정(기기 로컬 tk.controls.v1) — 입문 공격 확인 ↔ 클래식. store에 반영, PauseMenu가 토글.
+  const [controls, setControls] = useState(loadControls);
+  useEffect(() => {
+    store.setConfirmAttacks(controls.attackConfirm);
+  }, [store, controls]);
+  const toggleConfirmAttacks = useCallback((on: boolean) => {
+    const next = { attackConfirm: on };
+    saveControls(next);
+    setControls(next);
+  }, []);
+  // dev 핸들 — E2E/콘솔에서 store 직접 조작(tools/editor/e2e/battle-ux.mjs). 프로덕션 미노출.
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "production") {
+      (window as unknown as { __tkBattle?: BattleStore }).__tkBattle = store;
+    }
+  }, [store]);
 
   const mountRef = useRef<HTMLDivElement | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -293,7 +345,21 @@ export default function BattleScreen(): React.ReactElement {
     () => (ctx.stage.dialogue ?? []).some((d) => d.trigger.kind === "battleStart"),
     [ctx],
   );
-  const [introDone, setIntroDone] = useState(!hasOpeningDialogue);
+  // 복원 세션은 개전 대사를 재생하지 않으므로(initialPlayedIds) 드레인 신호가 없다 — 즉시 통과.
+  const [introDone, setIntroDone] = useState(!hasOpeningDialogue || resumed);
+  // 대사 재생 억제(스펙 §7): 복원 시점에 "이미 발동했어야 할" 대사(battleStart·지나간 turn/
+  // unitRetreated/duelOccurred)를 재생 완료로 시드 — 첫 구독의 레벨 트리거 몰아치기 방지.
+  const initialPlayedIds = useMemo<ReadonlySet<string>>(
+    () =>
+      resumed
+        ? new Set(
+            firedDialogues(ctx.stage.dialogue ?? [], null, toDialogueSnapshot(store.settledState), new Set()).map(
+              (d) => d.id,
+            ),
+          )
+        : new Set(),
+    [resumed, ctx, store],
+  );
   // 결산 게이트(2026-07-03 "이긴 화면이 대사 중에 계속 떠 있다") — battleEnd 대사가 있는
   // 스테이지는 그 대사가 다 재생된 뒤에 ResultSequence를 띄운다. 순서: 승패 확정 → 마무리
   // 대사(탭 진행) → 결산. 해당 결과의 battleEnd 대사가 없으면(패배 등) 즉시 통과.
@@ -473,6 +539,7 @@ export default function BattleScreen(): React.ReactElement {
           store={store}
           // duelOccurred 대사는 컷인(DuelCutin)이 직접 재생 — 오버레이 중복 재생 방지(duelMedia 계약).
           dialogue={ctx.stage.dialogue?.filter((d) => d.trigger.kind !== "duelOccurred")}
+          initialPlayedIds={initialPlayedIds}
           onLineChange={(speaker) => {
             const unit = store.committedState.units.find((u) => u.id === speaker);
             if (unit) delegate.target?.focusOn({ x: unit.x, y: unit.y }, 500);
@@ -554,7 +621,26 @@ export default function BattleScreen(): React.ReactElement {
           </p>
         </div>
       )}
-      <PauseMenu open={paused} onClose={() => setPaused(false)} sandbox={sandbox} />
+      <PauseMenu
+        open={paused}
+        onClose={() => setPaused(false)}
+        sandbox={sandbox}
+        canSuspend={canSuspend(snap.ui, store.committedState)}
+        onSuspend={() =>
+          writeSuspend({
+            version: 1,
+            stageId: ctx.stage.id,
+            seed: store.seed,
+            sortie: readSortie(),
+            log: [...store.actionLog],
+            playthroughCount: getPlaythroughCount(),
+            turn: store.committedState.turn,
+            savedAt: new Date().toISOString(),
+          })
+        }
+        confirmAttacks={controls.attackConfirm}
+        onToggleConfirmAttacks={toggleConfirmAttacks}
+      />
     </div>
   );
 }

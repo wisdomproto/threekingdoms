@@ -4,7 +4,8 @@
  *
  * 전투는 턴제라 멈출 "시계"가 없다 — 모달 백드롭이 맵 입력을 가려 사실상 멈춘다.
  * 담는 것: ① 계속하기(닫기) ② 소리(전체/음악/효과음 + 음소거 — audio 엔진 설정 공유,
- * 좌하단 AudioControl과 같은 SSOT) ③ 전투 그만두기(스테이지 선택으로).
+ * 좌하단 AudioControl과 같은 SSOT) ③ 조작(입문 공격 확인/클래식 — tk.controls.v1)
+ * ④ 저장하고 나가기(아군 idle에만, 스펙 §7 — sandbox 미표시) ⑤ 전투 그만두기(스테이지 선택으로).
  *  - 모바일 우선(§3): ESC 없는 기기를 위해 여는 버튼은 BattleControls에 둔다(이 파일은 패널만 그린다).
  *  - 나가기는 결산 전이라 진행이 저장되지 않으므로 한 번 확인을 받는다(오조작 방지).
  *  - 청동/수묵 톤 = LoadingTransition·HUD 프레임과 일치.
@@ -69,6 +70,10 @@ export function PauseMenu({
   onClose,
   exitTo = "/stages",
   sandbox = false,
+  canSuspend = false,
+  onSuspend,
+  confirmAttacks = true,
+  onToggleConfirmAttacks,
 }: {
   open: boolean;
   /** 패널을 닫는다(계속하기/백드롭/ESC). 실제 paused 상태는 BattleScreen이 소유. */
@@ -77,6 +82,13 @@ export function PauseMenu({
   exitTo?: string;
   /** 실험실/플레이테스트 전투: 「나가기」가 leaveSandbox(에디터 탭 복귀 또는 /lab) 로 간다. */
   sandbox?: boolean;
+  /** 「저장하고 나가기」 활성 조건(아군 idle·ongoing) — 아니면 비활성 + 사유 표시 */
+  canSuspend?: boolean;
+  /** 중단 저장(저장만) — 이동(exitTo)은 여기서. 없거나 sandbox면 버튼 미표시 */
+  onSuspend?: () => void;
+  /** 조작: true=입문(공격 확인 카드) / false=클래식(즉시 공격) */
+  confirmAttacks?: boolean;
+  onToggleConfirmAttacks?: (on: boolean) => void;
 }): React.ReactElement | null {
   const router = useRouter();
   const [confirmExit, setConfirmExit] = useState(false);
@@ -188,6 +200,62 @@ export function PauseMenu({
               <SoundRow label="음악" value={s.bgm} onChange={(v) => audio.setSettings({ bgm: v })} />
               <SoundRow label="효과음" value={s.sfx} onChange={(v) => audio.setSettings({ sfx: v })} />
             </div>
+
+            {/* 조작 — 입문(공격 확인) / 클래식(원작 즉시 공격). 활성 쪽만 금빛(액자는 border-image라 색으로 구분) */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "2px 2px 6px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 11, letterSpacing: "0.3em", color: BRONZE_DIM }}>조작</span>
+                <span style={{ flex: 1, height: 1, background: `${BRONZE_DIM}44` }} />
+              </div>
+              <div style={{ display: "flex", gap: 6 }}>
+                {(
+                  [
+                    ["controls-beginner", true, "입문(공격 확인)"],
+                    ["controls-classic", false, "클래식(즉시 공격)"],
+                  ] as const
+                ).map(([tid, on, label]) => (
+                  <button
+                    key={tid}
+                    type="button"
+                    data-testid={tid}
+                    aria-pressed={confirmAttacks === on}
+                    onClick={() => onToggleConfirmAttacks?.(on)}
+                    style={{
+                      ...MENU_BTN,
+                      fontSize: 12.5,
+                      letterSpacing: "0.02em",
+                      textIndent: 0,
+                      padding: "6px 4px",
+                      color: confirmAttacks === on ? BRONZE_GOLD : BRONZE_DIM,
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {!sandbox && onSuspend && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <button
+                  type="button"
+                  data-testid="pause-suspend"
+                  disabled={!canSuspend}
+                  onClick={() => {
+                    onSuspend();
+                    router.push(exitTo);
+                  }}
+                  style={{ ...MENU_BTN, opacity: canSuspend ? 1 : 0.45, cursor: canSuspend ? "pointer" : "not-allowed" }}
+                >
+                  저장하고 나가기
+                </button>
+                {!canSuspend && (
+                  <p style={{ margin: 0, fontSize: 12, color: BRONZE_DIM, textAlign: "center", lineHeight: 1.5 }}>
+                    아군 차례에 행동을 고르기 전에만 저장할 수 있습니다
+                  </p>
+                )}
+              </div>
+            )}
 
             <button type="button" onClick={() => setConfirmExit(true)} style={{ ...MENU_BTN, color: "#cfa9a3" }}>
               전투 그만두기

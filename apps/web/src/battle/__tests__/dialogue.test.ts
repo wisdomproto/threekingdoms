@@ -112,6 +112,21 @@ describe("대사 디렉터 트리거 판정", () => {
     const again = firedDialogues(dialogue, snap({ turn: 2 }), snap({ turn: 3 }), played);
     expect(again.map((d) => d.id)).toEqual(["t3"]);
   });
+
+  it("initialPlayedIds 에 든 대사는 첫 구독에서 발동하지 않는다 (이어하기 복원, 스펙 §7)", () => {
+    const dialogue: StageDialogue[] = [
+      { id: "intro", trigger: { kind: "battleStart" }, lines: [{ speaker: "유비", text: "a" }] },
+      { id: "t3", trigger: { kind: "turn", n: 3 }, lines: [{ speaker: "관우", text: "b" }] },
+      { id: "t5", trigger: { kind: "turn", n: 5 }, lines: [{ speaker: "장비", text: "c" }] },
+    ];
+    // 복원 시점(턴 3)에 "이미 발동했어야 할" 것 = BattleScreen이 시드하는 값(오버레이 playedIds 초기값)
+    const seeded = new Set(firedDialogues(dialogue, null, snap({ turn: 3 }), new Set()).map((d) => d.id));
+    expect([...seeded]).toEqual(["intro", "t3"]);
+    // 오버레이 첫 구독(prev=null)과 동일한 평가 — 시드된 건 발동하지 않는다
+    expect(firedDialogues(dialogue, null, snap({ turn: 3 }), seeded)).toEqual([]);
+    // 이후 진행(턴 5 도달)은 정상 발동
+    expect(firedDialogues(dialogue, snap({ turn: 4 }), snap({ turn: 5 }), seeded).map((d) => d.id)).toEqual(["t5"]);
+  });
 });
 
 describe("사수관 파일럿 대사 데이터", () => {
