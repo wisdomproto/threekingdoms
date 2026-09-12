@@ -7,21 +7,18 @@
  *  - 그 뒤 턴 루프 내내 상태 띠에 스테이지명·턴이 상시 노출(§5) — 목표는 상시 작게 떠 있어야 한다.
  * 우리 복제:
  *  - **전투 진입 시 1회만** 잠깐 강조 배너(중앙, 청동/수묵 띠) — 레퍼런스의 진입 오버레이.
- *  - 그 뒤로는 좌상단 모서리에 **상시 작은 목표 칩**(승리 명령형 + 제한턴 꼬리표)만 둔다.
+ *    → `ObjectiveFlashLayer`(절대좌표, 루트 오버레이).
+ *  - 그 뒤로는 좌측 HUD 컬럼 맨 위에 **상시 작은 목표 칩**(승리 명령형 + 주의(패배조건) + 제한턴)만 둔다.
+ *    → `ObjectiveStrip`(흐름 자식 — 위치는 BattleScreen의 좌측 컬럼이 결정, 스펙 §4).
  *    (매 턴 큰 배너를 재노출하면 플레이 중 거슬린다 — 레퍼런스도 진입 1회 + 상시 띠다.)
- * 데이터는 vm(turn/status) + stage(objectives/failConditions/turnLimit)에서만 — 순수 텍스트는
- * objectiveText.ts가 만든다. ⚠️ store/renderer/engine/schemas 의존 없음(소유 경계).
+ * 데이터는 vm(turn/status) + 호출부가 objectiveText.buildObjectiveDisplay로 1회 만든 display만.
+ * ⚠️ store/renderer/engine/schemas 의존 없음(소유 경계).
  *
  * 아트 스킨만 독자(청동/수묵) — 동작·정보위계·레이아웃은 레퍼런스 그대로(충실 복제 원칙).
  */
 import { useEffect, useRef, useState } from "react";
 import type { BattleVM } from "../viewmodel";
-import {
-  buildObjectiveDisplay,
-  type ObjectiveDisplay,
-  type ObjectiveTextOptions,
-  type StageObjectiveLike,
-} from "../objectiveText";
+import type { ObjectiveDisplay } from "../objectiveText";
 
 /** 강조 배너 노출 시간(ms) — TurnBanner 페이즈 배너와 동일한 짧은 코스메틱 길이. */
 const FLASH_MS = 2200;
@@ -39,6 +36,8 @@ const INK = "rgba(14, 16, 20, 0.82)";
 const BRONZE = "#c8a25a";
 const BRONZE_DIM = "#8a7038";
 const PARCHMENT = "#efe7d2";
+/** 패배조건 "주의:" 줄 — 붉은 기 도는 양피지(경고지만 칩 톤 유지, 스펙 §6). */
+const WARN = "#e7b4ac";
 
 const FLASH_WRAP: React.CSSProperties = {
   position: "absolute",
@@ -63,23 +62,20 @@ const FLASH_CARD: React.CSSProperties = {
   animation: `tk-objective-flash ${FLASH_MS}ms cubic-bezier(0.22,0.61,0.36,1) both`,
 };
 
-/** 상시 작은 목표 칩 — 좌상단 모서리(상태 띠와 겹치지 않게 살짝 아래). */
+/** 상시 작은 목표 칩 — 좌측 컬럼의 흐름 자식(절대좌표 없음, 폭은 컬럼이 결정). */
 const STRIP_WRAP: React.CSSProperties = {
-  position: "absolute",
-  top: "calc(40px + env(safe-area-inset-top))",
-  left: "calc(10px + env(safe-area-inset-left))",
-  maxWidth: "min(64vw, 280px)",
+  maxWidth: "100%",
+  boxSizing: "border-box",
   padding: "7px 11px",
   background: INK,
   border: `1px solid ${BRONZE_DIM}`,
   borderRadius: 8,
   pointerEvents: "none",
   userSelect: "none",
-  zIndex: 4,
   boxShadow: "0 2px 10px rgba(0,0,0,0.45)",
 };
 
-/** 강조 배너 1개 (전투 시작/아군 턴 시작). 필수 목표만 큼직하게, 제한턴은 꼬리표로. */
+/** 강조 배너 1개 (전투 시작). 필수 목표 큼직하게 → 주의(패배조건) dim → 제한턴 꼬리표. */
 function ObjectiveFlash({
   display,
   flashKey,
@@ -118,14 +114,22 @@ function ObjectiveFlash({
             {line}
           </div>
         ))}
+        {display.fails.map((f) => (
+          <div key={f} style={{ marginTop: 4, fontSize: 14, color: WARN, opacity: 0.85 }}>
+            주의: {f}
+          </div>
+        ))}
         <div style={{ marginTop: 6, fontSize: 13, color: BRONZE }}>{display.turnLimit}</div>
       </div>
     </div>
   );
 }
 
-/** 상시 칩 — 승리 명령형(필수) + 제한턴. 보너스/패배조건은 강조 배너에서 제외, 칩에선 생략(간결 우선). */
-function ObjectiveStrip({ display }: { display: ObjectiveDisplay }): React.ReactElement | null {
+/**
+ * 상시 칩 — 승리 명령형(필수) → 주의(패배조건, 스펙 §6) → 제한턴. 보너스 목표는 생략(간결 우선).
+ * 흐름 자식: BattleScreen 좌측 컬럼(`#hudLeft`) 맨 위에 꽂힌다.
+ */
+export function ObjectiveStrip({ display }: { display: ObjectiveDisplay }): React.ReactElement | null {
   if (display.primary.length === 0) return null;
   return (
     <div style={STRIP_WRAP} aria-label="현재 목표">
@@ -141,6 +145,11 @@ function ObjectiveStrip({ display }: { display: ObjectiveDisplay }): React.React
           }}
         >
           {line}
+        </div>
+      ))}
+      {display.fails.map((f) => (
+        <div key={f} style={{ fontSize: 12.5, color: WARN, lineHeight: 1.35, marginTop: 2 }}>
+          주의: {f}
         </div>
       ))}
       <div style={{ fontSize: 11, color: BRONZE, marginTop: 3 }}>{display.turnLimit}</div>
@@ -175,29 +184,15 @@ function useObjectiveFlash(vm: BattleVM): number | null {
   return flashKey;
 }
 
-export function ObjectiveBanner({
+/** 진입 1회 강조 배너 레이어(절대좌표, 루트 오버레이). 칩(ObjectiveStrip)과 같은 display를 받는다. */
+export function ObjectiveFlashLayer({
   vm,
-  stage,
-  nameOf,
-  tileNameOf,
+  display,
 }: {
   vm: BattleVM;
-  /** ctx.stage (objectives/failConditions/turnLimit/레거시 victory·defeat). */
-  stage: StageObjectiveLike;
-  /** unitId → 표시 이름(보통 (id)=>commanders[id]?.name ?? id). 미지정 시 id 그대로. */
-  nameOf?: ObjectiveTextOptions["nameOf"];
-  /** 좌표 → 지명(reachTile/captureTile). 미지정 시 좌표 라벨. */
-  tileNameOf?: ObjectiveTextOptions["tileNameOf"];
+  display: ObjectiveDisplay;
 }): React.ReactElement | null {
-  const opts: ObjectiveTextOptions = { nameOf, tileNameOf };
-  const display = buildObjectiveDisplay(stage, opts);
   const flashKey = useObjectiveFlash(vm);
-
-  if (display.primary.length === 0) return null;
-  return (
-    <>
-      <ObjectiveStrip display={display} />
-      {flashKey != null && <ObjectiveFlash display={display} flashKey={flashKey} />}
-    </>
-  );
+  if (flashKey == null || display.primary.length === 0) return null;
+  return <ObjectiveFlash display={display} flashKey={flashKey} />;
 }

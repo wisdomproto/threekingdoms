@@ -28,7 +28,8 @@ import { AttackForecast } from "./hud/AttackForecast";
 import { ActionMenu } from "./hud/ActionMenu";
 import { TurnBanner } from "./hud/TurnBanner";
 import { EndTurnConfirm } from "./hud/EndTurnConfirm";
-import { ObjectiveBanner } from "./hud/ObjectiveBanner";
+import { ObjectiveStrip, ObjectiveFlashLayer } from "./hud/ObjectiveBanner";
+import { buildObjectiveDisplay } from "./objectiveText";
 import { ResultSequence } from "./hud/ResultSequence";
 import { DialogueOverlay } from "./dialogue/DialogueOverlay";
 import { DuelCutin, type DuelCineVM } from "./duel/DuelCutin";
@@ -42,6 +43,26 @@ import type { InputState } from "./inputMachine";
 
 /** 고정 시드 — dev 재현성 (seed + actionLog가 버그 재현 수단, 설계 §1 리플레이 기반) */
 const SEED = 20260612;
+
+/**
+ * 좌측 HUD 컬럼(스펙 §4) — 목표 칩 → 유닛 패널(좌측 슬롯) → 공격 예보/확인 카드를 흐름 자식으로
+ * 세로 적층. 절대좌표 패널끼리 겹치던 것을 컬럼이 중재한다. bottom=84는 전역 AudioControl 위.
+ * pointerEvents:none — 맵 탭을 가리지 않는다(카드 버튼만 auto). overflow:hidden = 저해상도에서
+ * 하단 패널이 잘리는 걸 감수(겹침보다 낫다).
+ */
+const LEFT_COL: React.CSSProperties = {
+  position: "absolute",
+  top: "calc(44px + env(safe-area-inset-top))",
+  left: "calc(10px + env(safe-area-inset-left))",
+  bottom: "calc(84px + env(safe-area-inset-bottom))",
+  width: "min(64vw, 280px)",
+  display: "flex",
+  flexDirection: "column",
+  gap: 8,
+  pointerEvents: "none",
+  overflow: "hidden",
+  zIndex: 4,
+};
 
 type Ev<T extends BattleEvent["type"]> = Extract<BattleEvent, { type: T }>;
 
@@ -389,6 +410,11 @@ export default function BattleScreen(): React.ReactElement {
     delegate.target?.setSpeed(next);
   }, [store, delegate]);
   const selectedId = activeUnitId(snap.ui);
+  // 목표 텍스트(승리/패배/제한턴)는 stage 불변이라 1회 — 칩·강조 배너가 같은 display를 받는다.
+  const display = useMemo(
+    () => buildObjectiveDisplay(ctx.stage, { nameOf: (id) => ctx.data.commanders[id]?.name ?? id }),
+    [ctx],
+  );
 
   return (
     <div
@@ -398,13 +424,10 @@ export default function BattleScreen(): React.ReactElement {
       <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
       <TurnBanner ui={snap.ui} vm={snap.vm} dispatch={dispatch} stageName={ctx.stage.name} />
       {/* 승리조건 배너 = 장막 걷힘 + 개전 나레이션 종료 후 — "나레이션 끝나고 목표가 딱" 시퀀스 */}
-      {boot.ready && introDone && (
-        <ObjectiveBanner
-          vm={snap.vm}
-          stage={ctx.stage}
-          nameOf={(id) => ctx.data.commanders[id]?.name ?? id}
-        />
-      )}
+      {boot.ready && introDone && <ObjectiveFlashLayer vm={snap.vm} display={display} />}
+      <div id="hudLeft" style={LEFT_COL}>
+        {boot.ready && introDone && <ObjectiveStrip display={display} />}
+      </div>
       <UnitPanel
         ui={snap.ui}
         vm={snap.vm}
