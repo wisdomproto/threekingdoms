@@ -2042,7 +2042,7 @@ function renderExisting(cardId) {
   const poses = [['front_idle', '대기'], ['front_move', '이동'], ['front_attack', '공격']];
   host.innerHTML = `<div class="exnote">✓ 게임에 들어간 현재 스프라이트 — <b>${sel.n}</b> (<code>${sel.s}</code>):</div>
     <div class="exrow">` +
-    poses.map(([p, label]) => `<figure class="exfig"><div class="exbox"><img src="${base}/${p}.png?t=${assetStatusStamp}" alt="${label}" loading="lazy"></div><figcaption>${label}</figcaption></figure>`).join('') +
+    poses.map(([p, label]) => `<figure class="exfig"><div class="exbox"><img src="${base}/${p}.webp?t=${assetStatusStamp}" alt="${label}" loading="lazy"></div><figcaption>${label}</figcaption></figure>`).join('') +
     `</div>`;
 }
 
