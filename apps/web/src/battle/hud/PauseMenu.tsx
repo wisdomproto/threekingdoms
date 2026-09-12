@@ -287,7 +287,7 @@ export function PauseMenu({
                     » 배속 ×{mobileControls.speed}
                   </button>
                   <button
-                    type="button"
+                    type="button" aria-pressed={mobileControls.auto}
                     data-testid="pause-auto"
                     disabled={!mobileControls.canAutoFight}
                     onClick={mobileControls.canAutoFight ? mobileControls.onToggleAuto : undefined}

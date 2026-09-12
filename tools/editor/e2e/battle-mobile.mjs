@@ -132,7 +132,7 @@ async function main() {
   const ctrl = await t.waitFor(`Array.from(document.querySelectorAll('button')).some(b => b.textContent.includes('배속'))`, 20, 100);
   check("mobile: ☰ opens pause menu with 전투 제어 row", ctrl);
   const ctrlBtns = await t.eval(`Array.from(document.querySelectorAll('button')).filter(b => /기본 줌|배속|자동전투/.test(b.textContent)).map(b => [b.textContent.trim(), Math.round(b.getBoundingClientRect().height)])`);
-  check("mobile: 전투 제어 buttons ≥ 44px", ctrlBtns.length === 3 && ctrlBtns.every((b) => b[1] >= 44), ctrlBtns);
+  check("mobile: 전투 제어 buttons ≥ 48px", ctrlBtns.length === 3 && ctrlBtns.every((b) => b[1] >= 48), ctrlBtns);
   for (let i = 0; i < 2; i++) await t.eval(clickBtn("", "» 배속 ×" + (i + 1)));
   check("mobile: 배속 cycles to ×3", (await t.eval(`window.__tkBattle.speed`)) === 3, await t.eval(`window.__tkBattle.speed`));
   await t.eval(clickBtn("", "계속하기"));

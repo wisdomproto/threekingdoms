@@ -20,7 +20,7 @@ import { HUD_BRONZE_DIM, HUD_FONT, HUD_INK, HUD_PARCHMENT } from "./frames";
 import { canEndTurn } from "./TurnBanner";
 import { PortraitBox, TroopsBar, UnitPanel, activeUnitId, sideColor } from "./UnitPanel";
 
-/** 패널 높이 CSS 변수 — AudioController(bottom calc)·BattleScreen 목표 칩이 읽는다 */
+/** 패널 높이 CSS 변수 — AudioController(bottom calc)가 읽어 컨트롤을 패널 위로 올린다 */
 export const BOTTOM_INSET_VAR = "--tk-bottom-inset";
 /** 터치 타깃(design-guide §2): 행동 52 / 보조 44 */
 const ACTION_H = 52;
@@ -151,10 +151,10 @@ export function BottomPanel({
     };
   }, [hidden]);
   // 상태 전이 시 상세 시트 자동 닫힘
-  useEffect(() => setSheet(false), [ui.kind]);
+  const id = activeUnitId(ui);
+  useEffect(() => setSheet(false), [ui.kind, id]);   // 조회 대상이 바뀌거나 사라져도 시트 상태가 남지 않게
 
   if (hidden) return null;
-  const id = activeUnitId(ui);
   const unit = id ? (vm.units.find((u) => u.id === id) ?? null) : null;
   const items = state === "expanded" && !previewWalking ? itemsFor(ui, dispatch) : [];
 
