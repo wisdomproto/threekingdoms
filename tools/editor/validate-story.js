@@ -1,9 +1,33 @@
 // tools/editor/validate-story.js — 씬/대사 검증 (DOM 무관, 순수). spec 2026-09-12-creator-ux-p2-design §9
 // 에디터 validate() 가 결과를 합친다. 나머지 형식 검사는 서버 zod(StageSchema).
-import { slotParts, isMapScene } from "./story-model.js";
+import { slotParts, isMapScene, isComicScene } from "./story-model.js";
 
 const SLOT_LABEL = { intro: "전투 전 이야기", outro: "전투 후 이야기", outroDefeat: "패배 후 이야기" };
 const blank = (s) => typeof s !== "string" || s.trim() === "";
+const RECT_EPS = 1e-6;   // schemas ComicPanelSchema 와 동일(드래그 float 오차)
+const rectOk = (r) => Array.isArray(r) && r.length === 4 && r.every((v) => typeof v === "number" && v >= 0 && v <= 1)
+  && r[2] > 0 && r[3] > 0 && r[0] + r[2] <= 1 + RECT_EPS && r[1] + r[3] <= 1 + RECT_EPS;
+
+/** 만화 파트 — 페이지 image·칸 rect·줄 text·hold. 문구 = `${at} N번째 페이지 N번째 칸 N번째 줄: …`. */
+function validateComic(part, at, errs) {
+  const pages = Array.isArray(part.pages) ? part.pages : [];
+  if (pages.length === 0) errs.push(`${at}(만화): 페이지가 없습니다`);
+  pages.forEach((pg, gi) => {
+    const atPg = `${at} ${gi + 1}번째 페이지`;
+    if (blank(pg?.image)) errs.push(`${atPg}: 지면 이미지가 비어 있습니다`);
+    const panels = Array.isArray(pg?.panels) ? pg.panels : [];
+    if (panels.length === 0) errs.push(`${atPg}: 칸이 없습니다`);
+    panels.forEach((pn, ni) => {
+      const atPn = `${atPg} ${ni + 1}번째 칸`;
+      if (!rectOk(pn?.rect)) errs.push(`${atPn}: 칸 사각형이 이미지 범위(0~1)를 벗어났습니다`);
+      if (pn?.hold !== undefined && !(Number.isInteger(pn.hold) && pn.hold >= 1)) errs.push(`${atPn}: 자동 진행(hold)은 1 이상 정수(ms)여야 합니다`);
+      (Array.isArray(pn?.lines) ? pn.lines : []).forEach((l, li) => {
+        if ("speaker" in l && blank(l.speaker)) errs.push(`${atPn} ${li + 1}번째 줄: 화자가 비어 있습니다 (내레이션이면 화자 없음으로)`);
+        if (blank(l.text)) errs.push(`${atPn} ${li + 1}번째 줄: 본문이 비어 있습니다`);
+      });
+    });
+  });
+}
 
 /**
  * @param stage  편집 모델(scenario·dialogue 는 optional)
@@ -19,6 +43,7 @@ export function validateStory(stage, { placedIds = [], duelIds = [] } = {}) {
     slotParts(slot).forEach((part, pi) => {
       const at = `${label} ${pi + 1}번째 장면`;
       const lines = Array.isArray(part?.lines) ? part.lines : [];
+      if (isComicScene(part)) { validateComic(part, at, errs); return; }   // VN 폴백("줄이 없습니다") 앞
       if (isMapScene(part)) {
         if (blank(part.map)) errs.push(`${at}(맵 씬): map이 비어 있습니다`);
         if (!Array.isArray(part.units) || part.units.length === 0) errs.push(`${at}(맵 씬): 등장 유닛이 없습니다`);

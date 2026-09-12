@@ -23,7 +23,7 @@ const mark = (ok: boolean) => (ok ? "✅" : "⬜");
 let s = "";
 s += "# 에셋 매니페스트 (생성 요청서)\n\n";
 s += "캠페인 루프에 필요한 이미지 목록. ⬜ = 미보유(placeholder 표시 중) · ✅ = 보유. 파일을 경로에 넣으면 자동 반영.\n";
-s += "경로 규약: 초상 `apps/web/public/assets/ui/portraits/{id}.webp` · 씬 배경 `.../assets/scenes/{bgId}.webp` · 맵 `.../assets/maps/{mapId}.webp`.\n\n";
+s += "경로 규약: 초상 `apps/web/public/assets/ui/portraits/{id}.webp` · 씬 배경 `.../assets/scenes/{bgId}.webp` · 맵 `.../assets/maps/{mapId}.webp` · 만화 지면 `.../assets/comics/{image}.webp`.\n\n";
 
 // 요약
 const pHave = req.portraits.filter((p) => has(`ui/portraits/${p.id}.webp`)).length;
@@ -31,7 +31,8 @@ const sHave = req.scenes.filter((sc) => has(`scenes/${sc.bgId}.webp`)).length;
 // 맵 파일 키 = **mapId** (loadMapBackground(map.id) — 전투/씬 공통. 종전 stageId 키잉은
 // 실파일(zhuojun.webp 등)과 어긋나 보유 0 오표기 + 씬 맵 행이 전투맵 경로로 오도되던 버그).
 const mHave = req.maps.filter((m) => has(`maps/${m.mapId}.webp`) || has(`maps/${m.mapId}.png`)).length;
-s += `요약: 초상 ${pHave}/${req.portraits.length} · 씬 배경 ${sHave}/${req.scenes.length} · 맵 ${mHave}/${req.maps.length}\n\n`;
+const cHave = req.comics.filter((c) => has(`comics/${c.image}.webp`)).length;
+s += `요약: 초상 ${pHave}/${req.portraits.length} · 씬 배경 ${sHave}/${req.scenes.length} · 맵 ${mHave}/${req.maps.length} · 만화 지면 ${cHave}/${req.comics.length}\n\n`;
 
 s += "## 1. 초상 (portraits)\n\n";
 s += "톱다운 수묵 채색 인물 흉상(투명/단색 배경). id = 파일명.\n\n";
@@ -56,7 +57,15 @@ for (const m of req.maps) {
   s += `| ${mark(ok)} | ${m.stageId} | ${m.mapId} | maps/${m.mapId}.webp |\n`;
 }
 
+s += "\n## 4. 만화 지면 (comics)\n\n";
+s += "모션코믹 씬 페이지 이미지(세로 지면 3:4, 칸 경계 굵은 검정, 말풍선 없음 — 대사는 데이터). 칸 사각형은 스테이지 JSON(ComicScene)이 결정.\n\n";
+s += "| 보유 | image | 스테이지 | 유형 | 첫 대사(힌트) |\n|--|--|--|--|--|\n";
+for (const c of req.comics) {
+  const hint = c.firstLine.length > 40 ? c.firstLine.slice(0, 40) + "…" : c.firstLine;
+  s += `| ${mark(has(`comics/${c.image}.webp`))} | ${c.image} | ${c.stageId} | ${c.type} | ${hint} |\n`;
+}
+
 mkdirSync(dirname(outPath), { recursive: true });
 writeFileSync(outPath, s, "utf8");
 console.log(`매니페스트 생성: ${outPath}`);
-console.log(`필요: 초상 ${req.portraits.length}(보유 ${pHave}) · 씬 ${req.scenes.length}(${sHave}) · 맵 ${req.maps.length}(${mHave})`);
+console.log(`필요: 초상 ${req.portraits.length}(보유 ${pHave}) · 씬 ${req.scenes.length}(${sHave}) · 맵 ${req.maps.length}(${mHave}) · 만화 ${req.comics.length}(${cHave})`);

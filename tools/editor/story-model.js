@@ -43,6 +43,8 @@ export function slotParts(slot) {
 }
 
 export const isMapScene = (part) => !!part && typeof part === "object" && "map" in part;
+/** 만화 파트(kind:"comic") — VN 폴백 앞에서 분기(story editor v2). schemas isComicScene 과 동형. */
+export const isComicScene = (part) => !!part && typeof part === "object" && part.kind === "comic";
 
 /** rail 부제 "컷신 N" = intro + outro 파트 수. */
 export function sceneCount(stage) {

@@ -98,4 +98,17 @@ describe("validate-story (spec §9)", () => {
   it("turn.n 0", () => one((s) => { dlg(s)[1]!.trigger.n = 0; }, "전투 중 대사 2번째", "턴"));
   it("unitRetreated.unitId 미배치", () => one((s) => { dlg(s)[2]!.trigger.unitId = "ghost"; }, "전투 중 대사 3번째", "ghost"));
   it("duelOccurred.duelId 없음", () => one((s) => { dlg(s)[3]!.trigger.duelId = "nope"; }, "전투 중 대사 4번째", "nope"));
+
+  // 만화 파트(story editor v2) — VN "줄이 없습니다" 폴백에 걸리지 않고 자체 규칙만
+  const comic = (): Json => ({ kind: "comic", pages: [{ image: "p1", panels: [
+    { rect: [0, 0, 1, 1] },
+    { rect: [0, 0, 0.5, 0.5], lines: [{ text: "n" }, { speaker: "유비", text: "t" }], hold: 1200 },
+  ] }] });
+  const comicIn = (s: Json) => { (s.scenario as Json).intro = [comic()]; return (s.scenario as Json).intro as Json[]; };
+  const page = (s: Json) => comicIn(s)[0]!.pages as Array<Json & { panels: Array<Json & { lines: Json[] }> }>;
+  it("만화 파트 정상 → [] (VN 줄 검사 미적용)", () => { const s = good(); comicIn(s); expect(validateStory(s, ctx)).toEqual([]); });
+  it("만화 페이지 image 빈 문자열", () => one((s) => { page(s)[0]!.image = ""; }, "전투 전 이야기 1번째 장면 1번째 페이지", "이미지"));
+  it("만화 칸 rect 범위 밖(x+w>1)", () => one((s) => { page(s)[0]!.panels[1]!.rect = [0.7, 0, 0.5, 0.5]; }, "전투 전 이야기 1번째 장면 1번째 페이지 2번째 칸", "사각형"));
+  it("만화 칸 줄 text 빈", () => one((s) => { page(s)[0]!.panels[1]!.lines[1]!.text = " "; }, "전투 전 이야기 1번째 장면 1번째 페이지 2번째 칸 2번째 줄", "본문"));
+  it("만화 칸 hold 0", () => one((s) => { page(s)[0]!.panels[1]!.hold = 0; }, "전투 전 이야기 1번째 장면 1번째 페이지 2번째 칸", "hold"));
 });

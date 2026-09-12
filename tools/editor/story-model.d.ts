@@ -8,5 +8,6 @@ export function newSceneLine(speaker?: string): SceneLine;
 export function newVnPart(): VnPart;
 export function slotParts<T = Json>(slot: T | T[] | undefined | null): T[];
 export function isMapScene(part: unknown): boolean;
+export function isComicScene(part: unknown): boolean;
 export function sceneCount(stage: Json): number;
 export function collectSceneBgs(stages: Json[]): string[];

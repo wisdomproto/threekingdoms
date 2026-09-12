@@ -1,6 +1,6 @@
 // tools/editor/publish.js — Publish UX. spec 2026-09-12-creator-ux-p2-design §7
 // 상단 = 순수(diffStage · checklist, node 테스트). 하단 = DOM 모달(openPublishModal)·에셋 프로브(probeAssets) — 브라우저 전용.
-import { slotParts } from "./story-model.js";
+import { slotParts, isComicScene } from "./story-model.js";
 
 const J = (v) => JSON.stringify(v);
 const lineCount = (slot) => slotParts(slot).reduce((n, p) => n + (p.lines?.length ?? 0), 0);
@@ -60,6 +60,13 @@ export async function probeAssets(stage, base) {
   if (stage.mapId) urls.set(`painted 맵 배경 ${stage.mapId}`, `${base}/assets/maps/${encodeURIComponent(stage.mapId)}.webp`);
   const portraits = new Set();
   for (const slot of Object.values(stage.scenario ?? {})) for (const p of slotParts(slot)) {
+    if (isComicScene(p)) {   // 만화 지면 + 칸 대사 초상 (VN 폴백 앞)
+      for (const pg of p.pages ?? []) {
+        if (pg.image) urls.set(`만화 지면 ${pg.image}`, `${base}/assets/comics/${encodeURIComponent(pg.image)}.webp`);
+        for (const pn of pg.panels ?? []) for (const l of pn.lines ?? []) if (l.portraitId) portraits.add(l.portraitId);
+      }
+      continue;
+    }
     if (p.bg) urls.set(`씬 배경 ${p.bg}`, `${base}/assets/scenes/${encodeURIComponent(p.bg)}.webp`);
     for (const l of p.lines ?? []) { if (l.bg) urls.set(`씬 배경 ${l.bg}`, `${base}/assets/scenes/${encodeURIComponent(l.bg)}.webp`); if (l.portraitId) portraits.add(l.portraitId); }
   }

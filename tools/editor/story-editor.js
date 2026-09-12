@@ -3,7 +3,7 @@
 // renderDialogueList(el, ctx) — 전투 중 대사 카드(WHEN 빌더 + 줄 + Advanced id)
 // renderLines(el, lines, opts) — 공용 줄 편집기. 모든 변형은 제자리 + commit()(= refreshValidation). 텍스트는 oninput(히스토리 병합).
 // 빈 문자열 필드(speaker/portraitId/bg/side)는 키 삭제 — 파일에 무의미한 "" 를 남기지 않는다.
-import { newSceneLine, newVnPart, newDialogueId, slotParts, isMapScene, describeTrigger } from "./story-model.js";
+import { newSceneLine, newVnPart, newDialogueId, slotParts, isMapScene, isComicScene, describeTrigger } from "./story-model.js";
 
 const SIDE_OPTS = [["", "(자동)"], ["player", "아군"], ["ally", "우군"], ["enemy", "적군"]];
 const KINDS = [["battleStart", "전투가 시작되면"], ["turn", "N턴이 시작되면"], ["unitRetreated", "유닛이 퇴각하면"], ["duelOccurred", "일기토가 일어나면"], ["battleEnd", "전투가 끝나면"]];
@@ -123,7 +123,7 @@ export function renderSceneSlot(el, ctx) {
   parts.forEach((part, i) => {
     const card = h("div", "card part");
     const head = h("div", "lrow head");
-    head.appendChild(h("h3", null, isMapScene(part) ? `맵 씬 (고급) — ${part.label ?? part.map}` : `장면 ${i + 1}`));
+    head.appendChild(h("h3", null, isMapScene(part) ? `맵 씬 (고급) — ${part.label ?? part.map}` : isComicScene(part) ? `만화 장면 ${i + 1}` : `장면 ${i + 1}`));
     head.appendChild(arr ? moveBtns(arr, i, afterParts) : btn("✕", "이 장면 삭제", () => { setSlot(undefined); again(); }));
     card.appendChild(head);
     if (isMapScene(part)) {   // 고급 JSON 카드 — 적용 = JSON.parse 성공 시 파트 교체 (MapScene 은 배열 안에만 존재)
@@ -135,6 +135,10 @@ export function renderSceneSlot(el, ctx) {
         catch (e) { err.textContent = "JSON 오류: " + e.message; err.style.display = "block"; }
       });
       det.append(ta, err, ap); card.appendChild(det);
+    } else if (isComicScene(part)) {   // 읽기 전용 — 편집 UI는 Chunk 3(renderComicPart). VN 카드의 `lines ??= []` 변형 금지(strict 스키마)
+      const pages = Array.isArray(part.pages) ? part.pages : [];
+      const panels = pages.reduce((n, pg) => n + (pg?.panels?.length ?? 0), 0);
+      card.appendChild(h("div", "msg", `만화 장면 (편집 UI 다음 단계) — 페이지 ${pages.length} · 칸 ${panels}`));
     } else {
       const br = h("div", "lrow bgrow");
       const bg = h("input"); bg.type = "text"; bg.setAttribute("list", "tk-bgs"); bg.placeholder = "배경 키 (예: 05-sishuiguan-intro)"; bg.value = part.bg ?? "";
