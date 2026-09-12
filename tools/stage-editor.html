@@ -1103,6 +1103,7 @@ function scheduleRecovery() {
   recoveryTimer = setTimeout(() => {
     recoveryTimer = null;
     if (!history.isDirty()) { clearRecovery(); updateSaveState(); return; } // 울리는 시점에 판정 — undo로 clean이면 옛 복구본도 제거
+    if (document.getElementById('recoveryBar').style.display !== 'none') return; // 복구 결정 전엔 옛 복구본을 덮지 않는다
     try {
       localStorage.setItem(recoveryKey(), JSON.stringify({ savedAt: new Date().toISOString(), snapshot: history.current() }));
       lastRecoveryAt = new Date();
@@ -1258,6 +1259,7 @@ function doNew() {
   const w = +prompt('맵 너비(칸)', W) || W;
   const h = +prompt('맵 높이(칸)', H) || H;
   const nid = (prompt('stage id', 'stageXX') || 'stageXX').trim();
+  document.getElementById('recoveryBar').style.display = 'none';
   const prevSuspend = suspendHistory; suspendHistory = true; cancelRecoveryTimer();
   try {
     W = Math.max(8, Math.min(120, w)); H = Math.max(8, Math.min(120, h));
