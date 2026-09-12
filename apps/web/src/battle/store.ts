@@ -46,6 +46,11 @@ export interface BattleStoreOptions {
   onPreviewCancel?: (unitId: string, to: Coord) => void;
   /** 플레이어 부대 창고 소모품(원작 창고 §7) — friendly 공유 풀로 주입(편성에서 전달). */
   sharedItems?: string[];
+  /**
+   * 중단 저장 복원 — createBattle 직후 연출 없이 엔진 fold(applyAction 순차)로 committed/settled/actionLog를
+   * 재구성한다. 적용 불가 액션이면 throw(호출부가 새 전투로 폴백).
+   */
+  replayLog?: readonly Action[];
 }
 
 /**
@@ -92,6 +97,8 @@ export interface StoreSnapshot {
   autoBattle: boolean;
   /** 연출 배속 (1·2·3) — 버튼 라벨 + 렌더러 연동 */
   speed: number;
+  /** 입문 공격 확인 ON — PauseMenu 조작 토글 표시 */
+  confirmAttacks: boolean;
   /**
    * 조회(호버/탭) 중인 유닛 id (Tier 1-2/1-3) — 순수 표현 채널.
    * inputMachine(idle/selected/targetSelect…)과 **독립**: 진행 중인 턴 상태기계를 오염시키지 않는다.
@@ -133,6 +140,8 @@ export class BattleStore {
   private _autoBattle = false;
   /** 연출 배속 (1=기본). 순수 표현 — 게임 상태 불변, 렌더러 TweenRunner에 전달 */
   private _speed = 1;
+  /** 입문 공격 확인 — reduceInput 6번째 인자. 클래식(false)=즉시 커밋 */
+  private _confirmAttacks = false;
   /** 조회(호버/탭) 중인 유닛 id — 순수 표현 채널 (Tier 1-2/1-3). inputMachine 무관 */
   private _inspectedId: string | null = null;
   /** 커맨드 메뉴 앵커 — 렌더러가 매 틱 활성 유닛 스크린좌표를 push. 메뉴 비표시면 null */
@@ -152,6 +161,10 @@ export class BattleStore {
     this.seed = seed;
     this.opts = opts;
     this.committed = createBattle(ctx, seed, { sharedItems: opts.sharedItems });
+    for (const a of opts.replayLog ?? []) {
+      this.committed = applyAction(ctx, this.committed, a).state; // 실패 시 throw
+      this.log.push(a);
+    }
     this.settled = this.committed;
     this.player = new EventPlayer({
       presenter: opts.presenter ?? createInstantPresenter(),
@@ -283,7 +296,9 @@ export class BattleStore {
   dispatchUi(event: UiEvent): void {
     const prevUi = this.ui;
     const prevKind = this.ui.kind;
-    const { next, effects } = reduceInput(this.ui, event, this.ctx, this.committed, this._autoBattle);
+    const { next, effects } = reduceInput(
+      this.ui, event, this.ctx, this.committed, this._autoBattle, this._confirmAttacks,
+    );
     this.ui = next;
 
     const batch: BattleEvent[] = [];
@@ -358,6 +373,17 @@ export class BattleStore {
     this.notify();
   }
 
+  get confirmAttacks(): boolean {
+    return this._confirmAttacks;
+  }
+
+  /** 입문 공격 확인 토글 — 다음 공격 대상 탭부터 적용(진행 중 confirmAttack 상태는 건드리지 않음) */
+  setConfirmAttacks(on: boolean): void {
+    if (this._confirmAttacks === on) return;
+    this._confirmAttacks = on;
+    this.notify();
+  }
+
   /**
    * 자동전투 토글. ON: 아군 페이즈를 그리디 드라이버가 구동(적 페이즈는 원래 자동).
    * 수동 선택 중(selected/postMoveMenu/targetSelect)에 켜면 프리뷰를 원위치로 되돌리고
@@ -373,7 +399,8 @@ export class BattleStore {
       this.committed.status === "ongoing" &&
       !this.player.playing
     ) {
-      const cur = this.ui;
+      // confirmAttack은 prior(selected|targetSelect)를 풀어 같은 정리 규칙을 탄다
+      const cur = this.ui.kind === "confirmAttack" ? this.ui.prior : this.ui;
       if (cur.kind === "postMoveMenu" || cur.kind === "targetSelect") {
         // 진행 중 프리뷰 워크를 원위치로 되돌리고 선택 해제
         if (cur.preview.x !== cur.from.x || cur.preview.y !== cur.from.y) {
@@ -414,6 +441,7 @@ export class BattleStore {
         previewWalking: this._previewWalking,
         autoBattle: this._autoBattle,
         speed: this._speed,
+        confirmAttacks: this._confirmAttacks,
         inspectedId: this._inspectedId,
         menuAnchor: this._menuAnchor,
         inspectAnchor: this._inspectAnchor,

@@ -10,7 +10,7 @@ import { applyAction, createBattle, getAttackableTargets, getMovableTiles } from
 import type { BattleState, Coord } from "@tk/engine";
 import { reduceInput, type InputState, type UiEvent } from "../inputMachine";
 import { BattleStore } from "../store";
-import { findUnit, sishuiCtx, withUnit } from "./fixtures";
+import { findUnit, sishuiCtx, testCtx, withUnit } from "./fixtures";
 
 const SEED = 42;
 const ctx = sishuiCtx;
@@ -477,6 +477,57 @@ describe("전이 전수 — 모든 (상태, 이벤트) 조합이 던지지 않�
       });
     }
   }
+});
+
+describe("confirmAttacks 토글 (store 통합)", () => {
+  // testCtx: 관우(1,4) 경기병 move 6 — (6,3)까지 이동하면 이숙(6,2)이 사거리 안. 이동 프리뷰≠원위치.
+  function reachConfirm(store: BattleStore): void {
+    store.setConfirmAttacks(true);
+    store.dispatchUi({ type: "tapTile", coord: { x: 1, y: 4 } });
+    store.dispatchUi({ type: "tapTile", coord: { x: 6, y: 3 } });
+    expect(store.uiState.kind).toBe("postMoveMenu");
+    store.dispatchUi({ type: "menuAttack" });
+    store.dispatchUi({ type: "tapTile", coord: { x: 6, y: 2 } });
+    expect(store.uiState).toMatchObject({ kind: "confirmAttack", targetId: "이숙", prior: { kind: "targetSelect" } });
+  }
+
+  it("setConfirmAttacks(true) → 대상 탭이 confirmAttack에서 멈추고, 스냅샷에 노출, 확정 시 커밋", async () => {
+    const store = new BattleStore(testCtx, SEED);
+    expect(store.getSnapshot().confirmAttacks).toBe(false);
+    reachConfirm(store);
+    expect(store.getSnapshot().confirmAttacks).toBe(true);
+    expect(store.actionLog).toEqual([]);
+    store.dispatchUi({ type: "confirmAttack" });
+    expect(store.uiState.kind).toBe("animating");
+    expect(store.actionLog).toEqual([
+      { type: "move", unitId: GUANYU, to: { x: 6, y: 3 } },
+      { type: "attack", unitId: GUANYU, targetId: "이숙" },
+    ]);
+    await store.whenIdle();
+  });
+
+  it("클래식(기본): 같은 흐름이 즉시 커밋", () => {
+    const store = new BattleStore(testCtx, SEED);
+    store.dispatchUi({ type: "tapTile", coord: { x: 1, y: 4 } });
+    store.dispatchUi({ type: "tapTile", coord: { x: 6, y: 3 } });
+    store.dispatchUi({ type: "menuAttack" });
+    store.dispatchUi({ type: "tapTile", coord: { x: 6, y: 2 } });
+    expect(store.uiState.kind).toBe("animating");
+    expect(store.actionLog).toHaveLength(2);
+  });
+
+  it("confirmAttack(prior=targetSelect, preview≠from) 중 setAutoBattle(true) → 프리뷰 취소 + confirmAttack 이탈", () => {
+    let cancelled: string | null = null;
+    const store = new BattleStore(testCtx, SEED, {
+      onPreviewWalk: () => Promise.resolve(),
+      onPreviewCancel: (unitId) => { cancelled = unitId; },
+    });
+    reachConfirm(store);
+    store.setAutoBattle(true);
+    expect(cancelled).toBe(GUANYU);
+    expect(store.uiState.kind).not.toBe("confirmAttack");
+    expect(store.previewWalking).toBe(false);
+  });
 });
 
 describe("movePreview 취소 = 엔진 무호출 (store 통합)", () => {

@@ -36,4 +36,20 @@ describe("replay — actionLog fold ≡ committed", () => {
     const parsed = JSON.parse(wire) as { seed: number; log: Action[] };
     expect(foldLog(parsed.seed, parsed.log)).toEqual(store.committedState);
   }, 30_000);
+
+  it("replayLog 옵션으로 만든 store 는 fold 결과와 동일한 committed/settled·actionLog 를 갖는다", async () => {
+    const live = new BattleStore(ctx, SEED);
+    await playGreedyToEnd(live, ctx);
+    const log = JSON.parse(JSON.stringify(live.actionLog)) as Action[];
+    const resumed = new BattleStore(ctx, SEED, { replayLog: log });
+    expect(resumed.committedState).toEqual(live.committedState);
+    expect(resumed.settledState).toEqual(live.committedState);
+    expect(resumed.actionLog).toEqual(log);
+  }, 30_000);
+
+  it("replayLog 가 적용 불가면 throw", () => {
+    expect(
+      () => new BattleStore(ctx, SEED, { replayLog: [{ type: "wait", unitId: "없는유닛" } as Action] }),
+    ).toThrow();
+  });
 });
