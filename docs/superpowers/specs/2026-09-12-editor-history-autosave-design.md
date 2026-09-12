@@ -28,7 +28,7 @@
 ```ts
 createHistory({ limit = 100, coalesceMs = 400, now = () => Date.now() }): History
 interface History {
-  push(snapshot: string): boolean;   // 직전 current 와 같으면 false(무시). redo 스택 비움. 직전 push 로부터 coalesceMs 안이면 top 교체(타이핑 버스트 = 한 항목).
+  push(snapshot: string, opts?: { coalesce?: boolean }): boolean; // 직전 current 와 같으면 false — 이때 redo 스택·병합 창은 건드리지 않는다. 다르면 redo 비우고 추가/교체.
   undo(): string | null;             // current 를 한 칸 앞으로. 불가면 null
   redo(): string | null;
   canUndo(): boolean; canRedo(): boolean;
@@ -39,7 +39,7 @@ interface History {
 }
 ```
 - 스택은 상태(문자열)의 배열 + 인덱스. `limit` 초과 시 가장 오래된 것부터 버림.
-- coalesce: `push(snapshot, { coalesce })`. `coalesce === true`이고 직전 push 시각으로부터 `coalesceMs` 이내이며 **마지막 호출이 push(true 반환)였고 그 뒤 undo/redo/reset이 없었으면** top을 교체(교체 연쇄 허용). 버스트의 첫 항목 이전 상태가 Undo 지점이 된다. **`undo()`·`redo()`·`reset()`은 병합 창을 닫는다**(`lastPushAt = -∞`) — 그렇지 않으면 "편집 → Ctrl+Z → 300ms 안 재편집"이 방금 돌아간 상태를 덮어쓴다.
+- coalesce: `push(snapshot, { coalesce })`. `coalesce === true`이고 직전 push 시각으로부터 `coalesceMs` 이내이며 **마지막 호출이 push(true 반환)였고 그 push도 `coalesce:true`였으며 그 뒤 undo/redo/reset이 없었으면** top을 교체(교체 연쇄 허용) — 체크박스(coalesce:false) 직후 400ms 안의 타이핑이 체크박스 항목을 덮지 않게. 버스트의 첫 항목 이전 상태가 Undo 지점이 된다. **`undo()`·`redo()`·`reset()`은 병합 창을 닫는다**(`lastPushAt = -∞`) — 그렇지 않으면 "편집 → Ctrl+Z → 300ms 안 재편집"이 방금 돌아간 상태를 덮어쓴다.
 - `coalesce` 여부는 호출측이 정한다: HTML 훅은 **텍스트류 입력(`input[type=text|number]`·`textarea`·contenteditable)에 포커스가 있을 때만 `true`** — 타이핑 버스트만 한 항목이 되고, 빠른 클릭 두 번(목표 추가 ×2·체크박스 둘)은 각각 별 항목으로 남는다("사용자가 생각하는 한 작업 = Undo 한 번").
 - `isDirty()`는 첫 `reset` 전에는 false(초기 `init()` 렌더가 만드는 push는 dirty가 아니다).
 - 시간은 주입(`now`)해 테스트한다.
@@ -48,28 +48,28 @@ interface History {
 
 ```js
 const snapshot = () => JSON.stringify({ stage: serializeStageModel(stage), map: serializeMapModel({ id: mapId, name: mapName, width: W, height: H, tileLegend: loadedLegend, tiles }) });
-function restore(snap) {            // Undo/Redo/복구본 공용
-  restoring = true;
+function restore(snap) {            // Undo/Redo/복구본 공용 — 로드와 같은 suspendHistory 플래그 하나만 쓴다
+  const prev = suspendHistory; suspendHistory = true;
   try {
     const s = JSON.parse(snap);
     stage = loadStageModel(s.stage);
     const mm = loadMapModel(s.map); W = mm.width; H = mm.height; mapId = mm.id; mapName = mm.name; loadedLegend = mm.tileLegend; tiles = mm.tiles;
     selUnit = null; resizeCanvas(); renderAll(); renderTab(); refreshUnitList(); refreshValidation();
-  } finally { restoring = false; }
+  } finally { suspendHistory = prev; }   // 중첩(loadMapOnlyFromServer→loadMapObject 등) 안전
 }
 ```
 - `refreshValidation()` 끝에: `if (!suspendHistory) { if (history.push(snapshot(), { coalesce: isTextLike(document.activeElement) })) scheduleRecovery(); } updateSaveState();`
-- **`suspendHistory` 플래그**를 `restore()`뿐 아니라 `loadStageObject`·`loadMapObject`·`doNew`·`loadMapOnlyFromServer` 본문 전체에 걸고, 각 함수 **마지막**(`loadMapOnlyFromServer`는 `stage.mapId` 대입 뒤)에 `history.reset(snapshot())` — 로드 중 `setMapOnlyMode(false)`→`refreshValidation()`이 만드는 선행 push를 원천 차단. `init()` 끝에도 `history.reset(snapshot())`. 기존 `undoStack.length = 0` 3곳·`pushUndo`/`doUndo`/`undoStack`·`pushUndo()` 호출 4곳 삭제. `cloneUnits`의 HTML import는 제거하되 **모듈 export는 유지**(`editor-roundtrip.test.ts`가 import).
+- **`suspendHistory` 플래그 하나**를 `restore()`와 `loadStageObject`·`loadMapObject`·`doNew`·`loadMapOnlyFromServer` 본문 전체에 걸고(진입 시 이전 값을 저장했다가 `finally`에서 되돌려 중첩 안전), 각 함수 **마지막**(`loadMapOnlyFromServer`는 `stage.mapId` 대입 뒤)에 `history.reset(snapshot())` — 로드 중 `setMapOnlyMode(false)`→`refreshValidation()`이 만드는 선행 push를 원천 차단. `init()` 끝에도 `history.reset(snapshot())`. 기존 `undoStack.length = 0` 3곳·`pushUndo`/`doUndo`/`undoStack`·`pushUndo()` 호출 4곳 삭제. `cloneUnits`의 HTML import는 제거하되 **모듈 export는 유지**(`editor-roundtrip.test.ts`가 import).
 - 맵 단독 모드도 같은 스냅샷(스테이지가 기본값이어도 포함)으로 다룬다.
 
 ## 6. 키보드·버튼
-- 기존 keydown(522행)을 교체: 포커스가 **텍스트류**(`input[type=text|number]`·`textarea`·contenteditable)면 가로채지 않는다(브라우저 텍스트 undo 우선 — 그 undo가 `input` 이벤트를 내면 에디터 히스토리에는 *새 항목*이 쌓인다: 두 시스템은 상쇄가 아니라 연쇄. 수용). `select`·체크박스 포커스는 네이티브 undo가 없으니 가로챈다. 아니면 Ctrl/Cmd+Z → undo, Ctrl+Y 또는 Ctrl/Cmd+Shift+Z → redo. 좌표 집기(`coordPick`) 중엔 무시.
+- 기존 keydown(522행)을 교체: 포커스가 **텍스트류**(`input[type=text|number]`·`textarea`·contenteditable)면 Ctrl+Z/Y뿐 아니라 `1`~`9` 지형 단축키도 가로채지 않는다(turnLimit에 "12"를 치면 브러시가 바뀌던 기존 문제 동시 해결)(브라우저 텍스트 undo 우선 — 그 undo가 `input` 이벤트를 내면 에디터 히스토리에는 *새 항목*이 쌓인다: 두 시스템은 상쇄가 아니라 연쇄. 수용). `select`·체크박스 포커스는 네이티브 undo가 없으니 가로챈다. 아니면 Ctrl/Cmd+Z → undo, Ctrl+Y 또는 Ctrl/Cmd+Shift+Z → redo. 좌표 집기(`coordPick`) 중엔 무시.
 - 툴바에 이미 `#undo`(↶, 166행, `doUndo` 배선 521행)가 있다 — **그 버튼을 재배선**하고 옆에 `#redo`(↷) 추가. `canUndo/canRedo`로 `disabled` 갱신(`updateSaveState`에서).
 
 ## 7. 저장 상태 칩 + 복구본
 - 툴바 `#saveMap` 뒤 `<span id="saveState">`: `저장됨 ✓ HH:MM` / `수정됨 · 복구본 보관 HH:MM:SS` / `저장 중…`. `updateSaveState()`가 `history.isDirty()`와 마지막 복구본 시각으로 그린다. 파일 저장 성공(`saveStageFile`/`saveMapFile`) → `history.markSaved()` + 복구본 삭제 + 칩 갱신. 붙여넣기 내보내기(`openPasteExport`)는 저장으로 치지 않는다(파일에 안 닿음).
 - 복구본 키: 스테이지 모드 `tk.editor.recovery.stage:<stage.id>`, 맵 단독 모드 `tk.editor.recovery.map:<mapId>`(맵 단독 세션끼리 충돌 방지). 값 `{ savedAt: ISO, snapshot }`. push 후 **1초 디바운스**로 기록하되 **타이머가 울리는 시점에 `history.isDirty()`를 검사**하고, `history.reset()`(로드)이 대기 중 타이머를 취소한다 — 새로 연 스테이지에 엉뚱한 복구본이 남지 않게. 저장 실패(quota)는 조용히 무시(칩에 "복구본 보관 실패").
-- 복원 프롬프트: `checkRecovery()`는 **진입점 4곳의 꼬리**(`loadStageFromServer`·`loadMapOnlyFromServer`·`openFile`·`doPasteLoad`)에서 **한 번** 호출(로드 함수 안에 두면 서버 로드가 맵→스테이지 두 번 부르고 첫 번째는 이전 스테이지 키로 잘못 검사). 현재 모드의 키에 복구본이 있고 `snapshot !== history.current()`면 `#recoveryBar` 표시 — "복구본 있음 (HH:MM) — 저장하지 않은 편집이 있습니다 [복원] [버리기]". 복원 → `restore(rec.snapshot)` 후 `history.reset(rec.snapshot)`(스택은 새로, 단 saved는 로드 시점 스냅샷으로 두어 dirty). 버리기 → 키 삭제. 새 스테이지(`doNew`)는 검사 안 함.
+- 복원 프롬프트: `checkRecovery()`는 **진입점 4곳의 꼬리**(`loadStageFromServer`·`loadMapOnlyFromServer`·`openFile`·`doPasteLoad`)에서 **한 번** 호출(로드 함수 안에 두면 서버 로드가 맵→스테이지 두 번 부르고 첫 번째는 이전 스테이지 키로 잘못 검사). 현재 모드의 키에 복구본이 있고 `snapshot !== history.current()`면 `#recoveryBar` 표시 — "복구본 있음 (HH:MM) — 저장하지 않은 편집이 있습니다 [복원] [버리기]". 복원 → `restore(rec.snapshot)`(suspend 하에) 후 **`history.push(rec.snapshot, { coalesce: false })`** — 스택 = [로드 시점, 복구본], saved = 로드 시점이라 dirty로 남고(칩 "수정됨", `beforeunload` 경고, 복구본 디바운스 유지) Undo 한 번이면 디스크 상태로 돌아간다. 버리기 → 키 삭제. 새 스테이지(`doNew`)는 검사 안 함. `openFile`/`doPasteLoad`는 **성공 분기에서만** `checkRecovery()`.
 - `beforeunload`: `history.isDirty()`일 때만 경고.
 - `window.__stageEditor`에 `history` 노출(검증용).
 
@@ -77,6 +77,7 @@ function restore(snap) {            // Undo/Redo/복구본 공용
 - 스냅샷 직렬화 실패(순환 등)는 발생하지 않는다(모델은 JSON 유래). 방어적으로 try/catch 후 콘솔 경고, 히스토리 push 생략.
 - `restore` 중 `refreshValidation`이 다시 push하지 않도록 `restoring` 플래그.
 - `loadStageObject` 안의 `setMapOnlyMode(false)` → `refreshValidation()` 호출 순서: reset은 **마지막**에 하여 로드 직후 상태가 스택의 유일 항목이 되게 한다.
+- `doNew()`의 확인창은 `history.isDirty()`일 때만 띄운다("Save is always allowed / destructive is recoverable"에 정합).
 - 스테이지 id를 편집하면 복구본 키가 바뀐다 — 옛 키는 남는다(무해, 다음 저장 때 새 id 키만 삭제). 범위 밖.
 - 새 맵(`loadedLegend === null`)은 첫 복원 뒤 `serializeMap`이 만든 범례 객체를 갖게 되어, 지운 문자의 범례 항목이 남을 수 있다 — 무해(여분 범례), 수용.
 - 맵 단독 모드에서 `refreshValidation()`이 배너를 스테이지 검증 문구로 덮어쓰는 기존 현상: 배너 갱신만 `mapOnlyMode`면 건너뛴다(push는 그대로).
