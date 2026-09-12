@@ -23,10 +23,10 @@
 | `.gitignore` (수정) | `apps/web/public/_draft/` |
 | `apps/web/src/lab/playtest.ts` (신규) | 순수 로직: `PlaytestSnapshot` 타입, `parsePlaytestSnapshot(json) → { ok: true, payload: LabPayload } \| { ok: false, message }`(kind/version 확인 + `StageSchema`/`BattleMapSchema` parse + 첫 zod 이슈 메시지). DOM·Next 무관 → node 테스트 가능 |
 | `apps/web/app/playtest/page.tsx` (신규) | 착륙 페이지(얇은 클라이언트 컴포넌트, `/lab/page.tsx`처럼 `dynamic(ssr:false)`): `?draft=` → fetch → `parsePlaytestSnapshot` → 성공 시 `writeLab` + `router.replace('/battle?stage=__lab')`, 실패 시 메시지 + 「닫기」 |
-| `apps/web/src/lab/lab.ts` (수정) | `LabPayload.returnUrl?`; 순수 `exitTarget(payload, hasOpener)`; 부수효과 래퍼 `leaveSandbox(navigate)` = `exitTarget(readLab(), window.opener != null)` → `close`면 `window.close()` + 100ms 뒤 `window.closed`가 아니면 `navigate(returnUrl)` 폴백, `navigate`면 `navigate(to)` |
+| `apps/web/src/lab/lab.ts` (수정) | `LabPayload.returnUrl?`; 순수 `exitTarget(payload, hasOpener)`; 부수효과 래퍼 `leaveSandbox(navigate, payload = readLab())` = `exitTarget(payload, window.opener != null)` → `close`면 `window.close()` + 100ms 뒤 `window.closed`가 아니면 `navigate(returnUrl)` 폴백, `navigate`면 `navigate(to)` |
 | `apps/web/src/battle/BattleScreen.tsx` (수정) | `makeCtx()`가 `sandbox: boolean`(= `__lab` 분기 여부)을 반환; 476~477행 `stageId`/`sandbox` prop과 529행 종료 결정을 `ctx.stage.id === LAB_STAGE_ID` 대신 이 플래그로. sandbox면 `PauseMenu`에 `onExit={() => leaveSandbox(router.push)}` |
 | `apps/web/src/battle/hud/PauseMenu.tsx` (수정) | `onExit?: () => void` prop 추가 — 있으면 `router.push(exitTo)` 대신 호출(기본 동작 불변) |
-| `apps/web/src/battle/hud/ResultSequence.tsx` (수정) | 481·958행 `sandbox ? "/lab" : …` → `sandbox ? leaveSandbox(fadeTo) : fadeTo(…)`; sandbox 버튼 라벨 "실험실로 ▶" → `readLab()?.returnUrl`이 있으면 "에디터로 ▶" |
+| `apps/web/src/battle/hud/ResultSequence.tsx` (수정) | 481·958행 `sandbox ? "/lab" : …` → `sandbox ? leaveSandbox(fadeTo) : fadeTo(…)`; sandbox 버튼 라벨 "실험실로 ▶" → `readLab()?.returnUrl`이 있으면 "에디터로 ▶"(`useMemo`로 1회 계산) |
 | `tools/stage-editor.html` (수정) | ▶ 이 스테이지 테스트 버튼(`#playtestBtn`, `#publishCheck` 옆·같은 핸들러 스타일) + `GAME_ORIGIN` 상수 |
 | `apps/web/src/lab/__tests__/playtest.test.ts` (신규) | §8 — `exitTarget`·`parsePlaytestSnapshot` 단위 테스트(node 환경, 기존 web 테스트 관례: jsdom 없음) |
 
@@ -70,7 +70,7 @@ export function exitTarget(payload: Pick<LabPayload, "returnUrl"> | null, hasOpe
 에디터 상태(선택·줌·탭·Undo 스택)는 에디터 탭이 계속 열려 있으므로 보존된다 — 별도 저장 없음.
 
 ## 7. 검증·에러
-- 착륙 페이지: fetch 404 → "드래프트가 없습니다 — 에디터에서 ▶ 테스트를 다시 누르세요" + 「닫기」; `kind`/`version` 불일치 → 같은 안내; zod 실패 → 첫 이슈의 `path`·`message` 표시(이게 "실행 최소 조건" 실검사) + 「닫기」. 「닫기」 = `exitTarget` 규칙.
+- 착륙 페이지: fetch 404 → "드래프트가 없습니다 — 에디터에서 ▶ 테스트를 다시 누르세요" + 「닫기」; `kind`/`version` 불일치 → 같은 안내; zod 실패 → 첫 이슈의 `path`·`message` 표시(이게 "실행 최소 조건" 실검사) + 「닫기」. 「닫기」 = `leaveSandbox(navigate, { returnUrl })` — 실패 경로에선 `tk.lab`에 아무것도 안 썼으므로 스냅샷에서 읽은 `returnUrl`(있으면)을 직접 넘긴다; 없으면 `window.close()` + 같은 100ms 폴백(`/lab`으로 보내지 않는다).
 - `readLab()`은 `returnUrl`을 선택 필드로 통과(기존 검증 로직 불변).
 - serve.py: `draftId` 불일치/경로 탈출(`..`)/JSON 파싱 실패/크기 초과 → `ok:false`.
 - 드래프트는 dev 전용: `public/_draft/`는 gitignore, `next build` 산출물에 없음, R2 업로더는 `apps/web/public/assets`만 훑는다(`tools/upload-assets.py` `ASSET_DIR` — 확인됨, 변경 없음).
@@ -78,7 +78,7 @@ export function exitTarget(payload: Pick<LabPayload, "returnUrl"> | null, hasOpe
 ## 8. 테스트
 - `exitTarget` 순수 함수: (없음, any) → `/lab`; (있음, opener) → close; (있음, no opener) → navigate returnUrl.
 - `parsePlaytestSnapshot`(node): 유효 스냅샷(`gameData.stages["05-sishuiguan"]` + `gameData.maps["sishuiguan"]`로 구성 — 기존 web 테스트 픽스처 관례) → `ok:true`, payload에 `sharedItems: []`·`seed`·`returnUrl` 전달; `kind` 불일치 → `ok:false` 안내; zod 실패(예: `turnLimit` 삭제, `safeParse`의 첫 이슈) → `ok:false` 메시지에 `turnLimit` 경로 포함.
-- `makeCtx` sandbox 플래그: 기존 BattleScreen 테스트가 있으면 `__lab` URL로 `sandbox: true`·정규 스테이지로 `false`를 확인(없으면 플랜에서 최소 케이스 추가). (web 테스트는 `environment: node` — jsdom·`next/navigation` 모킹은 도입하지 않는다.)
+- `makeCtx`의 sandbox 플래그는 단위 테스트하지 않는다(`BattleScreen`은 pixi를 import해 node 환경에서 로드 불가) — 브라우저 E2E가 담당. 플랜은 BattleScreen을 vitest에서 import하려 하지 않는다. (web 테스트는 `environment: node` — jsdom·`next/navigation` 모킹은 도입하지 않는다.)
 - serve.py: `python -m py_compile` + curl 수동(정상 저장 / 잘못된 id 거부).
 - 브라우저 E2E(플랜 단계): 에디터에서 유닛 좌표를 바꾸고 ▶ → 전투에 바뀐 좌표로 시작 → 나가기 → 에디터 탭 복귀·상태 유지. 레포 JSON `git status` 무변화, `_draft/` 파일만 생성.
 
