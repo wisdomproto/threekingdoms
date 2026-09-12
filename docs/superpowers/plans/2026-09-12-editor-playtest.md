@@ -61,7 +61,7 @@ describe("exitTarget — 실험실/플레이테스트 종료 목적지 (spec §6
 });
 ```
 
-- [ ] **Step 2: 실패 확인** — `pnpm --filter @tk/web test -- playtest` → FAIL (`exitTarget` is not exported)
+- [ ] **Step 2: 실패 확인** — `pnpm --filter @tk/web test playtest` → FAIL (`exitTarget` is not exported)
 
 - [ ] **Step 3: 구현** — `apps/web/src/lab/lab.ts`
 
@@ -114,7 +114,7 @@ export function leaveSandbox(
 ```
 (`readLab`은 이미 `returnUrl`을 통과시킨다 — 4개 필드만 검사하고 `p as LabPayload` 캐스트. 변경 없음.)
 
-- [ ] **Step 4: 통과 확인** — `pnpm --filter @tk/web test -- playtest` → 3 passed
+- [ ] **Step 4: 통과 확인** — `pnpm --filter @tk/web test playtest` → 3 passed
 - [ ] **Step 5: 커밋**
 ```bash
 git add apps/web/src/lab/lab.ts apps/web/src/lab/__tests__/playtest.test.ts
@@ -179,7 +179,7 @@ describe("parsePlaytestSnapshot — 드래프트 파일 → LabPayload (spec §4
 });
 ```
 
-- [ ] **Step 2: 실패 확인** — `pnpm --filter @tk/web test -- playtest` → FAIL (`../playtest` 없음)
+- [ ] **Step 2: 실패 확인** — `pnpm --filter @tk/web test playtest` → FAIL (`../playtest` 없음)
 
 - [ ] **Step 3: 구현** — `apps/web/src/lab/playtest.ts`
 
@@ -233,7 +233,7 @@ export function parsePlaytestSnapshot(json: unknown): PlaytestParseResult {
 }
 ```
 
-- [ ] **Step 4: 통과 확인** — `pnpm --filter @tk/web test -- playtest` → 8 passed; `pnpm --filter @tk/web typecheck` → Done (zod `issues[].path` 타입이 `PropertyKey[]`가 아니면 `(string | number)[]`로 맞춘다 — 설치된 zod 버전 기준 typecheck 가 결정).
+- [ ] **Step 4: 통과 확인** — `pnpm --filter @tk/web test playtest` → 8 passed; `pnpm --filter @tk/web typecheck` → Done (zod `issues[].path` 타입이 `PropertyKey[]`가 아니면 `(string | number)[]`로 맞춘다 — 설치된 zod 버전 기준 typecheck 가 결정).
 - [ ] **Step 5: 커밋**
 ```bash
 git add apps/web/src/lab/playtest.ts apps/web/src/lab/__tests__/playtest.test.ts
@@ -330,7 +330,7 @@ onClick={() => (sandbox ? leaveSandbox(fadeTo) : fadeTo(stageId ? `/scene?stage=
 ```
 (`fadeTo`의 타입이 `(href: string) => void` 인지 확인 — `useFadeNav` 참조. 다르면 `(to) => fadeTo(to)` 로 감싼다.)
 
-- [ ] **Step 4: 게이트** — `pnpm --filter @tk/web test && pnpm --filter @tk/web typecheck` → 전부 green (기존 617 + 8).
+- [ ] **Step 4: 게이트** — `pnpm --filter @tk/web test && pnpm --filter @tk/web typecheck` → 전부 green.
 - [ ] **Step 5: 실험실 무회귀 수동 확인** — next dev(:3000) 에서 `/lab` → 「전투 시작」 → 일시정지 「나가기」 → `/lab`으로 돌아오는지; 결산 버튼 라벨이 "실험실로 ▶"인지(브라우저 도구로 확인).
 - [ ] **Step 6: 커밋**
 ```bash
@@ -559,7 +559,7 @@ document.getElementById('playtestBtn').onclick = async function () {
   2. 새 탭이 `/playtest?draft=02-yingchuan-…` → 자동으로 `/battle?stage=__lab` 로 이동, 전투가 뜨고 첫 유닛이 **바뀐 좌표**에 있다(`read_page`/`javascript_tool` 로 확인; 배경은 yingchuan painted).
   3. `apps/web/public/_draft/02-yingchuan-*.json` 이 생겼고 `git status` 는 무변화(레포 JSON 불변), `git status --porcelain | grep _draft` 없음.
   4. 일시정지 「나가기」 → 게임 탭이 닫히고 에디터 탭이 앞에 온다(브라우저 도구의 tabs_context 로 탭 수 확인); 에디터의 선택·바꾼 좌표가 유지된다.
-  5. 다시 ▶ → 이번엔 결산까지(자동전투 또는 「전투 그만두기」) — sandbox 결산: 결산 화면 버튼 라벨 "에디터로 ▶", 클릭 → 탭 닫힘. `localStorage` 메타(골드/클리어)가 바뀌지 않았는지 전후 비교(`JSON.parse(localStorage.getItem(...))` — 메타 키 이름은 `apps/web/src/meta/metaStore.ts` 참조).
+  5. 다시 ▶ → 이번엔 결산까지(자동전투 또는 「전투 그만두기」) — sandbox 결산: 결산 화면 버튼 라벨 "에디터로 ▶", 클릭 → 탭 닫힘. `localStorage` 메타(골드/클리어)가 바뀌지 않았는지 전후 비교: `JSON.parse(localStorage.getItem("tk.meta.v1"))`(키 = `apps/web/src/meta/metaStore.ts` `STORAGE_KEY`).
   6. 검증 에러 상태(유닛 좌표 999)에서 ▶ → 토스트 "테스트 불가 N건", 탭 열리지 않음.
   7. 실험실 무회귀: `/lab` → 전투 → 나가기 → `/lab`.
   서버 종료, `_draft/*.json` 정리(선택).
