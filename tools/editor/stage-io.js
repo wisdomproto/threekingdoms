@@ -58,7 +58,7 @@ function stripNulls(o) {
 }
 
 const KEYS = {
-  stage: ["id", "name", "mapId", "turnLimit", "camera", "reward", "levelCap", "units", "objectives", "failConditions", "reinforcements", "strategyConditions", "victory", "defeat", "events"],
+  stage: ["id", "name", "mapId", "turnLimit", "camera", "reward", "levelCap", "scenario", "dialogue", "units", "objectives", "failConditions", "reinforcements", "strategyConditions", "victory", "defeat", "events"],
   unit: ["commanderId", "classId", "level", "troops", "items", "side", "x", "y"],
   event: ["id", "type", "trigger", "outcome", "once"],
   reinf: ["id", "side", "trigger", "units", "once"],
@@ -107,6 +107,9 @@ export function loadStage(obj) {
   m.strategyConditions = (obj.strategyConditions ?? []).map((s) => own(pickShallow(s, KEYS.strat), s));
   m.objectives = (obj.objectives ?? []).map((o) => ({ ...o }));       // 그대로 통과(kind 별 재조립 금지)
   m.failConditions = (obj.failConditions ?? []).map((f) => ({ ...f }));
+  // 스토리(P2 spec §10): 에디터가 줄/카드를 제자리 변형하므로 깊은 복제 — ORIG 오염 없이 직렬화에 반영.
+  if (obj.scenario !== undefined) m.scenario = structuredClone(obj.scenario);
+  if (obj.dialogue !== undefined) m.dialogue = structuredClone(obj.dialogue);
   return own(m, obj);
 }
 

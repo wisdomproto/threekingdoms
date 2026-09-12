@@ -17,7 +17,7 @@
 - **챕터 = campaign.ts `CHAPTERS` 표의 사본**(`tools/editor/chapters.js`, 5행). SSOT는 `apps/web/src/meta/campaign.ts` — 표를 바꾸면 둘 다(주석으로 명시; 테스트가 두 표를 대조).
 - **Story Editor v1 = 런타임이 지금 재생하는 포맷을 편집**한다: VN 씬(`ScenarioScene` — bg·줄·내레이션·줄 배경 전환)과 전투 중 대사(`StageDialogue` — 트리거+줄). MapScene 파트는 **고급(JSON) 카드**로 보존·편집. 타임라인·Zoom/Pan/Shake·음성/BGM(§17 모션코믹)은 **포맷 결정(미결 ②·부록 #3) 뒤 Story Editor v2** — 도구 없이 포맷을 또 바꾸지 않는다는 원칙의 역도 같다: 포맷 없이 도구를 먼저 만들지 않는다.
 - **Quick Edit = 탭 하나 + 진입 URL.** 별도 앱이 아니라 `전투` 그룹의 첫 탭 「빠른 편집」(유닛 Lv/병력/좌표 + 주 목표 + 제한 턴). `?stage=ID&quick=1`로 열면 rail을 접고 그 탭을 편다. 게임 PauseMenu(dev·non-sandbox)에 `✏ 이 스테이지 편집` = `${NEXT_PUBLIC_TOOLS_ORIGIN ?? "http://localhost:8080"}/tools/stage-editor.html?stage=…&quick=1` 새 탭.
-- **Publish = 초안을 레포 JSON에 쓰고 전수 검사, 실패 시 롤백.** 1인 개발·Project Store 이연(미결 ③) 상태에서 "Published"는 **레포의 `packages/data/json`**이고 버전 이력은 git이다. serve.py에 `POST /publish-stage`(백업→쓰기→`_validate_data()`→실패면 백업 복원) + `POST /publish-rollback`. 파일 바이트는 에디터 직렬화 그대로(2칸 들여쓰기·끝 개행) — 변경 없는 Publish는 `git status` 무변화.
+- **Publish = 초안을 레포 JSON에 쓰고 전수 검사, 실패 시 롤백.** 1인 개발·Project Store 이연(미결 ③) 상태에서 "Published"는 **레포의 `packages/data/json`**이고 버전 이력은 git이다. serve.py에 `POST /publish-stage`(백업→쓰기→`_validate_data()`→실패면 백업 복원) + `POST /publish-rollback`. 파일 바이트는 에디터 직렬화 그대로(2칸 들여쓰기·끝 개행·`newline="\n"`) — 보장은 **git 수준**(변경 없는 Publish 전후 `git status --porcelain packages/data/json`이 같다). 작업 트리 일부 JSON이 CRLF(autocrlf)라 "바이트 동일"은 그 파일들에선 성립하지 않는다.
 - **씬 미리보기 = 기존 Playtest 스냅샷 재사용.** 스냅샷의 `stage`에 `scenario`가 이미 들어 있다. `/playtest?draft=X&scene=intro|outro|outroDefeat` → `/scene?stage=__lab&type=…`; scene 페이지가 `__lab`이면 `readLab().stage`를 쓰고, 끝나면 `leaveSandbox`(에디터 탭 복귀).
 
 ## 3. 파일
@@ -57,21 +57,21 @@
 ```
 
 - **Project Bar** = 기존 `<header>` 재구성. 브레드크럼 `삼국지 / 제{n}장 · {stage.name}`(맵 단독 모드면 `맵 · {mapName}`), `Draft` 배지(상시), ↶↷(기존 `#undo/#redo`), `#saveState` 칩(기존), **`▶ 이 장 테스트 ▾`** = 기본 클릭 전투(기존 `#playtestBtn`), 드롭다운 항목 `전투 전 이야기`/`전투 후 이야기`/`패배 후 이야기`(해당 슬롯 없으면 비활성), **`Publish…`**(§7), **`⚙▾`** 메뉴에 기존 개발자 버튼(새로·스테이지 열기·맵 열기·붙여넣기·⬇ stage JSON·⬇ map JSON·⬇ 블록아웃 PNG·Publish 검사(레포 전수)·맵 단독 선택). 기존 버튼 id는 유지(E2E·핸들러 불변) — 위치만 메뉴 안으로.
-- **Chapter rail** `#rail`: `chapters.js`로 5장 그룹, 항목 = `{번호} {이름}` + 부제 `컷신 {intro+outro 파트 수} · 전투`. 현재 장 `.on`. 클릭 → 기존 `loadStageFromServer(id)`(dirty면 기존 `confirm`). 27개 JSON은 로드 시 1회 병렬 fetch해 이름·컷신 수를 채운다(실패 항목은 id만). `[◂ 접기]`로 44px 아이콘 열로 축소(`localStorage tk.editor.rail=collapsed`). `?quick=1`이면 접힌 채 시작. 기존 `#stageSelect`는 ⚙ 메뉴의 "맵 단독 선택" 옆으로 이동(맵 단독 드롭다운은 그대로).
+- **Chapter rail** `#rail`: `chapters.js`로 5장 그룹, 항목 = `{번호} {이름}` + 부제 `컷신 {intro+outro 파트 수} · 전투`. 현재 장 `.on`. 클릭 → `loadStageFromServer(id)` — **여기에 `history.isDirty() && !confirm(...)` 가드를 추가**(현재는 `doNew`만 확인한다; rail·드롭다운 공통). 스테이지 id 목록의 출처 = 기존 `#stageSelect`의 `<option>` 값(하드코딩 27개 — 인덱스 파일이 없다); 그 id로 27개 JSON을 로드 시 1회 병렬 fetch해 이름·컷신 수를 채운다(실패 항목은 id만). `[◂ 접기]`로 44px 아이콘 열로 축소(`localStorage tk.editor.rail=collapsed`). `?quick=1`이면 접힌 채 시작. 기존 `#stageSelect`는 ⚙ 메뉴의 "맵 단독 선택" 옆으로 이동(맵 단독 드롭다운은 그대로).
 - Inspector는 우측 `#right` 유지(목업의 하단 탭+우측 Inspector 2단 구조는 우측 패널 하나로 합친다 — 340px 안에 탭 본문이 곧 인스펙터).
 - 지형 팔레트: 이미 색 견본 + 이름(§5 충족). 변경 없음.
 
 ## 5. 탭 재편
 
-`#right .tabs` = `전투 전 이야기` · `전투` · `전투 중 대사` · `전투 후 이야기` · `보상`. `전투` 탭 안에 2단 서브탭 `빠른 편집 · 메타 · 유닛 · 목표/패배 · 일기토 · 증원/전략`(기존 5탭 + 빠른 편집). `activeTab` 값은 `story-intro | battle:quick | battle:meta | … | dialogue | story-outro | reward`. `renderTab()`이 분기; `switchTab()`은 기존 그대로(문자열). 기존 메타 탭의 `reward` 카드는 **보상 탭으로 이동**(전략조건 보상은 증원/전략에 남긴다).
+`#right .tabs` = `전투 전 이야기` · `전투` · `전투 중 대사` · `전투 후 이야기` · `보상`. `전투` 탭 안에 2단 서브탭 `빠른 편집 · 메타 · 유닛 · 목표/패배 · 일기토 · 증원/전략`(기존 5탭 + 빠른 편집). `activeTab` 값은 `story-intro | battle:quick | battle:meta | … | dialogue | story-outro | reward`. `renderTab()`이 분기; `switchTab(t)`는 `t.split(':')`로 상·하 탭 바의 `.on`을 갱신. **하드코딩 호출부 갱신**: `switchTab('unit')` 4곳(≈479/489/606/953) → `'battle:unit'`; `setMapOnlyMode`(≈1295/1298)는 `'meta'` → `'battle:meta'`로, 맵 단독 모드에선 `battle:meta`만 활성(상단 5탭 중 `전투`만 활성·서브탭은 메타만). 기존 메타 탭의 `reward` 카드는 **보상 탭으로 이동**(전략조건 보상은 증원/전략에 남긴다).
 
-**전투 전/후 이야기 탭** (`story-editor.renderSceneSlot`): 슬롯 = `stage.scenario?.[intro|outro]`(후 탭은 `outro` + 접힌 `outroDefeat` 섹션). 빈 슬롯 = 빈 상태 카드 "아직 이야기가 없습니다 **[첫 장면 만들기]**"(§5 Empty states) → `{ bg: "", lines: [{ text: "" }] }`. 슬롯이 단일 VN이면 그대로(배열로 승격하지 않음 — 무손실), 파트 배열이면 파트 카드 나열.
-- VN 파트 카드: `배경` 입력(`<datalist>` = 전 스테이지 scenario에서 수집한 bg 키 54개 + 현재 값; 옆에 48px 썸네일 `/apps/web/public/assets/scenes/{bg}.webp`, 없으면 회색 "미생성"), 줄 목록. 줄 = `[내레이션 ☐] 화자(datalist=commanders 이름) · 좌/우(side, 화자 있을 때) · 초상(portraitId, 기본=화자 → 빈칸이면 미기록) · 본문(textarea, 자동 높이) · 이 줄부터 배경(bg, 선택)` + `↑ ↓ ✕`, 끝에 `+ 줄 추가`. 내레이션 체크 = `speaker` 삭제(`delete line.speaker`), 해제 = `speaker: ""`. 미지 키는 건드리지 않는다(줄 객체를 그대로 변형).
+**전투 전/후 이야기 탭** (`story-editor.renderSceneSlot`): 슬롯 = `stage.scenario?.[intro|outro]`(후 탭은 `outro` + 접힌 `outroDefeat` 섹션). 빈 슬롯 = 빈 상태 카드 "아직 이야기가 없습니다 **[첫 장면 만들기]**"(§5 Empty states) → `newVnPart()` = `{ lines: [{ text: "" }] }`(**`bg`는 비어 있으면 키 자체를 쓰지 않는다** — `/assets/scenes/.webp` 방지). 슬롯이 단일 VN이면 그대로(배열로 승격하지 않음 — 무손실), 파트 배열이면 파트 카드 나열.
+- VN 파트 카드: `배경` 입력(`<datalist>` = 전 스테이지 scenario에서 수집한 bg 키 54개 + 현재 값; 옆에 48px 썸네일 `/apps/web/public/assets/scenes/{bg}.webp`, 없으면 회색 "미생성"), 줄 목록. 줄 = `[내레이션 ☐] 화자(datalist=commanders 이름) · 좌/우(side, 화자 있을 때) · 초상(portraitId, 기본=화자 → 빈칸이면 미기록) · 본문(textarea, 자동 높이) · 이 줄부터 배경(bg, 선택)` + `↑ ↓ ✕`, 끝에 `+ 줄 추가`. 내레이션 체크 = `speaker`·`portraitId` 삭제, 해제 = `speaker`를 입력받되 **빈 문자열이면 키를 쓰지 않는다**(런타임 `isNarration = !line.speaker`라 `""`도 내레이션 — 파일에 무의미한 `"speaker": ""`를 남기지 않는다; validate-story가 "speaker가 있으면 비어 있지 않음"을 검사). 새 줄의 `portraitId`는 화자와 같게 기록(기존 데이터 관행). 미지 키는 건드리지 않는다(줄 객체를 그대로 변형).
 - MapScene 파트 카드(`"map" in part`): 제목 `맵 씬 (고급) — {label ?? map}`, 접힌 `<textarea>` JSON. `적용` 버튼 → `JSON.parse` 성공 시 파트 교체(실패면 인라인 오류, 미적용). 파트 배열 안에서만 존재. 새로 만들기는 제공하지 않는다(맵 씬 저작은 `/motion-editor`·수기 — v2).
 - 파트 추가: `+ VN 장면 추가`(단일 VN 슬롯이면 `[기존, 새]` 배열로 승격 — 사용자가 명시적으로 두 번째 파트를 만든 것이므로 형식 변경 OK), 파트 `↑ ↓ ✕`. 파트가 0개가 되면 슬롯 키 삭제(`delete stage.scenario.intro`; scenario가 비면 `delete stage.scenario`).
 - 모든 변형 끝에 `ctx.commit()` = `refreshValidation()`(히스토리 진입). textarea/input은 `oninput` → 타이핑 병합.
 
-**전투 중 대사 탭** (`renderDialogueList`): `stage.dialogue ?? []` 카드 목록. 카드 머리 = 사람 말 `describeTrigger`: `전투가 시작되면` / `{n}턴이 시작되면` / `{이름}이(가) 퇴각하면` / `일기토 {공격자} vs {방어자}가 일어나면` / `전투가 끝나면(승리|패배|모두)`. WHEN 빌더 = `<select>`(battleStart/turn/unitRetreated/duelOccurred/battleEnd) + 종속 입력(턴 숫자 / 배치 유닛 select / 일기토 select(`stage.events`) / 결과 select). 줄 편집기는 씬과 같은 컴포넌트(`bg` 없음, `speaker` 필수 — 내레이션 체크 없음). id는 `Advanced ▾` 접힘 안에 표시(수정 가능, 중복은 validate 오류). `+ 대사 추가` → `{ id: newDialogueId(existing), trigger: { kind: "battleStart" }, lines: [{ speaker: "", text: "" }] }`. 빈 상태 카드.
+**전투 중 대사 탭** (`renderDialogueList`): `stage.dialogue ?? []` 카드 목록. 카드 머리 = 사람 말 `describeTrigger`: `전투가 시작되면` / `{n}턴이 시작되면` / `{이름}이(가) 퇴각하면` / `일기토 {공격자} vs {방어자}가 일어나면` / `전투가 끝나면(승리|패배|모두)`. WHEN 빌더 = `<select>`(battleStart/turn/unitRetreated/duelOccurred/battleEnd) + 종속 입력(턴 숫자 / 배치 유닛 select / 일기토 select(`stage.events`) / 결과 select). 줄 편집기는 씬과 같은 컴포넌트(`bg` 없음, `speaker` 필수 — 내레이션 체크 없음). id는 `Advanced ▾` 접힘 안에 표시(수정 가능, 중복은 validate 오류). `+ 대사 추가` → `{ id: newDialogueId(existing), trigger: { kind: "battleStart" }, lines: [{ speaker: "", text: "" }] }`(validate가 빈 화자를 오류로 잡아 Publish를 막는다). 카드를 전부 지우면 `stage.dialogue = undefined`(원본에 키가 있었어도 빈 배열 대신 키 삭제 — scenario 규칙과 동일). 빈 상태 카드.
 
 **보상 탭**: 기존 `reward` 카드(gold/exp/treasures) 그대로 이동 + 안내 "전략조건 보물은 전투 › 증원/전략에서".
 
@@ -81,7 +81,7 @@
 
 - 에디터: `▶ ▾` 항목 클릭 → 기존 플레이테스트 핸들러에 `scene` 인자(`'intro'|'outro'|'outroDefeat'`) → 스냅샷 동일, `window.open(`${GAME_ORIGIN}/playtest?draft=${draftId}&scene=${scene}`)`.
 - `PlaytestLanding`: `scene` 파라미터가 유효하면 `router.replace(`/scene?stage=__lab&type=${scene}`)`, 아니면 기존 `/battle`.
-- `scene/page.tsx`: `const stage = stageId === LAB_STAGE_ID ? readLab()?.stage : stages[stageId]`; `target()`이 `__lab`이면 `leaveSandbox`로 종료(`fadeTo` 대신 `leaveSandbox((to) => router.push(to))`); 슬롯 비었으면(빈 씬 가드) 즉시 `leaveSandbox`. `readLab`은 sessionStorage라 클라이언트 전용 — 이 페이지는 이미 `"use client"`. `stage?.name` 제목 유지.
+- `scene/page.tsx`: `const lab = useMemo(() => (stageId === LAB_STAGE_ID ? readLab() : null), [stageId])`(렌더마다 새 객체가 되어 `parts` 메모가 깨지지 않게); `const stage = lab?.stage ?? stages[stageId]`; `target()`이 `__lab`이면 `leaveSandbox`로 종료(`fadeTo` 대신 `leaveSandbox((to) => router.push(to))`); 슬롯 비었으면(빈 씬 가드) 즉시 `leaveSandbox`. `readLab`은 sessionStorage라 클라이언트 전용 — 이 페이지는 이미 `"use client"`. `stage?.name` 제목 유지.
 - 편집 상태 유지(§4 Playtest 복귀): 에디터 탭이 그대로 살아 있으므로 선택·탭·카메라 전부 유지(P1과 동일 — 추가 작업 없음).
 
 ## 7. Publish UX (design-guide §13)
@@ -96,10 +96,11 @@
 [변경사항 보기 ▾]  meta: turnLimit 30→25 · units 12→13 · dialogue +1 · scenario.intro 줄 6→8
 [취소]  [Publish]
 ```
-- 체크 항목 중 **오류(✗)가 있으면 Publish 비활성**(경고 `!`는 허용). 에셋 프로브 = `fetch(HEAD)` `/apps/web/public/assets/{maps/{stageId}.webp | scenes/{bg}.webp | ui/portraits/{speaker}.webp}` — 없으면 경고(§13 "누락 에셋" — 출시 게이트가 아니라 경고. R2 직독 배포에선 로컬에 없을 수 있음).
+- 체크 항목 중 **오류(✗)가 있으면 Publish 비활성**(경고 `!`는 허용). 에셋 프로브 = `fetch(HEAD)` `/apps/web/public/assets/{maps/{stageId}.webp | scenes/{bg}.webp | ui/portraits/{id}.webp}` — 초상 키는 **씬 줄은 `portraitId`, 전투 대사는 `speaker`**(런타임이 그렇게 읽는다). 없으면 경고(§13 "누락 에셋" — 출시 게이트가 아니라 경고. R2 직독 배포에선 로컬에 없을 수 있음). 새 스테이지(레포에 파일 없음)면 체크리스트에 `! index.ts 등록 필요 — 전수 검사가 이 파일을 보지 않음` 경고.
 - 변경사항 = `diffStage(repoJson, JSON.parse(serializeStage()))` — 레포 원본은 `/packages/data/json/stages/{id}.json` fetch(없으면 "새 스테이지 — index.ts 등록 필요" 안내). 맵도 `serializeMap()` vs 레포 맵 비교 → 바뀌었으면 함께 쓴다.
 - **Publish** → `POST /publish-stage { stage: <serializeStage() 문자열>, map?: <serializeMap()> }`:
-  1. 서버: `stage` JSON 파싱 → `id` 검증(`^[A-Za-z0-9_-]+$`), 크기 5MB, 경로 `packages/data/json/stages/{id}.json`(맵은 `maps/{map.id}.json`). 기존 파일이 있으면 `apps/web/public/_draft/publish-backup/{id}.json`(맵도)로 백업. tmp→`os.replace`로 쓴다(문자열 그대로, 끝 개행 보장).
+  0. **`_VALIDATE_LOCK`을 먼저 잡는다**(비차단; 실패면 409 "검사/Publish 진행 중") — 백업→쓰기→검사→복원 전 구간을 잠근다(`/publish-rollback`도 동일). 락은 지금 `/validate-data` 핸들러에 있고 `_validate_data()` 안에 없다.
+  1. 서버: `stage` JSON 파싱 → `id` 검증(`^[A-Za-z0-9_-]+$`), `map`이 오면 `map.id`도 같은 검사 + `stage.mapId === map.id` 확인, 크기 5MB, 경로 `packages/data/json/stages/{id}.json`(맵은 `maps/{map.id}.json`). 기존 파일이 있으면 `apps/web/public/_draft/publish-backup/{stageId}.json`·`{stageId}.map.json`으로 백업하고 `{stageId}.meta.json`에 `{ wrote:[rel paths], hadBackup:{stage,map}, at }`를 기록(롤백이 짝을 찾는 근거). tmp→`os.replace`로 쓴다 — **`open(..., "w", encoding="utf-8", newline="\n")`**(Windows에서 `\n`→`\r\n` 변환 방지), 끝 개행 보장. 맵 쓰기가 실패하면 스테이지를 백업으로 되돌린다.
   2. `_validate_data()`(기존 pnpm test, `_VALIDATE_LOCK`) → `ok:false`면 **백업 복원** 후 `{ ok:false, rolledBack:true, output }`. 성공이면 `{ ok:true, wrote:[paths], backup: bool, validated: true, at }`.
   3. 새 파일(백업 없음)이 검사 실패면 새 파일 삭제.
 - 모달 결과 화면: `Publish 완료 · 14:32 · 05-sishuiguan.json(+ map) · 검사 통과` + `[롤백]`(백업 있을 때: `POST /publish-rollback {stageId}` → 백업을 되돌리고 다시 `_validate_data()`) + "버전 이력은 git — `git log -- packages/data/json/stages/05-sishuiguan.json`". 실패 화면: 검사 출력 + "자동 롤백됨".
@@ -110,7 +111,7 @@
 - `editorUrlFor(stageId, origin)` = `${origin}/tools/stage-editor.html?stage=${encodeURIComponent(stageId)}&quick=1`.
 - `BattleScreen`: `process.env.NODE_ENV !== "production" && !sandbox`면 `editorUrl = editorUrlFor(ctx.stage.id, process.env.NEXT_PUBLIC_TOOLS_ORIGIN ?? "http://localhost:8080")`을 PauseMenu에 전달. PauseMenu: `editorUrl`이 있으면 「전투 그만두기」 위에 `✏ 이 스테이지 편집` 버튼(`window.open(editorUrl, "_blank")`, `data-testid="pause-edit-stage"`). 전투는 계속 일시정지 상태(플레이어가 돌아와 이어감).
 - 에디터: `init()`에서 `URLSearchParams` `stage` → `autoLoadDefault(stage)`(없으면 기존 05), `quick=1` → rail 접기 + `switchTab('battle:quick')`.
-- `.env.local.example`에 `NEXT_PUBLIC_TOOLS_ORIGIN=http://localhost:8080  # tools/serve.py 포트`.
+- `.env.local.example`에 `NEXT_PUBLIC_TOOLS_ORIGIN=http://localhost:8081  # tools/serve.py 포트(launch "tools"=8081)`. 코드 기본값도 `http://localhost:8081`.
 
 ## 9. 검증 규칙 추가 (`validate-story.js`, `validate()`에 합류)
 
@@ -121,13 +122,13 @@
 ## 10. 히스토리·무손실 계약
 
 - 스토리/대사/보상/빠른 편집의 모든 변형은 모델 객체를 **제자리 변형**하고 `refreshValidation()`을 부른다 → P1 히스토리·복구본이 그대로 적용(테스트: Undo 후 `serializeStage()`가 편집 전과 같다).
-- `stage-io.js`는 `scenario`·`dialogue`를 **소유 키가 아닌 원본 그대로**(`ORIG` 병합) 두었다면, 에디터가 제자리 변형한 객체가 직렬화에 반영되는지 확인: `merge()`는 `model[k]`를 우선 쓰므로 `stage.scenario`/`stage.dialogue`가 모델에 있으면 그 값이 나간다(현재 KEYS에 두 키가 없으면 **KEYS에 추가** — `loadStage`가 모델에 그대로 복사하므로 무손실 유지; `editor-roundtrip.test.ts`에 "scenario 줄 수정 후 저장 → 그 줄만 바뀜, 미지 키 보존" 케이스 추가).
+- `stage-io.js` `KEYS.stage`에는 **`scenario`·`dialogue`가 없다**(사실) — 모델에 두 키가 없어 제자리 편집이 직렬화에 반영되지 않는다. **KEYS에 두 키를 추가**하고 `loadStage`에서 `structuredClone`으로 깊은 복제(ORIG 불변·Undo 복원은 `loadStage(JSON.parse)`라 무관). `merge()`는 `model[k]` 우선이라 그 값이 나간다. `editor-roundtrip.test.ts`에 "scenario 줄 수정 후 저장 → 그 줄만 바뀜, 미지 키·원본 보존", "dialogue 추가", "키 없음 유지" 케이스 추가. 단일 VN → 파트 배열 승격 시 그 VN은 `ScenarioSceneSchema.strict()` 대상이 된다(미지 키가 있었다면 Publish 검사에서 드러남 — 드묾, 감수).
 
 ## 11. 테스트
 
 - 순수(`packages/data/test`): `editor-chapters.test.ts`(CHAPTERS가 campaign.ts와 동일 — campaign.ts를 import할 수 없으면 표 상수를 `packages/data`에 두지 말고 apps/web 테스트에서 `tools/editor/chapters.js`를 import해 대조), `editor-story.test.ts`(describeTrigger 5종·validateStory 8케이스·newDialogueId 유일), `editor-publish.test.ts`(diffStage: 키 추가/삭제/변경·units 개수·scenario 줄 수·동일→빈 배열; checklist: 오류→publish 불가·경고만→가능).
 - `apps/web`: `editorLink.test.ts`(URL 인코딩), `playtest.test.ts`에 `scene` 파라미터 정규화(`parseSceneParam("intro")→"intro"`, 그 외 null).
-- E2E `tools/editor/e2e/creator.mjs`(cdp.mjs 하네스 + next dev :3000): ① rail 5장/27항목·현재 `.on` ② rail에서 `06-huluguan` 클릭 → 브레드크럼 `제2장 · 호로관…` ③ `전투 전 이야기` 탭 → 첫 줄 본문에 문자열 추가 → `history.canUndo()`·칩 `수정됨` → `▶ ▾ 전투 전 이야기` → 새 탭 `/scene?stage=__lab&type=intro` → 화면 텍스트에 추가한 문자열 포함 → 끝까지 클릭 → 탭 닫힘·에디터 x 유지 ④ `전투 중 대사` `+ 대사 추가` → 카드 머리 `전투가 시작되면` → Undo → 카드 사라짐 ⑤ `?stage=05-sishuiguan&quick=1`로 재진입 → rail 접힘·빠른 편집 탭 활성·Lv `+` → 유닛 level +1 ⑥ Publish: 05를 **무변경**으로 Publish → `ok:true` → `git status --porcelain packages/data/json` 빈 문자열(바이트 안정) → turnLimit 변경 후 Publish → 파일 반영 확인 → `[롤백]` → 파일 원복·git 무변화 ⑦ 게임 `/battle` ☰ → `pause-edit-stage` 존재(dev). 실행 후 `_draft/publish-backup` 정리.
+- E2E `tools/editor/e2e/creator.mjs`(cdp.mjs 하네스 + next dev :3000): ① rail 5장/27항목·현재 `.on` ② rail에서 `06-huluguan` 클릭 → 브레드크럼 `제2장 · 호로관…` ③ `전투 전 이야기` 탭 → 첫 줄 본문에 문자열 추가 → `history.canUndo()`·칩 `수정됨` → `▶ ▾ 전투 전 이야기` → 새 탭 `/scene?stage=__lab&type=intro` → 화면 텍스트에 추가한 문자열 포함 → 끝까지 클릭 → 탭 닫힘·에디터 x 유지 ④ `전투 중 대사` `+ 대사 추가` → 카드 머리 `전투가 시작되면` → Undo → 카드 사라짐 ⑤ `?stage=05-sishuiguan&quick=1`로 재진입 → rail 접힘·빠른 편집 탭 활성·Lv `+` → 유닛 level +1 ⑥ Publish: `git status --porcelain packages/data/json`을 **먼저 기록**하고 05를 **무변경**으로 Publish → `ok:true` → 같은 명령 출력이 동일(델타 0) → turnLimit 변경 후 Publish → 파일 반영 확인 → `[롤백]` → 파일 원복·git 무변화 ⑦ 게임 `/battle` ☰ → `pause-edit-stage` 존재(dev). 실행 후 `_draft/publish-backup` 정리.
 
 ## 12. 범위 밖
 

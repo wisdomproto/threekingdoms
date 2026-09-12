@@ -148,3 +148,41 @@ describe("에디터 round-trip — 편집 의미론 (spec §6-2)", () => {
     expect(out.units[0]!.note).toBe("미지");
   });
 });
+
+describe("에디터 round-trip — scenario/dialogue 소유 (P2 spec §10)", () => {
+  const s05 = (): Json => JSON.parse(readFileSync(join(JSON_DIR, "stages", "05-sishuiguan.json"), "utf-8"));
+  type Line = { text: string; speaker?: string };
+  const introLines = (o: Json) => ((o.scenario as Json).intro as { lines: Line[] }).lines;
+
+  it("(a) intro 첫 줄 text 수정 → 그 줄만 다르고 나머지(미지 키 포함) 동일, 원본 객체는 불변", () => {
+    const orig = s05();
+    const m = loadStage(orig);
+    introLines(m)[0]!.text = "수정됨";
+    const out = serializeStage(m);
+    const want = s05(); introLines(want)[0]!.text = "수정됨";
+    same(out, want);
+    expect(introLines(orig)[0]!.text).not.toBe("수정됨");   // 깊은 복제 — ORIG 오염 없음
+  });
+
+  it("(b) dialogue 카드 push → 직렬화에 포함, 다시 로드해도 같음", () => {
+    const m = loadStage(s05()) as Json & { dialogue: Json[] };
+    const card = { id: "dlg-1", trigger: { kind: "battleStart" }, lines: [{ speaker: "유비", text: "t" }] };
+    m.dialogue.push(card);
+    const out = serializeStage(m) as Json & { dialogue: Json[] };
+    expect(out.dialogue.at(-1)).toEqual(card);
+    expect(out.dialogue.length).toBe((s05().dialogue as unknown[]).length + 1);
+    same(serializeStage(loadStage(JSON.parse(JSON.stringify(out)))), out);
+  });
+
+  it("(c) scenario 없는 스테이지: 미설정이면 키 없음; dialogue=[] (원본에 키 없음) 도 키 없음", () => {
+    const src: Json = { id: "t", name: "T", mapId: "m", turnLimit: 5, units: [], objectives: [], events: [] };
+    const m = loadStage(src) as Json;
+    expect("scenario" in m).toBe(false);
+    m.dialogue = [];
+    const out = serializeStage(m) as Json;
+    expect("scenario" in out).toBe(false);
+    expect("dialogue" in out).toBe(false);
+    m.scenario = { intro: { lines: [{ text: "x" }] } };
+    expect((serializeStage(m) as Json).scenario).toEqual({ intro: { lines: [{ text: "x" }] } });
+  });
+});
