@@ -366,10 +366,10 @@ AI로 시나리오 초안, 캐릭터 디자인, 초상화, 스프라이트, 배�
 
 ### P1 --- 제작 루프
 
--   Project Store (미결 ③ — 이연)
+-   ✅ Project Store v1 (2026-09-12, 로컬 — Published = 레포 JSON / Draft = serve.py `_draft/` 파일; 미결 ③ 결정 = 로컬 우선)
 -   ✅ Autosave (2026-09-12, 로컬 복구본 + 저장 상태 칩)
 -   ✅ Undo / Redo (2026-09-12, 전범위 스냅샷 히스토리)
--   Draft (미결 ③ — 이연)
+-   ✅ Draft (2026-09-12, 1.5s 자동 저장 → `Draft 저장됨 ✓`, Draft 우선 로드·배지·rail ●, Publish 시 삭제, 오프라인/다른 탭 409 상태)
 -   ✅ 현재 챕터 Playtest (2026-09-12, ▶ 이 스테이지 테스트 → `/playtest?draft=`)
 -   ✅ Editor 복귀 (2026-09-12, sandbox 종료 시 에디터 탭 복귀)
 
@@ -616,4 +616,4 @@ Skin/Animation/VFX Package 공유 및 Marketplace.
 | 12 | Character Presentation "Studio Preview와 Battle Renderer는 가능한 한 같은 렌더러 재사용" | 벤치마크 §12.4 | 현황 정정: `rig-editor.html`은 Canvas2D, 전투는 Pixi `SkeletonView` — **같은 렌더러가 아니다.** 같은 렌더러는 *목표*(P2 Foundation). 그 전엔 포즈 계산·외형 조합·이벤트 시간 해석을 공유하고 동일 입력 캡처 비교로 차이를 잡는다. |
 | 13 | Character Presentation "armor socket" 하나 | 벤치마크 §7·§12.2 | 갑옷·망토는 **여러 본에 걸친 부착물 묶음**일 수 있다(Sulis 이미지 레이어). 게임 규칙의 `armor` 슬롯 하나 ≠ 표현의 부위 하나. 장비 호환성 메타(rigId/schemaVersion·slot·weaponArchetype·gripOffset/facing·animationSet·fallback)는 설계 예시이지 현 스키마가 아님. 말은 탑승자+말 합성 리그. |
 
-**미결(길중 결정 필요)**: ① 공식 콘텐츠 2탄(진시황 / TROIA / DAVID) ② ~~Story Editor 착수 시점~~ → **v1(현행 VN·대사 편집)은 P2에서 착수·완료(2026-09-12)**; 남은 결정 = 모션코믹 **포맷**(타임라인 데이터 계약) — 그것이 정해지면 Story Editor v2 ③ 저작도구 공개 형태(Project Store가 로컬 JSON인지 Supabase인지) ④ 리깅 런타임(자체 컷아웃 확장 vs Spine 도입 — Presentation 데이터 계약은 어느 쪽이든 교체 가능하게) ⑤ GPL 부품(RPGAtlas 등) 코드 차용 여부 — 원하는 엔진 공개 정책과 라이선스 공개 범위를 먼저 결정(벤치마크 §13).
+**미결(길중 결정 필요)**: ① 공식 콘텐츠 2탄(진시황 / TROIA / DAVID) ② ~~Story Editor 착수 시점~~ → **v1(현행 VN·대사 편집)은 P2에서 착수·완료(2026-09-12)**; 남은 결정 = 모션코믹 **포맷**(타임라인 데이터 계약) — 그것이 정해지면 Story Editor v2 ~~③ 저작도구 공개 형태(Project Store가 로컬 JSON인지 Supabase인지)~~ → **결정(2026-09-12): 로컬 우선(v1)** — Published = 레포 JSON(git), Draft = serve.py `_draft/` 파일 + 자동 저장(`docs/superpowers/specs/2026-09-12-project-store-draft-design.md`); Supabase는 같은 4 엔드포인트(`draft-list/save/delete`·`publish-stage`)를 어댑터로 교체하는 자리 — 계정/권한이 필요해질 때 ④ 리깅 런타임(자체 컷아웃 확장 vs Spine 도입 — Presentation 데이터 계약은 어느 쪽이든 교체 가능하게) ⑤ GPL 부품(RPGAtlas 등) 코드 차용 여부 — 원하는 엔진 공개 정책과 라이선스 공개 범위를 먼저 결정(벤치마크 §13).

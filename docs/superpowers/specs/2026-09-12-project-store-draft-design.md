@@ -1,5 +1,7 @@
 # Project Store v1 — 로컬 Draft/Published + 자동 저장 (2026-09-12)
 
+> **상태: 구현 완료 (2026-09-12)** — 통합 브랜치 `feat/battle-mobile-hud`. 추가 결정: undo로 레포와 같아지면 Draft를 디바운스 없이 즉시 삭제(유령 Draft 방지), 파일/붙여넣기/새로 로드도 서버 index의 revision을 물려받음(409 오탐 방지), 오프라인 E2E는 죽은 포트 대신 페이지 내 `fetch` 몽키패치(`/draft-save`만 reject). 실브라우저 E2E `tools/editor/e2e/draft.mjs` 40건 PASS(`pnpm e2e:draft`).
+
 > master-plan §12 Project Store("Runtime → 읽기 / Editor → 같은 Store 수정 / Playtest → 현재 Draft / Publish → Draft 검증 후 Published"), §13 Draft/Published("제작 중 변경이 서비스 버전을 망가뜨리지 않게"), §16 Autosave(`저장 중… → 저장됨 ✓`), §22 P1 "Project Store·Draft". design-guide §4 Save states(`저장 중… / 저장됨 ✓ / 오프라인 — 로컬에 보관됨 / 저장 실패 — 다시 시도`), 벤치마크 §10 저장 정책("로컬 복구본 저장"과 "서버에 저장"을 다른 상태로 표시; 병합 불가 다중 탭 변경은 조용히 덮어쓰지 않는다). 부록 미결 ③ "저작도구 공개 형태(Project Store가 로컬 JSON인지 Supabase인지)".
 
 ## 1. 결정 (미결 ③)
