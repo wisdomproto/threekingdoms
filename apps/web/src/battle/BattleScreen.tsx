@@ -13,6 +13,7 @@
  * HUD는 useSyncExternalStore로 settled 기반 뷰모델 스냅샷만 구독 (설계 §4 스포일러 차단).
  */
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useSearchParams } from "next/navigation";
 import { gameData } from "@tk/data";
 import { getMeta, getPlaythroughCount } from "../meta/metaStore";
 import type { Action, BattleContext, BattleEvent, BattleState, Coord } from "@tk/engine";
@@ -249,13 +250,15 @@ interface Session {
   resumed: boolean;
 }
 
-function createSession(): Session {
+/**
+ * @param resume `?resume=1` — 호출부가 useSearchParams로 읽어 넘긴다. window.location은 클라이언트
+ *   내비게이션(router.push)과 같은 렌더에선 아직 이전 URL이라(URL 갱신은 커밋 시) 여기서 읽으면 안 된다.
+ */
+function createSession(resume: boolean): Session {
   const { ctx, sharedItems, seed, sandbox } = makeCtx();
   const delegate = new PresenterDelegate();
   // 이어하기(스펙 §7): ?resume=1 + 저장본이 이 스테이지·회차와 맞으면 seed+actionLog를 엔진 fold로 복원.
   // 새 출진(정규 경로)은 이전 저장본을 지운다 — 저장본은 다음 출진 전까지만 사는 세이브 지점.
-  const resume =
-    typeof window !== "undefined" && new URLSearchParams(window.location.search).get("resume") === "1";
   let battleSeed = seed ?? SEED;
   let replayLog: readonly Action[] | undefined;
   if (!sandbox && !resume) clearSuspend();
@@ -297,8 +300,9 @@ function createSession(): Session {
 }
 
 export default function BattleScreen(): React.ReactElement {
+  const resume = useSearchParams().get("resume") === "1";
   const sessionRef = useRef<Session | null>(null);
-  sessionRef.current ??= createSession();
+  sessionRef.current ??= createSession(resume);
   const { ctx, store, delegate, sandbox, resumed } = sessionRef.current;
 
   // 조작 설정(기기 로컬 tk.controls.v1) — 입문 공격 확인 ↔ 클래식. store에 반영, PauseMenu가 토글.
