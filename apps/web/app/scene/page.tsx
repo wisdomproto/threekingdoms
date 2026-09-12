@@ -10,7 +10,7 @@
  */
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { normalizeSceneSlot, stages } from "@tk/data";
+import { isComicScene, normalizeSceneSlot, stages } from "@tk/data";
 import { ScenePlayer } from "../../src/scene/ScenePlayer";
 import { MapScenePlayer } from "../../src/scene/MapScenePlayer";
 import { nextStageId } from "../../src/meta/campaign";
@@ -83,7 +83,9 @@ function SceneRoute(): React.ReactElement | null {
   };
   return (
     <>
-      {"map" in part ? (
+      {isComicScene(part) ? (
+        null // TODO Chunk 2: ComicScenePlayer (story editor v2 — 페이지/칸 카메라 런타임)
+      ) : "map" in part ? (
         <MapScenePlayer key={playerKey} scene={part} title={stage?.name} onComplete={next} />
       ) : (
         <ScenePlayer key={playerKey} scene={part} title={stage?.name} onComplete={next} />

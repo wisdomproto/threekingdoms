@@ -3,7 +3,7 @@ import {
   CommanderSchema, UnitClassSchema, TerrainSchema, ItemSchema,
   CombatConfigSchema, BattleMapSchema, StageSchema, StageEventSchema,
   StageDialogueSchema, ScenarioSceneSchema,
-  SceneSlotSchema, normalizeSceneSlot,
+  SceneSlotSchema, normalizeSceneSlot, ScenePartSchema, ComicSceneSchema, isComicScene,
 } from "../src/schemas";
 
 describe("스키마 v2 (원작 모델)", () => {
@@ -352,5 +352,61 @@ describe("scene slot v4 (parts array)", () => {
   it("choice.options 1개짜리는 거부된다(min 2)", () => {
     const oneOption = { ...mapPart, lines: [{ text: "q", choice: { options: [{ label: "only" }] } }] };
     expect(() => SceneSlotSchema.parse([oneOption])).toThrow();
+  });
+});
+
+describe("ComicScene (story editor v2 — 페이지/칸/카메라)", () => {
+  const vn = { bg: "x", lines: [{ text: "a" }] };
+  const mapPart = { map: "scene-01-street", units: [{ id: "u", sprite: "s", cell: [0, 0] }], lines: [{ text: "x" }] };
+  const comic = {
+    kind: "comic",
+    pages: [{
+      image: "05-sishuiguan-intro-p1",
+      bgm: "battle",
+      panels: [
+        { rect: [0, 0, 1, 1] },
+        { rect: [0, 0, 0.5, 0.4], lines: [{ speaker: "유비", portraitId: "유비", text: "가자" }, { text: "내레이션" }], fx: ["shake", "flash"], hold: 1200, sfx: "slash" },
+      ],
+    }],
+  };
+  const withRect = (rect: number[]) => ({ ...comic, pages: [{ image: "p", panels: [{ rect }] }] });
+  it("유효 씬 parse", () => {
+    expect(() => ComicSceneSchema.parse(comic)).not.toThrow();
+  });
+  it("rect x+w > 1+1e-6 거부 / 드래그 float 오차(0.7+0.3000001)는 통과", () => {
+    expect(() => ComicSceneSchema.parse(withRect([0.7, 0, 0.31, 1]))).toThrow();
+    expect(() => ComicSceneSchema.parse(withRect([0, 0.7, 1, 0.31]))).toThrow();
+    expect(() => ComicSceneSchema.parse(withRect([0.7, 0, 0.3000001, 1]))).not.toThrow();
+    expect(() => ComicSceneSchema.parse(withRect([0, 0, 0, 1]))).toThrow();   // w=0
+    expect(() => ComicSceneSchema.parse(withRect([0, 0, 1, 0]))).toThrow();   // h=0
+  });
+  it("미지 키 거부(strict) — 씬·페이지·칸·줄", () => {
+    expect(() => ComicSceneSchema.parse({ ...comic, transition: "fade" })).toThrow();
+    expect(() => ComicSceneSchema.parse({ ...comic, pages: [{ ...comic.pages[0], fadeIn: 1 }] })).toThrow();
+    expect(() => ComicSceneSchema.parse({ ...comic, pages: [{ image: "p", panels: [{ rect: [0, 0, 1, 1], fadeOut: 1 }] }] })).toThrow();
+    expect(() => ComicSceneSchema.parse({ ...comic, pages: [{ image: "p", panels: [{ rect: [0, 0, 1, 1], lines: [{ text: "t", voice: "v" }] }] }] })).toThrow();
+  });
+  it("image 빈 문자열 · hold 0 · 페이지/칸 0개 거부", () => {
+    expect(() => ComicSceneSchema.parse({ ...comic, pages: [{ image: "", panels: [{ rect: [0, 0, 1, 1] }] }] })).toThrow();
+    expect(() => ComicSceneSchema.parse({ ...comic, pages: [{ image: "p", panels: [{ rect: [0, 0, 1, 1], hold: 0 }] }] })).toThrow();
+    expect(() => ComicSceneSchema.parse({ ...comic, pages: [] })).toThrow();
+    expect(() => ComicSceneSchema.parse({ ...comic, pages: [{ image: "p", panels: [] }] })).toThrow();
+  });
+  it("ScenePartSchema 판별: comic / map / vn", () => {
+    const c = ScenePartSchema.parse(comic);
+    expect(isComicScene(c)).toBe(true);
+    expect((c as any).pages).toHaveLength(1);
+    const m = ScenePartSchema.parse(mapPart);
+    expect(isComicScene(m)).toBe(false);
+    expect("map" in m).toBe(true);
+    const v = ScenePartSchema.parse(vn);
+    expect(isComicScene(v)).toBe(false);
+    expect("bg" in v && !("kind" in v)).toBe(true);
+  });
+  it("normalizeSceneSlot 배열 안 comic 유지", () => {
+    const parts = normalizeSceneSlot(SceneSlotSchema.parse([vn, comic, mapPart]));
+    expect(parts).toHaveLength(3);
+    expect(isComicScene(parts[1])).toBe(true);
+    expect((parts[1] as any).pages[0].panels).toHaveLength(2);
   });
 });

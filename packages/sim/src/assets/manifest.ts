@@ -5,7 +5,7 @@
  * "모든 에셋은 생성 출력물"(§2-7) — 이 목록이 길중의 "이 이미지 만들어주세요" 요청서가 된다.
  */
 import type { Stage, Commander } from "@tk/data";
-import { normalizeSceneSlot } from "@tk/data";
+import { isComicScene, normalizeSceneSlot } from "@tk/data";
 
 export interface PortraitReq {
   id: string; // commanderId(=portraitId 규약)
@@ -22,11 +22,18 @@ export interface MapReq {
   stageId: string;
   mapId: string;
 }
+export interface ComicReq {
+  image: string; // /assets/comics/{image}.webp — 만화 지면 한 면
+  stageId: string;
+  type: "intro" | "outro" | "outroDefeat";
+  firstLine: string; // 첫 대사(프롬프트 힌트)
+}
 
 export interface RequiredAssets {
   portraits: PortraitReq[];
   scenes: SceneReq[];
   maps: MapReq[];
+  comics: ComicReq[];
 }
 
 function stageNum(id: string): number {
@@ -44,7 +51,9 @@ export function collectRequiredAssets(
   const portraitFirst = new Map<string, string>(); // id → firstStage
   const scenes: SceneReq[] = [];
   const maps: MapReq[] = [];
+  const comics: ComicReq[] = [];
   const seenMap = new Set<string>();
+  const seenComic = new Set<string>();
 
   const notePortrait = (id: string | undefined, stageId: string) => {
     if (!id) return;
@@ -84,6 +93,18 @@ export function collectRequiredAssets(
             }
             continue;
           }
+          if (isComicScene(part)) {
+            // 모션코믹 파트 — 페이지 지면 이미지 요구(image 키 중복 제거) + 화자 초상
+            for (const pg of part.pages) {
+              if (!seenComic.has(pg.image)) {
+                seenComic.add(pg.image);
+                const first = pg.panels.flatMap((p) => p.lines ?? [])[0]?.text ?? "";
+                comics.push({ image: pg.image, stageId: st.id, type, firstLine: first });
+              }
+              for (const p of pg.panels) for (const l of p.lines ?? []) notePortrait(l.portraitId ?? l.speaker, st.id);
+            }
+            continue;
+          }
           if (part.bg) scenes.push({ bgId: part.bg, stageId: st.id, type, firstLine: part.lines[0]?.text ?? "" });
           for (const l of part.lines) notePortrait(l.portraitId ?? l.speaker, st.id);
         }
@@ -95,5 +116,5 @@ export function collectRequiredAssets(
     .map(([id, firstStage]) => ({ id, name: commanders[id]?.name ?? id, firstStage }))
     .sort((a, b) => stageNum(a.firstStage) - stageNum(b.firstStage) || a.id.localeCompare(b.id));
 
-  return { portraits, scenes, maps };
+  return { portraits, scenes, maps, comics };
 }

@@ -623,12 +623,54 @@ export const MapSceneSchema = z.object({
 export type MapScene = z.infer<typeof MapSceneSchema>;
 export type SceneUnit = z.infer<typeof SceneUnitSchema>;
 export type MapSceneLine = z.infer<typeof MapSceneLineSchema>;
+
 /**
- * ⚠ MapScene을 union 앞에 + VN 폴백은 strict — 비-strict ScenarioScene이 폴백이면
+ * 모션코믹 씬 (story editor v2, spec 2026-09-12-story-editor-v2-comic-design §2).
+ * 페이지 = 지면 한 면 이미지(/assets/comics/{image}.webp) + 칸 목록(이미지 기준 정규화 rect).
+ * 재생 = 칸 순서대로 카메라 pan/zoom + 그 칸의 대사. 타임라인 = 칸 순서 + hold. 전부 strict(additive 확장).
+ *  - rect: [x,y,w,h] 0..1. w,h>0, x+w·y+h ≤ 1+1e-6(드래그 float 오차 허용 — 에디터는 소수 3자리).
+ *  - hold: 자동 진행 ms(≥1). 미지정 = 탭 대기(무대사 칸은 런타임 기본 1200).
+ *  - sfx/bgm: 키 문자열 — 런타임이 isSfxKey/isBgmTrackId 가드 뒤에서만 재생.
+ */
+export const ComicLineSchema = z.object({
+  speaker: z.string().optional(),
+  side: SideSchema.optional(),
+  portraitId: z.string().optional(),
+  text: z.string(),
+}).strict();
+const unit = z.number().min(0).max(1);
+const RECT_EPS = 1e-6;
+export const ComicPanelSchema = z.object({
+  rect: z.tuple([unit, unit, unit, unit])
+    .refine(([x, y, w, h]) => w > 0 && h > 0 && x + w <= 1 + RECT_EPS && y + h <= 1 + RECT_EPS,
+      { message: "rect must satisfy w,h>0 and x+w,y+h ≤ 1" }),
+  lines: z.array(ComicLineSchema).optional(),
+  fx: z.array(z.enum(["shake", "flash"])).optional(),
+  hold: z.number().int().min(1).optional(),
+  sfx: z.string().optional(),
+}).strict();
+export const ComicPageSchema = z.object({
+  image: z.string().min(1),
+  panels: z.array(ComicPanelSchema).min(1),
+  bgm: z.string().optional(),
+}).strict();
+export const ComicSceneSchema = z.object({
+  kind: z.literal("comic"),
+  pages: z.array(ComicPageSchema).min(1),
+}).strict();
+export type ComicLine = z.infer<typeof ComicLineSchema>;
+export type ComicPanel = z.infer<typeof ComicPanelSchema>;
+export type ComicPage = z.infer<typeof ComicPageSchema>;
+export type ComicScene = z.infer<typeof ComicSceneSchema>;
+/** 판별 가드 — "map 아니면 VN" 분기 5곳(page.tsx·sim manifest·에디터)은 이걸 VN 폴백 **앞**에 둔다. */
+export const isComicScene = (p: unknown): p is ComicScene =>
+  !!p && typeof p === "object" && (p as { kind?: unknown }).kind === "comic";
+/**
+ * ⚠ 판별 가능한 것(MapScene=map, Comic=kind) 먼저 + VN 폴백은 strict — 비-strict ScenarioScene이 폴백이면
  * *불량* MapScene(react 액션 위반 등)이 map/units를 벗겨먹힌 채 VN으로 조용히 강등된다(오파싱).
  * strict라 파트 배열 안의 VN은 bg/lines 외 키 금지(기존 27 단일 VN 씬 경로는 비-strict 유지).
  */
-export const ScenePartSchema = z.union([MapSceneSchema, ScenarioSceneSchema.strict()]);
+export const ScenePartSchema = z.union([MapSceneSchema, ComicSceneSchema, ScenarioSceneSchema.strict()]);
 export type ScenePart = z.infer<typeof ScenePartSchema>;
 export const SceneSlotSchema = z.union([z.array(ScenePartSchema), ScenarioSceneSchema]);
 export type SceneSlot = z.infer<typeof SceneSlotSchema>;
