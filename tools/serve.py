@@ -338,7 +338,11 @@ def _publish_stage(payload):
         _drop_meta(stage_id)  # 반영된 적 없는 publish — 롤백 대상 아님
         sys.stdout.write(f"[publish-stage] {stage_id} 검사 실패 → 롤백\n")
         return 200, {"ok": False, "rolledBack": True, "output": result.get("output") or result.get("error", "")}
-    draft_deleted = _delete_draft(stage_id)  # Published 가 곧 Draft — 로컬 Draft 는 역할 종료
+    try:
+        draft_deleted = _delete_draft(stage_id)  # Published 가 곧 Draft — 로컬 Draft 는 역할 종료
+    except OSError as e:  # Windows 공유 위반 등 — publish 는 이미 성공, Draft 삭제만 보고
+        draft_deleted = []
+        sys.stdout.write(f"[publish-stage] Draft 삭제 실패(무시): {e}\n")
     sys.stdout.write(f"[publish-stage] {stage_id} → {', '.join(wrote)} (backup={had}, draftDeleted={bool(draft_deleted)})\n")
     return 200, {"ok": True, "wrote": wrote, "backup": had, "validated": True, "at": at, "draftDeleted": bool(draft_deleted)}
 
@@ -404,9 +408,9 @@ def _draft_save(payload):
     with _DRAFT_LOCK:
         prev = _read_draft_meta(stage_id) or {}
         cur = prev.get("revision")
-        if base is not None and base != cur:
+        if base != cur:  # null = "Draft 없음을 기대" — 다른 탭이 먼저 만든 Draft 도 조용히 덮지 않는다
             return 409, {"ok": False, "conflict": True, "revision": cur}
-        revision = (cur or 0) + 1
+        revision = (cur if isinstance(cur, int) else 0) + 1
         at = datetime.now(timezone.utc).isoformat(timespec="seconds")
         has_map = map_txt is not None or bool(prev.get("hasMap") and prev.get("mapId") == map_id)
         os.makedirs(_DRAFT_STAGES_DIR, exist_ok=True)
@@ -641,7 +645,7 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
                 return
             try:
                 code, body = (_draft_save if endpoint == "/draft-save" else _draft_delete)(payload)
-            except OSError as e:
+            except Exception as e:  # noqa: BLE001 — meta 손상(TypeError/ValueError) 도 JSON 500
                 code, body = 500, {"ok": False, "error": f"Draft 쓰기 실패: {e}"}
             self._json(code, body)
             return

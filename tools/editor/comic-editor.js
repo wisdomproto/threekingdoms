@@ -7,10 +7,11 @@ const clamp01 = (v) => Math.min(1, Math.max(0, Number.isFinite(v) ? v : 0));
 
 /** [x,y,w,h] 를 0..1 안으로, w/h ≥ MIN, x+w·y+h ≤ 1 로 정리(소수 3자리). */
 export function clampRect(r) {
-  let [x, y, w, h] = [clamp01(r?.[0]), clamp01(r?.[1]), clamp01(r?.[2]), clamp01(r?.[3])];
+  // 먼저 반올림, 그 다음 반올림된 변 기준으로 클램프 — 반올림을 뒤에 하면 3자리 타이(0.9895→0.99)에서 x+w 가 1을 넘는다
+  let [x, y, w, h] = [r?.[0], r?.[1], r?.[2], r?.[3]].map((v) => r3(clamp01(v)));
   w = Math.max(MIN, w); h = Math.max(MIN, h);
-  x = Math.min(x, 1 - w); y = Math.min(y, 1 - h);
-  return [r3(x), r3(y), r3(w), r3(h)];
+  x = Math.min(x, r3(1 - w)); y = Math.min(y, r3(1 - h));
+  return [x, y, w, h];
 }
 
 /**

@@ -138,7 +138,7 @@ export function renderSceneSlot(el, ctx) {
     } else if (isComicScene(part)) {   // 읽기 전용 — 편집 UI는 Chunk 3(renderComicPart). VN 카드의 `lines ??= []` 변형 금지(strict 스키마)
       const pages = Array.isArray(part.pages) ? part.pages : [];
       const panels = pages.reduce((n, pg) => n + (pg?.panels?.length ?? 0), 0);
-      card.appendChild(h("div", "msg", `만화 장면 (편집 UI 다음 단계) — 페이지 ${pages.length} · 칸 ${panels}`));
+      card.appendChild(h("div", "dim", `만화 장면 (편집 UI 다음 단계) — 페이지 ${pages.length} · 칸 ${panels}`));   // .part .msg 는 숨김 클래스
     } else {
       const br = h("div", "lrow bgrow");
       const bg = h("input"); bg.type = "text"; bg.setAttribute("list", "tk-bgs"); bg.placeholder = "배경 키 (예: 05-sishuiguan-intro)"; bg.value = part.bg ?? "";

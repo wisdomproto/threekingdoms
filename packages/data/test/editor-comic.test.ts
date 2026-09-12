@@ -19,6 +19,7 @@ describe("comic-editor — 순수 헬퍼 (spec §4)", () => {
   it("clampRect: 범위 밖·NaN 정리, x+w ≤ 1 — 결과는 항상 스키마 유효", () => {
     expect(clampRect([0.8, -0.2, 0.5, 1.5])).toEqual([0.5, 0, 0.5, 1]);
     expect(clampRect([Number.NaN, 0, 0, 0])).toEqual([0, 0, 0.01, 0.01]);
+    for (const r of [[0.9895, 0, 0.0105, 1], [0, 0.0625, 1, 0.9375], [0.7, 0.2, 0.3000004, 0.1]]) { const c = clampRect(r); expect(c[0] + c[2]).toBeLessThanOrEqual(1 + 1e-6); expect(c[1] + c[3]).toBeLessThanOrEqual(1 + 1e-6); } // 3자리 타이에서도 refine 통과
     for (const r of [[0.8, -0.2, 0.5, 1.5], [0.99999, 0.99999, 0.00001, 0.00001], [0.1234567, 0.2, 0.3, 0.4]]) {
       const c = clampRect(r);
       expect(() => ComicSceneSchema.parse({ kind: "comic", pages: [{ image: "p", panels: [{ rect: c }] }] })).not.toThrow();

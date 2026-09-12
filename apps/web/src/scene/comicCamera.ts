@@ -10,7 +10,7 @@ export interface Camera { scale: number; tx: number; ty: number }
 /** @param pad 뷰포트 여백 비율(양쪽 합 2·pad). 기본 0.06. */
 export function cameraFor(rect: readonly number[], img: Size, view: Size, pad = 0.06): Camera {
   const [x = 0, y = 0, w = 1, h = 1] = rect;
-  const scale = Math.min((view.w * (1 - 2 * pad)) / (w * img.w), (view.h * (1 - 2 * pad)) / (h * img.h));
+  const scale = Math.min((view.w * (1 - 2 * pad)) / ((w * img.w) || 1), (view.h * (1 - 2 * pad)) / ((h * img.h) || 1)); // 0 분모 가드
   const tx = view.w / 2 - (x + w / 2) * img.w * scale;
   const ty = view.h / 2 - (y + h / 2) * img.h * scale;
   return { scale, tx, ty };

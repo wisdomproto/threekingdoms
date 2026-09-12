@@ -66,6 +66,16 @@ describe("createDraftSaver — 디바운스·재시도·409 정지 상태기계"
     expect(s.draftAt).toMatch(/^\d\d:\d\d$/); expect(s.lastError).toBe(null);
     expect(onSaved).toHaveBeenCalledTimes(1); expect(onState).toHaveBeenCalled();
   });
+  it("저장 진행 중 reset() → 옛 응답이 새 문서 상태를 덮지 않는다(onSaved 미호출, revision 유지)", async () => {
+    let resolve!: (v: unknown) => void;
+    const { T, onSaved, saver } = setup(() => new Promise((r) => { resolve = r; }));
+    saver.touch(); await T.tick(1500);            // post 진행 중
+    saver.reset({ revision: 5 });                  // 다른 장 로드
+    resolve({ ok: true, revision: 9 }); await flush();
+    expect(onSaved).not.toHaveBeenCalled();
+    expect(saver.state().revision).toBe(5);
+    expect(saver.state().saving).toBe(false);
+  });
   it("두 번째 저장은 baseRevision 에 직전 revision 을 넣는다", async () => {
     const { T, post, saver } = setup();
     saver.touch(); await T.tick(1500); saver.touch(); await T.tick(1500);

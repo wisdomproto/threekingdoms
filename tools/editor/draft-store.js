@@ -23,6 +23,7 @@ export function createDraftSaver({
   const s = { dirty: false, saving: false, lastError: null, conflict: false, revision: null, draftAt: null };
   let timer = null;       // 디바운스 또는 재시도 타이머 (동시에 하나만)
   let again = false;      // 저장 중 touch → 완료 후 한 번 더
+  let gen = 0;            // reset() 세대 — 진행 중이던 save 응답이 새 문서 상태를 덮지 않게
   const emit = () => onState({ ...s });
   const arm = (ms) => { if (timer !== null) clearT(timer); timer = setT(() => { timer = null; save(); }, ms); };
 
@@ -30,8 +31,10 @@ export function createDraftSaver({
     if (s.conflict || s.saving) return;
     s.saving = true; s.dirty = false; again = false; emit();
     let res;
+    const g = gen;
     try { res = await post({ baseRevision: s.revision }); }
     catch (e) { res = { ok: false, error: (e && e.message) || String(e) }; }
+    if (g !== gen) return;      // 그 사이 reset() — 이 응답은 옛 문서의 것
     s.saving = false;
     if (res && res.ok) {
       s.revision = res.revision; s.lastError = null; s.draftAt = hhmm(now());
@@ -63,7 +66,7 @@ export function createDraftSaver({
     /** 새 문서 로드 / conflict 해제. revision = 서버 Draft meta 의 revision(없으면 null). */
     reset({ revision = null, draftAt = null } = {}) {
       if (timer !== null) { clearT(timer); timer = null; }
-      again = false;
+      again = false; gen++;
       Object.assign(s, { dirty: false, saving: false, lastError: null, conflict: false, revision, draftAt });
       emit();
     },
