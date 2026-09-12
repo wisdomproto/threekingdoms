@@ -239,8 +239,17 @@ def _rel(path):
 def _write_text_atomic(dest, txt, tmp_dir=_PUBLISH_BACKUP_DIR):
     os.makedirs(tmp_dir, exist_ok=True)
     tmp = os.path.join(tmp_dir, os.path.basename(dest) + ".tmp")  # 추적 디렉터리에 .tmp 잔류 금지
+    # 기존 파일이 CRLF(autocrlf 체크아웃)면 그 줄끝을 유지 — 변경 없는 Publish 가 바이트/`git status` 모두 무변화이도록
+    eol = "\n"
+    if os.path.exists(dest):
+        try:
+            with open(dest, "rb") as f:
+                if b"\r\n" in f.read(4096):
+                    eol = "\r\n"
+        except OSError:
+            pass
     try:
-        with open(tmp, "w", encoding="utf-8", newline="\n") as f:  # Windows \r\n 변환 방지
+        with open(tmp, "w", encoding="utf-8", newline=eol) as f:  # newline= 로 줄끝 고정(플랫폼 변환 없음)
             f.write(txt)
         os.replace(tmp, dest)
     finally:

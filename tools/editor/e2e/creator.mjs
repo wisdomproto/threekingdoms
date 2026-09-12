@@ -98,6 +98,32 @@ try {
   check("quick: undo → level restored, clean", await t.eval(`${H}.getStage().units[0].level === ${lv0} && !${H}.history.isDirty()`));
   await t.eval(`${H}.setRailCollapsed(false); 0`);   // don't leave the collapsed flag in the profile
 
+  // ── ⑦ game PauseMenu ✏ 이 스테이지 편집 ─────────────────────────────────
+  // runs BEFORE publish: publish/rollback rewrite packages/data/json → next dev recompiles, which can wedge on Windows (.next errno -4094)
+  let http = 0;
+  for (let i = 0; i < 30 && http !== 200; i++) { http = await fetch(`${GAME}/battle`).then((r) => r.status).catch(() => 0); if (http !== 200) await sleep(2000); }
+  check("game: /battle answers 200", http === 200, http);
+  const before7 = (await pages()).map((p) => p.id);
+  await t.eval(`window.open(${JSON.stringify(`${GAME}/stages`)}); 'w'`);
+  let gamePage = null;
+  for (let i = 0; i < 40 && !gamePage; i++) { await sleep(500); gamePage = (await pages()).find((p) => !before7.includes(p.id) && p.url.startsWith(GAME)); }
+  check("game: /stages tab opened", !!gamePage, gamePage?.url);
+  if (!gamePage) throw new Error("no game tab");
+  g = await Tab.open(gamePage);
+  await g.waitFor("document.readyState === 'complete' && !!document.querySelector('h1')");
+  await g.eval("localStorage.clear(); sessionStorage.clear(); location.href = '/battle'; 'ok'");   // fresh save → default 05-sishuiguan
+  check("game: battle store handle", await g.waitFor("!!window.__tkBattle && !!document.querySelector('#hudRight')", 120, 500));
+  // DialogueOverlay root (zIndex 8 + pointer, see battle-ux.mjs) — click through the opening dialogue until the menu button responds
+  const DLG = "Array.from(document.querySelectorAll('div')).find(d => d.style.zIndex === '8' && d.style.cursor === 'pointer')";
+  let editBtn = false;
+  for (let i = 0; i < 120 && !editBtn; i++) {
+    await g.eval(`(${DLG})?.click(); document.querySelector('#hudRight button[aria-label="메뉴 열기"]')?.click(); 0`);
+    await sleep(250);
+    editBtn = await g.eval("!!document.querySelector('[data-testid=pause-edit-stage]')");
+  }
+  check("game: pause menu has ✏ 이 스테이지 편집 (dev)", editBtn);
+  const opened = await g.eval(`(() => { window.__e2eOpen = []; window.open = (u) => { window.__e2eOpen.push(String(u)); return null; }; document.querySelector('[data-testid=pause-edit-stage]')?.click(); return window.__e2eOpen; })()`);
+  check("game: ✏ opens stage-editor.html?stage=05-sishuiguan&quick=1", opened.length === 1 && opened[0].includes("stage-editor.html?stage=05-sishuiguan&quick=1"), opened);
   // ── ⑥ Publish: no-change → git delta 0; turnLimit → file → rollback ───────
   const gitBefore = gitStatus();
   const fileBefore = readFileSync(STAGE_FILE, "utf8");
@@ -136,32 +162,6 @@ try {
   await t.eval(closeModal);
   await t.eval(`${H}.doUndo(); window.onbeforeunload = null; 0`);   // draft back to repo value
 
-  // ── ⑦ game PauseMenu ✏ 이 스테이지 편집 ─────────────────────────────────
-  // publish/rollback just rewrote packages/data/json → next dev recompiles @tk/data; wait for /battle to answer 200 first
-  let http = 0;
-  for (let i = 0; i < 30 && http !== 200; i++) { http = await fetch(`${GAME}/battle`).then((r) => r.status).catch(() => 0); if (http !== 200) await sleep(2000); }
-  check("game: /battle answers 200 after publish rebuild", http === 200, http);
-  const before7 = (await pages()).map((p) => p.id);
-  await t.eval(`window.open(${JSON.stringify(`${GAME}/stages`)}); 'w'`);
-  let gamePage = null;
-  for (let i = 0; i < 40 && !gamePage; i++) { await sleep(500); gamePage = (await pages()).find((p) => !before7.includes(p.id) && p.url.startsWith(GAME)); }
-  check("game: /stages tab opened", !!gamePage, gamePage?.url);
-  if (!gamePage) throw new Error("no game tab");
-  g = await Tab.open(gamePage);
-  await g.waitFor("document.readyState === 'complete' && !!document.querySelector('h1')");
-  await g.eval("localStorage.clear(); sessionStorage.clear(); location.href = '/battle'; 'ok'");   // fresh save → default 05-sishuiguan
-  check("game: battle store handle", await g.waitFor("!!window.__tkBattle && !!document.querySelector('#hudRight')", 120, 500));
-  // DialogueOverlay root (zIndex 8 + pointer, see battle-ux.mjs) — click through the opening dialogue until the menu button responds
-  const DLG = "Array.from(document.querySelectorAll('div')).find(d => d.style.zIndex === '8' && d.style.cursor === 'pointer')";
-  let editBtn = false;
-  for (let i = 0; i < 120 && !editBtn; i++) {
-    await g.eval(`(${DLG})?.click(); document.querySelector('#hudRight button[aria-label="메뉴 열기"]')?.click(); 0`);
-    await sleep(250);
-    editBtn = await g.eval("!!document.querySelector('[data-testid=pause-edit-stage]')");
-  }
-  check("game: pause menu has ✏ 이 스테이지 편집 (dev)", editBtn);
-  const opened = await g.eval(`(() => { window.__e2eOpen = []; window.open = (u) => { window.__e2eOpen.push(String(u)); return null; }; document.querySelector('[data-testid=pause-edit-stage]')?.click(); return window.__e2eOpen; })()`);
-  check("game: ✏ opens stage-editor.html?stage=05-sishuiguan&quick=1", opened.length === 1 && opened[0].includes("stage-editor.html?stage=05-sishuiguan&quick=1"), opened);
 } catch (e) {
   check("script error", false, String(e?.stack || e));
 } finally {
