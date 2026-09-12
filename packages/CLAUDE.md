@@ -12,7 +12,7 @@
 ## data (`@tk/data` — JSON SSOT + zod)
 - **rosters/stages가 병종 진실**(§6 표는 v1.0 구상). 원작 원천은 initialForces(영걸전)·sosoden generals.
 - 스테이지 `decorations`는 계약 테스트(`test/decorations.test.ts`)가 강제 — 경계·통행칸·유닛칸·중복. `kind` 추가 시 `apps/web textures.ts OBJECT_FILES` 등록 필수.
-- 씬 슬롯 `stage.scenario.{intro,outro,outroDefeat}` = 단일 VN 객체 **또는** 파트 배열(VN | MapScene). 기존 단일 객체는 로더가 1파트로 정규화.
+- 씬 슬롯 `stage.scenario.{intro,outro,outroDefeat}` = 단일 VN 객체 **또는** 파트 배열(VN | MapScene | **ComicScene** `{kind:"comic", pages:[{image, bgm?, panels:[{rect:[x,y,w,h] 정규화, lines?, fx?, hold?, sfx?}]}]}` — strict, `ScenePartSchema` union 순서 [MapScene, Comic, VN]; `isComicScene` 타입가드). 기존 단일 객체는 로더가 1파트로 정규화.
 - 스키마 변경 = `src/schemas.ts` + `test/schemas.test.ts` + **에디터 round-trip 확인**(master-plan P0: 에디터가 모르는 필드를 저장 중 버리지 않는다).
 
 ## sim (`@tk/sim`)

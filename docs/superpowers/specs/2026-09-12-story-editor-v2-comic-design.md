@@ -1,5 +1,7 @@
 # Story Editor v2 — 모션코믹 포맷(ComicScene) + 런타임 + 컷 편집기 (2026-09-12)
 
+> **상태: 구현 완료 (2026-09-12)** — `feat/battle-mobile-hud`. Chunk 1 스키마·카메라·에디터 순수·검증·매니페스트, Chunk 2 `ComicScenePlayer`, Chunk 3 만화 파트 편집기·보드 카드, Chunk 4 E2E `tools/editor/e2e/comic.mjs`(32 checks PASS, 데스크톱 + 모바일 메트릭) + 문서.
+
 > master-plan §5 STORY("카툰만 봐도 책 한 권"), §17 Story Editor("컷/이미지/캐릭터 · 대사/내레이션 · 음성/BGM/효과음 · Zoom/Pan/Shake/Fade/Transition · 타임라인"), 부록 #3(모션코믹 전환은 도구와 함께; 2026-09-10 웹툰 v5 결정 = **페이지 단위 · 칸 이미지와 대사 데이터 분리 · 지면 통짜 생성 후 슬라이스**를 소재 원칙으로 흡수), 미결 ②(포맷 결정 — 이 문서가 결정). design-guide §8 Dialogue/Story UX(타이핑 중 입력=완성, 완성 후=다음, 마지막=명확한 종료; AUTO/SKIP/LOG 후보), §11 Story 시각 언어.
 
 ## 1. 결정 (미결 ②)
