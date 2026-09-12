@@ -85,19 +85,21 @@ export function PauseMenu({
   /** 「저장하고 나가기」 활성 조건(아군 idle·ongoing) — 아니면 비활성 + 사유 표시 */
   canSuspend?: boolean;
   /** 중단 저장(저장만) — 이동(exitTo)은 여기서. 없거나 sandbox면 버튼 미표시 */
-  onSuspend?: () => void;
+  /** 중단 저장 — true면 저장 성공(메뉴가 exitTo로 이동), false면 실패 안내만. */
+  onSuspend?: () => boolean;
   /** 조작: true=입문(공격 확인 카드) / false=클래식(즉시 공격) */
   confirmAttacks?: boolean;
   onToggleConfirmAttacks?: (on: boolean) => void;
 }): React.ReactElement | null {
   const router = useRouter();
   const [confirmExit, setConfirmExit] = useState(false);
+  const [suspendFailed, setSuspendFailed] = useState(false);
   const [, force] = useState(0);
   // 외부(좌하단 패널 등)에서 음량이 바뀌어도 슬라이더가 따라오도록 엔진 설정을 구독.
   useEffect(() => audio.subscribe(() => force((n) => n + 1)), []);
   // 메뉴가 닫히면 확인 단계도 리셋 — 다음에 열 때 깨끗한 상태.
   useEffect(() => {
-    if (!open) setConfirmExit(false);
+    if (!open) { setConfirmExit(false); setSuspendFailed(false); }
   }, [open]);
 
   if (!open) return null;
@@ -242,16 +244,16 @@ export function PauseMenu({
                   data-testid="pause-suspend"
                   disabled={!canSuspend}
                   onClick={() => {
-                    onSuspend();
-                    router.push(exitTo);
+                    if (onSuspend()) router.push(exitTo);
+                    else setSuspendFailed(true);
                   }}
                   style={{ ...MENU_BTN, opacity: canSuspend ? 1 : 0.45, cursor: canSuspend ? "pointer" : "not-allowed" }}
                 >
                   저장하고 나가기
                 </button>
-                {!canSuspend && (
-                  <p style={{ margin: 0, fontSize: 12, color: BRONZE_DIM, textAlign: "center", lineHeight: 1.5 }}>
-                    아군 차례에 행동을 고르기 전에만 저장할 수 있습니다
+                {(!canSuspend || suspendFailed) && (
+                  <p style={{ margin: 0, fontSize: 12, color: suspendFailed ? "#e7b4ac" : BRONZE_DIM, textAlign: "center", lineHeight: 1.5 }}>
+                    {suspendFailed ? "저장에 실패했습니다 (브라우저 저장공간 확인)" : "아군 차례에 행동을 고르기 전에만 저장할 수 있습니다"}
                   </p>
                 )}
               </div>

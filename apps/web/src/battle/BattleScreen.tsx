@@ -265,7 +265,7 @@ function createSession(resume: boolean): Session {
   if (!sandbox && resume) {
     const s = readSuspend();
     if (
-      isResumable(s, { playthroughCount: getPlaythroughCount(), hasStage: (id) => id in gameData.stages }) &&
+      isResumable(s, { playthroughCount: getPlaythroughCount(), hasStage: (id) => Object.hasOwn(gameData.stages, id) }) &&
       s.stageId === ctx.stage.id
     ) {
       battleSeed = s.seed;
@@ -503,7 +503,8 @@ export default function BattleScreen(): React.ReactElement {
       {boot.ready && introDone && <ObjectiveFlashLayer vm={snap.vm} display={display} />}
       <div id="hudLeft" style={LEFT_COL}>
         {boot.ready && introDone && <ObjectiveStrip display={display} />}
-        {panelSide === "left" && unitPanel}
+        {/* 확인 카드 중엔 정보창을 접는다 — 720p에서 카드 버튼이 컬럼 하단(overflow hidden)에 잘리던 문제 */}
+        {panelSide === "left" && snap.ui.kind !== "confirmAttack" && unitPanel}
         <AttackForecast ui={snap.ui} ctx={ctx} committed={store.committedState} dispatch={dispatch} />
       </div>
       <InspectPopup inspectedId={snap.inspectedId} activeId={selectedId} vm={snap.vm} anchor={snap.inspectAnchor} viewport={viewport} />
@@ -520,10 +521,13 @@ export default function BattleScreen(): React.ReactElement {
           position: "absolute",
           top: "calc(44px + env(safe-area-inset-top))",
           right: 12,
+          bottom: "calc(84px + env(safe-area-inset-bottom))", // 우하단 턴종료 버튼 위에서 끊는다
           display: "flex",
           flexDirection: "column",
           alignItems: "flex-end",
           gap: 8,
+          overflow: "hidden",
+          pointerEvents: "none", // 미니맵/버튼은 각자 auto
         }}
       >
         <Minimap map={ctx.map} units={snap.vm.units} selectedId={selectedId} viewport={snap.viewport} />

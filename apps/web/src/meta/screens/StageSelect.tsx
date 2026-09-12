@@ -73,7 +73,7 @@ export function StageSelect(): React.ReactElement {
     setConfirmNg(false);
     const s = readSuspend();
     setSuspended(
-      isResumable(s, { playthroughCount: m.playthroughCount, hasStage: (id) => id in stages }) ? s : null,
+      isResumable(s, { playthroughCount: m.playthroughCount, hasStage: (id) => Object.hasOwn(stages, id) }) ? s : null,
     );
   }, []);
 

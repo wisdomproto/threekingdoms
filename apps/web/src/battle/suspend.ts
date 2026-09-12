@@ -62,12 +62,14 @@ export function readSuspend(): SuspendedBattle | null {
 }
 
 /** 저장(비브라우저/쿼터초과는 무시). */
-export function writeSuspend(s: SuspendedBattle): void {
-  if (!hasStorage()) return;
+/** 저장 성공 여부 — 실패(쿼터/비브라우저)면 false: 호출부가 "저장됐다"고 믿고 나가면 안 된다(무손실). */
+export function writeSuspend(s: SuspendedBattle): boolean {
+  if (!hasStorage()) return false;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    return true;
   } catch {
-    // 무시
+    return false;
   }
 }
 
