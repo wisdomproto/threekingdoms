@@ -12,7 +12,7 @@
 ## 2. 제약과 결정
 
 - **에디터와 게임은 origin이 다르다**(serve.py vs Next `:3000`). `sessionStorage`·iframe 공유 불가 → 드래프트는 **서버 파일**로 건넨다. 게임 쪽은 같은 origin(`/_draft/…`)에서 그 파일을 읽는다.
-- 게임의 `__lab` 경로(`LabPayload` → `writeLab` → `/battle?stage=__lab` → `BattleScreen.makeCtx` → 결산 `sandbox`)를 **그대로 재사용**한다. 전투 코드는 종료 목적지 외 불변.
+- 게임의 `__lab` 경로(`LabPayload` → `writeLab` → `/battle?stage=__lab` → `BattleScreen.makeCtx`)를 **재사용**한다. 단, 현재 `BattleScreen`은 sandbox 판정을 `ctx.stage.id === LAB_STAGE_ID`로 하므로(476·477·529행) 실제 스테이지 id(예 `05-sishuiguan`)를 가진 스냅샷은 sandbox로 잡히지 않아 결산이 골드·클리어·레벨을 **쓴다** — 이 판정을 "`makeCtx`가 `__lab` 분기를 탔는가"로 바꾼다(§5-5). 그 외 전투 코드는 불변.
 - 기각: `postMessage` 핸드오프(핸드셰이크·팝업 차단·드래프트가 어디에도 안 남음), URL 해시 페이로드(60KB 스테이지 → 80KB URL).
 
 ## 3. 구조
@@ -23,9 +23,11 @@
 | `.gitignore` (수정) | `apps/web/public/_draft/` |
 | `apps/web/src/lab/playtest.ts` (신규) | 순수 로직: `PlaytestSnapshot` 타입, `parsePlaytestSnapshot(json) → { ok: true, payload: LabPayload } \| { ok: false, message }`(kind/version 확인 + `StageSchema`/`BattleMapSchema` parse + 첫 zod 이슈 메시지). DOM·Next 무관 → node 테스트 가능 |
 | `apps/web/app/playtest/page.tsx` (신규) | 착륙 페이지(얇은 클라이언트 컴포넌트, `/lab/page.tsx`처럼 `dynamic(ssr:false)`): `?draft=` → fetch → `parsePlaytestSnapshot` → 성공 시 `writeLab` + `router.replace('/battle?stage=__lab')`, 실패 시 메시지 + 「닫기」 |
-| `apps/web/src/lab/lab.ts` (수정) | `LabPayload.returnUrl?`, `exitTarget(payload)` 순수 헬퍼 |
-| `apps/web/src/battle/BattleScreen.tsx`, `hud/ResultSequence.tsx`(481·958행), `hud/PauseMenu.tsx` (수정) | 실험실 종료 목적지 `/lab` 하드코딩 → `exitTarget()` |
-| `tools/stage-editor.html` (수정) | ▶ 이 스테이지 테스트 버튼 + `GAME_ORIGIN` 상수 |
+| `apps/web/src/lab/lab.ts` (수정) | `LabPayload.returnUrl?`; 순수 `exitTarget(payload, hasOpener)`; 부수효과 래퍼 `leaveSandbox(navigate)` = `exitTarget(readLab(), window.opener != null)` → `close`면 `window.close()` + 100ms 뒤 `window.closed`가 아니면 `navigate(returnUrl)` 폴백, `navigate`면 `navigate(to)` |
+| `apps/web/src/battle/BattleScreen.tsx` (수정) | `makeCtx()`가 `sandbox: boolean`(= `__lab` 분기 여부)을 반환; 476~477행 `stageId`/`sandbox` prop과 529행 종료 결정을 `ctx.stage.id === LAB_STAGE_ID` 대신 이 플래그로. sandbox면 `PauseMenu`에 `onExit={() => leaveSandbox(router.push)}` |
+| `apps/web/src/battle/hud/PauseMenu.tsx` (수정) | `onExit?: () => void` prop 추가 — 있으면 `router.push(exitTo)` 대신 호출(기본 동작 불변) |
+| `apps/web/src/battle/hud/ResultSequence.tsx` (수정) | 481·958행 `sandbox ? "/lab" : …` → `sandbox ? leaveSandbox(fadeTo) : fadeTo(…)`; sandbox 버튼 라벨 "실험실로 ▶" → `readLab()?.returnUrl`이 있으면 "에디터로 ▶" |
+| `tools/stage-editor.html` (수정) | ▶ 이 스테이지 테스트 버튼(`#playtestBtn`, `#publishCheck` 옆·같은 핸들러 스타일) + `GAME_ORIGIN` 상수 |
 | `apps/web/src/lab/__tests__/playtest.test.ts` (신규) | §8 — `exitTarget`·`parsePlaytestSnapshot` 단위 테스트(node 환경, 기존 web 테스트 관례: jsdom 없음) |
 
 ## 4. Playtest 스냅샷 (계약)
@@ -37,8 +39,8 @@ interface PlaytestSnapshot {
   kind: "tk-playtest-snapshot"; version: 1;
   draftId: string;        // `${stage.id}-${revision}` — 파일명. [A-Za-z0-9_-]+
   revision: number;       // Date.now() — 같은 스테이지의 연속 테스트를 구분
-  stage: Stage;           // 에디터 모델의 serializeStage() 결과 (미저장 편집 포함)
-  map: BattleMap;         // 에디터가 들고 있는 현재 맵의 serializeMap() 결과 — stage.mapId 와 무관하게 편집 중인 맵을 우선
+  stage: Stage;           // serializeStageModel(stage) — 객체 (HTML의 serializeStage()는 문자열 래퍼라 쓰지 않는다). 미저장 편집 포함
+  map: BattleMap;         // serializeMapModel({id: mapId, name: mapName, width: W, height: H, tileLegend: loadedLegend, tiles}) — 편집 중인 맵. validate()가 stage.mapId === map.id 를 이미 강제하므로 불일치는 Playtest 단에서 걸린다
   seed: number;           // 고정 1 — 같은 편집 = 같은 롤(재현). 시드 선택 UI는 범위 밖
   returnUrl: string;      // 에디터 탭 URL(location.href)
   savedAt: string;        // ISO
@@ -49,11 +51,11 @@ interface PlaytestSnapshot {
 
 ## 5. 데이터 흐름
 
-1. 에디터 ▶ 클릭 → `validate()` 에러가 있으면 토스트 "테스트 불가 N건" 후 중단(Playtest 단 검증 — P0 스펙 §5).
-2. `POST /playtest-draft` body = 스냅샷(§4). serve.py: `draftId` 정규식 검사, 본문 ≤ 5MB, `apps/web/public/_draft/` 생성, 임시 파일 → `os.replace` 원자 쓰기, 응답 `{ok, draftId, url: "/_draft/{draftId}.json"}`. 실패는 200 + `ok:false` + 메시지(기존 serve.py 관례). `do_POST` 허용 목록에 추가, R2 업로드 없음.
-3. 에디터 `window.open(GAME_ORIGIN + "/playtest?draft=" + draftId)`. `GAME_ORIGIN` 상수 기본 `http://localhost:3000`(보드의 「🎮 게임 열기」와 동일 값).
-4. `/playtest` 페이지: `useSearchParams().get("draft")` → `fetch("/_draft/{id}.json", {cache:"no-store"})` → `parsePlaytestSnapshot(json)`(kind/version 확인 → `StageSchema.parse(stage)`·`BattleMapSchema.parse(map)` → `LabPayload {stage, map, sharedItems: [], seed, returnUrl}`) → `writeLab(payload)` → `router.replace("/battle?stage=__lab")`. 로딩 중 한 줄 표시. 페이지 자체는 얇아서 테스트하지 않고(`LabScreen`과 같은 급) 로직은 `playtest.ts`에서 검증한다.
-5. 전투: 기존 `__lab` 경로. 종료 3지점(일시정지 「나가기」, 승리 결산 종료, 패배 결산 종료)이 `exitTarget(readLab())`을 따른다.
+1. 에디터 ▶ 클릭 → `validate()` 에러가 있으면 토스트 "테스트 불가 N건" 후 중단(Playtest 단 검증 — P0 스펙 §5). `draftId = `${stage.id.replace(/[^A-Za-z0-9_-]/g, '_')}-${Date.now()}``(에디터 쪽 sanitize).
+2. `POST /playtest-draft` body = 스냅샷(§4). serve.py: `Content-Length`를 **읽기 전에** 5MB 상한 검사, JSON 파싱, `draftId` 정규식 `^[A-Za-z0-9_-]+$` 검사(경로 탈출 차단), `kind === "tk-playtest-snapshot"` 확인, `apps/web/public/_draft/` 생성, 임시 파일 → `os.replace` 원자 쓰기, 응답 `200 {ok: true, draftId, url: "/_draft/{draftId}.json"}`. 실패는 기존 do_POST 관례대로 **`400 {ok: false, error}`**(파싱·검증)·`500`(쓰기 실패). `do_POST` 허용 목록에 추가, R2 업로드 없음. 정리(오래된 드래프트 삭제)는 범위 밖(gitignore된 dev 파일).
+3. 에디터 `window.open(GAME_ORIGIN + "/playtest?draft=" + draftId)` — **`noopener` 없이**(`window.opener`가 살아 있어야 §6 `close` 복귀가 된다; 보드 링크의 `rel="noopener"` 패턴을 복사하지 않는다). 서버 `ok:false`면 토스트에 `error` 표시. `GAME_ORIGIN` 상수 기본 `http://localhost:3000`(보드의 「🎮 게임 열기」와 동일 값).
+4. `/playtest` 페이지: `new URLSearchParams(window.location.search).get("draft")`(BattleScreen과 같은 방식 — `useSearchParams`의 Suspense 경계 요구 회피) → `fetch("/_draft/{id}.json", {cache:"no-store"})` → `parsePlaytestSnapshot(json)`(kind/version 확인 → `StageSchema.parse(stage)`·`BattleMapSchema.parse(map)` → `LabPayload {stage, map, sharedItems: [], seed, returnUrl}`) → `writeLab(payload)` → `router.replace("/battle?stage=__lab")`. 로딩 중 한 줄 표시. 페이지 자체는 얇아서 테스트하지 않고(`LabScreen`과 같은 급) 로직은 `playtest.ts`에서 검증한다.
+5. 전투: `makeCtx()`가 `__lab` 분기를 타면 `sandbox: true`를 함께 반환하고, `BattleScreen`은 그 플래그로 `stageId={undefined}`·`sandbox` prop·종료 방식을 정한다(스테이지 id 비교 제거 — 스냅샷은 실제 id를 유지한 채 sandbox가 된다: 결산은 골드/클리어/레벨/기연/광고 전부 생략 = 기존 sandbox 보장). 종료 3지점(일시정지 「나가기」, 승리 결산 종료, 패배 결산 종료)이 `leaveSandbox(navigate)`를 호출한다.
 
 ## 6. 복귀
 
@@ -64,6 +66,7 @@ export function exitTarget(payload: Pick<LabPayload, "returnUrl"> | null, hasOpe
 - `returnUrl` 없음 → `navigate "/lab"` (현행 동일, 무회귀).
 - `returnUrl` 있음 + `hasOpener`(`window.opener != null`) → `close` (호출측이 `window.close()`; 에디터 탭이 자연히 앞으로 옴).
 - `returnUrl` 있음 + opener 없음(탭을 직접 새로고침/복사한 경우) → `navigate returnUrl`.
+`leaveSandbox(navigate)`가 이 결과를 실행한다: `close`면 `window.close()` 뒤 100ms 타이머로 `!window.closed`면 `navigate(returnUrl)`(브라우저가 닫기를 조용히 거부하는 경우 대비). "다시 도전"(`location.reload()`) 뒤에도 `tk.lab`은 남아 있어 복귀가 유지된다.
 에디터 상태(선택·줌·탭·Undo 스택)는 에디터 탭이 계속 열려 있으므로 보존된다 — 별도 저장 없음.
 
 ## 7. 검증·에러
@@ -74,7 +77,8 @@ export function exitTarget(payload: Pick<LabPayload, "returnUrl"> | null, hasOpe
 
 ## 8. 테스트
 - `exitTarget` 순수 함수: (없음, any) → `/lab`; (있음, opener) → close; (있음, no opener) → navigate returnUrl.
-- `parsePlaytestSnapshot`(node): 유효 스냅샷(실제 `packages/data/json` 05-sishuiguan + sishuiguan 맵을 읽어 구성) → `ok:true`, payload에 `sharedItems: []`·`seed`·`returnUrl` 전달; `kind` 불일치 → `ok:false` 안내; zod 실패(예: `turnLimit` 삭제) → `ok:false` 메시지에 `turnLimit` 경로 포함. (web 테스트는 `environment: node` — jsdom·`next/navigation` 모킹은 도입하지 않는다.)
+- `parsePlaytestSnapshot`(node): 유효 스냅샷(`gameData.stages["05-sishuiguan"]` + `gameData.maps["sishuiguan"]`로 구성 — 기존 web 테스트 픽스처 관례) → `ok:true`, payload에 `sharedItems: []`·`seed`·`returnUrl` 전달; `kind` 불일치 → `ok:false` 안내; zod 실패(예: `turnLimit` 삭제, `safeParse`의 첫 이슈) → `ok:false` 메시지에 `turnLimit` 경로 포함.
+- `makeCtx` sandbox 플래그: 기존 BattleScreen 테스트가 있으면 `__lab` URL로 `sandbox: true`·정규 스테이지로 `false`를 확인(없으면 플랜에서 최소 케이스 추가). (web 테스트는 `environment: node` — jsdom·`next/navigation` 모킹은 도입하지 않는다.)
 - serve.py: `python -m py_compile` + curl 수동(정상 저장 / 잘못된 id 거부).
 - 브라우저 E2E(플랜 단계): 에디터에서 유닛 좌표를 바꾸고 ▶ → 전투에 바뀐 좌표로 시작 → 나가기 → 에디터 탭 복귀·상태 유지. 레포 JSON `git status` 무변화, `_draft/` 파일만 생성.
 
