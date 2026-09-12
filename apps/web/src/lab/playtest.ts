@@ -49,3 +49,9 @@ export function parsePlaytestSnapshot(json: unknown): PlaytestParseResult {
   if (typeof s.returnUrl === "string" && s.returnUrl) payload.returnUrl = s.returnUrl;
   return { ok: true, payload };
 }
+
+/** `/playtest?scene=` 값 → 씬 슬롯 키. 그 외(null 포함) = 전투로. (P2 spec §6) */
+export type SceneKey = "intro" | "outro" | "outroDefeat";
+export function parseSceneParam(v: string | null): SceneKey | null {
+  return v === "intro" || v === "outro" || v === "outroDefeat" ? v : null;
+}

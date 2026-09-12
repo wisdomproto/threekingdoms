@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { gameData } from "@tk/data";
 import { exitTarget } from "../lab";
-import { parsePlaytestSnapshot, PLAYTEST_KIND, PLAYTEST_VERSION } from "../playtest";
+import { parsePlaytestSnapshot, parseSceneParam, PLAYTEST_KIND, PLAYTEST_VERSION } from "../playtest";
 
 describe("exitTarget — 실험실/플레이테스트 종료 목적지 (spec §6)", () => {
   it("returnUrl 없음 → /lab (현행 실험실 동작)", () => {
@@ -75,4 +75,17 @@ describe("parsePlaytestSnapshot — 드래프트 파일 → LabPayload (spec §4
     if (r.ok) return;
     expect(r.message).toContain("mapId");
   });
+});
+
+describe("parseSceneParam — 씬 미리보기 파라미터 (P2 spec §6)", () => {
+  it("intro/outro/outroDefeat 그대로", () => {
+    expect(parseSceneParam("intro")).toBe("intro");
+    expect(parseSceneParam("outro")).toBe("outro");
+    expect(parseSceneParam("outroDefeat")).toBe("outroDefeat");
+  });
+  it("그 외 → null", () => {
+    expect(parseSceneParam("battle")).toBeNull();
+    expect(parseSceneParam("")).toBeNull();
+  });
+  it("null → null", () => expect(parseSceneParam(null)).toBeNull());
 });
