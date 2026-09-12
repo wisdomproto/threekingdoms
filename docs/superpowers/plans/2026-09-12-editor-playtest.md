@@ -1,5 +1,7 @@
 # 에디터 Playtest 왕복 — Implementation Plan
 
+> **상태: 완료 (2026-09-12)** — 실브라우저 E2E는 `tools/editor/e2e/playtest.mjs`(13건 PASS)로 자동화.
+
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** `tools/stage-editor.html`의 ▶ 이 스테이지 테스트 한 번으로 지금 편집 중인(미저장 포함) 스테이지+맵이 새 탭의 전투로 뜨고, 전투를 끝내거나 나가면 에디터 탭으로 돌아온다. 테스트 전투는 레포 파일·R2·메타를 바꾸지 않는다.

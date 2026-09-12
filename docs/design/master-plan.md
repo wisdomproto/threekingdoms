@@ -361,17 +361,17 @@ AI로 시나리오 초안, 캐릭터 디자인, 초상화, 스프라이트, 배�
 
 ### P0 --- 데이터 안전성
 
--   Editor round-trip 무손실
--   기존 데이터 필드 보존
+-   ✅ Editor round-trip 무손실 (2026-09-11, `tools/editor/stage-io.js` + 게이트)
+-   ✅ 기존 데이터 필드 보존
 
 ### P1 --- 제작 루프
 
--   Project Store
--   Autosave
--   Undo / Redo
--   Draft
--   현재 챕터 Playtest
--   Editor 복귀
+-   Project Store (미결 ③ — 이연)
+-   ✅ Autosave (2026-09-12, 로컬 복구본 + 저장 상태 칩)
+-   ✅ Undo / Redo (2026-09-12, 전범위 스냅샷 히스토리)
+-   Draft (미결 ③ — 이연)
+-   ✅ 현재 챕터 Playtest (2026-09-12, ▶ 이 스테이지 테스트 → `/playtest?draft=`)
+-   ✅ Editor 복귀 (2026-09-12, sandbox 종료 시 에디터 탭 복귀)
 
 ### P1 --- 전투 UX
 

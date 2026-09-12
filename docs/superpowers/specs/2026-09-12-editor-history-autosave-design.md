@@ -1,5 +1,7 @@
 # 에디터 Undo/Redo 전범위 + Autosave 복구본 + 저장 상태 — 설계 (2026-09-12)
 
+> **상태: 구현 완료 (2026-09-12)** — `feat/editor-history`. 추가 결정: undo/redo도 복구본 타이머를 재스케줄(clean 복귀 시 옛 복구본 삭제), 복구 배너 표시 중엔 복구본을 덮어쓰지 않음, `doNew`는 배너를 숨김. 실브라우저 E2E `tools/editor/e2e/history.mjs` 28건 PASS.
+
 > master-plan §16 "Autosave `저장 중... → 저장됨 ✓`", "Undo/Redo — 지형·유닛·이벤트·목표·메타데이터·삭제까지 일관되게"; §22 P1 제작 루프. design-guide 원칙 8·9("Save is always allowed", "Everything destructive is recoverable"), §4 Save states·Undo/Redo("텍스트 입력 중 Ctrl/Cmd+Z는 텍스트 필드 Undo가 우선"). 벤치마크 §5 RPGAtlas "사용자가 생각하는 한 작업 = Undo 한 번", §10 저장 정책("로컬 복구본 저장"과 "서버 저장"을 다른 상태로 표시).
 > 선행: P0 round-trip(`tools/editor/stage-io.js`, 머지) · P1 Playtest(머지).
 

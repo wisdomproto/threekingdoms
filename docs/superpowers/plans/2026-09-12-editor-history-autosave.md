@@ -1,5 +1,7 @@
 # 에디터 Undo/Redo 전범위 + Autosave 복구본 + 저장 상태 — Implementation Plan
 
+> **상태: 완료 (2026-09-12)** — Task 1~5 전부 구현·커밋. E2E: history 28/28, playtest 13/13 PASS.
+
 > **For agentic workers:** REQUIRED: Use superpowers:subagent-driven-development (if subagents available) or superpowers:executing-plans to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** `tools/stage-editor.html`의 모든 편집이 Ctrl+Z/Ctrl+Y로 되돌리기·다시 하기가 되고(타이핑은 한 묶음), Undo 뒤 저장해도 P0 무손실이 유지되며, 탭을 닫았다 열어도 마지막 편집이 복구본으로 돌아오고, 툴바가 저장 상태를 항상 보여준다.
@@ -36,7 +38,7 @@
 
 **Files:** Create `packages/data/test/editor-history.test.ts`, `tools/editor/history.js`, `tools/editor/history.d.ts`
 
-- [ ] **Step 1: 테스트 작성**
+- [x] **Step 1: 테스트 작성**
 
 ```ts
 import { describe, it, expect } from "vitest";
@@ -120,9 +122,9 @@ describe("editor history — 스냅샷 스택 (spec §4)", () => {
 });
 ```
 
-- [ ] **Step 2: 실패 확인** — `pnpm --filter @tk/data test editor-history` → FAIL (`Failed to load url ../../../tools/editor/history.js`)
+- [x] **Step 2: 실패 확인** — `pnpm --filter @tk/data test editor-history` → FAIL (`Failed to load url ../../../tools/editor/history.js`)
 
-- [ ] **Step 3: 구현** — `tools/editor/history.js`
+- [x] **Step 3: 구현** — `tools/editor/history.js`
 
 ```js
 // tools/editor/history.js — 에디터 스냅샷 히스토리 (DOM 무관). spec 2026-09-12-editor-history-autosave-design §4
@@ -173,14 +175,14 @@ export interface History {
 export function createHistory(opts?: { limit?: number; coalesceMs?: number; now?: () => number }): History;
 ```
 
-- [ ] **Step 4: 통과** — `pnpm --filter @tk/data test editor-history` → 11 passed; `pnpm --filter @tk/data typecheck` clean.
-- [ ] **Step 5: 커밋** — `feat(editor): history module — snapshot stack with dedupe, text coalescing, undo/redo, saved mark`
+- [x] **Step 4: 통과** — `pnpm --filter @tk/data test editor-history` → 11 passed; `pnpm --filter @tk/data typecheck` clean.
+- [x] **Step 5: 커밋** — `feat(editor): history module — snapshot stack with dedupe, text coalescing, undo/redo, saved mark`
 
 ### Task 2: round-trip 게이트에 "복원 뒤 무손실" 케이스
 
 **Files:** Modify `packages/data/test/editor-roundtrip.test.ts`
 
-- [ ] **Step 1:** 편집 의미론 describe 끝에 추가(모듈 이름 `loadStage/serializeStage/loadMap/serializeMap` 사용):
+- [x] **Step 1:** 편집 의미론 describe 끝에 추가(모듈 이름 `loadStage/serializeStage/loadMap/serializeMap` 사용):
 ```ts
   it("스냅샷(직렬화 문자열) → 복원(loadStage) → 직렬화 = 편집본, 유닛 미지 필드 보존 (Undo 복원 뒤 저장 무손실)", () => {
     const m = loadStage(base()) as Json & { units: Json[] };
@@ -194,8 +196,8 @@ export function createHistory(opts?: { limit?: number; coalesceMs?: number; now?
     expect(out.units[0]!.note).toBe("미지");
   });
 ```
-- [ ] **Step 2:** `pnpm --filter @tk/data test` → 전부 green (roundtrip 70 → 71).
-- [ ] **Step 3: 커밋** — `test(editor): round-trip after snapshot restore keeps unknown fields`
+- [x] **Step 2:** `pnpm --filter @tk/data test` → 전부 green (roundtrip 70 → 71).
+- [x] **Step 3: 커밋** — `test(editor): round-trip after snapshot restore keeps unknown fields`
 
 ---
 
@@ -205,7 +207,7 @@ export function createHistory(opts?: { limit?: number; coalesceMs?: number; now?
 
 **Files:** Modify `tools/stage-editor.html`
 
-- [ ] **Step 1: import + 상태**
+- [x] **Step 1: import + 상태**
   import 문에 `import { createHistory } from './editor/history.js';` 추가. `cloneUnits` import 제거(`stage-io.js`의 export는 유지).
   `const undoStack = [];`(291행)를 다음으로 교체:
 ```js
@@ -215,9 +217,9 @@ let recoveryTimer = null;
 let lastRecoveryAt = null;        // 칩 표시용
 ```
 
-- [ ] **Step 2: 옛 undo 제거** — `function pushUndo(){…}`·`function doUndo(){…}`(436~445) 삭제; `pushUndo();` 호출 4곳(≈474·494·751·940) 삭제; `undoStack.length = 0` 3곳(≈1095·1104·1178) 삭제(대신 Step 5의 reset).
+- [x] **Step 2: 옛 undo 제거** — `function pushUndo(){…}`·`function doUndo(){…}`(436~445) 삭제; `pushUndo();` 호출 4곳(≈474·494·751·940) 삭제; `undoStack.length = 0` 3곳(≈1095·1104·1178) 삭제(대신 Step 5의 reset).
 
-- [ ] **Step 3: 스냅샷·복원·훅** — `refreshValidation` 정의 **위**에 추가:
+- [x] **Step 3: 스냅샷·복원·훅** — `refreshValidation` 정의 **위**에 추가:
 ```js
 /* ═══════════════════════ 히스토리·복구본 ═══════════════════════ */
 const isTextLike = (el) => !!el && ((el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number')) || el.tagName === 'TEXTAREA' || el.isContentEditable);
@@ -288,20 +290,20 @@ let lastSavedAt = null;
 ```
   그리고 `refreshValidation` 안 배너 갱신은 `if (!mapOnlyMode) { …배너… }`로 감싼다(push 는 그대로).
 
-- [ ] **Step 4: 미도달 5곳** — 각 줄에 `refreshValidation();` 추가:
+- [x] **Step 4: 미도달 5곳** — 각 줄에 `refreshValidation();` 추가:
   - 495행: `if (tool === 'fill') { floodFill(c[0], c[1]); refreshValidation(); } else {…}`
   - 704행: `inputText(mapName, v => { mapName = v; refreshValidation(); })`
   - 809행: `oc.onchange = () => { o.optional = oc.checked; refreshValidation(); };`
   - 895행: `lc.onchange = () => { e.outcome.loserRetreats = lc.checked; refreshValidation(); };`
   - 898행: `occ.onchange = () => { e.once = occ.checked; refreshValidation(); };`
 
-- [ ] **Step 5: 로드 경로 = suspend + reset 마지막**
+- [x] **Step 5: 로드 경로 = suspend + reset 마지막**
   `loadStageObject(obj)`: 본문 시작에 `const prevSuspend = suspendHistory; suspendHistory = true; cancelRecoveryTimer();`, `return true` 직전에 `suspendHistory = prevSuspend; history.reset(snapshot()); updateSaveState();`(early-return 가드 경로에서도 `suspendHistory = prevSuspend` 복원). `loadMapObject(m)`·`doNew()` 동일. `doNew()`의 `confirm(...)`은 `if (history.isDirty() && !confirm(...)) return;` 로. `loadMapOnlyFromServer`: `loadMapObject(m)` 뒤 `stage.mapId = …; setMapOnlyMode(true);` 다음에 `history.reset(snapshot()); updateSaveState();` 한 번 더(mapId 반영된 baseline). `init()` 마지막에도 `history.reset(snapshot());`.
   진입점 4곳 **성공 분기** 꼬리에 `checkRecovery();`: `loadStageFromServer`(스테이지 로드 성공 뒤), `loadMapOnlyFromServer`(toast 뒤), `openFile`(`loadXObject`가 true 반환한 뒤), `doPasteLoad`(로드 성공 뒤).
 
-- [ ] **Step 6: 저장 성공 훅** — `saveStageFile`·`saveMapFile`의 성공 토스트 뒤에 `history.markSaved(); clearRecovery(); lastSavedAt = new Date().toLocaleTimeString(); updateSaveState();`. `openPasteExport` 경로는 그대로.
+- [x] **Step 6: 저장 성공 훅** — `saveStageFile`·`saveMapFile`의 성공 토스트 뒤에 `history.markSaved(); clearRecovery(); lastSavedAt = new Date().toLocaleTimeString(); updateSaveState();`. `openPasteExport` 경로는 그대로.
 
-- [ ] **Step 7: 키보드·버튼**
+- [x] **Step 7: 키보드·버튼**
   keydown(522~)의 첫 줄을 교체:
 ```js
     if ((e.ctrlKey || e.metaKey) && !e.altKey) {
@@ -324,15 +326,15 @@ let lastSavedAt = null;
   <button class="btn" id="recoveryDiscard">버리기</button>
 </div>
 ```
-- [ ] **Step 8: beforeunload + 훅** — 1191행을 `window.onbeforeunload = e => { if (history.isDirty()) { e.preventDefault(); e.returnValue = ''; } };`(**프로퍼티** — E2E가 `onbeforeunload = null`로 끌 수 있어야 한다; addEventListener 금지). `window.__stageEditor = { serializeStage, serializeMap, getStage: () => stage, history, snapshot, restore, refreshValidation, doUndo, doRedo };`
-- [ ] **Step 9: 정적 점검** — 브라우저에서 `http://localhost:8095/tools/stage-editor.html`(serve.py 8095 백그라운드) 열어 `#modfail` 없음·콘솔 에러 0(`read_console_messages`); `grep -c "pushUndo\|undoStack\|cloneUnits" tools/stage-editor.html` → 0.
-- [ ] **Step 10: 커밋** — `feat(editor): full-range undo/redo via snapshot history, local recovery autosave, save-state chip`
+- [x] **Step 8: beforeunload + 훅** — 1191행을 `window.onbeforeunload = e => { if (history.isDirty()) { e.preventDefault(); e.returnValue = ''; } };`(**프로퍼티** — E2E가 `onbeforeunload = null`로 끌 수 있어야 한다; addEventListener 금지). `window.__stageEditor = { serializeStage, serializeMap, getStage: () => stage, history, snapshot, restore, refreshValidation, doUndo, doRedo };`
+- [x] **Step 9: 정적 점검** — 브라우저에서 `http://localhost:8095/tools/stage-editor.html`(serve.py 8095 백그라운드) 열어 `#modfail` 없음·콘솔 에러 0(`read_console_messages`); `grep -c "pushUndo\|undoStack\|cloneUnits" tools/stage-editor.html` → 0.
+- [x] **Step 10: 커밋** — `feat(editor): full-range undo/redo via snapshot history, local recovery autosave, save-state chip`
 
 ### Task 4: CDP E2E 스크립트 (실제 Chrome)
 
 **Files:** Create `tools/editor/e2e/cdp.mjs`, `tools/editor/e2e/history.mjs`, `tools/editor/e2e/playtest.mjs`
 
-- [ ] **Step 1: `cdp.mjs`** (공용)
+- [x] **Step 1: `cdp.mjs`** (공용)
 ```js
 // tools/editor/e2e/cdp.mjs — Chrome DevTools Protocol 미니 클라이언트 (Node 22 내장 WebSocket/fetch, 의존성 0)
 // 사용: chrome.exe --remote-debugging-port=9334 --user-data-dir=%TEMP%\tk-cdp --no-first-run --disable-popup-blocking <url>
@@ -360,7 +362,7 @@ export async function launchChrome(url) {
 }
 export function check(name, ok, detail) { console.log(`${ok ? "PASS" : "FAIL"} ${name}${detail !== undefined ? " — " + JSON.stringify(detail) : ""}`); if (!ok) process.exitCode = 1; }
 ```
-- [ ] **Step 2: `history.mjs`**
+- [x] **Step 2: `history.mjs`**
 ```js
 // tools/editor/e2e/history.mjs — Undo/Redo·coalesce·복구본·저장 칩 (실제 Chrome). 전제: serve.py 가 EDITOR_ORIGIN(기본 http://localhost:8095) 에 떠 있음.
 import { Tab, pages, launchChrome, sleep, check } from "./cdp.mjs";
@@ -401,12 +403,12 @@ orig.units[0].x = x0;
 check("복원 뒤 직렬화 = 원본+편집(무손실)", JSON.stringify(cur) === JSON.stringify(orig));
 t.close();
 ```
-- [ ] **Step 3: `playtest.mjs`** — 세션에서 검증에 썼던 스크립트를 `cdp.mjs` 기반으로 옮긴다: 유닛 x+1 → `#playtestBtn.click()` → 새 탭 `/battle?stage=__lab` → `tk.lab.stage.units[0].x` 일치·`returnUrl`·`opener` → ☰/전투 그만두기/나가기 → 게임 탭 닫힘 → 에디터 x 유지. `check()`로 6개 항목 출력. (내용은 위 history.mjs 와 같은 스타일 — 구현자가 작성.)
-- [ ] **Step 4: 실행** — `python tools/serve.py 8095`(백그라운드), next dev 는 playtest 에만 필요(:3000 떠 있으면 재사용). `node tools/editor/e2e/history.mjs` → 전부 PASS; `node tools/editor/e2e/playtest.mjs` → 전부 PASS. Chrome CDP 인스턴스 종료(`taskkill` on the pid using 9334 or leave — 프로필은 `%TEMP%\tk-cdp-9334`).
-- [ ] **Step 5: 커밋** — `test(editor): CDP-driven Chrome E2E for history/recovery and playtest round-trip`
+- [x] **Step 3: `playtest.mjs`** — 세션에서 검증에 썼던 스크립트를 `cdp.mjs` 기반으로 옮긴다: 유닛 x+1 → `#playtestBtn.click()` → 새 탭 `/battle?stage=__lab` → `tk.lab.stage.units[0].x` 일치·`returnUrl`·`opener` → ☰/전투 그만두기/나가기 → 게임 탭 닫힘 → 에디터 x 유지. `check()`로 6개 항목 출력. (내용은 위 history.mjs 와 같은 스타일 — 구현자가 작성.)
+- [x] **Step 4: 실행** — `python tools/serve.py 8095`(백그라운드), next dev 는 playtest 에만 필요(:3000 떠 있으면 재사용). `node tools/editor/e2e/history.mjs` → 전부 PASS; `node tools/editor/e2e/playtest.mjs` → 전부 PASS. Chrome CDP 인스턴스 종료(`taskkill` on the pid using 9334 or leave — 프로필은 `%TEMP%\tk-cdp-9334`).
+- [x] **Step 5: 커밋** — `test(editor): CDP-driven Chrome E2E for history/recovery and playtest round-trip`
 
 ### Task 5: 문서 + 전체 게이트
 
-- [ ] `tools/CLAUDE.md` 에디터 bullet 끝에: ` Undo/Redo 전범위 = `tools/editor/history.js` 스냅샷 스택(`refreshValidation` 훅, 텍스트 타이핑 병합), 복구본 = `localStorage tk.editor.recovery.*`(1초 디바운스, 저장 시 삭제), 저장 상태 칩. **E2E** = `node tools/editor/e2e/{history,playtest}.mjs`(실제 Chrome을 CDP :9334 로 자동 구동, 의존성 0; serve.py :8095 + next dev :3000 필요).`
-- [ ] `pnpm test && pnpm typecheck` green.
-- [ ] 커밋 — `docs(tools): history/recovery and CDP e2e notes`
+- [x] `tools/CLAUDE.md` 에디터 bullet 끝에: ` Undo/Redo 전범위 = `tools/editor/history.js` 스냅샷 스택(`refreshValidation` 훅, 텍스트 타이핑 병합), 복구본 = `localStorage tk.editor.recovery.*`(1초 디바운스, 저장 시 삭제), 저장 상태 칩. **E2E** = `node tools/editor/e2e/{history,playtest}.mjs`(실제 Chrome을 CDP :9334 로 자동 구동, 의존성 0; serve.py :8095 + next dev :3000 필요).`
+- [x] `pnpm test && pnpm typecheck` green.
+- [x] 커밋 — `docs(tools): history/recovery and CDP e2e notes`
