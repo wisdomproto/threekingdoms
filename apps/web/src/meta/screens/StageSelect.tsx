@@ -4,12 +4,16 @@
  *
  * 해금 규칙: 첫 스테이지는 항상 해금, 그 외는 "직전 스테이지 클리어"로 해금.
  * 잠긴 스테이지 → 콤팩트 한 줄(번호+자물쇠). 해금 스테이지 → 풀 카드.
+ * 「이어하기」 배너(스펙 §7): 중단 저장본(tk.battle.suspend.v1)이 이 회차·스테이지와 맞으면 헤더 아래 표시.
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { stages } from "@tk/data";
 import type { Stage } from "@tk/data";
 import { getMeta, startNewGame } from "../metaStore";
+import { writeSortie } from "../sortie";
+import { clearSuspend, isResumable, readSuspend, type SuspendedBattle } from "../../battle/suspend";
 
 const INK = "#17130f";
 const INK_DEEP = "#0c0a07";
@@ -54,10 +58,12 @@ function chapterOf(num: number): number {
 }
 
 export function StageSelect(): React.ReactElement {
+  const router = useRouter();
   const [cleared, setCleared] = useState<string[]>([]);
   const [gold, setGold] = useState(0);
   const [playthroughCount, setPlaythroughCount] = useState(0);
   const [confirmNg, setConfirmNg] = useState(false);
+  const [suspended, setSuspended] = useState<SuspendedBattle | null>(null);
 
   const reload = useCallback(() => {
     const m = getMeta();
@@ -65,7 +71,20 @@ export function StageSelect(): React.ReactElement {
     setGold(m.gold);
     setPlaythroughCount(m.playthroughCount);
     setConfirmNg(false);
+    const s = readSuspend();
+    setSuspended(
+      isResumable(s, { playthroughCount: m.playthroughCount, hasStage: (id) => id in stages }) ? s : null,
+    );
   }, []);
+
+  // 이어하기 — 저장 당시 편성을 되살려(없으면 원본 배치) ?resume=1 로 진입 → BattleScreen이 로그를 fold.
+  const resume = useCallback(
+    (s: SuspendedBattle) => {
+      writeSortie(s.sortie ?? { stageId: s.stageId, members: [], sharedItems: [] });
+      router.push(`/battle?stage=${s.stageId}&resume=1`);
+    },
+    [router],
+  );
 
   useEffect(() => { reload(); }, [reload]);
 
@@ -139,6 +158,38 @@ export function StageSelect(): React.ReactElement {
           </span>
         </span>
       </header>
+
+      {/* ── 이어하기 배너 — 중단 저장본이 있을 때만 ── */}
+      {suspended && (
+        <div style={{ maxWidth: 720, margin: "0 auto", padding: "14px 12px 0", display: "flex", gap: 8, alignItems: "stretch" }}>
+          <button
+            type="button"
+            data-testid="resume-battle"
+            onClick={() => resume(suspended)}
+            style={{
+              flex: 1, padding: "12px 14px", borderRadius: 8, textAlign: "left",
+              border: `1px solid ${GOLD}99`, background: "rgba(50,38,12,0.7)",
+              color: GOLD, fontSize: 14, fontWeight: 700, letterSpacing: "0.04em",
+              cursor: "pointer", fontFamily: "inherit",
+              boxShadow: `0 2px 18px rgba(205,171,110,0.15)`,
+            }}
+          >
+            이어하기 — {stages[suspended.stageId]?.name ?? suspended.stageId} · {suspended.turn}턴 · {savedAtLabel(suspended.savedAt)}
+          </button>
+          <button
+            type="button"
+            onClick={() => { clearSuspend(); reload(); }}
+            aria-label="저장본 지우기"
+            style={{
+              padding: "0 12px", borderRadius: 8,
+              border: "1px solid #2c2620", background: "rgba(20,18,14,0.5)",
+              color: GOLD_DIM, fontSize: 12, cursor: "pointer", fontFamily: "inherit",
+            }}
+          >
+            지우기
+          </button>
+        </div>
+      )}
 
       {/* ── 챕터 목록 ── */}
       <div style={{ maxWidth: 720, margin: "0 auto", padding: "6px 12px 0" }}>
@@ -233,6 +284,13 @@ export function StageSelect(): React.ReactElement {
       </div>
     </section>
   );
+}
+
+/** 저장 시각 HH:MM (ISO 파싱 실패 시 빈 문자열). */
+function savedAtLabel(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
 /** 챕터 구분 헤더 — active(해금 스테이지 있는 챕터)는 더 밝게. */
