@@ -1,5 +1,7 @@
 # 전투 UX P1 — HUD 충돌 정리 · 입문 공격 확인 · 핵심 패배조건 표시 · 저장하고 나가기 (2026-09-12)
 
+> **상태: 구현 완료 (2026-09-12)** — `feat/battle-ux-p1`. 리뷰 반영: 확인 카드 중 유닛 정보창 숨김(720p 클리핑), 우측 컬럼도 bottom/overflow 제한, `writeSuspend` boolean(실패 시 안 나감), `?resume`은 `useSearchParams`. E2E `tools/editor/e2e/battle-ux.mjs` 22/22 PASS.
+
 > master-plan §18 개선 방향("HUD 영역 통합", "공격 확정 입문/클래식", "승리/패배조건 3줄", "전투 중단 = 저장하고 나가기 → 이어하기"), §22 P1 전투 UX. design-guide §3("HUD 패널들이 각자 고정 좌표를 점유해 겹치는 구조는 최소화"), §6 Battle HUD(선택 유닛·목표를 패널이 가리지 않게), §7 Beginner confirmation / Attack Forecast / Cancelability, §14 Battle QA(선택 유닛 미가림·목표와 핵심 패배조건·확정 전 결과 이해·실수 취소).
 
 ## 1. 문제 (실측)
