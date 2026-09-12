@@ -10,6 +10,7 @@
   시크릿(R2 키)은 이 서버에만 있고 에디터엔 노출되지 않는다.
 """
 import sys, os, json, base64, mimetypes, subprocess, re, shutil, threading
+from datetime import datetime, timezone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUBLIC = os.path.join(ROOT, "apps", "web", "public")
@@ -225,6 +226,131 @@ def _save_playtest_draft(payload):
     return 200, {"ok": True, "draftId": draft_id, "url": f"/_draft/{draft_id}.json"}
 
 
+_PUBLISH_BACKUP_DIR = os.path.join(_DRAFT_DIR, "publish-backup")
+_STAGES_DIR = os.path.join(ROOT, "packages", "data", "json", "stages")
+_MAPS_DIR = os.path.join(ROOT, "packages", "data", "json", "maps")
+
+
+def _rel(path):
+    return os.path.relpath(path, ROOT).replace(os.sep, "/")
+
+
+def _write_text_atomic(dest, txt):
+    tmp = dest + ".tmp"
+    with open(tmp, "w", encoding="utf-8", newline="\n") as f:  # Windows \r\n 변환 방지
+        f.write(txt)
+    os.replace(tmp, dest)
+
+
+def _restore(dest, backup, had_backup):
+    """백업이 있었으면 되돌리고, 없었으면(새 파일) 삭제. 백업 파일 자체는 남긴다(재롤백 가능)."""
+    if had_backup:
+        shutil.copyfile(backup, dest)
+    elif os.path.exists(dest):
+        os.remove(dest)
+
+
+def _parse_publish_doc(txt, label):
+    """JSON 문자열 → (id, 끝 개행 보장 텍스트) 또는 (None, error)."""
+    if not isinstance(txt, str):
+        return None, f"{label} 는 JSON 문자열이어야 함"
+    if len(txt) > _DRAFT_MAX_BYTES:
+        return None, f"{label} 가 너무 큼 (>5MB)"
+    try:
+        obj = json.loads(txt)
+    except ValueError as e:
+        return None, f"{label} JSON 파싱 실패: {e}"
+    doc_id = obj.get("id") if isinstance(obj, dict) else None
+    if not isinstance(doc_id, str) or not _DRAFT_ID_RE.match(doc_id):
+        return None, f"{label}.id 형식 오류 ([A-Za-z0-9_-]+)"
+    return (obj, doc_id, txt if txt.endswith("\n") else txt + "\n"), None
+
+
+def _publish_targets(stage_id, with_map):
+    """(dest, backup, key) — key 는 meta.hadBackup 의 키."""
+    t = [(os.path.join(_STAGES_DIR, stage_id + ".json"), os.path.join(_PUBLISH_BACKUP_DIR, stage_id + ".json"), "stage")]
+    if with_map:
+        t.append((os.path.join(_MAPS_DIR, with_map + ".json"), os.path.join(_PUBLISH_BACKUP_DIR, stage_id + ".map.json"), "map"))
+    return t
+
+
+def _publish_stage(payload):
+    """레포 stages/{id}.json(+maps/{mapId}.json)에 쓰고 전수 검사, 실패면 백업 복원.
+    호출측이 _VALIDATE_LOCK 을 잡은 상태여야 한다(spec 2026-09-12-creator-ux-p2 §7). 반환 (http_code, body)."""
+    if not isinstance(payload, dict):
+        return 400, {"ok": False, "error": "본문이 JSON 객체가 아님"}
+    parsed, err = _parse_publish_doc(payload.get("stage"), "stage")
+    if err:
+        return 400, {"ok": False, "error": err}
+    stage_obj, stage_id, stage_txt = parsed
+    texts = [stage_txt]
+    map_id = None
+    if payload.get("map") is not None:
+        parsed, err = _parse_publish_doc(payload.get("map"), "map")
+        if err:
+            return 400, {"ok": False, "error": err}
+        _, map_id, map_txt = parsed
+        if stage_obj.get("mapId") != map_id:
+            return 400, {"ok": False, "error": f"stage.mapId({stage_obj.get('mapId')}) != map.id({map_id})"}
+        texts.append(map_txt)
+
+    targets = _publish_targets(stage_id, map_id)
+    os.makedirs(_PUBLISH_BACKUP_DIR, exist_ok=True)
+    had = {}
+    for dest, backup, key in targets:
+        had[key] = os.path.exists(dest)
+        if had[key]:
+            shutil.copyfile(dest, backup)
+        elif os.path.exists(backup):
+            os.remove(backup)  # 이전 publish 의 잔재 — 짝이 안 맞는 백업은 지운다
+    at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    wrote = [_rel(dest) for dest, _, _ in targets]
+    _write_text_atomic(os.path.join(_PUBLISH_BACKUP_DIR, stage_id + ".meta.json"),
+                       json.dumps({"wrote": wrote, "hadBackup": had, "at": at}, ensure_ascii=False, indent=2) + "\n")
+
+    written = []
+    try:
+        for (dest, backup, key), txt in zip(targets, texts):
+            _write_text_atomic(dest, txt)
+            written.append((dest, backup, key))
+    except OSError as e:
+        for dest, backup, key in written:
+            _restore(dest, backup, had[key])
+        return 500, {"ok": False, "error": f"쓰기 실패: {e}"}
+
+    result = _validate_data()
+    if not result.get("ok"):
+        for dest, backup, key in written:
+            _restore(dest, backup, had[key])
+        sys.stdout.write(f"[publish-stage] {stage_id} 검사 실패 → 롤백\n")
+        return 200, {"ok": False, "rolledBack": True, "output": result.get("output") or result.get("error", "")}
+    sys.stdout.write(f"[publish-stage] {stage_id} → {', '.join(wrote)} (backup={had})\n")
+    return 200, {"ok": True, "wrote": wrote, "backup": had, "validated": True, "at": at}
+
+
+def _publish_rollback(payload):
+    """마지막 publish 의 백업으로 되돌리고 전수 검사. 호출측이 _VALIDATE_LOCK 을 잡은 상태여야 한다."""
+    stage_id = payload.get("stageId") if isinstance(payload, dict) else None
+    if not isinstance(stage_id, str) or not _DRAFT_ID_RE.match(stage_id):
+        return 400, {"ok": False, "error": "stageId 형식 오류 ([A-Za-z0-9_-]+)"}
+    meta_path = os.path.join(_PUBLISH_BACKUP_DIR, stage_id + ".meta.json")
+    if not os.path.exists(meta_path):
+        return 404, {"ok": False, "error": f"{stage_id} 의 publish 백업 없음"}
+    with open(meta_path, encoding="utf-8") as f:
+        meta = json.load(f)
+    had = meta.get("hadBackup") or {}
+    restored = []
+    for rel in meta.get("wrote") or []:
+        dest = os.path.join(ROOT, *rel.split("/"))
+        key = "map" if rel.startswith("packages/data/json/maps/") else "stage"
+        backup = os.path.join(_PUBLISH_BACKUP_DIR, stage_id + (".map.json" if key == "map" else ".json"))
+        _restore(dest, backup, bool(had.get(key)))
+        restored.append(rel)
+    result = _validate_data()
+    sys.stdout.write(f"[publish-rollback] {stage_id} ← {', '.join(restored)} ok={result.get('ok')}\n")
+    return 200, {"ok": bool(result.get("ok")), "restored": restored, "output": result.get("output") or result.get("error", "")}
+
+
 class NoCacheHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=ROOT, **kwargs)
@@ -334,7 +460,8 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self):  # noqa: N802
         endpoint = self.path.split("?")[0]
-        if endpoint not in ("/save-asset", "/delete-asset", "/rebuild-audio-manifest", "/validate-data", "/playtest-draft"):
+        if endpoint not in ("/save-asset", "/delete-asset", "/rebuild-audio-manifest", "/validate-data", "/playtest-draft",
+                            "/publish-stage", "/publish-rollback"):
             self._json(404, {"ok": False, "error": "unknown endpoint"})
             return
 
@@ -351,6 +478,30 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
                 return
             try:
                 self._json(200, _validate_data())
+            finally:
+                _VALIDATE_LOCK.release()
+            return
+
+        if endpoint in ("/publish-stage", "/publish-rollback"):
+            if not _VALIDATE_LOCK.acquire(blocking=False):  # 백업→쓰기→검사→복원 전 구간 1개만
+                self._json(409, {"ok": False, "error": "검사/Publish 진행 중"})
+                return
+            try:
+                length = int(self.headers.get("Content-Length", 0) or 0)
+                if length > 2 * _DRAFT_MAX_BYTES:
+                    self._json(400, {"ok": False, "error": f"본문이 너무 큼 ({length} bytes)"})
+                    return
+                try:
+                    payload = json.loads(self.rfile.read(length).decode("utf-8")) if length else {}
+                except Exception as e:  # noqa: BLE001
+                    self._json(400, {"ok": False, "error": f"잘못된 요청: {e}"})
+                    return
+                fn = _publish_stage if endpoint == "/publish-stage" else _publish_rollback
+                try:
+                    code, body = fn(payload)
+                except OSError as e:
+                    code, body = 500, {"ok": False, "error": f"publish 실패: {e}"}
+                self._json(code, body)
             finally:
                 _VALIDATE_LOCK.release()
             return
