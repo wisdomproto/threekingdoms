@@ -74,6 +74,25 @@ try {
   await t.eval(`${H}.doUndo()`);
   check("one doUndo -> clean", await t.eval(`!${H}.history.isDirty() && !${H}.history.canUndo()`));
   check("recovery removed after final undo", await t.waitFor(`localStorage.getItem(${KEY}) === null`, 12, 250));
+
+  // 5) unit drag-and-drop on the grid (unit mode): mousedown on units[0] -> mousemove to an empty cell -> mouseup = 1 undo entry
+  await t.eval("document.getElementById('m-unit').click(); 'm'");
+  const drag = await t.eval(`(() => {
+    const s = ${H}.getStage(); const u = s.units[0]; const px = +document.getElementById('cellpx').value;
+    const all = s.units.concat(...(s.reinforcements || []).map(r => r.units || []));
+    let tx = u.x + 1; while (all.some(o => o.x === tx && o.y === u.y)) tx++;
+    const g = document.getElementById('grid'); const r = g.getBoundingClientRect();
+    const at = (x, y) => ({ clientX: r.left + x * px + px / 2, clientY: r.top + y * px + px / 2, bubbles: true });
+    const from = [u.x, u.y];
+    g.dispatchEvent(new MouseEvent('mousedown', at(u.x, u.y)));
+    window.dispatchEvent(new MouseEvent('mousemove', at(tx, u.y)));
+    window.dispatchEvent(new MouseEvent('mouseup', at(tx, u.y)));
+    return { from, to: [u.x, u.y], tx };
+  })()`);
+  check("drag: unit moved to empty cell", drag.to[0] === drag.tx && drag.to[1] === drag.from[1], JSON.stringify(drag));
+  check("drag: dirty, one undo entry", await t.eval(`${H}.history.isDirty() && ${H}.history.canUndo()`));
+  await t.eval(`${H}.doUndo()`);
+  check("drag: undo restores position -> clean", await t.eval(`${H}.getStage().units[0].x === ${drag.from[0]} && !${H}.history.isDirty()`));
 } catch (e) {
   check("script error", false, String(e?.stack || e));
 } finally {

@@ -398,6 +398,7 @@ let mode = 'terrain';         // 'terrain' | 'unit'
 let tool = 'paint';
 let cellPx = 15;
 let painting = false;
+let dragU = null, dragFrom = null, dragMoved = false;   // 유닛 모드 드래그 앤 드롭(빈 칸으로 끌어 이동)
 let selUnit = null;           // 선택된 유닛 객체(stage.units[i] 또는 증원 유닛)
 let activeTab = 'battle:meta';  // 'story-intro' | 'battle:{quick|meta|unit|obj|duel|adv}' | 'dialogue' | 'story-outro' | 'reward'
 let battleSub = 'meta';         // 상단 「전투」 재클릭 시 돌아갈 서브탭
@@ -684,14 +685,29 @@ function bind() {
       if (tool === 'fill') { floodFill(c[0], c[1]); refreshValidation(); } else { painting = true; paintAt(c[0], c[1]); }
       renderTerrain(); renderUnits();
     } else {
+      // 유닛 모드: 기존 유닛 위에서 누르면 선택 + 드래그 시작(빈 칸으로 끌어 이동), 빈 칸이면 신규 배치
+      dragU = unitAt(c[0], c[1]); dragFrom = c; dragMoved = false;
       placeOrSelect(c[0], c[1]);
+      if (dragU) gridC.style.cursor = 'grabbing';
     }
   });
   window.addEventListener('mousemove', e => {
+    if (dragU) {
+      const c = cellAt(e);
+      if (c && (c[0] !== dragU.x || c[1] !== dragU.y) && !unitAt(c[0], c[1])) { dragU.x = c[0]; dragU.y = c[1]; dragMoved = true; renderUnits(); }
+      return;
+    }
     if (!painting) return;
     const c = cellAt(e); if (c) { paintAt(c[0], c[1]); renderTerrain(); }
   });
-  window.addEventListener('mouseup', () => { if (painting) { painting = false; refreshValidation(); } });
+  window.addEventListener('mouseup', () => {
+    if (painting) { painting = false; refreshValidation(); }
+    if (dragU) {
+      if (dragMoved) { refreshUnitList(); renderTab(); refreshValidation(); toast(`${dragU.commanderId} (${dragFrom[0]},${dragFrom[1]}) → (${dragU.x},${dragU.y})`); }   // 드롭 1회 = Undo 1단계
+      dragU = null; dragFrom = null; dragMoved = false;
+      gridC.style.cursor = mode === 'terrain' ? 'crosshair' : 'pointer';
+    }
+  });
 
   // 모드 전환
   document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => {
