@@ -971,6 +971,27 @@ const SCENE_NEGATIVE = 'Avoid: figures, characters, people, portraits, faces, te
     desc: '각 스테이지 막간 씬의 풀스크린 배경 이미지. 인물·텍스트 없음(ScenePlayer가 초상·대사를 위에 얹음). 전투 establishing은 <b>야외 풍경</b>, 군략 회의·궁정·밀담은 <b>실내</b>(군막/궁정/밀실 — 원작 다양성, 현재 9씬). 생성 후 ⬇ 저장 → apps/web/public/assets/scenes/ 에 배치하면 게임 막간 씬에 즉시 반영. 16:9 webp 변환 적용.',
     items: sceneItems,
   });
+
+  /* 만화 지면 — Story Editor v2 ComicScene 페이지 이미지(spec 2026-09-12-story-editor-v2-comic-design §4).
+     sceneCard 경로(프롬프트 조립·webp 고정명)를 그대로 타되 comicCard 플래그로 저장 디렉터리만 assets/comics/ 로 분기.
+     대사·칸 사각형은 에디터 데이터(말풍선·글자 금지). 시드 3장 = 05 사수관 intro p1~p3 — {장면 설명}·칸 수는 복사 후 채운다. */
+  const COMIC_STYLE = 'Vertical comic page, 3:4 portrait aspect ratio, laid out as {N} panels of a manhwa page with THICK BLACK panel borders and clean white gutters, panels rectangular and non-overlapping. NO speech bubbles, NO text, NO lettering, NO sound-effect words (dialogue is overlaid by the game). Art style: East Asian ink-wash (sumi-e) brushwork fused with modern cartoon/webtoon rendering — bold confident linework, soft cel shading, muted earth tones with selective vivid accents (vermilion, jade, gold). Late Han / Three Kingdoms setting with period-accurate armor and architecture. Do NOT imitate Koei character designs.';
+  const COMIC_NEGATIVE = 'Avoid: speech bubbles, text, lettering, captions, watermark, UI, photorealistic, glossy anime-cel, Koei-style illustration, modern objects, overlapping or rounded panels, border frame around the whole page.';
+  SECTIONS.push({
+    id: 'NC',
+    title: 'NC. 만화 지면 (ComicScene 페이지 — 시드 3장)',
+    desc: '스토리 에디터 v2 만화 파트의 페이지 이미지. 세로 지면 3:4, N칸, 칸 경계 굵은 검정, <b>말풍선·글자 없음</b>(대사는 데이터 — 에디터 썸네일 위 칸 사각형+줄로 저작). 붙여넣기 → <code>apps/web/public/assets/comics/{키}.webp</code> + R2. 프롬프트의 <code>{장면 설명}</code>·<code>{N}</code>은 복사 후 채운다.',
+    items: ['p1', 'p2', 'p3'].map((pg, i) => {
+      const key = `05-sishuiguan-intro-${pg}`;
+      return {
+        id: `NC-${key}`, title: `05 사수관 · intro · 페이지 ${i + 1}`,
+        saveName: `${key}.webp`, sceneCard: true, comicCard: true,
+        note: `저장: <code>apps/web/public/assets/comics/${key}.webp</code> · image 키: <code>${key}</code>`,
+        prompt: `Comic page ${i + 1} of the pre-battle story of stage 05 (Sishui Pass — the coalition against Dong Zhuo, Hua Xiong at the gate). Scene: {장면 설명}\n\n${COMIC_STYLE}`,
+        _neg: COMIC_NEGATIVE,
+      };
+    }),
+  });
 })();
 
 /* ───────────────────────── DUEL. 일기토 키비주얼 (§9 Tier 1) ───────────────────────── */
@@ -1799,7 +1820,7 @@ function buildPrompt(item) {
 const TAB_DEFS = [
   { id: 'pose',    label: '① SD 포즈시트',  secs: ['S'] },
   { id: 'portrait',label: '② 초상시트',     secs: ['I'] },
-  { id: 'scene',   label: '③ 시나리오 씬',  secs: ['N', 'FS'] },
+  { id: 'scene',   label: '③ 시나리오 씬',  secs: ['N', 'NC', 'FS'] },
   { id: 'duel',    label: '⚔ 일기토',       secs: ['DUEL'] },
   { id: 'item',    label: '④ 아이템',       secs: ['ITEMS'] },
   { id: 'ui',      label: 'UI',             secs: ['D','L'] },
@@ -1831,12 +1852,15 @@ document.getElementById('refreshbtn').addEventListener('click', () => refreshAss
 // ── R2/로컬 자동 로드 ──────────────────────────────────────────────────────────
 const R2_BASE = 'https://pub-0266c86410774a648f958fb4d8fc3e46.r2.dev';
 
+/** 씬 계열 카드의 저장 디렉터리 — comicCard(만화 지면)는 assets/comics/, 그 외 sceneCard 는 assets/scenes/. */
+const sceneDir = (item) => item && item.comicCard ? 'assets/comics' : 'assets/scenes';
+
 /** 카드 아이템 → 알려진 game 경로 배열(없으면 [] → dump 카드로 처리). */
 function cardGamePaths(item) {
   if (!item) return [];
   if (item.tile) { const a = Array.isArray(item.tile) ? item.tile : [item.tile]; return a.map(t => `assets/tiles/${t}`); }
   if (item.objectSheet) return [`assets/objects/_sheet_${item.objectSheet}.png`];
-  if (item.sceneCard && item.saveName) return [`assets/scenes/${item.saveName}`];
+  if (item.sceneCard && item.saveName) return [`${sceneDir(item)}/${item.saveName}`];
   if (item.duelPair) return [`assets/duels/${item.duelPair}.webp`];
   if (item.portraitSheet && item.portraitGroup) return [`assets/ui/portraits/_sheet_${item.portraitGroup}.png`];
   if (item.itemSheet && item.itemGroup) return [`assets/ui/items/_sheet_${item.itemGroup}.png`];
@@ -2170,7 +2194,7 @@ async function addImageToCard(cardId, blob) {
   updateProgress();
   const tileFile = tileTarget(item, cardId);
   if (item && item.sceneCard) {
-    rec.gamePath = `assets/scenes/${name}`;
+    rec.gamePath = `${sceneDir(item)}/${name}`;
     try {
       const res = await applyToGame(rec.gamePath, finalBlob);
       toast(`${name} → 게임 적용 완료${res.r2 ? ' (+R2)' : ''}. 게임 새로고침하면 보입니다`);
