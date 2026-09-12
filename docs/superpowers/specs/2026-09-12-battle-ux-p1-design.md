@@ -36,7 +36,8 @@
 | `apps/web/src/pixi/BattleRenderer.ts`, `pixi/layers/HighlightLayer.ts`, `hud/ActionMenu.tsx` (수정) | `"targetSelect"` 분기에 `"confirmAttack"` 동반(하이라이트·앵커 유지, 메뉴 숨김) |
 | `apps/web/src/battle/hud/ResultSequence.tsx` (수정) | 승리 메타 반영 시 `clearSuspend()` (clearSortie 옆) |
 | 테스트 | `__tests__/inputMachine.test.ts`(confirmAttack 6케이스), `__tests__/suspend.test.ts`(순수 판정), `__tests__/replay.test.ts`(replayLog 옵션 = fold 결과 동일), `__tests__/hudLayout.test.ts`, `__tests__/controlSettings.test.ts` |
-| `tools/editor/e2e/battle-ux.mjs` (신규) | CDP 실브라우저: 칩 `주의` 표시, 유닛 선택 시 칩/패널 rect 비겹침, 입문 확인 카드→취소→공격, 저장→/stages 이어하기→복원 턴/로그 일치 |
+| `apps/web/src/battle/dialogue/DialogueOverlay.tsx` (수정) | `initialPlayedIds` prop(복원 시 기재생 처리) |
+| `tools/editor/e2e/battle-ux.mjs` (신규) | CDP 실브라우저(`tools/editor/e2e/cdp.mjs` 하네스 — main 로컬 82660e5에 있음): 칩 `주의` 표시, 유닛 선택 시 칩/패널 rect 비겹침, 입문 확인 카드→취소→공격, 저장→/stages 이어하기→복원 턴/로그 일치 |
 
 ## 4. HUD 레이아웃
 
@@ -58,6 +59,7 @@ BattleScreen root (fixed inset 0)
 ```
 
 - `unitPanelSide(anchor, viewportWidth)`: `anchor && viewportWidth>0 && anchor.x < viewportWidth/2 ? "right" : "left"` — UnitPanel 469~473행 규칙을 순수 함수로 옮긴 것. 앵커는 종전대로 `ui.kind==="idle" ? inspectAnchor : menuAnchor`.
+- `ObjectiveFlashLayer`·`ObjectiveStrip` **둘 다** 기존 `boot.ready && introDone` 게이트 뒤에 남긴다("나레이션 끝나고 목표가 딱" 회귀 방지). AudioControl 펼침 패널(z60)이 컬럼 하단과 겹칠 수 있으나 컬럼이 pointer-events:none이라 조작은 되므로 감수.
 - 컬럼 `overflow:hidden`은 저해상도에서 하단 패널이 잘리는 걸 감수한다(겹침보다 낫다). 모바일 하단 패널(§6 Mobile)은 별도 항목(P1 "모바일 터치 타깃")이라 이번엔 안 한다.
 - UnitPanel·AttackForecast·ObjectiveStrip에서 `position/top/left/right/zIndex` 제거, 폭은 컬럼이 결정(`maxWidth:100%`).
 
@@ -74,8 +76,8 @@ type UiEvent = … | { type: "confirmAttack" }
 - `confirmAttack` 처리:
   - `confirmAttack` 이벤트 또는 **같은 targetId 재탭** → 종전과 동일한 커밋(`prior.kind==="selected"`면 `attack` 단일, `targetSelect`면 `chainActions(unitId, from, preview, final)`·`ultimate` 반영) → `animating`.
   - 다른 공격 가능 대상 탭 → `targetId` 교체(카드 갱신).
-  - `cancel`(Esc/우클릭/[취소]) 또는 그 외 탭 → `prior`로 복귀.
-- `activeUnitId(ui)`(UnitPanel), `ActionMenu`(메뉴 숨김), `HighlightLayer`/`BattleRenderer`의 `"targetSelect"` 분기: `confirmAttack`은 `prior`의 공격 가능 하이라이트를 유지하고 대상 칸을 강조. 렌더러 메뉴 앵커(`menuAnchor`)는 `prior.unitId` 기준 유지.
+  - `cancel`([취소] 버튼) → `prior`로 복귀. 공격 대상이 아닌 칸 탭 → `reduceInput(prior, event, …)`에 재위임(선택 유닛의 이동 가능 칸이면 종전처럼 바로 postMoveMenu — 취소 한 번 더 탭할 필요 없음; targetSelect면 noop = 사실상 복귀).
+- `activeUnitId(ui)`(UnitPanel **과 BattleScreen의 별도 사본**), `ActionMenu`(메뉴 숨김), `HighlightLayer`, `BattleRenderer`의 `menuUnitId`·`getSelectedUnitId` 두 지점, `store.setAutoBattle`의 ui 정리 분기(`prior`를 풀어 postMoveMenu/targetSelect/selected와 같은 처리 — 안 하면 autoStart 미발행·프리뷰 고착)의 `"targetSelect"` 분기: `confirmAttack`은 `prior`의 공격 가능 하이라이트를 유지하고 대상 칸을 강조. 렌더러 메뉴 앵커(`menuAnchor`)는 `prior.unitId` 기준 유지.
 - 자동전투·적 AI는 `commit()` 직행이라 무관. `sandbox`/실험실도 같은 설정을 따른다.
 - 설정: `store.setConfirmAttacks(on)` → `_confirmAttacks`; `dispatchUi`가 `reduceInput(..., this._autoBattle, this._confirmAttacks)`. 스냅샷에 `confirmAttacks` 노출(PauseMenu 토글 표시). BattleScreen 마운트 시 `loadControls().attackConfirm`으로 초기화, PauseMenu 토글 → `saveControls` + `store.setConfirmAttacks`.
 
@@ -105,7 +107,8 @@ isResumable(s, { playthroughCount, hasStage }) = s?.version === 1 && hasStage(s.
 
 - **저장**: PauseMenu 「저장하고 나가기」(sandbox면 미표시). `canSuspend`가 아니면 비활성 + 사유 "아군 차례에 행동을 고르기 전에만 저장할 수 있습니다"(design-guide "행동 불가 이유"). 클릭 → `writeSuspend({ stageId: ctx.stage.id, seed: store.seed, sortie: readSortie(), log: [...store.actionLog], playthroughCount: getPlaythroughCount(), turn: committed.turn, savedAt })` → `router.push("/stages")`. 「전투 그만두기」 문구·동작 불변(저장 안 함, 기존 복구본은 건드리지 않음 = 세이브 파일처럼 남는다).
 - **이어하기**: `StageSelect` 최상단 배너 `이어하기 — {stageName} · {turn}턴 · {savedAt 시:분}` (`isResumable`일 때만). 클릭 → `writeSortie(s.sortie ?? { stageId, members: [], sharedItems: [] })`(members 빈 배열 = 원본 배치 유지, `applySortieToStage` 미적용) → `router.push('/battle?stage='+stageId+'&resume=1')`.
-- **복원**(`BattleScreen.createSession`): `resume = URL '?resume=1'`. `s = readSuspend()`; `isResumable && s.stageId === ctx.stage.id`면 `new BattleStore(ctx, s.seed, { …, replayLog: s.log })`. store 생성자: `createBattle` 뒤 `for (a of replayLog) committed = applyAction(ctx, committed, a).state`(실패 시 throw), `log.push(...replayLog)`, `settled = committed`, 초기 `ui = initialUiFor(committed, false)`(기존 함수 — 저장 시점이 아군 idle이라 idle). throw 시 BattleScreen이 `clearSuspend()` 후 새 전투로 폴백(console.warn). `introDone` 초기값 = `!hasOpeningDialogue || resumed`(개전 대사는 재생 안 함 — 이벤트가 없으므로 어차피 큐 비고, 목표 칩이 안 뜨는 함정 방지).
+- **복원**(`BattleScreen.createSession`): `resume = URL '?resume=1'`. `s = readSuspend()`; `isResumable && s.stageId === ctx.stage.id`면 `new BattleStore(ctx, s.seed, { …, replayLog: s.log })`. store 생성자: `createBattle` 뒤 `for (a of replayLog) committed = applyAction(ctx, committed, a).state`(실패 시 throw), `log.push(...replayLog)`, `settled = committed`, 초기 ui는 기존 `{kind:"idle"}` 그대로(`canSuspend`가 아군 페이즈·ongoing을 보장). throw 시 BattleScreen이 `clearSuspend()` 후 새 전투로 폴백(console.warn). **대사 재생 억제**: `director.triggerFired`는 첫 구독에 `battleStart`를, `turn(n≤현재)`·`unitRetreated`·`duelOccurred`를 레벨 트리거로 전부 발동하므로 복원 직후 지나간 대사가 몽땅 재생된다 → `DialogueOverlay`에 `initialPlayedIds?: ReadonlySet<string>` prop을 추가하고 복원 시 BattleScreen이 `firedDialogues(dialogue, null, toDialogueSnapshot(store.settledState), new Set()).map(d=>d.id)`로 시드(이미 발동했어야 할 것 = 재생 완료로 간주). 그러면 큐가 실제로 비고 `onQueueDrained`는 `>0→0` 전이에서만 발화하므로 `introDone` 초기값 = `!hasOpeningDialogue || resumed`가 필요하다(목표 칩 게이트 통과). `dialogue.test.ts`에 케이스 1개.
+- 패배 후엔 복구본이 남아 /stages에 「이어하기」가 보인다 — 의도(세이브 지점 재도전). 새 출진 진입 시 삭제.
 - **삭제**: ResultSequence 승리 메타 반영(`clearSortie` 옆) + BattleScreen 새 전투 진입(`!resume && !sandbox`)에서 `clearSuspend()`.
 - 실험실/플레이테스트(sandbox)는 저장 없음(메뉴 미표시).
 
