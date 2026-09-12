@@ -4,7 +4,7 @@
 
 **Goal:** `tools/stage-editor.html`의 모든 편집이 Ctrl+Z/Ctrl+Y로 되돌리기·다시 하기가 되고(타이핑은 한 묶음), Undo 뒤 저장해도 P0 무손실이 유지되며, 탭을 닫았다 열어도 마지막 편집이 복구본으로 돌아오고, 툴바가 저장 상태를 항상 보여준다.
 
-**Architecture:** DOM 무관 스냅샷 히스토리 모듈 `tools/editor/history.js`(문자열 스택, dedupe·coalesce·undo/redo·saved 표식)를 `refreshValidation()`에 걸어 전범위 Undo를 얻는다. 스냅샷 = `serializeStage/serializeMap` JSON(미지 필드 포함), 복원 = `loadStage/loadMap`(ORIG 재부착) — P0 게이트가 무손실을 보증. 복구본은 `localStorage`(1초 디바운스, dirty일 때만), 진입점 4곳 꼬리에서 복원 배너. 브라우저 검증은 CDP(:9333)로 실제 Chrome을 구동하는 스크립트(`tools/editor/e2e/`)로 자동화한다.
+**Architecture:** DOM 무관 스냅샷 히스토리 모듈 `tools/editor/history.js`(문자열 스택, dedupe·coalesce·undo/redo·saved 표식)를 `refreshValidation()`에 걸어 전범위 Undo를 얻는다. 스냅샷 = `serializeStage/serializeMap` JSON(미지 필드 포함), 복원 = `loadStage/loadMap`(ORIG 재부착) — P0 게이트가 무손실을 보증. 복구본은 `localStorage`(1초 디바운스, dirty일 때만), 진입점 4곳 꼬리에서 복원 배너. 브라우저 검증은 CDP(:9334)로 실제 Chrome을 구동하는 스크립트(`tools/editor/e2e/`)로 자동화한다.
 
 **Tech Stack:** 브라우저 ESM(빌드 없음) · vitest(`packages/data`, node) · Chrome DevTools Protocol(Node 22 내장 `WebSocket`/`fetch`, 의존성 0).
 
@@ -194,7 +194,7 @@ export function createHistory(opts?: { limit?: number; coalesceMs?: number; now?
     expect(out.units[0]!.note).toBe("미지");
   });
 ```
-- [ ] **Step 2:** `pnpm --filter @tk/data test` → 전부 green (70 in roundtrip).
+- [ ] **Step 2:** `pnpm --filter @tk/data test` → 전부 green (roundtrip 70 → 71).
 - [ ] **Step 3: 커밋** — `test(editor): round-trip after snapshot restore keeps unknown fields`
 
 ---
@@ -242,7 +242,7 @@ function scheduleRecovery() {
   if (recoveryTimer) clearTimeout(recoveryTimer);
   recoveryTimer = setTimeout(() => {
     recoveryTimer = null;
-    if (!history.isDirty()) return;               // 울리는 시점에 판정 — 로드 직후 스케줄된 것은 무시
+    if (!history.isDirty()) { clearRecovery(); updateSaveState(); return; } // 울리는 시점에 판정 — undo로 clean이면 옛 복구본도 제거
     try {
       localStorage.setItem(recoveryKey(), JSON.stringify({ savedAt: new Date().toISOString(), snapshot: history.current() }));
       lastRecoveryAt = new Date();
@@ -324,7 +324,7 @@ let lastSavedAt = null;
   <button class="btn" id="recoveryDiscard">버리기</button>
 </div>
 ```
-- [ ] **Step 8: beforeunload + 훅** — 1191행을 `window.addEventListener('beforeunload', e => { if (history.isDirty()) { e.preventDefault(); e.returnValue = ''; } });`. `window.__stageEditor = { serializeStage, serializeMap, getStage: () => stage, history, snapshot, restore, refreshValidation, doUndo, doRedo };`
+- [ ] **Step 8: beforeunload + 훅** — 1191행을 `window.onbeforeunload = e => { if (history.isDirty()) { e.preventDefault(); e.returnValue = ''; } };`(**프로퍼티** — E2E가 `onbeforeunload = null`로 끌 수 있어야 한다; addEventListener 금지). `window.__stageEditor = { serializeStage, serializeMap, getStage: () => stage, history, snapshot, restore, refreshValidation, doUndo, doRedo };`
 - [ ] **Step 9: 정적 점검** — 브라우저에서 `http://localhost:8095/tools/stage-editor.html`(serve.py 8095 백그라운드) 열어 `#modfail` 없음·콘솔 에러 0(`read_console_messages`); `grep -c "pushUndo\|undoStack\|cloneUnits" tools/stage-editor.html` → 0.
 - [ ] **Step 10: 커밋** — `feat(editor): full-range undo/redo via snapshot history, local recovery autosave, save-state chip`
 
@@ -388,7 +388,7 @@ await t.eval(`${H}.doRedo()`); check("Redo: 유닛 x 재적용", (await t.eval(`
 await sleep(1300);
 check("복구본 localStorage 기록", await t.eval("!!localStorage.getItem('tk.editor.recovery.stage:05-sishuiguan')"));
 await t.eval("window.onbeforeunload = null; location.reload(); 'r'"); await sleep(2500);
-await t.waitFor("window.__stageEditor && document.getElementById('recoveryBar')");
+await t.waitFor(`${H} && ${H}.getStage().id === '05-sishuiguan'`);
 check("새로고침 후 복구본 배너 표시", await t.eval("document.getElementById('recoveryBar').style.display !== 'none'"));
 await t.eval("document.getElementById('recoveryRestore').click()"); await sleep(300);
 check("복원 후 유닛 x 유지", (await t.eval(`${H}.getStage().units[0].x`)) === x0);
