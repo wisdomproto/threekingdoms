@@ -74,6 +74,7 @@ export function PauseMenu({
   onSuspend,
   confirmAttacks = true,
   onToggleConfirmAttacks,
+  editorUrl,
 }: {
   open: boolean;
   /** 패널을 닫는다(계속하기/백드롭/ESC). 실제 paused 상태는 BattleScreen이 소유. */
@@ -90,6 +91,8 @@ export function PauseMenu({
   /** 조작: true=입문(공격 확인 카드) / false=클래식(즉시 공격) */
   confirmAttacks?: boolean;
   onToggleConfirmAttacks?: (on: boolean) => void;
+  /** dev 전용(P2 spec §8): 있으면 「전투 그만두기」 위에 ✏ 이 스테이지 편집(에디터 새 탭). 전투는 그대로 멈춰 있음. */
+  editorUrl?: string;
 }): React.ReactElement | null {
   const router = useRouter();
   const [confirmExit, setConfirmExit] = useState(false);
@@ -259,6 +262,16 @@ export function PauseMenu({
               </div>
             )}
 
+            {editorUrl && (
+              <button
+                type="button"
+                data-testid="pause-edit-stage"
+                onClick={() => window.open(editorUrl, "_blank", "noopener")}
+                style={{ ...MENU_BTN, fontSize: 13, letterSpacing: "0.08em", textIndent: 0, color: BRONZE_GOLD }}
+              >
+                ✏ 이 스테이지 편집
+              </button>
+            )}
             <button type="button" onClick={() => setConfirmExit(true)} style={{ ...MENU_BTN, color: "#cfa9a3" }}>
               전투 그만두기
             </button>

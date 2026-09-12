@@ -15,6 +15,7 @@ import { ScenePlayer } from "../../src/scene/ScenePlayer";
 import { MapScenePlayer } from "../../src/scene/MapScenePlayer";
 import { nextStageId } from "../../src/meta/campaign";
 import { useFadeNav } from "../../src/ui/useFadeNav";
+import { readLab, leaveSandbox, LAB_STAGE_ID, type LabPayload } from "../../src/lab/lab";
 
 type SceneType = "intro" | "outro" | "outroDefeat";
 
@@ -25,7 +26,14 @@ function SceneRoute(): React.ReactElement | null {
   const raw = params.get("type");
   const type: SceneType = raw === "outro" ? "outro" : raw === "outroDefeat" ? "outroDefeat" : "intro";
 
-  const stage = stages[stageId];
+  // 에디터 씬 미리보기(/playtest?scene=…): stage=__lab 이면 드래프트 스테이지를 재생하고 끝나면 leaveSandbox 로 복귀(P2 spec §6).
+  // readLab 은 sessionStorage(클라이언트 전용) — 렌더 중 읽으면 서버 HTML(null)과 클라이언트 첫 렌더(씬)가 달라
+  // hydration 오류라 마운트 뒤 effect 에서 읽는다. undefined = 아직 안 읽음(빈 씬 가드 보류). 정규 경로는 null 고정.
+  const isLab = stageId === LAB_STAGE_ID;
+  const [lab, setLab] = useState<LabPayload | null | undefined>(isLab ? undefined : null);
+  useEffect(() => { setLab(isLab ? readLab() : null); }, [isLab]);
+  const labPending = lab === undefined;
+  const stage = lab?.stage ?? stages[stageId];
   const slot = stage?.scenario?.[type];
   const parts = useMemo(() => (slot ? normalizeSceneSlot(slot) : []), [slot]);
   // 파트 인덱스 — 씬 식별(outro→다음 intro 등)이 바뀌면 처음부터.
@@ -54,14 +62,21 @@ function SceneRoute(): React.ReactElement | null {
 
   // 빈 씬(미작성)은 즉시 건너뜀(페이드 없이 — 보여줄 씬이 없으므로).
   useEffect(() => {
-    if (parts.length === 0) router.push(target());
-  }, [parts.length, router, target]);
+    if (labPending) return;
+    if (parts.length === 0) {
+      if (lab) leaveSandbox((to) => router.push(to), lab);
+      else router.push(target());
+    }
+  }, [labPending, parts.length, router, target, lab]);
 
-  if (parts.length === 0) return null;
+  if (labPending || parts.length === 0) return null;
   const part = parts[Math.min(pi, parts.length - 1)]!;
   const playerKey = `${stageId}:${type}:${replay}:${pi}`;
   const next = (): void => {
-    if (pi >= parts.length - 1) fadeTo(target());
+    if (pi >= parts.length - 1) {
+      if (lab) leaveSandbox((to) => router.push(to), lab);
+      else fadeTo(target());
+    }
     else setPi((i) => i + 1);
   };
   return (

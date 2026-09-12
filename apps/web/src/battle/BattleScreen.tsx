@@ -23,6 +23,7 @@ import type { UiEvent } from "./inputMachine";
 import { BattleRenderer } from "../pixi/BattleRenderer";
 import { readSortie, applySortieToStage } from "../meta/sortie";
 import { readLab, LAB_STAGE_ID } from "../lab/lab";
+import { editorUrlFor } from "../lab/editorLink";
 import { UnitPanel } from "./hud/UnitPanel";
 import { InspectPopup } from "./hud/InspectPopup";
 import { AttackForecast } from "./hud/AttackForecast";
@@ -648,6 +649,11 @@ export default function BattleScreen(): React.ReactElement {
         }
         confirmAttacks={controls.attackConfirm}
         onToggleConfirmAttacks={toggleConfirmAttacks}
+        editorUrl={
+          process.env.NODE_ENV !== "production" && !sandbox
+            ? editorUrlFor(ctx.stage.id, process.env.NEXT_PUBLIC_TOOLS_ORIGIN ?? "http://localhost:8081")
+            : undefined
+        }
       />
     </div>
   );

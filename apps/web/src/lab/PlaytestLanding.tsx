@@ -7,7 +7,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { writeLab, leaveSandbox, LAB_STAGE_ID } from "./lab";
-import { parsePlaytestSnapshot } from "./playtest";
+import { parsePlaytestSnapshot, parseSceneParam } from "./playtest";
 
 export default function PlaytestLanding(): React.ReactElement {
   const router = useRouter();
@@ -16,7 +16,10 @@ export default function PlaytestLanding(): React.ReactElement {
 
   useEffect(() => {
     let alive = true;
-    const draftId = new URLSearchParams(window.location.search).get("draft");
+    const params = new URLSearchParams(window.location.search);
+    const draftId = params.get("draft");
+    // P2 spec §6: scene=intro|outro|outroDefeat → 씬 미리보기, 그 외 → 전투.
+    const scene = parseSceneParam(params.get("scene"));
     if (!draftId) { setMessage("draft 파라미터가 없습니다 — 에디터에서 ▶ 테스트를 누르세요"); return; }
     (async () => {
       try {
@@ -29,7 +32,7 @@ export default function PlaytestLanding(): React.ReactElement {
         if (!parsed.ok) { if (alive) setMessage(parsed.message); return; }
         if (!alive) return;
         writeLab(parsed.payload);
-        router.replace(`/battle?stage=${LAB_STAGE_ID}`);
+        router.replace(scene ? `/scene?stage=${LAB_STAGE_ID}&type=${scene}` : `/battle?stage=${LAB_STAGE_ID}`);
       } catch (e) {
         if (alive) setMessage(`드래프트를 읽지 못했습니다: ${String(e)}`);
       }
