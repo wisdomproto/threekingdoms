@@ -426,6 +426,7 @@ function newStageMeta() {
 function blankTiles(w, h) { return Array.from({ length: h }, () => Array(w).fill('.')); }
 
 /* ═══════════════════════ 부팅 ═══════════════════════ */
+const DEFAULT_STAGE = '05-sishuiguan';
 async function init() {
   tiles = blankTiles(W, H);
   await loadRefData();
@@ -438,7 +439,9 @@ async function init() {
   refreshValidation();
   history.reset(snapshot());
   const q = new URLSearchParams(location.search);   // ?stage=ID&quick=1 (spec §8)
-  await Promise.all([loadRailStages(), loadStageFromServer(q.get('stage') || '05-sishuiguan')]);
+  const wanted = q.get('stage') || DEFAULT_STAGE;
+  const [, ok] = await Promise.all([loadRailStages(), loadStageFromServer(wanted)]);
+  if (!ok && wanted !== DEFAULT_STAGE) { toast(`스테이지 ${wanted} 없음 — 기본 장으로`, true); await loadStageFromServer(DEFAULT_STAGE); }
   if (q.get('quick') === '1') { setRailCollapsed(true); switchTab('battle:quick'); }   // 게임 ☰ → ✏ 편집 진입
 }
 
@@ -1480,6 +1483,7 @@ function setMapOnlyMode(on) {
 }
 
 async function loadMapOnlyFromServer(mapId_) {
+  if (history.isDirty() && !confirm('저장하지 않은 편집이 있습니다. 맵 단독 모드로 전환할까요?')) return;
   try {
     const res = await fetch(`/packages/data/json/maps/${mapId_}.json`, { cache: 'no-store' });
     if (!res.ok) throw new Error(res.status);
@@ -1545,12 +1549,13 @@ function setRailCollapsed(on) {
 }
 function updateRail() {   // updateSaveState 마다 호출 — 현재 장·이름·컷신 수·접힘이 바뀔 때만 리렌더
   const cur = mapOnlyMode ? null : stage.id;
-  const live = cur ? railGroups.flatMap(g => g.stages).find(e => e.id === cur) : null;
-  if (live) { live.name = stage.name || cur; live.scenes = sceneCount(stage); }
+  // 드래프트 이름·컷신 수는 렌더 전용 오버라이드 — railGroups(서버 원본) 모델은 오염시키지 않는다
+  const live = cur ? { name: stage.name || cur, scenes: sceneCount(stage) } : null;
   const key = `${cur}|${live ? live.name + '|' + live.scenes : ''}|${railCollapsed}`;
   if (key === railKey) return;
   railKey = key;
-  renderRail(document.getElementById('rail'), { groups: railGroups, currentId: cur, collapsed: railCollapsed, onPick: pickStage, onToggle: () => setRailCollapsed(!railCollapsed) });
+  const groups = live ? railGroups.map(g => ({ ...g, stages: g.stages.map(e => e.id === cur ? { ...e, ...live } : e) })) : railGroups;
+  renderRail(document.getElementById('rail'), { groups, currentId: cur, collapsed: railCollapsed, onPick: pickStage, onToggle: () => setRailCollapsed(!railCollapsed) });
 }
 async function pickStage(id) {   // rail 항목·⚙ 드롭다운 공통
   const ok = await loadStageFromServer(id);
@@ -1572,7 +1577,11 @@ document.getElementById('publishCheck').onclick = async function () {
 };
 async function runPlaytest(scene) {   // scene: undefined=전투 | 'intro'|'outro'|'outroDefeat' = 씬 미리보기 (spec §6)
   const btn = document.getElementById('playtestBtn');
-  const errs = validate();
+  const menuBtns = Array.from(document.querySelectorAll('#playtestMenu [data-scene]'));
+  // 씬 미리보기는 이야기 오류만 막는다 — 유닛 겹침 등 전투 오류는 VN 재생과 무관
+  const errs = scene
+    ? validateStory(stage, { placedIds: allPlacedUnits().map(({ u }) => u.commanderId), duelIds: (stage.events || []).map(e => e.id) }).filter(m => m.startsWith(scene === 'intro' ? '전투 전' : scene === 'outro' ? '전투 후' : '패배 후'))
+    : validate();
   if (errs.length) { toast(`테스트 불가 ${errs.length}건 — 배너의 오류를 먼저 고치세요`, true); return; }
   const stamp = Date.now();
   const draftId = `${String(stage.id).replace(/[^A-Za-z0-9_-]/g, '_')}-${stamp}`;
@@ -1582,7 +1591,7 @@ async function runPlaytest(scene) {   // scene: undefined=전투 | 'intro'|'outr
     map: serializeMapModel({ id: mapId, name: mapName, width: W, height: H, tileLegend: loadedLegend, tiles }),
     seed: 1, returnUrl: location.href, savedAt: new Date().toISOString(),
   };
-  btn.disabled = true;
+  btn.disabled = true; menuBtns.forEach(b => { b.disabled = true; });
   try {
     const r = await fetch('/playtest-draft', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(snapshot) });
     const j = await r.json().catch(() => ({}));
@@ -1593,7 +1602,7 @@ async function runPlaytest(scene) {   // scene: undefined=전투 | 'intro'|'outr
     else toast(`테스트 탭 열림 · ${j.draftId}`);
   } catch (e) {
     toast('테스트 요청 실패: ' + e.message + ' — serve.py로 여세요 (launch tools = :8081, 기본 :8080)', true);
-  } finally { btn.disabled = false; }
+  } finally { btn.disabled = false; refreshPlaytestMenu(); }
 }
 document.getElementById('playtestBtn').onclick = () => runPlaytest();
 
