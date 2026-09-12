@@ -110,6 +110,18 @@
   .rail-item .sub { font-size:10.5px; color:var(--dim); }
   .rail-toggle { margin:8px 6px 0; font-size:11px; padding:4px; }
   #rail.collapsed .rail-toggle { margin:8px 4px 0; padding:4px 0; }
+  /* 탭 재편 (상단 5탭 + 전투 서브탭) — spec creator-ux-p2 §5 */
+  #tabhead { position:sticky; top:0; z-index:5; background:var(--panel); }
+  #tabhead .tabs { position:static; }
+  .tabs.sub { background:var(--panel2); } .tabs.sub .tab { font-size:10.5px; padding:6px 2px; }
+  /* 빠른 편집 표 */
+  table.quick { width:100%; border-collapse:collapse; font-size:11.5px; margin-bottom:10px; }
+  table.quick th { text-align:left; font-weight:normal; color:var(--dim); font-size:10.5px; padding:2px 3px; border-bottom:1px solid var(--line); }
+  table.quick td { padding:3px 3px; border-bottom:1px solid rgba(255,255,255,.04); white-space:nowrap; }
+  table.quick .dot { display:inline-block; width:9px; height:9px; border-radius:50%; }
+  table.quick .lv .btn { padding:1px 6px; font-size:11px; } table.quick .lv .n { display:inline-block; min-width:22px; text-align:center; }
+  table.quick input[type=number] { width:58px; background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:2px 4px; font-size:11.5px; }
+  .quick-goal { background:var(--panel2); border:1px solid var(--line); border-radius:5px; padding:5px 7px; font-size:12.5px; }
 </style>
 </head>
 <body>
@@ -253,12 +265,22 @@
   </div></div>
 
   <div id="right">
-    <div class="tabs">
-      <div class="tab on" data-tab="meta">메타</div>
-      <div class="tab" data-tab="unit">유닛</div>
-      <div class="tab" data-tab="obj">목표/패배</div>
-      <div class="tab" data-tab="duel">일기토</div>
-      <div class="tab" data-tab="adv">증원/전략</div>
+    <div id="tabhead">
+      <div class="tabs">
+        <div class="tab" data-tab="story-intro">전투 전 이야기</div>
+        <div class="tab on" data-tab="battle">전투</div>
+        <div class="tab" data-tab="dialogue">전투 중 대사</div>
+        <div class="tab" data-tab="story-outro">전투 후 이야기</div>
+        <div class="tab" data-tab="reward">보상</div>
+      </div>
+      <div class="tabs sub" id="subtabs">
+        <div class="tab" data-sub="quick">빠른 편집</div>
+        <div class="tab on" data-sub="meta">메타</div>
+        <div class="tab" data-sub="unit">유닛</div>
+        <div class="tab" data-sub="obj">목표·패배</div>
+        <div class="tab" data-sub="duel">일기토</div>
+        <div class="tab" data-sub="adv">증원·전략</div>
+      </div>
     </div>
     <div id="valbanner"></div>
     <div id="recoveryBar" style="display:none;background:#3a2f1a;color:#ffe2a8;padding:6px 10px;font-size:12.5px;margin:6px 0">
@@ -298,6 +320,7 @@ import { createHistory } from './editor/history.js';
 import { CHAPTERS, chapterOf } from './editor/chapters.js';
 import { slotParts, sceneCount } from './editor/story-model.js';
 import { renderRail } from './editor/rail.js';
+import { renderQuick } from './editor/quick-edit.js';
 const GAME_ORIGIN = 'http://localhost:3000'; // next dev. 보드의 「🎮 게임 열기」와 같은 값
 document.getElementById('modfail').remove();
 
@@ -339,7 +362,8 @@ let tool = 'paint';
 let cellPx = 15;
 let painting = false;
 let selUnit = null;           // 선택된 유닛 객체(stage.units[i] 또는 증원 유닛)
-let activeTab = 'meta';
+let activeTab = 'battle:meta';  // 'story-intro' | 'battle:{quick|meta|unit|obj|duel|adv}' | 'dialogue' | 'story-outro' | 'reward'
+let battleSub = 'meta';         // 상단 「전투」 재클릭 시 돌아갈 서브탭
 let coordPick = null;         // { cb(x,y), label } — 좌표 집기 모드
 const history = createHistory();  // 전범위 Undo/Redo — spec 2026-09-12-editor-history-autosave-design
 let suspendHistory = false;       // 로드/복원 중 refreshValidation 의 push 차단
@@ -381,6 +405,7 @@ async function init() {
   history.reset(snapshot());
   const q = new URLSearchParams(location.search);   // ?stage=ID&quick=1 (spec §8)
   await Promise.all([loadRailStages(), loadStageFromServer(q.get('stage') || '05-sishuiguan')]);
+  if (q.get('quick') === '1') { setRailCollapsed(true); switchTab('battle:quick'); }   // 게임 ☰ → ✏ 편집 진입
 }
 
 async function loadRefData() {
@@ -523,7 +548,7 @@ function unitAt(x, y) {
 }
 function placeOrSelect(x, y) {
   const existing = unitAt(x, y);
-  if (existing) { selUnit = existing; switchTab('unit'); renderUnits(); return; }
+  if (existing) { selUnit = existing; switchTab('battle:unit'); renderUnits(); return; }
   const u = {
     commanderId: COMMANDERS[0] ? COMMANDERS[0].id : '',
     classId: document.getElementById('placeClass').value || 'footman',
@@ -533,7 +558,7 @@ function placeOrSelect(x, y) {
   };
   stage.units.push(u);
   selUnit = u;
-  switchTab('unit');
+  switchTab('battle:unit');
   renderUnits(); refreshValidation();
   toast(`${SIDES[u.side].label} 유닛 배치 (${x},${y})`);
 }
@@ -603,7 +628,8 @@ function bind() {
   document.getElementById('placeSide').onchange = () => {};
 
   // 우측 탭
-  document.querySelectorAll('.tab').forEach(t => t.onclick = () => switchTab(t.dataset.tab));
+  document.querySelectorAll('.tab[data-tab]').forEach(t => t.onclick = () => switchTab(t.dataset.tab));
+  document.querySelectorAll('.tab[data-sub]').forEach(t => t.onclick = () => switchTab('battle:' + t.dataset.sub));
   // 붙여넣기 모달
   document.getElementById('pasteCancel').onclick = closePaste;
   document.getElementById('pasteAsStage').onclick = () => doPasteLoad('stage');
@@ -611,9 +637,13 @@ function bind() {
   document.getElementById('pasteModal').onclick = e => { if (e.target.id === 'pasteModal') closePaste(); };
 }
 
-function switchTab(t) {
+function switchTab(t) {   // 'battle' 단독이면 마지막 서브탭으로
+  let [top, sub] = String(t).split(':');
+  if (top === 'battle') { sub = sub || battleSub; battleSub = sub; t = `battle:${sub}`; }
   activeTab = t;
-  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x.dataset.tab === t));
+  document.querySelectorAll('.tab[data-tab]').forEach(x => x.classList.toggle('on', x.dataset.tab === top));
+  document.querySelectorAll('.tab[data-sub]').forEach(x => x.classList.toggle('on', x.dataset.sub === sub));
+  document.getElementById('subtabs').style.display = top === 'battle' ? '' : 'none';
   renderTab();
 }
 
@@ -643,7 +673,7 @@ function refreshUnitList() {
     if (u === selUnit) d.style.background = 'var(--panel2)';
     d.innerHTML = `<span style="width:9px;height:9px;border-radius:50%;background:${s.raw};flex-shrink:0"></span>`
       + `<span>${esc(u.commanderId)}</span><span style="color:var(--dim);margin-left:auto">${u.x},${u.y}</span>`;
-    d.onclick = () => { selUnit = u; switchTab('unit'); renderUnits(); refreshUnitList(); };
+    d.onclick = () => { selUnit = u; switchTab('battle:unit'); renderUnits(); refreshUnitList(); };
     el.appendChild(d);
   });
 }
@@ -652,11 +682,17 @@ function refreshUnitList() {
 function renderTab() {
   const body = document.getElementById('tabbody');
   body.innerHTML = '';
-  if (activeTab === 'meta') renderMetaTab(body);
-  else if (activeTab === 'unit') renderUnitTab(body);
-  else if (activeTab === 'obj') renderObjTab(body);
-  else if (activeTab === 'duel') renderDuelTab(body);
-  else if (activeTab === 'adv') renderAdvTab(body);
+  const [top, sub] = activeTab.split(':');
+  if (top === 'battle') {
+    if (sub === 'quick') renderQuickTab(body);
+    else if (sub === 'meta') renderMetaTab(body);
+    else if (sub === 'unit') renderUnitTab(body);
+    else if (sub === 'obj') renderObjTab(body);
+    else if (sub === 'duel') renderDuelTab(body);
+    else if (sub === 'adv') renderAdvTab(body);
+  }
+  else if (top === 'reward') renderRewardTab(body);
+  else body.innerHTML = '<div class="card">다음 단계에서 편집 UI</div>';   // story-intro · dialogue · story-outro — Chunk 4 (story-editor.js)
   refreshValidation();
 }
 
@@ -739,7 +775,19 @@ function renderMetaTab(b) {
     if (hasFocus) coordPickRow(b, 'focus [x,y]', () => stage.camera.focus[0], () => stage.camera.focus[1], (x, y) => { stage.camera.focus = [x, y]; refreshValidation(); });
   }
 
-  const rwHdr = document.createElement('div'); rwHdr.className = 'sectlabel'; rwHdr.textContent = '보상 (선택)'; b.appendChild(rwHdr);
+  // 맵 메타 (블록아웃/맵 export용)
+  const mpHdr = document.createElement('div'); mpHdr.className = 'sectlabel'; mpHdr.textContent = '맵 (map JSON)'; b.appendChild(mpHdr);
+  field(b, 'map id', 'mapId와 보통 동일', inputText(mapId, v => { mapId = v.trim() || 'newmap'; refreshValidation(); }));
+  field(b, 'map name', '', inputText(mapName, v => { mapName = v; refreshValidation(); }));
+  const sizeRow = document.createElement('div'); sizeRow.className = 'row2';
+  sizeRow.appendChild((() => { const w = document.createElement('div'); w.className = 'field'; const l = document.createElement('label'); l.textContent = 'width'; w.appendChild(l); w.appendChild(inputNum(W, v => resizeGrid(v == null ? W : v, H), { min: 1, max: 120 })); return w; })());
+  sizeRow.appendChild((() => { const w = document.createElement('div'); w.className = 'field'; const l = document.createElement('label'); l.textContent = 'height'; w.appendChild(l); w.appendChild(inputNum(H, v => resizeGrid(W, v == null ? H : v), { min: 1, max: 120 })); return w; })());
+  b.appendChild(sizeRow);
+}
+
+/* ── 보상 탭 (spec §5 — 기존 메타 탭의 reward 카드 이동) ── */
+function renderRewardTab(b) {
+  const rwHdr = document.createElement('div'); rwHdr.className = 'sectlabel'; rwHdr.textContent = '클리어 보상 (reward — 선택)'; b.appendChild(rwHdr);
   const rwChk = document.createElement('label'); rwChk.style.cssText = 'display:flex;gap:6px;font-size:11.5px;color:var(--dim);margin-bottom:8px';
   const rc = document.createElement('input'); rc.type = 'checkbox'; rc.style.width = 'auto'; rc.checked = !!stage.reward;
   rc.onchange = () => { stage.reward = rc.checked ? { gold: 0, exp: 0, treasures: [] } : null; renderTab(); };
@@ -749,15 +797,21 @@ function renderMetaTab(b) {
     field(b, 'exp', '정수 ≥0', inputNum(stage.reward.exp, v => { stage.reward.exp = v == null ? 0 : v; refreshValidation(); }, { min: 0 }));
     field(b, 'treasures (보물 item)', '복수 선택', multiItem(stage.reward.treasures, arr => { stage.reward.treasures = arr; refreshValidation(); }));
   }
+  const note = document.createElement('div'); note.className = 'hint'; note.textContent = '전략조건 보물은 전투 › 증원·전략에서.'; b.appendChild(note);
+}
 
-  // 맵 메타 (블록아웃/맵 export용)
-  const mpHdr = document.createElement('div'); mpHdr.className = 'sectlabel'; mpHdr.textContent = '맵 (map JSON)'; b.appendChild(mpHdr);
-  field(b, 'map id', 'mapId와 보통 동일', inputText(mapId, v => { mapId = v.trim() || 'newmap'; refreshValidation(); }));
-  field(b, 'map name', '', inputText(mapName, v => { mapName = v; refreshValidation(); }));
-  const sizeRow = document.createElement('div'); sizeRow.className = 'row2';
-  sizeRow.appendChild((() => { const w = document.createElement('div'); w.className = 'field'; const l = document.createElement('label'); l.textContent = 'width'; w.appendChild(l); w.appendChild(inputNum(W, v => resizeGrid(v == null ? W : v, H), { min: 1, max: 120 })); return w; })());
-  sizeRow.appendChild((() => { const w = document.createElement('div'); w.className = 'field'; const l = document.createElement('label'); l.textContent = 'height'; w.appendChild(l); w.appendChild(inputNum(H, v => resizeGrid(W, v == null ? H : v), { min: 1, max: 120 })); return w; })());
-  b.appendChild(sizeRow);
+/* ── 빠른 편집 탭 (quick-edit.js) ── */
+function renderQuickTab(b) {
+  renderQuick(b, {
+    stage, commanders: COMMANDERS, classes: CLASSES, sides: SIDES,
+    onChange: () => { renderUnits(); refreshUnitList(); refreshValidation(); },
+    onPick: (u) => {   // 기존 coordPick 패턴
+      selUnit = u; renderUnits();
+      coordPick = { cb: (x, y) => { u.x = x; u.y = y; renderUnits(); refreshUnitList(); renderTab(); toast(`좌표 (${x},${y})`); } };
+      renderGrid(); toast('격자에서 칸을 클릭하세요 (Esc 취소)');
+    },
+    onPlaytest: () => runPlaytest(),
+  });
 }
 
 function resizeGrid(nw, nh) {
@@ -990,7 +1044,7 @@ function reinforceCard(r, i) {
   const addu = document.createElement('button'); addu.className = 'addbtn'; addu.textContent = '＋ 증원 유닛 추가(중앙 배치)';
   addu.onclick = () => {
     const u = { commanderId: COMMANDERS[0] ? COMMANDERS[0].id : '', classId: 'footman', level: 1, troops: 100, items: [], side: r.side, x: Math.floor(W / 2), y: Math.floor(H / 2) };
-    r.units.push(u); selUnit = u; switchTab('unit'); renderUnits();
+    r.units.push(u); selUnit = u; switchTab('battle:unit'); renderUnits();
     toast('증원 유닛 추가 — 유닛 탭에서 위치 설정');
   };
   card.appendChild(addu);
@@ -1333,9 +1387,9 @@ let mapOnlyMode = false;
 function setMapOnlyMode(on) {
   mapOnlyMode = on;
   // 우측 패널 탭: 유닛/목표/일기토/증원·전략 탭 비활성화 (지형+메타만 활성)
-  if (on && activeTab !== 'meta') switchTab('meta');
-  document.querySelectorAll('.tab').forEach(t => {
-    const disable = on && t.dataset.tab !== 'meta';
+  if (on && activeTab !== 'battle:meta') switchTab('battle:meta');
+  document.querySelectorAll('.tab').forEach(t => {   // 상단 「전투」 + 서브 「메타」만 활성
+    const disable = on && !(t.dataset.tab === 'battle' || t.dataset.sub === 'meta');
     t.style.opacity = disable ? '0.35' : '';
     t.style.pointerEvents = disable ? 'none' : '';
   });
