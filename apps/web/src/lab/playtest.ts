@@ -40,7 +40,11 @@ export function parsePlaytestSnapshot(json: unknown): PlaytestParseResult {
   if (!stage.success) return { ok: false, message: `스테이지 검증 실패 — ${firstIssue(stage.error)}` };
   const map = BattleMapSchema.safeParse(s.map);
   if (!map.success) return { ok: false, message: `맵 검증 실패 — ${firstIssue(map.error)}` };
-  const seed = typeof s.seed === "number" && Number.isFinite(s.seed) ? s.seed : 1;
+  // 에디터의 자체 validate()를 신뢰하지 않는다 — 트러스트 바운더리에서 다시 교차검증.
+  if (stage.data.mapId !== map.data.id) {
+    return { ok: false, message: `스테이지 mapId(${stage.data.mapId})와 맵 id(${map.data.id})가 다릅니다` };
+  }
+  const seed = typeof s.seed === "number" ? s.seed : 1; // 에디터는 항상 1을 보낸다 — 폴백은 방어용.
   const payload: LabPayload = { stage: stage.data, map: map.data, sharedItems: [], seed };
   if (typeof s.returnUrl === "string" && s.returnUrl) payload.returnUrl = s.returnUrl;
   return { ok: true, payload };

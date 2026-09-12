@@ -59,4 +59,20 @@ describe("parsePlaytestSnapshot — 드래프트 파일 → LabPayload (spec §4
     expect(parsePlaytestSnapshot(null).ok).toBe(false);
     expect(parsePlaytestSnapshot("x").ok).toBe(false);
   });
+  it("맵 검증 실패(tiles 손상) → ok:false, 메시지에 '맵 검증 실패'", () => {
+    const s = snap();
+    (s.map as { tiles: string[] }).tiles.pop();
+    const r = parsePlaytestSnapshot(s);
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.message).toContain("맵 검증 실패");
+  });
+  it("mapId 불일치(스테이지가 다른 맵을 가리킴) → ok:false, 메시지에 'mapId'", () => {
+    const s = snap();
+    (s.stage as { mapId: string }).mapId = "zhuojun";
+    const r = parsePlaytestSnapshot(s);
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.message).toContain("mapId");
+  });
 });

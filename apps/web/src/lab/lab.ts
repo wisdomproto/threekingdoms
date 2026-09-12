@@ -6,8 +6,9 @@
  * 이 페이로드로 ctx(스테이지·맵·공유풀·시드)를 구성한다. 정규 스테이지 경로는 불변.
  *
  * 메타 불가침: 실험실 전투는 결산에서 **어떤 메타도 쓰지 않는다**(골드/클리어/레벨 영속 전부
- * 생략 — ResultSequence sandbox 모드). 승급 테스트 = 엔진 승급 메커니즘이 아직 없으므로(§4 후속)
- * 같은 장수를 티어 다른 병종(경기병→중기병→친위대)으로 편성해 A/B 하는 방식.
+ * 생략 — ResultSequence sandbox 모드). 승급 A/B 테스트 = 빌더에서 고른 병종 티어를 그대로 보존하고
+ * (buildLabStage의 autoPromote:false), 자동 승급 자체를 보고 싶으면 T1 병종 + 임계 직전 레벨로 편성해
+ * 전투 중 레벨업으로 관찰한다.
  */
 import type { Stage, StageUnit, BattleMap, Weather } from "@tk/data";
 
@@ -128,14 +129,16 @@ export function exitTarget(
 }
 
 /**
- * 종료 실행 — 3지점(일시정지 나가기·승리 결산·패배 결산)과 착륙 페이지 「닫기」가 공유하는 유일한 부수효과 seam.
+ * 종료 실행 — 종료 3지점(일시정지 나가기·승리/패배 결산)이 공유하는 부수효과 seam.
+ * 착륙 페이지는 returnUrl 이 있을 때만 이 함수를 쓴다(returnUrl 없는 실패 분기는 window.close() 직접 호출).
  * close 는 브라우저가 조용히 거부할 수 있어 100ms 뒤 닫히지 않았으면 returnUrl 로 이동한다.
  */
 export function leaveSandbox(
   navigate: (to: string) => void,
   payload: Pick<LabPayload, "returnUrl"> | null = readLab(),
 ): void {
-  const hasOpener = typeof window !== "undefined" && window.opener != null;
+  // opener 가 이미 닫혔으면(에디터 탭을 유저가 먼저 닫은 경우) close 대신 returnUrl 로 이동 — closed 는 cross-origin에서도 읽을 수 있다.
+  const hasOpener = typeof window !== "undefined" && window.opener != null && !window.opener.closed;
   const target = exitTarget(payload, hasOpener);
   if (target.kind === "navigate") { navigate(target.to); return; }
   window.close();
