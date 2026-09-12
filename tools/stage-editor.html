@@ -85,6 +85,9 @@
   #hint { position:fixed; bottom:7px; left:calc(50% - 80px); transform:translateX(-50%); background:rgba(0,0,0,.72); padding:4px 12px; border-radius:14px; font-size:11px; color:var(--dim); pointer-events:none; }
   #toast { position:fixed; bottom:34px; left:50%; transform:translateX(-50%); background:var(--acc); color:#1a1407; font-weight:bold; padding:7px 18px; border-radius:18px; font-size:13px; display:none; z-index:80; }
   #toast.bad { background:var(--bad); color:#fff; }
+  .chip { font-size:12px; padding:3px 8px; border-radius:10px; border:1px solid var(--dim); color:var(--dim); }
+  .chip.ok { color:#8fd19e; border-color:#8fd19e; }
+  .chip.warn { color:#e7c27a; border-color:#e7c27a; }
 </style>
 </head>
 <body>
@@ -158,12 +161,14 @@
   <div class="sep"></div>
   <button class="btn go" id="saveStage">⬇ stage JSON</button>
   <button class="btn go" id="saveMap">⬇ map JSON</button>
+  <span id="saveState" class="chip"></span>
   <button class="btn" id="publishCheck" title="레포에 저장된 packages/data/json/* 을 zod 로 전수 검사 (pnpm --filter @tk/data test). index.ts 에 등록되지 않은 새 스테이지/맵 파일은 검사 대상이 아님">Publish 검사</button>
   <button class="btn" id="playtestBtn" title="지금 편집 중인 스테이지+맵(미저장 포함)을 게임(:3000)에서 바로 실행 — 결산은 sandbox(메타 불변), 나가면 이 탭으로 복귀">▶ 이 스테이지 테스트</button>
   <button class="btn go" id="expBlock">⬇ 블록아웃 PNG</button>
   <div class="sep"></div>
   <label>셀px <input type="number" id="cellpx" min="6" max="40" value="15" style="width:44px"></label>
-  <button class="btn" id="undo">↶</button>
+  <button class="btn" id="undo" title="되돌리기 (Ctrl+Z)">↶</button>
+  <button class="btn" id="redo" title="다시 하기 (Ctrl+Y / Ctrl+Shift+Z)">↷</button>
   <span id="dims" style="color:var(--dim); font-size:12px; margin-left:auto"></span>
 </header>
 <main>
@@ -217,6 +222,11 @@
       <div class="tab" data-tab="adv">증원/전략</div>
     </div>
     <div id="valbanner"></div>
+    <div id="recoveryBar" style="display:none;background:#3a2f1a;color:#ffe2a8;padding:6px 10px;font-size:12.5px;margin:6px 0">
+      복구본 있음 (<span id="recoveryTime"></span>) — 저장하지 않은 편집이 있습니다
+      <button class="btn" id="recoveryRestore" style="margin-left:8px">복원</button>
+      <button class="btn" id="recoveryDiscard">버리기</button>
+    </div>
     <pre id="publishOut" style="display:none;max-height:220px;overflow:auto;font-size:12px;background:#111;color:#ddd;padding:8px;margin:6px 0"></pre>
     <div class="tabbody" id="tabbody"></div>
   </div>
@@ -242,9 +252,10 @@
 <script type="module">
 import {
   TERRAINS,
-  loadStage as loadStageModel, serializeStage as serializeStageModel, cloneUnits,
+  loadStage as loadStageModel, serializeStage as serializeStageModel,
   loadMap as loadMapModel, serializeMap as serializeMapModel,
 } from './editor/stage-io.js';
+import { createHistory } from './editor/history.js';
 const GAME_ORIGIN = 'http://localhost:3000'; // next dev. 보드의 「🎮 게임 열기」와 같은 값
 document.getElementById('modfail').remove();
 
@@ -288,7 +299,11 @@ let painting = false;
 let selUnit = null;           // 선택된 유닛 객체(stage.units[i] 또는 증원 유닛)
 let activeTab = 'meta';
 let coordPick = null;         // { cb(x,y), label } — 좌표 집기 모드
-const undoStack = [];
+const history = createHistory();  // 전범위 Undo/Redo — spec 2026-09-12-editor-history-autosave-design
+let suspendHistory = false;       // 로드/복원 중 refreshValidation 의 push 차단
+let recoveryTimer = null;
+let lastRecoveryAt = null;        // 칩 표시용
+let lastSavedAt = null;
 let pasteTarget = null;
 const hasFS = 'showOpenFilePicker' in window;
 let stageHandle = null, mapHandle = null;
@@ -318,6 +333,7 @@ async function init() {
   refreshInfo();
   renderTab();
   refreshValidation();
+  history.reset(snapshot());
 }
 
 async function loadRefData() {
@@ -433,16 +449,6 @@ function cellAt(ev) {
   const y = Math.floor((ev.clientY - r.top) / cellPx);
   return (x >= 0 && y >= 0 && x < W && y < H) ? [x, y] : null;
 }
-function pushUndo() {
-  undoStack.push({ tiles: tiles.map(r => r.slice()), units: cloneUnits(stage.units) });
-  if (undoStack.length > 60) undoStack.shift();
-}
-function doUndo() {
-  if (!undoStack.length) return;
-  const s = undoStack.pop();
-  tiles = s.tiles; stage.units = s.units; selUnit = null;
-  renderAll(); renderTab(); refreshValidation();
-}
 function paintAt(x, y) {
   const b = Math.max(1, +document.getElementById('brush').value);
   const o = Math.floor((b - 1) / 2);
@@ -471,7 +477,6 @@ function unitAt(x, y) {
 function placeOrSelect(x, y) {
   const existing = unitAt(x, y);
   if (existing) { selUnit = existing; switchTab('unit'); renderUnits(); return; }
-  pushUndo();
   const u = {
     commanderId: COMMANDERS[0] ? COMMANDERS[0].id : '',
     classId: document.getElementById('placeClass').value || 'footman',
@@ -491,8 +496,7 @@ function bind() {
     const c = cellAt(e); if (!c) return;
     if (coordPick) { const cb = coordPick.cb; coordPick = null; renderGrid(); cb(c[0], c[1]); return; }
     if (mode === 'terrain') {
-      pushUndo();
-      if (tool === 'fill') floodFill(c[0], c[1]); else { painting = true; paintAt(c[0], c[1]); }
+      if (tool === 'fill') { floodFill(c[0], c[1]); refreshValidation(); } else { painting = true; paintAt(c[0], c[1]); }
       renderTerrain(); renderUnits();
     } else {
       placeOrSelect(c[0], c[1]);
@@ -519,10 +523,18 @@ function bind() {
     document.querySelectorAll('[data-tool]').forEach(x => x.classList.toggle('on', x === b));
   });
   document.getElementById('undo').onclick = doUndo;
+  document.getElementById('redo').onclick = doRedo;
   window.addEventListener('keydown', e => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); doUndo(); return; }
+    if (e.key === 'Escape' && coordPick) { coordPick = null; renderGrid(); toast('좌표 집기 취소'); return; }
+    if ((e.ctrlKey || e.metaKey) && !e.altKey) {
+      const k = e.key.toLowerCase();
+      if (isTextLike(document.activeElement)) { /* 텍스트 undo 는 브라우저에 양보 */ }
+      else if (k === 'z' && e.shiftKey) { e.preventDefault(); if (!coordPick) doRedo(); return; }
+      else if (k === 'z') { e.preventDefault(); if (!coordPick) doUndo(); return; }
+      else if (k === 'y') { e.preventDefault(); if (!coordPick) doRedo(); return; }
+    }
+    if (isTextLike(document.activeElement)) return;   // 1~9 지형 단축키도 텍스트 입력 중엔 무시
     if (mode === 'terrain' && e.key >= '1' && e.key <= '9') { const t = TERRAINS[+e.key - 1]; if (t) selectTerrain(t[0]); }
-    if (e.key === 'Escape' && coordPick) { coordPick = null; renderGrid(); toast('좌표 집기 취소'); }
   });
   document.getElementById('cellpx').onchange = e => { cellPx = Math.max(6, Math.min(40, +e.target.value)); resizeCanvas(); renderAll(); };
 
@@ -701,7 +713,7 @@ function renderMetaTab(b) {
   // 맵 메타 (블록아웃/맵 export용)
   const mpHdr = document.createElement('div'); mpHdr.className = 'sectlabel'; mpHdr.textContent = '맵 (map JSON)'; b.appendChild(mpHdr);
   field(b, 'map id', 'mapId와 보통 동일', inputText(mapId, v => { mapId = v.trim() || 'newmap'; refreshValidation(); }));
-  field(b, 'map name', '', inputText(mapName, v => { mapName = v; }));
+  field(b, 'map name', '', inputText(mapName, v => { mapName = v; refreshValidation(); }));
   const sizeRow = document.createElement('div'); sizeRow.className = 'row2';
   sizeRow.appendChild((() => { const w = document.createElement('div'); w.className = 'field'; const l = document.createElement('label'); l.textContent = 'width'; w.appendChild(l); w.appendChild(inputNum(W, v => resizeGrid(v == null ? W : v, H), { min: 1, max: 120 })); return w; })());
   sizeRow.appendChild((() => { const w = document.createElement('div'); w.className = 'field'; const l = document.createElement('label'); l.textContent = 'height'; w.appendChild(l); w.appendChild(inputNum(H, v => resizeGrid(W, v == null ? H : v), { min: 1, max: 120 })); return w; })());
@@ -748,7 +760,7 @@ function renderUnitTab(b) {
   const s = SIDES[u.side];
   head.innerHTML = `<span class="ptag" style="background:${s.raw};color:#fff">${s.label}</span>`;
   const del = document.createElement('button'); del.className = 'btn warn'; del.textContent = '삭제'; del.style.padding = '3px 9px';
-  del.onclick = () => { pushUndo(); removeUnit(u); selUnit = null; renderUnits(); renderTab(); refreshUnitList(); toast('유닛 삭제'); };
+  del.onclick = () => { removeUnit(u); selUnit = null; renderUnits(); renderTab(); refreshUnitList(); toast('유닛 삭제'); };
   head.appendChild(del); b.appendChild(head);
 
   field(b, 'commanderId', 'commanders.json 참조', selectEl(commanderOptions(), u.commanderId, v => { u.commanderId = v; renderUnits(); refreshUnitList(); refreshValidation(); }));
@@ -806,7 +818,7 @@ function objCard(o, i) {
   }
   const opt = document.createElement('label'); opt.style.cssText = 'display:flex;gap:6px;font-size:11px;color:var(--dim)';
   const oc = document.createElement('input'); oc.type = 'checkbox'; oc.style.width = 'auto'; oc.checked = !!o.optional;
-  oc.onchange = () => { o.optional = oc.checked; };
+  oc.onchange = () => { o.optional = oc.checked; refreshValidation(); };
   opt.appendChild(oc); opt.appendChild(document.createTextNode('optional (보너스 목표)')); card.appendChild(opt);
   return card;
 }
@@ -892,10 +904,10 @@ function duelCard(e, i) {
     e.outcome.winnerId, v => { e.outcome.winnerId = v; refreshValidation(); }));
   const lr = document.createElement('label'); lr.style.cssText = 'display:flex;gap:6px;font-size:11px;color:var(--dim);margin-bottom:6px';
   const lc = document.createElement('input'); lc.type = 'checkbox'; lc.style.width = 'auto'; lc.checked = !!e.outcome.loserRetreats;
-  lc.onchange = () => { e.outcome.loserRetreats = lc.checked; }; lr.appendChild(lc); lr.appendChild(document.createTextNode('loserRetreats (패자 퇴각)')); card.appendChild(lr);
+  lc.onchange = () => { e.outcome.loserRetreats = lc.checked; refreshValidation(); }; lr.appendChild(lc); lr.appendChild(document.createTextNode('loserRetreats (패자 퇴각)')); card.appendChild(lr);
   const oc = document.createElement('label'); oc.style.cssText = 'display:flex;gap:6px;font-size:11px;color:var(--dim)';
   const occ = document.createElement('input'); occ.type = 'checkbox'; occ.style.width = 'auto'; occ.checked = !!e.once;
-  occ.onchange = () => { e.once = occ.checked; }; oc.appendChild(occ); oc.appendChild(document.createTextNode('once (1회만)')); card.appendChild(oc);
+  occ.onchange = () => { e.once = occ.checked; refreshValidation(); }; oc.appendChild(occ); oc.appendChild(document.createTextNode('once (1회만)')); card.appendChild(oc);
   return card;
 }
 function fixWinner(e) { if (e.outcome.winnerId !== e.trigger.attackerId && e.outcome.winnerId !== e.trigger.defenderId) e.outcome.winnerId = e.trigger.attackerId; }
@@ -937,7 +949,6 @@ function reinforceCard(r, i) {
   card.appendChild(ul);
   const addu = document.createElement('button'); addu.className = 'addbtn'; addu.textContent = '＋ 증원 유닛 추가(중앙 배치)';
   addu.onclick = () => {
-    pushUndo();
     const u = { commanderId: COMMANDERS[0] ? COMMANDERS[0].id : '', classId: 'footman', level: 1, troops: 100, items: [], side: r.side, x: Math.floor(W / 2), y: Math.floor(H / 2) };
     r.units.push(u); selUnit = u; switchTab('unit'); renderUnits();
     toast('증원 유닛 추가 — 유닛 탭에서 위치 설정');
@@ -1068,16 +1079,82 @@ function validate() {
 }
 function inBounds(x, y) { return Number.isInteger(x) && Number.isInteger(y) && x >= 0 && y >= 0 && x < W && y < H; }
 
+/* ═══════════════════════ 히스토리·복구본 ═══════════════════════ */
+const isTextLike = (el) => !!el && ((el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'number')) || el.tagName === 'TEXTAREA' || el.isContentEditable);
+function snapshot() {
+  return JSON.stringify({ stage: serializeStageModel(stage), map: serializeMapModel({ id: mapId, name: mapName, width: W, height: H, tileLegend: loadedLegend, tiles }) });
+}
+function restore(snap) {  // Undo/Redo/복구본 공용 — 복원된 모델은 ORIG 를 새로 갖는다(무손실)
+  const prev = suspendHistory; suspendHistory = true;
+  try {
+    const s = JSON.parse(snap);
+    stage = loadStageModel(s.stage);
+    const mm = loadMapModel(s.map);
+    W = mm.width; H = mm.height; mapId = mm.id; mapName = mm.name; loadedLegend = mm.tileLegend; tiles = mm.tiles;
+    selUnit = null; resizeCanvas(); renderAll(); renderTab(); refreshUnitList(); refreshValidation();
+  } finally { suspendHistory = prev; }
+  updateSaveState();
+}
+function doUndo() { const s = history.undo(); if (s != null) { restore(s); scheduleRecovery(); toast('되돌리기'); } }  // 복구본은 항상 현재 상태를 따른다(clean 이면 삭제)
+function doRedo() { const s = history.redo(); if (s != null) { restore(s); scheduleRecovery(); toast('다시 하기'); } }
+function recoveryKey() { return mapOnlyMode ? `tk.editor.recovery.map:${mapId}` : `tk.editor.recovery.stage:${stage.id}`; }
+function scheduleRecovery() {
+  if (recoveryTimer) clearTimeout(recoveryTimer);
+  recoveryTimer = setTimeout(() => {
+    recoveryTimer = null;
+    if (!history.isDirty()) { clearRecovery(); updateSaveState(); return; } // 울리는 시점에 판정 — undo로 clean이면 옛 복구본도 제거
+    try {
+      localStorage.setItem(recoveryKey(), JSON.stringify({ savedAt: new Date().toISOString(), snapshot: history.current() }));
+      lastRecoveryAt = new Date();
+    } catch { lastRecoveryAt = 'fail'; }
+    updateSaveState();
+  }, 1000);
+}
+function cancelRecoveryTimer() { if (recoveryTimer) { clearTimeout(recoveryTimer); recoveryTimer = null; } }
+function clearRecovery() { try { localStorage.removeItem(recoveryKey()); } catch {} lastRecoveryAt = null; }
+function checkRecovery() {  // 진입점 4곳의 꼬리에서 1회
+  let rec = null;
+  try { rec = JSON.parse(localStorage.getItem(recoveryKey()) || 'null'); } catch {}
+  const bar = document.getElementById('recoveryBar');
+  if (!rec || typeof rec.snapshot !== 'string' || rec.snapshot === history.current()) { bar.style.display = 'none'; return; }
+  document.getElementById('recoveryTime').textContent = new Date(rec.savedAt).toLocaleTimeString();
+  bar.style.display = '';
+  document.getElementById('recoveryRestore').onclick = () => {
+    restore(rec.snapshot);                                  // suspend 하에 복원
+    history.push(rec.snapshot, { coalesce: false });        // 스택 [로드 시점, 복구본] → dirty, Undo 1회면 디스크 상태
+    scheduleRecovery();
+    bar.style.display = 'none'; updateSaveState(); toast('복구본 복원');
+  };
+  document.getElementById('recoveryDiscard').onclick = () => { clearRecovery(); bar.style.display = 'none'; updateSaveState(); };
+}
+function updateSaveState() {
+  const chip = document.getElementById('saveState');
+  const u = document.getElementById('undo'), r = document.getElementById('redo');
+  if (u) u.disabled = !history.canUndo();
+  if (r) r.disabled = !history.canRedo();
+  if (!chip) return;
+  if (!history.isDirty()) { chip.textContent = lastSavedAt ? `저장됨 ✓ ${lastSavedAt}` : '저장됨 ✓'; chip.className = 'chip ok'; return; }
+  chip.className = 'chip warn';
+  chip.textContent = lastRecoveryAt === 'fail' ? '수정됨 · 복구본 보관 실패' : lastRecoveryAt ? `수정됨 · 복구본 보관 ${lastRecoveryAt.toLocaleTimeString()}` : '수정됨';
+}
+
 function refreshValidation() {
   const errs = validate();
-  const b = document.getElementById('valbanner');
-  if (errs.length) {
-    b.className = 'on';
-    b.innerHTML = `⚠ 테스트 불가 ${errs.length}건 (저장은 가능):<br>` + errs.slice(0, 8).map(esc).join('<br>') + (errs.length > 8 ? '<br>…' : '');
-  } else {
-    b.className = 'on ok';
-    b.innerHTML = '✓ 테스트 가능 — Publish 검사는 레포에 저장 후 「Publish 검사」';
+  if (!mapOnlyMode) {  // 맵 단독 모드 배너는 setMapOnlyMode 가 그린다 (push 는 그대로)
+    const b = document.getElementById('valbanner');
+    if (errs.length) {
+      b.className = 'on';
+      b.innerHTML = `⚠ 테스트 불가 ${errs.length}건 (저장은 가능):<br>` + errs.slice(0, 8).map(esc).join('<br>') + (errs.length > 8 ? '<br>…' : '');
+    } else {
+      b.className = 'on ok';
+      b.innerHTML = '✓ 테스트 가능 — Publish 검사는 레포에 저장 후 「Publish 검사」';
+    }
   }
+  if (!suspendHistory) {
+    try { if (history.push(snapshot(), { coalesce: isTextLike(document.activeElement) })) scheduleRecovery(); }
+    catch (e) { console.warn('history snapshot skipped:', e); }
+  }
+  updateSaveState();
   return errs.length === 0;
 }
 
@@ -1090,19 +1167,27 @@ function serializeMap() {
 /* ═══════════════════════ 로드 ═══════════════════════ */
 function loadStageObject(obj) {
   if (!obj || typeof obj !== 'object') { toast('stage 객체가 아님', true); return false; }
-  stage = loadStageModel(obj);
-  setMapOnlyMode(false);   // 맵 단독 모드에서 스테이지를 열면 stage 저장 버튼 재활성 (disabled 는 이 함수만 만진다)
-  selUnit = null; undoStack.length = 0;
-  renderAll(); renderTab(); refreshUnitList(); refreshValidation();
+  const prevSuspend = suspendHistory; suspendHistory = true; cancelRecoveryTimer();
+  try {
+    stage = loadStageModel(obj);
+    setMapOnlyMode(false);   // 맵 단독 모드에서 스테이지를 열면 stage 저장 버튼 재활성 (disabled 는 이 함수만 만진다)
+    selUnit = null;
+    renderAll(); renderTab(); refreshUnitList(); refreshValidation();
+  } finally { suspendHistory = prevSuspend; }
+  history.reset(snapshot()); updateSaveState();   // 로드 직후 상태 = 스택 유일 항목 (reset 은 마지막)
   toast(`스테이지 "${stage.id}" 로드`);
   return true;
 }
 function loadMapObject(m) {
   if (!m || typeof m !== 'object' || !m.tiles) { toast('map 객체가 아님', true); return false; }
-  const mm = loadMapModel(m);
-  W = mm.width; H = mm.height; mapId = mm.id || 'map'; mapName = mm.name || mapId; loadedLegend = mm.tileLegend; tiles = mm.tiles;
-  selUnit = null; undoStack.length = 0;
-  resizeCanvas(); renderAll(); renderTab(); refreshValidation();
+  const prevSuspend = suspendHistory; suspendHistory = true; cancelRecoveryTimer();
+  try {
+    const mm = loadMapModel(m);
+    W = mm.width; H = mm.height; mapId = mm.id || 'map'; mapName = mm.name || mapId; loadedLegend = mm.tileLegend; tiles = mm.tiles;
+    selUnit = null;
+    resizeCanvas(); renderAll(); renderTab(); refreshValidation();
+  } finally { suspendHistory = prevSuspend; }
+  history.reset(snapshot()); updateSaveState();
   toast(`맵 "${mapId}" 로드 (${W}×${H})`);
   return true;
 }
@@ -1114,8 +1199,8 @@ async function openFile(kind) {
     const [h] = await window.showOpenFilePicker({ types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] });
     const text = await (await h.getFile()).text();
     const obj = JSON.parse(text);
-    if (kind === 'stage') { stageHandle = h; loadStageObject(obj); }
-    else { mapHandle = h; loadMapObject(obj); }
+    if (kind === 'stage') { stageHandle = h; if (loadStageObject(obj)) checkRecovery(); }
+    else { mapHandle = h; if (loadMapObject(obj)) checkRecovery(); }
   } catch (e) { if (e.name !== 'AbortError') toast('열기 실패: ' + e.message, true); }
 }
 async function saveStageFile() {
@@ -1126,6 +1211,7 @@ async function saveStageFile() {
     const w = await stageHandle.createWritable(); await w.write(txt); await w.close();
     const n = validate().length;
     toast(`stage 저장 → ${stageHandle.name}` + (n ? ` · 테스트 불가 ${n}건` : ''));
+    history.markSaved(); clearRecovery(); lastSavedAt = new Date().toLocaleTimeString(); updateSaveState();
   } catch (e) { if (e.name !== 'AbortError') toast('저장 실패: ' + e.message, true); }
 }
 async function saveMapFile() {
@@ -1135,6 +1221,7 @@ async function saveMapFile() {
     if (!mapHandle) mapHandle = await window.showSaveFilePicker({ suggestedName: `${mapId}.json`, types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }] });
     const w = await mapHandle.createWritable(); await w.write(txt); await w.close();
     toast(`map 저장 → ${mapHandle.name}`);
+    history.markSaved(); clearRecovery(); lastSavedAt = new Date().toLocaleTimeString(); updateSaveState();
   } catch (e) { if (e.name !== 'AbortError') toast('저장 실패: ' + e.message, true); }
 }
 function download(name, blob) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); }
@@ -1161,26 +1248,30 @@ function closePaste() { document.getElementById('pasteModal').classList.remove('
 function doPasteLoad(kind) {
   const txt = document.getElementById('pasteArea').value.trim();
   if (!txt) { closePaste(); return; }
-  try { const obj = JSON.parse(txt); if (kind === 'stage' ? loadStageObject(obj) : loadMapObject(obj)) closePaste(); }
+  try { const obj = JSON.parse(txt); if (kind === 'stage' ? loadStageObject(obj) : loadMapObject(obj)) { closePaste(); checkRecovery(); } }
   catch (e) { toast('JSON 파싱 실패: ' + e.message, true); }
 }
 
 /* ═══════════════════════ 새로 ═══════════════════════ */
 function doNew() {
-  if (!confirm('새 스테이지로 초기화할까요? (저장 안 한 내용은 사라집니다)')) return;
+  if (history.isDirty() && !confirm('새 스테이지로 초기화할까요? (저장 안 한 내용은 사라집니다)')) return;
   const w = +prompt('맵 너비(칸)', W) || W;
   const h = +prompt('맵 높이(칸)', H) || H;
-  W = Math.max(8, Math.min(120, w)); H = Math.max(8, Math.min(120, h));
   const nid = (prompt('stage id', 'stageXX') || 'stageXX').trim();
-  mapId = nid; mapName = nid; loadedLegend = null;
-  tiles = blankTiles(W, H);
-  stage = newStageMeta(); stage.id = nid; stage.name = nid; stage.mapId = nid;
-  selUnit = null; undoStack.length = 0; stageHandle = null; mapHandle = null;
-  // 맵 단독 모드 해제 및 드롭다운 리셋
-  document.getElementById('stageSelect').value = '';
-  document.getElementById('mapOnlySelect').value = '';
-  setMapOnlyMode(false);
-  resizeCanvas(); renderAll(); renderTab(); refreshUnitList(); refreshValidation();
+  const prevSuspend = suspendHistory; suspendHistory = true; cancelRecoveryTimer();
+  try {
+    W = Math.max(8, Math.min(120, w)); H = Math.max(8, Math.min(120, h));
+    mapId = nid; mapName = nid; loadedLegend = null;
+    tiles = blankTiles(W, H);
+    stage = newStageMeta(); stage.id = nid; stage.name = nid; stage.mapId = nid;
+    selUnit = null; stageHandle = null; mapHandle = null;
+    // 맵 단독 모드 해제 및 드롭다운 리셋
+    document.getElementById('stageSelect').value = '';
+    document.getElementById('mapOnlySelect').value = '';
+    setMapOnlyMode(false);
+    resizeCanvas(); renderAll(); renderTab(); refreshUnitList(); refreshValidation();
+  } finally { suspendHistory = prevSuspend; }
+  history.reset(snapshot()); updateSaveState();
   toast('새 스테이지');
 }
 
@@ -1188,7 +1279,7 @@ function doNew() {
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 let toastT = null;
 function toast(m, bad) { const t = document.getElementById('toast'); t.textContent = m; t.className = bad ? 'bad' : ''; t.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', 2600); }
-window.addEventListener('beforeunload', e => { if (stage.units.length || tiles.some(r => r.some(ch => ch !== '.'))) { e.preventDefault(); e.returnValue = ''; } });
+window.onbeforeunload = e => { if (history.isDirty()) { e.preventDefault(); e.returnValue = ''; } };  // 프로퍼티 — E2E 가 null 로 끈다
 
 /* ═══════════════════════ 맵 단독 모드 ═══════════════════════
    맵 드롭다운에서 맵만 선택하면: 지형 편집 가능, 유닛/스테이지 패널 비활성.
@@ -1239,10 +1330,12 @@ async function loadMapOnlyFromServer(mapId_) {
     // 스테이지 메타를 최소화 (mapId 동기화만)
     stage.mapId = m.id || mapId_;
     setMapOnlyMode(true);
+    history.reset(snapshot()); updateSaveState();   // mapId 반영된 baseline
     // 드롭다운 동기화
     const sel = document.getElementById('mapOnlySelect');
     if (sel && sel.value !== mapId_) sel.value = mapId_;
     toast(`맵 "${mapId_}" 단독 로드 (${W}×${H}) — 맵 단독 모드`);
+    checkRecovery();
   } catch (e) {
     console.info('맵 fetch 실패:', e.message);
     toast('맵 로드 실패: ' + e.message, true);
@@ -1271,6 +1364,7 @@ async function loadStageFromServer(stageId_) {
   const sel = document.getElementById('stageSelect');
   if (sel && sel.value !== stageId_) sel.value = stageId_;
   stageHandle = null; mapHandle = null;
+  checkRecovery();
 }
 
 document.getElementById('publishCheck').onclick = async function () {
@@ -1309,7 +1403,7 @@ document.getElementById('playtestBtn').onclick = async function () {
   } finally { this.disabled = false; }
 };
 // 검증용 dev 훅 (모듈 스코프라 콘솔에서 안 보이므로) — 저장 버튼과 동일한 직렬화 경로를 노출
-window.__stageEditor = { serializeStage, serializeMap, getStage: () => stage };
+window.__stageEditor = { serializeStage, serializeMap, getStage: () => stage, history, snapshot, restore, refreshValidation, doUndo, doRedo };
 
 init();
 
