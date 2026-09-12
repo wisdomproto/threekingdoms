@@ -16,7 +16,9 @@ export function renderRail(el, { groups, currentId, collapsed, onPick, onToggle 
       const d = document.createElement("div");
       d.className = "rail-item" + (st.id === currentId ? " on" : "");
       d.dataset.stageId = st.id;
-      const nm = document.createElement("div"); nm.className = "nm"; nm.textContent = `${st.id.slice(0, 2)} ${st.name}`;
+      const nm = document.createElement("div"); nm.className = "nm";
+      if (st.draft) { const dot = document.createElement("span"); dot.className = "draft-dot"; dot.textContent = "● "; dot.title = "Draft 있음"; nm.appendChild(dot); }
+      nm.appendChild(document.createTextNode(`${st.id.slice(0, 2)} ${st.name}`));
       const sub = document.createElement("div"); sub.className = "sub"; sub.textContent = `컷신 ${st.scenes} · 전투`;
       d.appendChild(nm); d.appendChild(sub);
       d.onclick = () => onPick(st.id);

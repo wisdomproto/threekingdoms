@@ -13,7 +13,7 @@ const canon = (o) => JSON.stringify(o); // key order: serializer preserves disk 
 let t;
 try {
   t = await openEditor();
-  await t.eval("localStorage.clear(); location.reload(); 'r'"); await sleep(1500);
+  await t.eval("localStorage.clear(); location.search = '?nodraft=1'; 'r'"); await sleep(1500);   // ?nodraft=1: 자동 저장 끔 — 이 스크립트는 localStorage 복구본 흐름을 검증한다 (Draft 저장 성공 = 복구본 삭제)
   check("reload after localStorage.clear", await t.waitFor(EDITOR_READY));
   check("initial: not dirty, cannot undo", await t.eval(`!${H}.history.isDirty() && !${H}.history.canUndo()`));
   const tl0 = await t.eval(`${H}.getStage().turnLimit`);
@@ -36,7 +36,7 @@ try {
   check("undo 3: typing burst reverted as one entry", (await t.eval(`${H}.getStage().turnLimit`)) === tl0);
   check("after undo to baseline: clean, cannot undo, can redo", await t.eval(`!${H}.history.isDirty() && !${H}.history.canUndo() && ${H}.history.canRedo()`));
   const chip1 = await t.eval("document.getElementById('saveState').textContent");
-  check("chip shows saved", chip1.startsWith("저장됨"), chip1);
+  check("chip shows saved", /^(저장됨|Published)/.test(chip1), chip1);   // clean + Draft 없음 = Published (draft-store saveState)
   check("recovery removed once clean (undo schedules recovery)", await t.waitFor(`localStorage.getItem(${KEY}) === null`, 12, 250));
 
   // 2) redo cycles + lossless round-trip: end at disk + turnLimit only
