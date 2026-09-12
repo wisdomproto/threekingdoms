@@ -236,9 +236,9 @@ def _rel(path):
     return os.path.relpath(path, ROOT).replace(os.sep, "/")
 
 
-def _write_text_atomic(dest, txt):
-    os.makedirs(_PUBLISH_BACKUP_DIR, exist_ok=True)
-    tmp = os.path.join(_PUBLISH_BACKUP_DIR, os.path.basename(dest) + ".tmp")  # 추적 디렉터리에 .tmp 잔류 금지
+def _write_text_atomic(dest, txt, tmp_dir=_PUBLISH_BACKUP_DIR):
+    os.makedirs(tmp_dir, exist_ok=True)
+    tmp = os.path.join(tmp_dir, os.path.basename(dest) + ".tmp")  # 추적 디렉터리에 .tmp 잔류 금지
     try:
         with open(tmp, "w", encoding="utf-8", newline="\n") as f:  # Windows \r\n 변환 방지
             f.write(txt)
@@ -338,8 +338,114 @@ def _publish_stage(payload):
         _drop_meta(stage_id)  # 반영된 적 없는 publish — 롤백 대상 아님
         sys.stdout.write(f"[publish-stage] {stage_id} 검사 실패 → 롤백\n")
         return 200, {"ok": False, "rolledBack": True, "output": result.get("output") or result.get("error", "")}
-    sys.stdout.write(f"[publish-stage] {stage_id} → {', '.join(wrote)} (backup={had})\n")
-    return 200, {"ok": True, "wrote": wrote, "backup": had, "validated": True, "at": at}
+    draft_deleted = _delete_draft(stage_id)  # Published 가 곧 Draft — 로컬 Draft 는 역할 종료
+    sys.stdout.write(f"[publish-stage] {stage_id} → {', '.join(wrote)} (backup={had}, draftDeleted={bool(draft_deleted)})\n")
+    return 200, {"ok": True, "wrote": wrote, "backup": had, "validated": True, "at": at, "draftDeleted": bool(draft_deleted)}
+
+
+# ── 로컬 Draft 저장소 (spec 2026-09-12-project-store-draft-design §3) ──
+# _draft/stages/{id}.json(stage 원문) + {id}.meta.json{revision,savedAt,mapId,hasMap}, _draft/maps/{mapId}.json.
+# 최상위 _draft/*.json 은 플레이테스트 스냅샷(별개) — 건드리지 않는다. 읽기는 정적 GET /apps/web/public/_draft/… .
+_DRAFT_STAGES_DIR = os.path.join(_DRAFT_DIR, "stages")
+_DRAFT_MAPS_DIR = os.path.join(_DRAFT_DIR, "maps")
+_DRAFT_TMP_DIR = os.path.join(_DRAFT_DIR, ".tmp")
+_DRAFT_LOCK = threading.Lock()  # ponytail: 전역 하나 — 짧은 파일 I/O 라 충분. _VALIDATE_LOCK 과 무관(Publish 검사 중에도 저장 가능)
+
+
+def _draft_meta_path(stage_id):
+    return os.path.join(_DRAFT_STAGES_DIR, stage_id + ".meta.json")
+
+
+def _read_draft_meta(stage_id):
+    try:
+        with open(_draft_meta_path(stage_id), encoding="utf-8") as f:
+            m = json.load(f)
+        return m if isinstance(m, dict) else None
+    except (OSError, ValueError):
+        return None
+
+
+def _draft_list():
+    drafts = {}
+    if os.path.isdir(_DRAFT_STAGES_DIR):
+        for name in sorted(os.listdir(_DRAFT_STAGES_DIR)):
+            if not name.endswith(".meta.json"):
+                continue
+            sid = name[:-len(".meta.json")]
+            m = _read_draft_meta(sid)
+            if m and os.path.exists(os.path.join(_DRAFT_STAGES_DIR, sid + ".json")):
+                drafts[sid] = {k: m.get(k) for k in ("savedAt", "revision", "mapId", "hasMap")}
+    return {"ok": True, "drafts": drafts}
+
+
+def _draft_save(payload):
+    """{stageId, stage:<json str>, map?:<json str>, baseRevision?} → 200 {ok,revision,savedAt} / 409 {ok:false,conflict,revision}."""
+    if not isinstance(payload, dict):
+        return 400, {"ok": False, "error": "본문이 JSON 객체가 아님"}
+    stage_id = payload.get("stageId")
+    if not isinstance(stage_id, str) or not _DRAFT_ID_RE.fullmatch(stage_id):
+        return 400, {"ok": False, "error": "stageId 형식 오류 ([A-Za-z0-9_-]+)"}
+    parsed, err = _parse_publish_doc(payload.get("stage"), "stage")
+    if err:
+        return 400, {"ok": False, "error": err}
+    stage_obj, doc_id, stage_txt = parsed
+    if doc_id != stage_id:
+        return 400, {"ok": False, "error": f"stageId({stage_id}) != stage.id({doc_id})"}
+    map_id = stage_obj.get("mapId")
+    map_txt = None
+    if payload.get("map") is not None:
+        parsed, err = _parse_publish_doc(payload.get("map"), "map")
+        if err:
+            return 400, {"ok": False, "error": err}
+        _, mid, map_txt = parsed
+        if map_id != mid:
+            return 400, {"ok": False, "error": f"stage.mapId({map_id}) != map.id({mid})"}
+    base = payload.get("baseRevision")
+    with _DRAFT_LOCK:
+        prev = _read_draft_meta(stage_id) or {}
+        cur = prev.get("revision")
+        if base is not None and base != cur:
+            return 409, {"ok": False, "conflict": True, "revision": cur}
+        revision = (cur or 0) + 1
+        at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        has_map = map_txt is not None or bool(prev.get("hasMap") and prev.get("mapId") == map_id)
+        os.makedirs(_DRAFT_STAGES_DIR, exist_ok=True)
+        _write_text_atomic(os.path.join(_DRAFT_STAGES_DIR, stage_id + ".json"), stage_txt, _DRAFT_TMP_DIR)
+        if map_txt is not None:
+            os.makedirs(_DRAFT_MAPS_DIR, exist_ok=True)
+            _write_text_atomic(os.path.join(_DRAFT_MAPS_DIR, map_id + ".json"), map_txt, _DRAFT_TMP_DIR)
+        meta = {"revision": revision, "savedAt": at, "mapId": map_id, "hasMap": has_map}
+        _write_text_atomic(_draft_meta_path(stage_id), json.dumps(meta, ensure_ascii=False) + "\n", _DRAFT_TMP_DIR)
+    return 200, {"ok": True, "revision": revision, "savedAt": at}
+
+
+def _delete_draft(stage_id):
+    """stage·meta 삭제, 맵은 다른 Draft meta 가 같은 mapId 를 hasMap 으로 참조하지 않을 때만. 반환 = 지운 상대경로 목록."""
+    deleted = []
+    with _DRAFT_LOCK:
+        meta = _read_draft_meta(stage_id) or {}
+        for p in (os.path.join(_DRAFT_STAGES_DIR, stage_id + ".json"), _draft_meta_path(stage_id)):
+            if os.path.exists(p):
+                os.remove(p)
+                deleted.append(_rel(p))
+        map_id = meta.get("mapId")
+        if meta.get("hasMap") and isinstance(map_id, str) and _DRAFT_ID_RE.fullmatch(map_id):
+            others = _draft_list()["drafts"]
+            if not any(o.get("hasMap") and o.get("mapId") == map_id for o in others.values()):
+                mp = os.path.join(_DRAFT_MAPS_DIR, map_id + ".json")
+                if os.path.exists(mp):
+                    os.remove(mp)
+                    deleted.append(_rel(mp))
+    if deleted:
+        sys.stdout.write(f"[draft] {stage_id} 삭제 → {', '.join(deleted)}\n")
+    return deleted
+
+
+def _draft_delete(payload):
+    stage_id = payload.get("stageId") if isinstance(payload, dict) else None
+    if not isinstance(stage_id, str) or not _DRAFT_ID_RE.fullmatch(stage_id):
+        return 400, {"ok": False, "error": "stageId 형식 오류 ([A-Za-z0-9_-]+)"}
+    return 200, {"ok": True, "deleted": _delete_draft(stage_id)}
 
 
 def _publish_rollback(payload):
@@ -435,6 +541,9 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
         if self.path.split("?")[0] == "/asset-status":
             self._json(200, self._asset_status())
             return
+        if self.path.split("?")[0] == "/draft-list":
+            self._json(200, _draft_list())
+            return
         if self.path.startswith("/list-dir"):
             from urllib.parse import urlparse, parse_qs
             qs = parse_qs(urlparse(self.path).query)
@@ -475,7 +584,7 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
     def do_POST(self):  # noqa: N802
         endpoint = self.path.split("?")[0]
         if endpoint not in ("/save-asset", "/delete-asset", "/rebuild-audio-manifest", "/validate-data", "/playtest-draft",
-                            "/publish-stage", "/publish-rollback"):
+                            "/publish-stage", "/publish-rollback", "/draft-save", "/draft-delete"):
             self._json(404, {"ok": False, "error": "unknown endpoint"})
             return
 
@@ -518,6 +627,23 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
                 self._json(code, body)
             finally:
                 _VALIDATE_LOCK.release()
+            return
+
+        if endpoint in ("/draft-save", "/draft-delete"):  # _VALIDATE_LOCK 무관 — 짧은 파일 쓰기, _DRAFT_LOCK 이 직렬화
+            length = int(self.headers.get("Content-Length", 0) or 0)
+            if length > 2 * _DRAFT_MAX_BYTES:
+                self._json(400, {"ok": False, "error": f"본문이 너무 큼 ({length} bytes)"})
+                return
+            try:
+                payload = json.loads(self.rfile.read(length).decode("utf-8")) if length else {}
+            except Exception as e:  # noqa: BLE001
+                self._json(400, {"ok": False, "error": f"잘못된 요청: {e}"})
+                return
+            try:
+                code, body = (_draft_save if endpoint == "/draft-save" else _draft_delete)(payload)
+            except OSError as e:
+                code, body = 500, {"ok": False, "error": f"Draft 쓰기 실패: {e}"}
+            self._json(code, body)
             return
 
         if endpoint == "/playtest-draft":
