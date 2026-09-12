@@ -2,12 +2,12 @@
 /**
  * UnitPanel (설계 §2.3) — 선택/조회 중인 유닛 정보 패널.
  * 순수 표시 컴포넌트: settled 기반 BattleVM + InputState만 받아 그린다 (스토어 직접 접근 금지).
- * 표시 대상: selected/postMoveMenu/targetSelect의 unitId, idle의 inspectedId.
+ * 표시 대상: selected/postMoveMenu/targetSelect의 unitId, idle의 inspectedId, confirmAttack의 prior.unitId.
+ * 흐름 자식(스펙 §4): 절대좌표 없음 — BattleScreen이 좌/우 컬럼 슬롯(unitPanelSide)에 꽂는다.
  */
 import { useEffect, useRef, useState } from "react";
 import type { Grade } from "@tk/data";
 import type { InputState } from "../inputMachine";
-import type { MenuAnchor } from "../store";
 import { rangeGrid } from "../rangeGrid";
 import type { BattleVM, ItemVM, StrategyVM, UnitVM } from "../viewmodel";
 import { PANEL_FRAME, PORTRAIT_FRAME } from "./frames";
@@ -58,17 +58,17 @@ function activeUnitId(ui: InputState): string | null {
     case "strategyMenu":
     case "strategyTarget":
       return ui.unitId;
+    case "confirmAttack":
+      return ui.prior.unitId;
     default:
       return null;
   }
 }
 
 const PANEL_STYLE: React.CSSProperties = {
-  position: "absolute",
-  top: 44,
-  left: 12,
   minWidth: 200,
-  maxWidth: 268,
+  maxWidth: "100%",
+  boxSizing: "border-box",
   padding: "2px 6px 4px",
   // 청동 프레임(border-image) + 가운데만 어둡게(padding-box) — 프레임 안쪽에 내용
   ...PANEL_FRAME,
@@ -453,27 +453,17 @@ function TabStrip({ active, onSelect }: { active: TabId; onSelect: (t: TabId) =>
 export function UnitPanel({
   ui,
   vm,
-  anchor,
-  viewport,
 }: {
   ui: InputState;
   vm: BattleVM;
-  anchor: MenuAnchor | null;
-  viewport: { width: number; height: number };
 }): React.ReactElement | null {
   const [tab, setTab] = useState<TabId>("ability");
   const id = activeUnitId(ui);
   const unit = id ? (vm.units.find((u) => u.id === id) ?? null) : null;
   if (!unit) return null;
-  // 원작(영걸전 리메이크 §7-A): 정보창은 선택 유닛 가림 회피로 좌/우 자동 전환.
-  // 유닛 화면 x가 좌측 절반이면 패널을 우측으로(반대편). anchor 없으면 기본 좌측.
-  const flipRight = anchor != null && viewport.width > 0 && anchor.x < viewport.width / 2;
-  // 우측 전환 시엔 우상단 미니맵·줌/배속/자동전투 버튼(대략 top<210)을 피해 아래로 내린다.
-  const panelStyle: React.CSSProperties = flipRight
-    ? { ...PANEL_STYLE, left: "auto", right: 12, top: 220 }
-    : PANEL_STYLE;
+  // 좌/우 전환(원작 §7-A 가림 회피)은 BattleScreen이 hudLayout.unitPanelSide로 슬롯을 고른다.
   return (
-    <div style={panelStyle}>
+    <div style={PANEL_STYLE}>
       <div style={{ display: "flex", gap: 8 }}>
         <PortraitBox key={unit.name} name={unit.name} />
         <div style={{ flex: 1, minWidth: 0 }}>

@@ -10,11 +10,15 @@
  * 구현 메모: 맵 위 부유 배지 대신 HUD 패널 목록으로 — 그리드→스크린 투영(렌더러 소유)을
  * DOM으로 끌어오지 않아 회귀 위험이 낮고 모바일 가독성이 좋다(작은 칸 위 텍스트보다 명확).
  * 좌표·피해는 committed(엔진 진실)에서 직접 계산 — targetSelect 동안 커밋이 없어 안정적이다.
+ *
+ * confirmAttack(입문 공격 확인, 스펙 §5): 목록 대신 **VS 카드** — 공격자→대상, 명중/피해/반격,
+ * 행동 후 예상 병력, [공격]/[취소]. 카드 버튼만 pointerEvents:auto(패널은 정보 전용 유지).
+ * 흐름 자식(스펙 §4): 절대좌표 없음 — BattleScreen 좌측 컬럼이 위치를 정한다.
  */
 import type { BattleContext, BattleState } from "@tk/engine";
-import type { InputState } from "../inputMachine";
+import type { InputState, UiEvent } from "../inputMachine";
 import { buildAttackPreview, type AttackPreview } from "../attackPreview";
-import { PANEL_FRAME } from "./frames";
+import { HUD_BRONZE, HUD_BRONZE_DIM, HUD_FONT, HUD_INK, HUD_PARCHMENT, PANEL_FRAME } from "./frames";
 
 const RETREAT_COLOR = "#ff5d5d"; // 격파 임박 — 강조
 const DAMAGE_COLOR = "#ffd27a"; // 일반 피해 (청동 호박색)
@@ -25,12 +29,9 @@ const DOUBLE_COLOR = "#d8a6ff"; // 연속공격 2연타 (보라)
 const HIT_COLOR = "#9aa3ad"; // 명중률 (회색조 보조 — 100% 미만일 때만)
 
 const PANEL_STYLE: React.CSSProperties = {
-  position: "absolute",
-  // 좌측 중단 — 상단 UnitPanel(공격자 정보)과 우상단 미니맵/하단 액션존을 모두 피한다
-  top: "42%",
-  left: 12,
   minWidth: 168,
-  maxWidth: 248,
+  maxWidth: "100%",
+  boxSizing: "border-box",
   padding: "2px 8px 6px",
   ...PANEL_FRAME,
   background: "rgba(16, 14, 10, 0.9)",
@@ -40,8 +41,106 @@ const PANEL_STYLE: React.CSSProperties = {
   lineHeight: 1.4,
   pointerEvents: "none", // 정보 전용 — 맵 탭을 가리지 않는다
   userSelect: "none",
-  zIndex: 5,
 };
+
+/** VS 카드 버튼 — 터치 타깃 ≥44px(design-guide), 패널의 pointerEvents:none을 버튼만 되돌린다 */
+const CARD_BTN: React.CSSProperties = {
+  flex: 1,
+  minHeight: 44,
+  pointerEvents: "auto",
+  fontFamily: HUD_FONT,
+  fontSize: 15,
+  fontWeight: 700,
+  color: HUD_PARCHMENT,
+  background: HUD_INK,
+  border: `1.5px solid ${HUD_BRONZE_DIM}`,
+  borderRadius: 6,
+  cursor: "pointer",
+  touchAction: "manipulation",
+};
+
+/**
+ * 입문 공격 확인 카드. prior(selected|targetSelect)가 공격자·이동 프리뷰·필살의 진실.
+ * 예상 병력 = troops − 피해(0 하한); 반격 없으면 "반격 없음"(방어자 퇴각/사거리 밖).
+ */
+function ConfirmCard({
+  ui,
+  ctx,
+  committed,
+  dispatch,
+}: {
+  ui: Extract<InputState, { kind: "confirmAttack" }>;
+  ctx: BattleContext;
+  committed: BattleState;
+  dispatch: (e: UiEvent) => void;
+}): React.ReactElement | null {
+  const prior = ui.prior;
+  const attacker = committed.units.find((u) => u.id === prior.unitId && !u.retreated);
+  const target = committed.units.find((u) => u.id === ui.targetId && !u.retreated);
+  if (!attacker || !target) return null;
+  const ultimate = prior.kind === "targetSelect" && prior.ultimate;
+  const preview = buildAttackPreview(
+    ctx,
+    committed,
+    prior.unitId,
+    { x: target.x, y: target.y },
+    prior.kind === "targetSelect" ? prior.preview : undefined,
+    ultimate,
+  );
+  if (!preview) return null;
+  const name = (id: string): string => ctx.data.commanders[id]?.name ?? id;
+  const after = (troops: number, dmg: number): number => Math.max(0, troops - dmg);
+  const attackerAfter = after(attacker.troops, preview.counter?.damage ?? 0);
+  const targetAfter = after(target.troops, preview.damage);
+  const stat: React.CSSProperties = { fontVariantNumeric: "tabular-nums", whiteSpace: "nowrap" };
+  return (
+    <div style={PANEL_STYLE} data-testid="attack-confirm">
+      <div style={{ fontSize: 15, fontWeight: 800, color: HUD_PARCHMENT, marginBottom: 4 }}>
+        {ultimate ? <span style={{ color: "#5ad7ff" }}>필살 </span> : null}
+        {name(prior.unitId)} <span style={{ color: HUD_BRONZE }}>→</span> {name(ui.targetId)}
+      </div>
+      <div style={{ display: "flex", gap: 10, fontSize: 13, flexWrap: "wrap" }}>
+        <span style={{ ...stat, color: HIT_COLOR }}>명중 {preview.hitPercent}%</span>
+        <span style={{ ...stat, color: preview.willRetreat ? RETREAT_COLOR : DAMAGE_COLOR, fontWeight: 700 }}>
+          피해 {preview.damage}
+          {preview.willRetreat ? " 격파" : ""}
+        </span>
+        {preview.counter ? (
+          <span style={{ ...stat, color: preview.counter.willRetreat ? RETREAT_COLOR : COUNTER_COLOR }}>
+            반격 {preview.counter.damage}
+          </span>
+        ) : (
+          <span style={{ ...stat, color: COUNTER_COLOR }}>반격 없음</span>
+        )}
+      </div>
+      <div style={{ fontSize: 12, color: "#9aa3ad", marginTop: 5 }}>행동 후 예상 병력</div>
+      <div style={{ ...stat, fontSize: 13, color: "#c7cdd4" }}>
+        {name(prior.unitId)} <strong style={{ color: HUD_PARCHMENT }}>{attackerAfter}</strong>
+        {" / "}
+        {name(ui.targetId)}{" "}
+        <strong style={{ color: targetAfter === 0 ? RETREAT_COLOR : HUD_PARCHMENT }}>{targetAfter}</strong>
+      </div>
+      <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+        <button
+          type="button"
+          data-testid="attack-confirm-ok"
+          onClick={() => dispatch({ type: "confirmAttack" })}
+          style={{ ...CARD_BTN, color: "#16130f", background: HUD_BRONZE, borderColor: HUD_BRONZE }}
+        >
+          공격
+        </button>
+        <button
+          type="button"
+          data-testid="attack-confirm-cancel"
+          onClick={() => dispatch({ type: "cancel" })}
+          style={CARD_BTN}
+        >
+          취소
+        </button>
+      </div>
+    </div>
+  );
+}
 
 interface Row {
   id: string;
@@ -53,12 +152,18 @@ export function AttackForecast({
   ui,
   ctx,
   committed,
+  dispatch,
 }: {
   ui: InputState;
   ctx: BattleContext;
   /** 엔진 진실 상태 — 피해 산출 입력. targetSelect 동안 불변이라 안전 */
   committed: BattleState;
+  /** VS 카드 [공격]/[취소] — confirmAttack/cancel 이벤트 */
+  dispatch: (e: UiEvent) => void;
 }): React.ReactElement | null {
+  if (ui.kind === "confirmAttack") {
+    return <ConfirmCard ui={ui} ctx={ctx} committed={committed} dispatch={dispatch} />;
+  }
   if (ui.kind !== "targetSelect" || ui.attackable.length === 0) return null;
 
   const rows: Row[] = [];

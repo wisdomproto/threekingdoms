@@ -427,15 +427,10 @@ export default function BattleScreen(): React.ReactElement {
       {boot.ready && introDone && <ObjectiveFlashLayer vm={snap.vm} display={display} />}
       <div id="hudLeft" style={LEFT_COL}>
         {boot.ready && introDone && <ObjectiveStrip display={display} />}
+        <UnitPanel ui={snap.ui} vm={snap.vm} />
+        <AttackForecast ui={snap.ui} ctx={ctx} committed={store.committedState} dispatch={dispatch} />
       </div>
-      <UnitPanel
-        ui={snap.ui}
-        vm={snap.vm}
-        anchor={snap.ui.kind === "idle" ? snap.inspectAnchor : snap.menuAnchor}
-        viewport={viewport}
-      />
       <InspectPopup inspectedId={snap.inspectedId} activeId={selectedId} vm={snap.vm} anchor={snap.inspectAnchor} viewport={viewport} />
-      <AttackForecast ui={snap.ui} ctx={ctx} committed={store.committedState} />
       <ActionMenu
         ui={snap.ui}
         dispatch={dispatch}
