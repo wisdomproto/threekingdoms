@@ -17,6 +17,7 @@ const ATTACK_TINT = 0xd54a3a; // 공격 가능 범위 (빨강)
 const ATTACK_ALPHA = 0.4;
 const TARGET_TINT = 0xff9a3d; // 공격 대상군 (주황 채움)
 const TARGET_ALPHA = 0.55;
+const CONFIRM_ALPHA = 0.9; // 입문 확인 중인 대상 칸 — 대상군 위에 진하게 (confirmAttack)
 // 선택 유닛 커서 — 레퍼런스(§10) "흰 사각 테두리". 채움 칸(이동/공격/위협)과 톤 분리.
 const CURSOR_COLOR = 0xffffff;
 const CURSOR_INSET = 2; // px — 타일 안쪽으로 들여 그려 인접 칸과 겹침 방지
@@ -119,14 +120,17 @@ export class HighlightLayer extends Container {
   update(ui: InputState, battle: BattleState): void {
     this.releaseAll();
     this.placeCursor(null); // 기본 숨김 — 선택/행동 흐름에서만 표시
-    switch (ui.kind) {
+    // confirmAttack(입문 공격 확인)은 prior(selected|targetSelect)의 하이라이트를 그대로 유지하고
+    // 그 위에 대상 칸만 강조한다(스펙 §5). prior를 풀어 기존 분기를 재사용.
+    const ts = ui.kind === "confirmAttack" ? ui.prior : ui;
+    switch (ts.kind) {
       case "selected": {
-        for (const t of ui.movable) this.place(t, MOVE_TINT, MOVE_ALPHA);
+        for (const t of ts.movable) this.place(t, MOVE_TINT, MOVE_ALPHA);
         // 제자리에서 칠 수 있는 적 = 대상군(주황). 이동범위(파랑) 위에 얹는다.
-        for (const t of this.targetCoords(battle, ui.attackable)) {
+        for (const t of this.targetCoords(battle, ts.attackable)) {
           this.place(t, TARGET_TINT, TARGET_ALPHA);
         }
-        const u = battle.units.find((x) => x.id === ui.unitId);
+        const u = battle.units.find((x) => x.id === ts.unitId);
         // 선택 유닛 = 흰 사각 테두리 커서 (§10). 채움 칸과 톤 분리.
         this.placeCursor(u ? { x: u.x, y: u.y } : null);
         break;
@@ -134,59 +138,64 @@ export class HighlightLayer extends Container {
       case "postMoveMenu": {
         // 출발지 마커: 유닛이 걸어간 뒤 원위치에 잔상을 남긴다 (원작 문법).
         // preview=from(제자리)인 경우 마커는 불필요 — 유닛이 이동하지 않았으므로.
-        const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
-        if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
+        const moved = ts.preview.x !== ts.from.x || ts.preview.y !== ts.from.y;
+        if (moved) this.place(ts.from, ORIGIN_TINT, ORIGIN_ALPHA);
         // 흰 커서는 현재(프리뷰) 위치 — 행동 메뉴 중 활성 유닛 위치 명확화
-        this.placeCursor(ui.preview);
+        this.placeCursor(ts.preview);
         break;
       }
       case "targetSelect": {
         // 출발지 마커 + §10 2계층: 공격 가능 범위(빨강) → 그 위에 대상군(주황)
-        const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
-        if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
-        for (const t of this.attackRangeTiles(battle, ui.unitId, ui.preview)) {
+        const moved = ts.preview.x !== ts.from.x || ts.preview.y !== ts.from.y;
+        if (moved) this.place(ts.from, ORIGIN_TINT, ORIGIN_ALPHA);
+        for (const t of this.attackRangeTiles(battle, ts.unitId, ts.preview)) {
           this.place(t, ATTACK_TINT, ATTACK_ALPHA);
         }
-        for (const t of this.targetCoords(battle, ui.attackable)) {
+        for (const t of this.targetCoords(battle, ts.attackable)) {
           this.place(t, TARGET_TINT, TARGET_ALPHA);
         }
-        this.placeCursor(ui.preview);
+        this.placeCursor(ts.preview);
         break;
       }
       case "strategyMenu": {
-        const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
-        if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
-        this.placeCursor(ui.preview);
+        const moved = ts.preview.x !== ts.from.x || ts.preview.y !== ts.from.y;
+        if (moved) this.place(ts.from, ORIGIN_TINT, ORIGIN_ALPHA);
+        this.placeCursor(ts.preview);
         break;
       }
       case "strategyTarget": {
         // 출발지 마커 + 시전 가능 칸(보라) 하이라이트
-        const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
-        if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
-        for (const t of ui.castTiles) this.place(t, STRATEGY_TINT, STRATEGY_ALPHA);
-        this.placeCursor(ui.preview);
+        const moved = ts.preview.x !== ts.from.x || ts.preview.y !== ts.from.y;
+        if (moved) this.place(ts.from, ORIGIN_TINT, ORIGIN_ALPHA);
+        for (const t of ts.castTiles) this.place(t, STRATEGY_TINT, STRATEGY_ALPHA);
+        this.placeCursor(ts.preview);
         break;
       }
       case "itemMenu": {
-        const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
-        if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
-        this.placeCursor(ui.preview);
+        const moved = ts.preview.x !== ts.from.x || ts.preview.y !== ts.from.y;
+        if (moved) this.place(ts.from, ORIGIN_TINT, ORIGIN_ALPHA);
+        this.placeCursor(ts.preview);
         break;
       }
       case "itemTarget": {
         // 출발지 마커 + 도구 대상 칸 (회복약=초록 아군 / 공격아이템=적 빨강)
-        const moved = ui.preview.x !== ui.from.x || ui.preview.y !== ui.from.y;
-        if (moved) this.place(ui.from, ORIGIN_TINT, ORIGIN_ALPHA);
-        const supply = ui.itemKind === "supplyItem";
+        const moved = ts.preview.x !== ts.from.x || ts.preview.y !== ts.from.y;
+        if (moved) this.place(ts.from, ORIGIN_TINT, ORIGIN_ALPHA);
+        const supply = ts.itemKind === "supplyItem";
         // 회복=초록 아군 / 공격아이템 대상칸=주황 대상군(§10)
-        for (const t of ui.castTiles) {
+        for (const t of ts.castTiles) {
           this.place(t, supply ? SUPPLY_TINT : TARGET_TINT, supply ? SUPPLY_ALPHA : TARGET_ALPHA);
         }
-        this.placeCursor(ui.preview);
+        this.placeCursor(ts.preview);
         break;
       }
       default:
         break; // idle/animating/enemyTurn/battleOver — 하이라이트 없음
+    }
+    if (ui.kind === "confirmAttack") {
+      // 확인 중인 대상 칸 — 대상군(주황)보다 진하게 덧칠해 "지금 이 적"을 분리
+      const t = battle.units.find((x) => x.id === ui.targetId && !x.retreated);
+      if (t) this.place({ x: t.x, y: t.y }, TARGET_TINT, CONFIRM_ALPHA);
     }
   }
 }

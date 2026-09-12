@@ -51,6 +51,8 @@ function menuUnitId(ui: InputState): string | null {
     case "strategyTarget":
     case "itemTarget":
       return ui.unitId;
+    case "confirmAttack": // 입문 확인 카드 — 앵커·선택은 prior 유닛 기준 유지
+      return ui.prior.unitId;
     default:
       return null;
   }
@@ -452,6 +454,7 @@ export class BattleRenderer implements Presenter {
     // 하이라이트 = InputMachine 상태의 수동적 뷰 (좌표 해석은 committed 기준)
     // 선택 연동: uiState에서 선택된 unitId를 뽑아 UnitLayer.setSelected() 호출
     const getSelectedUnitId = (ui: InputState): string | null => {
+      if (ui.kind === "confirmAttack") return ui.prior.unitId;
       if (
         ui.kind === "selected" || ui.kind === "postMoveMenu" || ui.kind === "targetSelect" ||
         ui.kind === "strategyMenu" || ui.kind === "strategyTarget" ||

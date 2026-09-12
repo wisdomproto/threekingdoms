@@ -40,6 +40,7 @@ import { Minimap } from "./hud/Minimap";
 import { adLifecycle } from "../meta/adProviders";
 import { HUD_FONT, HUD_BRONZE, HUD_BRONZE_DIM, HUD_PARCHMENT } from "./hud/frames";
 import type { InputState } from "./inputMachine";
+import { unitPanelSide } from "./hudLayout";
 
 /** 고정 시드 — dev 재현성 (seed + actionLog가 버그 재현 수단, 설계 §1 리플레이 기반) */
 const SEED = 20260612;
@@ -173,6 +174,8 @@ function activeUnitId(ui: InputState): string | null {
     case "itemMenu":
     case "itemTarget":
       return ui.unitId;
+    case "confirmAttack":
+      return ui.prior.unitId;
     default:
       return null;
   }
@@ -410,6 +413,9 @@ export default function BattleScreen(): React.ReactElement {
     delegate.target?.setSpeed(next);
   }, [store, delegate]);
   const selectedId = activeUnitId(snap.ui);
+  // 원작(§7-A) 가림 회피: 활성 유닛이 화면 좌측 절반이면 UnitPanel을 우측 컬럼 슬롯으로.
+  const panelSide = unitPanelSide(snap.ui.kind === "idle" ? snap.inspectAnchor : snap.menuAnchor, viewport.width);
+  const unitPanel = <UnitPanel ui={snap.ui} vm={snap.vm} />;
   // 목표 텍스트(승리/패배/제한턴)는 stage 불변이라 1회 — 칩·강조 배너가 같은 display를 받는다.
   const display = useMemo(
     () => buildObjectiveDisplay(ctx.stage, { nameOf: (id) => ctx.data.commanders[id]?.name ?? id }),
@@ -427,7 +433,7 @@ export default function BattleScreen(): React.ReactElement {
       {boot.ready && introDone && <ObjectiveFlashLayer vm={snap.vm} display={display} />}
       <div id="hudLeft" style={LEFT_COL}>
         {boot.ready && introDone && <ObjectiveStrip display={display} />}
-        <UnitPanel ui={snap.ui} vm={snap.vm} />
+        {panelSide === "left" && unitPanel}
         <AttackForecast ui={snap.ui} ctx={ctx} committed={store.committedState} dispatch={dispatch} />
       </div>
       <InspectPopup inspectedId={snap.inspectedId} activeId={selectedId} vm={snap.vm} anchor={snap.inspectAnchor} viewport={viewport} />
@@ -439,6 +445,7 @@ export default function BattleScreen(): React.ReactElement {
         previewWalking={snap.previewWalking}
       />
       <div
+        id="hudRight"
         style={{
           position: "absolute",
           top: "calc(44px + env(safe-area-inset-top))",
@@ -459,6 +466,7 @@ export default function BattleScreen(): React.ReactElement {
           onOpenMenu={() => setPaused(true)}
           canAutoFight={canAutoFight}
         />
+        {panelSide === "right" && unitPanel}
       </div>
       {boot.ready && (
         <DialogueOverlay

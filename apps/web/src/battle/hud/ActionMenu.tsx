@@ -212,6 +212,8 @@ function itemsFor(ui: InputState, dispatch: (e: UiEvent) => void): Item[] {
     ];
   }
 
+  // 입문 공격 확인 — [공격]/[취소]는 AttackForecast VS 카드가 갖는다. 메뉴 숨김.
+  if (ui.kind === "confirmAttack") return [];
   // 표적 조준 — 취소만 (맵 칸 탭으로 대상 지정, 무효 칸 탭은 noop이므로 취소 버튼 필수)
   if (ui.kind === "targetSelect" || ui.kind === "strategyTarget" || ui.kind === "itemTarget") {
     return [{ key: "cancel", label: "취소", onPress: () => dispatch({ type: "cancel" }) }];
