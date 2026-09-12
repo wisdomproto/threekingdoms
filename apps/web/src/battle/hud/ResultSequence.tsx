@@ -266,7 +266,7 @@ export function ResultSequence({
   stageId?: string;
   /**
    * 실험실(/lab) 샌드박스 — 결산 연출은 그대로 재생하되 **메타를 일절 쓰지 않는다**
-   * (골드/레벨 영속/기연/클리어/보물 적립/광고 2배 전부 생략). 종료 내비게이션은 /lab 복귀.
+   * (골드/레벨 영속/기연/클리어/보물 적립/광고 2배 전부 생략). 종료는 leaveSandbox(에디터 탭 복귀 또는 /lab).
    */
   sandbox?: boolean;
 }): React.ReactElement | null {

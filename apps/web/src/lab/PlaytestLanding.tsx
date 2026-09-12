@@ -27,6 +27,7 @@ export default function PlaytestLanding(): React.ReactElement {
         if (alive && typeof ru === "string") setReturnUrl(ru);
         const parsed = parsePlaytestSnapshot(json);
         if (!parsed.ok) { if (alive) setMessage(parsed.message); return; }
+        if (!alive) return;
         writeLab(parsed.payload);
         router.replace(`/battle?stage=${LAB_STAGE_ID}`);
       } catch (e) {
@@ -40,7 +41,7 @@ export default function PlaytestLanding(): React.ReactElement {
     if (returnUrl) { leaveSandbox((to) => router.push(to), { returnUrl }); return; }
     // returnUrl 없는 실패 경로: 착륙 페이지가 직접 닫는다(/lab 으로 보내지 않음)
     window.close();
-    window.setTimeout(() => { if (!window.closed) setMessage((m) => `${m ?? ""} — 이 탭을 직접 닫아주세요`); }, 100);
+    window.setTimeout(() => { if (!window.closed) setMessage((m) => (m && m.endsWith("이 탭을 직접 닫아주세요") ? m : `${m ?? ""} — 이 탭을 직접 닫아주세요`)); }, 100);
   };
 
   return (
