@@ -48,7 +48,8 @@ function PortraitBox({ name }: { name: string }): React.ReactElement | null {
   );
 }
 
-function activeUnitId(ui: InputState): string | null {
+/** 표시 대상 유닛 id — BattleScreen 미니맵 강조·모바일 BottomPanel 유닛 행이 같은 규칙을 쓴다 */
+export function activeUnitId(ui: InputState): string | null {
   switch (ui.kind) {
     case "idle":
       return ui.inspectedId ?? null;
@@ -57,6 +58,8 @@ function activeUnitId(ui: InputState): string | null {
     case "targetSelect":
     case "strategyMenu":
     case "strategyTarget":
+    case "itemMenu":
+    case "itemTarget":
       return ui.unitId;
     case "confirmAttack":
       return ui.prior.unitId;
@@ -82,7 +85,7 @@ const PANEL_STYLE: React.CSSProperties = {
 };
 
 /** 진영색 (Tier 2-1): 아군 파랑 / 우군 주황 / 적 빨강 */
-function sideColor(side: UnitVM["side"]): string {
+export function sideColor(side: UnitVM["side"]): string {
   return side === "enemy" ? "#ff6b6b" : side === "ally" ? "#ffa53d" : "#4da3ff";
 }
 /** 진영 라벨 */
@@ -90,7 +93,7 @@ function sideLabel(side: UnitVM["side"]): string {
   return side === "enemy" ? "적군" : side === "ally" ? "우군" : "아군";
 }
 
-function TroopsBar({ unit }: { unit: UnitVM }): React.ReactElement {
+export function TroopsBar({ unit }: { unit: UnitVM }): React.ReactElement {
   const ratio = unit.maxTroops > 0 ? Math.max(0, unit.troops / unit.maxTroops) : 0;
   const color = sideColor(unit.side);
   return (

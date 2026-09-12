@@ -64,7 +64,7 @@ const BUTTON_STYLE: CSSProperties = {
   whiteSpace: "nowrap",
 };
 
-interface Item {
+export interface Item {
   key: string;
   label: string;
   accent?: string;
@@ -125,8 +125,8 @@ export function placeMenu(
   return { left, top };
 }
 
-/** 현재 ui 상태에서 보여줄 세로 메뉴 항목 목록 (8항목 고정 레이아웃 or 하위/표적 메뉴) */
-function itemsFor(ui: InputState, dispatch: (e: UiEvent) => void): Item[] {
+/** 현재 ui 상태에서 보여줄 세로 메뉴 항목 목록 (8항목 고정 레이아웃 or 하위/표적 메뉴). 모바일 BottomPanel도 같은 모델을 큰 버튼으로 그린다 */
+export function itemsFor(ui: InputState, dispatch: (e: UiEvent) => void): Item[] {
   if (ui.kind === "postMoveMenu") {
     // 레퍼런스 §9: 공격/책략/도구/교환/협공/필살/대기/취소 — 8항목 고정.
     // 교환/협공/필살은 우리 차별화 백로그(CLAUDE.md §7) → 자리만 두고 항상 dim.
@@ -249,6 +249,7 @@ export function ActionMenu({
 
   return (
     <div
+      data-testid="action-menu"
       style={{
         position: "absolute",
         left,
