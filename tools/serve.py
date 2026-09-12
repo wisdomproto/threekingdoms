@@ -206,6 +206,8 @@ _DRAFT_MAX_BYTES = 5 * 1024 * 1024
 def _save_playtest_draft(payload):
     """에디터 플레이테스트 스냅샷(spec 2026-09-12-editor-playtest-design §4·§5-2)을 원자적으로 저장한다.
     반환 (http_code, body). 검증 실패 400, 쓰기 실패는 호출측에서 500."""
+    if not isinstance(payload, dict):
+        return 400, {"ok": False, "error": "본문이 JSON 객체가 아님"}
     draft_id = payload.get("draftId")
     if not isinstance(draft_id, str) or not _DRAFT_ID_RE.match(draft_id):
         return 400, {"ok": False, "error": "draftId 형식 오류 ([A-Za-z0-9_-]+)"}
