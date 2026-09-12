@@ -9,6 +9,7 @@
     "e2e:editor": "node tools/editor/e2e/history.mjs && node tools/editor/e2e/playtest.mjs",
     "e2e:battle": "node tools/editor/e2e/battle-ux.mjs",
     "e2e:creator": "node tools/editor/e2e/creator.mjs",
-    "e2e:mobile": "node tools/editor/e2e/battle-mobile.mjs"
+    "e2e:mobile": "node tools/editor/e2e/battle-mobile.mjs",
+    "e2e:draft": "node tools/editor/e2e/draft.mjs"
   }
 }
