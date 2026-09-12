@@ -1,6 +1,6 @@
 // tools/editor/comic-editor.js — 만화 파트(ComicScene) 순수 헬퍼 (DOM 무관). spec 2026-09-12-story-editor-v2-comic-design §4
 // 데이터 모양 = packages/data/src/schemas.ts ComicSceneSchema. 아래 DOM 부(renderComicPart)는 story-editor.js 헬퍼 재사용(순환 import — 양쪽 다 top-level 에서 호출하지 않으므로 안전).
-import { h, btn, moveBtns, datalist, setOrDel, renderLines } from "./story-editor.js";
+import { h, moveBtns, datalist, setOrDel, renderLines } from "./story-editor.js";
 import { newSceneLine } from "./story-model.js";
 
 const MIN = 0.01;                                   // 칸 최소 변(정규화) — 클릭만 한 드래그도 스키마 유효(w,h>0)
@@ -53,7 +53,7 @@ const selected = new WeakMap();
 
 let comicFiles = null;   // GET /list-dir?path=assets/comics → 확장자 뗀 이름들. 디렉터리 없음·serve.py 아님 → []
 const loadComicFiles = () => (comicFiles ??= fetch("/list-dir?path=assets/comics").then((r) => r.json())
-  .then((j) => (j?.files ?? []).map((f) => f.replace(/\.webp$/i, ""))).catch(() => []));
+  .then((j) => (j?.files ?? []).filter((f) => /\.webp$/i.test(f)).map((f) => f.replace(/\.webp$/i, ""))).catch(() => []));
 
 const CSS = `
 .cpage{border:1px solid var(--line,#333);border-radius:6px;padding:6px;margin-bottom:6px;background:var(--bg,#14161c)}
@@ -132,6 +132,7 @@ function pageCard(page, gi, pages, again, ctx) {
   function paint() { drawPanels(); drawList(); drawInspector(); }
 
   function drawPanels() {
+    const hadFocus = thumb.contains(document.activeElement);   // 이동/리사이즈 뒤 노드가 재생성돼도 Delete 가 계속 먹게
     thumb.querySelectorAll(".cpanel").forEach((n) => n.remove());
     const cur = sel();
     panels.forEach((p, i) => {
@@ -142,6 +143,7 @@ function pageCard(page, gi, pages, again, ctx) {
       if (p === cur) for (const k of HANDLES) { const hd = h("div", "chandle " + k); hd.dataset.h = k; d.appendChild(hd); }
       thumb.appendChild(d);
     });
+    if (hadFocus) (thumb.querySelector(".cpanel.sel") ?? thumb).focus();
   }
   function drawList() {
     list.innerHTML = "";
@@ -169,7 +171,7 @@ function pageCard(page, gi, pages, again, ctx) {
       lab.append(cb, document.createTextNode(label)); r.appendChild(lab);
     }
     const hold = h("input"); hold.type = "number"; hold.min = 1; hold.step = 1; hold.placeholder = "ms"; hold.title = "자동 진행(hold, ms ≥1) — 비우면 탭 대기"; hold.value = p.hold ?? "";
-    hold.oninput = () => { const n = Math.trunc(Number(hold.value)); if (hold.value === "" || !Number.isFinite(n)) delete p.hold; else p.hold = Math.max(1, n); commit(); };
+    hold.oninput = () => { const n = Math.trunc(Number(hold.value)); if (hold.value === "" || !Number.isFinite(n)) delete p.hold; else { p.hold = Math.max(1, n); if (String(p.hold) !== hold.value) hold.value = String(p.hold); } commit(); };
     const sfx = h("input"); sfx.type = "text"; sfx.setAttribute("list", "tk-sfx"); sfx.placeholder = "효과음 키 (선택)"; sfx.title = "칸 진입 효과음 — 비우면 없음"; sfx.value = p.sfx ?? "";
     sfx.oninput = () => { setOrDel(p, "sfx", sfx.value.trim()); commit(); };
     r.append(h("span", "dim", "hold"), hold, sfx); insp.appendChild(r);
