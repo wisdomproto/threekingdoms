@@ -98,6 +98,11 @@ const BANNER_KEYFRAMES = `
 }
 @keyframes tk-phase-fade { 0%,100% { opacity: 0; } 22%,72% { opacity: 1; } }`;
 
+/** 턴 종료 가능(아군 idle·진행 중) — 상단 배너 버튼과 모바일 BottomPanel이 같은 규칙을 쓴다 */
+export function canEndTurn(ui: InputState, vm: Pick<BattleVM, "turn" | "status">): boolean {
+  return ui.kind === "idle" && vm.turn.phase === "player" && vm.status === "ongoing";
+}
+
 const PHASE_BANNER_MS = 900; // 짧은 코스메틱 — Pixi 페이즈 진행 게이팅과 독립(순수 표현)
 
 /**
@@ -190,15 +195,16 @@ export function TurnBanner({
   vm,
   dispatch,
   stageName,
+  hideEndTurn = false,
 }: {
   ui: InputState;
   vm: BattleVM;
   dispatch: (e: UiEvent) => void;
   /** 스테이지명 (§5 좌측 배지) — BattleScreen이 ctx.stage.name 전달 */
   stageName?: string;
+  /** 모바일: 턴 종료 버튼은 BottomPanel이 그린다(절대좌표 버튼 숨김) */
+  hideEndTurn?: boolean;
 }): React.ReactElement {
-  const canEndTurn =
-    ui.kind === "idle" && vm.turn.phase === "player" && vm.status === "ongoing";
   return (
     <>
       <PhaseFlash phase={vm.turn.phase} turn={vm.turn.turn} status={vm.status} />
@@ -221,7 +227,7 @@ export function TurnBanner({
           {phaseLabel(ui, vm)}
         </span>
       </div>
-      {canEndTurn && (
+      {!hideEndTurn && canEndTurn(ui, vm) && (
         <button
           type="button"
           style={END_TURN_STYLE}

@@ -12,10 +12,13 @@ export function hudMode(viewportWidth: number): "mobile" | "desktop" {
 
 /**
  * 모바일 하단 패널 상태 — 상태기계가 곧 상태(사용자 토글 없음).
- * 유닛을 다루는 중(선택~조준~확인)이면 expanded, 그 외(대기·연출·타 진영·종료)는 collapsed.
+ * 유닛을 다루는 중(선택~조준~확인)이면 expanded, 종료(battleOver)는 hidden(ResultSequence를 가리지 않게),
+ * 그 외(대기·연출·타 진영)는 collapsed.
  */
-export function bottomPanelState(ui: InputState): "collapsed" | "expanded" {
+export function bottomPanelState(ui: InputState): "hidden" | "collapsed" | "expanded" {
   switch (ui.kind) {
+    case "battleOver":
+      return "hidden";
     case "selected":
     case "postMoveMenu":
     case "targetSelect":

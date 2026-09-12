@@ -18,11 +18,13 @@ describe("hudMode — <768px 모바일 게이트", () => {
 });
 
 describe("bottomPanelState — InputState kind 전표", () => {
-  const collapsed: InputState["kind"][] = ["idle", "enemyTurn", "autoTurn", "animating", "battleOver", "confirmEndTurn"];
+  const collapsed: InputState["kind"][] = ["idle", "enemyTurn", "autoTurn", "animating", "confirmEndTurn"];
   const expanded: InputState["kind"][] = [
     "selected", "postMoveMenu", "targetSelect", "confirmAttack",
     "strategyMenu", "strategyTarget", "itemMenu", "itemTarget",
   ];
+  it("battleOver → hidden (결산을 가리지 않는다)", () =>
+    expect(bottomPanelState({ kind: "battleOver", result: "victory" })).toBe("hidden"));
   for (const kind of collapsed) {
     it(`${kind} → collapsed`, () => expect(bottomPanelState({ kind } as InputState)).toBe("collapsed"));
   }

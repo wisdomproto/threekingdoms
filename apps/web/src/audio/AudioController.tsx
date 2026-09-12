@@ -70,7 +70,8 @@ export function AudioController(): React.ReactElement {
 const WRAP_STYLE: React.CSSProperties = {
   position: "fixed",
   left: "max(10px, env(safe-area-inset-left))",
-  bottom: "max(10px, env(safe-area-inset-bottom))",
+  // --tk-bottom-inset: 모바일 전투 BottomPanel 높이(패널이 documentElement에 씀) — 패널 위로 올라간다
+  bottom: "calc(max(10px, env(safe-area-inset-bottom)) + var(--tk-bottom-inset, 0px))",
   zIndex: 60,
   display: "flex",
   flexDirection: "column",

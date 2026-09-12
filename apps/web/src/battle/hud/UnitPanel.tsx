@@ -16,7 +16,7 @@ import { assetUrl } from "../../assetUrl";
 // 초상은 파일 유무로 자동 판정 — PortraitBox가 onError 시 미표시(하드코딩 목록 제거).
 
 /** 청동 초상 프레임 + 얼굴 (조조전 장수 정보 패널 §1). 초상 파일 없으면(onError) 미표시(종전 동작). */
-function PortraitBox({ name }: { name: string }): React.ReactElement | null {
+export function PortraitBox({ name }: { name: string }): React.ReactElement | null {
   const [failed, setFailed] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   useEffect(() => {

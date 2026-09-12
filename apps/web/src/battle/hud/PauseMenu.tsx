@@ -36,6 +36,18 @@ const MENU_BTN: React.CSSProperties = {
   width: "100%",
 };
 
+/** 전투 제어 버튼(모바일) — 48px 터치 타깃(design-guide §2), 3열 균등 */
+const MOBILE_CTRL_BTN: React.CSSProperties = {
+  ...MENU_BTN,
+  flex: 1,
+  minHeight: 48,
+  fontSize: 13,
+  letterSpacing: "0.02em",
+  textIndent: 0,
+  padding: "6px 2px",
+  whiteSpace: "nowrap",
+};
+
 /** 소리 한 줄 슬라이더 — 좌하단 AudioControl과 같은 audio 엔진 값에 연결(표시만 컴팩트). */
 function SoundRow({
   label,
@@ -75,6 +87,7 @@ export function PauseMenu({
   confirmAttacks = true,
   onToggleConfirmAttacks,
   editorUrl,
+  mobileControls,
 }: {
   open: boolean;
   /** 패널을 닫는다(계속하기/백드롭/ESC). 실제 paused 상태는 BattleScreen이 소유. */
@@ -93,6 +106,15 @@ export function PauseMenu({
   onToggleConfirmAttacks?: (on: boolean) => void;
   /** dev 전용(P2 spec §8): 있으면 「전투 그만두기」 위에 ✏ 이 스테이지 편집(에디터 새 탭). 전투는 그대로 멈춰 있음. */
   editorUrl?: string;
+  /** 모바일(<768px)에서만 전달 — 우상단 BattleControls가 ☰ 하나로 줄어든 자리를 「전투 제어」 행이 대신한다 */
+  mobileControls?: {
+    speed: number;
+    onCycleSpeed: () => void;
+    auto: boolean;
+    onToggleAuto: () => void;
+    canAutoFight: boolean;
+    onResetCamera: () => void;
+  };
 }): React.ReactElement | null {
   const router = useRouter();
   const [confirmExit, setConfirmExit] = useState(false);
@@ -239,6 +261,49 @@ export function PauseMenu({
                 ))}
               </div>
             </div>
+
+            {/* 전투 제어(모바일) — BattleControls 3버튼(기본 줌·배속·자동전투)을 48px 터치 타깃으로 */}
+            {mobileControls && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "2px 2px 6px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 11, letterSpacing: "0.3em", color: BRONZE_DIM }}>전투 제어</span>
+                  <span style={{ flex: 1, height: 1, background: `${BRONZE_DIM}44` }} />
+                </div>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <button
+                    type="button"
+                    data-testid="pause-reset-camera"
+                    onClick={() => { mobileControls.onResetCamera(); onClose(); }}
+                    style={MOBILE_CTRL_BTN}
+                  >
+                    ⟲ 기본 줌
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="pause-speed"
+                    onClick={mobileControls.onCycleSpeed}
+                    style={{ ...MOBILE_CTRL_BTN, color: mobileControls.speed > 1 ? BRONZE_GOLD : PARCHMENT }}
+                  >
+                    » 배속 ×{mobileControls.speed}
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="pause-auto"
+                    disabled={!mobileControls.canAutoFight}
+                    onClick={mobileControls.canAutoFight ? mobileControls.onToggleAuto : undefined}
+                    title={mobileControls.canAutoFight ? undefined : "클리어한 스테이지에서만 사용 가능"}
+                    style={{
+                      ...MOBILE_CTRL_BTN,
+                      color: mobileControls.auto ? BRONZE_GOLD : PARCHMENT,
+                      opacity: mobileControls.canAutoFight ? 1 : 0.45,
+                      cursor: mobileControls.canAutoFight ? "pointer" : "not-allowed",
+                    }}
+                  >
+                    {mobileControls.auto ? "■ 자동전투" : "▶︎ 자동전투"}
+                  </button>
+                </div>
+              </div>
+            )}
 
             {!sandbox && onSuspend && (
               <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
