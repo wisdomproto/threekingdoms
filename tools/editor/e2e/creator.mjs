@@ -26,7 +26,7 @@ let t, g;
 try {
   t = await openEditor();
   // profile dir persists across runs — rail collapse / recovery state from a previous run must not leak in
-  await t.eval("localStorage.clear(); location.reload(); 'r'"); await sleep(1000);
+  await t.eval("localStorage.clear(); location.search = '?nodraft=1'; 'r'"); await sleep(1000);   // ?nodraft=1: this script owns publish/undo steps — autosave drafts must not leak into them if a step aborts
   if (!(await t.waitFor(EDITOR_READY))) throw new Error("editor did not reload");
 
   // ── ① rail ────────────────────────────────────────────────────────────────
