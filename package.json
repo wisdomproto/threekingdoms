@@ -6,6 +6,7 @@
     "typecheck": "pnpm -r typecheck",
     "sim": "pnpm --filter @tk/sim start",
     "import-hero": "pnpm --filter @tk/import-hero start",
-    "e2e:editor": "node tools/editor/e2e/history.mjs && node tools/editor/e2e/playtest.mjs"
+    "e2e:editor": "node tools/editor/e2e/history.mjs && node tools/editor/e2e/playtest.mjs",
+    "e2e:battle": "node tools/editor/e2e/battle-ux.mjs"
   }
 }
