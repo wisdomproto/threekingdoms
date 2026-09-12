@@ -273,6 +273,102 @@ describe("targetSelect", () => {
   });
 });
 
+describe("confirmAttack (입문 공격 확인)", () => {
+  const C = true; // confirmAttacks
+  const HX = { x: 51, y: 15 };
+
+  it("클래식 회귀: confirmAttacks 생략 → 인접 적 탭이 즉시 attack 커밋", () => {
+    const r = reduceInput(select(adjacentState, GUANYU), { type: "tapTile", coord: HX }, ctx, adjacentState);
+    expect(r.next).toEqual({ kind: "animating" });
+    expect(r.effects).toEqual([
+      { type: "commit", actions: [{ type: "attack", unitId: GUANYU, targetId: HUAXIONG }] },
+    ]);
+  });
+
+  it("입문 selected: 인접 적 탭 → confirmAttack(prior=selected), 커밋 없음", () => {
+    const sel = select(adjacentState, GUANYU);
+    const r = reduceInput(sel, { type: "tapTile", coord: HX }, ctx, adjacentState, false, C);
+    expect(r.next).toMatchObject({ kind: "confirmAttack", targetId: HUAXIONG, prior: { kind: "selected" } });
+    if (r.next.kind === "confirmAttack") expect(r.next.prior).toBe(sel);
+    expect(r.effects).toEqual([]);
+  });
+
+  const preview: Coord = { x: 49, y: 15 };
+  /** nearState 프리뷰(49,15) targetSelect — ultimate=true는 SP 무관하게 합성(커밋 final만 검증) */
+  function tsNear(ultimate = false): InputState {
+    const menu = reduceInput(select(nearState, GUANYU), { type: "tapTile", coord: preview }, ctx, nearState).next;
+    const ts = reduceInput(menu, { type: "menuAttack" }, ctx, nearState).next;
+    if (ts.kind !== "targetSelect") throw new Error("픽스처 구성 실패");
+    return { ...ts, ultimate };
+  }
+
+  it("입문 targetSelect: 대상 탭 → confirmAttack(prior=targetSelect, preview 보존)", () => {
+    const ts = tsNear();
+    const r = reduceInput(ts, { type: "tapTile", coord: { x: 48, y: 15 } }, ctx, nearState, false, C);
+    expect(r.next).toMatchObject({ kind: "confirmAttack", targetId: HUAXIONG, prior: { kind: "targetSelect", preview } });
+    expect(r.effects).toEqual([]);
+  });
+
+  it("확정(confirmAttack 이벤트) → 클래식 경로와 동일한 move+attack 커밋", () => {
+    const ts = tsNear();
+    const classic = reduceInput(ts, { type: "tapTile", coord: { x: 48, y: 15 } }, ctx, nearState);
+    const pending = reduceInput(ts, { type: "tapTile", coord: { x: 48, y: 15 } }, ctx, nearState, false, C).next;
+    const r = reduceInput(pending, { type: "confirmAttack" }, ctx, nearState, false, C);
+    expect(r.next).toEqual({ kind: "animating" });
+    expect(r.effects).toEqual([
+      { type: "commit", actions: [{ type: "move", unitId: GUANYU, to: preview }, { type: "attack", unitId: GUANYU, targetId: HUAXIONG }] },
+    ]);
+    expect(r).toEqual(classic);
+  });
+
+  it("같은 대상 재탭 = 확정 / 다른 공격 가능 대상 탭 = targetId 교체", () => {
+    const pending = reduceInput(select(adjacentState, GUANYU), { type: "tapTile", coord: HX }, ctx, adjacentState, false, C).next;
+    const again = reduceInput(pending, { type: "tapTile", coord: HX }, ctx, adjacentState, false, C);
+    expect(again.next).toEqual({ kind: "animating" });
+    expect(again.effects).toEqual([
+      { type: "commit", actions: [{ type: "attack", unitId: GUANYU, targetId: HUAXIONG }] },
+    ]);
+
+    // 화웅(51,15)·이숙(49,15) 둘 다 인접 ((50,14)는 유비)
+    const two = withUnit(adjacentState, "이숙", { x: 49, y: 15 });
+    const sel2 = select(two, GUANYU);
+    if (sel2.kind === "selected") expect(sel2.attackable).toEqual(expect.arrayContaining([HUAXIONG, "이숙"]));
+    const p2 = reduceInput(sel2, { type: "tapTile", coord: HX }, ctx, two, false, C).next;
+    const swap = reduceInput(p2, { type: "tapTile", coord: { x: 49, y: 15 } }, ctx, two, false, C);
+    expect(swap.next).toMatchObject({ kind: "confirmAttack", targetId: "이숙" });
+    if (swap.next.kind === "confirmAttack") expect(swap.next.prior).toBe(sel2);
+    expect(swap.effects).toEqual([]);
+  });
+
+  it("cancel → prior 복귀 / 대상 아닌 칸 탭 → prior에 재위임(빈 칸=idle, 이동 칸=postMoveMenu)", () => {
+    const sel = select(adjacentState, GUANYU);
+    const pending = reduceInput(sel, { type: "tapTile", coord: HX }, ctx, adjacentState, false, C).next;
+    const c = reduceInput(pending, { type: "cancel" }, ctx, adjacentState, false, C);
+    expect(c.next).toEqual(sel);
+    expect(c.effects).toEqual([]);
+    // 빈 칸(이동 불가) — selected 규칙 그대로 idle (취소 두 번 탭 방지)
+    const empty = { type: "tapTile", coord: { x: 10, y: 15 } } as const;
+    expect(reduceInput(pending, empty, ctx, adjacentState, false, C)).toEqual(
+      reduceInput(sel, empty, ctx, adjacentState, false, C),
+    );
+    expect(reduceInput(pending, empty, ctx, adjacentState, false, C).next).toEqual({ kind: "idle" });
+    // 이동 가능 칸 — 바로 postMoveMenu
+    const mv = reduceInput(pending, { type: "tapTile", coord: { x: 49, y: 15 } }, ctx, adjacentState, false, C);
+    expect(mv.next).toMatchObject({ kind: "postMoveMenu", unitId: GUANYU, preview: { x: 49, y: 15 } });
+    expect(mv.effects.filter((e) => e.type === "commit")).toEqual([]);
+  });
+
+  it("필살 조준(ultimate) → 확정 시 final이 ultimate", () => {
+    const ts = tsNear(true);
+    const pending = reduceInput(ts, { type: "tapTile", coord: { x: 48, y: 15 } }, ctx, nearState, false, C).next;
+    expect(pending.kind).toBe("confirmAttack");
+    const r = reduceInput(pending, { type: "confirmAttack" }, ctx, nearState, false, C);
+    expect(r.effects).toEqual([
+      { type: "commit", actions: [{ type: "move", unitId: GUANYU, to: preview }, { type: "ultimate", unitId: GUANYU, targetId: HUAXIONG }] },
+    ]);
+  });
+});
+
 describe("animating / enemyTurn — drained 분기", () => {
   it.each([
     ["animating", { kind: "animating" } satisfies InputState],
@@ -311,11 +407,14 @@ describe("전이 전수 — 모든 (상태, 이벤트) 조합이 던지지 않�
   const itemMenu: InputState = { kind: "itemMenu", unitId: GUANYU, from: C, preview: C, movable: [], attackable: [], strategies: [], items: ["쌀"] };
   const itemTarget: InputState = { kind: "itemTarget", unitId: GUANYU, from: C, preview: C, movable: [], attackable: [], strategies: [], items: ["쌀"], itemId: "쌀", itemKind: "supplyItem", castTiles: [{ x: 45, y: 20 }] };
 
+  // confirmAttack 합성 — prior=ts(targetSelect, 대상 화웅). 빈 평지 탭/cancel은 prior 복귀, confirmAttack은 커밋.
+  const confirmAtk: InputState = { kind: "confirmAttack", targetId: "화웅", prior: ts as Extract<InputState, { kind: "targetSelect" }> };
   const states: InputState[] = [
     { kind: "idle" },
     sel,
     menu,
     ts,
+    confirmAtk,
     stratMenu,
     stratTarget,
     itemMenu,
@@ -341,6 +440,7 @@ describe("전이 전수 — 모든 (상태, 이벤트) 조합이 던지지 않�
     { type: "endTurnConfirm" },
     { type: "autoStart" },
     { type: "drained" },
+    { type: "confirmAttack" },
   ];
 
   /**
@@ -349,19 +449,20 @@ describe("전이 전수 — 모든 (상태, 이벤트) 조합이 던지지 않�
    * 관우는 책략 미보유 → menuStrategy(postMoveMenu.strategies=[])·selectStrategy는 시전 불가라 noop.
    */
   const table: Record<InputState["kind"], Record<UiEvent["type"], InputState["kind"]>> = {
-    idle: { tapTile: "idle", cancel: "idle", menuAttack: "idle", menuUltimate: "idle", menuStrategy: "idle", selectStrategy: "idle", menuItem: "idle", selectItem: "idle", menuWait: "idle", menuCancel: "idle", endTurnPressed: "confirmEndTurn", endTurnConfirm: "idle", autoStart: "autoTurn", drained: "idle" },
-    selected: { tapTile: "idle", cancel: "idle", menuAttack: "selected", menuUltimate: "selected", menuStrategy: "selected", selectStrategy: "selected", menuItem: "selected", selectItem: "selected", menuWait: "selected", menuCancel: "selected", endTurnPressed: "selected", endTurnConfirm: "selected", autoStart: "selected", drained: "selected" },
-    postMoveMenu: { tapTile: "postMoveMenu", cancel: "selected", menuAttack: "targetSelect", menuUltimate: "postMoveMenu", menuStrategy: "postMoveMenu", selectStrategy: "postMoveMenu", menuItem: "itemMenu", selectItem: "postMoveMenu", menuWait: "animating", menuCancel: "selected", endTurnPressed: "postMoveMenu", endTurnConfirm: "postMoveMenu", autoStart: "postMoveMenu", drained: "postMoveMenu" },
-    targetSelect: { tapTile: "targetSelect", cancel: "postMoveMenu", menuAttack: "targetSelect", menuUltimate: "targetSelect", menuStrategy: "targetSelect", selectStrategy: "targetSelect", menuItem: "targetSelect", selectItem: "targetSelect", menuWait: "targetSelect", menuCancel: "postMoveMenu", endTurnPressed: "targetSelect", endTurnConfirm: "targetSelect", autoStart: "targetSelect", drained: "targetSelect" },
-    strategyMenu: { tapTile: "strategyMenu", cancel: "postMoveMenu", menuAttack: "strategyMenu", menuUltimate: "strategyMenu", menuStrategy: "strategyMenu", selectStrategy: "strategyMenu", menuItem: "strategyMenu", selectItem: "strategyMenu", menuWait: "strategyMenu", menuCancel: "postMoveMenu", endTurnPressed: "strategyMenu", endTurnConfirm: "strategyMenu", autoStart: "strategyMenu", drained: "strategyMenu" },
-    strategyTarget: { tapTile: "animating", cancel: "strategyMenu", menuAttack: "strategyTarget", menuUltimate: "strategyTarget", menuStrategy: "strategyTarget", selectStrategy: "strategyTarget", menuItem: "strategyTarget", selectItem: "strategyTarget", menuWait: "strategyTarget", menuCancel: "strategyMenu", endTurnPressed: "strategyTarget", endTurnConfirm: "strategyTarget", autoStart: "strategyTarget", drained: "strategyTarget" },
-    itemMenu: { tapTile: "itemMenu", cancel: "postMoveMenu", menuAttack: "itemMenu", menuUltimate: "itemMenu", menuStrategy: "itemMenu", selectStrategy: "itemMenu", menuItem: "itemMenu", selectItem: "itemTarget", menuWait: "itemMenu", menuCancel: "postMoveMenu", endTurnPressed: "itemMenu", endTurnConfirm: "itemMenu", autoStart: "itemMenu", drained: "itemMenu" },
-    itemTarget: { tapTile: "animating", cancel: "itemMenu", menuAttack: "itemTarget", menuUltimate: "itemTarget", menuStrategy: "itemTarget", selectStrategy: "itemTarget", menuItem: "itemTarget", selectItem: "itemTarget", menuWait: "itemTarget", menuCancel: "itemMenu", endTurnPressed: "itemTarget", endTurnConfirm: "itemTarget", autoStart: "itemTarget", drained: "itemTarget" },
-    animating: { tapTile: "animating", cancel: "animating", menuAttack: "animating", menuUltimate: "animating", menuStrategy: "animating", selectStrategy: "animating", menuItem: "animating", selectItem: "animating", menuWait: "animating", menuCancel: "animating", endTurnPressed: "animating", endTurnConfirm: "animating", autoStart: "animating", drained: "idle" },
-    enemyTurn: { tapTile: "enemyTurn", cancel: "enemyTurn", menuAttack: "enemyTurn", menuUltimate: "enemyTurn", menuStrategy: "enemyTurn", selectStrategy: "enemyTurn", menuItem: "enemyTurn", selectItem: "enemyTurn", menuWait: "enemyTurn", menuCancel: "enemyTurn", endTurnPressed: "enemyTurn", endTurnConfirm: "enemyTurn", autoStart: "enemyTurn", drained: "idle" },
-    autoTurn: { tapTile: "autoTurn", cancel: "autoTurn", menuAttack: "autoTurn", menuUltimate: "autoTurn", menuStrategy: "autoTurn", selectStrategy: "autoTurn", menuItem: "autoTurn", selectItem: "autoTurn", menuWait: "autoTurn", menuCancel: "autoTurn", endTurnPressed: "autoTurn", endTurnConfirm: "autoTurn", autoStart: "autoTurn", drained: "idle" },
-    confirmEndTurn: { tapTile: "confirmEndTurn", cancel: "idle", menuAttack: "confirmEndTurn", menuUltimate: "confirmEndTurn", menuStrategy: "confirmEndTurn", selectStrategy: "confirmEndTurn", menuItem: "confirmEndTurn", selectItem: "confirmEndTurn", menuWait: "confirmEndTurn", menuCancel: "idle", endTurnPressed: "confirmEndTurn", endTurnConfirm: "animating", autoStart: "confirmEndTurn", drained: "confirmEndTurn" },
-    battleOver: { tapTile: "battleOver", cancel: "battleOver", menuAttack: "battleOver", menuUltimate: "battleOver", menuStrategy: "battleOver", selectStrategy: "battleOver", menuItem: "battleOver", selectItem: "battleOver", menuWait: "battleOver", menuCancel: "battleOver", endTurnPressed: "battleOver", endTurnConfirm: "battleOver", autoStart: "battleOver", drained: "battleOver" },
+    idle: { tapTile: "idle", cancel: "idle", menuAttack: "idle", menuUltimate: "idle", menuStrategy: "idle", selectStrategy: "idle", menuItem: "idle", selectItem: "idle", menuWait: "idle", menuCancel: "idle", endTurnPressed: "confirmEndTurn", endTurnConfirm: "idle", autoStart: "autoTurn", drained: "idle", confirmAttack: "idle" },
+    selected: { tapTile: "idle", cancel: "idle", menuAttack: "selected", menuUltimate: "selected", menuStrategy: "selected", selectStrategy: "selected", menuItem: "selected", selectItem: "selected", menuWait: "selected", menuCancel: "selected", endTurnPressed: "selected", endTurnConfirm: "selected", autoStart: "selected", drained: "selected", confirmAttack: "selected" },
+    postMoveMenu: { tapTile: "postMoveMenu", cancel: "selected", menuAttack: "targetSelect", menuUltimate: "postMoveMenu", menuStrategy: "postMoveMenu", selectStrategy: "postMoveMenu", menuItem: "itemMenu", selectItem: "postMoveMenu", menuWait: "animating", menuCancel: "selected", endTurnPressed: "postMoveMenu", endTurnConfirm: "postMoveMenu", autoStart: "postMoveMenu", drained: "postMoveMenu", confirmAttack: "postMoveMenu" },
+    targetSelect: { tapTile: "targetSelect", cancel: "postMoveMenu", menuAttack: "targetSelect", menuUltimate: "targetSelect", menuStrategy: "targetSelect", selectStrategy: "targetSelect", menuItem: "targetSelect", selectItem: "targetSelect", menuWait: "targetSelect", menuCancel: "postMoveMenu", endTurnPressed: "targetSelect", endTurnConfirm: "targetSelect", autoStart: "targetSelect", drained: "targetSelect", confirmAttack: "targetSelect" },
+    confirmAttack: { tapTile: "targetSelect", cancel: "targetSelect", menuAttack: "confirmAttack", menuUltimate: "confirmAttack", menuStrategy: "confirmAttack", selectStrategy: "confirmAttack", menuItem: "confirmAttack", selectItem: "confirmAttack", menuWait: "confirmAttack", menuCancel: "targetSelect", endTurnPressed: "confirmAttack", endTurnConfirm: "confirmAttack", autoStart: "confirmAttack", drained: "confirmAttack", confirmAttack: "animating" },
+    strategyMenu: { tapTile: "strategyMenu", cancel: "postMoveMenu", menuAttack: "strategyMenu", menuUltimate: "strategyMenu", menuStrategy: "strategyMenu", selectStrategy: "strategyMenu", menuItem: "strategyMenu", selectItem: "strategyMenu", menuWait: "strategyMenu", menuCancel: "postMoveMenu", endTurnPressed: "strategyMenu", endTurnConfirm: "strategyMenu", autoStart: "strategyMenu", drained: "strategyMenu", confirmAttack: "strategyMenu" },
+    strategyTarget: { tapTile: "animating", cancel: "strategyMenu", menuAttack: "strategyTarget", menuUltimate: "strategyTarget", menuStrategy: "strategyTarget", selectStrategy: "strategyTarget", menuItem: "strategyTarget", selectItem: "strategyTarget", menuWait: "strategyTarget", menuCancel: "strategyMenu", endTurnPressed: "strategyTarget", endTurnConfirm: "strategyTarget", autoStart: "strategyTarget", drained: "strategyTarget", confirmAttack: "strategyTarget" },
+    itemMenu: { tapTile: "itemMenu", cancel: "postMoveMenu", menuAttack: "itemMenu", menuUltimate: "itemMenu", menuStrategy: "itemMenu", selectStrategy: "itemMenu", menuItem: "itemMenu", selectItem: "itemTarget", menuWait: "itemMenu", menuCancel: "postMoveMenu", endTurnPressed: "itemMenu", endTurnConfirm: "itemMenu", autoStart: "itemMenu", drained: "itemMenu", confirmAttack: "itemMenu" },
+    itemTarget: { tapTile: "animating", cancel: "itemMenu", menuAttack: "itemTarget", menuUltimate: "itemTarget", menuStrategy: "itemTarget", selectStrategy: "itemTarget", menuItem: "itemTarget", selectItem: "itemTarget", menuWait: "itemTarget", menuCancel: "itemMenu", endTurnPressed: "itemTarget", endTurnConfirm: "itemTarget", autoStart: "itemTarget", drained: "itemTarget", confirmAttack: "itemTarget" },
+    animating: { tapTile: "animating", cancel: "animating", menuAttack: "animating", menuUltimate: "animating", menuStrategy: "animating", selectStrategy: "animating", menuItem: "animating", selectItem: "animating", menuWait: "animating", menuCancel: "animating", endTurnPressed: "animating", endTurnConfirm: "animating", autoStart: "animating", drained: "idle", confirmAttack: "animating" },
+    enemyTurn: { tapTile: "enemyTurn", cancel: "enemyTurn", menuAttack: "enemyTurn", menuUltimate: "enemyTurn", menuStrategy: "enemyTurn", selectStrategy: "enemyTurn", menuItem: "enemyTurn", selectItem: "enemyTurn", menuWait: "enemyTurn", menuCancel: "enemyTurn", endTurnPressed: "enemyTurn", endTurnConfirm: "enemyTurn", autoStart: "enemyTurn", drained: "idle", confirmAttack: "enemyTurn" },
+    autoTurn: { tapTile: "autoTurn", cancel: "autoTurn", menuAttack: "autoTurn", menuUltimate: "autoTurn", menuStrategy: "autoTurn", selectStrategy: "autoTurn", menuItem: "autoTurn", selectItem: "autoTurn", menuWait: "autoTurn", menuCancel: "autoTurn", endTurnPressed: "autoTurn", endTurnConfirm: "autoTurn", autoStart: "autoTurn", drained: "idle", confirmAttack: "autoTurn" },
+    confirmEndTurn: { tapTile: "confirmEndTurn", cancel: "idle", menuAttack: "confirmEndTurn", menuUltimate: "confirmEndTurn", menuStrategy: "confirmEndTurn", selectStrategy: "confirmEndTurn", menuItem: "confirmEndTurn", selectItem: "confirmEndTurn", menuWait: "confirmEndTurn", menuCancel: "idle", endTurnPressed: "confirmEndTurn", endTurnConfirm: "animating", autoStart: "confirmEndTurn", drained: "confirmEndTurn", confirmAttack: "confirmEndTurn" },
+    battleOver: { tapTile: "battleOver", cancel: "battleOver", menuAttack: "battleOver", menuUltimate: "battleOver", menuStrategy: "battleOver", selectStrategy: "battleOver", menuItem: "battleOver", selectItem: "battleOver", menuWait: "battleOver", menuCancel: "battleOver", endTurnPressed: "battleOver", endTurnConfirm: "battleOver", autoStart: "battleOver", drained: "battleOver", confirmAttack: "battleOver" },
   };
 
   for (const st of states) {

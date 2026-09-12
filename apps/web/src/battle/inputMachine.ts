@@ -6,6 +6,9 @@
  * movePreview 지연 커밋: selected에서 이동 가능 타일 탭 → 엔진 무커밋 상태로 고스트 좌표(preview)를
  * 들고 즉시 postMoveMenu로 진입한다(§5 표의 "movePreview → 즉시 postMoveMenu"를 한 전이로 구현).
  * 취소(menuCancel)는 커밋이 없었으므로 무손실로 selected에 복귀한다.
+ *
+ * confirmAttack(입문 공격 확인, reduceInput 6번째 인자 confirmAttacks=true): 공격 대상 탭이 즉시 커밋되지
+ * 않고 prior(selected|targetSelect)를 품은 확인 상태로 멈춘다 — 확정/재탭이면 클래식과 동일 커밋, 취소면 prior 복귀.
  */
 import {
   getAttackableTargets, getMovableTiles, getStrategyTargets, unitAt,
@@ -122,6 +125,12 @@ export type InputState =
       /** 필살 조준 중이면 true — 대상 확정 시 attack 대신 ultimate 커밋 */
       ultimate?: boolean;
     }
+  /** 입문 공격 확인 — VS 카드 표시 중. prior가 하이라이트/앵커의 진실(unitId·attackable·preview) */
+  | {
+      kind: "confirmAttack";
+      targetId: string;
+      prior: Extract<InputState, { kind: "targetSelect" | "selected" }>;
+    }
   /** 계략: 책략 목록에서 선택 */
   | {
       kind: "strategyMenu";
@@ -200,7 +209,9 @@ export type UiEvent =
   /** 자동전투 ON 진입 — idle(아군 페이즈)에서 autoTurn으로 전이 */
   | { type: "autoStart" }
   /** EventPlayer 큐 소진 시 store가 내부 발행 */
-  | { type: "drained" };
+  | { type: "drained" }
+  /** 입문 공격 확인 카드 [공격] — confirmAttack 상태에서만 유효 */
+  | { type: "confirmAttack" };
 
 export type UiEffect =
   /** 연쇄 원자 커밋 — store가 순서대로 applyAction하고 events를 이어붙여 한 번에 큐 투입 */
@@ -242,12 +253,30 @@ function chainActions(
     : [{ type: "move", unitId, to: preview }, final];
 }
 
+type AttackPrior = Extract<InputState, { kind: "targetSelect" | "selected" }>;
+
+/**
+ * 공격 커밋 — selected면 제자리 attack 단일, targetSelect면 move+final 연쇄(ultimate 반영).
+ * confirmAttacks면 커밋 대신 confirmAttack 상태로 멈춘다(클래식/입문 분기의 유일한 지점).
+ */
+function attackCommit(prior: AttackPrior, targetId: string, confirmAttacks: boolean): ReduceResult {
+  if (confirmAttacks) return { next: { kind: "confirmAttack", targetId, prior }, effects: [] };
+  const final: Action =
+    prior.kind === "targetSelect" && prior.ultimate
+      ? { type: "ultimate", unitId: prior.unitId, targetId }
+      : { type: "attack", unitId: prior.unitId, targetId };
+  const actions =
+    prior.kind === "selected" ? [final] : chainActions(prior.unitId, prior.from, prior.preview, final);
+  return { next: { kind: "animating" }, effects: [{ type: "commit", actions }] };
+}
+
 export function reduceInput(
   state: InputState,
   event: UiEvent,
   ctx: BattleContext,
   battle: BattleState,
   auto = false,
+  confirmAttacks = false,
 ): ReduceResult {
   switch (state.kind) {
     case "idle": {
@@ -358,18 +387,10 @@ export function reduceInput(
         };
       }
 
-      // ② 현위치 사거리 내 적 → 즉시 attack 커밋
+      // ② 현위치 사거리 내 적 → 즉시 attack 커밋 (입문이면 confirmAttack)
       const target = unitAt(battle, event.coord.x, event.coord.y);
       if (target && state.attackable.includes(target.id)) {
-        return {
-          next: { kind: "animating" },
-          effects: [
-            {
-              type: "commit",
-              actions: [{ type: "attack", unitId: state.unitId, targetId: target.id }],
-            },
-          ],
-        };
+        return attackCommit(state, target.id, confirmAttacks);
       }
 
       // ③ 이동 가능 타일 → movePreview(엔진 무커밋) → 즉시 postMoveMenu
@@ -461,14 +482,24 @@ export function reduceInput(
       if (event.type === "tapTile") {
         const target = unitAt(battle, event.coord.x, event.coord.y);
         if (!target || !state.attackable.includes(target.id)) return noop(state);
-        // 필살 조준이면 ultimate, 아니면 일반 attack 커밋.
-        const final: Action = state.ultimate
-          ? { type: "ultimate", unitId: state.unitId, targetId: target.id }
-          : { type: "attack", unitId: state.unitId, targetId: target.id };
-        return {
-          next: { kind: "animating" },
-          effects: [{ type: "commit", actions: chainActions(state.unitId, state.from, state.preview, final) }],
-        };
+        // 필살 조준이면 ultimate, 아니면 일반 attack 커밋 (입문이면 confirmAttack).
+        return attackCommit(state, target.id, confirmAttacks);
+      }
+      return noop(state);
+    }
+
+    case "confirmAttack": {
+      if (event.type === "confirmAttack") return attackCommit(state.prior, state.targetId, false);
+      if (event.type === "cancel" || event.type === "menuCancel") return { next: state.prior, effects: [] };
+      if (event.type === "tapTile") {
+        const target = unitAt(battle, event.coord.x, event.coord.y);
+        // 대상 아닌 칸 → prior의 규칙에 재위임 (selected의 이동 칸 탭이 바로 postMoveMenu — 취소 두 번 탭 방지)
+        if (!target || !state.prior.attackable.includes(target.id)) {
+          return reduceInput(state.prior, event, ctx, battle, auto, confirmAttacks);
+        }
+        // 같은 대상 재탭 = 확정, 다른 대상 = 카드 교체
+        if (target.id === state.targetId) return attackCommit(state.prior, state.targetId, false);
+        return { next: { ...state, targetId: target.id }, effects: [] };
       }
       return noop(state);
     }
