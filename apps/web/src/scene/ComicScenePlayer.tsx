@@ -93,7 +93,7 @@ export function ComicScenePlayer({
       ref={rootRef}
       data-testid="comic-scene"
       onClick={advance}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") advance(); }}
+      onKeyDown={(e) => { if (e.target !== e.currentTarget) return; if (e.key === "Enter" || e.key === " ") advance(); }}   // AUTO/스킵 버튼의 Enter 는 진행 아님
       role="button"
       tabIndex={0}
       aria-label="만화 진행 (탭)"
@@ -112,7 +112,7 @@ export function ComicScenePlayer({
             position: "absolute", left: 0, top: 0, width: size.w, height: size.h,
             transformOrigin: "0 0",
             transform: `translate(${cam.tx}px, ${cam.ty}px) scale(${cam.scale})`,
-            transition: transit ? "transform 600ms cubic-bezier(.22,.61,.36,1)" : "none",
+            transition: transit && ready ? "transform 600ms cubic-bezier(.22,.61,.36,1)" : "none",   // 새 페이지 첫 칸은 즉시(ready 전)
             visibility: view ? "visible" : "hidden",
           }}
         >

@@ -50,14 +50,15 @@ export function useComicProgression(scene: ComicScene, onComplete: () => void) {
   const line = panel.lines?.[pos.li];
   const { shown, done, reveal } = useTypewriter(line?.text ?? "");
 
+  const completed = useRef(false);
   const advance = useCallback(() => {
-    if (fading) return;
+    if (fading || fadeTimer.current || completed.current) return;   // 페이드 중·완료 후 재진입 방지(AUTO 타이머 + 탭 동시)
     if (line && !done) { reveal(); return; }
     const step = comicStep(scene, pos);
-    if (step.kind === "complete") { onComplete(); return; }
+    if (step.kind === "complete") { completed.current = true; onComplete(); return; }
     if (step.kind === "page") {
       setFading(true);
-      fadeTimer.current = setTimeout(() => { setPos(step.pos); setFading(false); }, PAGE_FADE_MS);
+      fadeTimer.current = setTimeout(() => { fadeTimer.current = null; setPos(step.pos); setFading(false); }, PAGE_FADE_MS);
       return;
     }
     setPos(step.pos);
