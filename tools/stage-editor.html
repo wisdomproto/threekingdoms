@@ -97,6 +97,19 @@
   .menu .btn { text-align:left; } .menu select { width:100%; }
   .menu-sec { font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:.5px; padding:4px 4px 0; }
   .menu-sec:not(:first-child) { border-top:1px solid var(--line); margin-top:2px; padding-top:6px; }
+  /* Chapter rail — spec creator-ux-p2 §4 */
+  #rail { width:220px; background:var(--panel); border-right:1px solid var(--line); overflow:auto; flex-shrink:0; display:flex; flex-direction:column; padding:4px 0 6px; }
+  #rail.collapsed { width:44px; }
+  .rail-ch { padding:9px 12px 3px; font-size:10.5px; color:var(--dim); text-transform:uppercase; letter-spacing:.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #rail.collapsed .rail-ch { text-align:center; padding:9px 0 3px; font-size:12px; color:var(--acc); }
+  .rail-item { padding:5px 12px 5px 10px; cursor:pointer; border-left:2px solid transparent; }
+  .rail-item:hover { background:var(--panel2); }
+  .rail-item.on { border-left-color:var(--acc); background:var(--panel2); }
+  .rail-item .nm { font-size:12px; color:var(--txt); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rail-item.on .nm { color:var(--acc); font-weight:bold; }
+  .rail-item .sub { font-size:10.5px; color:var(--dim); }
+  .rail-toggle { margin:8px 6px 0; font-size:11px; padding:4px; }
+  #rail.collapsed .rail-toggle { margin:8px 4px 0; padding:4px 0; }
 </style>
 </head>
 <body>
@@ -197,6 +210,7 @@
   </span>
 </header>
 <main>
+  <aside id="rail" title="장 목록"></aside>
   <div id="left">
     <div class="moderow">
       <button class="btn on" data-mode="terrain" id="m-terrain">지형</button>
@@ -281,8 +295,9 @@ import {
   loadMap as loadMapModel, serializeMap as serializeMapModel,
 } from './editor/stage-io.js';
 import { createHistory } from './editor/history.js';
-import { chapterOf, chapterTitle } from './editor/chapters.js';
-import { slotParts } from './editor/story-model.js';
+import { CHAPTERS, chapterOf } from './editor/chapters.js';
+import { slotParts, sceneCount } from './editor/story-model.js';
+import { renderRail } from './editor/rail.js';
 const GAME_ORIGIN = 'http://localhost:3000'; // next dev. 보드의 「🎮 게임 열기」와 같은 값
 document.getElementById('modfail').remove();
 
@@ -332,6 +347,9 @@ let recoveryTimer = null;
 let lastRecoveryAt = null;        // 칩 표시용
 let lastSavedAt = null;
 let pasteTarget = null;
+let railGroups = [];              // Chapter rail 모델 (loadRailStages 가 채움)
+let railCollapsed = localStorage.getItem('tk.editor.rail') === 'collapsed';
+let railKey = '';                 // 마지막 렌더 키 — 바뀔 때만 리렌더
 const hasFS = 'showOpenFilePicker' in window;
 let stageHandle = null, mapHandle = null;
 
@@ -362,7 +380,7 @@ async function init() {
   refreshValidation();
   history.reset(snapshot());
   const q = new URLSearchParams(location.search);   // ?stage=ID&quick=1 (spec §8)
-  await loadStageFromServer(q.get('stage') || '05-sishuiguan');
+  await Promise.all([loadRailStages(), loadStageFromServer(q.get('stage') || '05-sishuiguan')]);
 }
 
 async function loadRefData() {
@@ -570,14 +588,7 @@ function bind() {
   document.getElementById('newStage').onclick = doNew;
   document.getElementById('openStage').onclick = () => openFile('stage');
   document.getElementById('openMap').onclick = () => openFile('map');
-  document.getElementById('stageSelect').onchange = async function() {
-    const val = this.value;
-    if (!val) return;
-    // 스테이지 선택 시 맵 단독 드롭다운 리셋, 맵 단독 모드 해제
-    setMapOnlyMode(false);
-    document.getElementById('mapOnlySelect').value = '';
-    await loadStageFromServer(val);
-  };
+  document.getElementById('stageSelect').onchange = function() { if (this.value) pickStage(this.value); };
   document.getElementById('mapOnlySelect').onchange = async function() {
     const val = this.value;
     if (!val) { setMapOnlyMode(false); return; }
@@ -1158,7 +1169,7 @@ function checkRecovery() {  // 진입점 4곳의 꼬리에서 1회
   document.getElementById('recoveryDiscard').onclick = () => { clearRecovery(); bar.style.display = 'none'; updateSaveState(); };
 }
 function updateSaveState() {
-  updateCrumb();
+  updateCrumb(); updateRail();
   const chip = document.getElementById('saveState');
   const u = document.getElementById('undo'), r = document.getElementById('redo');
   if (u) u.disabled = !history.canUndo();
@@ -1376,6 +1387,7 @@ async function loadMapOnlyFromServer(mapId_) {
 
 /* ── 서버에서 스테이지(+연결 맵) fetch 로드 ── */
 async function loadStageFromServer(stageId_) {
+  if (history.isDirty() && !confirm('저장하지 않은 편집이 있습니다. 다른 장을 열까요?')) return false;   // rail·드롭다운 공통 가드
   const tryFetch = async (url) => {
     try {
       const r = await fetch(url, { cache: 'no-store' });
@@ -1384,7 +1396,7 @@ async function loadStageFromServer(stageId_) {
     } catch { return null; }
   };
   const stageObj = await tryFetch(`/packages/data/json/stages/${stageId_}.json`);
-  if (!stageObj) { console.info('스테이지 fetch 실패:', stageId_); return; }
+  if (!stageObj) { console.info('스테이지 fetch 실패:', stageId_); toast('스테이지 로드 실패: ' + stageId_, true); return false; }
   // 연결된 mapId로 맵도 fetch
   const mapId_ = stageObj.mapId;
   if (mapId_) {
@@ -1397,6 +1409,38 @@ async function loadStageFromServer(stageId_) {
   if (sel && sel.value !== stageId_) sel.value = stageId_;
   stageHandle = null; mapHandle = null;
   checkRecovery();
+  return true;
+}
+
+/* ═══════════════════════ Chapter rail (spec §4) ═══════════════════════ */
+const STAGE_IDS = Array.from(document.getElementById('stageSelect').options).map(o => o.value).filter(Boolean);   // 27 하드코딩 옵션이 id 출처
+async function loadRailStages() {   // 27 JSON 병렬 fetch → 이름·컷신 수 (실패 항목은 id 만)
+  const entries = await Promise.all(STAGE_IDS.map(async id => {
+    try { const r = await fetch(`/packages/data/json/stages/${id}.json`, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); const s = await r.json(); return { id, name: s.name || id, scenes: sceneCount(s) }; }
+    catch { return { id, name: id, scenes: 0 }; }
+  }));
+  railGroups = CHAPTERS.map(ch => ({ chapter: ch.chapter, title: ch.title, stages: entries.filter(e => chapterOf(e.id) === ch.chapter) }));
+  railKey = ''; updateRail();
+}
+function setRailCollapsed(on) {
+  railCollapsed = on;
+  try { localStorage.setItem('tk.editor.rail', on ? 'collapsed' : 'open'); } catch {}
+  railKey = ''; updateRail();
+}
+function updateRail() {   // updateSaveState 마다 호출 — 현재 장·이름·컷신 수·접힘이 바뀔 때만 리렌더
+  const cur = mapOnlyMode ? null : stage.id;
+  const live = cur ? railGroups.flatMap(g => g.stages).find(e => e.id === cur) : null;
+  if (live) { live.name = stage.name || cur; live.scenes = sceneCount(stage); }
+  const key = `${cur}|${live ? live.name + '|' + live.scenes : ''}|${railCollapsed}`;
+  if (key === railKey) return;
+  railKey = key;
+  renderRail(document.getElementById('rail'), { groups: railGroups, currentId: cur, collapsed: railCollapsed, onPick: pickStage, onToggle: () => setRailCollapsed(!railCollapsed) });
+}
+async function pickStage(id) {   // rail 항목·⚙ 드롭다운 공통
+  const ok = await loadStageFromServer(id);
+  if (ok) { document.getElementById('mapOnlySelect').value = ''; return; }
+  const sel = document.getElementById('stageSelect');   // 취소/실패 → 드롭다운을 현재 장으로 되돌림
+  if (sel) sel.value = (!mapOnlyMode && STAGE_IDS.includes(stage.id)) ? stage.id : '';
 }
 
 document.getElementById('publishCheck').onclick = async function () {
@@ -1456,7 +1500,7 @@ function updateCrumb() {
   el.textContent = ch ? `삼국지 / 제${ch}장 · ${stage.name}` : `삼국지 / ${stage.name}`;
 }
 // 검증용 dev 훅 (모듈 스코프라 콘솔에서 안 보이므로) — 저장 버튼과 동일한 직렬화 경로를 노출
-window.__stageEditor = { serializeStage, serializeMap, getStage: () => stage, history, snapshot, restore, refreshValidation, doUndo, doRedo, switchTab, getActiveTab: () => activeTab };
+window.__stageEditor = { serializeStage, serializeMap, getStage: () => stage, history, snapshot, restore, refreshValidation, doUndo, doRedo, switchTab, getActiveTab: () => activeTab, setRailCollapsed, railStages: () => railGroups.flatMap(g => g.stages.map(s => ({ ...s, chapter: g.chapter }))) };
 
 init();
 </script>
