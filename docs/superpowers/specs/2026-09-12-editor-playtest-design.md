@@ -21,11 +21,12 @@
 |---|---|
 | `tools/serve.py` (수정) | `POST /playtest-draft` — 스냅샷 파일 저장 |
 | `.gitignore` (수정) | `apps/web/public/_draft/` |
-| `apps/web/app/playtest/page.tsx` (신규) | 착륙 페이지: 스냅샷 fetch → zod 검증 → `writeLab` → `/battle?stage=__lab` |
+| `apps/web/src/lab/playtest.ts` (신규) | 순수 로직: `PlaytestSnapshot` 타입, `parsePlaytestSnapshot(json) → { ok: true, payload: LabPayload } \| { ok: false, message }`(kind/version 확인 + `StageSchema`/`BattleMapSchema` parse + 첫 zod 이슈 메시지). DOM·Next 무관 → node 테스트 가능 |
+| `apps/web/app/playtest/page.tsx` (신규) | 착륙 페이지(얇은 클라이언트 컴포넌트, `/lab/page.tsx`처럼 `dynamic(ssr:false)`): `?draft=` → fetch → `parsePlaytestSnapshot` → 성공 시 `writeLab` + `router.replace('/battle?stage=__lab')`, 실패 시 메시지 + 「닫기」 |
 | `apps/web/src/lab/lab.ts` (수정) | `LabPayload.returnUrl?`, `exitTarget(payload)` 순수 헬퍼 |
 | `apps/web/src/battle/BattleScreen.tsx`, `hud/ResultSequence.tsx`(481·958행), `hud/PauseMenu.tsx` (수정) | 실험실 종료 목적지 `/lab` 하드코딩 → `exitTarget()` |
 | `tools/stage-editor.html` (수정) | ▶ 이 스테이지 테스트 버튼 + `GAME_ORIGIN` 상수 |
-| `apps/web/src/lab/__tests__/exitTarget.test.ts`, `apps/web/app/playtest/__tests__/playtest.test.tsx` (신규) | §7 |
+| `apps/web/src/lab/__tests__/playtest.test.ts` (신규) | §8 — `exitTarget`·`parsePlaytestSnapshot` 단위 테스트(node 환경, 기존 web 테스트 관례: jsdom 없음) |
 
 ## 4. Playtest 스냅샷 (계약)
 
@@ -51,7 +52,7 @@ interface PlaytestSnapshot {
 1. 에디터 ▶ 클릭 → `validate()` 에러가 있으면 토스트 "테스트 불가 N건" 후 중단(Playtest 단 검증 — P0 스펙 §5).
 2. `POST /playtest-draft` body = 스냅샷(§4). serve.py: `draftId` 정규식 검사, 본문 ≤ 5MB, `apps/web/public/_draft/` 생성, 임시 파일 → `os.replace` 원자 쓰기, 응답 `{ok, draftId, url: "/_draft/{draftId}.json"}`. 실패는 200 + `ok:false` + 메시지(기존 serve.py 관례). `do_POST` 허용 목록에 추가, R2 업로드 없음.
 3. 에디터 `window.open(GAME_ORIGIN + "/playtest?draft=" + draftId)`. `GAME_ORIGIN` 상수 기본 `http://localhost:3000`(보드의 「🎮 게임 열기」와 동일 값).
-4. `/playtest` 페이지: `useSearchParams().get("draft")` → `fetch("/_draft/{id}.json", {cache:"no-store"})` → `kind/version` 확인 → `StageSchema.parse(stage)`·`BattleMapSchema.parse(map)`(`@tk/data`) → `writeLab({stage, map, sharedItems: [], seed, returnUrl})` → `router.replace("/battle?stage=__lab")`. 로딩 중 한 줄 표시.
+4. `/playtest` 페이지: `useSearchParams().get("draft")` → `fetch("/_draft/{id}.json", {cache:"no-store"})` → `parsePlaytestSnapshot(json)`(kind/version 확인 → `StageSchema.parse(stage)`·`BattleMapSchema.parse(map)` → `LabPayload {stage, map, sharedItems: [], seed, returnUrl}`) → `writeLab(payload)` → `router.replace("/battle?stage=__lab")`. 로딩 중 한 줄 표시. 페이지 자체는 얇아서 테스트하지 않고(`LabScreen`과 같은 급) 로직은 `playtest.ts`에서 검증한다.
 5. 전투: 기존 `__lab` 경로. 종료 3지점(일시정지 「나가기」, 승리 결산 종료, 패배 결산 종료)이 `exitTarget(readLab())`을 따른다.
 
 ## 6. 복귀
@@ -69,11 +70,11 @@ export function exitTarget(payload: Pick<LabPayload, "returnUrl"> | null, hasOpe
 - 착륙 페이지: fetch 404 → "드래프트가 없습니다 — 에디터에서 ▶ 테스트를 다시 누르세요" + 「닫기」; `kind`/`version` 불일치 → 같은 안내; zod 실패 → 첫 이슈의 `path`·`message` 표시(이게 "실행 최소 조건" 실검사) + 「닫기」. 「닫기」 = `exitTarget` 규칙.
 - `readLab()`은 `returnUrl`을 선택 필드로 통과(기존 검증 로직 불변).
 - serve.py: `draftId` 불일치/경로 탈출(`..`)/JSON 파싱 실패/크기 초과 → `ok:false`.
-- 드래프트는 dev 전용: `public/_draft/`는 gitignore, `next build` 산출물에 없음, R2 업로더는 `assets/`만 훑는다(변경 없음 — 확인 필요 항목으로 플랜에 명시).
+- 드래프트는 dev 전용: `public/_draft/`는 gitignore, `next build` 산출물에 없음, R2 업로더는 `apps/web/public/assets`만 훑는다(`tools/upload-assets.py` `ASSET_DIR` — 확인됨, 변경 없음).
 
 ## 8. 테스트
 - `exitTarget` 순수 함수: (없음, any) → `/lab`; (있음, opener) → close; (있음, no opener) → navigate returnUrl.
-- `/playtest` 페이지(vitest + jsdom, 기존 web 테스트 관례): 유효 스냅샷 → `writeLab` 호출 인자 + `replace("/battle?stage=__lab")`; 404 → 안내 렌더; zod 실패(예: `turnLimit` 누락) → path/message 렌더. `fetch`·`next/navigation` 모킹.
+- `parsePlaytestSnapshot`(node): 유효 스냅샷(실제 `packages/data/json` 05-sishuiguan + sishuiguan 맵을 읽어 구성) → `ok:true`, payload에 `sharedItems: []`·`seed`·`returnUrl` 전달; `kind` 불일치 → `ok:false` 안내; zod 실패(예: `turnLimit` 삭제) → `ok:false` 메시지에 `turnLimit` 경로 포함. (web 테스트는 `environment: node` — jsdom·`next/navigation` 모킹은 도입하지 않는다.)
 - serve.py: `python -m py_compile` + curl 수동(정상 저장 / 잘못된 id 거부).
 - 브라우저 E2E(플랜 단계): 에디터에서 유닛 좌표를 바꾸고 ▶ → 전투에 바뀐 좌표로 시작 → 나가기 → 에디터 탭 복귀·상태 유지. 레포 JSON `git status` 무변화, `_draft/` 파일만 생성.
 
