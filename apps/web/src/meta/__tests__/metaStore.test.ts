@@ -41,6 +41,7 @@ import {
   reduceApplyRosterProgress,
   healStartItems,
   healEquipInventory,
+  earnedInventoryCount,
 } from "../metaStore";
 import { PULL_COST } from "../serendipity";
 
@@ -194,6 +195,22 @@ describe("광고 공개 API (node 메모리 캐시)", () => {
     setAdFree(true);
     reset();
     expect(isAdFree()).toBe(false);
+  });
+});
+
+describe("earnedInventoryCount — 시작 장비는 진행이 아니다(타이틀 새 게임 확인 오발)", () => {
+  const rosters: Record<string, RosterEntry> = {
+    유비: { commanderId: "유비", classId: "footman", joinChapter: 1, role: "lord", startItems: ["쌍고검"] },
+    관우: { commanderId: "관우", classId: "lightCavalry", joinChapter: 1, role: "melee", startItems: ["청룡언월도"] },
+  };
+  it("빈 세이브 + 로드 치유(시작 장비 지급) = 0", () => {
+    const healed = healEquipInventory(healStartItems(initialMeta(), rosters), rosters);
+    expect(healed.inventory.length).toBe(2);
+    expect(earnedInventoryCount(healed, rosters)).toBe(0);
+  });
+  it("시작 장비와 같은 아이템 추가분·다른 아이템은 센다", () => {
+    const s = { ...initialMeta(), inventory: ["쌍고검", "쌍고검", "청룡언월도", "상처약"] };
+    expect(earnedInventoryCount(s, rosters)).toBe(2);
   });
 });
 

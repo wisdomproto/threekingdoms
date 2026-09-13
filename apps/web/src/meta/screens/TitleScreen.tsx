@@ -14,7 +14,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BUTTON_FRAME } from "../../battle/hud/frames";
-import { getMeta, reset } from "../metaStore";
+import { earnedInventoryCount, getMeta, reset } from "../metaStore";
 import { adLifecycle } from "../adProviders";
 
 /** 수묵·청동 공유 팔레트 (frames.ts 청동기 톤 + 먹빛 배경). */
@@ -38,11 +38,13 @@ export function TitleScreen(): React.ReactElement {
     // 포털 로딩 완료 신호(§13 — 타이틀 = 상호작용 가능 시점. stub이면 no-op, 내부 1회 가드).
     adLifecycle.loadingFinished();
     const m = getMeta();
+    // 시작 장비는 로드 시 자동 지급되므로 진행으로 치지 않는다(빈 세이브 = 확인 없이 새 게임).
+    const earned = earnedInventoryCount(m);
     const progressed =
       m.clearedStages.length > 0 ||
       m.gold > 0 ||
       Object.keys(m.rosterProgress).length > 0 ||
-      m.inventory.length > 0;
+      earned > 0;
     setHasProgress(progressed);
     if (progressed) {
       const parts: string[] = [];
@@ -50,7 +52,7 @@ export function TitleScreen(): React.ReactElement {
       if (m.gold > 0) parts.push(`${m.gold.toLocaleString()} 金`);
       const grown = Object.keys(m.rosterProgress).length;
       if (grown > 0) parts.push(`육성 장수 ${grown}명`);
-      if (m.inventory.length > 0) parts.push(`장비·보물 ${m.inventory.length}개`);
+      if (earned > 0) parts.push(`장비·보물 ${earned}개`);
       setProgressSummary(parts.join(" · "));
     }
   }, []);

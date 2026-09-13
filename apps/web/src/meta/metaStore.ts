@@ -471,6 +471,28 @@ export function healEquipInventory(
   return { ...s, inventory: [...s.inventory, ...add] };
 }
 
+/**
+ * 시작 장비(startItems)를 뺀 인벤토리 수 = 플레이로 *얻은* 아이템 수.
+ * 로드 치유가 빈 세이브에도 시작 장비를 채우므로, 인벤 길이로 "진행 있음"을 판정하면
+ * 새 게임도 진행으로 오인한다(타이틀 새 게임 확인창 오발). 이탈 장수 반환분은 진행으로 친다.
+ */
+export function earnedInventoryCount(
+  s: MetaState,
+  rosters: Record<string, RosterEntry> = gameData.rosters,
+): number {
+  const start = new Map<string, number>();
+  for (const entry of Object.values(rosters)) {
+    for (const it of entry.startItems ?? []) start.set(it, (start.get(it) ?? 0) + 1);
+  }
+  let earned = 0;
+  for (const it of s.inventory) {
+    const left = start.get(it) ?? 0;
+    if (left > 0) start.set(it, left - 1);
+    else earned++;
+  }
+  return earned;
+}
+
 /** 로드 직후 치유 체인 — 시작 장비(1회) + 장착⊆인벤 불변식(멱등). 바뀌었으면 즉시 저장. */
 function healPersist(s: MetaState): MetaState {
   const healed = healEquipInventory(healStartItems(s));
