@@ -16,6 +16,8 @@
 - **씬 미리보기·에디터 진입(P2, 2026-09-12)**: `/playtest?draft=X&scene=intro|outro|outroDefeat` → `/scene?stage=__lab&type=…`(scene 페이지가 `readLab().stage`를 마운트 효과로 읽음 — 렌더 중 sessionStorage 읽기는 hydration 불일치; 페이로드 없으면 `/lab`), 종료 = `leaveSandbox`. PauseMenu(dev·non-sandbox) `✏ 이 스테이지 편집` = `editorUrlFor(stageId, NEXT_PUBLIC_TOOLS_ORIGIN ?? http://localhost:8081)` → 에디터 `?stage=&quick=1`.
 - **저장하고 나가기 / 이어하기**: `battle/suspend.ts` — `tk.battle.suspend.v1 {stageId, seed, sortie, log, playthroughCount, turn}`; 저장은 아군 페이즈 idle에서만(`canSuspend`), 복원은 `/battle?stage=…&resume=1`(`useSearchParams` — `window.location`은 router.push 직후 stale) → `BattleStoreOptions.replayLog` fold + `DialogueOverlay.initialPlayedIds`(지나간 대사 재생 억제) + `introDone=true`. 승리·새 출진 진입 시 삭제. `writeSuspend`는 boolean — false면 나가지 않는다. dev 핸들 `window.__tkBattle`. E2E `pnpm e2e:battle`(CDP 실 Chrome, next dev :3000 필요).
 - **초기 로드 예산 = Poki 8MB**: 프리로드를 추가하기 전에 `next build` + 실제 네트워크 바이트로 측정(scene-motions 9MB PNG가 현재 최대 항목).
+- **타격 FX 분기 = `damageDealt.source`(2026-09-14)**: 엔진이 책략·공격아이템 피해에 `source: "strategy"|"item"`을 붙인다 → `BattleRenderer.damageDealt`는 그때 시전자 돌진·참격/찌르기/화살을 건너뛰고 대상 칸에 책략 카테고리 임팩트만(`lastStrategyCategory`). 무기 타격·필살은 source 없음. 새 비물리 피해 경로도 source를 붙일 것(안 붙이면 칼 연출).
+- **"진행 있음" 판정 = `earnedInventoryCount`(2026-09-14)**: 로드 치유(`healStartItems`/`healEquipInventory`)가 빈 세이브에도 시작 장비를 채우므로 `inventory.length`로 진행을 판정하면 안 된다(타이틀 새 게임 확인창이 매번 뜨던 버그). 시작 장비 수량을 뺀 값을 쓴다.
 - **결산(ResultSequence)이 메타 영속 책임**: 새 진행 데이터 = ①UnitVM 노출 ②metaStore reducer ③결산 저장 호출 3종 세트. `/battle?stage=__lab`(실험실)은 메타 불가침.
 
 ## 3. 기술 스택
