@@ -1,3 +1,4 @@
+import { parseAssetBindings } from "./asset-bindings";
 import { AuthoringProjectSchema, exportLegacyBattle, type AuthoringProject, type ChapterStage } from "@tk/data/authoring-project";
 import { BattleMapSchema, normalizeSceneSlot, StageSchema, type ScenePart } from "@tk/data";
 import { parseRuntimeCatalogs } from "../lab/catalog-data";
@@ -67,5 +68,5 @@ export function compileGame(record: StoredProject, catalogs: unknown): GameSnaps
     const checked = parsePlaytestSnapshot({ kind:"tk-playtest-snapshot", version:1, stage, map:maps[stage.mapId], sceneMaps:maps, catalogs:parsedCatalogs, seed:1 });
     if (!checked.ok) throw new Error(`${stage.name}: ${checked.message}`);
   }
-  return GameSnapshotSchema.parse({ version:1, projectId:record.id, revision:record.revision, name:project.name, chapters, stages, maps, ...parsedCatalogs });
+  return GameSnapshotSchema.parse({ assetBindings:parseAssetBindings(record.project.assetBindings), version:1, projectId:record.id, revision:record.revision, name:project.name, chapters, stages, maps, ...parsedCatalogs });
 }

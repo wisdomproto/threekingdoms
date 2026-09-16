@@ -1,3 +1,5 @@
+import { listLibrary, importLibrary } from "./asset-library";
+import { parseAssetBindings } from "./asset-bindings";
 import { objectPreview } from "./object-preview";
 import { spriteCandidates } from "../pixi/spriteMap";
 import { assetUrl } from "../assetUrl";
@@ -64,6 +66,15 @@ export async function studioRequest(request: Request): Promise<Response> {
     const dataDir = join(root, "packages", "data", "json");
     const route = new URL(request.url).pathname.replace(/^\/api\/studio\//, "");
     const json = (value: unknown, status = 200) => Response.json(value, { status, headers: { "Cache-Control": "no-store" } });
+    const assetRoot = join(root, 'apps', 'web', 'public', 'assets');
+    if (route === 'asset-library') {
+      if(request.method === 'GET') return json(await listLibrary(assetRoot));
+      if(request.method === 'POST') {
+        if(Number(request.headers.get('content-length')) > 85_000_000) throw new StoreError(413,'80MB 이하로 추가해 주세요.');
+        try { return json(await importLibrary(assetRoot, await request.formData()),201); }
+        catch(e) { throw new StoreError(400, e instanceof Error ? e.message : String(e)); }
+      }
+    }
     if (route === "game") {
       const games = createGameStore(join(root, ".studio", "game"));
       if (request.method === "POST") {
@@ -145,7 +156,7 @@ export async function studioRequest(request: Request): Promise<Response> {
         const project = applyLegacyEditorEdit(record.project, target, input.stage, input.map, randomUUID);
         if (request.method === "PUT") return json(await store.save(record.id, project, record.revision));
         const doc = legacyEditorDocument(project, target), draftId = randomUUID();
-        const snapshot = { kind: "tk-playtest-snapshot", version: 1, draftId, revision: record.revision, seed: 1, savedAt: new Date().toISOString(), returnUrl: `/studio?project=${record.id}`, ...doc, catalogs: await projectCatalogs(project, dataDir) };
+        const snapshot = { kind: "tk-playtest-snapshot", version: 1, draftId, revision: record.revision, seed: 1, savedAt: new Date().toISOString(), returnUrl: `/studio?project=${record.id}`, ...doc, assetBindings: parseAssetBindings(project.assetBindings), catalogs: await projectCatalogs(project, dataDir) };
         const parsed = parsePlaytestSnapshot(snapshot);
         if (!parsed.ok) throw new StoreError(400, parsed.message);
         const directory = join(root, "apps", "web", "public", "_draft");
@@ -184,7 +195,7 @@ export async function studioRequest(request: Request): Promise<Response> {
           const directory = join(root, "apps", "web", "public", "assets", "comics");
           return json({ files: existsSync(directory) ? (await readdir(directory)).filter(name => name.endsWith(".webp")) : [] });
         }
-        const modules = ["map-scene-editor", "map-scene-model", "asset-image-editor", "battle-events", "stage-io", "history", "chapters", "story-model", "validate-story", "story-editor", "publish", "rail", "draft-store", "quick-edit", "studio-bridge", "comic-editor", "editor-mode", "catalog-bridge", "catalog-io"];
+        const modules = ["asset-library", "map-scene-editor", "map-scene-model", "asset-image-editor", "battle-events", "stage-io", "history", "chapters", "story-model", "validate-story", "story-editor", "publish", "rail", "draft-store", "quick-edit", "studio-bridge", "comic-editor", "editor-mode", "catalog-bridge", "catalog-io"];
         const module = /^editor\/([a-z-]+)\.js$/.exec(file);
         const data = /^data\/(commanders|unitClasses|items|rosters)\.json$/.exec(file);
         const projectId = new URL(request.url).searchParams.get("project");
@@ -199,7 +210,13 @@ export async function studioRequest(request: Request): Promise<Response> {
         }
         const path = ["stage-editor.html", "character-editor.html", "item-editor.html"].includes(file) ? join(root, "tools", file) : module && modules.includes(module[1]!) ? join(root, "tools", "editor", `${module[1]}.js`) : data ? join(dataDir, `${data[1]}.json`) : null;
         if (!path) throw new StoreError(404, "파일을 찾을 수 없습니다.");
-        return new Response(await readFile(path, "utf8"), { headers: { "Content-Type": data ? "application/json" : module ? "text/javascript; charset=utf-8" : "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+        let source = await readFile(path, "utf8");
+        if(file.endsWith('.html') && projectId) {
+          const record=await store.read(projectId);
+          const bindings=JSON.stringify(parseAssetBindings(record.project.assetBindings)).replaceAll('<','\\u003c');
+          source=source.replace('<head>', `<head><script>window.STUDIO_ASSET_BINDINGS=${bindings};</script>`);
+        }
+        return new Response(source, { headers: { "Content-Type": data ? "application/json" : module ? "text/javascript; charset=utf-8" : "text/html; charset=utf-8", "Cache-Control": "no-store" } });
       }
       if (route.startsWith("exports/")) {
         const id = route.slice(8);
@@ -272,7 +289,7 @@ export async function studioRequest(request: Request): Promise<Response> {
         const legacySnapshot = createLegacyPlaytestSnapshot(input.project, input.battleId, {
           draftId, revision: Number(input.revision), seed: 1, savedAt: new Date().toISOString(), returnUrl,
         });
-        const snapshot = { ...legacySnapshot, sceneMaps: projectSceneMaps(input.project, loadAuthoringProject(legacySnapshot.stage)), catalogs: await projectCatalogs(loadAuthoringProject(input.project), dataDir) };
+        const snapshot = { ...legacySnapshot, assetBindings: parseAssetBindings(loadAuthoringProject(input.project).assetBindings), sceneMaps: projectSceneMaps(input.project, loadAuthoringProject(legacySnapshot.stage)), catalogs: await projectCatalogs(loadAuthoringProject(input.project), dataDir) };
         const parsed = parsePlaytestSnapshot(snapshot);
         if (!parsed.ok) throw new StoreError(400, parsed.message);
         const directory = join(root, "apps", "web", "public", "_draft");

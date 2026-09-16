@@ -156,6 +156,7 @@
 </div>
 
 <script type="module">
+import { editorAssetUrl, chooseLibraryAsset } from "./editor/asset-library.js";
 'use strict';
 import { catalogContext, connectCatalog } from './editor/catalog-bridge.js';
 const studioCatalog = catalogContext('characters');
@@ -421,8 +422,9 @@ async function renderCharacterArt(id) {
     box.className='image-box';caption.textContent=label;figure.append(box,caption);root.appendChild(figure);
     const img=document.createElement('img');img.alt=`${commanders[id]?.name||id} ${label}`;if(sprite)img.className='sprite';
     let index=0;
-    const next=()=>{if(request!==previewRequest)return;if(index>=urls.length){box.replaceChildren();const note=document.createElement('span');note.className='missing';note.textContent='등록된 이미지가 없습니다';box.appendChild(note);return;}img.src=urls[index++];};
-    img.onerror=next;box.appendChild(img);next();return box;
+    const next=()=>{if(request!==previewRequest)return;if(index>=urls.length){box.replaceChildren();const note=document.createElement('span');note.className='missing';note.textContent='등록된 이미지가 없습니다';box.appendChild(note);return;}img.src=editorAssetUrl(urls[index++]);};
+    img.onerror=next;box.appendChild(img);next();
+    const choose=document.createElement('button');choose.type='button';choose.textContent='공용 에셋에서 선택';choose.onclick=()=>{let target=decodeURIComponent((urls[Math.max(0,index-1)]||'').replace('/api/local-assets/','/assets/'));if(sprite)target=target.slice(0,target.lastIndexOf('/')+1);chooseLibraryAsset(target);};figure.appendChild(choose);return box;
   };
   add('초상',[`${studioCatalog?'/api/local-assets':'/assets'}/ui/portraits/${encodeURIComponent(id)}.webp`]);
   if(!studioCatalog){add('전투 캐릭터',[`/assets/sprites/${encodeURIComponent(id)}/front_idle.webp`],true);return;}

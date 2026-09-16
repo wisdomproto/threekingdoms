@@ -1,3 +1,4 @@
+import { resolveActiveAsset } from "../asset-bindings";
 import { afterEach, describe, expect, it } from "vitest";
 import { gameData } from "@tk/data";
 import { importLegacyChapter } from "@tk/data/authoring-project";
@@ -17,6 +18,13 @@ function record(): StoredProject {
 }
 afterEach(() => installGame(null));
 describe("normal game compilation", () => {
+  it('preserves per-project asset bindings through compile and resets on project switch', () => {
+    const draft=record();draft.project.assetBindings={'/assets/maps/01-zhuojun.webp':'/assets/library/custom/map.webp'};
+    const snapshot=compileGame(draft,gameData);installGame(snapshot);
+    expect(resolveActiveAsset('/assets/maps/01-zhuojun.webp')).toBe('/assets/library/custom/map.webp');
+    installGame(compileGame(record(),gameData));
+    expect(resolveActiveAsset('/assets/maps/01-zhuojun.webp')).toBe('/assets/maps/01-zhuojun.webp');
+  });
   it("installs edited combat and catalog data without modifying drafts or base game", () => {
     const draft=record();
     const before=JSON.stringify(draft);

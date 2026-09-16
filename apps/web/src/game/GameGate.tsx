@@ -1,4 +1,5 @@
 "use client";
+import { installAssetBindings } from "../studio/asset-bindings";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { installGame } from "./data";
@@ -24,6 +25,7 @@ export function GameGate({ children }: { children: React.ReactNode }) {
       if (!response.ok) throw new Error(result.error ?? "게임 데이터를 불러오지 못했습니다.");
       if (cancelled) return;
       installGame(result.snapshot);
+      if(query.get("stage")==="__lab") { try { installAssetBindings(JSON.parse(sessionStorage.getItem("tk.lab") ?? "null")?.assetBindings); } catch { installAssetBindings(); } }
       setWarning(result.warning ?? ""); setReady(true);
     }
     void load().catch(e => { if (!cancelled) setError(String(e)); });

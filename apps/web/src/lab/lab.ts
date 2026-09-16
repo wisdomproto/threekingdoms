@@ -17,6 +17,7 @@ export const LAB_STAGE_ID = "__lab";
 const LAB_KEY = "tk.lab";
 
 export interface LabPayload {
+  assetBindings?: Record<string,string>;
   sceneMaps?: Record<string, BattleMap>;
   chapterRun?: { runId: string; nodeId: string; visit: number };
   catalogs?: RuntimeCatalogs;

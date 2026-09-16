@@ -44,7 +44,7 @@ export function createChapterTest(value: unknown, chapterId: string, catalogs: u
     if (!node.resourceId) throw new Error(`${node.name}: 리소스를 연결해 주세요.`);
     const doc = legacyEditorDocument(project, { kind: node.kind, id: node.resourceId });
     doc.stage.name = node.name;
-    return { ...node, kind: node.kind, snapshot: { ...doc, catalogs, kind: "tk-playtest-snapshot", version: 1, draftId: id, revision: 1, seed: 1, savedAt: new Date().toISOString(), returnUrl } };
+    return { ...node, kind: node.kind, snapshot: { ...doc, assetBindings: raw.assetBindings ?? {}, catalogs, kind: "tk-playtest-snapshot", version: 1, draftId: id, revision: 1, seed: 1, savedAt: new Date().toISOString(), returnUrl } };
   });
   return parseChapterTest({ kind: "tk-chapter-test", version: 1, id, name: chapter.name, chapterNumber: project.chapters.indexOf(chapter) + 1, entry: chapter.entryStageId, returnUrl, nodes });
 }

@@ -52,6 +52,13 @@ export default function Studio({ connectionsOnly = false }: { connectionsOnly?: 
   }
   const [detailSection, setDetailSection] = useState("맵·배치");
   const pendingPage = useRef<string | null>(null);
+  async function openAssets(target = "") {
+    if(editor.recovery) return;
+    if(editor.state) { try { sessionStorage.setItem('tk.asset-return.'+editor.state.id,JSON.stringify({chapterId,nodeId,view,battlePage,legacy})); } catch {} }
+    const url = `/studio/assets?project=${editor.state?.id ?? ""}&target=${encodeURIComponent(target)}`;
+    if(legacy) { pendingPage.current=url; legacyFrame.current?.contentWindow?.postMessage({type:"tk-studio:request-close"},location.origin); return; }
+    if(!editor.state || await editor.save()) location.assign(url);
+  }
   async function launchGame() {
     if (!editor.state || editor.recovery) return;
     const url = `/game?project=${editor.state.id}`;
@@ -135,6 +142,7 @@ export default function Studio({ connectionsOnly = false }: { connectionsOnly?: 
     const storageId = editor.state.id;
     const handler = (event: MessageEvent) => {
       if (event.origin !== location.origin || event.source !== legacyFrame.current?.contentWindow) return;
+      if (event.data?.type === "tk-studio:assets" && typeof event.data.target === "string") void openAssets(event.data.target);
       if (event.data?.type === "tk-studio:section" && typeof event.data.label === "string") setDetailSection(event.data.label);
       if (event.data?.type === "tk-studio:mode" && ["basic", "advanced"].includes(event.data.mode)) changeMode(event.data.mode);
       if (event.data?.type === "tk-studio:close") {
@@ -157,6 +165,17 @@ export default function Studio({ connectionsOnly = false }: { connectionsOnly?: 
     const firstBattle = firstChapter?.stages.find(n => n.kind === "battle");
     setExpandedChapters({});
     editor.open(record); setChapterId(firstChapter?.id ?? ""); setNodeId(firstBattle?.id ?? ""); setView(!connectionsOnly && firstBattle ? "resource" : "chapter"); setDialog(null); setMessage(""); setPreviewUrl(""); setExportUrl("");
+    if(new URLSearchParams(location.search).get('assetReturn')==='1') {
+      try {
+        const saved=JSON.parse(sessionStorage.getItem('tk.asset-return.'+record.id)??'null');
+        if(saved && opened.success && opened.data.chapters.some(c=>c.id===saved.chapterId && c.stages.some(n=>n.id===saved.nodeId))) {
+          setChapterId(saved.chapterId);setNodeId(saved.nodeId);setView(saved.view==='chapter'?'chapter':'resource');setBattlePage(saved.battlePage==='story'?'story':'battle');
+          if(saved.legacy && ['characters','items','battle','scene'].includes(saved.legacy.kind)) setLegacy(saved.legacy);
+        }
+        sessionStorage.removeItem('tk.asset-return.'+record.id);
+        history.replaceState(null,'',location.pathname+'?project='+record.id);
+      } catch {}
+    }
     window.history.replaceState(null, "", `${connectionsOnly ? "/studio/connections" : "/studio"}?project=${record.id}`);
   }
   const maySwitch = () => !editor.dirty || window.confirm("아직 저장하지 않은 수정이 있습니다. 다른 프로젝트로 이동할까요? 복구본은 이 브라우저에 남습니다.");
@@ -305,6 +324,7 @@ export default function Studio({ connectionsOnly = false }: { connectionsOnly?: 
         </div>
         <span className="studio-mark" aria-hidden="true">三</span><div><small>THREE KINGDOMS / STUDIO</small><h1>{typeof raw?.name === "string" ? raw.name : "프로젝트 스튜디오"}</h1></div></div>
       <nav aria-label="프로젝트 작업">
+        <button onClick={() => void openAssets()}>공용 에셋</button>
         {project && <button className="studio-primary" disabled={busy || editor.saving || !!editor.recovery} onClick={() => void launchGame()}>▶ 게임 실행</button>}
         {project && <div className="studio-area-nav" aria-label="작업 영역">
           {([ ["scenario", "시나리오"], ["characters", "캐릭터·로스터"], ["items", "무기·아이템"] ] as const).map(([area, label]) => <button key={area} className="studio-area-button" aria-current={!connectionsOnly && activeArea === area ? "page" : undefined} disabled={busy || editor.saving || !!editor.recovery} onClick={() => navigateArea(area)}>{label}</button>)}

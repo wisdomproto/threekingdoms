@@ -1,12 +1,14 @@
+import { editorAssetUrl, chooseLibraryAsset } from "./asset-library.js";
 /** Local image replacement. Existing assets are backed up by the server. */
 export function assetImageEditor(parent,{kind,id,onSaved}) {
   const box=document.createElement('section');box.style.cssText='padding:12px;margin:12px 0;border:1px solid #45504f;border-radius:8px';parent.appendChild(box);
   const title=document.createElement('h3');title.textContent=kind==='maps'?'맵 이미지':kind==='items'?'아이템 이미지':kind==='objects'?'지형지물 이미지':'효과 이미지';box.appendChild(title);
   const path=`/api/local-assets/${kind==='items'?'ui/items':kind}/${id.split('/').map(encodeURIComponent).join('/')}.${kind==='fx'?'png':'webp'}`;
-  const image=document.createElement('img');image.alt=title.textContent;image.style.cssText='display:block;max-width:100%;max-height:220px;object-fit:contain;background:#b9b8aa;margin-bottom:8px';image.src=path;box.appendChild(image);
+  const image=document.createElement('img');image.alt=title.textContent;image.style.cssText='display:block;max-width:100%;max-height:220px;object-fit:contain;background:#b9b8aa;margin-bottom:8px';image.src=editorAssetUrl(path);box.appendChild(image);
   const status=document.createElement('p');status.setAttribute('role','status');image.onerror=()=>{image.hidden=true;status.textContent='등록된 이미지가 없습니다.';};box.appendChild(status);
+  const library=document.createElement('button');library.type='button';library.className='btn';library.textContent='공용 에셋에서 선택';library.onclick=()=>chooseLibraryAsset(decodeURIComponent(path.replace('/api/local-assets/','/assets/')));box.appendChild(library);
   const input=document.createElement('input');input.type='file';input.accept='image/png,image/webp,image/jpeg';input.hidden=true;box.appendChild(input);
-  const choose=document.createElement('button');choose.type='button';choose.textContent='이미지 파일 선택';choose.className='btn';choose.onclick=()=>input.click();box.appendChild(choose);
+  const choose=document.createElement('button');choose.type='button';choose.textContent='공용 원본 파일 교체';choose.className='btn';choose.onclick=()=>input.click();box.appendChild(choose);
   const save=document.createElement('button');save.type='button';save.className='btn';save.textContent='이미지 적용';save.disabled=true;box.appendChild(save);
   let pending=null;
   input.onchange=async()=>{const file=input.files?.[0];if(!file)return;input.value='';if(file.size>20000000){status.textContent='20MB 이하의 이미지를 선택하세요.';return;}

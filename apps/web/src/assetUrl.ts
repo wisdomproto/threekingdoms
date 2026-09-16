@@ -1,3 +1,4 @@
+import { resolveActiveAsset } from "./studio/asset-bindings";
 /**
  * assetUrl — 생성 에셋(씬 배경·초상·맵 배경·스프라이트·지형 타일·VFX·영상)의
  * 서빙 출처를 한 겹으로 결정한다.
@@ -35,12 +36,12 @@ const PROJECT_ASSETS: Record<string, string> = {
 export function assetUrl(path: string): string {
   if (!path) return path;
   if (/^https?:\/\//i.test(path)) return path;
-  const p = path.startsWith("/") ? path : `/${path}`;
+  const p = resolveActiveAsset(path.startsWith("/") ? path : `/${path}`);
   let decoded = p;
   try { decoded = decodeURIComponent(p); } catch { /* Preserve malformed paths for the normal loader. */ }
-  if (Object.hasOwn(PROJECT_ASSETS, decoded)) return PROJECT_ASSETS[decoded]!;
+  if (Object.hasOwn(PROJECT_ASSETS, decoded)) return resolveActiveAsset(PROJECT_ASSETS[decoded]!);
   // Local authoring and battle previews share regenerated files before CDN publishing.
-  if (process.env.NODE_ENV === "development" && /^\/assets\/(maps|objects|sprites|fx|ui\/(items|portraits)|audio\/voices)(\/|$)/.test(p)) {
+  if (process.env.NODE_ENV === "development" && /^\/assets\/(library|maps|objects|sprites|fx|ui\/(items|portraits)|audio\/voices)(\/|$)/.test(p)) {
     return p.replace(/^\/assets\//, "/api/local-assets/");
   }
   return ASSET_BASE + p;

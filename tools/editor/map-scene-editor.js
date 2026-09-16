@@ -1,3 +1,4 @@
+import { editorAssetUrl } from "./asset-library.js";
 import { h, btn, moveBtns, setOrDel } from './story-editor.js';
 import { ACTIONS, newMapPart, setAction, removeActor, sceneLayout } from './map-scene-model.js';
 export { newMapPart };
@@ -20,7 +21,7 @@ function previewFrame(frame, assetBase) {
       for(let xx=0;xx<w;xx++){push(xx);push((hh-1)*w+xx);}for(let yy=0;yy<hh;yy++){push(yy*w);push(yy*w+w-1);}
       for(let q=0;q<queue.length;q++){const i=queue[q];p[i*4+3]=0;if(i%w)push(i-1);if(i%w<w-1)push(i+1);if(i>=w)push(i-w);if(i<w*(hh-1))push(i+w);}
       ctx.putImageData(data,0,0);resolve(c.toDataURL());
-    }catch(e){reject(e);}};img.src=frame.image.startsWith('data:')?frame.image:`${assetBase}${frame.image}`;
+    }catch(e){reject(e);}};img.src=frame.image.startsWith('data:')?frame.image:editorAssetUrl(`${assetBase}${frame.image}`);
   });frameCache.set(key,task);task.catch(()=>frameCache.delete(key));return task;
 }
 function select(options, value, change) {
@@ -72,7 +73,7 @@ export function renderMapPart(el, part, { commit, assetBase = '', loadMaps, onPr
     const map=maps[part.map]; const w=map?.width ?? 15, hh=map?.height ?? 10;
     const viewport=h('div');Object.assign(viewport.style,{overflow:'hidden',position:'relative',aspectRatio:`${w}/${hh}`});
     const board=h('div','mse-board'); board.style.aspectRatio=`${w}/${hh}`; if(picker)board.classList.add('mse-pick'); board.tabIndex=0;
-    const bg=h('img','mse-bg');bg.src=`${assetBase}/assets/maps/${encodeURIComponent(part.map)}.webp`;bg.alt='장면 배경';bg.onerror=()=>{if(bg.src.endsWith('.webp'))bg.src=`${assetBase}/assets/maps/${encodeURIComponent(part.map)}.png`;else bg.hidden=true;};board.append(bg);
+    const bg=h('img','mse-bg');bg.src=editorAssetUrl(`${assetBase}/assets/maps/${encodeURIComponent(part.map)}.webp`);bg.alt='장면 배경';bg.onerror=()=>{if(bg.src.endsWith('.webp'))bg.src=`${assetBase}/assets/maps/${encodeURIComponent(part.map)}.png`;else bg.hidden=true;};board.append(bg);
     const gridOverlay=h('div');Object.assign(gridOverlay.style,{position:'absolute',inset:'0',pointerEvents:'none',backgroundImage:'linear-gradient(#ffffff22 1px,transparent 1px),linear-gradient(90deg,#ffffff22 1px,transparent 1px)',backgroundSize:`${100/w}% ${100/hh}%`});board.append(gridOverlay);
     const cell=e=>{const b=board.getBoundingClientRect();return [Math.max(0,Math.min(w-1,Math.floor((e.clientX-b.left)/b.width*w))),Math.max(0,Math.min(hh-1,Math.floor((e.clientY-b.top)/b.height*hh)))];};
     board.onclick=e=>{if(picker){const cb=picker;picker=null;cb(cell(e));}};
@@ -87,7 +88,7 @@ export function renderMapPart(el, part, { commit, assetBase = '', loadMaps, onPr
       const direction=state.facing==='right'?'left':state.facing??'left';
       const clips=library[u.sprite]?.clips; const frame=(clips?.[`${direction}.${state.pose}`]??clips?.[`${direction}.idle`])?.frames?.[0];
       if(frame){const sprite=h('img');sprite.alt='';sprite.style.transform=state.facing==='right'?'scaleX(-1)':'';actor.append(sprite);previewFrame(frame,assetBase).then(src=>{sprite.src=src;}).catch(()=>{sprite.hidden=true;});}
-      else {const img=h('img');img.src=`${assetBase}/assets/sprites/${encodeURIComponent(u.sprite)}/front_idle.webp`;img.alt='';img.style.transform=state.facing==='right'?'scaleX(-1)':'';img.onerror=()=>{img.hidden=true;};actor.append(img);}
+      else {const img=h('img');img.src=editorAssetUrl(`${assetBase}/assets/sprites/${encodeURIComponent(u.sprite)}/front_idle.webp`);img.alt='';img.style.transform=state.facing==='right'?'scaleX(-1)':'';img.onerror=()=>{img.hidden=true;};actor.append(img);}
       actor.append(h('span',null,`${actorName(u.id)}${state.hidden?' (숨김)':''}`));
       actor.onclick=e=>{if(picker)return;e.stopPropagation();selected=u.id;draw();};
       actor.onpointerdown=e=>{if(picker||timer)return;e.stopPropagation();actor.setPointerCapture(e.pointerId);const start=[e.clientX,e.clientY];let moved=false;

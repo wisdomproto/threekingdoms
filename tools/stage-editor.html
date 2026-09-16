@@ -363,6 +363,7 @@
   에디터 모듈을 불러오지 못했습니다 — <code>file://</code> 로 열면 동작하지 않습니다. serve.py로 여세요 (launch <code>tools</code> = :8081, 기본 :8080).
 </div>
 <script type="module">
+import { editorAssetUrl, chooseLibraryAsset } from "./editor/asset-library.js";
 import {
   TERRAINS,
   loadStage as loadStageModel, serializeStage as serializeStageModel,
@@ -690,7 +691,7 @@ function previewImage(urls) {
     const image = new Image();
     image.onload = () => { previewImages.set(key, image); renderTerrain(); renderUnits(); };
     image.onerror = () => attempt(index + 1);
-    image.src = urls[index];
+    image.src = editorAssetUrl(urls[index]);
   };
   attempt(0);
   return null;
@@ -1009,7 +1010,7 @@ function openMapMenu(event, x, y) {
     const load=index=>{
       if(version!==previewVersion)return;
       if(index>=urls.length){previewImg.hidden=true;caption.textContent=`${label} · 등록된 이미지가 없습니다`;return;}
-      previewImg.onerror=()=>load(index+1);previewImg.src=urls[index];
+      previewImg.onerror=()=>load(index+1);previewImg.src=editorAssetUrl(urls[index]);
     };load(0);
   };
   terrain.addEventListener('change',showPreview);showPreview();

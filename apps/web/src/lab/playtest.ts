@@ -1,3 +1,4 @@
+import { parseAssetBindings } from "../studio/asset-bindings";
 /**
  * 에디터 플레이테스트 스냅샷(spec 2026-09-12-editor-playtest-design §4) → LabPayload.
  * 서버 드래프트 파일 `/_draft/{draftId}.json` 의 내용을 검증한다. DOM·Next 무관(순수) — node 테스트 대상.
@@ -12,6 +13,7 @@ export const PLAYTEST_KIND = "tk-playtest-snapshot";
 export const PLAYTEST_VERSION = 1;
 
 export interface PlaytestSnapshot {
+  assetBindings?: unknown;
   sceneMaps?: unknown;
   catalogs?: unknown;
   kind: typeof PLAYTEST_KIND;
@@ -66,6 +68,7 @@ export function parsePlaytestSnapshot(json: unknown): PlaytestParseResult {
     }
   }
   sceneMaps[map.data.id] = map.data;
+  try { payload.assetBindings = parseAssetBindings(s.assetBindings); } catch { return {ok:false,message:"에셋 연결 형식을 확인해 주세요."}; }
   payload.sceneMaps = sceneMaps;
   for (const slot of Object.values(stage.data.scenario ?? {})) {
     for (const part of normalizeSceneSlot(slot)) {
