@@ -172,6 +172,7 @@ function darken(color: number, factor: number): number {
 export const UNIT_BASE_SIZE = TILE_SIZE - 10;
 
 export class TextureResolver {
+  private disposed = false;
   private readonly baked = new Map<string, Texture>();
   /** spriteId → pose → Texture. loadSprites() 완료 후에만 채워진다 */
   private readonly sprites = new Map<string, Map<string, Texture>>();
@@ -519,10 +520,15 @@ export class TextureResolver {
   }
 
   async loadTiles(): Promise<void> {
+    if (this.disposed) return;
     await this.loadDecos();
+    if (this.disposed) return;
     await this.loadObjects();
+    if (this.disposed) return;
     await this.loadFx();
+    if (this.disposed) return;
     await this.loadGround();
+    if (this.disposed) return;
     let manifest: TilesManifest;
     try {
       const res = await fetch(`${this.tileBase}/tiles-manifest.json`);
@@ -536,6 +542,7 @@ export class TextureResolver {
       return;
     }
 
+    if (this.disposed) return;
     // manifest v2와 v1(숫자) 둘 다 허용 — 이전 파일 호환
     const normalizedManifest: TilesManifest = {};
     for (const [tid, entry] of Object.entries(manifest)) {
@@ -566,6 +573,8 @@ export class TextureResolver {
       console.warn("[TextureResolver] 지형 타일 텍스처 로드 오류 — 부분 폴백", e);
     }
 
+    // Scene changes may destroy the renderer while image requests are in flight.
+    if (this.disposed) return;
     // 지형별 분류
     const macroGrouped = new Map<string, Array<{ variant: number; url: string }>>();
     const tileGrouped = new Map<string, Array<{ variant: number; url: string }>>();
@@ -724,6 +733,7 @@ export class TextureResolver {
   }
 
   destroy(): void {
+    this.disposed = true;
     for (const tex of this.baked.values()) tex.destroy(true);
     this.baked.clear();
     // sprites는 Assets 전역 캐시가 관리 — 여기서 개별 destroy 안 함 (공유 참조 보호)

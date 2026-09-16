@@ -22,14 +22,15 @@ import { gameData, type GameData } from "../../game/data";
 import type { CSSProperties } from "react";
 import type { InputState, UiEvent } from "../inputMachine";
 import type { MenuAnchor } from "../store";
+import { StrategyIcon } from "./StrategyIcon";
 
 /**
  * 메뉴 패널 폭(px, box-sizing:border-box — 패딩 포함). 한글 2~3자 + 내부 패딩.
  * 레퍼런스 §9 "돌/회색 버튼" = 불투명 패널 → 맵/유닛이 비치지 않게 한 장으로 묶는다.
  */
-export const MENU_WIDTH = 96;
+export const MENU_WIDTH = 160;
 /** 버튼 높이(px) — 촘촘한 세로 리스트(border-image 프레임 제거로 비대화 해소) */
-const BUTTON_H = 34;
+const BUTTON_H = 46;
 /** 버튼 간 간격(px) — 패널 배경이 채우므로 맵이 비치지 않음 */
 const GAP = 3;
 /** 패널 내부 패딩(px) — 버튼과 청동 테두리 사이 */
@@ -75,7 +76,7 @@ export interface Item {
   onPress?: () => void;
 }
 
-function Btn({ item }: { item: Item }): React.ReactElement {
+function Btn({ item, strategy }: { item: Item; strategy?: GameData["strategies"][string] }): React.ReactElement {
   const dim = item.disabled || item.placeholder;
   return (
     <button
@@ -84,11 +85,14 @@ function Btn({ item }: { item: Item }): React.ReactElement {
       disabled={dim}
       style={{
         ...BUTTON_STYLE,
+        flexShrink: 0,
+        gap: 6,
         ...(item.accent && !dim ? { color: item.accent } : {}),
         ...(dim ? { opacity: 0.4, cursor: "default" } : {}),
       }}
     >
-      {item.label}
+      {strategy && <StrategyIcon name={strategy.name} category={strategy.category} />}
+      <span>{item.label}</span>
     </button>
   );
 }
@@ -103,7 +107,7 @@ export function placeMenu(
   itemCount: number,
   viewport: { width: number; height: number },
 ): { left: number; top: number } {
-  const menuH = menuPanelHeight(itemCount);
+  const menuH = Math.min(menuPanelHeight(itemCount), Math.max(0, viewport.height - EDGE * 2));
   const offset = anchor.half + SIDE_PAD; // 셀 중심에서 메뉴 안쪽 변까지
 
   // 가로: 기본 = anchor.preferRight(렌더러가 유닛 점유 보고 빈 쪽 결정). 그 쪽이 화면 밖이면 반대로.
@@ -244,18 +248,28 @@ export function ActionMenu({
   if (previewWalking) return null;
   if (!anchor) return null;
 
-  const items = itemsFor(ui, dispatch, data);
+  const items = ui.kind === "selected"
+    ? [{ key: "cancel", label: "선택 취소", onPress: () => dispatch({ type: "cancel" }) }]
+    : itemsFor(ui, dispatch, data).filter(item => !item.placeholder);
   if (items.length === 0) return null;
 
-  const { left, top } = placeMenu(anchor, items.length, viewport);
+  // Leave the turn header and compact information dock unobstructed.
+  const usableHeight = Math.max(80, viewport.height - 150);
+  const { left, top } = placeMenu({ ...anchor, y: anchor.y - 44 }, items.length,
+    { ...viewport, height: usableHeight });
 
   return (
     <div
       data-testid="action-menu"
+      role="group"
+      aria-label="장수 행동"
       style={{
         position: "absolute",
         left,
-        top,
+        top: top + 44,
+        maxHeight: Math.max(0, usableHeight - EDGE * 2),
+        overflowY: "auto",
+        zIndex: 6,
         width: MENU_WIDTH,
         boxSizing: "border-box",
         padding: PANEL_PAD,
@@ -273,7 +287,7 @@ export function ActionMenu({
       }}
     >
       {items.map((item) => (
-        <Btn key={item.key} item={item} />
+        <Btn key={item.key} item={item} strategy={ui.kind === "strategyMenu" ? data.strategies[item.key] : undefined} />
       ))}
     </div>
   );

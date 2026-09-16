@@ -245,7 +245,11 @@ function MapSceneInner({
     <div
       onClick={advance}
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") advance();
+        if (e.target !== e.currentTarget) return;
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          if (!e.repeat) advance();
+        }
       }}
       role="button"
       tabIndex={0}
