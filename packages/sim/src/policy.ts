@@ -175,10 +175,12 @@ export function chooseAction(ctx: BattleContext, state: BattleState): Action | u
         return { type: "wait", unitId: unit.id };
       }
 
-      // 섬멸 자세: 가장 가까운 적과의 *맨해튼* 거리 최소화로 전진 (기존 동작 보존).
-      const best = [...tiles].sort((a, b) => nearestEnemyDist(a) - nearestEnemyDist(b))[0];
-      if (best && !(best.x === unit.x && best.y === unit.y)) {
-        return { type: "move", unitId: unit.id, to: best };
+      // Follow terrain cost even when the first step leads away from the target.
+      // Straight-line pursuit traps the attacker at rivers instead of using bridges.
+      const targets = [...enemies].sort((a,b) => distance(unit,a)-distance(unit,b) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+      for (const target of targets) {
+        const approach = stepToward(ctx, state, unit, target);
+        if (approach) return approach;
       }
     }
   }

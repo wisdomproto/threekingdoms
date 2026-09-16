@@ -5,7 +5,7 @@
  * (상점의 ItemDetailPopup은 양피지 톤+구매 버튼이라 별도 — 톤/행동이 달라 합치지 않는다.)
  * 효과 풀이는 shopItemView.effectLines(순수)와 공유 — 상점 팝업과 문구가 항상 일치.
  */
-import { gameData } from "@tk/data";
+import { gameData } from "../game/data";
 import { CATEGORY_LABEL, effectLines } from "../meta/screens/shopItemView";
 import { ItemIcon } from "./ItemIcon";
 

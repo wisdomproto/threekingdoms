@@ -22,4 +22,11 @@ describe('scene motion contract',()=>{
       expect(validateLibrary(copy)).toBe(false);
     }
   });
+  it('accepts bounded mounted-actor scaling and rejects invalid scales',()=>{
+    for(const scale of [0, -1, 2.1, NaN, Infinity]){
+      const copy=structuredClone(library);Object.assign(copy.actors['liubei-foot'],{displayScale:scale});
+      expect(validateLibrary(copy)).toBe(false);
+    }
+    expect(library.actors['zhaoyun-rescue'].displayScale).toBe(1.55);
+  });
 });

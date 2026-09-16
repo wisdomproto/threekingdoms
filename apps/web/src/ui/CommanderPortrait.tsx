@@ -29,7 +29,7 @@ export function CommanderPortrait({
       style={{
         width: "100%",
         height: "100%",
-        background: "linear-gradient(to bottom, #2a2014, #171208)",
+        background: "linear-gradient(to bottom, #49391b, #211b10)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

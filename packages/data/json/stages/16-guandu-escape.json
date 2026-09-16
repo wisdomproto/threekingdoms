@@ -17,70 +17,266 @@
   },
   "levelCap": 27,
   "scenario": {
-    "intro": {
-      "bg": "16-guandu-escape-intro",
-      "lines": [
-        {
-          "text": "옥대 속에 꿰매 숨긴 천자의 밀조 — 의대조. 조조를 주살하라는 붉은 글씨는, 그러나 새어 나가고 말았다."
+    "intro": [
+      {
+        "bg": "16-guandu-escape-intro",
+        "lines": [
+          {
+            "text": "옥대 속에 꿰매 숨긴 천자의 밀조 — 의대조. 조조를 주살하라는 붉은 글씨는, 그러나 새어 나가고 말았다."
+          }
+        ]
+      },
+      {
+        "map": "scene-refugee-road",
+        "label": "관도 · 멈추지 마라",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "text": "동승 일파는 몰살당했다. 조조의 칼끝이 이번에는 유비를 향했다."
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-official",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "zhaoyun",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "jianyong",
+            "sprite": "jianyong-robes",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "동승 일파는 몰살당했다. 조조의 칼끝이 이번에는 유비를 향했다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "조운",
+            "side": "player",
+            "portraitId": "조운",
+            "text": "주공, 조인의 추격대가 이미 코앞입니다. 제 창이 길을 열겠습니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "zhaoyun",
+                "to": [
+                  6,
+                  3
+                ]
+              }
+            ]
+          },
+          {
+            "speaker": "간옹",
+            "side": "player",
+            "portraitId": "간옹",
+            "text": "원소에게 갑니다. 원수의 원수와는 손을 잡을 수 있는 법 — 북쪽뿐입니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "관도 벌판을 가로지른다. 멈추면 따라잡힌다 — 쉬지 않고 간다.",
+            "pose": [
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "흩어지면 끝이다. 나를 따르라!",
+            "pose": [
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "!"
+            }
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "16-guandu-escape-outro",
+        "lines": [
+          {
+            "text": "관도의 벌판을 벗어나자 원소의 척후가 일행을 맞았다. 등 뒤의 추격은 거기서 끊겼다."
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-day",
+        "label": "북쪽 진영 · 헤어진 형제",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "조운",
-          "side": "player",
-          "portraitId": "조운",
-          "text": "주공, 조인의 추격대가 이미 코앞입니다. 제 창이 길을 열겠습니다."
-        },
-        {
-          "speaker": "간옹",
-          "side": "player",
-          "portraitId": "간옹",
-          "text": "원소에게 갑니다. 원수의 원수와는 손을 잡을 수 있는 법 — 북쪽뿐입니다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "관도 벌판을 가로지른다. 멈추면 따라잡힌다 — 쉬지 않고 간다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "흩어지면 끝이다. 나를 따르라!"
-        }
-      ]
-    },
-    "outro": {
-      "bg": "16-guandu-escape-outro",
-      "lines": [
-        {
-          "text": "관도의 벌판을 벗어나자 원소의 척후가 일행을 맞았다. 등 뒤의 추격은 거기서 끊겼다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "또 쫓기는 신세로구나... 운장과 익덕은 무사할까."
-        },
-        {
-          "speaker": "조운",
-          "side": "player",
-          "portraitId": "조운",
-          "text": "반드시 다시 만날 겁니다. 살아만 계시면."
-        },
-        {
-          "text": "같은 시각 — 하비에서 퇴로가 끊긴 관우는, 두 형수를 지키기 위해 무거운 결단을 내리고 있었다."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-official",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "zhaoyun",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "또 쫓기는 신세로구나... 운장과 익덕은 무사할까.",
+            "pose": [
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "rest"
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "조운",
+            "side": "player",
+            "portraitId": "조운",
+            "text": "반드시 다시 만날 겁니다. 살아만 계시면.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "text": "같은 시각 — 하비에서 퇴로가 끊긴 관우는, 두 형수를 지키기 위해 무거운 결단을 내리고 있었다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "유비",
       "classId": "lord",
-      "level": 22,
+      "level": 16,
       "troops": 240,
       "items": [
         "옥새"
@@ -92,7 +288,7 @@
     {
       "commanderId": "관우",
       "classId": "guardCavalry",
-      "level": 23,
+      "level": 16,
       "troops": 270,
       "items": [
         "청룡언월도",
@@ -105,7 +301,7 @@
     {
       "commanderId": "장비",
       "classId": "guardCavalry",
-      "level": 23,
+      "level": 16,
       "troops": 265,
       "items": [
         "사모"
@@ -117,7 +313,7 @@
     {
       "commanderId": "조운",
       "classId": "guardCavalry",
-      "level": 22,
+      "level": 16,
       "troops": 255,
       "items": [
         "적로"
@@ -129,7 +325,7 @@
     {
       "commanderId": "간옹",
       "classId": "strategist",
-      "level": 21,
+      "level": 16,
       "troops": 190,
       "items": [
         "손자의병법서",
@@ -142,7 +338,7 @@
     {
       "commanderId": "미축",
       "classId": "sorcerer",
-      "level": 20,
+      "level": 16,
       "troops": 175,
       "items": [
         "상약"
@@ -154,7 +350,7 @@
     {
       "commanderId": "미방",
       "classId": "footman",
-      "level": 20,
+      "level": 16,
       "troops": 200,
       "items": [],
       "side": "player",
@@ -164,7 +360,7 @@
     {
       "commanderId": "유벽",
       "classId": "footman",
-      "level": 18,
+      "level": 14,
       "troops": 160,
       "items": [],
       "side": "ally",
@@ -174,8 +370,8 @@
     {
       "commanderId": "조인",
       "classId": "heavyCavalry",
-      "level": 24,
-      "troops": 280,
+      "level": 18,
+      "troops": 154,
       "items": [],
       "side": "enemy",
       "x": 44,
@@ -184,8 +380,8 @@
     {
       "commanderId": "허저",
       "classId": "brawler",
-      "level": 24,
-      "troops": 270,
+      "level": 18,
+      "troops": 149,
       "items": [],
       "side": "enemy",
       "x": 42,
@@ -194,8 +390,8 @@
     {
       "commanderId": "이전",
       "classId": "archer",
-      "level": 22,
-      "troops": 210,
+      "level": 16,
+      "troops": 116,
       "items": [],
       "side": "enemy",
       "x": 46,
@@ -204,8 +400,8 @@
     {
       "commanderId": "악진",
       "classId": "lightCavalry",
-      "level": 22,
-      "troops": 220,
+      "level": 16,
+      "troops": 121,
       "items": [],
       "side": "enemy",
       "x": 42,
@@ -214,8 +410,8 @@
     {
       "commanderId": "조성",
       "classId": "footman",
-      "level": 20,
-      "troops": 180,
+      "level": 14,
+      "troops": 99,
       "items": [],
       "side": "enemy",
       "x": 28,
@@ -224,8 +420,8 @@
     {
       "commanderId": "조순",
       "classId": "archer",
-      "level": 20,
-      "troops": 170,
+      "level": 14,
+      "troops": 94,
       "items": [],
       "side": "enemy",
       "x": 30,
@@ -234,8 +430,8 @@
     {
       "commanderId": "왕충",
       "classId": "lightCavalry",
-      "level": 20,
-      "troops": 180,
+      "level": 14,
+      "troops": 99,
       "items": [],
       "side": "enemy",
       "x": 50,
@@ -271,8 +467,8 @@
         {
           "commanderId": "서황",
           "classId": "heavyCavalry",
-          "level": 23,
-          "troops": 240,
+          "level": 17,
+          "troops": 132,
           "items": [],
           "side": "enemy",
           "x": 6,
@@ -281,8 +477,8 @@
         {
           "commanderId": "한맹",
           "classId": "lightCavalry",
-          "level": 21,
-          "troops": 190,
+          "level": 15,
+          "troops": 105,
           "items": [],
           "side": "enemy",
           "x": 10,
@@ -301,8 +497,8 @@
         {
           "commanderId": "우금",
           "classId": "heavyCavalry",
-          "level": 23,
-          "troops": 240,
+          "level": 17,
+          "troops": 132,
           "items": [],
           "side": "enemy",
           "x": 4,
@@ -311,8 +507,8 @@
         {
           "commanderId": "조하",
           "classId": "lightCavalry",
-          "level": 21,
-          "troops": 185,
+          "level": 15,
+          "troops": 102,
           "items": [],
           "side": "enemy",
           "x": 2,

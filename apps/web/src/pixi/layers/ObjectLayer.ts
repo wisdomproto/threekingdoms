@@ -12,6 +12,8 @@ import type { TextureResolver } from "../textures";
 import type { WorldRect } from "./TerrainLayer";
 import { wallTile } from "../objects/autotile";
 import { objectKind, decoObjectKey, decoVariant } from "../objects/objectModel";
+import { terrainComposition, type TerrainComposition } from "../objects/terrainComposition";
+import { propScale } from "../objects/propPresentation";
 
 const CHUNK_TILES = 16;
 const N = 1, E = 2, S = 4, W = 8;
@@ -23,6 +25,7 @@ export class ObjectLayer extends Container {
   private readonly chunks: Chunk[] = [];
   private readonly ctx: BattleContext;
   private readonly textures: TextureResolver;
+  private readonly composition: Map<string, TerrainComposition>;
   /** 칸별 성문/성벽 상태. 키=`${gx},${gy}` */
   private readonly state = new Map<string, string>();
   /** 스테이지 정밀 데코(§5.2) — 청크 rebuild 때마다 소속 칸 기준으로 얹는다. */
@@ -36,6 +39,8 @@ export class ObjectLayer extends Container {
     this.textures = textures;
     this.decorations = ctx.stage.decorations ?? [];
     const { width, height } = ctx.map;
+    this.composition = terrainComposition(width, height, (x, y) =>
+      x >= 0 && y >= 0 && x < width && y < height ? terrainAt(ctx, x, y).id : undefined);
     const chunksX = Math.ceil(width / CHUNK_TILES);
     const chunksY = Math.ceil(height / CHUNK_TILES);
     for (let cy = 0; cy < chunksY; cy++) {
@@ -128,7 +133,7 @@ export class ObjectLayer extends Container {
       if (gx < ox || gx >= ox + tw || gy < oy || gy >= oy + th) continue;
       const tex = this.textures.getObject(d.kind);
       if (!tex || tex.width === 0) continue; // 미보유 키 = 조용히 생략(드롭인)
-      this.placeDeco(chunk, tex, gx - ox, gy - oy, d.flip, d.scale);
+      this.placeDeco(chunk, tex, gx - ox, gy - oy, d.flip, propScale(d.kind, d.scale));
     }
   }
 
@@ -170,13 +175,23 @@ export class ObjectLayer extends Container {
     // 유기적 변형(decoVariant — 반전/크기/오프셋/산지 바위 혼합, (gx,gy) 결정론)으로
     // 정격자 도장 반복을 깬다. 변형 키 텍스처 미보유면 기본 키로 폴백.
     const baseKey = decoObjectKey(terrainId);
-    const v = decoVariant(terrainId, gx, gy);
+    const patch = this.composition.get(`${gx},${gy}`);
+    if (["forest", "mountain", "village"].includes(terrainId) && !patch) return;
+    const v = patch ?? decoVariant(terrainId, gx, gy);
+    if (patch?.courtyard) {
+      const yard = new Graphics();
+      yard.roundRect(tx * TILE_SIZE + 3, ty * TILE_SIZE + TILE_SIZE * 0.3,
+        patch.width * TILE_SIZE - 6, patch.height * TILE_SIZE - TILE_SIZE * 0.35, 8)
+        .fill({ color: 0xb9a578, alpha: 0.24 });
+      chunk.container.addChild(yard);
+      chunk.sprites.push(yard);
+    }
     const tex =
       (v ? this.textures.getObject(v.key) : null) ??
       (baseKey ? this.textures.getObject(baseKey) : null) ??
       this.textures.getDeco(terrainId);
     if (!tex || tex.width === 0) return;
-    this.placeDeco(chunk, tex, tx, ty, v?.flip, v?.scale ?? 1, v?.dx ?? 0, v?.dy ?? 0, v?.tint);
+    this.placeDeco(chunk, tex, tx, ty, v?.flip, v?.scale ?? 1, v?.dx ?? 0, v?.dy ?? 0, v?.tint, patch?.maxHeight);
   }
 
   /** 데코 스프라이트 1개 배치(그림자 타원 + 바닥 앵커 빌보드) — 지형 자동 데코·정밀 데코 공용.
@@ -191,12 +206,14 @@ export class ObjectLayer extends Container {
     dxTile = 0,
     dyTile = 0,
     tint?: number,
+    maxHeight?: number,
   ): void {
-    const s = ((TILE_SIZE * 1.18) / tex.width) * scaleMul;
+    const s = Math.min(((TILE_SIZE * 1.18) / tex.width) * scaleMul,
+      maxHeight === undefined ? Infinity : TILE_SIZE * maxHeight / tex.height);
     const cx = tx * TILE_SIZE + TILE_SIZE / 2 + dxTile * TILE_SIZE;
     const cy = ty * TILE_SIZE + TILE_SIZE - 1 + dyTile * TILE_SIZE;
     const shadow = new Graphics();
-    shadow.ellipse(0, 0, tex.width * s * 0.32, TILE_SIZE * 0.16).fill({ color: 0x000000, alpha: 0.18 });
+    shadow.ellipse(0, 0, tex.width * s * 0.32, TILE_SIZE * 0.16 * Math.min(1, scaleMul)).fill({ color: 0x000000, alpha: 0.18 });
     shadow.position.set(cx, cy - 2);
     chunk.container.addChild(shadow);
     chunk.sprites.push(shadow);
@@ -211,7 +228,7 @@ export class ObjectLayer extends Container {
 
   cull(view: WorldRect): void {
     for (const c of this.chunks)
-      c.container.visible = c.x < view.x + view.width && c.x + c.width > view.x &&
-        c.y < view.y + view.height && c.y + c.height > view.y;
+      c.container.visible = c.x - TILE_SIZE * 2 < view.x + view.width && c.x + c.width + TILE_SIZE * 2 > view.x &&
+        c.y - TILE_SIZE * 2 < view.y + view.height && c.y + c.height + TILE_SIZE * 2 > view.y;
   }
 }

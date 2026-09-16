@@ -101,6 +101,7 @@ export function applySortieToStage(stage: Stage, members: SortieMember[]): Stage
       commanderId: m.commanderId,
       classId: m.classId,
       level: m.level,
+      exp: m.exp,
       items: [...m.items],
       ...(m.troops != null ? { troops: m.troops } : {}),
     });

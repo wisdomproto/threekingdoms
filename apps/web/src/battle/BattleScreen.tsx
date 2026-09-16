@@ -12,9 +12,10 @@
  *
  * HUD는 useSyncExternalStore로 settled 기반 뷰모델 스냅샷만 구독 (설계 §4 스포일러 차단).
  */
+import { runtimeGameData } from "../lab/catalog-data";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useSearchParams } from "next/navigation";
-import { gameData } from "@tk/data";
+import { gameData } from "../game/data";
 import { getMeta, getPlaythroughCount } from "../meta/metaStore";
 import type { Action, BattleContext, BattleEvent, BattleState, Coord } from "@tk/engine";
 import { BattleStore } from "./store";
@@ -24,15 +25,17 @@ import { BattleRenderer } from "../pixi/BattleRenderer";
 import { readSortie, applySortieToStage } from "../meta/sortie";
 import { readLab, LAB_STAGE_ID } from "../lab/lab";
 import { editorUrlFor } from "../lab/editorLink";
-import { UnitPanel, activeUnitId } from "./hud/UnitPanel";
+import { activeUnitId } from "./hud/UnitPanel";
 import { InspectPopup } from "./hud/InspectPopup";
 import { AttackForecast } from "./hud/AttackForecast";
-import { ActionMenu } from "./hud/ActionMenu";
+import { SelectionDock } from "./hud/SelectionDock";
+import { CombatPortraits, type CombatHit } from "./hud/CombatPortraits";
 import { TurnBanner } from "./hud/TurnBanner";
 import { EndTurnConfirm } from "./hud/EndTurnConfirm";
 import { ObjectiveStrip, ObjectiveFlashLayer } from "./hud/ObjectiveBanner";
 import { buildObjectiveDisplay } from "./objectiveText";
 import { ResultSequence } from "./hud/ResultSequence";
+import { collectBattleCarry } from "../studio/chapter-progress";
 import { DialogueOverlay } from "./dialogue/DialogueOverlay";
 import { DuelCutin, type DuelCineVM } from "./duel/DuelCutin";
 import { duelBanter } from "./duel/duelMedia";
@@ -42,7 +45,7 @@ import { Minimap } from "./hud/Minimap";
 import { BottomPanel } from "./hud/BottomPanel";
 import { adLifecycle } from "../meta/adProviders";
 import { HUD_FONT, HUD_BRONZE, HUD_BRONZE_DIM, HUD_INK, HUD_PARCHMENT } from "./hud/frames";
-import { hudMode, unitPanelSide } from "./hudLayout";
+import { hudMode } from "./hudLayout";
 import { loadControls, saveControls } from "./controlSettings";
 import { canSuspend, clearSuspend, isResumable, readSuspend, writeSuspend } from "./suspend";
 import { firedDialogues, toDialogueSnapshot } from "./dialogue/director";
@@ -98,13 +101,22 @@ type Ev<T extends BattleEvent["type"]> = Extract<BattleEvent, { type: T }>;
  * previewWalk/previewCancel도 여기서 위임 — store 생성 시 onPreviewWalk/onPreviewCancel에 연결.
  */
 class PresenterDelegate implements Presenter {
+  scriptMessage(e: Ev<"scriptMessage">): Promise<void> { return this.target?.scriptMessage(e) ?? Promise.resolve(); }
+  scriptEffect(e: Ev<"scriptEffect">): Promise<void> { return this.target?.scriptEffect(e) ?? Promise.resolve(); }
+  scriptDamage(e: Ev<"scriptDamage">): Promise<void> { return this.target?.scriptDamage(e) ?? Promise.resolve(); }
   target: BattleRenderer | null = null;
+  onCombat: ((hit: CombatHit | null) => void) | null = null;
 
   unitMoved(e: Ev<"unitMoved">): Promise<void> {
     return this.target?.unitMoved(e) ?? Promise.resolve();
   }
-  damageDealt(e: Ev<"damageDealt">): Promise<void> {
-    return this.target?.damageDealt(e) ?? Promise.resolve();
+  async damageDealt(e: Ev<"damageDealt">): Promise<void> {
+    this.onCombat?.(e);
+    try {
+      await this.target?.damageDealt(e);
+    } finally {
+      this.onCombat?.(null);
+    }
   }
   strategyCast(e: Ev<"strategyCast">): Promise<void> {
     return this.target?.strategyCast(e) ?? Promise.resolve();
@@ -197,7 +209,7 @@ function makeCtx(): { ctx: BattleContext; sharedItems: string[]; seed?: number; 
     const lab = readLab();
     if (lab) {
       // 실험실·플레이테스트: 결산 sandbox(메타 불가침)·종료 복귀는 이 플래그가 결정 — 스테이지 id 비교 금지(플레이테스트 스냅샷은 실제 id 유지).
-      return { ctx: { data: gameData, stage: lab.stage, map: lab.map }, sharedItems: lab.sharedItems, seed: lab.seed, sandbox: true };
+      return { ctx: { data: runtimeGameData(lab.catalogs), stage: lab.stage, map: lab.map }, sharedItems: lab.sharedItems, seed: lab.seed, sandbox: true };
     }
   }
   const sortie = readSortie();
@@ -253,8 +265,9 @@ interface Session {
  * @param resume `?resume=1` — 호출부가 useSearchParams로 읽어 넘긴다. window.location은 클라이언트
  *   내비게이션(router.push)과 같은 렌더에선 아직 이전 URL이라(URL 갱신은 커밋 시) 여기서 읽으면 안 된다.
  */
-function createSession(resume: boolean): Session {
-  const { ctx, sharedItems, seed, sandbox } = makeCtx();
+export interface BattleSetup { ctx: BattleContext; seed: number; sharedItems: string[]; localAssets?: boolean }
+function createSession(resume: boolean, setup?: BattleSetup): Session {
+  const { ctx, sharedItems, seed, sandbox } = setup ? { ...setup, sandbox: true } : makeCtx();
   const delegate = new PresenterDelegate();
   // 이어하기(스펙 §7): ?resume=1 + 저장본이 이 스테이지·회차와 맞으면 seed+actionLog를 엔진 fold로 복원.
   // 새 출진(정규 경로)은 이전 저장본을 지운다 — 저장본은 다음 출진 전까지만 사는 세이브 지점.
@@ -298,11 +311,20 @@ function createSession(resume: boolean): Session {
   return { ctx, store, delegate, sandbox, resumed: replayLog !== undefined };
 }
 
-export default function BattleScreen(): React.ReactElement {
+export default function BattleScreen({ setup, onComplete, onExit }: {
+  setup?: BattleSetup;
+  onComplete?: (result: "victory" | "defeat") => void;
+  onExit?: () => void;
+} = {}): React.ReactElement {
   const resume = useSearchParams().get("resume") === "1";
   const sessionRef = useRef<Session | null>(null);
-  sessionRef.current ??= createSession(resume);
+  sessionRef.current ??= createSession(resume, setup);
   const { ctx, store, delegate, sandbox, resumed } = sessionRef.current;
+  const [combatHit, setCombatHit] = useState<CombatHit | null>(null);
+  useEffect(() => {
+    delegate.onCombat = setCombatHit;
+    return () => { delegate.onCombat = null; };
+  }, [delegate]);
 
   // 조작 설정(기기 로컬 tk.controls.v1) — 입문 공격 확인 ↔ 클래식. store에 반영, PauseMenu가 토글.
   const [controls, setControls] = useState(loadControls);
@@ -339,9 +361,10 @@ export default function BattleScreen(): React.ReactElement {
 
   // 전투 부트 게이트 — 에셋(스프라이트·오브젝트·맵배경) 로드 완료까지 로딩 장막을 덮는다.
   // "캐릭터/오브젝트가 뒤늦게 뜨는" 점진 노출 대신 준비 후 시작(2026-07-03 피드백).
-  // 타임아웃(15s) 폴백 = §13 무손실 — 파일 누락/네트워크 행이 게임을 인질 잡지 않는다
-  // (장막만 걷히고, 밑에서는 기존 점진 로드가 계속 채운다).
+  // After 15 seconds, offer manual entry while assets continue loading.
+  // Never reveal placeholder units automatically just because loading is slow.
   const [boot, setBoot] = useState({ pct: 0, ready: false });
+  const [bootSlow, setBootSlow] = useState(false);
   // 개전 나레이션(battleStart 대사) 종료 후에 승리조건 배너를 띄운다(2026-07-03 피드백 —
   // "나레이션 끝나고 목표가 딱"). 개전 대사가 없는 스테이지는 장막 걷히는 즉시.
   const hasOpeningDialogue = useMemo(
@@ -374,12 +397,13 @@ export default function BattleScreen(): React.ReactElement {
   useEffect(() => {
     const el = mountRef.current;
     if (!el) return;
-    const renderer = new BattleRenderer(ctx);
+    const renderer = new BattleRenderer(ctx, setup?.localAssets);
     renderer.connect(store);
     delegate.target = renderer;
     // 부트 게이트 구독 — StrictMode 재마운트 시 새 렌더러 기준으로 리셋.
     let cancelled = false;
     setBoot({ pct: 0, ready: false });
+    setBootSlow(false);
     renderer.onAssetProgress((pct) => {
       if (!cancelled) setBoot((b) => (b.ready ? b : { pct, ready: false }));
     });
@@ -387,7 +411,7 @@ export default function BattleScreen(): React.ReactElement {
       if (!cancelled) setBoot({ pct: 1, ready: true });
     });
     const bootTimeout = window.setTimeout(() => {
-      if (!cancelled) setBoot((b) => ({ ...b, ready: true }));
+      if (!cancelled) setBootSlow(true);
     }, 15_000);
     // 일기토 컷인(§9) — duelTriggered마다 React 오버레이를 띄우고 완주(resolve)까지 대기.
     // vm은 스테이지 데이터에서 조립: 이름·즉사 여부(duel 이벤트 outcome)·banter 대사.
@@ -484,9 +508,7 @@ export default function BattleScreen(): React.ReactElement {
   const selectedId = activeUnitId(snap.ui);
   // 모바일 HUD(스펙 2026-09-12): <768px면 하단 패널이 부유 메뉴·정보창·턴종료를 대신한다. 데스크톱 JSX는 불변.
   const mobile = hudMode(viewport.width) === "mobile";
-  // 원작(§7-A) 가림 회피: 활성 유닛이 화면 좌측 절반이면 UnitPanel을 우측 컬럼 슬롯으로.
-  const panelSide = unitPanelSide(snap.ui.kind === "idle" ? snap.inspectAnchor : snap.menuAnchor, viewport.width);
-  const unitPanel = <UnitPanel ui={snap.ui} vm={snap.vm} />;
+  // Desktop selection information and commands share a stable bottom dock.
   // 목표 텍스트(승리/패배/제한턴)는 stage 불변이라 1회 — 칩·강조 배너가 같은 display를 받는다.
   const display = useMemo(
     () => buildObjectiveDisplay(ctx.stage, { nameOf: (id) => ctx.data.commanders[id]?.name ?? id }),
@@ -499,24 +521,23 @@ export default function BattleScreen(): React.ReactElement {
       style={{ position: "fixed", inset: 0, overflow: "hidden", background: "#1b1f24" }}
     >
       <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
-      <TurnBanner ui={snap.ui} vm={snap.vm} dispatch={dispatch} stageName={ctx.stage.name} hideEndTurn={mobile} />
+      <TurnBanner ui={snap.ui} vm={snap.vm} dispatch={dispatch} stageName={ctx.stage.name} hideEndTurn={mobile || selectedId !== null} />
       {/* 승리조건 배너 = 장막 걷힘 + 개전 나레이션 종료 후 — "나레이션 끝나고 목표가 딱" 시퀀스 */}
       {boot.ready && introDone && <ObjectiveFlashLayer vm={snap.vm} display={display} />}
       <div id="hudLeft" style={mobile ? LEFT_COL_MOBILE : LEFT_COL}>
-        {boot.ready && introDone && <ObjectiveStrip display={display} />}
+        {boot.ready && introDone && !["animating", "enemyTurn", "autoTurn"].includes(snap.ui.kind) && <ObjectiveStrip display={display} />}
         {/* 확인 카드 중엔 정보창을 접는다 — 720p에서 카드 버튼이 컬럼 하단(overflow hidden)에 잘리던 문제 */}
-        {!mobile && panelSide === "left" && snap.ui.kind !== "confirmAttack" && unitPanel}
         {!mobile && <AttackForecast ui={snap.ui} ctx={ctx} committed={store.committedState} dispatch={dispatch} />}
       </div>
       {!mobile && (
         <InspectPopup inspectedId={snap.inspectedId} activeId={selectedId} vm={snap.vm} anchor={snap.inspectAnchor} viewport={viewport} />
       )}
-      {!mobile && (
-        <ActionMenu
+      {!mobile && !combatHit && (
+        <SelectionDock
+          data={ctx.data}
           ui={snap.ui}
           dispatch={dispatch}
-          anchor={snap.menuAnchor}
-          viewport={viewport}
+          vm={snap.vm}
           previewWalking={snap.previewWalking}
         />
       )}
@@ -551,11 +572,11 @@ export default function BattleScreen(): React.ReactElement {
               onOpenMenu={() => setPaused(true)}
               canAutoFight={canAutoFight}
             />
-            {panelSide === "right" && unitPanel}
           </>
         )}
       </div>
-      {mobile && (
+      <CombatPortraits hit={combatHit} vm={snap.vm} />
+      {mobile && !combatHit && (
         <BottomPanel
           ui={snap.ui}
           vm={snap.vm}
@@ -595,6 +616,8 @@ export default function BattleScreen(): React.ReactElement {
       )}
       {endDialogueDone && (
         <ResultSequence
+          onComplete={onComplete}
+          chapterCarry={sandbox ? collectBattleCarry(store.committedState) : undefined}
           ui={snap.ui}
           vm={snap.vm}
           reward={ctx.stage.reward}
@@ -603,7 +626,7 @@ export default function BattleScreen(): React.ReactElement {
           sandbox={sandbox}
         />
       )}
-      {/* 부트 장막 — 에셋 준비 전 전장을 가린다(입력도 차단). 준비/타임아웃 시 즉시 걷힘. */}
+      {/* Keep loading visible until assets settle; slow connections may explicitly opt out. */}
       {!boot.ready && (
         <div
           aria-label="전장 로딩"
@@ -650,9 +673,17 @@ export default function BattleScreen(): React.ReactElement {
           <p style={{ margin: 0, fontSize: 12, color: HUD_BRONZE_DIM }} aria-live="polite">
             전장을 준비하는 중… {Math.round(boot.pct * 100)}%
           </p>
+          {bootSlow && <>
+            <p style={{ margin: 0, fontSize: 13 }}>캐릭터와 전장 이미지를 불러오고 있습니다.</p>
+            <button
+              style={{ padding: "10px 16px", borderRadius: 6, border: `1px solid ${HUD_BRONZE_DIM}`, background: "transparent", color: HUD_PARCHMENT, fontFamily: HUD_FONT, cursor: "pointer" }}
+              onClick={() => setBoot(b => ({ ...b, ready: true }))}
+            >이미지 로딩을 기다리지 않고 입장</button>
+          </>}
         </div>
       )}
       <PauseMenu
+        onExit={onExit}
         open={paused}
         onClose={() => setPaused(false)}
         sandbox={sandbox}

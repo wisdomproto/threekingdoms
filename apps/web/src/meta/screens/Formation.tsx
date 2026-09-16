@@ -2,18 +2,14 @@
 /**
  * 편성 화면 (§10 막간 = 상점→편성→출진). /prep 셸이 <Shop/>과 나란히 합성한다.
  *
- * 2026-07-03 레퍼런스 재구성 — 3존 문법:
- *  - 좌: 「장수 선택」 카드 그리드(초상 카드 + 배치됨 플라크 + 역할 뱃지, 정렬 칩).
- *  - 우: 「선택된 장수 상세」(CommanderDetail — 스탯 바·장비 슬롯·편성/해제). 좁은 화면은 바텀시트.
- *  - 하단 출진 슬롯/출정 버튼은 SortieBar(셸 소유)가 담당 — 종전 화면 내 슬롯 행은 그리로 이관.
- *
- * 인터랙션(오탭 해제 방지): 카드 탭 = 미배치·여유면 배치+상세, 그 외(배치됨/가득)는 상세만.
- * 배치 해제는 상세 패널 「편성 해제」 또는 하단 슬롯 ✕ 로만.
+ * Commander cards are the single selection list. Summary and sortie actions sit below them.
+ * The right panel shows stats and equipment; narrow screens use a detail sheet.
+ * Tapping the focused deployed card again removes it from the formation.
  *
  * 불가침(CLAUDE.md §10/§13): 확률 강화·랜덤 스탯 없음. 장비는 "지정 장착"만.
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { gameData } from "@tk/data";
+import { gameData } from "../../game/data";
 import { isConsumable } from "@tk/engine";
 import type { RosterUnit } from "../metaStore";
 import { getMeta } from "../metaStore";
@@ -21,6 +17,7 @@ import type { SortieMember } from "../sortie";
 import { unitStats } from "../unitStats";
 import { sortRoster, type SortKey } from "../rosterSort";
 import { CommanderPortrait } from "../../ui/CommanderPortrait";
+import { CommanderFigure } from "../../ui/CommanderFigure";
 import { CommanderDetail, type StatMax } from "./CommanderDetail";
 import { ArmyPouch } from "./ArmyPouch";
 import {
@@ -34,7 +31,8 @@ export interface FormationProps {
   selected: SortieMember[];
   onChange: (members: SortieMember[]) => void;
   chapter: number;
-  /** 상세 패널 대상(셸 소유 — 하단 슬롯 칩 탭과 공유) */
+  actions?: React.ReactNode;
+  /** Detail target owned by the preparation shell. */
   focusId: string | null;
   onFocus: (commanderId: string | null) => void;
   /** 장비 변경 — 셸이 스토어·roster·출진 멤버 3곳을 한 번에 동기(스냅샷 갈라짐 방지) */
@@ -60,25 +58,24 @@ function Ribbon({ seal, title, children }: {
 }): React.ReactElement {
   return (
     <div style={{
-      display: "flex", alignItems: "center", gap: 8,
-      background: "linear-gradient(to bottom, rgba(26,20,11,0.96), rgba(16,12,7,0.96))",
+      display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap",
+      background: "#342912",
       border: `1px solid ${GOLD_DIM}88`,
       borderRadius: 6,
       padding: "6px 10px",
       marginBottom: 10,
     }}>
       <span style={{
-        width: 20, height: 20, borderRadius: 4, flexShrink: 0,
+        display: "none", width: 20, height: 20, borderRadius: 4, flexShrink: 0,
         background: `linear-gradient(135deg, ${SEAL_RED}, #6a1e14)`,
         border: "1px solid rgba(0,0,0,0.5)",
-        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        alignItems: "center", justifyContent: "center",
         fontSize: 12, fontWeight: 900, color: "#f0e2c8",
       }}>{seal}</span>
       <span style={{ fontSize: 13.5, fontWeight: 700, color: GOLD_BRIGHT, letterSpacing: "0.14em" }}>
         {title}
       </span>
-      <span style={{ flex: 1 }} />
-      {children}
+      {children && <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginLeft: "auto" }}>{children}</div>}
     </div>
   );
 }
@@ -107,7 +104,7 @@ function toMember(u: RosterUnit, items: string[]): SortieMember {
 }
 
 export function Formation({
-  roster, maxSlots, selected, onChange, chapter, focusId, onFocus, onEquip,
+  roster, maxSlots, selected, onChange, chapter, focusId, onFocus, onEquip, actions,
 }: FormationProps): React.ReactElement {
   const narrow = useNarrow();
 
@@ -193,9 +190,9 @@ export function Formation({
 
   return (
     <section style={{
-      background: `linear-gradient(150deg, ${PARCHMENT_WARM} 0%, ${PARCHMENT} 55%, #e2d6b6 100%)`,
-      border: `3px solid ${WOOD}`,
-      boxShadow: `inset 0 0 0 2px ${GOLD}, inset 0 0 0 5px #3a2410, inset 0 0 60px rgba(90,70,40,0.18)`,
+      background: "#241e10",
+      border: "1px solid #806738",
+      boxShadow: "none",
       borderRadius: 8,
       padding: 12,
       fontFamily: SERIF,
@@ -204,15 +201,7 @@ export function Formation({
       gap: 14,
     }}>
       {/* ━━ 좌: 장수 선택 그리드 ━━ */}
-      <div style={{ minWidth: 0, position: "relative" }}>
-        {/* 빈 양피지 채우는 수묵 워터마크 — 초반 챕터(로스터 5명)에 벌판처럼 비지 않게 */}
-        <span aria-hidden style={{
-          position: "absolute", inset: "40px 0 0 0",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          pointerEvents: "none", userSelect: "none",
-          fontSize: "min(240px, 40vw)", fontWeight: 900, lineHeight: 1,
-          color: "rgba(90, 70, 40, 0.08)", letterSpacing: "0.1em",
-        }}>出陣</span>
+      <div style={{ minWidth: 0, position: "relative", display: "flex", flexDirection: "column" }}>
         <Ribbon seal="將" title={`장수 선택 — ${chapter}장 편성`}>
           {(["role", "power", "level", "new"] as SortKey[]).map((k) => {
             const label = ({ role: "역할", power: "전투", level: "레벨", new: "신규" } as Record<SortKey, string>)[k];
@@ -221,10 +210,10 @@ export function Formation({
               <button
                 key={k} type="button" onClick={() => setSortKey(k)}
                 style={{
-                  fontSize: 10.5, padding: "3px 9px", borderRadius: 4, fontFamily: "inherit",
+                  minWidth: 44, minHeight: 44, fontSize: 13, padding: "6px 9px", borderRadius: 4, fontFamily: "inherit",
                   border: `1px solid ${active ? GOLD : GOLD_DIM + "66"}`,
                   background: active ? GOLD_GLOW : "transparent",
-                  color: active ? GOLD_BRIGHT : "#b8a070",
+                  color: active ? GOLD_BRIGHT : "#c4b27e",
                   fontWeight: active ? 700 : 400,
                   cursor: "pointer",
                 }}
@@ -235,91 +224,22 @@ export function Formation({
           })}
         </Ribbon>
 
-        <div style={{
-          display: "grid",
-          // 레퍼런스 밀도(≈4열) — 5명뿐인 1장도 2줄로 앉아 좌측 컬럼이 빈 벌판이 안 된다(2026-07-03).
-          gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))",
-          gap: 10,
-          alignContent: "start",
-        }}>
-          {sortedRoster.map((u) => {
-            const on = selectedIds.has(u.commanderId);
-            const isFocus = detailId === u.commanderId;
-            const isNew = u.joinChapter === chapter;
-            return (
-              <button
-                key={u.commanderId}
-                type="button"
-                onClick={() => tapCard(u)}
-                aria-pressed={on}
-                style={{
-                  position: "relative",
-                  display: "flex", flexDirection: "column", alignItems: "stretch",
-                  padding: 0, minWidth: 0,
-                  borderRadius: 8,
-                  border: isFocus ? `2px solid ${GOLD_BRIGHT}` : `2px solid ${on ? GOLD + "aa" : "#3a2c1866"}`,
-                  background: "linear-gradient(to bottom, #241a0e, #171208)",
-                  boxShadow: isFocus
-                    ? `0 0 18px ${GOLD_GLOW}, 0 3px 12px rgba(0,0,0,0.35)`
-                    : "0 3px 10px rgba(0,0,0,0.3)",
-                  cursor: "pointer",
-                  overflow: "hidden",
-                  transition: "box-shadow 0.12s, border-color 0.12s",
-                  fontFamily: "inherit",
-                }}
-              >
-                <RoleBadge role={u.role} />
-
-                {/* 배치됨 플라크 / NEW */}
-                {on ? (
-                  <span style={{
-                    position: "absolute", top: 6, right: 6, zIndex: 2,
-                    background: "linear-gradient(to bottom, #ddd3ba, #b8ab8c)",
-                    color: "#241a0e", borderRadius: 3, padding: "2px 6px",
-                    fontSize: 9, fontWeight: 800, letterSpacing: "0.08em",
-                    border: "1px solid rgba(0,0,0,0.45)", boxShadow: "0 1px 3px rgba(0,0,0,0.4)",
-                  }}>배치됨</span>
-                ) : isNew ? (
-                  <span style={{
-                    position: "absolute", top: 6, right: 6, zIndex: 2,
-                    background: "#c0392b", borderRadius: 3, padding: "2px 5px",
-                    fontSize: 8, color: "#fff", fontWeight: 800, letterSpacing: 0.5,
-                  }}>NEW</span>
-                ) : null}
-
-                {/* 초상 */}
-                <div style={{ aspectRatio: "3 / 3.6", minWidth: 0 }}>
-                  <CommanderPortrait commanderId={u.commanderId} name={commanderName(u.commanderId)} />
-                </div>
-
-                {/* 명판 */}
-                <div style={{
-                  padding: "5px 6px 6px",
-                  background: "linear-gradient(to bottom, rgba(14,10,5,0.9), rgba(10,7,3,0.96))",
-                  borderTop: `1px solid ${on || isFocus ? GOLD + "77" : "rgba(200,164,64,0.18)"}`,
-                  display: "flex", flexDirection: "column", gap: 3,
-                }}>
-                  <span style={{
-                    fontSize: 14.5, fontWeight: 700, color: PARCHMENT,
-                    letterSpacing: "0.05em", lineHeight: 1.1,
-                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                  }}>
-                    {commanderName(u.commanderId)}
-                  </span>
-                  <span style={{
-                    display: "flex", alignItems: "center", justifyContent: "space-between", gap: 4,
-                  }}>
-                    <span style={{ fontSize: 10, color: GOLD_DIM, fontWeight: 700 }}>Lv.{u.level}</span>
-                    <span style={{
-                      fontSize: 9.5, color: "#cbb88e",
-                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                    }}>{className(u.classId)}</span>
-                  </span>
-                </div>
+        <p style={{ fontFamily: "system-ui", fontSize: 13, color: "#baaa85", lineHeight: 1.5 }}>장수를 누르면 배치와 상세를 확인합니다. 선택한 장수를 다시 누르면 편성에서 해제합니다.</p>
+        <div style={{ display: "grid", gridTemplateColumns: narrow ? "repeat(3, minmax(0, 1fr))" : "repeat(auto-fill, minmax(92px, 1fr))", gap: 8, alignContent: "start" }}>
+          {sortedRoster.map(u => {
+            const index = selected.findIndex(m => m.commanderId === u.commanderId);
+            const on = index >= 0;
+            return <article key={u.commanderId} style={{ border: `2px solid ${on ? "#b85336" : "transparent"}`, borderRadius: 8, background: on ? "linear-gradient(#65291c, #302411)" : "transparent", overflow: "hidden" }}>
+              <button type="button" aria-label={`${commanderName(u.commanderId)} ${on ? `출진 ${index + 1}번` : "배치"}`} aria-pressed={on} onClick={() => tapCard(u)} style={{ width: "100%", border: 0, padding: 6, background: "transparent", color: PARCHMENT, cursor: "pointer", fontFamily: "system-ui", textAlign: "center" }}>
+                <div style={{ textAlign: "right", fontSize: 12, minHeight: 18, color: on ? "#f2d16b" : "#bba875" }}>{on ? `${index + 1} · 출진` : ""}</div>
+                <div style={{ height: 84, width: "100%", margin: "0 auto" }}><CommanderFigure commanderId={u.commanderId} classId={u.classId} tier={gameData.unitClasses[u.classId]?.tier ?? 1} name={commanderName(u.commanderId)} /></div>
+                <span style={{ display: "block", fontSize: 13, color: "#8ecd67", marginTop: 3 }}>Lv.{u.level}</span>
+                <strong style={{ display: "block", fontSize: 15, marginTop: 2 }}>{commanderName(u.commanderId)}</strong>
               </button>
-            );
+            </article>;
           })}
         </div>
+        <div style={{ marginTop: "auto", paddingTop: 20 }}>{actions}</div>
       </div>
 
       {/* ━━ 우: 선택된 장수 상세 (넓은 화면 — 컬럼은 늘고, 내용만 sticky) ━━ */}

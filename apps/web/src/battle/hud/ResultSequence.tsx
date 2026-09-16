@@ -21,7 +21,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Item, StageReward } from "@tk/data";
-import { gameData } from "@tk/data";
+import { gameData } from "../../game/data";
 import type { InputState } from "../inputMachine";
 import type { BattleVM } from "../viewmodel";
 import { PANEL_FRAME, BUTTON_FRAME } from "./frames";
@@ -35,7 +35,7 @@ import { useFadeNav } from "../../ui/useFadeNav";
 import { playSfx, SFX } from "../../audio";
 import { ItemIcon } from "../../ui/ItemIcon";
 import { ItemInfoPopup } from "../../ui/ItemInfoPopup";
-import { leaveSandbox, readLab } from "../../lab/lab";
+import { completeSandbox, readLab } from "../../lab/lab";
 
 const OVERLAY_STYLE: React.CSSProperties = {
   position: "absolute",
@@ -252,6 +252,8 @@ function CoinBurst({ count, gold }: { count: number; gold: string }): React.Reac
 }
 
 export function ResultSequence({
+  onComplete,
+  chapterCarry,
   ui,
   vm,
   reward,
@@ -259,6 +261,8 @@ export function ResultSequence({
   stageId,
   sandbox = false,
 }: {
+  onComplete?: (result: "victory" | "defeat") => void;
+  chapterCarry?: unknown;
   ui: InputState;
   vm: BattleVM;
   reward: StageReward | undefined;
@@ -276,7 +280,7 @@ export function ResultSequence({
 
   // 결산 요약(승리 시에만 의미) — 순수 산출
   // 플레이테스트(에디터가 연 탭)면 "에디터로", 실험실이면 "실험실로". 렌더마다 sessionStorage 를 읽지 않게 1회.
-  const sandboxLabel = useMemo(() => (readLab()?.returnUrl ? "에디터로 ▶" : "실험실로 ▶"), []);
+  const sandboxLabel = useMemo(() => (readLab()?.chapterRun ? "다음 단계로 ▶" : readLab()?.returnUrl ? "에디터로 ▶" : "실험실로 ▶"), []);
   const summary = useMemo(
     () => (victory ? buildResultSummary(vm, reward, items) : null),
     [victory, vm, reward, items],
@@ -483,9 +487,9 @@ export function ResultSequence({
           <button
             type="button"
             style={BUTTON_STYLE}
-            onClick={() => (sandbox ? leaveSandbox(fadeTo) : fadeTo(stageId ? `/scene?stage=${stageId}&type=outroDefeat` : "/stages"))}
+            onClick={() => onComplete ? onComplete("defeat") : (sandbox ? completeSandbox(fadeTo, "defeat") : fadeTo(stageId ? `/scene?stage=${stageId}&type=outroDefeat` : "/stages"))}
           >
-            {sandbox ? sandboxLabel : "이야기 계속 ▶"}
+            {onComplete ? "이야기 계속 ▶" : sandbox ? sandboxLabel : "이야기 계속 ▶"}
           </button>
         </div>
         {fadeOverlay}
@@ -960,9 +964,9 @@ export function ResultSequence({
             <button
               type="button"
               style={BUTTON_STYLE}
-              onClick={() => (sandbox ? leaveSandbox(fadeTo) : fadeTo(stageId ? `/scene?stage=${stageId}&type=outro` : "/stages"))}
+              onClick={() => onComplete ? onComplete("victory") : (sandbox ? completeSandbox(fadeTo, "victory", undefined, chapterCarry) : fadeTo(stageId ? `/scene?stage=${stageId}&type=outro` : "/stages"))}
             >
-              {sandbox ? sandboxLabel : "다음으로 ▶"}
+              {onComplete ? "이야기 계속 ▶" : sandbox ? sandboxLabel : "다음으로 ▶"}
             </button>
           </div>
         </div>

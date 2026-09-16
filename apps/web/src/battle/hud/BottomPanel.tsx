@@ -156,7 +156,7 @@ export function BottomPanel({
 
   if (hidden) return null;
   const unit = id ? (vm.units.find((u) => u.id === id) ?? null) : null;
-  const items = state === "expanded" && !previewWalking ? itemsFor(ui, dispatch) : [];
+  const items = state === "expanded" && !previewWalking ? itemsFor(ui, dispatch, ctx.data) : [];
 
   return (
     <>

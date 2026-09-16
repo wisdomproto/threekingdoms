@@ -47,7 +47,7 @@ export function tickStatuses(
       if (t <= 0) events.push({ type: "statusExpired", unitId: u.id, kind: s.kind });
       else next.push({ kind: s.kind, turns: t });
     }
-    units = units.map((x) => (x.id === u.id ? { ...x, troops, retreated, statuses: next } : x));
+    units = units.map((x) => (x.id === u.id ? { ...x, troops, retreated, statuses: next, ...(hasStatus(u, "stun") ? { moved: true, acted: true } : {}) } : x));
   }
   return { state: { ...state, units }, events };
 }

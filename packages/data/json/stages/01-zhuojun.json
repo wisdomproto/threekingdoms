@@ -1135,40 +1135,223 @@
         ]
       }
     ],
-    "outro": {
-      "bg": "01-zhuojun-outro",
-      "lines": [
-        {
-          "text": "싸움이 끝나자 마을 사람들이 하나둘 성문 밖으로 나왔다. 누군가 세 사람의 이름을 물었고, 누군가는 벌써 외치고 있었다."
+    "outro": [
+      {
+        "map": "scene-town-gate",
+        "label": "탁군 · 첫 승리",
+        "camera": {
+          "zoom": 1.25,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "백성",
-          "side": "player",
-          "text": "고맙습니다, 장군님들! 탁군의 은인이십니다!"
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "크하하! 들었소 형님? 장군님이란다, 우리가!"
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "교만은 금물이다, 아우. 큰 싸움은 이제부터다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "그래도... 첫 승이다. 백성들이 웃는구나. — 이 웃음을 지키는 일을 업으로 삼자."
-        },
-        {
-          "text": "의용군 승리의 소문은 곧 유주 일대로 퍼져나갔다."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liu",
+            "sprite": "liubei-foot",
+            "cell": [
+              5,
+              4
+            ],
+            "facing": "right",
+            "hidden": false
+          },
+          {
+            "id": "guan",
+            "sprite": "guanyu-foot",
+            "cell": [
+              4,
+              5
+            ],
+            "facing": "up",
+            "hidden": false
+          },
+          {
+            "id": "zhang",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              6,
+              5
+            ],
+            "facing": "up",
+            "hidden": false
+          },
+          {
+            "id": "civilian",
+            "sprite": "civilian-scene",
+            "cell": [
+              7,
+              2
+            ],
+            "facing": "left",
+            "hidden": true
+          }
+        ],
+        "lines": [
+          {
+            "text": "싸움이 끝나자 마을 사람들이 하나둘 성문 밖으로 나왔다. 누군가 세 사람의 이름을 물었고, 누군가는 벌써 외치고 있었다.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              }
+            ],
+            "enter": [
+              {
+                "id": "civilian",
+                "from": [
+                  7,
+                  2
+                ],
+                "to": [
+                  7,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "speaker": "백성",
+            "side": "player",
+            "text": "고맙습니다, 장군님들! 탁군의 은인이십니다!",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "크하하! 들었소 형님? 장군님이란다, 우리가!",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "emphasize"
+              }
+            ],
+            "bubble": {
+              "id": "zhang",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "교만은 금물이다, 아우. 큰 싸움은 이제부터다.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "talk"
+              }
+            ],
+            "face": [
+              {
+                "id": "zhang",
+                "dir": "left"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "그래도... 첫 승이다. 백성들이 웃는구나. — 이 웃음을 지키는 일을 업으로 삼자.",
+            "pose": [
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              },
+              {
+                "id": "liu",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "text": "의용군 승리의 소문은 곧 유주 일대로 퍼져나갔다.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {

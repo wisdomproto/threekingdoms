@@ -152,7 +152,7 @@ describe("게임 데이터 v2 무결성", () => {
     // 전투 맵 27 + 씬 맵(막간 v4, "scene-" 접두 — 전투 스테이지와 1:1 아님)
     const battleMaps = Object.keys(gameData.maps).filter((k) => !k.startsWith("scene-"));
     expect(battleMaps.length).toBe(27);
-    expect(Object.keys(gameData.maps).filter((k) => k.startsWith("scene-")).length).toBe(3);
+    expect(Object.keys(gameData.maps).filter((k) => k.startsWith("scene-")).length).toBe(12);
     // 레코드 키 = id, mapId가 실존 맵을 가리킨다
     for (const [k, s] of Object.entries(gameData.stages)) {
       expect(s.id).toBe(k);

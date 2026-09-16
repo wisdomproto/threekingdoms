@@ -19,67 +19,188 @@
   },
   "levelCap": 30,
   "scenario": {
-    "intro": {
-      "bg": "21-changbanqiao-intro",
-      "lines": [
-        {
-          "text": "조운이 아두를 품에 안고 강을 향해 내달릴 때 — 그 등 뒤를 조조의 대군이 새까맣게 뒤쫓고 있었다."
+    "intro": [
+      {
+        "bg": "21-changbanqiao-intro",
+        "lines": [
+          {
+            "text": "조운이 아두를 품에 안고 강을 향해 내달릴 때 — 그 등 뒤를 조조의 대군이 새까맣게 뒤쫓고 있었다."
+          }
+        ]
+      },
+      {
+        "map": "scene-changban-bridge",
+        "label": "장판교 · 혼자 남다",
+        "camera": {
+          "zoom": 1.6,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "text": "장판교. 외나무 같은 다리 하나가 추격의 유일한 길목이었다. 그 위에 — 장팔사모를 비껴든 사내가 홀로 서 있었다."
+        "units": [
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-bridge",
+            "cell": [
+              5,
+              3
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "장판교. 외나무 같은 다리 하나가 추격의 유일한 길목이었다. 그 위에 — 장팔사모를 비껴든 사내가 홀로 서 있었다.",
+            "pose": [
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "형님은 먼저 가시오! 이 다리는 — 연인 장익덕이 막는다!",
+            "pose": [
+              {
+                "id": "zhangfei",
+                "pose": "emphasize"
+              }
+            ],
+            "bubble": {
+              "id": "zhangfei",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "너희 스무 기는 숲을 돌며 흙먼지를 일으켜라. 대군이 숨은 것처럼 — 나머지는 이 목청이 알아서 한다.",
+            "pose": [
+              {
+                "id": "zhangfei",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "조조 백만 대군이라도 여기서는 외나무다리다. — 누가 감히 나와 죽음을 겨루겠느냐!",
+            "pose": [
+              {
+                "id": "zhangfei",
+                "pose": "emphasize"
+              }
+            ],
+            "bubble": {
+              "id": "zhangfei",
+              "mark": "!"
+            }
+          },
+          {
+            "text": "다리 위의 호통 한 번에, 백전의 조조군이 말을 멈춰 세웠다.",
+            "pose": [
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "21-changbanqiao-outro",
+        "lines": [
+          {
+            "text": "다리 위의 사내가 세 번째로 고함쳤을 때 — 조조군 진영에서 하후걸이 낙마했다. 백만 대군이 주춤, 물러섰다."
+          }
+        ]
+      },
+      {
+        "map": "scene-changban-bridge",
+        "label": "장판교 · 호통",
+        "camera": {
+          "zoom": 1.6,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "형님은 먼저 가시오! 이 다리는 — 연인 장익덕이 막는다!"
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "너희 스무 기는 숲을 돌며 흙먼지를 일으켜라. 대군이 숨은 것처럼 — 나머지는 이 목청이 알아서 한다."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "조조 백만 대군이라도 여기서는 외나무다리다. — 누가 감히 나와 죽음을 겨루겠느냐!"
-        },
-        {
-          "text": "다리 위의 호통 한 번에, 백전의 조조군이 말을 멈춰 세웠다."
-        }
-      ]
-    },
-    "outro": {
-      "bg": "21-changbanqiao-outro",
-      "lines": [
-        {
-          "text": "다리 위의 사내가 세 번째로 고함쳤을 때 — 조조군 진영에서 하후걸이 낙마했다. 백만 대군이 주춤, 물러섰다."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "연인 장익덕이 여기 있다! 누가 감히 나와 죽음을 겨루겠느냐!!"
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "...으하하! 내 고함 한 방에 조조 대군이 물러가는구나!"
-        },
-        {
-          "text": "장비는 다리를 끊고 유유히 말머리를 돌렸다. 훗날 조조는 이날의 다리를 두고두고 아까워했다 한다."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-bridge",
+            "cell": [
+              5,
+              3
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "연인 장익덕이 여기 있다! 누가 감히 나와 죽음을 겨루겠느냐!!",
+            "pose": [
+              {
+                "id": "zhangfei",
+                "pose": "emphasize"
+              }
+            ],
+            "bubble": {
+              "id": "zhangfei",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "...으하하! 내 고함 한 방에 조조 대군이 물러가는구나!",
+            "pose": [
+              {
+                "id": "zhangfei",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "장비는 다리를 끊고 유유히 말머리를 돌렸다. 훗날 조조는 이날의 다리를 두고두고 아까워했다 한다.",
+            "pose": [
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ],
+            "exit": [
+              {
+                "id": "zhangfei",
+                "to": [
+                  1,
+                  3
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "장비",
       "classId": "lightCavalry",
-      "level": 26,
+      "level": 21,
       "troops": 640,
       "items": [
         "사모"
@@ -91,7 +212,7 @@
     {
       "commanderId": "관평",
       "classId": "lightCavalry",
-      "level": 18,
+      "level": 21,
       "troops": 150,
       "items": [],
       "side": "player",
@@ -101,7 +222,7 @@
     {
       "commanderId": "주창",
       "classId": "archer",
-      "level": 18,
+      "level": 21,
       "troops": 140,
       "items": [],
       "side": "player",
@@ -116,22 +237,22 @@
       "items": [],
       "side": "enemy",
       "x": 19,
-      "y": 2
+      "y": 1
     },
     {
       "commanderId": "하후돈",
       "classId": "lightCavalry",
-      "level": 22,
+      "level": 24,
       "troops": 180,
       "items": [],
       "side": "enemy",
-      "x": 17,
+      "x": 15,
       "y": 5
     },
     {
       "commanderId": "하후연",
       "classId": "lightCavalry",
-      "level": 22,
+      "level": 24,
       "troops": 175,
       "items": [],
       "side": "enemy",
@@ -141,27 +262,27 @@
     {
       "commanderId": "허저",
       "classId": "footman",
-      "level": 22,
+      "level": 24,
       "troops": 185,
       "items": [],
       "side": "enemy",
-      "x": 18,
-      "y": 6
+      "x": 15,
+      "y": 7
     },
     {
       "commanderId": "악진",
       "classId": "footman",
-      "level": 20,
+      "level": 23,
       "troops": 160,
       "items": [],
       "side": "enemy",
-      "x": 21,
-      "y": 6
+      "x": 24,
+      "y": 7
     },
     {
       "commanderId": "이전",
       "classId": "archer",
-      "level": 20,
+      "level": 23,
       "troops": 150,
       "items": [],
       "side": "enemy",
@@ -171,7 +292,7 @@
     {
       "commanderId": "우금",
       "classId": "archer",
-      "level": 20,
+      "level": 23,
       "troops": 150,
       "items": [],
       "side": "enemy",
@@ -181,7 +302,7 @@
     {
       "commanderId": "서황",
       "classId": "lightCavalry",
-      "level": 21,
+      "level": 24,
       "troops": 165,
       "items": [],
       "side": "enemy",
@@ -191,7 +312,7 @@
     {
       "commanderId": "조인",
       "classId": "footman",
-      "level": 21,
+      "level": 24,
       "troops": 165,
       "items": [],
       "side": "enemy",
@@ -201,7 +322,7 @@
     {
       "commanderId": "조홍",
       "classId": "footman",
-      "level": 19,
+      "level": 22,
       "troops": 140,
       "items": [],
       "side": "enemy",
@@ -211,7 +332,7 @@
     {
       "commanderId": "문빙",
       "classId": "lightCavalry",
-      "level": 19,
+      "level": 22,
       "troops": 145,
       "items": [],
       "side": "enemy",
@@ -243,7 +364,7 @@
         {
           "commanderId": "조순",
           "classId": "footman",
-          "level": 18,
+          "level": 21,
           "troops": 130,
           "items": [],
           "side": "enemy",
@@ -253,7 +374,7 @@
         {
           "commanderId": "조성",
           "classId": "archer",
-          "level": 18,
+          "level": 21,
           "troops": 125,
           "items": [],
           "side": "enemy",
@@ -439,6 +560,48 @@
         15
       ],
       "kind": "debris_pile"
+    }
+  ],
+  "scriptEvents": [
+    {
+      "id": "campaign-roar-21-changbanqiao",
+      "name": "장판교의 일갈",
+      "editingMode": "complex",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "message",
+          "text": "장비의 일갈에 다리로 접근하던 선봉이 멈칫했다! 이번 틈에 수비를 정비하라."
+        },
+        {
+          "kind": "effect",
+          "effect": "special",
+          "area": {
+            "x": 14,
+            "y": 7,
+            "width": 12,
+            "height": 8
+          }
+        },
+        {
+          "kind": "status",
+          "target": {
+            "side": "enemy",
+            "area": {
+              "x": 14,
+              "y": 7,
+              "width": 12,
+              "height": 8
+            }
+          },
+          "status": "stun",
+          "turns": 1
+        }
+      ]
     }
   ]
 }

@@ -58,8 +58,8 @@ function stripNulls(o) {
 }
 
 const KEYS = {
-  stage: ["id", "name", "mapId", "turnLimit", "camera", "reward", "levelCap", "scenario", "dialogue", "units", "objectives", "failConditions", "reinforcements", "strategyConditions", "victory", "defeat", "events"],
-  unit: ["commanderId", "classId", "level", "troops", "items", "side", "x", "y"],
+  stage: ["id", "name", "mapId", "turnLimit", "camera", "reward", "levelCap", "scenario", "dialogue", "decorations", "units", "objectives", "failConditions", "reinforcements", "strategyConditions", "scriptEvents", "victory", "defeat", "events"],
+  unit: ["commanderId", "facing", "classId", "level", "troops", "items", "side", "x", "y"],
   event: ["id", "type", "trigger", "outcome", "once"],
   reinf: ["id", "side", "trigger", "units", "once"],
   strat: ["id", "description", "trigger", "reward"],
@@ -109,6 +109,8 @@ export function loadStage(obj) {
   m.failConditions = (obj.failConditions ?? []).map((f) => ({ ...f }));
   // 스토리(P2 spec §10): 에디터가 줄/카드를 제자리 변형하므로 깊은 복제 — ORIG 오염 없이 직렬화에 반영.
   if (obj.scenario !== undefined) m.scenario = structuredClone(obj.scenario);
+  if (obj.decorations !== undefined) m.decorations = structuredClone(obj.decorations);
+  if (obj.scriptEvents !== undefined) m.scriptEvents = structuredClone(obj.scriptEvents);
   if (obj.dialogue !== undefined) m.dialogue = structuredClone(obj.dialogue);
   return own(m, obj);
 }

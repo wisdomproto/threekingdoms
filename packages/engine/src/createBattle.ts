@@ -81,7 +81,7 @@ function spawnUnitRaw(data: GameData, p: StageUnit): UnitState {
   const maxMp = Math.floor((p.level + 10) * cmd.intelligence / 40);
   return {
     id: cmd.id, classId: cls.id, line: cls.line, moveClass: cls.moveClass,
-    side: p.side, x: p.x, y: p.y, level: p.level, exp: 0,
+    side: p.side, x: p.x, y: p.y, level: p.level, exp: p.exp ?? 0,
     troops: p.troops, maxTroops: p.troops, morale: 100,
     mp: maxMp, maxMp,
     war: cmd.war, leadership: cmd.leadership, intelligence: cmd.intelligence,
@@ -108,6 +108,11 @@ export interface CreateBattleOptions {
 
 export function createBattle(ctx: BattleContext, seed: number, opts?: CreateBattleOptions): BattleState {
   const { data, stage } = ctx;
+  const ids = new Set<string>();
+  for (const unit of [...stage.units, ...(stage.reinforcements ?? []).flatMap((group) => group.units)]) {
+    if (ids.has(unit.commanderId)) throw new Error(`duplicate commanderId: ${unit.commanderId}`);
+    ids.add(unit.commanderId);
+  }
   const sharedItems: SharedItems = { friendly: [], hostile: [] };
   // 스폰 후 각 유닛 소모품을 진영 풀로 분리(원작 창고). stage 적 유닛의 소모품 → hostile 풀.
   const units: UnitState[] = stage.units.map((p) =>

@@ -13,7 +13,7 @@
  * 청동 프레임/팔레트는 battle/hud/frames.ts 재사용(원작 UI 크롬 일관).
  */
 import { useMemo, useState } from "react";
-import type { CSSProperties } from "react";
+import styles from "./Shop.module.css";
 import type { Shop as ShopData, Item } from "@tk/data";
 import { getMeta, spendGold, addItem, addGold, canWatchGoldAd, recordAdGold } from "../metaStore";
 import { RewardedAdButton } from "../RewardedAdButton";
@@ -38,26 +38,6 @@ export interface ShopProps {
   /** 구매 완료 콜백 — 부모가 잔액/인벤토리 재조회. */
   onPurchase?: (itemId: string) => void;
 }
-
-// --- 양피지+목재 팔레트 (Formation.tsx 일치) ---
-const C = {
-  parchment: "#ede4cc",
-  parchmentWarm: "#f5edd8",
-  parchmentDark: "#d4c4a0",
-  parchmentShadow: "#c8b890",
-  wood: "#1e1408",
-  woodMid: "#3a2410",
-  gold: "#c8a440",
-  goldBright: "#e0b840",
-  goldDim: "#8a6a28",
-  goldGlow: "rgba(200,164,64,0.18)",
-  darkText: "#1a1008",
-  mutedText: "#5a4a30",
-  dimText: "#8a7850",
-  rowBg: "rgba(255,248,224,0.55)",
-  rowOwned: "rgba(220,200,120,0.35)",
-  rowBorder: "rgba(200,164,64,0.25)",
-};
 
 export function Shop({
   shop,
@@ -84,6 +64,7 @@ export function Shop({
     if (!row.affordable) return;
     if (!spendGold(row.price)) return; // 동시성/경합 방어 — 실패면 무변경
     addItem(row.itemId);
+    setNotice(`${row.name} 1개를 구매했습니다.`);
     setTick((t) => t + 1); // 보유 수량 갱신
     onPurchase?.(row.itemId); // 부모가 gold/inventory 재조회
   }
@@ -93,378 +74,63 @@ export function Shop({
   function handleAdGold(): void {
     addGold(AD_GOLD_REWARD);
     recordAdGold();
+    setNotice(`자금 ${AD_GOLD_REWARD} 금을 받았습니다.`);
     setTick((t) => t + 1); // 캡/affordable 재평가
     onPurchase?.(""); // 부모가 보유 자금(gold prop) 재조회 — itemId 없는 잔액 갱신 신호
   }
 
+  const [category, setCategory] = useState<string>("all");
+  const [notice, setNotice] = useState("");
+  const groups = buildShopGroups(rows);
+  const visibleRows = category === "all" ? rows : rows.filter((row) => row.category === category);
+  const detail = visibleRows.find((row) => row.itemId === detailId) ?? visibleRows[0];
+
   return (
-    <section style={panelStyle} aria-label="상점">
-      {/* 목재 제목 바 */}
-      <div style={titleBarStyle}>
-        <span style={shopIconStyle}>⚖</span>
-        <h2 style={titleStyle}>{shop.name}</h2>
-        <div style={headerRightStyle}>
-          <RewardedAdButton
-            placement="shop_gold"
-            label={`+${AD_GOLD_REWARD} 金`}
-            capReached={!canWatchGoldAd()}
-            onReward={handleAdGold}
-          />
-          <span style={goldStyle} aria-label="보유 자금">
-            <span style={goldLabelStyle}>자금</span>
-            {gold.toLocaleString()}
-            <span style={goldUnitStyle}>金</span>
-          </span>
+    <section className={styles.shop} aria-label="상점">
+      <header className={styles.header}>
+        <div><h2>{shop.name}</h2><p>출진에 필요한 장비와 도구를 준비하세요.</p></div>
+        <div className={styles.wallet} aria-label="보유 자금"><span>보유 자금</span><strong>{gold.toLocaleString()} <small>금</small></strong></div>
+      </header>
+      <div className={styles.layout}>
+        <div className={styles.catalog}>
+          <nav className={styles.filters} aria-label="상품 분류">
+            {[{ category: "all", label: "전체" }, ...groups].map((group) => (
+              <button key={group.category} type="button" aria-pressed={category === group.category}
+                onClick={() => setCategory(group.category)}>{group.label}</button>
+            ))}
+          </nav>
+          <div className={styles.grid}>
+            {visibleRows.map((row) => (
+              <button key={row.itemId} type="button" className={styles.card}
+                aria-label={`${row.name} 상세 보기`} aria-pressed={detail?.itemId === row.itemId}
+                onClick={() => setDetailId(row.itemId)}>
+                <span className={styles.category}>{row.categoryLabel}</span>
+                <ItemIcon itemId={row.itemId} category={row.category} size={100}
+                  style={{ background: "transparent", border: 0 }} />
+                <strong>{row.name}</strong>
+                <span className={styles.effect}>{effectLines(items[row.itemId]!)[0] ?? row.effect}</span>
+                <span className={styles.cardBottom}><b>{row.price.toLocaleString()} 금</b><span>보유 {row.owned}</span></span>
+              </button>
+            ))}
+          </div>
+          {!visibleRows.length && <p>진열 중인 물품이 없습니다.</p>}
         </div>
+        {detail && <aside className={styles.detail} aria-label="선택 상품 상세">
+          <div className={styles.hero}><ItemIcon key={detail.itemId} itemId={detail.itemId} category={detail.category} size={172}
+            style={{ border: 0, background: "transparent" }} /></div>
+          <span className={styles.category}>{detail.categoryLabel}</span>
+          <h3>{detail.name}</h3>
+          <ul>{effectLines(items[detail.itemId]!).map((line) => <li key={line}>{line}</li>)}</ul>
+          <p className={styles.usage}>{detail.consumable ? "구매한 도구는 부대 소지품에 보관됩니다. 전투 중 아군 누구나 사용할 수 있습니다." : "구매한 장비는 편성 화면에서 장수를 선택해 장착할 수 있습니다."}</p>
+          <dl><div><dt>보유 수량</dt><dd>{detail.owned}개</dd></div><div><dt>구매 가격</dt><dd>{detail.price.toLocaleString()} 금</dd></div></dl>
+          <button type="button" className={styles.buy} disabled={!detail.affordable}
+            aria-label={`${detail.name} 구매`} onClick={() => handleBuy(detail)}>
+            {detail.affordable ? "1개 구매" : `${Math.max(0, detail.price - gold).toLocaleString()} 금 부족`}
+          </button>
+          <p className={styles.notice} role="status">{notice}</p>
+        </aside>}
       </div>
-
-      <div style={bodyStyle}>
-        {rows.length === 0 ? (
-          <p style={{ color: C.mutedText, margin: "8px 4px", fontStyle: "italic" }}>
-            진열 중인 물품이 없습니다.
-          </p>
-        ) : (
-          buildShopGroups(rows).map((group) => (
-            <div key={group.category} style={{ marginBottom: 12 }}>
-              <div style={groupHeaderStyle}>{group.label}</div>
-              <ul style={listStyle}>
-                {group.rows.map((row) => (
-                  <ShopRowView
-                    key={row.itemId}
-                    row={row}
-                    onBuy={() => handleBuy(row)}
-                    onDetail={() => setDetailId(row.itemId)}
-                  />
-                ))}
-              </ul>
-            </div>
-          ))
-        )}
-      </div>
-
-      {(() => {
-        const row = detailId ? rows.find((r) => r.itemId === detailId) : undefined;
-        return row ? (
-          <ItemDetailPopup
-            row={row}
-            item={items[row.itemId]}
-            onBuy={() => handleBuy(row)}
-            onClose={() => setDetailId(null)}
-          />
-        ) : null;
-      })()}
+      <footer className={styles.footer}><span>자금이 부족한가요?</span><RewardedAdButton placement="shop_gold" label={`자금 ${AD_GOLD_REWARD} 금 받기`} capReached={!canWatchGoldAd()} onReward={handleAdGold} /></footer>
     </section>
   );
-}
-
-/** 아이템 상세 팝업 — 큰 아이콘 + 효과 줄별 풀이 + 가격/보유 + 구매. 배경 탭 = 닫기. */
-function ItemDetailPopup({
-  row,
-  item,
-  onBuy,
-  onClose,
-}: {
-  row: ShopRow;
-  item: Item | undefined;
-  onBuy: () => void;
-  onClose: () => void;
-}): React.ReactElement {
-  const lines = item ? effectLines(item) : [];
-  return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={`${row.name} 상세`}
-      onClick={onClose}
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 70,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 20,
-        boxSizing: "border-box",
-        background: "rgba(10, 8, 5, 0.62)",
-      }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          width: "min(340px, 90vw)",
-          borderRadius: 10,
-          overflow: "hidden",
-          border: `2px solid ${C.woodMid}`,
-          background: `linear-gradient(150deg, ${C.parchmentWarm} 0%, ${C.parchment} 100%)`,
-          boxShadow: "0 14px 44px rgba(0,0,0,0.55)",
-          color: C.darkText,
-        }}
-      >
-        {/* 헤더 — 이름 + 분류 */}
-        <div style={{ ...titleBarStyle, padding: "9px 14px" }}>
-          <h3 style={{ ...titleStyle, fontSize: 15 }}>{row.name}</h3>
-          <span style={{ ...badgeStyle, background: "rgba(0,0,0,0.25)", color: C.gold, border: `1px solid ${C.gold}66` }}>
-            {row.categoryLabel}
-          </span>
-        </div>
-
-        <div style={{ padding: "16px 16px 14px", display: "flex", flexDirection: "column", gap: 12 }}>
-          {/* 큰 아이콘 */}
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <ItemIcon
-              itemId={row.itemId}
-              category={row.category}
-              size={96}
-              style={{ borderRadius: 10, border: `1px solid ${C.goldDim}66`, boxShadow: "0 4px 14px rgba(0,0,0,0.18)" }}
-            />
-          </div>
-
-          {/* 효과 줄별 풀이 */}
-          <ul style={{ listStyle: "none", margin: 0, padding: "2px 2px 0", display: "flex", flexDirection: "column", gap: 5 }}>
-            {(lines.length ? lines : ["고유 효과"]).map((line) => (
-              <li key={line} style={{ fontSize: 13, color: C.darkText, display: "flex", gap: 7, alignItems: "baseline" }}>
-                <span style={{ color: C.gold, fontSize: 11 }}>◆</span>
-                {line}
-              </li>
-            ))}
-          </ul>
-
-          {/* 가격/보유 + 행동 */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: `1px solid ${C.parchmentDark}`, paddingTop: 11 }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <span style={priceStyle}>
-                {row.price.toLocaleString()}
-                <span style={{ fontSize: 11, marginLeft: 2 }}>金</span>
-              </span>
-              {row.owned > 0 && <span style={ownedTagStyle}>보유 ×{row.owned}</span>}
-            </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button
-                type="button"
-                onClick={onClose}
-                style={{ ...buyBtnStyle(true), background: `${C.parchmentDark}88`, color: C.mutedText, border: `1px solid ${C.parchmentShadow}` }}
-              >
-                닫기
-              </button>
-              <button
-                type="button"
-                onClick={onBuy}
-                disabled={!row.affordable}
-                style={buyBtnStyle(row.affordable)}
-                aria-label={`${row.name} 구매`}
-              >
-                {row.affordable ? "구매" : "자금 부족"}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ShopRowView({
-  row,
-  onBuy,
-  onDetail,
-}: {
-  row: ShopRow;
-  onBuy: () => void;
-  /** 아이콘/이름 영역 탭 → 상세 팝업(큰 아이콘 + 효과 풀이) */
-  onDetail: () => void;
-}): React.ReactElement {
-  const rowStyle: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    padding: "9px 10px",
-    borderRadius: 6,
-    background: row.owned > 0 ? C.rowOwned : C.rowBg,
-    border: `1px solid ${row.owned > 0 ? C.gold + "55" : C.rowBorder}`,
-  };
-  return (
-    <li style={rowStyle}>
-      <button
-        type="button"
-        onClick={onDetail}
-        aria-label={`${row.name} 상세 보기`}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 10,
-          flex: 1,
-          minWidth: 0,
-          background: "none",
-          border: "none",
-          padding: 0,
-          textAlign: "left",
-          cursor: "pointer",
-          font: "inherit",
-        }}
-      >
-        <ItemIcon
-          itemId={row.itemId}
-          category={row.category}
-          size={44}
-          style={{ borderRadius: 6, border: `1px solid ${C.goldDim}55`, flexShrink: 0 }}
-        />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 6, flexWrap: "wrap" }}>
-            <span style={{ color: C.darkText, fontWeight: 700, fontSize: 14 }}>{row.name}</span>
-            <span style={badgeStyle}>{row.categoryLabel}</span>
-            {row.owned > 0 && (
-              <span style={ownedTagStyle}>보유{row.owned > 1 ? ` ×${row.owned}` : ""}</span>
-            )}
-          </div>
-          <div style={{ color: C.mutedText, fontSize: 11, marginTop: 2 }}>
-            {row.effect}
-            {/* 소모성 표기는 분류 배지가 이미 "소모품"인 supplyItem엔 중복이라 생략(공격 아이템 등에만) */}
-            {row.consumable && row.category !== "supplyItem" && (
-              <span style={{ marginLeft: 5, opacity: 0.7 }}>· 소모성</span>
-            )}
-          </div>
-        </div>
-      </button>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
-        <span style={priceStyle} aria-label="가격">
-          {row.price.toLocaleString()}
-          <span style={{ fontSize: 11, marginLeft: 2 }}>金</span>
-        </span>
-        <button
-          type="button"
-          onClick={onBuy}
-          disabled={!row.affordable}
-          style={buyBtnStyle(row.affordable)}
-          aria-label={`${row.name} 구매`}
-        >
-          {row.affordable ? "구매" : "부족"}
-        </button>
-      </div>
-    </li>
-  );
-}
-
-// --- 스타일 ---
-const panelStyle: CSSProperties = {
-  background: `linear-gradient(150deg, ${C.parchmentWarm} 0%, ${C.parchment} 100%)`,
-  borderRadius: 8,
-  overflow: "hidden",
-  border: `2px solid ${C.woodMid}`,
-  boxShadow: `0 4px 16px rgba(0,0,0,0.45), inset 0 1px 0 ${C.goldBright}33`,
-  color: C.darkText,
-};
-
-const titleBarStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 8,
-  padding: "10px 14px",
-  background: `linear-gradient(90deg, ${C.wood} 0%, ${C.woodMid} 100%)`,
-  borderBottom: `2px solid ${C.gold}`,
-  flexWrap: "wrap",
-};
-
-const shopIconStyle: CSSProperties = {
-  fontSize: 18,
-  color: C.gold,
-  lineHeight: 1,
-};
-
-const titleStyle: CSSProperties = {
-  margin: 0,
-  flex: 1,
-  fontSize: 16,
-  fontWeight: 700,
-  color: C.gold,
-  letterSpacing: "0.06em",
-};
-
-const headerRightStyle: CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 10,
-};
-
-const goldLabelStyle: CSSProperties = {
-  color: C.goldDim,
-  fontSize: 11,
-  marginRight: 3,
-};
-
-const goldUnitStyle: CSSProperties = {
-  fontSize: 11,
-  marginLeft: 2,
-  color: C.goldDim,
-};
-
-const goldStyle: CSSProperties = {
-  color: C.goldBright,
-  fontVariantNumeric: "tabular-nums",
-  fontWeight: 700,
-  fontSize: 15,
-};
-
-const bodyStyle: CSSProperties = {
-  padding: "12px 14px 14px",
-};
-
-const listStyle: CSSProperties = {
-  listStyle: "none",
-  margin: 0,
-  padding: 0,
-  display: "flex",
-  flexDirection: "column",
-  gap: 6,
-};
-
-const groupHeaderStyle: CSSProperties = {
-  fontSize: 10,
-  fontWeight: 700,
-  color: C.woodMid,
-  letterSpacing: "0.12em",
-  padding: "3px 2px",
-  marginBottom: 4,
-  borderBottom: `1px solid ${C.gold}55`,
-  textTransform: "uppercase" as const,
-};
-
-const badgeStyle: CSSProperties = {
-  fontSize: 10,
-  color: C.mutedText,
-  background: `${C.parchmentDark}cc`,
-  border: `1px solid ${C.goldDim}55`,
-  borderRadius: 3,
-  padding: "1px 5px",
-  whiteSpace: "nowrap" as const,
-};
-
-const ownedTagStyle: CSSProperties = {
-  fontSize: 11,
-  fontWeight: 600,
-  color: C.gold,
-};
-
-const priceStyle: CSSProperties = {
-  color: C.darkText,
-  fontVariantNumeric: "tabular-nums",
-  fontWeight: 700,
-  fontSize: 14,
-  textAlign: "right" as const,
-  lineHeight: 1,
-};
-
-function buyBtnStyle(enabled: boolean): CSSProperties {
-  return {
-    fontSize: 12,
-    fontWeight: 700,
-    padding: "5px 10px",
-    borderRadius: 5,
-    border: `1px solid ${enabled ? C.gold : C.parchmentShadow}`,
-    background: enabled
-      ? `linear-gradient(180deg, ${C.goldBright}cc 0%, ${C.gold}cc 100%)`
-      : `${C.parchmentDark}88`,
-    color: enabled ? C.wood : C.dimText,
-    cursor: enabled ? "pointer" : "not-allowed",
-    whiteSpace: "nowrap" as const,
-  };
 }

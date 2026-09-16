@@ -348,7 +348,9 @@ def _publish_stage(payload):
         sys.stdout.write(f"[publish-stage] {stage_id} 검사 실패 → 롤백\n")
         return 200, {"ok": False, "rolledBack": True, "output": result.get("output") or result.get("error", "")}
     try:
-        draft_deleted = _delete_draft(stage_id)  # Published 가 곧 Draft — 로컬 Draft 는 역할 종료
+        # Only remove the revision represented by this publish request.
+        # A missing revision from an older client must preserve the draft.
+        draft_deleted = _delete_draft(stage_id, payload.get("baseRevision")) if "baseRevision" in payload else []
     except OSError as e:  # Windows 공유 위반 등 — publish 는 이미 성공, Draft 삭제만 보고
         draft_deleted = []
         sys.stdout.write(f"[publish-stage] Draft 삭제 실패(무시): {e}\n")
@@ -419,10 +421,19 @@ def _draft_save(payload):
         cur = prev.get("revision")
         if base != cur:  # null = "Draft 없음을 기대" — 다른 탭이 먼저 만든 Draft 도 조용히 덮지 않는다
             return 409, {"ok": False, "conflict": True, "revision": cur}
-        revision = (cur if isinstance(cur, int) else 0) + 1
+        # Keep a high-water mark after deletion to prevent stale requests matching
+        # a newly created draft (revision 1 -> delete -> revision 1 / ABA).
+        counter_path = os.path.join(_DRAFT_STAGES_DIR, stage_id + ".revision")
+        try:
+            with open(counter_path, encoding="utf-8") as f:
+                last_revision = int(f.read())
+        except FileNotFoundError:
+            last_revision = 0
+        revision = max(cur if isinstance(cur, int) else 0, last_revision) + 1
         at = datetime.now(timezone.utc).isoformat(timespec="seconds")
         has_map = map_txt is not None or bool(prev.get("hasMap") and prev.get("mapId") == map_id)
         os.makedirs(_DRAFT_STAGES_DIR, exist_ok=True)
+        _write_text_atomic(counter_path, str(revision), _DRAFT_TMP_DIR)
         _write_text_atomic(os.path.join(_DRAFT_STAGES_DIR, stage_id + ".json"), stage_txt, _DRAFT_TMP_DIR)
         if map_txt is not None:
             os.makedirs(_DRAFT_MAPS_DIR, exist_ok=True)
@@ -432,11 +443,21 @@ def _draft_save(payload):
     return 200, {"ok": True, "revision": revision, "savedAt": at}
 
 
-def _delete_draft(stage_id):
+def _delete_draft(stage_id, expected_revision):
     """stage·meta 삭제, 맵은 다른 Draft meta 가 같은 mapId 를 hasMap 으로 참조하지 않을 때만. 반환 = 지운 상대경로 목록."""
     deleted = []
     with _DRAFT_LOCK:
         meta = _read_draft_meta(stage_id) or {}
+        if meta.get("revision") != expected_revision:
+            return None
+        if isinstance(meta.get("revision"), int):
+            counter_path = os.path.join(_DRAFT_STAGES_DIR, stage_id + ".revision")
+            try:
+                with open(counter_path, encoding="utf-8") as f:
+                    last_revision = int(f.read())
+            except FileNotFoundError:
+                last_revision = 0
+            _write_text_atomic(counter_path, str(max(last_revision, meta["revision"])), _DRAFT_TMP_DIR)
         for p in (os.path.join(_DRAFT_STAGES_DIR, stage_id + ".json"), _draft_meta_path(stage_id)):
             if os.path.exists(p):
                 os.remove(p)
@@ -458,7 +479,12 @@ def _draft_delete(payload):
     stage_id = payload.get("stageId") if isinstance(payload, dict) else None
     if not isinstance(stage_id, str) or not _DRAFT_ID_RE.fullmatch(stage_id):
         return 400, {"ok": False, "error": "stageId 형식 오류 ([A-Za-z0-9_-]+)"}
-    return 200, {"ok": True, "deleted": _delete_draft(stage_id)}
+    if "baseRevision" not in payload:
+        return 400, {"ok": False, "error": "baseRevision is required"}
+    deleted = _delete_draft(stage_id, payload["baseRevision"])
+    if deleted is None:
+        return 409, {"ok": False, "conflict": True, "error": "다른 탭에서 수정됨 — 새로고침"}
+    return 200, {"ok": True, "deleted": deleted}
 
 
 def _publish_rollback(payload):

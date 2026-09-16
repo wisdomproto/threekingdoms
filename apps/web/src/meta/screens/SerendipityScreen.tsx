@@ -11,7 +11,7 @@
  */
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { gameData } from "@tk/data";
+import { gameData } from "../../game/data";
 import type { ItemEffects } from "@tk/data";
 import { getSerendipity, getSerendipityPity, pullSerendipity, pullSerendipityFree } from "../metaStore";
 import { PULL_COST, PITY_CAP, pickFlavor, isSerendipityTreasure } from "../serendipity";

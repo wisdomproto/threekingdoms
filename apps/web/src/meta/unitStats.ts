@@ -4,7 +4,7 @@
  * 무반격·관통·흡혈 등 *행동* 특성은 전력 숫자를 안 바꾼다 — 그건 효과 문구(shopItemView)로 보여준다.
  */
 import { spawnUnit, attackPower, defensePower, spiritPower } from "@tk/engine";
-import { gameData } from "@tk/data";
+import { gameData } from "../game/data";
 
 export interface UnitStatLine {
   atk: number;

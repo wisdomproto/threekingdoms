@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>무기·아이템 에디터 — 삼국지 SRPG (items.json)</title>
 <style>
   :root { --bg:#14161c; --panel:#1d212b; --panel2:#242936; --line:#333a4a; --txt:#e8e6df; --dim:#9aa1b0; --acc:#d4a843; --acc2:#6fae6f; --bad:#e06a6a; --bronze:#a9763f; }
@@ -63,6 +64,12 @@
   #toast.bad { background:var(--bad); color:#fff; }
   #count { color:var(--dim); font-size:12px; }
   .dirty { color:var(--acc); }
+  @media(max-width:800px) {
+    main { flex-direction:column; overflow:auto; }
+    #listpane { flex:none; min-height:200px; max-height:40vh; }
+    #tablewrap { min-height:120px; }
+    #editpane { width:100%; overflow:visible; }
+  }
 </style>
 </head>
 <body>
@@ -116,8 +123,13 @@
 
 <div id="toast"></div>
 
-<script>
+<script type="module">
 'use strict';
+import { assetImageEditor } from './editor/asset-image-editor.js';
+import { catalogContext, connectCatalog } from './editor/catalog-bridge.js';
+import { cloneItemCatalog, serializeItemCatalog } from './editor/catalog-io.js';
+const studioCatalog = catalogContext('items');
+let catalogBridge = null;
 
 /* ─────────────────────────────────────────────────────────────────────────
    선언적 필드 정의 — 스키마(packages/data/src/schemas.ts ItemSchema)와 1:1.
@@ -146,24 +158,24 @@ const FIELDS = [
     },
   },
   {
-    key: 'name', label: '이름(name)', type: 'text', required: true,
+    key: 'name', label: '이름', type: 'text', required: true,
     hint: '표시 이름. 보통 id와 동일.',
     validate: (v) => (typeof v === 'string' && v.trim() !== '') ? null : 'name은 비어 있을 수 없습니다.',
   },
   {
-    key: 'category', label: '분류(category)', type: 'select', required: true,
+    key: 'category', label: '분류', type: 'select', required: true,
     options: CATEGORIES.map(c => ({ value: c.value, label: `${c.label} (${c.value})` })),
     hint: (item) => (CAT_MAP[item.category] ? CAT_MAP[item.category].hint : ''),
     validate: (v) => CAT_VALUES.includes(v) ? null : `category는 ${CAT_VALUES.join('/')} 중 하나여야 합니다.`,
   },
   {
-    key: 'power', label: 'power', type: 'int', min: 0, max: 255, required: true,
-    hint: 'b13: 소모 효과량. 255 = 비소모(무기·보물·명마 등 영구 장비). 0~255 정수.',
+    key: 'power', label: '효과량', type: 'int', min: 0, max: 255, required: true,
+    hint: '소모품의 효과량입니다. 영구 장비는 255를 사용합니다. 0~255 정수.',
     validate: (v) => intRange(v, 0, 255, 'power'),
   },
   {
-    key: 'bonusPercent', label: 'bonusPercent', type: 'int', min: 0, max: 100, required: true,
-    hint: 'b14: 무기/병법서 % 가산. 소모품/공격아이템은 보통 0. 0~100 정수.',
+    key: 'bonusPercent', label: '장비 보정 (%)', type: 'int', min: 0, max: 100, required: true,
+    hint: '무기 공격력·병법서 정신력의 증가 비율입니다. 소모품은 보통 0. 0~100 정수.',
     validate: (v) => intRange(v, 0, 100, 'bonusPercent'),
   },
   {
@@ -184,7 +196,7 @@ const FIELDS = [
     validate: (v, item) => {
       if (item._effErr) return `effects ${item._effErr} (예: {"move":1})`;
       const e = item.effects; if (!e) return null;
-      const allowed = ['move', 'atkPercent', 'spiritPercent', 'defensePercent', 'doubleStrike'];
+      const allowed = ['move', 'atkPercent', 'spiritPercent', 'defensePercent', 'doubleStrike', 'noCounter', 'multiHit', 'counterStrikes', 'flatDamagePerLevel', 'alwaysHit', 'inflictStatus', 'rangeBonus', 'lifestealPercent'];
       const bad = Object.keys(e).filter(k => !allowed.includes(k));
       if (bad.length) return `알 수 없는 효과 키: ${bad.join(', ')} (허용: ${allowed.join('/')})`;
       return null;
@@ -309,6 +321,7 @@ function renderForm() {
   if (!selId || !data[selId]) { form.innerHTML = '<div class="none">항목을 선택하세요.</div>'; return; }
   const item = data[selId];
   form.innerHTML = '';
+  if(studioCatalog)assetImageEditor(form,{kind:'items',id:selId});
   FIELDS.forEach(f => {
     const wrap = document.createElement('div');
     wrap.className = 'field'; wrap.dataset.key = f.key;
@@ -329,6 +342,7 @@ function renderForm() {
       if (f.type === 'int') { if (f.min != null) inp.min = f.min; if (f.max != null) inp.max = f.max; inp.step = 1; }
       inp.value = curVal ?? '';
     }
+    inp.id = `item_${f.key}`; lab.htmlFor = inp.id;
     inp.oninput = () => onEdit(f, inp);
     inp.onchange = () => onEdit(f, inp);
     wrap.appendChild(inp);
@@ -416,7 +430,7 @@ function refreshBanner() {
   const saveBtn = document.getElementById('saveFile');
   if (bad.length) {
     b.classList.add('on');
-    b.innerHTML = `⚠ ${bad.length}개 항목에 오류가 있어 저장이 차단됩니다: ` +
+    b.innerHTML = `⚠ ${bad.length}개 항목 확인 필요${studioCatalog ? ' · 초안은 저장되며 실행 전에 검증합니다' : ' · 파일 저장이 차단됩니다'}: ` +
       bad.slice(0, 6).map(x => esc(x.id)).join(', ') + (bad.length > 6 ? ' …' : '');
   } else {
     b.classList.remove('on');
@@ -461,34 +475,14 @@ function delItem() {
   toast('삭제됨');
 }
 
-function markDirty() { dirty = true; refreshBanner(); }
+function markDirty() { dirty = true; refreshBanner(); catalogBridge?.touch(); }
 
 /* ── 직렬화 ── */
-function serialize() {
-  const out = {};
-  order.forEach(id => {
-    const it = data[id];
-    // 스키마 필드 순서로 정규화 출력 (기존 items.json 형태와 동일)
-    out[id] = { id: it.id, name: it.name, category: it.category, power: it.power, bonusPercent: it.bonusPercent };
-    // §7 장착 효과(말·보물) — 있으면 보존(에디터가 떨어뜨리지 않게). 비면 생략.
-    if (it.effects && Object.keys(it.effects).length) out[id].effects = it.effects;
-  });
-  return JSON.stringify(out, null, 2) + '\n';
-}
+function serialize() { return serializeItemCatalog(data, order); }
 function loadFromObject(obj, label) {
   if (!obj || typeof obj !== 'object' || Array.isArray(obj)) { toast('Record<id,Item> 객체가 아닙니다', true); return false; }
-  const nd = {}, no = [];
-  for (const [k, v] of Object.entries(obj)) {
-    if (!v || typeof v !== 'object') continue;
-    nd[k] = {
-      id: v.id != null ? String(v.id) : k,
-      name: v.name != null ? String(v.name) : k,
-      category: v.category,
-      power: typeof v.power === 'number' ? v.power : Number(v.power),
-      bonusPercent: typeof v.bonusPercent === 'number' ? v.bonusPercent : Number(v.bonusPercent),
-    };
-    no.push(k);
-  }
+  let nd; try { nd = cloneItemCatalog(obj); } catch(error) { toast(String(error), true); return false; }
+  const no = Object.keys(nd);
   data = nd; order = no; selId = null; dirty = false;
   document.getElementById('dupItem').disabled = true;
   document.getElementById('delItem').disabled = true;
@@ -585,6 +579,15 @@ init();
 
 /* ── 자동 로드: 서버 기동 중이면 기본 데이터를 바로 표시 ── */
 (async function autoLoadDefault() {
+  if (studioCatalog) {
+    try { catalogBridge = await connectCatalog(studioCatalog, {
+      read: () => ({items: JSON.parse(serialize())}),
+      load: value => { const selected = selId; loadFromObject(value.items, '프로젝트 아이템'); if (selected && data[selected]) select(selected); },
+      setDirty: value => { dirty = value; refreshBanner(); },
+      hide: ['openFile','saveFile','saveAs','pasteIn']
+    }); } catch(error) { document.querySelector('main').textContent = String(error); }
+    return;
+  }
   try {
     const res = await fetch('/packages/data/json/items.json', { cache: 'no-store' });
     if (!res.ok) throw new Error(res.status);

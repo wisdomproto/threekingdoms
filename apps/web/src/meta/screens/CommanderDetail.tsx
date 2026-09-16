@@ -8,7 +8,7 @@
  * 배치 여부와 무관하게 편집 가능(setEquipped로 영속 — 배치 중이면 셸이 member도 갱신).
  */
 import { useMemo, useState } from "react";
-import { gameData } from "@tk/data";
+import { gameData } from "../../game/data";
 import type { RosterUnit } from "../metaStore";
 import type { SortieMember } from "../sortie";
 import { unitStats } from "../unitStats";
@@ -43,12 +43,12 @@ function StatBar({ label, value, max, color }: {
   const pct = max > 0 ? Math.max(5, Math.round((value / max) * 100)) : 0;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-      <span style={{ fontSize: 12, color: "#c8b48a", width: 30, flexShrink: 0, letterSpacing: "0.1em" }}>
+      <span style={{ fontSize: 13, color: "#c7b48a", width: 48, flexShrink: 0 }}>
         {label}
       </span>
       <div style={{
         flex: 1, height: 10, borderRadius: 5, overflow: "hidden",
-        background: "rgba(0,0,0,0.5)", border: "1px solid rgba(0,0,0,0.55)",
+        background: "#100f09", border: "1px solid rgba(0,0,0,0.55)",
         boxShadow: "inset 0 1px 2px rgba(0,0,0,0.55)",
       }}>
         <div style={{
@@ -84,7 +84,7 @@ function SlotBox({ slot, id, editable, onTapFilled, onTapEmpty }: {
           position: "relative", width: "100%", aspectRatio: "1", borderRadius: 9, padding: 0,
           border: id ? `1.5px solid ${GOLD}99` : `1.5px dashed ${GOLD_DIM}66`,
           background: id
-            ? "linear-gradient(160deg, rgba(64,48,22,0.9), rgba(26,18,9,0.96))"
+            ? "#3b3019"
             : "rgba(0,0,0,0.32)",
           boxShadow: id ? `inset 0 0 12px ${GOLD_GLOW}` : "none",
           display: "flex", alignItems: "center", justifyContent: "center",
@@ -221,16 +221,16 @@ export function CommanderDetail({
       border: `1.5px solid ${GOLD_DIM}aa`,
       borderRadius: 10,
       overflow: "hidden",
-      boxShadow: "0 8px 28px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(200,164,64,0.12)",
+      boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
       fontFamily: SERIF,
       display: "flex", flexDirection: "column",
     }}>
       {/* ── 히어로: 전장 비네트 배경 위 초상 + 하단 명판(레퍼런스 그랜드 톤) ── */}
-      <div style={{ position: "relative", height: 208, flexShrink: 0, overflow: "hidden" }}>
+      <div style={{ position: "relative", height: 168, flexShrink: 0, overflow: "hidden" }}>
         {/* 따뜻한 전장 비네트 */}
         <div aria-hidden style={{
           position: "absolute", inset: 0,
-          background: "radial-gradient(115% 90% at 50% 22%, rgba(122,68,36,0.55), rgba(24,16,9,0.5) 62%, rgba(12,8,4,0.96) 100%)",
+          background: "radial-gradient(ellipse at top, #5a4722, #211b10 80%)",
         }} />
         {/* 초상 — 세로비 유지 중앙 배치(흉상 정상 표시, 와이드 크롭 금지) */}
         <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
@@ -246,7 +246,7 @@ export function CommanderDetail({
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <span style={{
-              fontSize: 26, fontWeight: 800, color: PARCHMENT, lineHeight: 1,
+              fontSize: 26, fontWeight: 800, color: "#ffffff", lineHeight: 1,
               textShadow: "0 2px 8px rgba(0,0,0,0.85)", letterSpacing: "0.08em",
               overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
             }}>{name}</span>
@@ -268,7 +268,7 @@ export function CommanderDetail({
           </div>
           <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
             <span style={{
-              fontSize: 12, fontWeight: 700, color: PARCHMENT, padding: "2px 9px",
+              fontSize: 12, fontWeight: 700, color: "#ffffff", padding: "2px 9px",
               borderRadius: 10, border: `1px solid ${GOLD_DIM}`, background: "rgba(14,10,5,0.75)",
             }}>Lv.{unit.level}</span>
             <span style={{
@@ -277,14 +277,14 @@ export function CommanderDetail({
               background: `linear-gradient(135deg, ${SEAL_RED}, #6a1e14)`,
             }}>{className(unit.classId)}</span>
             <span style={{ flex: 1 }} />
-            <span style={{ fontSize: 11.5, color: "#c8b48a" }}>
-              전력 <strong style={{ color: GOLD_BRIGHT, fontSize: 14 }}>{stats.power}</strong>
+            <span style={{ fontSize: 11.5, color: "#b5c4d0" }}>
+              전력 <strong style={{ color: "#ffffff", fontSize: 14 }}>{stats.power}</strong>
             </span>
           </div>
         </div>
         {onClose && (
           <button type="button" onClick={onClose} aria-label="닫기" style={{
-            position: "absolute", top: 8, right: 8, width: 28, height: 28,
+            position: "absolute", top: 8, right: 8, width: 44, height: 44,
             borderRadius: "50%", border: `1px solid ${GOLD_DIM}`,
             background: "rgba(14,10,5,0.75)", color: PARCHMENT, fontSize: 14, cursor: "pointer", lineHeight: 1,
           }}>✕</button>
@@ -294,9 +294,9 @@ export function CommanderDetail({
       <div style={{ padding: "13px 15px 15px", display: "flex", flexDirection: "column", gap: 13 }}>
         {/* ── 스탯 3줄 ── */}
         <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-          <StatBar label="무력" value={stats.atk} max={statMax.atk} color="#c23b2a" />
-          <StatBar label="통솔" value={stats.def} max={statMax.def} color="#2e8050" />
-          <StatBar label="지력" value={stats.spirit} max={statMax.spirit} color="#3565b0" />
+          <StatBar label="공격력" value={stats.atk} max={statMax.atk} color="#c23b2a" />
+          <StatBar label="방어력" value={stats.def} max={statMax.def} color="#2e8050" />
+          <StatBar label="정신력" value={stats.spirit} max={statMax.spirit} color="#3565b0" />
         </div>
 
         <div style={{ height: 1, background: `linear-gradient(to right, transparent, ${GOLD_DIM}88, transparent)` }} />

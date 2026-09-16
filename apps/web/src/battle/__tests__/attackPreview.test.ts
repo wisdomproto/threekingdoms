@@ -139,6 +139,8 @@ describe("buildAttackPreview", () => {
     const hits = damageEvents(res.events).filter((d) => !d.counter && d.defenderId === "조잠");
     expect(withFlank.damage).toBe(hits.reduce((a, h) => a + h.damage, 0)); // 연속공격이면 2타 합산
     expect(res.events.some((e) => e.type === "flank" && e.defenderId === "조잠")).toBe(true);
+    const flankEvent = res.events.find(e => e.type === "flank");
+    expect(flankEvent?.type === "flank" && flankEvent.participantIds?.slice().sort()).toEqual(["유비", "장비"]);
   });
 
   it("기병 돌격: 이동 후 공격이면 charge 발동(+20%), 제자리면 미발동", () => {

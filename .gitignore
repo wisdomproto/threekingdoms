@@ -1,5 +1,9 @@
 node_modules/
 .next/
+.next-*/
+.next-story/
+.artifacts/
+.threekingdoms_cao_cao_art.png
 dist/
 *.tsbuildinfo
 tools/hero-extract/out/
@@ -61,3 +65,6 @@ docs/art/samples/
 
 # 에디터 플레이테스트 스냅샷(dev 전용, serve.py POST /playtest-draft 가 씀) — 레포·R2 무관
 apps/web/public/_draft/
+
+# Local authoring projects (independent of published game data)
+.studio/

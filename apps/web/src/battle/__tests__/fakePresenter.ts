@@ -46,6 +46,9 @@ export class FakePresenter implements Presenter {
     return new Promise((resolve) => this.pending.push(resolve));
   }
 
+  scriptMessage(e: Ev<"scriptMessage">): Promise<void> { return this.handle(e); }
+  scriptEffect(e: Ev<"scriptEffect">): Promise<void> { return this.handle(e); }
+  scriptDamage(e: Ev<"scriptDamage">): Promise<void> { return this.handle(e); }
   unitMoved(e: Ev<"unitMoved">): Promise<void> {
     return this.handle(e);
   }
@@ -156,6 +159,10 @@ export class TrackingPresenter extends FakePresenter {
           (u) => u.x === coord.x && u.y === coord.y && !u.retreated,
         );
         if (target) target.troops += e.amount;
+        break;
+      }
+      case "scriptDamage": {
+        const u = this.units.get(e.unitId); if (u) u.troops -= e.damage;
         break;
       }
       case "statusApplied": // 표시 전용 — diffSnapshot은 statuses 미비교(투영 불필요)

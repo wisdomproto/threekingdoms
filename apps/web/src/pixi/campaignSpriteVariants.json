@@ -1,0 +1,199 @@
+{
+  "위속": {
+    "footman": "위속-footman",
+    "lightCavalry": "위속-cavalry",
+    "archer": "위속-archer"
+  },
+  "조표": {
+    "footman": "조표-footman"
+  },
+  "진기": {
+    "footman": "진기-footman"
+  },
+  "후성": {
+    "archer": "후성-archer",
+    "lightCavalry": "후성-cavalry"
+  },
+  "기령": {
+    "heavyCavalry": "기령-cavalry"
+  },
+  "이풍": {
+    "footman": "이풍-footman"
+  },
+  "악취": {
+    "archer": "악취-archer"
+  },
+  "한섬": {
+    "lightCavalry": "한섬-cavalry"
+  },
+  "기병대": {
+    "lightCavalry": "기병대-cavalry"
+  },
+  "보병대_2": {
+    "footman": "보병대_2-footman"
+  },
+  "허저": {
+    "footman": "허저-footman",
+    "brawler": "허저-footman",
+    "heavyCavalry": "허저-cavalry"
+  },
+  "왕충": {
+    "footman": "왕충-footman",
+    "lightCavalry": "왕충-cavalry"
+  },
+  "유대": {
+    "footman": "유대-footman"
+  },
+  "채양": {
+    "archer": "채양-archer",
+    "lightCavalry": "채양-cavalry"
+  },
+  "하후걸": {
+    "archer": "하후걸-archer"
+  },
+  "하후상": {
+    "lightCavalry": "하후상-cavalry"
+  },
+  "하후은": {
+    "lightCavalry": "하후은-cavalry",
+    "heavyCavalry": "하후은-cavalry"
+  },
+  "하후덕": {
+    "footman": "하후덕-footman"
+  },
+  "원술": {
+    "pikeman": "원술-pikeman"
+  },
+  "하후란": {
+    "lightCavalry": "하후란-cavalry"
+  },
+  "조순": {
+    "archer": "조순-archer",
+    "lightCavalry": "조순-cavalry",
+    "footman": "조순-footman"
+  },
+  "서황": {
+    "heavyCavalry": "xuhuang-cavalry-v2",
+    "lightCavalry": "xuhuang-cavalry-v2",
+    "footman": "서황-footman"
+  },
+  "조하": {
+    "lightCavalry": "조하-cavalry"
+  },
+  "관평": {
+    "lightCavalry": "관평-cavalry"
+  },
+  "주창": {
+    "bandit": "주창-bandit",
+    "archer": "주창-archer",
+    "footman": "주창-footman"
+  },
+  "제갈량": {
+    "strategist": "제갈량-strategist"
+  },
+  "유봉": {
+    "footman": "유봉-footman",
+    "archer": "유봉-archer"
+  },
+  "조홍": {
+    "footman": "조홍-footman",
+    "lightCavalry": "조홍-cavalry"
+  },
+  "공지": {
+    "civilian": "공지-civilian"
+  },
+  "이적": {
+    "civilian": "이적-civilian"
+  },
+  "진응": {
+    "civilian": "진응-civilian"
+  },
+  "진진": {
+    "civilian": "진진-civilian"
+  },
+  "유선": {
+    "civilian": "유선-civilian"
+  },
+  "조진": {
+    "lightCavalry": "조진-cavalry"
+  },
+  "조휴": {
+    "archer": "조휴-archer"
+  },
+  "문빙": {
+    "archer": "문빙-archer",
+    "footman": "문빙-footman",
+    "lightCavalry": "문빙-cavalry",
+    "heavyCavalry": "문빙-cavalry"
+  },
+  "손권": {
+    "lord": "손권-lord"
+  },
+  "주유": {
+    "strategist": "주유-strategist"
+  },
+  "장무": {
+    "heavyCavalry": "장무-cavalry"
+  },
+  "진손": {
+    "lightCavalry": "진손-cavalry"
+  },
+  "노숙": {
+    "strategist": "노숙-strategist"
+  },
+  "황개": {
+    "heavyCavalry": "황개-cavalry",
+    "lightCavalry": "황개-cavalry"
+  },
+  "정보": {
+    "footman": "정보-footman",
+    "archer": "정보-archer"
+  },
+  "한당": {
+    "archer": "한당-archer"
+  },
+  "채모": {
+    "heavyCavalry": "채모-cavalry",
+    "footman": "채모-footman",
+    "archer": "채모-archer"
+  },
+  "장윤": {
+    "footman": "장윤-footman",
+    "archer": "장윤-archer"
+  },
+  "채중": {
+    "archer": "채중-archer"
+  },
+  "진무": {
+    "footman": "진무-footman"
+  },
+  "반장": {
+    "archer": "반장-archer"
+  },
+  "감녕": {
+    "heavyCavalry": "감녕-cavalry",
+    "lightCavalry": "감녕-cavalry"
+  },
+  "정봉": {
+    "footman": "정봉-footman"
+  },
+  "능통": {
+    "archer": "능통-archer"
+  },
+  "여몽": {
+    "lightCavalry": "여몽-cavalry"
+  },
+  "주태": {
+    "lightCavalry": "주태-cavalry"
+  },
+  "장합": {
+    "lightCavalry": "장합-cavalry"
+  },
+  "이전": {
+    "archer": "lidian-archer-v2"
+  },
+  "하후연": {
+    "lightCavalry": "xiahouyuan-cavalry-v2",
+    "heavyCavalry": "xiahouyuan-cavalry-v2"
+  }
+}

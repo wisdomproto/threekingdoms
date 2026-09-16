@@ -3,7 +3,7 @@
  * 하단 "개발 링크" 영역에 보존한다 — 화면이 채워지는 동안 직접 진입 경로 유지.
  */
 import Link from "next/link";
-import { gameData, stages } from "@tk/data";
+import { gameData, stages } from "../src/game/data";
 import { TitleScreen } from "../src/meta/screens/TitleScreen";
 
 export default function Home() {

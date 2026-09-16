@@ -9,7 +9,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { stages } from "@tk/data";
+import { stages, activeGame } from "../../game/data";
+import { campaignChapters, chapterOf, stageNumber, orderedStageIds } from "../campaign";
 import type { Stage } from "@tk/data";
 import { getMeta, startNewGame } from "../metaStore";
 import { writeSortie } from "../sortie";
@@ -39,24 +40,6 @@ function missionTag(name: string): string {
   return "섬멸전";
 }
 
-const CHAPTERS: { chapter: number; title: string; from: number; to: number }[] = [
-  { chapter: 1, title: "황건적의 난", from: 1, to: 4 },
-  { chapter: 2, title: "반동탁연합", from: 5, to: 9 },
-  { chapter: 3, title: "서주, 여포", from: 10, to: 15 },
-  { chapter: 4, title: "관도 ~ 장판파", from: 16, to: 22 },
-  { chapter: 5, title: "적벽", from: 23, to: 27 },
-];
-
-function stageNumber(id: string): number {
-  const n = Number.parseInt(id.slice(0, id.indexOf("-")), 10);
-  return Number.isFinite(n) ? n : 999;
-}
-
-function chapterOf(num: number): number {
-  const c = CHAPTERS.find((ch) => num >= ch.from && num <= ch.to);
-  return c ? c.chapter : 0;
-}
-
 export function StageSelect(): React.ReactElement {
   const router = useRouter();
   const [cleared, setCleared] = useState<string[]>([]);
@@ -81,7 +64,7 @@ export function StageSelect(): React.ReactElement {
   const resume = useCallback(
     (s: SuspendedBattle) => {
       writeSortie(s.sortie ?? { stageId: s.stageId, members: [], sharedItems: [] });
-      router.push(`/battle?stage=${s.stageId}&resume=1`);
+      window.location.assign(`/battle?stage=${s.stageId}&resume=1`);
     },
     [router],
   );
@@ -89,7 +72,7 @@ export function StageSelect(): React.ReactElement {
   useEffect(() => { reload(); }, [reload]);
 
   const ordered = useMemo(
-    () => Object.values(stages).slice().sort((a, b) => stageNumber(a.id) - stageNumber(b.id)),
+    () => orderedStageIds().map(id => stages[id]!),
     [],
   );
 
@@ -104,9 +87,9 @@ export function StageSelect(): React.ReactElement {
   }, [ordered, clearedSet]);
 
   const grouped = useMemo(() =>
-    CHAPTERS.map((ch) => ({
+    campaignChapters().map((ch) => ({
       ...ch,
-      list: ordered.filter((s) => chapterOf(stageNumber(s.id)) === ch.chapter),
+      list: ordered.filter((s) => activeGame ? activeGame.chapters.find(c => c.chapter === ch.chapter)?.stageIds.includes(s.id) : chapterOf(stageNumber(s.id)) === ch.chapter),
     })),
     [ordered],
   );

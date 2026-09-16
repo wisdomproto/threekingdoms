@@ -8,11 +8,11 @@
           "loop": true,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-directions.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-0.webp",
               "col": 0,
               "row": 0,
-              "columns": 6,
-              "rows": 3,
+              "columns": 1,
+              "rows": 1,
               "ms": 800
             }
           ]
@@ -58,11 +58,11 @@
           "loop": true,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-directions.png",
-              "col": 3,
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-4.webp",
+              "col": 0,
               "row": 0,
-              "columns": 6,
-              "rows": 3,
+              "columns": 1,
+              "rows": 1,
               "ms": 800
             }
           ]
@@ -108,11 +108,11 @@
           "loop": true,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-0.webp",
               "col": 0,
               "row": 0,
-              "columns": 6,
-              "rows": 3,
+              "columns": 1,
+              "rows": 1,
               "ms": 800
             }
           ]
@@ -155,31 +155,23 @@
           ]
         },
         "left.talk": {
-          "loop": true,
+          "loop": false,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-0.webp",
               "col": 0,
               "row": 0,
-              "columns": 6,
-              "rows": 3,
-              "ms": 400
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
             },
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
-              "col": 3,
-              "row": 0,
-              "columns": 6,
-              "rows": 3,
-              "ms": 900
-            },
-            {
-              "image": "/assets/scene-motions/brothers-gestures.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-1.webp",
               "col": 0,
               "row": 0,
-              "columns": 6,
-              "rows": 3,
-              "ms": 600
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
             }
           ]
         },
@@ -187,20 +179,20 @@
           "loop": false,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-0.webp",
               "col": 0,
               "row": 0,
-              "columns": 6,
-              "rows": 3,
+              "columns": 1,
+              "rows": 1,
               "ms": 180
             },
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
-              "col": 4,
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-3.webp",
+              "col": 0,
               "row": 0,
-              "columns": 6,
-              "rows": 3,
-              "ms": 900
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
             }
           ]
         },
@@ -247,6 +239,192 @@
               "rows": 2,
               "col": 1,
               "row": 0,
+              "ms": 800
+            }
+          ]
+        },
+        "left.emphasize": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "down.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "down.emphasize": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "down.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "up.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "up.emphasize": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-6.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "up.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/liubei-foot-7.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-rest-v1/liubei-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest-talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-rest-v1/liubei-foot-1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest-emphasize": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-rest-v1/liubei-foot-2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
               "ms": 800
             }
           ]
@@ -260,11 +438,11 @@
           "loop": true,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-directions.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-0.webp",
               "col": 0,
-              "row": 1,
-              "columns": 6,
-              "rows": 3,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
               "ms": 800
             }
           ]
@@ -310,11 +488,11 @@
           "loop": true,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-directions.png",
-              "col": 3,
-              "row": 1,
-              "columns": 6,
-              "rows": 3,
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
               "ms": 800
             }
           ]
@@ -360,11 +538,11 @@
           "loop": true,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-0.webp",
               "col": 0,
-              "row": 1,
-              "columns": 6,
-              "rows": 3,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
               "ms": 800
             }
           ]
@@ -407,31 +585,23 @@
           ]
         },
         "left.talk": {
-          "loop": true,
+          "loop": false,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-0.webp",
               "col": 0,
-              "row": 1,
-              "columns": 6,
-              "rows": 3,
-              "ms": 400
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
             },
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
-              "col": 3,
-              "row": 1,
-              "columns": 6,
-              "rows": 3,
-              "ms": 900
-            },
-            {
-              "image": "/assets/scene-motions/brothers-gestures.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-1.webp",
               "col": 0,
-              "row": 1,
-              "columns": 6,
-              "rows": 3,
-              "ms": 600
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
             }
           ]
         },
@@ -439,20 +609,20 @@
           "loop": false,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-0.webp",
               "col": 0,
-              "row": 1,
-              "columns": 6,
-              "rows": 3,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
               "ms": 180
             },
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
-              "col": 4,
-              "row": 1,
-              "columns": 6,
-              "rows": 3,
-              "ms": 900
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
             }
           ]
         },
@@ -476,6 +646,192 @@
               "ms": 1200
             }
           ]
+        },
+        "left.emphasize": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "down.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "down.emphasize": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "down.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "up.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "up.emphasize": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-6.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "up.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/guanyu-foot-7.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-rest-v1/guanyu-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest-talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-rest-v1/guanyu-foot-1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest-emphasize": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-rest-v1/guanyu-foot-2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
         }
       }
     },
@@ -486,11 +842,11 @@
           "loop": true,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-directions.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-0.webp",
               "col": 0,
-              "row": 2,
-              "columns": 6,
-              "rows": 3,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
               "ms": 800
             }
           ]
@@ -536,11 +892,11 @@
           "loop": true,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-directions.png",
-              "col": 3,
-              "row": 2,
-              "columns": 6,
-              "rows": 3,
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
               "ms": 800
             }
           ]
@@ -586,11 +942,11 @@
           "loop": true,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-0.webp",
               "col": 0,
-              "row": 2,
-              "columns": 6,
-              "rows": 3,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
               "ms": 800
             }
           ]
@@ -633,31 +989,23 @@
           ]
         },
         "left.talk": {
-          "loop": true,
+          "loop": false,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-0.webp",
               "col": 0,
-              "row": 2,
-              "columns": 6,
-              "rows": 3,
-              "ms": 400
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
             },
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
-              "col": 3,
-              "row": 2,
-              "columns": 6,
-              "rows": 3,
-              "ms": 900
-            },
-            {
-              "image": "/assets/scene-motions/brothers-gestures.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-1.webp",
               "col": 0,
-              "row": 2,
-              "columns": 6,
-              "rows": 3,
-              "ms": 600
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
             }
           ]
         },
@@ -665,20 +1013,20 @@
           "loop": false,
           "frames": [
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-0.webp",
               "col": 0,
-              "row": 2,
-              "columns": 6,
-              "rows": 3,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
               "ms": 180
             },
             {
-              "image": "/assets/scene-motions/brothers-gestures.png",
-              "col": 4,
-              "row": 2,
-              "columns": 6,
-              "rows": 3,
-              "ms": 900
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
             }
           ]
         },
@@ -725,6 +1073,192 @@
               "rows": 2,
               "col": 1,
               "row": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.emphasize": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "down.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "down.emphasize": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "down.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "up.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "up.emphasize": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-6.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "up.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 180
+            },
+            {
+              "image": "/assets/scene-motions/brothers-quarter-v1/zhangfei-foot-7.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 700
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-rest-v1/zhangfei-foot-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest-talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-rest-v1/zhangfei-foot-1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest-emphasize": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/brothers-rest-v1/zhangfei-foot-2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
               "ms": 800
             }
           ]
@@ -762,6 +1296,2153 @@
               "columns": 2,
               "rows": 1,
               "ms": 1000
+            }
+          ]
+        }
+      }
+    },
+    "caocao-robes": {
+      "name": "조조",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/caocao-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/caocao-robes-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/caocao-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/caocao-robes-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/caocao-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/caocao-robes-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/caocao-robes-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.sit": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/caocao-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.sit-talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/caocao-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "gongsunzan-robes": {
+      "name": "공손찬",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/gongsunzan-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/gongsunzan-robes-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/gongsunzan-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/gongsunzan-robes-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/gongsunzan-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/gongsunzan-robes-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/gongsunzan-robes-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.sit": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/gongsunzan-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.sit-talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/gongsunzan-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "zhaoyun-robes": {
+      "name": "조운",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhaoyun-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhaoyun-robes-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhaoyun-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhaoyun-robes-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhaoyun-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhaoyun-robes-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhaoyun-robes-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.sit": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhaoyun-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.sit-talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhaoyun-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "jianyong-robes": {
+      "name": "간옹",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/jianyong-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/jianyong-robes-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/jianyong-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/jianyong-robes-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/jianyong-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/jianyong-robes-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/jianyong-robes-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.sit": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/jianyong-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.sit-talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/jianyong-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "mizhu-robes": {
+      "name": "미축",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/mizhu-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/mizhu-robes-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/mizhu-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/mizhu-robes-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/mizhu-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/mizhu-robes-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/mizhu-robes-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.sit": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/mizhu-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.sit-talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/mizhu-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "sunqian-robes": {
+      "name": "손건",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/sunqian-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/sunqian-robes-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/sunqian-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/sunqian-robes-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/sunqian-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/sunqian-robes-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/sunqian-robes-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.sit": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/sunqian-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.sit-talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/sunqian-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "liubei-official": {
+      "name": "유비",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/liubei-official-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/liubei-official-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/liubei-official-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/liubei-official-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/liubei-official-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/liubei-official-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/liubei-official-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/liubei-official-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "guanyu-official": {
+      "name": "관우",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/guanyu-official-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/guanyu-official-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/guanyu-official-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/guanyu-official-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/guanyu-official-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/guanyu-official-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/guanyu-official-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/guanyu-official-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "zhangfei-official": {
+      "name": "장비",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-official-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-official-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhangfei-official-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhangfei-official-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhangfei-official-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-official-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-official-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-official-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "liubei-leader": {
+      "name": "유비",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/liubei-leader-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/liubei-leader-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/liubei-leader-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/liubei-leader-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/liubei-leader-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/liubei-leader-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/liubei-leader-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/liubei-leader-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "guanyu-leader": {
+      "name": "관우",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/guanyu-leader-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/guanyu-leader-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/guanyu-leader-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/guanyu-leader-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/guanyu-leader-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/guanyu-leader-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/guanyu-leader-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/guanyu-leader-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "zhangfei-leader": {
+      "name": "장비",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-leader-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-leader-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhangfei-leader-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhangfei-leader-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhangfei-leader-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-leader-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-leader-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-leader-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "zhugeliang-robes": {
+      "name": "제갈량",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhugeliang-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhugeliang-robes-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhugeliang-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhugeliang-robes-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhugeliang-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhugeliang-robes-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhugeliang-robes-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhugeliang-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "zhouyu-robes": {
+      "name": "주유",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhouyu-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhouyu-robes-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhouyu-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhouyu-robes-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhouyu-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhouyu-robes-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhouyu-robes-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhouyu-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "xushu-robes": {
+      "name": "서서",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/xushu-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/xushu-robes-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/xushu-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/xushu-robes-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/xushu-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/xushu-robes-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/xushu-robes-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/xushu-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "chendeng-robes": {
+      "name": "진등",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/chendeng-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/chendeng-robes-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/chendeng-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/chendeng-robes-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/chendeng-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/chendeng-robes-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/chendeng-robes-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/chendeng-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "mifang-robes": {
+      "name": "미방",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/mifang-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/mifang-robes-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/mifang-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/mifang-robes-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/mifang-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/mifang-robes-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/mifang-robes-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/mifang-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "taoqian-robes": {
+      "name": "도겸",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/taoqian-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/taoqian-robes-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/taoqian-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/taoqian-robes-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/taoqian-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/taoqian-robes-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/taoqian-robes-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/taoqian-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "huanggai-robes": {
+      "name": "황개",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/huanggai-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/huanggai-robes-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/huanggai-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/huanggai-robes-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/huanggai-robes-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/huanggai-robes-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/huanggai-robes-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.rest": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/huanggai-robes-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "zhaoyun-rescue": {
+      "name": "조운",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhaoyun-rescue-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhaoyun-rescue-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhaoyun-rescue-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhaoyun-rescue-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhaoyun-rescue-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhaoyun-rescue-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.emphasize": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhaoyun-rescue-v1/4.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhaoyun-rescue-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      },
+      "displayScale": 1.55
+    },
+    "zhangfei-bridge": {
+      "name": "장비",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-bridge-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-bridge-v1/1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhangfei-bridge-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhangfei-bridge-v1/2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhangfei-bridge-v1/0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        },
+        "left.talk": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-bridge-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.emphasize": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-bridge-v1/3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.salute": {
+          "loop": false,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhangfei-bridge-v1/5.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        }
+      }
+    },
+    "zhaoyun-field": {
+      "name": "조운",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhaoyun-field-v1/idle-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            },
+            {
+              "image": "/assets/scene-motions/zhaoyun-field-v1/idle-1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/zhaoyun-field-v1/move-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhaoyun-field-v1/move-1.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhaoyun-field-v1/move-2.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            },
+            {
+              "image": "/assets/scene-motions/zhaoyun-field-v1/move-3.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
+            }
+          ]
+        }
+      }
+    },
+    "soldier-story": {
+      "name": "병사",
+      "clips": {
+        "left.idle": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/soldier-story-v1/idle-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 800
+            }
+          ]
+        },
+        "left.move": {
+          "loop": true,
+          "frames": [
+            {
+              "image": "/assets/scene-motions/soldier-story-v1/move-0.webp",
+              "col": 0,
+              "row": 0,
+              "columns": 1,
+              "rows": 1,
+              "ms": 160
             }
           ]
         }

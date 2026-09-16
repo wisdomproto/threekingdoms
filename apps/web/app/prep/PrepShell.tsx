@@ -1,7 +1,7 @@
 "use client";
 /**
  * 출진 준비 셸(클라이언트) — §10 막간 = 상점→편성→출진. <Formation/>과 <Shop/>을 합성하고
- * 하단 고정 출진 바를 둔다. 출진 = writeSortie(편성) 후 /battle?stage=ID 로 이동.
+ * 편성 패널에 출진 조작을 통합한다. 출진 = writeSortie(편성) 후 /battle?stage=ID 로 이동.
  *
  * 셸이 보유하는 상태:
  *  - stageId: ?stage= 쿼리(없으면 M1 기본 사수관).
@@ -12,17 +12,18 @@
  *
  * useSearchParams를 쓰므로 부모 page.tsx가 Suspense로 감싼다.
  */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { gameData, stages } from "@tk/data";
+import { gameData, stages } from "../../src/game/data";
 import { Formation } from "../../src/meta/screens/Formation";
 import { Shop } from "../../src/meta/screens/Shop";
 import { SortieBar } from "../../src/meta/screens/SortieBar";
 import { LoadingTransition } from "../../src/meta/screens/LoadingTransition";
-import { getMeta, getRoster, setEquipped, type RosterUnit } from "../../src/meta/metaStore";
+import { getMeta, getRoster, setEquipped, rosterTrainingLevel, type RosterUnit } from "../../src/meta/metaStore";
 import { writeSortie, type SortieMember } from "../../src/meta/sortie";
 import { sortieSummary } from "../../src/meta/sortieSummary";
+import { autoFormation } from "../../src/meta/autoFormation";
 import { shouldShowInterstitial } from "../../src/meta/interstitialPolicy";
 
 /** 데스크톱에서 콘텐츠가 화면 전폭으로 퍼지지 않게 잡는 상한(레퍼런스 구도 유지, 2026-07-03). */
@@ -61,18 +62,27 @@ export function PrepShell(): React.ReactElement {
   const [refreshKey, setRefreshKey] = useState(0);
   const [roster, setRoster] = useState<RosterUnit[]>([]);
   const [gold, setGold] = useState(0);
+  const [trainingLevel, setTrainingLevel] = useState(1);
   const [isCleared, setIsCleared] = useState(false);
+  const initializedStage = useRef("");
 
   useEffect(() => {
     const meta = getMeta();
-    setRoster(getRoster(chapter));
+    setTrainingLevel(rosterTrainingLevel(meta));
+    const available = getRoster(chapter);
+    setRoster(available);
+    if (initializedStage.current !== stage.id) {
+      setSelected(autoFormation(available, stage));
+      setFocusId(null);
+      initializedStage.current = stage.id;
+    }
     setGold(meta.gold);
     setIsCleared(meta.clearedStages.includes(stageId));
   }, [refreshKey, chapter, stageId]);
 
   const [selected, setSelected] = useState<SortieMember[]>([]);
   const [activeTab, setActiveTab] = useState<"formation" | "shop">("formation");
-  // 상세 패널 대상 — Formation 카드/하단 슬롯 칩이 공유(리마운트(key=refreshKey)에도 생존).
+  // 상세 패널 대상 — Formation 카드가 사용(리마운트(key=refreshKey)에도 생존).
   const [focusId, setFocusId] = useState<string | null>(null);
 
   // 출진 클릭 후 로딩/전면광고 전환 셸을 띄울지.
@@ -90,6 +100,7 @@ export function PrepShell(): React.ReactElement {
   }, []);
 
   const onSortie = useCallback(() => {
+    if (!selected.length || initializedStage.current !== stage.id) return;
     // 부대 공유 소지품(원작 창고 §7) — 인벤토리의 소모품 전량을 friendly 풀로 들고 나간다.
     const inv = getMeta().inventory;
     const sharedItems = inv.filter((id) => {
@@ -110,6 +121,16 @@ export function PrepShell(): React.ReactElement {
     [selected, roster, maxSlots],
   );
 
+  const sortieActions = (
+    <SortieBar
+      summary={summary}
+      maxSlots={maxSlots}
+      onSortie={onSortie}
+      onClearAll={() => { setSelected([]); setFocusId(null); }}
+      onAutoDeploy={() => { setSelected(autoFormation(roster, stage)); setFocusId(null); }}
+    />
+  );
+
   if (transition) {
     return (
       <LoadingTransition
@@ -126,26 +147,26 @@ export function PrepShell(): React.ReactElement {
       style={{
         display: "flex",
         flexDirection: "column",
-        minHeight: "100dvh",
+        position: "fixed", inset: 0, overflow: "hidden",
         // 페이지 캔버스도 먹빛 — 패널 밖 여백이 흰 벌판으로 뜨지 않게(2026-07-03).
-        background: "linear-gradient(to bottom, #14100a, #0d0a06)",
+        background: "#17140c",
       }}
     >
       {/* 헤더 — 먹빛 바 + 청동 타이틀 + 출진 카운터(레퍼런스 우상단 플라크) */}
       <header
         style={{
-          background: "linear-gradient(to bottom, #1a140c, #100c07)",
-          borderBottom: "1px solid #6f5a3488",
-          fontFamily: '"Noto Serif KR", "Nanum Myeongjo", "Apple SD Gothic Neo", serif',
+          background: "#2a2110",
+          borderBottom: "1px solid #705c31",
+          fontFamily: '"Apple SD Gothic Neo", system-ui, sans-serif',
         }}
       >
         <div style={{
-          display: "flex", alignItems: "center", gap: 12,
+          display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
           padding: "12px 16px", maxWidth: CONTENT_MAX, margin: "0 auto",
         }}>
-          <h1 style={{ margin: 0, fontSize: 18, color: "#e0b84a", letterSpacing: "0.1em", fontWeight: 800 }}>
+          <h1 style={{ margin: 0, fontSize: 18, color: "#dfc47a", letterSpacing: "0.1em", fontWeight: 800 }}>
             출진 준비
-            <span style={{ fontSize: 13.5, color: "#b8a070", fontWeight: 600, marginLeft: 10 }}>
+            <span style={{ fontSize: 13.5, color: "#c3af7c", fontWeight: 600, marginLeft: 10 }}>
               — {stage.name}
             </span>
           </h1>
@@ -158,18 +179,10 @@ export function PrepShell(): React.ReactElement {
                 상인
               </Link>
             )}
-            <Link href="/stages" style={{ color: "#8a7350", fontSize: 13, textDecoration: "none" }}>
+            <Link href="/stages" style={{ color: "#c4ae75", fontSize: 13, textDecoration: "none" }}>
               ◀ 전장 선택
             </Link>
-            <span style={{
-              padding: "4px 12px", borderRadius: 6,
-              border: "1.5px solid #8a6a28", background: "rgba(200,164,64,0.1)",
-              fontSize: 13, color: "#e8d9b0", fontWeight: 700, letterSpacing: "0.06em",
-              boxShadow: "inset 0 0 8px rgba(200,164,64,0.12)",
-            }}>
-              출진 <strong style={{ color: "#e0b84a", fontSize: 15 }}>{selected.length}</strong>
-              <span style={{ color: "#8a7350" }}> / {maxSlots}</span>
-            </span>
+
           </div>
         </div>
       </header>
@@ -178,7 +191,7 @@ export function PrepShell(): React.ReactElement {
       <div
         style={{
           display: "flex",
-          borderBottom: "1px solid #2a2f36",
+          borderBottom: "1px solid #5f502e",
           margin: "12px auto 0",
           width: "calc(100% - 32px)",
           maxWidth: CONTENT_MAX - 32,
@@ -194,14 +207,15 @@ export function PrepShell(): React.ReactElement {
               onClick={() => setActiveTab(tab)}
               style={{
                 padding: "8px 20px",
+                minHeight: 44,
                 fontSize: 15,
                 fontWeight: active ? 700 : 400,
-                fontFamily: '"Noto Serif KR", "Nanum Myeongjo", "Apple SD Gothic Neo", serif',
+                fontFamily: '"Apple SD Gothic Neo", system-ui, sans-serif',
                 letterSpacing: "0.14em",
-                color: active ? "#e0b84a" : "#9aa3ad",
+                color: active ? "#dfc47a" : "#ae9d73",
                 background: "transparent",
                 border: "none",
-                borderBottom: active ? "2px solid #e0b84a" : "2px solid transparent",
+                borderBottom: active ? "2px solid #dfc47a" : "2px solid transparent",
                 cursor: "pointer",
                 marginBottom: -1,
               }}
@@ -212,6 +226,7 @@ export function PrepShell(): React.ReactElement {
         })}
       </div>
 
+      <p style={{ color: "#c5b582", fontSize: 13 }}>부대 훈련 Lv.{trainingLevel} · 뒤처진 장수와 새로 합류한 장수도 이 레벨부터 출전합니다.</p>
       {/* 탭 콘텐츠 + 출진 바 = 한 클러스터. 남은 높이에서 세로 중앙(auto 마진 — 내용이 넘치면
           마진이 0으로 접혀 스크롤 안전). 더는 보드를 늘여 양피지 벌판을 만들지 않는다(2026-07-03). */}
       <div style={{
@@ -220,7 +235,7 @@ export function PrepShell(): React.ReactElement {
         padding: 16, boxSizing: "border-box",
         display: "flex", flexDirection: "column",
       }}>
-        <div style={{ margin: "auto 0", display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {activeTab === "formation" ? (
             <Formation
               key={refreshKey}
@@ -232,27 +247,21 @@ export function PrepShell(): React.ReactElement {
               focusId={focusId}
               onFocus={setFocusId}
               onEquip={onEquip}
+              actions={sortieActions}
             />
           ) : (
+            <>
             <Shop
-              shop={gameData.shops.ch1!}
+              shop={{ ...gameData.shops.ch1!, name: "도구 상점" }}
               items={gameData.items}
               gold={gold}
               chapter={chapter}
               onPurchase={onPurchase}
             />
+            {sortieActions}
+            </>
           )}
 
-          {/* 출진 바 — 보드 바로 아래(레퍼런스 풋터). 슬롯 칩 탭 = 편성 탭 전환 + 상세 포커스 */}
-          <SortieBar
-            summary={summary}
-            maxSlots={maxSlots}
-            members={selected}
-            onSortie={onSortie}
-            onRemove={(id) => setSelected(selected.filter((m) => m.commanderId !== id))}
-            onFocus={(id) => { setActiveTab("formation"); setFocusId(id); }}
-            onClearAll={() => { setSelected([]); setFocusId(null); }}
-          />
         </div>
       </div>
     </main>

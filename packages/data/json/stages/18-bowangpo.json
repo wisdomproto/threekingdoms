@@ -17,85 +17,401 @@
   },
   "levelCap": 32,
   "scenario": {
-    "intro": {
-      "bg": "18-bowangpo-intro",
-      "lines": [
-        {
-          "text": "신야의 작은 성에서, 유비는 세 번 초려를 찾은 끝에 스물일곱의 와룡 — 제갈량 공명을 얻었다."
+    "intro": [
+      {
+        "bg": "18-bowangpo-intro",
+        "lines": [
+          {
+            "text": "신야의 작은 성에서, 유비는 세 번 초려를 찾은 끝에 스물일곱의 와룡 — 제갈량 공명을 얻었다."
+          }
+        ]
+      },
+      {
+        "map": "scene-council-hall",
+        "label": "신야 · 군사의 첫 계책",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "서서",
-          "side": "player",
-          "portraitId": "서서",
-          "text": "주공, 제 벗 공명은 저와는 그릇이 다릅니다. 이 서서, 이제야 마음 놓고 어머님께 갈 수 있겠습니다."
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-leader",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-leader",
+            "cell": [
+              3,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-leader",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "xushu",
+            "sprite": "xushu-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "zhugeliang",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "서서",
+            "side": "player",
+            "portraitId": "서서",
+            "text": "주공, 제 벗 공명은 저와는 그릇이 다릅니다. 이 서서, 이제야 마음 놓고 어머님께 갈 수 있겠습니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "xushu",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "제갈량",
+            "side": "player",
+            "portraitId": "제갈량",
+            "text": "박망파 — 좁은 골짜기와 마른 숲입니다. 하후돈의 대군은 저 안에서 스스로 불쏘시개가 될 겁니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "xushu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "흥, 오자마자 군령부터 내리는구려. 책상물림 서생 말을 믿으라고?",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "xushu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "zhangfei",
+                "to": [
+                  6,
+                  5
+                ]
+              }
+            ],
+            "bubble": {
+              "id": "zhangfei",
+              "mark": "?"
+            }
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "...군사의 첫 싸움이다. 보고 나서 판단해도 늦지 않다, 아우.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "xushu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "제갈량",
+            "side": "player",
+            "portraitId": "제갈량",
+            "text": "두 분 장군께는 골짜기 어귀를 부탁드립니다. — 보고 나서, 마음껏 웃으셔도 좋습니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "xushu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "군사의 말대로 한다. 하후돈을 골짜기로 끌어들여라!",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "xushu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "18-bowangpo-outro",
+        "lines": [
+          {
+            "text": "골짜기의 불은 밤새 탔다. 하후돈의 대군은 절반으로 줄어 북으로 물러났다."
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-day",
+        "label": "박망파 · 벗의 작별",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "제갈량",
-          "side": "player",
-          "portraitId": "제갈량",
-          "text": "박망파 — 좁은 골짜기와 마른 숲입니다. 하후돈의 대군은 저 안에서 스스로 불쏘시개가 될 겁니다."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "흥, 오자마자 군령부터 내리는구려. 책상물림 서생 말을 믿으라고?"
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "...군사의 첫 싸움이다. 보고 나서 판단해도 늦지 않다, 아우."
-        },
-        {
-          "speaker": "제갈량",
-          "side": "player",
-          "portraitId": "제갈량",
-          "text": "두 분 장군께는 골짜기 어귀를 부탁드립니다. — 보고 나서, 마음껏 웃으셔도 좋습니다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "군사의 말대로 한다. 하후돈을 골짜기로 끌어들여라!"
-        }
-      ]
-    },
-    "outro": {
-      "bg": "18-bowangpo-outro",
-      "lines": [
-        {
-          "text": "골짜기의 불은 밤새 탔다. 하후돈의 대군은 절반으로 줄어 북으로 물러났다."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "...불바다가 됐구려. 하후돈의 대군이 통째로! 와룡 선생, 이 장비가 잘못 봤소!"
-        },
-        {
-          "speaker": "제갈량",
-          "side": "player",
-          "portraitId": "제갈량",
-          "text": "과찬이십니다. 이제 시작일 뿐 — 조조의 본대가 곧 남하합니다."
-        },
-        {
-          "speaker": "서서",
-          "side": "player",
-          "portraitId": "서서",
-          "text": "공명이 왔으니, 주공은 이제 날개를 얻으셨습니다. ...어머님, 이 불효자가 갑니다."
-        },
-        {
-          "text": "서서는 그 길로 북쪽으로 떠났다. 벗에게 주군을 맡기고."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-leader",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "zhugeliang",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "xushu",
+            "sprite": "xushu-robes",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "...불바다가 됐구려. 하후돈의 대군이 통째로! 와룡 선생, 이 장비가 잘못 봤소!",
+            "pose": [
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "xushu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "제갈량",
+            "side": "player",
+            "portraitId": "제갈량",
+            "text": "과찬이십니다. 이제 시작일 뿐 — 조조의 본대가 곧 남하합니다.",
+            "pose": [
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "xushu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "서서",
+            "side": "player",
+            "portraitId": "서서",
+            "text": "공명이 왔으니, 주공은 이제 날개를 얻으셨습니다. ...어머님, 이 불효자가 갑니다.",
+            "pose": [
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "xushu",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "text": "서서는 그 길로 북쪽으로 떠났다. 벗에게 주군을 맡기고.",
+            "pose": [
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "xushu",
+                "pose": "idle"
+              }
+            ],
+            "exit": [
+              {
+                "id": "xushu",
+                "to": [
+                  1,
+                  5
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "유비",
       "classId": "lord",
-      "level": 24,
+      "level": 18,
       "troops": 230,
       "items": [
         "옥새"
@@ -107,7 +423,7 @@
     {
       "commanderId": "제갈량",
       "classId": "strategist",
-      "level": 22,
+      "level": 18,
       "troops": 180,
       "items": [
         "둔갑천서"
@@ -119,7 +435,7 @@
     {
       "commanderId": "관우",
       "classId": "lightCavalry",
-      "level": 25,
+      "level": 18,
       "troops": 240,
       "items": [
         "청룡언월도",
@@ -132,7 +448,7 @@
     {
       "commanderId": "장비",
       "classId": "lightCavalry",
-      "level": 24,
+      "level": 18,
       "troops": 235,
       "items": [
         "사모"
@@ -144,7 +460,7 @@
     {
       "commanderId": "조운",
       "classId": "lightCavalry",
-      "level": 24,
+      "level": 18,
       "troops": 230,
       "items": [
         "적로"
@@ -156,7 +472,7 @@
     {
       "commanderId": "미축",
       "classId": "sorcerer",
-      "level": 21,
+      "level": 18,
       "troops": 160,
       "items": [
         "상약"
@@ -168,7 +484,7 @@
     {
       "commanderId": "하후돈",
       "classId": "heavyCavalry",
-      "level": 26,
+      "level": 20,
       "troops": 260,
       "items": [
         "근위개"
@@ -180,7 +496,7 @@
     {
       "commanderId": "이전",
       "classId": "lightCavalry",
-      "level": 23,
+      "level": 17,
       "troops": 200,
       "items": [],
       "side": "enemy",
@@ -190,7 +506,7 @@
     {
       "commanderId": "악진",
       "classId": "footman",
-      "level": 22,
+      "level": 16,
       "troops": 190,
       "items": [],
       "side": "enemy",
@@ -200,7 +516,7 @@
     {
       "commanderId": "여건",
       "classId": "archer",
-      "level": 21,
+      "level": 16,
       "troops": 170,
       "items": [],
       "side": "enemy",
@@ -210,7 +526,7 @@
     {
       "commanderId": "우금",
       "classId": "catapult",
-      "level": 21,
+      "level": 16,
       "troops": 165,
       "items": [],
       "side": "enemy",
@@ -245,7 +561,7 @@
         {
           "commanderId": "유봉",
           "classId": "footman",
-          "level": 20,
+          "level": 18,
           "troops": 150,
           "items": [
             "폭탄"
@@ -257,7 +573,7 @@
         {
           "commanderId": "관평",
           "classId": "lightCavalry",
-          "level": 20,
+          "level": 18,
           "troops": 150,
           "items": [
             "폭탄"
@@ -279,7 +595,7 @@
         {
           "commanderId": "하후연",
           "classId": "archer",
-          "level": 22,
+          "level": 16,
           "troops": 170,
           "items": [],
           "side": "enemy",
@@ -289,7 +605,7 @@
         {
           "commanderId": "조홍",
           "classId": "footman",
-          "level": 21,
+          "level": 16,
           "troops": 175,
           "items": [],
           "side": "enemy",
@@ -502,6 +818,77 @@
         16
       ],
       "kind": "campfire"
+    }
+  ],
+  "scriptEvents": [
+    {
+      "id": "campaign-fire-18-bowangpo",
+      "name": "박망파 매복 화공",
+      "editingMode": "complex",
+      "trigger": {
+        "kind": "turn",
+        "turn": 4,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "message",
+          "text": "매복군의 신호가 올랐다. 협곡의 불길로 적의 진군을 끊어라!"
+        },
+        {
+          "kind": "effect",
+          "effect": "fire",
+          "area": {
+            "x": 23,
+            "y": 12,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "kind": "damage",
+          "target": {
+            "side": "enemy",
+            "area": {
+              "x": 23,
+              "y": 12,
+              "width": 6,
+              "height": 5
+            }
+          },
+          "amount": 12,
+          "percent": true,
+          "nonlethal": true
+        },
+        {
+          "kind": "status",
+          "target": {
+            "side": "enemy",
+            "area": {
+              "x": 23,
+              "y": 12,
+              "width": 6,
+              "height": 5
+            }
+          },
+          "status": "stun",
+          "turns": 1
+        },
+        {
+          "kind": "fire",
+          "area": {
+            "x": 23,
+            "y": 12,
+            "width": 6,
+            "height": 5
+          },
+          "duration": 3,
+          "damagePercent": 5,
+          "spread": false,
+          "extinguishInRain": true,
+          "flammableOnly": true
+        }
+      ]
     }
   ]
 }

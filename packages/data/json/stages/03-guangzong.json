@@ -106,78 +106,483 @@
   },
   "levelCap": 8,
   "scenario": {
-    "intro": {
-      "bg": "03-guangzong-intro",
-      "lines": [
-        {
-          "text": "영천의 불길이 잦아들 무렵, 북쪽 길에서 흰 말갈기의 기병대가 달려왔다. 깃발에 적힌 글자는 '공손(公孫)' — 낯익은 이름이었다."
+    "intro": [
+      {
+        "map": "scene-camp-day",
+        "label": "북쪽 길 · 옛 벗과의 재회",
+        "camera": {
+          "zoom": 1.25,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "공손찬",
-          "side": "ally",
-          "portraitId": "공손찬",
-          "text": "현덕! 이게 몇 해 만인가. 노식 장군의 격문일세 — 광종에 틀어박힌 장보를 친다. 함께 가세."
+        "units": [
+          {
+            "id": "liu",
+            "sprite": "liubei-foot",
+            "cell": [
+              5,
+              4
+            ],
+            "facing": "right",
+            "hidden": false
+          },
+          {
+            "id": "guan",
+            "sprite": "guanyu-foot",
+            "cell": [
+              4,
+              5
+            ],
+            "facing": "up",
+            "hidden": false
+          },
+          {
+            "id": "zhang",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              6,
+              5
+            ],
+            "facing": "up",
+            "hidden": false
+          },
+          {
+            "id": "gong",
+            "sprite": "gongsunzan-robes",
+            "cell": [
+              10,
+              4
+            ],
+            "facing": "left",
+            "hidden": true
+          }
+        ],
+        "lines": [
+          {
+            "text": "영천의 불길이 잦아들 무렵, 북쪽 길에서 흰 말갈기의 기병대가 달려왔다. 깃발에 적힌 글자는 '공손(公孫)' — 낯익은 이름이었다.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "gong",
+                "pose": "idle"
+              }
+            ],
+            "enter": [
+              {
+                "id": "gong",
+                "from": [
+                  10,
+                  4
+                ],
+                "to": [
+                  7,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "speaker": "공손찬",
+            "side": "ally",
+            "portraitId": "공손찬",
+            "text": "현덕! 이게 몇 해 만인가. 노식 장군의 격문일세 — 광종에 틀어박힌 장보를 친다. 함께 가세.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "gong",
+                "pose": "salute"
+              }
+            ],
+            "bubble": {
+              "id": "liu",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "백규 형님! 스승님의 부름이라면 물을 것도 없지요. 아우들아, 광종으로 간다.",
+            "pose": [
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "gong",
+                "pose": "idle"
+              },
+              {
+                "id": "liu",
+                "pose": "salute"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-town-gate",
+        "label": "광종 · 성문을 앞두고",
+        "camera": {
+          "zoom": 1.25,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "백규 형님! 스승님의 부름이라면 물을 것도 없지요. 아우들아, 광종으로 간다."
+        "units": [
+          {
+            "id": "liu",
+            "sprite": "liubei-foot",
+            "cell": [
+              5,
+              4
+            ],
+            "facing": "right",
+            "hidden": false
+          },
+          {
+            "id": "guan",
+            "sprite": "guanyu-foot",
+            "cell": [
+              4,
+              5
+            ],
+            "facing": "up",
+            "hidden": false
+          },
+          {
+            "id": "zhang",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              6,
+              5
+            ],
+            "facing": "up",
+            "hidden": false
+          }
+        ],
+        "lines": [
+          {
+            "text": "광종성 아래. 성벽 위에 누런 깃발이 빽빽하고, 바람에 매캐한 향 연기가 실려 왔다 — 장보의 요술이 시작된 것이다.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              }
+            ],
+            "face": [
+              {
+                "id": "liu",
+                "dir": "up"
+              },
+              {
+                "id": "guan",
+                "dir": "up"
+              },
+              {
+                "id": "zhang",
+                "dir": "up"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "성문 걸어 잠그고 향불 피우며 요술 나부랭이라... 사내답지 못한 놈이구려!",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "emphasize"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "요술은 눈을 속일 뿐, 성벽을 지켜주진 못한다. 성문을 깨면 농성도 끝이다.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "성문을 열어젖히고 장보를 잡는다. 헛것에 현혹되지 마라 — 우리가 봐야 할 것은 백성의 내일이다.",
+            "pose": [
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "liu",
+                "pose": "emphasize"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-town-gate",
+        "label": "광종 · 열린 성문",
+        "camera": {
+          "zoom": 1.25,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "text": "광종성 아래. 성벽 위에 누런 깃발이 빽빽하고, 바람에 매캐한 향 연기가 실려 왔다 — 장보의 요술이 시작된 것이다."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "성문 걸어 잠그고 향불 피우며 요술 나부랭이라... 사내답지 못한 놈이구려!"
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "요술은 눈을 속일 뿐, 성벽을 지켜주진 못한다. 성문을 깨면 농성도 끝이다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "성문을 열어젖히고 장보를 잡는다. 헛것에 현혹되지 마라 — 우리가 봐야 할 것은 백성의 내일이다."
-        }
-      ]
-    },
-    "outro": {
-      "bg": "03-guangzong-outro",
-      "lines": [
-        {
-          "text": "성문이 열리자 갇혀 있던 백성들이 쏟아져 나왔다. 장보의 향불은 꺼졌고, 요술의 안개도 걷혔다."
-        },
-        {
-          "speaker": "백성",
-          "side": "player",
-          "text": "성이... 성이 풀렸다! 하늘이 보내신 분들이야!"
-        },
-        {
-          "speaker": "공손찬",
-          "side": "ally",
-          "portraitId": "공손찬",
-          "text": "역시 자네들이군. 노식 장군께 자네 공을 소상히 전하겠네."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "황건의 머리가 하나 떨어졌소. 이제 — 장각만 남았구려."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liu",
+            "sprite": "liubei-foot",
+            "cell": [
+              5,
+              4
+            ],
+            "facing": "right",
+            "hidden": false
+          },
+          {
+            "id": "guan",
+            "sprite": "guanyu-foot",
+            "cell": [
+              4,
+              5
+            ],
+            "facing": "up",
+            "hidden": false
+          },
+          {
+            "id": "zhang",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              6,
+              5
+            ],
+            "facing": "up",
+            "hidden": false
+          },
+          {
+            "id": "gong",
+            "sprite": "gongsunzan-robes",
+            "cell": [
+              8,
+              4
+            ],
+            "facing": "left",
+            "hidden": false
+          },
+          {
+            "id": "civilian",
+            "sprite": "civilian-scene",
+            "cell": [
+              7,
+              2
+            ],
+            "facing": "left",
+            "hidden": true
+          }
+        ],
+        "lines": [
+          {
+            "text": "성문이 열리자 갇혀 있던 백성들이 쏟아져 나왔다. 장보의 향불은 꺼졌고, 요술의 안개도 걷혔다.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "gong",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              }
+            ],
+            "enter": [
+              {
+                "id": "civilian",
+                "from": [
+                  7,
+                  2
+                ],
+                "to": [
+                  7,
+                  3
+                ]
+              }
+            ]
+          },
+          {
+            "speaker": "백성",
+            "side": "player",
+            "text": "성이... 성이 풀렸다! 하늘이 보내신 분들이야!",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "gong",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "civilian",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "공손찬",
+            "side": "ally",
+            "portraitId": "공손찬",
+            "text": "역시 자네들이군. 노식 장군께 자네 공을 소상히 전하겠네.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              },
+              {
+                "id": "gong",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "황건의 머리가 하나 떨어졌소. 이제 — 장각만 남았구려.",
+            "pose": [
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "gong",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              },
+              {
+                "id": "liu",
+                "pose": "salute"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "유비",
       "classId": "lord",
-      "level": 2,
+      "level": 3,
       "troops": 100,
       "items": [],
       "side": "player",
@@ -187,7 +592,7 @@
     {
       "commanderId": "관우",
       "classId": "lightCavalry",
-      "level": 2,
+      "level": 3,
       "troops": 105,
       "items": [
         "청룡언월도"
@@ -199,7 +604,7 @@
     {
       "commanderId": "장비",
       "classId": "lightCavalry",
-      "level": 2,
+      "level": 3,
       "troops": 105,
       "items": [
         "사모"
@@ -211,7 +616,7 @@
     {
       "commanderId": "간옹",
       "classId": "strategist",
-      "level": 2,
+      "level": 3,
       "troops": 80,
       "items": [
         "폭탄"
@@ -223,7 +628,7 @@
     {
       "commanderId": "공손찬",
       "classId": "lightCavalry",
-      "level": 3,
+      "level": 4,
       "troops": 100,
       "items": [],
       "side": "ally",
@@ -233,7 +638,7 @@
     {
       "commanderId": "장보",
       "classId": "footman",
-      "level": 4,
+      "level": 5,
       "troops": 160,
       "items": [],
       "side": "enemy",
@@ -243,7 +648,7 @@
     {
       "commanderId": "유벽",
       "classId": "archer",
-      "level": 3,
+      "level": 4,
       "troops": 95,
       "items": [],
       "side": "enemy",
@@ -253,7 +658,7 @@
     {
       "commanderId": "곽적",
       "classId": "footman",
-      "level": 3,
+      "level": 4,
       "troops": 95,
       "items": [],
       "side": "enemy",
@@ -263,7 +668,7 @@
     {
       "commanderId": "정덕",
       "classId": "bandit",
-      "level": 2,
+      "level": 3,
       "troops": 90,
       "items": [],
       "side": "enemy",
@@ -273,7 +678,7 @@
     {
       "commanderId": "장연",
       "classId": "bandit",
-      "level": 2,
+      "level": 3,
       "troops": 90,
       "items": [],
       "side": "enemy",
@@ -305,7 +710,7 @@
         {
           "commanderId": "보병대",
           "classId": "footman",
-          "level": 2,
+          "level": 3,
           "troops": 80,
           "items": [],
           "side": "enemy",
@@ -315,7 +720,7 @@
         {
           "commanderId": "궁병대",
           "classId": "archer",
-          "level": 2,
+          "level": 3,
           "troops": 75,
           "items": [],
           "side": "enemy",

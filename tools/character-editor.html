@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>캐릭터 에디터 — 삼국지 SRPG (commanders + rosters 합본 편집)</title>
 <style>
   :root { --bg:#14161c; --panel:#1d212b; --panel2:#242936; --line:#333a4a; --txt:#e8e6df; --dim:#9aa1b0; --acc:#d4a843; --acc2:#6fae6f; --err:#e06a5a; --bronze:#a9763e; }
@@ -51,6 +52,14 @@
   fieldset.roster { border:1px solid var(--line); border-radius:8px; padding:6px 14px 12px; margin:0; }
   fieldset.roster[disabled] { opacity:.45; }
   fieldset.roster legend { color:var(--bronze); font-size:11.5px; padding:0 6px; }
+  #characterTabs[hidden],#characterMotion[hidden]{display:none!important}
+  .character-art {display:flex;gap:18px;flex-wrap:wrap;margin:0 0 20px}
+  .character-art figure {margin:0;text-align:center;color:var(--dim)}
+  .character-art .image-box {width:160px;height:170px;display:flex;align-items:center;justify-content:center;background:#d7ceb0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .character-art img {max-width:100%;max-height:100%;object-fit:contain}
+  .character-art .sprite {height:130px;width:130px;image-rendering:pixelated}
+  .character-art figcaption {margin-top:6px}
+  .character-art .missing {color:#4a4132;padding:12px;font-size:12px}
   /* 하단 상태 */
   #status { border-top:1px solid var(--line); background:rgba(20,22,28,.96); padding:6px 14px; display:flex; gap:14px; align-items:center; font-size:12px; flex-wrap:wrap; }
   #status .ok { color:var(--acc2); }
@@ -64,12 +73,21 @@
   #pastebox .which { display:flex; gap:8px; margin-bottom:8px; }
   #pastebox .which select { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:5px; padding:4px 8px; }
   code { background:var(--panel2); padding:1px 5px; border-radius:4px; font-size:11.5px; color:var(--acc); }
+  @media(max-width:1000px) {
+    .field { flex-wrap:wrap; }
+    .field input[type=text], .field input[type=number], .field select { max-width:100%; }
+  }
+  @media(max-width:800px) {
+    main { flex-direction:column; overflow:auto; }
+    #listcol { width:100%; flex:none; height:35vh; min-height:180px; }
+    #formcol { flex:none; overflow:visible; }
+  }
 </style>
 </head>
 <body>
 <header>
   <h1>캐릭터 에디터</h1>
-  <button class="btn bronze" onclick="window.open('http://localhost:3000/motion-editor?character='+encodeURIComponent((['liubei','guanyu','zhangfei'].includes(selId)?selId:'liubei')+'-foot'),'_blank')">동작 · 방향 편집 ↗</button>
+
   <button class="btn" id="openFiles">파일 열기</button>
   <button class="btn" id="paste">JSON 붙여넣기</button>
   <div class="sep"></div>
@@ -105,7 +123,9 @@
   <div id="formcol">
     <div id="noselect">왼쪽에서 장수를 선택하거나, <b>파일 열기</b>로 commanders.json + rosters.json 을 불러오세요.<br><br>
       대상: <code>packages/data/json/commanders.json</code> + <code>rosters.json</code> (둘 다 <code>Record&lt;id,{...}&gt;</code> 객체맵).</div>
-    <div id="form" style="display:none"></div>
+    <nav id="characterTabs" hidden aria-label="캐릭터 편집 항목" style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="btn" data-character-tab="stats">능력치</button><button class="btn" data-character-tab="battle">전투 이미지</button><button class="btn" data-character-tab="story">시나리오 동작</button></nav>
+    <div id="form" style="display:none"></div><iframe id="characterMotion" title="캐릭터 이미지와 동작 편집" hidden style="width:100%;height:78vh;border:0"></iframe>
   </div>
 </main>
 
@@ -135,8 +155,11 @@
   </div>
 </div>
 
-<script>
+<script type="module">
 'use strict';
+import { catalogContext, connectCatalog } from './editor/catalog-bridge.js';
+const studioCatalog = catalogContext('characters');
+let catalogBridge = null;
 
 /* ────────────────────────────────────────────────────────────────────────
  * 선언적 필드 config — 후속작/스키마 변경 시 이 블록만 고친다.
@@ -146,6 +169,14 @@
  *                        role enum, uniqueSkillId? string
  * ──────────────────────────────────────────────────────────────────────── */
 const ROLES = ['lord', 'melee', 'caster', 'support', 'guest'];
+const ROLE_LABELS = {lord:'군주',melee:'근접 전투',ranged:'원거리',caster:'책략',support:'지원',guest:'임시 합류'};
+let profiles = {}, classNames = {};
+function profile(id) {
+  const c=commanders[id]||{}, r=rosters[id], inferred=profiles[id]||{};
+  const classId=r?.classId||c.defaultClassId||inferred.classId||'';
+  const roleForClass=classId==='lord'?'lord':['strategist','sorcerer'].includes(classId)?'caster':['archer','crossbowman','catapult'].includes(classId)?'ranged':['band','civilian','transport'].includes(classId)?'support':classId?'melee':'';
+  return {classId,role:c.battleRole||(r?.role!=='guest'?r?.role:null)||(c.defaultClassId?roleForClass:inferred.role)||roleForClass};
+}
 
 // 한 행 = commander 스탯 + (optional) roster 배정. group 으로 폼 섹션을 나눈다.
 const FIELDS = [
@@ -153,6 +184,8 @@ const FIELDS = [
   { key: 'id',           group: 'commander', label: 'id (고유)',    type: 'text',   required: true,  derived: 'rosterKey',
     note: '한글 이름 기반. 동명이인은 _2 접미. commanders/rosters 양쪽 키.' },
   { key: 'name',         group: 'commander', label: '이름',          type: 'text',   required: true },
+  { key: 'defaultClassId',group:'commander',label:'기본 병종',type:'enum-class',note:'전투 기록에서 불러옵니다. 기존 전투의 배치는 전투 편집에서 변경합니다.' },
+  { key: 'battleRole',group:'commander',label:'전투 역할',type:'enum',options:['','lord','melee','ranged','caster','support'] },
   { key: 'war',          group: 'commander', label: '무력 (war)',    type: 'int', min: 1, max: 100, required: true, bar: true, hint: '→ 공격 공식' },
   { key: 'leadership',   group: 'commander', label: '통솔 (leadership)', type: 'int', min: 1, max: 100, required: true, bar: true, hint: '→ 방어 공식' },
   { key: 'intelligence', group: 'commander', label: '지력 (intelligence)', type: 'int', min: 1, max: 100, required: true, bar: true, hint: '→ 정신/책략MP' },
@@ -184,7 +217,7 @@ const supportsFS = 'showOpenFilePicker' in window;
 function buildForm() {
   const f = document.getElementById('form');
   f.innerHTML = '';
-  let html = '<h2>장수 편집</h2>';
+  let html = '<h2>장수 편집</h2><div id="characterArt" class="character-art" aria-label="캐릭터 이미지 미리보기"></div>';
   html += FIELDS.filter(x => x.group === 'commander').map(fieldHtml).join('');
   html += '<h2 class="sec">로스터 배정 (편성 대상 장수만)</h2>';
   html += `<div class="rosterToggle"><input type="checkbox" id="hasRoster"><label for="hasRoster" style="color:var(--txt);cursor:pointer">이 장수를 로스터에 배정 (rosters.json 항목 생성)</label></div>`;
@@ -203,7 +236,7 @@ function buildForm() {
 function fieldHtml(fl) {
   let input;
   if (fl.type === 'enum') {
-    input = `<select id="fld_${fl.key}">${(fl.options || []).map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
+    input = `<select id="fld_${fl.key}">${(fl.options || []).map(o => `<option value="${o}">${ROLE_LABELS[o]||o||'자동 판단'}</option>`).join('')}</select>`;
   } else if (fl.type === 'enum-class') {
     input = `<select id="fld_${fl.key}"></select>`; // 옵션은 런타임 채움
   } else if (fl.type === 'int') {
@@ -213,8 +246,8 @@ function fieldHtml(fl) {
   }
   const bar = fl.bar ? `<span class="rangebar"><i id="bar_${fl.key}"></i></span>` : '';
   const meta = fl.hint ? `<span class="hint">${fl.hint}</span>` : (fl.note ? `<span class="hint">${fl.note}</span>` : '');
-  return `<div class="field" id="row_${fl.key}">
-    <label>${fl.label}${fl.required ? ' *' : ''}</label>
+  return `<div class="field" id="row_${fl.key}" data-key="${fl.key}"${fl.group==='roster'&&['classId','role'].includes(fl.key)?' style="display:none"':''}>
+    <label for="fld_${fl.key}">${fl.label}${fl.required ? ' *' : ''}</label>
     ${input}${bar}
     <span id="meta_${fl.key}">${meta}</span>
     <span class="err" id="err_${fl.key}"></span>
@@ -222,16 +255,18 @@ function fieldHtml(fl) {
 }
 
 function fillClassDropdowns() {
+  const defaults=document.getElementById('fld_defaultClassId');
+  if(defaults){const current=defaults.value;defaults.innerHTML='<option value="">전투 기록에서 자동</option>'+classIds.map(c=>`<option value="${esc(c)}">${esc(classNames[c]||c)}</option>`).join('');defaults.value=current;}
   const sel = document.getElementById('fld_classId');
   const flt = document.getElementById('fClass');
   if (sel) {
     const cur = sel.value;
-    sel.innerHTML = '<option value="">— 선택 —</option>' + classIds.map(c => `<option value="${c}">${c}</option>`).join('');
+    sel.innerHTML = '<option value="">— 선택 —</option>' + classIds.map(c => `<option value="${c}">${classNames[c]||c}</option>`).join('');
     sel.value = cur;
   }
   if (flt) {
     const cur = flt.value;
-    flt.innerHTML = '<option value="">병종 전체</option>' + classIds.map(c => `<option value="${c}">${c}</option>`).join('');
+    flt.innerHTML = '<option value="">병종 전체</option>' + classIds.map(c => `<option value="${c}">${classNames[c]||c}</option>`).join('');
     flt.value = cur;
   }
 }
@@ -290,13 +325,13 @@ function renderList() {
   const rows = order.filter(id => {
     const c = commanders[id] || {};
     const r = rosters[id];
-    if (fRole && (!r || r.role !== fRole)) return false;
-    if (fClass && (!r || r.classId !== fClass)) return false;
+    if (fRole && p.role !== fRole) return false;
+    if (fClass && p.classId !== fClass) return false;
     if (fRoster === 'yes' && !r) return false;
     if (fRoster === 'no' && r) return false;
     if (fValid === 'bad' && isRowValid(id)) return false;
     if (q) {
-      const hay = [id, c.name, r && r.classId, r && r.role, r && r.uniqueSkillId].filter(Boolean).join(' ').toLowerCase();
+      const hay = [id, c.name, p.classId, classNames[p.classId], p.role, ROLE_LABELS[p.role], r && r.uniqueSkillId].filter(Boolean).join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
@@ -310,9 +345,8 @@ function renderList() {
       const c = commanders[id] || {};
       const r = rosters[id];
       const bad = !isRowValid(id);
-      const rosterCell = r
-        ? `<td>${esc(r.classId || '')}</td><td class="num">${r.joinChapter ?? ''}</td><td><span class="pill">${esc(r.role || '')}</span></td>`
-        : `<td colspan="3"><span class="pill noroster">로스터 없음</span></td>`;
+      const p=profile(id);
+      const rosterCell = `<td>${esc(classNames[p.classId]||p.classId||'미지정')}</td><td class="num">${r?.joinChapter??'—'}</td><td><span class="pill">${esc(ROLE_LABELS[p.role]||'미지정')}</span></td>`;
       return `<tr data-id="${esc(id)}" class="${id === selId ? 'sel' : ''}${bad ? ' invalid' : ''}">
         <td>${esc(id)}</td><td>${esc(c.name || '')}</td>
         <td class="num">${c.war ?? ''}</td><td class="num">${c.leadership ?? ''}</td><td class="num">${c.intelligence ?? ''}</td>
@@ -346,20 +380,63 @@ function renderValidSummary() {
 }
 
 /* ── 행 선택 + 폼 바인딩 ── */
+let characterTab='stats', motionDirty=false, motionImageDirty=false;
+const motionFrame=document.getElementById('characterMotion');
+function syncMotion() {if(selId)motionFrame.contentWindow?.postMessage({type:'tk-character:select',commander:selId,workspace:characterTab==='story'?'story':'battle'},location.origin);}
+function showCharacterTab(tab) {
+  if(motionImageDirty&&tab!==characterTab){toast('먼저 이미지 적용 또는 미리보기 취소를 눌러주세요.');return;}
+  characterTab=tab;
+  document.getElementById('form').style.display=tab==='stats'?'block':'none';motionFrame.hidden=tab==='stats';
+  document.querySelectorAll('[data-character-tab]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.characterTab===tab));b.style.borderColor=b.dataset.characterTab===tab?'var(--acc)':'';});
+  if(tab!=='stats'&&!motionFrame.getAttribute('src')) {const q=new URLSearchParams({embedded:'1',commander:selId||'',workspace:tab,project:studioCatalog?.project||''});motionFrame.src='/motion-editor?'+q;}else syncMotion();
+}
+document.querySelectorAll('[data-character-tab]').forEach(b=>b.onclick=()=>showCharacterTab(b.dataset.characterTab));
+window.addEventListener('message',e=>{
+  if(e.origin!==location.origin)return;
+  if(e.source===motionFrame.contentWindow){if(e.data?.type==='tk-character:ready')syncMotion();if(e.data?.type==='tk-character:dirty'){motionDirty=e.data.dirty;motionImageDirty=e.data.imageDirty;}}
+  if(e.source===parent&&e.data?.type==='tk-studio:request-close'&&(motionDirty||motionImageDirty)){e.stopImmediatePropagation();toast('시나리오 동작을 저장하거나 이미지 미리보기를 취소한 뒤 이동하세요.');}
+});
 function selectRow(id) {
+  if(motionImageDirty&&selId!==id){toast('먼저 이미지 적용 또는 미리보기 취소를 눌러주세요.');return;}
   selId = id;
+  document.getElementById('characterTabs').hidden=false;
   document.getElementById('noselect').style.display = 'none';
   document.getElementById('form').style.display = 'block';
   document.getElementById('dupRow').disabled = false;
   document.getElementById('delRow').disabled = false;
   fillClassDropdowns();
   loadFormFrom(id);
+  showCharacterTab(characterTab);
   document.querySelectorAll('#listTable tbody tr').forEach(tr =>
     tr.classList.toggle('sel', tr.dataset.id === id));
 }
 
+let previewRequest = 0;
+async function renderCharacterArt(id) {
+  const request=++previewRequest;
+  const root=document.getElementById('characterArt');if(!root)return;
+  root.replaceChildren();
+  const add=(label,urls,sprite=false)=>{
+    const figure=document.createElement('figure'),box=document.createElement('div'),caption=document.createElement('figcaption');
+    box.className='image-box';caption.textContent=label;figure.append(box,caption);root.appendChild(figure);
+    const img=document.createElement('img');img.alt=`${commanders[id]?.name||id} ${label}`;if(sprite)img.className='sprite';
+    let index=0;
+    const next=()=>{if(request!==previewRequest)return;if(index>=urls.length){box.replaceChildren();const note=document.createElement('span');note.className='missing';note.textContent='등록된 이미지가 없습니다';box.appendChild(note);return;}img.src=urls[index++];};
+    img.onerror=next;box.appendChild(img);next();return box;
+  };
+  add('초상',[`${studioCatalog?'/api/local-assets':'/assets'}/ui/portraits/${encodeURIComponent(id)}.webp`]);
+  if(!studioCatalog){add('전투 캐릭터',[`/assets/sprites/${encodeURIComponent(id)}/front_idle.webp`],true);return;}
+  const query=new URLSearchParams({commander:id,class:profile(id).classId||'footman',side:rosters[id]?'player':'enemy'});
+  try {
+    const response=await fetch(`/api/studio/legacy/sprite-preview?${query}`);
+    if(!response.ok)throw new Error('preview');const urls=await response.json();
+    if(request===previewRequest)add('전투 캐릭터',urls,true);
+  }catch {if(request===previewRequest)add('전투 캐릭터',[],true);}
+}
+
 let suppress = false; // 폼 채우는 동안 input 핸들러 무시
 function loadFormFrom(id) {
+  renderCharacterArt(id);
   suppress = true;
   const c = commanders[id] || {};
   for (const fl of FIELDS.filter(x => x.group === 'commander')) {
@@ -368,6 +445,11 @@ function loadFormFrom(id) {
   }
   const r = rosters[id];
   document.getElementById('hasRoster').checked = !!r;
+  const p=profile(id);
+  document.getElementById('fld_defaultClassId').value=p.classId;
+  document.getElementById('fld_battleRole').value=p.role;
+  const used=(profiles[id]?.classes||[]).map(key=>classNames[key]||key);
+  document.getElementById('meta_defaultClassId').textContent=used.length ? `전투 기록: ${used.join(' · ')}. 각 전투의 배치는 전투 편집에서 변경합니다.` : '기본 병종을 선택하세요. 기존 전투 배치는 유지됩니다.';
   for (const fl of FIELDS.filter(x => x.group === 'roster')) {
     const el = document.getElementById('fld_' + fl.key);
     el.value = r && r[fl.key] != null ? r[fl.key] : '';
@@ -380,7 +462,7 @@ function loadFormFrom(id) {
 function onToggleRoster(e) {
   if (!selId) return;
   if (e.target.checked) {
-    if (!rosters[selId]) rosters[selId] = { commanderId: selId, classId: '', joinChapter: 1, role: 'melee' };
+    if (!rosters[selId]) { const p=profile(selId);rosters[selId] = { commanderId: selId, classId: p.classId, joinChapter: 1, role: ROLES.includes(p.role)?p.role:'melee' }; }
     document.getElementById('rosterFs').disabled = false;
     loadFormFrom(selId);
   } else {
@@ -400,7 +482,8 @@ function onFieldInput(fl) {
   if (fl.group === 'commander') {
     if (fl.key === 'id') { renameId(v.trim()); return; }
     commanders[selId] = commanders[selId] || { id: selId };
-    commanders[selId][fl.key] = fl.type === 'int' ? toIntOrRaw(v) : v;
+    if(['defaultClassId','battleRole'].includes(fl.key)&&!v)delete commanders[selId][fl.key];
+    else commanders[selId][fl.key] = fl.type === 'int' ? toIntOrRaw(v) : v;
   } else {
     if (!rosters[selId]) return;
     if (fl.key === 'uniqueSkillId') {
@@ -414,6 +497,10 @@ function onFieldInput(fl) {
   markDirty();
   validateForm();
   patchListRow(selId);
+  if(fl.key==='defaultClassId'&&rosters[selId]&&v){rosters[selId].classId=v;document.getElementById('fld_classId').value=v;markDirty();renderList();}
+  if(fl.key==='battleRole'&&rosters[selId]&&rosters[selId].role!=='guest'&&ROLES.includes(v)){rosters[selId].role=v;document.getElementById('fld_role').value=v;markDirty();}
+  if(['classId','defaultClassId'].includes(fl.key))renderCharacterArt(selId);
+  if(fl.key==='defaultClassId')document.getElementById('fld_battleRole').value=profile(selId).role;
 }
 function toIntOrRaw(v) { if (v === '' || v == null) return NaN; const n = Number(v); return Number.isFinite(n) ? Math.trunc(n) : v; }
 
@@ -542,7 +629,7 @@ function assignLoaded(fname, data, handle) {
   const n = fname.toLowerCase();
   if (n.includes('commander')) { commanders = data; cmdHandle = handle || cmdHandle; }
   else if (n.includes('roster')) { rosters = data; rosHandle = handle || rosHandle; }
-  else if (n.includes('unitclass') || n.includes('class')) { classIds = Object.keys(data); }
+  else if (n.includes('unitclass') || n.includes('class')) { classIds = Object.keys(data); classNames=Object.fromEntries(Object.entries(data).map(([id,c])=>[id,c.name||id])); }
   else {
     // 이름 모호: 내용으로 추정
     const first = data && typeof data === 'object' ? Object.values(data)[0] : null;
@@ -621,7 +708,7 @@ function exportRos() { if (!preflightOrConfirm()) return; downloadBlob('rosters.
 /* ── 필터 옵션 / 파일 정보 ── */
 function buildFilters() {
   const rsel = document.getElementById('fRole');
-  rsel.innerHTML = '<option value="">역할 전체</option>' + ROLES.map(r => `<option value="${r}">${r}</option>`).join('');
+  rsel.innerHTML = '<option value="">역할 전체</option>' + ['lord','melee','ranged','caster','support'].map(r => `<option value="${r}">${ROLE_LABELS[r]||r}</option>`).join('');
   fillClassDropdowns();
 }
 function updateFileInfo() {
@@ -630,7 +717,7 @@ function updateFileInfo() {
   parts.push(rosHandle ? 'rosters.json ✔핸들' : (Object.keys(rosters).length ? 'rosters(붙여넣기)' : ''));
   document.getElementById('fileInfo').textContent = parts.filter(Boolean).join(' · ') + (dirty ? ' · ●변경됨' : '');
 }
-function markDirty() { dirty = true; updateFileInfo(); }
+function markDirty() { dirty = true; updateFileInfo(); catalogBridge?.touch(); }
 
 /* ── 토스트 ── */
 let toastT = null;
@@ -668,6 +755,15 @@ init();
 
 /* ── 자동 로드: 서버 기동 중이면 commanders + rosters + unitClasses 를 바로 표시 ── */
 (async function autoLoadDefault() {
+  if (studioCatalog) {
+    try { catalogBridge = await connectCatalog(studioCatalog, {
+      read: () => ({commanders, rosters}),
+      load: value => { const selected = selId; if(value.characterProfiles)profiles=value.characterProfiles; assignLoaded('commanders.json', value.commanders, null); assignLoaded('rosters.json', value.rosters, null); if(value.unitClasses) assignLoaded('unitClasses.json', value.unitClasses, null); finishLoad(); if(selected && commanders[selected]) selectRow(selected); },
+      setDirty: value => { dirty = value; updateFileInfo(); },
+      hide: ['openFiles','saveFiles','paste']
+    }); } catch(error) { document.querySelector('main').textContent = String(error); }
+    return;
+  }
   const tryFetch = async (path) => {
     try {
       const res = await fetch(path, { cache: 'no-store' });

@@ -19,11 +19,13 @@
     "isolatedModules": true
   },
   "include": [
+    ".next-troia-dev/types/**/*.ts",
+    ".next/types/**/*.ts",
     "app",
+    "next-env.d.ts",
     "src",
     "vitest.config.ts",
-    "next-env.d.ts",
-    ".next/types/**/*.ts"
+    ".next-story/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

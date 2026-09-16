@@ -10,7 +10,7 @@ stitch_chunks.py 로 오버랩 블렌딩해 고해상 배경 한 장으로 합�
 전환, 종전 split_bounds 단순 등분 대체). 청크 시작은 [0, total-box]에 균등 배치(겹침 균일),
 manifest에 축별 겹침 ovx/ovy 기록 → stitch가 그 폭으로 페더 블렌딩(seam 정합).
 
-사용: python export_chunks.py [stageMapId|all] [overlap_tiles] [cell_px]
+사용: python export_chunks.py [stageMapId|all] [overlap_tiles] [cell_px] [input_json] [output_dir]
 기본: sishuiguan 3 48   (비율·격자는 맵 크기에서 자동 선택)
 """
 import sys, json, os, glob, math
@@ -79,7 +79,10 @@ if mapId == "all":
     print(f"\n전체 {len(maps)}개 맵 청크 생성 완료 → docs/art/chunks/index.js")
     sys.exit(0)
 
-mp = json.load(open(rf"{ROOT}\packages\data\json\maps\{mapId}.json", encoding="utf-8"))
+input_path = sys.argv[4] if len(sys.argv) > 4 else rf"{ROOT}\packages\data\json\maps\{mapId}.json"
+mp = json.load(open(input_path, encoding="utf-8-sig"))
+# Project content bundles can reuse this exporter without entering campaign catalogs.
+mp = mp.get("map", mp)
 W, H, tiles = mp["width"], mp["height"], mp["tiles"]
 mapName = mp.get("name", mapId)
 
@@ -89,7 +92,7 @@ ys = starts(H, ch, ROWS)
 ovx = cw - (xs[1] - xs[0]) if COLS > 1 else 0  # 균등배치 실제 겹침(타일)
 ovy = ch - (ys[1] - ys[0]) if ROWS > 1 else 0
 
-OUTDIR = rf"{ROOT}\docs\art\chunks"
+OUTDIR = os.path.abspath(sys.argv[5]) if len(sys.argv) > 5 else rf"{ROOT}\docs\art\chunks"
 os.makedirs(OUTDIR, exist_ok=True)
 manifest = {"mapId": mapId, "name": mapName, "width": W, "height": H, "tilePx": TILE,
             "cols": COLS, "rows": ROWS, "overlap": max(ovx, ovy), "ovx": ovx, "ovy": ovy,

@@ -152,7 +152,10 @@ describe("에디터 round-trip — 편집 의미론 (spec §6-2)", () => {
 describe("에디터 round-trip — scenario/dialogue 소유 (P2 spec §10)", () => {
   const s05 = (): Json => JSON.parse(readFileSync(join(JSON_DIR, "stages", "05-sishuiguan.json"), "utf-8"));
   type Line = { text: string; speaker?: string };
-  const introLines = (o: Json) => ((o.scenario as Json).intro as { lines: Line[] }).lines;
+  const introLines = (o: Json) => {
+    const intro = (o.scenario as Json).intro as { lines: Line[] } | { lines: Line[] }[];
+    return (Array.isArray(intro) ? intro[0]! : intro).lines;
+  };
 
   it("(a) intro 첫 줄 text 수정 → 그 줄만 다르고 나머지(미지 키 포함) 동일, 원본 객체는 불변", () => {
     const orig = s05();
@@ -185,4 +188,51 @@ describe("에디터 round-trip — scenario/dialogue 소유 (P2 spec §10)", () 
     m.scenario = { intro: { lines: [{ text: "x" }] } };
     expect((serializeStage(m) as Json).scenario).toEqual({ intro: { lines: [{ text: "x" }] } });
   });
+});
+
+it("preserves script events and unknown action fields through the legacy editor", () => {
+  const source = { ...files("stages")[0]![1], scriptEvents: [{ id: "fire", name: "Fire", custom: { keep: true }, trigger: { kind: "turn", turn: 4, phase: "player" }, actions: [{ kind: "damage", target: { side: "enemy" }, amount: 30, percent: true, custom: [1, 2] }] }] };
+  const model = loadStage(source);
+  expect(serializeStage(model)).toEqual(source);
+});
+
+
+it("edits decorations without mutating source or losing unknown decoration fields", () => {
+  const source = {id:"test",units:[],events:[],decorations:[{kind:"campfire",cell:[2,3],custom:{keep:true}}]};
+  const model = loadStage(source);
+  const decorations = model.decorations as typeof source.decorations;
+  decorations[0]!.cell[0] = 5;
+  (model.decorations as Array<Record<string, unknown>>).push({kind:"shrub",cell:[1,1]});
+  expect(source.decorations[0]!.cell).toEqual([2,3]);
+  expect(serializeStage(model).decorations).toEqual([{kind:"campfire",cell:[5,3],custom:{keep:true}},{kind:"shrub",cell:[1,1]}]);
+  model.decorations = [];
+  expect(serializeStage(model).decorations).toEqual([]);
+});
+
+it("preserves, changes and clears an authored initial facing", () => {
+  const source={units:[{commanderId:"hero",facing:"right",x:1,y:2,items:[],custom:"keep"}],events:[]};
+  const model=loadStage(source);
+  const units = model.units as Array<{ facing?: string }>;
+  units[0]!.facing="left";
+  expect((serializeStage(model).units as unknown[])[0]).toMatchObject({facing:"left",custom:"keep"});
+  expect(source.units[0]!.facing).toBe("right");
+  delete units[0]!.facing;
+  expect((serializeStage(model).units as unknown[])[0]).not.toHaveProperty("facing");
+});
+
+it("isolates edits to script events and retains unknown nested fields", () => {
+  const source = {id:"test",units:[],events:[],scriptEvents:[{id:"fire",name:"Fire",trigger:{kind:"turn",turn:4,phase:"player"},actions:[{kind:"damage",amount:30,target:{side:"enemy"},custom:{keep:true}}]}]};
+  const model = loadStage(source);
+  const scripts = model.scriptEvents as typeof source.scriptEvents;
+  scripts[0]!.actions[0]!.amount = 45;
+  expect(source.scriptEvents[0]!.actions[0]!.amount).toBe(30);
+  expect(serializeStage(model).scriptEvents).toEqual([{...source.scriptEvents[0],actions:[{...source.scriptEvents[0]!.actions[0],amount:45}]}]);
+  model.scriptEvents = [];
+  expect(serializeStage(model).scriptEvents).toEqual([]);
+});
+
+it("validates persistent fire settings and round-trips authoring metadata", () => {
+  const event={id:'fire',name:'Fire',editingMode:'simple',trigger:{kind:'turn',turn:1,phase:'player'},actions:[{kind:'fire',area:{x:2,y:3,width:4,height:5},duration:3,damagePercent:10,spread:true,extinguishInRain:true,flammableOnly:true,custom:{keep:true}}]};
+  const source={id:'test',units:[],events:[],scriptEvents:[event]};
+  expect(serializeStage(loadStage(source))).toEqual(source);
 });

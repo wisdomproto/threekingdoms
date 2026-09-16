@@ -14,7 +14,7 @@
  */
 import { Application, Container, Graphics, Sprite, Text } from "pixi.js";
 import type { BattleMap, MapScene, MapSceneLine } from "@tk/data";
-import { gameData } from "@tk/data";
+import { gameData } from "../../game/data";
 import type { BattleContext } from "@tk/engine";
 import { TILE_SIZE } from "../../pixi/projection";
 import { TextureResolver } from "../../pixi/textures";
@@ -50,8 +50,10 @@ export class SceneStage {
   private readonly bubbles = new Map<string, Container>();
   private walkable: Walkable = () => false;
   private cinematic = false;
+  private sceneCamera: MapScene['camera'];
   private cameraActor: string | null = null;
   private cameraSpeaker: string | null = null;
+  private readonly speakerActors = new Map<string, string>();
   private mapW = 0;
   private mapH = 0;
   /** skipToState/새 줄 시작이 올린다 — 진행 중 걷기 체인 무효화(타일 경계에서 끊김). */
@@ -66,7 +68,8 @@ export class SceneStage {
   async init(parent: HTMLElement, scene: MapScene, map: BattleMap, walkable: Walkable): Promise<void> {
     if (this.booted) throw new Error("SceneStage: 이미 init됨");
     this.walkable = walkable;
-    this.cinematic = scene.map === "scene-01-tavern" || scene.map === "scene-01-orchard";
+    this.cinematic = true;
+    this.sceneCamera = scene.camera;
     this.mapW = map.width;
     this.mapH = map.height;
 
@@ -205,6 +208,7 @@ export class SceneStage {
       const library: unknown = await response.json();
       if (validateLibrary(library)) await Promise.all(scene.units.map(async u => {
         const motion = library.actors[u.sprite]; if (!motion) return;
+        this.speakerActors.set(motion.name, u.id);
         const actor = new ActorView(motion, scene.map === "scene-01-tavern" ? { x: u.id === "zhangfei" ? -22 : 0, y: 8 } : undefined); await actor.load();
         if (this.destroyRequested) { actor.destroy({ children: true }); return; }
         const view = this.views.get(u.id)!;
@@ -225,20 +229,25 @@ export class SceneStage {
     const sw = b.app.screen.width, sh = b.app.screen.height;
     const ww = this.mapW * TILE_SIZE, wh = this.mapH * TILE_SIZE;
     if (Math.min(sw, sh, ww, wh) <= 0) return;
-    const scale = Math.min(sw / ww, sh / wh) * (this.cinematic ? 2.1 : 1);
+    const fit = Math.min(sw / ww, sh / wh);
+    const scale = this.sceneCamera?.zoom != null ? fit * this.sceneCamera.zoom
+      : Math.max(fit, Math.min(fit * 2.4, sh * 0.20 / SCENE_ACTOR_HEIGHT));
     let x = ww / 2, y = wh / 2;
     if (this.cinematic) {
       const followed = this.views.get(this.cameraActor ?? "");
       const speaker = this.views.get(this.cameraSpeaker ?? "");
-      const heroes = ["liubei", "guanyu", "zhangfei"]
-        .map(id => this.views.get(id)).filter((v): v is UnitView => !!v?.visible);
+      const heroes = [...this.views.values()].filter(v => v.visible);
       const anchor = followed?.visible ? followed : speaker?.visible ? speaker : heroes[0];
       const subjects = followed?.visible ? [followed] : anchor
         ? [anchor, ...heroes.filter(v => v !== anchor && Math.hypot(v.x-anchor.x, v.y-anchor.y) < TILE_SIZE*4)] : [];
       if (subjects.length) {
         x = subjects.reduce((n,v) => n+v.x,0)/subjects.length;
         y = subjects.reduce((n,v) => n+v.y,0)/subjects.length - 8;
-      } else { x = TILE_SIZE*7.5; y = TILE_SIZE*8; }
+      }
+    }
+    if (this.sceneCamera?.focus) {
+      x = (this.sceneCamera.focus[0] + 0.5) * TILE_SIZE;
+      y = (this.sceneCamera.focus[1] + 0.5) * TILE_SIZE;
     }
     const clamp = (pos: number, viewport: number, size: number) => size <= viewport
       ? (viewport-size)/2 : Math.max(viewport-size, Math.min(0,pos));
@@ -278,7 +287,7 @@ export class SceneStage {
    * x방향으로 덮은 facing을 인터프리터 상태로 수렴시킨다(라이브 종료 == 스킵 == 인터프리터).
    */
   async runLineActions(line: MapSceneLine, target: ReadonlyMap<string, SceneUnitState>): Promise<void> {
-    this.cameraSpeaker = ({ "유비": "liubei", "관우": "guanyu", "장비": "zhangfei", "주인장": "innkeeper", "의병": "jeonryeong" } as Record<string,string>)[line.speaker ?? ""] ?? line.bubble?.id ?? line.enter?.at(-1)?.id ?? line.move?.at(-1)?.id ?? null;
+    this.cameraSpeaker = this.speakerActors.get(line.speaker ?? "") ?? ({ "유비": "liubei", "관우": "guanyu", "장비": "zhangfei", "주인장": "innkeeper", "의병": "jeonryeong" } as Record<string,string>)[line.speaker ?? ""] ?? line.bubble?.id ?? line.enter?.at(-1)?.id ?? line.move?.at(-1)?.id ?? null;
     const gen = ++this.actionGen; // 새 줄 = 이전 잔여 걷기 무효화
     for (const { id, to } of line.exit ?? []) {
       const v = this.views.get(id);

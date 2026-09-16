@@ -15,7 +15,7 @@
  * 청동/수묵 팔레트는 TitleScreen/HUD frames와 톤 일치.
  */
 import { useEffect, useRef, useState } from "react";
-import { stages } from "@tk/data";
+import { stages } from "../../game/data";
 import { BUTTON_FRAME } from "../../battle/hud/frames";
 import { getAdService } from "../adService";
 import { isBossStage } from "../interstitialPolicy";

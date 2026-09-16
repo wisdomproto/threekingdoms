@@ -7,6 +7,12 @@ import { describe, it, expect } from "vitest";
 import { bgmForPath } from "../bgmRoute";
 
 describe("bgmForPath", () => {
+  it("keeps authoring silent without muting game playtests", () => {
+    expect(bgmForPath("/studio")).toBeNull();
+    expect(bgmForPath("/motion-editor")).toBeNull();
+    expect(bgmForPath("/battle-motion-preview")).toBeNull();
+    expect(bgmForPath("/studio/play")).toBe("menu");
+  });
   it("/battle은 보스 스테이지여도 항상 battle로 시작(보스곡=교전 트리거)", () => {
     expect(bgmForPath("/battle")).toBe("battle");
     expect(bgmForPath("/battle?stage=01-zhuojun")).toBe("battle");

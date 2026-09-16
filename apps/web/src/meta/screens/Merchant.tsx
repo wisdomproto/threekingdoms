@@ -8,7 +8,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { gameData } from "@tk/data";
+import { gameData } from "../../game/data";
 import { getMeta, spendGold, addItem } from "../metaStore";
 import { RewardedAdButton } from "../RewardedAdButton";
 import { PANEL_FRAME } from "../../battle/hud/frames";

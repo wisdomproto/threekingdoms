@@ -13,7 +13,7 @@
  *   getMeta, addGold, spendGold, addItem, removeItem, markCleared, getRoster,
  *   setEquipped, reset  + 타입 MetaState, RosterUnit.
  */
-import { gameData } from "@tk/data";
+import { gameData } from "../game/data";
 import type { RosterEntry } from "@tk/data";
 import { effectiveClassId } from "@tk/engine";
 import { registerAdFreeProvider } from "./adService";
@@ -328,8 +328,13 @@ export function healStartItems(
  *    M1은 스테이지 1개뿐이라 매핑이 없다. 따라서 현재 규칙은 보수적으로:
  *      해금 챕터 = 1 + (클리어한 스테이지 수). 즉 아무것도 안 깼으면 1장만,
  *      한 스테이지 깰 때마다 다음 장이 열린다(화면이 채워지면 chapter 맵으로 교체 예정 — TODO).
- *  rosterProgress가 없는 장수는 기본값(level 1/exp 0/equipped [])으로 채워 반환.
+ * New and reserve commanders receive the training floor and their starting equipment.
  */
+/** Unique victories train reserves too; replaying a cleared battle cannot farm levels. */
+export function rosterTrainingLevel(s: MetaState): number {
+  return Math.min(30, 1 + new Set(s.clearedStages).size);
+}
+
 export function selectRoster(
   s: MetaState,
   rosters: Record<string, RosterEntry>,
@@ -345,7 +350,7 @@ export function selectRoster(
     if (entry.joinChapter > unlockedChapter) continue;
     if (departed.has(entry.commanderId)) continue; // 이탈 장수 제외(§6)
     const p = s.rosterProgress[entry.commanderId];
-    const level = p?.level ?? DEFAULT_LEVEL;
+    const level = Math.max(p?.level ?? DEFAULT_LEVEL, rosterTrainingLevel(s));
     out.push({
       commanderId: entry.commanderId,
       // 승급(§7) = 레벨의 순수 함수 — 로스터 기본 병종에서 레벨 임계만큼 체인 전진.
@@ -355,7 +360,7 @@ export function selectRoster(
       role: entry.role,
       uniqueSkillId: entry.uniqueSkillId,
       level,
-      exp: p?.exp ?? 0,
+      exp: p && p.level >= level ? p.exp : 0,
       equipped: p?.equipped ?? entry.startItems ?? [], // ★ 시작 장비(Phase F) — 진행 저장 없으면 startItems(없으면 [])
     });
   }

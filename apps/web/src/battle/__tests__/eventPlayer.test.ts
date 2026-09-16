@@ -363,3 +363,18 @@ describe("회복약(supplyItem) 투영 (회귀: 드레인 정합 — itemUsed가
     expect(tp.snapshot!()!.units.find((u) => u.id === "화웅")!.troops).toBe(huaxiongCommitted.troops);
   });
 });
+
+it("presents scripted effects and damage in order without projection drift", async () => {
+  const tp = new TrackingPresenter(); tp.prime(state0);
+  const unit = state0.units.find(u => u.troops > 30)!;
+  const committed = { ...state0, units: state0.units.map(u => u.id === unit.id ? { ...u, troops: u.troops - 30 } : u) };
+  const violations: string[] = [];
+  const player = new EventPlayer({ presenter: tp, getCommitted: () => committed, dev: true, onDrained: () => {}, onDevViolation: message => violations.push(message) });
+  await player.enqueue([
+    { type: "scriptMessage", text: "Fire attack" },
+    { type: "scriptEffect", effect: "fire", area: { x: 0, y: 0, width: 3, height: 3 } },
+    { type: "scriptDamage", unitId: unit.id, damage: 30 },
+  ]);
+  expect(tp.log.slice(0, 3)).toEqual(["scriptMessage", "scriptEffect", "scriptDamage"]);
+  expect(violations).toEqual([]);
+});

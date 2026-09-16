@@ -31,6 +31,9 @@ export interface PresentedSnapshot {
 
 export interface Presenter {
   unitMoved(e: Ev<"unitMoved">): Promise<void>;
+  scriptMessage?(e: Ev<"scriptMessage">): Promise<void>;
+  scriptEffect?(e: Ev<"scriptEffect">): Promise<void>;
+  scriptDamage?(e: Ev<"scriptDamage">): Promise<void>;
   damageDealt(e: Ev<"damageDealt">): Promise<void>;
   strategyCast(e: Ev<"strategyCast">): Promise<void>;
   /** 도구 사용 피드백 — 미구현(옵셔널)이면 default로 흘러도 무방(W1). */
@@ -155,6 +158,9 @@ export class EventPlayer {
   private dispatch(e: BattleEvent): Promise<void> {
     const p = this.opts.presenter;
     switch (e.type) {
+      case "scriptMessage": return p.scriptMessage?.(e) ?? Promise.resolve();
+      case "scriptEffect": return p.scriptEffect?.(e) ?? Promise.resolve();
+      case "scriptDamage": return p.scriptDamage?.(e) ?? Promise.resolve();
       case "unitMoved":
         return p.unitMoved(e);
       case "damageDealt":

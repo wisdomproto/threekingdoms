@@ -19,88 +19,522 @@
   },
   "levelCap": 8,
   "scenario": {
-    "intro": {
-      "bg": "02-yingchuan-intro",
-      "lines": [
-        {
-          "text": "탁군의 승전보가 마르기도 전, 남쪽 하늘에 연기 기둥이 올랐다. 영천 — 황건 본대에 포위된 관군이 무너지기 직전이라 했다."
+    "intro": [
+      {
+        "map": "scene-camp-day",
+        "label": "남하 · 영천으로",
+        "camera": {
+          "zoom": 1.25,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "밤을 새워서라도 간다. 영천이 뚫리면 다음은 낙양이다."
+        "units": [
+          {
+            "id": "liu",
+            "sprite": "liubei-foot",
+            "cell": [
+              5,
+              4
+            ],
+            "facing": "right",
+            "hidden": false
+          },
+          {
+            "id": "guan",
+            "sprite": "guanyu-foot",
+            "cell": [
+              4,
+              5
+            ],
+            "facing": "up",
+            "hidden": false
+          },
+          {
+            "id": "zhang",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              6,
+              5
+            ],
+            "facing": "up",
+            "hidden": false
+          }
+        ],
+        "lines": [
+          {
+            "text": "탁군의 승전보가 마르기도 전, 남쪽 하늘에 연기 기둥이 올랐다. 영천 — 황건 본대에 포위된 관군이 무너지기 직전이라 했다.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "밤을 새워서라도 간다. 영천이 뚫리면 다음은 낙양이다.",
+            "pose": [
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "liu",
+                "pose": "emphasize"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-day",
+        "label": "영천 · 조조와의 첫 만남",
+        "camera": {
+          "zoom": 1.25,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "text": "이틀 밤낮을 달려 닿은 영천 벌판. 낯선 군기가 바람에 곤두서 있었다 — 검은 바탕에 '조(曹)' 한 글자."
+        "units": [
+          {
+            "id": "liu",
+            "sprite": "liubei-foot",
+            "cell": [
+              5,
+              4
+            ],
+            "facing": "right",
+            "hidden": false
+          },
+          {
+            "id": "guan",
+            "sprite": "guanyu-foot",
+            "cell": [
+              4,
+              5
+            ],
+            "facing": "up",
+            "hidden": false
+          },
+          {
+            "id": "zhang",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              6,
+              5
+            ],
+            "facing": "up",
+            "hidden": false
+          },
+          {
+            "id": "cao",
+            "sprite": "caocao-robes",
+            "cell": [
+              9,
+              4
+            ],
+            "facing": "left",
+            "hidden": true
+          }
+        ],
+        "lines": [
+          {
+            "text": "이틀 밤낮을 달려 닿은 영천 벌판. 낯선 군기가 바람에 곤두서 있었다 — 검은 바탕에 '조(曹)' 한 글자.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "cao",
+                "pose": "idle"
+              }
+            ],
+            "enter": [
+              {
+                "id": "cao",
+                "from": [
+                  9,
+                  4
+                ],
+                "to": [
+                  7,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "패국초의 조조 맹덕... 관군의 원병입니다. 바람의 방향을 재고 있군요 — 불을 놓을 셈입니다.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "cao",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "조조",
+            "side": "ally",
+            "portraitId": "조조",
+            "text": "그대들이 탁군의 의병인가. 마침 좋군 — 불은 내가 놓는다. 그대들은 불길에 쫓겨 나오는 무리의 퇴로를 끊어라.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "cao",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "흥, 초면에 남의 형님한테 명령질이오? 좋소 — 대신 적장의 목은 우리가 먼저 따겠소!",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "cao",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "emphasize"
+              }
+            ],
+            "move": [
+              {
+                "id": "zhang",
+                "to": [
+                  6,
+                  4
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "zhang",
+                "dir": "right"
+              }
+            ],
+            "bubble": {
+              "id": "zhang",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "(한눈에 전장을 손바닥처럼 읽는 자다... 범상치 않군.)",
+            "pose": [
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "cao",
+                "pose": "idle"
+              },
+              {
+                "id": "liu",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "liu",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "좋소, 조 공. 불길은 그대에게 맡기지. 우리는 관해의 본대를 친다 — 화공에 휘말리지 않게 측면으로!",
+            "pose": [
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "cao",
+                "pose": "idle"
+              },
+              {
+                "id": "liu",
+                "pose": "salute"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-camp-day",
+        "label": "영천 · 엇갈리는 길",
+        "camera": {
+          "zoom": 1.25,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "패국초의 조조 맹덕... 관군의 원병입니다. 바람의 방향을 재고 있군요 — 불을 놓을 셈입니다."
-        },
-        {
-          "speaker": "조조",
-          "side": "ally",
-          "portraitId": "조조",
-          "text": "그대들이 탁군의 의병인가. 마침 좋군 — 불은 내가 놓는다. 그대들은 불길에 쫓겨 나오는 무리의 퇴로를 끊어라."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "흥, 초면에 남의 형님한테 명령질이오? 좋소 — 대신 적장의 목은 우리가 먼저 따겠소!"
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "(한눈에 전장을 손바닥처럼 읽는 자다... 범상치 않군.)"
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "좋소, 조 공. 불길은 그대에게 맡기지. 우리는 관해의 본대를 친다 — 화공에 휘말리지 않게 측면으로!"
-        }
-      ]
-    },
-    "outro": {
-      "bg": "02-yingchuan-outro",
-      "lines": [
-        {
-          "text": "불길이 사그라든 벌판에 황건의 깃발이 재가 되어 날렸다. 관군 진영에서 승리의 북소리가 울렸다."
-        },
-        {
-          "speaker": "조조",
-          "side": "ally",
-          "portraitId": "조조",
-          "text": "쓸 만하군, 짚신 장수치고는. ...언젠가 다시 보세, 유비. 그 눈빛, 기억해 두지."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "뭐, 짚신 장수?! 저, 저놈이 끝까지...!"
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "(저 자의 눈... 야심이 깊다. 난세가 그를 어디로 데려갈 것인가.) 가자, 아우들아."
-        },
-        {
-          "text": "훗날 천하를 두고 다툴 두 사람의 첫 만남은, 그렇게 짧게 끝났다."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liu",
+            "sprite": "liubei-foot",
+            "cell": [
+              5,
+              4
+            ],
+            "facing": "right",
+            "hidden": false
+          },
+          {
+            "id": "guan",
+            "sprite": "guanyu-foot",
+            "cell": [
+              4,
+              5
+            ],
+            "facing": "up",
+            "hidden": false
+          },
+          {
+            "id": "zhang",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              6,
+              5
+            ],
+            "facing": "up",
+            "hidden": false
+          },
+          {
+            "id": "cao",
+            "sprite": "caocao-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left",
+            "hidden": false
+          }
+        ],
+        "lines": [
+          {
+            "text": "불길이 사그라든 벌판에 황건의 깃발이 재가 되어 날렸다. 관군 진영에서 승리의 북소리가 울렸다.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "cao",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "조조",
+            "side": "ally",
+            "portraitId": "조조",
+            "text": "쓸 만하군, 짚신 장수치고는. ...언젠가 다시 보세, 유비. 그 눈빛, 기억해 두지.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "cao",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "뭐, 짚신 장수?! 저, 저놈이 끝까지...!",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "cao",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "emphasize"
+              }
+            ],
+            "bubble": {
+              "id": "zhang",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "(저 자의 눈... 야심이 깊다. 난세가 그를 어디로 데려갈 것인가.) 가자, 아우들아.",
+            "pose": [
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "cao",
+                "pose": "idle"
+              },
+              {
+                "id": "liu",
+                "pose": "talk"
+              }
+            ],
+            "exit": [
+              {
+                "id": "cao",
+                "to": [
+                  10,
+                  4
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "liu",
+                "dir": "left"
+              }
+            ],
+            "bubble": {
+              "id": "liu",
+              "mark": "..."
+            }
+          },
+          {
+            "text": "훗날 천하를 두고 다툴 두 사람의 첫 만남은, 그렇게 짧게 끝났다.",
+            "pose": [
+              {
+                "id": "liu",
+                "pose": "idle"
+              },
+              {
+                "id": "guan",
+                "pose": "idle"
+              },
+              {
+                "id": "zhang",
+                "pose": "idle"
+              },
+              {
+                "id": "cao",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "유비",
       "classId": "lord",
-      "level": 3,
+      "level": 2,
       "troops": 110,
       "items": [],
       "side": "player",
@@ -110,7 +544,7 @@
     {
       "commanderId": "관우",
       "classId": "lightCavalry",
-      "level": 3,
+      "level": 2,
       "troops": 115,
       "items": [
         "청룡언월도"
@@ -122,7 +556,7 @@
     {
       "commanderId": "장비",
       "classId": "lightCavalry",
-      "level": 3,
+      "level": 2,
       "troops": 115,
       "items": [
         "사모"
@@ -134,7 +568,7 @@
     {
       "commanderId": "간옹",
       "classId": "strategist",
-      "level": 3,
+      "level": 2,
       "troops": 85,
       "items": [
         "쌀",
@@ -147,7 +581,7 @@
     {
       "commanderId": "조조",
       "classId": "lightCavalry",
-      "level": 5,
+      "level": 4,
       "troops": 130,
       "items": [],
       "side": "ally",
@@ -157,7 +591,7 @@
     {
       "commanderId": "하후돈",
       "classId": "lightCavalry",
-      "level": 4,
+      "level": 3,
       "troops": 110,
       "items": [],
       "side": "ally",
@@ -167,7 +601,7 @@
     {
       "commanderId": "공융",
       "classId": "strategist",
-      "level": 4,
+      "level": 3,
       "troops": 90,
       "items": [],
       "side": "ally",
@@ -177,7 +611,7 @@
     {
       "commanderId": "관해",
       "classId": "bandit",
-      "level": 5,
+      "level": 4,
       "troops": 160,
       "items": [],
       "side": "enemy",
@@ -187,7 +621,7 @@
     {
       "commanderId": "요화",
       "classId": "bandit",
-      "level": 4,
+      "level": 3,
       "troops": 105,
       "items": [],
       "side": "enemy",
@@ -197,7 +631,7 @@
     {
       "commanderId": "두습",
       "classId": "bandit",
-      "level": 4,
+      "level": 3,
       "troops": 100,
       "items": [],
       "side": "enemy",
@@ -207,7 +641,7 @@
     {
       "commanderId": "왕보",
       "classId": "archer",
-      "level": 4,
+      "level": 3,
       "troops": 95,
       "items": [],
       "side": "enemy",
@@ -217,7 +651,7 @@
     {
       "commanderId": "조루",
       "classId": "footman",
-      "level": 3,
+      "level": 2,
       "troops": 95,
       "items": [],
       "side": "enemy",
@@ -227,7 +661,7 @@
     {
       "commanderId": "학맹",
       "classId": "bandit",
-      "level": 3,
+      "level": 2,
       "troops": 90,
       "items": [],
       "side": "enemy",

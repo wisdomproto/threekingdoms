@@ -3,7 +3,7 @@ export const DIRECTIONS = ["left", "right", "up", "down"] as const;
 export type Direction = typeof DIRECTIONS[number];
 export interface MotionFrame { image: string; col: number; row: number; columns: number; rows: number; ms: number }
 export interface MotionClip { loop: boolean; frames: MotionFrame[] }
-export interface ActorMotions { name: string; clips: Record<string, MotionClip> }
+export interface ActorMotions { name: string; displayScale?: number; clips: Record<string, MotionClip> }
 export interface MotionLibrary { version: 1; actors: Record<string, ActorMotions> }
 export const MOTION_URL = "/assets/scene-motions/library.json";
 export function clipFor(actor: ActorMotions, pose: string, dir: Direction): MotionClip | undefined {
@@ -20,7 +20,8 @@ export function validateLibrary(value: unknown): value is MotionLibrary {
   const v = value as MotionLibrary;
   if (!v || v.version !== 1 || !v.actors || typeof v.actors !== "object") return false;
   return Object.entries(v.actors).length > 0 && Object.entries(v.actors).every(([id, a]) =>
-    /^[a-z0-9-]+$/.test(id) && a && typeof a.name === "string" && a.clips &&
+    /^[a-z0-9-]+$/.test(id) && a && typeof a.name === "string" &&
+    (a.displayScale === undefined || Number.isFinite(a.displayScale) && a.displayScale >= 0.5 && a.displayScale <= 2) && a.clips &&
     Object.keys(a.clips).length > 0 && Object.entries(a.clips).every(([key, c]) =>
       /^(left|up|down)\.[a-z][a-z0-9_-]*$/.test(key) && c && typeof c.loop === "boolean" &&
       Array.isArray(c.frames) && c.frames.length > 0 && c.frames.length <= 60 && c.frames.every(f =>

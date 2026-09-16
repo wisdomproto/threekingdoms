@@ -1,0 +1,850 @@
+[
+  [
+    {
+      "id": "유비",
+      "name": "유비",
+      "classId": "lord"
+    },
+    {
+      "id": "관우",
+      "name": "관우",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "장비",
+      "name": "장비",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "정원지",
+      "name": "정원지",
+      "classId": "footman"
+    },
+    {
+      "id": "보병대",
+      "name": "보병대",
+      "classId": "footman"
+    },
+    {
+      "id": "적병",
+      "name": "적병",
+      "classId": "bandit"
+    }
+  ],
+  [
+    {
+      "id": "궁병대",
+      "name": "궁병대",
+      "classId": "archer"
+    },
+    {
+      "id": "간옹",
+      "name": "간옹",
+      "classId": "strategist"
+    },
+    {
+      "id": "조조",
+      "name": "조조",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "하후돈",
+      "name": "하후돈",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "공융",
+      "name": "공융",
+      "classId": "strategist"
+    },
+    {
+      "id": "관해",
+      "name": "관해",
+      "classId": "bandit"
+    }
+  ],
+  [
+    {
+      "id": "요화",
+      "name": "요화",
+      "classId": "bandit"
+    },
+    {
+      "id": "두습",
+      "name": "두습",
+      "classId": "bandit"
+    },
+    {
+      "id": "왕보",
+      "name": "왕보",
+      "classId": "archer"
+    }
+  ],
+  [
+    {
+      "id": "조루",
+      "name": "조루",
+      "classId": "footman"
+    },
+    {
+      "id": "학맹",
+      "name": "학맹",
+      "classId": "bandit"
+    },
+    {
+      "id": "동탁",
+      "name": "동탁",
+      "classId": "footman"
+    }
+  ],
+  [
+    {
+      "id": "공손찬",
+      "name": "공손찬",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "장보",
+      "name": "장보",
+      "classId": "footman"
+    },
+    {
+      "id": "유벽",
+      "name": "유벽",
+      "classId": "archer"
+    }
+  ],
+  [
+    {
+      "id": "곽적",
+      "name": "곽적",
+      "classId": "footman"
+    },
+    {
+      "id": "정덕",
+      "name": "정덕",
+      "classId": "bandit"
+    },
+    {
+      "id": "장연",
+      "name": "장연",
+      "classId": "bandit"
+    }
+  ],
+  [
+    {
+      "id": "미축",
+      "name": "미축",
+      "classId": "footman"
+    },
+    {
+      "id": "장각",
+      "name": "장각",
+      "classId": "sorcerer"
+    },
+    {
+      "id": "요술사",
+      "name": "요술사",
+      "classId": "sorcerer"
+    }
+  ],
+  [
+    {
+      "id": "유벽",
+      "name": "유벽 산적",
+      "classId": "bandit"
+    }
+  ],
+  [
+    {
+      "id": "화웅",
+      "name": "화웅",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "조잠",
+      "name": "조잠",
+      "classId": "footman"
+    },
+    {
+      "id": "이숙",
+      "name": "이숙",
+      "classId": "archer"
+    }
+  ],
+  [
+    {
+      "id": "호진",
+      "name": "호진",
+      "classId": "footman"
+    }
+  ],
+  [
+    {
+      "id": "장료",
+      "name": "장료",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "관우",
+      "name": "관우",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "여포",
+      "name": "여포",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "장비",
+      "name": "장비",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "이각",
+      "name": "이각",
+      "classId": "footman"
+    },
+    {
+      "id": "곽사",
+      "name": "곽사 보병",
+      "classId": "footman"
+    },
+    {
+      "id": "서영",
+      "name": "서영 기병",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "곽사",
+      "name": "곽사 궁병",
+      "classId": "archer"
+    },
+    {
+      "id": "서영",
+      "name": "서영 보병",
+      "classId": "footman"
+    }
+  ],
+  [
+    {
+      "id": "손건",
+      "name": "손건",
+      "classId": "strategist"
+    },
+    {
+      "id": "이유",
+      "name": "이유",
+      "classId": "strategist"
+    }
+  ],
+  [
+    {
+      "id": "조성",
+      "name": "조성",
+      "classId": "archer"
+    },
+    {
+      "id": "왕개",
+      "name": "왕개",
+      "classId": "archer"
+    }
+  ],
+  [
+    {
+      "id": "송겸",
+      "name": "송겸 보병",
+      "classId": "footman"
+    },
+    {
+      "id": "송겸",
+      "name": "송겸 궁병",
+      "classId": "archer"
+    }
+  ],
+  [
+    {
+      "id": "양앙",
+      "name": "양앙",
+      "classId": "archer"
+    },
+    {
+      "id": "여건",
+      "name": "여건",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "이숙",
+      "name": "이숙 기병",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "호진",
+      "name": "호진 기병",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "서상",
+      "name": "서상",
+      "classId": "footman"
+    }
+  ],
+  [
+    {
+      "id": "조운",
+      "name": "조운",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "국의",
+      "name": "국의",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "공손월",
+      "name": "공손월",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "봉기",
+      "name": "봉기",
+      "classId": "footman"
+    },
+    {
+      "id": "경무",
+      "name": "경무",
+      "classId": "footman"
+    },
+    {
+      "id": "관순",
+      "name": "관순",
+      "classId": "footman"
+    }
+  ],
+  [
+    {
+      "id": "한맹",
+      "name": "한맹",
+      "classId": "archer"
+    },
+    {
+      "id": "엄강",
+      "name": "엄강",
+      "classId": "archer"
+    },
+    {
+      "id": "원윤",
+      "name": "원윤",
+      "classId": "archer"
+    }
+  ],
+  [
+    {
+      "id": "우금",
+      "name": "우금",
+      "classId": "footman"
+    },
+    {
+      "id": "하후연",
+      "name": "하후연",
+      "classId": "archer"
+    },
+    {
+      "id": "이전",
+      "name": "이전",
+      "classId": "footman"
+    }
+  ],
+  [
+    {
+      "id": "악진",
+      "name": "악진",
+      "classId": "archer"
+    },
+    {
+      "id": "조인",
+      "name": "조인",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "도겸",
+      "name": "도겸",
+      "classId": "lord"
+    },
+    {
+      "id": "태사자",
+      "name": "태사자",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "미방",
+      "name": "미방",
+      "classId": "footman"
+    },
+    {
+      "id": "고순",
+      "name": "고순",
+      "classId": "footman"
+    }
+  ],
+  [
+    {
+      "id": "진등",
+      "name": "진등",
+      "classId": "strategist"
+    },
+    {
+      "id": "진궁",
+      "name": "진궁",
+      "classId": "strategist"
+    }
+  ],
+  [
+    {
+      "id": "위속",
+      "name": "위속 · footman",
+      "classId": "footman"
+    },
+    {
+      "id": "조표",
+      "name": "조표 · footman",
+      "classId": "footman"
+    },
+    {
+      "id": "진기",
+      "name": "진기 · footman",
+      "classId": "footman"
+    }
+  ],
+  [
+    {
+      "id": "후성",
+      "name": "후성 · archer",
+      "classId": "archer"
+    },
+    {
+      "id": "위속",
+      "name": "위속 · cavalry",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "기령",
+      "name": "기령 · cavalry",
+      "classId": "heavyCavalry"
+    }
+  ],
+  [
+    {
+      "id": "이풍",
+      "name": "이풍 · footman",
+      "classId": "footman"
+    },
+    {
+      "id": "악취",
+      "name": "악취 · archer",
+      "classId": "archer"
+    },
+    {
+      "id": "한섬",
+      "name": "한섬 · cavalry",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "위속",
+      "name": "위속 · archer",
+      "classId": "archer"
+    }
+  ],
+  [
+    {
+      "id": "기병대",
+      "name": "기병대 · cavalry",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "보병대_2",
+      "name": "보병대_2 · footman",
+      "classId": "footman"
+    },
+    {
+      "id": "허저",
+      "name": "허저 · footman",
+      "classId": "footman"
+    }
+  ],
+  [
+    {
+      "id": "허저",
+      "name": "허저 · cavalry",
+      "classId": "heavyCavalry"
+    },
+    {
+      "id": "왕충",
+      "name": "왕충 · footman",
+      "classId": "footman"
+    },
+    {
+      "id": "유대",
+      "name": "유대 · footman",
+      "classId": "footman"
+    }
+  ],
+  [
+    {
+      "id": "채양",
+      "name": "채양 · archer",
+      "classId": "archer"
+    },
+    {
+      "id": "하후걸",
+      "name": "하후걸 · archer",
+      "classId": "archer"
+    },
+    {
+      "id": "하후상",
+      "name": "하후상 · cavalry",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "하후은",
+      "name": "하후은 · cavalry",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "하후덕",
+      "name": "하후덕 · footman",
+      "classId": "footman"
+    }
+  ],
+  [
+    {
+      "id": "후성",
+      "name": "후성 · cavalry",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "원술",
+      "name": "원술 · pikeman",
+      "classId": "pikeman"
+    }
+  ],
+  [
+    {
+      "id": "하후란",
+      "name": "하후란 · cavalry",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "조순",
+      "name": "조순 · archer",
+      "classId": "archer"
+    },
+    {
+      "id": "왕충",
+      "name": "왕충 · cavalry",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "서황",
+      "name": "서황 · cavalry",
+      "classId": "heavyCavalry"
+    }
+  ],
+  [
+    {
+      "id": "조하",
+      "name": "조하 · cavalry",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "관평",
+      "name": "관평 · cavalry",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "주창",
+      "name": "주창 · bandit",
+      "classId": "bandit"
+    }
+  ],
+  [
+    {
+      "id": "채양",
+      "name": "채양 · cavalry",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "제갈량",
+      "name": "제갈량 · strategist",
+      "classId": "strategist"
+    },
+    {
+      "id": "유봉",
+      "name": "유봉 · footman",
+      "classId": "footman"
+    }
+  ],
+  [
+    {
+      "id": "조홍",
+      "name": "조홍 · footman",
+      "classId": "footman"
+    },
+    {
+      "id": "유봉",
+      "name": "유봉 · archer",
+      "classId": "archer"
+    },
+    {
+      "id": "공지",
+      "name": "공지 · civilian",
+      "classId": "civilian"
+    }
+  ],
+  [
+    {
+      "id": "이적",
+      "name": "이적 · civilian",
+      "classId": "civilian"
+    },
+    {
+      "id": "진응",
+      "name": "진응 · civilian",
+      "classId": "civilian"
+    },
+    {
+      "id": "진진",
+      "name": "진진 · civilian",
+      "classId": "civilian"
+    }
+  ],
+  [
+    {
+      "id": "유선",
+      "name": "유선 · civilian",
+      "classId": "civilian"
+    },
+    {
+      "id": "조순",
+      "name": "조순 · cavalry",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "조진",
+      "name": "조진 · cavalry",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "조휴",
+      "name": "조휴 · archer",
+      "classId": "archer"
+    },
+    {
+      "id": "주창",
+      "name": "주창 · archer",
+      "classId": "archer"
+    },
+    {
+      "id": "조순",
+      "name": "조순 · footman",
+      "classId": "footman"
+    }
+  ],
+  [
+    {
+      "id": "문빙",
+      "name": "문빙 · archer",
+      "classId": "archer"
+    }
+  ],
+  [
+    {
+      "id": "주창",
+      "name": "주창 · footman",
+      "classId": "footman"
+    },
+    {
+      "id": "손권",
+      "name": "손권 · lord",
+      "classId": "lord"
+    },
+    {
+      "id": "주유",
+      "name": "주유 · strategist",
+      "classId": "strategist"
+    }
+  ],
+  [
+    {
+      "id": "장무",
+      "name": "장무 · cavalry",
+      "classId": "heavyCavalry"
+    },
+    {
+      "id": "진손",
+      "name": "진손 · cavalry",
+      "classId": "lightCavalry"
+    },
+    {
+      "id": "노숙",
+      "name": "노숙 · strategist",
+      "classId": "strategist"
+    }
+  ],
+  [
+    {
+      "id": "황개",
+      "name": "황개 · cavalry",
+      "classId": "heavyCavalry"
+    },
+    {
+      "id": "정보",
+      "name": "정보 · footman",
+      "classId": "footman"
+    },
+    {
+      "id": "한당",
+      "name": "한당 · archer",
+      "classId": "archer"
+    }
+  ],
+  [
+    {
+      "id": "채모",
+      "name": "채모 · cavalry",
+      "classId": "heavyCavalry"
+    },
+    {
+      "id": "장윤",
+      "name": "장윤 · footman",
+      "classId": "footman"
+    }
+  ],
+  [
+    {
+      "id": "채중",
+      "name": "채중 · archer",
+      "classId": "archer"
+    },
+    {
+      "id": "진무",
+      "name": "진무 · footman",
+      "classId": "footman"
+    },
+    {
+      "id": "반장",
+      "name": "반장 · archer",
+      "classId": "archer"
+    }
+  ],
+  [
+    {
+      "id": "감녕",
+      "name": "감녕 · cavalry",
+      "classId": "heavyCavalry"
+    },
+    {
+      "id": "정봉",
+      "name": "정봉 · footman",
+      "classId": "footman"
+    },
+    {
+      "id": "능통",
+      "name": "능통 · archer",
+      "classId": "archer"
+    }
+  ],
+  [
+    {
+      "id": "채모",
+      "name": "채모 · footman",
+      "classId": "footman"
+    },
+    {
+      "id": "문빙",
+      "name": "문빙 · footman",
+      "classId": "footman"
+    },
+    {
+      "id": "여몽",
+      "name": "여몽 · cavalry",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "서황",
+      "name": "서황 · footman",
+      "classId": "footman"
+    },
+    {
+      "id": "채모",
+      "name": "채모 · archer",
+      "classId": "archer"
+    },
+    {
+      "id": "장윤",
+      "name": "장윤 · archer",
+      "classId": "archer"
+    }
+  ],
+  [
+    {
+      "id": "정보",
+      "name": "정보 · archer",
+      "classId": "archer"
+    },
+    {
+      "id": "주태",
+      "name": "주태 · cavalry",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "문빙",
+      "name": "문빙 · cavalry",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "장합",
+      "name": "장합 · cavalry",
+      "classId": "lightCavalry"
+    }
+  ],
+  [
+    {
+      "id": "조홍",
+      "name": "조홍 · cavalry",
+      "classId": "lightCavalry"
+    }
+  ]
+]

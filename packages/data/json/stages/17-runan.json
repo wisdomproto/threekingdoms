@@ -17,85 +17,409 @@
   },
   "levelCap": 35,
   "scenario": {
-    "intro": {
-      "bg": "17-runan-intro",
-      "lines": [
-        {
-          "text": "원소와 조조가 관도에서 맞붙는 사이, 유비는 여남에서 유벽의 무리와 함께 조조의 등 뒤를 노렸다."
+    "intro": [
+      {
+        "bg": "17-runan-intro",
+        "lines": [
+          {
+            "text": "원소와 조조가 관도에서 맞붙는 사이, 유비는 여남에서 유벽의 무리와 함께 조조의 등 뒤를 노렸다."
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-day",
+        "label": "여남 · 천 리의 귀환",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "text": "그리고 — 바람결에 소문 하나가 닿았다. 조조 진영에 머물던 관우가, 다섯 관문을 베어 넘으며 형을 찾아 떠났다는 소문이었다."
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-official",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-official",
+            "cell": [
+              3,
+              5
+            ],
+            "facing": "right",
+            "hidden": true
+          },
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-official",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "sunqian",
+            "sprite": "sunqian-robes",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left",
+            "hidden": true
+          }
+        ],
+        "lines": [
+          {
+            "text": "그리고 — 바람결에 소문 하나가 닿았다. 조조 진영에 머물던 관우가, 다섯 관문을 베어 넘으며 형을 찾아 떠났다는 소문이었다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "손건",
+            "side": "player",
+            "portraitId": "손건",
+            "text": "주공! 소문이 아니랍니다. 관 장군께서 두 부인을 모시고 — 지금 이리로 오고 계십니다!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "sunqian",
+                "pose": "talk"
+              }
+            ],
+            "enter": [
+              {
+                "id": "sunqian",
+                "from": [
+                  10,
+                  3
+                ],
+                "to": [
+                  7,
+                  3
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "sunqian",
+                "dir": "left"
+              }
+            ],
+            "bubble": {
+              "id": "sunqian",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "운장이...! 천 리를... 다섯 관문을 뚫고 온단 말이냐.",
+            "pose": [
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "sunqian",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "진짜요?! 으하하! 그럼 마중을 나가야지, 뭘 꾸물대시오 형님!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "sunqian",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "talk"
+              }
+            ],
+            "bubble": {
+              "id": "zhangfei",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "...형님. 늦었습니다. 천 리를 돌아 — 이제야 왔습니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "sunqian",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "salute"
+              }
+            ],
+            "enter": [
+              {
+                "id": "guanyu",
+                "from": [
+                  10,
+                  5
+                ],
+                "to": [
+                  3,
+                  5
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "guanyu",
+                "dir": "right"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "운장! 살아 있었구나. ...그거면 됐다. 그거면 된 것이야.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "sunqian",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "liubei",
+                "to": [
+                  5,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "재회의 눈물이 마르기도 전 — 조조의 추격군이 여남 벌판에 모습을 드러냈다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "sunqian",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "17-runan-outro",
+        "lines": [
+          {
+            "text": "조조의 추격군을 물리친 벌판에서, 세 사람은 말에서 내려 서로를 부둥켜안았다."
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-day",
+        "label": "여남 · 다시 한자리",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "손건",
-          "side": "player",
-          "portraitId": "손건",
-          "text": "주공! 소문이 아니랍니다. 관 장군께서 두 부인을 모시고 — 지금 이리로 오고 계십니다!"
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "운장이...! 천 리를... 다섯 관문을 뚫고 온단 말이냐."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "진짜요?! 으하하! 그럼 마중을 나가야지, 뭘 꾸물대시오 형님!"
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "...형님. 늦었습니다. 천 리를 돌아 — 이제야 왔습니다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "운장! 살아 있었구나. ...그거면 됐다. 그거면 된 것이야."
-        },
-        {
-          "text": "재회의 눈물이 마르기도 전 — 조조의 추격군이 여남 벌판에 모습을 드러냈다."
-        }
-      ]
-    },
-    "outro": {
-      "bg": "17-runan-outro",
-      "lines": [
-        {
-          "text": "조조의 추격군을 물리친 벌판에서, 세 사람은 말에서 내려 서로를 부둥켜안았다."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "형님! 운장 형님! 으하하, 다시 뭉쳤구려!"
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "한실의 녹을 먹었으나 마음은 늘 형님께 있었습니다. 이제 다시는 떨어지지 않겠습니다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "삼형제가 다시 한자리에. ...이거면 천하가 두렵지 않다."
-        },
-        {
-          "text": "도원의 맹세가 일곱 해 만에 다시 하나가 되었다. 지켜보던 병사들도 소리 죽여 울었다."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-official",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-official",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-official",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "형님! 운장 형님! 으하하, 다시 뭉쳤구려!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "talk"
+              }
+            ],
+            "bubble": {
+              "id": "zhangfei",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "한실의 녹을 먹었으나 마음은 늘 형님께 있었습니다. 이제 다시는 떨어지지 않겠습니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "삼형제가 다시 한자리에. ...이거면 천하가 두렵지 않다.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "text": "도원의 맹세가 일곱 해 만에 다시 하나가 되었다. 지켜보던 병사들도 소리 죽여 울었다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "유비",
       "classId": "lord",
-      "level": 24,
+      "level": 17,
       "troops": 336,
       "items": [
         "적로"
@@ -107,7 +431,7 @@
     {
       "commanderId": "관우",
       "classId": "heavyCavalry",
-      "level": 25,
+      "level": 17,
       "troops": 270,
       "items": [
         "청룡언월도",
@@ -120,7 +444,7 @@
     {
       "commanderId": "장비",
       "classId": "heavyCavalry",
-      "level": 24,
+      "level": 17,
       "troops": 260,
       "items": [
         "사모"
@@ -132,7 +456,7 @@
     {
       "commanderId": "조운",
       "classId": "guardCavalry",
-      "level": 24,
+      "level": 17,
       "troops": 255,
       "items": [
         "삼첨도"
@@ -144,7 +468,7 @@
     {
       "commanderId": "간옹",
       "classId": "strategist",
-      "level": 22,
+      "level": 17,
       "troops": 180,
       "items": [
         "손자의병법서",
@@ -157,7 +481,7 @@
     {
       "commanderId": "미축",
       "classId": "sorcerer",
-      "level": 21,
+      "level": 17,
       "troops": 170,
       "items": [
         "상약"
@@ -169,7 +493,7 @@
     {
       "commanderId": "관평",
       "classId": "lightCavalry",
-      "level": 20,
+      "level": 17,
       "troops": 200,
       "items": [],
       "side": "player",
@@ -179,7 +503,7 @@
     {
       "commanderId": "주창",
       "classId": "bandit",
-      "level": 20,
+      "level": 17,
       "troops": 195,
       "items": [],
       "side": "player",
@@ -189,7 +513,7 @@
     {
       "commanderId": "유벽",
       "classId": "footman",
-      "level": 18,
+      "level": 15,
       "troops": 160,
       "items": [],
       "side": "ally",
@@ -199,8 +523,8 @@
     {
       "commanderId": "허저",
       "classId": "heavyCavalry",
-      "level": 25,
-      "troops": 300,
+      "level": 18,
+      "troops": 240,
       "items": [],
       "side": "enemy",
       "x": 22,
@@ -209,8 +533,8 @@
     {
       "commanderId": "조인",
       "classId": "guardCavalry",
-      "level": 26,
-      "troops": 320,
+      "level": 19,
+      "troops": 256,
       "items": [],
       "side": "enemy",
       "x": 36,
@@ -219,8 +543,8 @@
     {
       "commanderId": "이전",
       "classId": "archer",
-      "level": 22,
-      "troops": 210,
+      "level": 15,
+      "troops": 168,
       "items": [],
       "side": "enemy",
       "x": 28,
@@ -229,8 +553,8 @@
     {
       "commanderId": "악진",
       "classId": "lightCavalry",
-      "level": 22,
-      "troops": 220,
+      "level": 15,
+      "troops": 176,
       "items": [],
       "side": "enemy",
       "x": 28,
@@ -239,8 +563,8 @@
     {
       "commanderId": "우금",
       "classId": "footman",
-      "level": 22,
-      "troops": 215,
+      "level": 15,
+      "troops": 172,
       "items": [],
       "side": "enemy",
       "x": 30,
@@ -249,8 +573,8 @@
     {
       "commanderId": "채양",
       "classId": "lightCavalry",
-      "level": 21,
-      "troops": 200,
+      "level": 15,
+      "troops": 160,
       "items": [],
       "side": "enemy",
       "x": 33,
@@ -286,8 +610,8 @@
         {
           "commanderId": "하후돈",
           "classId": "heavyCavalry",
-          "level": 25,
-          "troops": 260,
+          "level": 18,
+          "troops": 208,
           "items": [],
           "side": "enemy",
           "x": 12,
@@ -296,8 +620,8 @@
         {
           "commanderId": "악취",
           "classId": "archer",
-          "level": 21,
-          "troops": 190,
+          "level": 15,
+          "troops": 152,
           "items": [],
           "side": "enemy",
           "x": 14,

@@ -3,13 +3,17 @@
  * 서버 드래프트 파일 `/_draft/{draftId}.json` 의 내용을 검증한다. DOM·Next 무관(순수) — node 테스트 대상.
  * 스테이지/맵은 zod 로 검증해 "실행 최소 조건" 을 실제로 검사한다(첫 이슈의 경로·메시지를 돌려준다).
  */
-import { StageSchema, BattleMapSchema } from "@tk/data";
+import { StageSchema, BattleMapSchema, normalizeSceneSlot } from "@tk/data";
+import { resolveSceneMap } from "./scene-maps";
 import type { LabPayload } from "./lab";
+import { parseRuntimeCatalogs, runtimeGameData } from "./catalog-data";
 
 export const PLAYTEST_KIND = "tk-playtest-snapshot";
 export const PLAYTEST_VERSION = 1;
 
 export interface PlaytestSnapshot {
+  sceneMaps?: unknown;
+  catalogs?: unknown;
   kind: typeof PLAYTEST_KIND;
   version: typeof PLAYTEST_VERSION;
   draftId: string;
@@ -44,8 +48,42 @@ export function parsePlaytestSnapshot(json: unknown): PlaytestParseResult {
   if (stage.data.mapId !== map.data.id) {
     return { ok: false, message: `스테이지 mapId(${stage.data.mapId})와 맵 id(${map.data.id})가 다릅니다` };
   }
+  for (const script of stage.data.scriptEvents ?? []) {
+    const areas = [script.trigger.kind === "enterArea" ? script.trigger.target.area : undefined,
+      ...script.actions.map(a => (a.kind === "effect" || a.kind === "fire") ? a.area : "target" in a ? a.target.area : undefined)];
+    if (areas.some(a => a && (a.x + a.width > map.data.width || a.y + a.height > map.data.height))) return { ok: false, message: `${script.name}: 사건 구역이 맵 범위를 벗어났습니다.` };
+  }
   const seed = typeof s.seed === "number" ? s.seed : 1; // 에디터는 항상 1을 보낸다 — 폴백은 방어용.
   const payload: LabPayload = { stage: stage.data, map: map.data, sharedItems: [], seed };
+  const sceneMaps: NonNullable<LabPayload["sceneMaps"]> = Object.create(null);
+  if (s.sceneMaps !== undefined) {
+    if (!s.sceneMaps || typeof s.sceneMaps !== "object" || Array.isArray(s.sceneMaps)) return { ok: false, message: "장면 맵 목록은 객체여야 합니다" };
+    for (const [id, value] of Object.entries(s.sceneMaps)) {
+      const parsed = BattleMapSchema.safeParse(value);
+      if (!parsed.success) return { ok: false, message: `장면 맵 ${id} 검증 실패 — ${firstIssue(parsed.error)}` };
+      if (parsed.data.id !== id) return { ok: false, message: `장면 맵 키(${id})와 id(${parsed.data.id})가 다릅니다` };
+      sceneMaps[id] = parsed.data;
+    }
+  }
+  sceneMaps[map.data.id] = map.data;
+  payload.sceneMaps = sceneMaps;
+  for (const slot of Object.values(stage.data.scenario ?? {})) {
+    for (const part of normalizeSceneSlot(slot)) {
+      if ("map" in part && !resolveSceneMap(part.map, sceneMaps)) return { ok: false, message: `스토리 장면의 맵을 찾을 수 없습니다: ${part.map}` };
+    }
+  }
+  if (s.catalogs !== undefined) {
+    try {
+      payload.catalogs = parseRuntimeCatalogs(s.catalogs);
+      const data = runtimeGameData(payload.catalogs);
+      for (const unit of [...payload.stage.units, ...(payload.stage.reinforcements ?? []).flatMap(group => group.units)]) {
+        if (!Object.hasOwn(data.commanders, unit.commanderId)) throw new Error(`장수 없음: ${unit.commanderId}`);
+        if (!Object.hasOwn(data.unitClasses, unit.classId)) throw new Error(`병종 없음: ${unit.classId}`);
+        for (const item of unit.items) if (!Object.hasOwn(data.items, item)) throw new Error(`아이템 없음: ${item}`);
+      }
+    }
+    catch (error) { return { ok: false, message: `프로젝트 데이터 검증 실패 — ${String(error)}` }; }
+  }
   if (typeof s.returnUrl === "string" && s.returnUrl) payload.returnUrl = s.returnUrl;
   return { ok: true, payload };
 }

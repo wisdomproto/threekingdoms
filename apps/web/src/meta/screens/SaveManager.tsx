@@ -6,7 +6,7 @@
  */
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { gameData } from "@tk/data";
+import { gameData } from "../../game/data";
 import { getMeta, exportSave, importSave, reset } from "../metaStore";
 import { PANEL_FRAME } from "../../battle/hud/frames";
 

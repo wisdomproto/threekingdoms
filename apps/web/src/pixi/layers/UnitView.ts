@@ -1,3 +1,4 @@
+import { hasLoadedWeakPose, isLowHealth, lowHealthTint } from "../lowHealth";
 /**
  * UnitView (설계 §2.2) — "애니메이션 시퀀스 재생기" 파사드.
  * play('idle'|'move'|'attack'|'hit'|'retreat') => Promise + setFacing/setGridPosition.
@@ -23,12 +24,13 @@ import { easeInOut, easeOut, easeOutBack, type TweenRunner } from "../tweens";
 import { resolveSpriteId, spriteCandidates } from "../spriteMap";
 import { SkeletonView, type AttachmentTextureResolver } from "./SkeletonView";
 import type { ClipName, Skeleton } from "../skeleton";
+import { ATTACK_CLIP_MS, ATTACK_CONTACT_MS, isSpriteClip, spriteFrameAt, type SpriteClip } from "../spriteClips";
 
 export type UnitSequence = "idle" | "move" | "attack" | "hit" | "retreat";
 
-const BAR_WIDTH = UNIT_BASE_SIZE;
-const BAR_HEIGHT = 5;
-const SP_BAR_HEIGHT = 3; // 필살 게이지 바(병력 바 아래, 더 얇게)
+const BAR_WIDTH = Math.round(UNIT_BASE_SIZE * 0.84);
+const BAR_HEIGHT = 3;
+const SP_BAR_HEIGHT = 2; // Keep the secondary gauge subordinate to health.
 const MOVE_MS_PER_TILE = 150; // 설계 §6: unitMoved는 경로 타일당 150ms
 const ATTACK_MS = 260; // 앤티시페이션+오버슈트+복귀 재배분 여유로 약간 늘림
 const HIT_MS = 200;
@@ -128,6 +130,8 @@ export class UnitView extends Container {
    * string 완화(막간 v4) — 씬 커스텀 포즈(kneel 등). 미보유 포즈는 getSprite 폴백 체인이 idle로.
    */
   private pose: string = "idle";
+  private idleElapsed = 0;
+  private attackVector = { x: 1, y: 0 };
   /** false = 병력/SP 바 미표시·미갱신(씬 모드). 생성자 opts로 고정. */
   private readonly bars: boolean;
   private readonly spriteHeight: number;
@@ -185,7 +189,10 @@ export class UnitView extends Container {
 
     // ── 발밑 그림자 (맨 뒤 — 유닛을 바닥에 붙인다) ──
     this.shadow = new Graphics();
-    this.shadow.ellipse(0, 0, UNIT_BASE_SIZE * 0.46, UNIT_BASE_SIZE * 0.2).fill({ color: 0x000000, alpha: 0.24 });
+    // Layered contact shadow: a soft outer footprint and a narrow grounding core.
+    this.shadow.ellipse(0, 0, UNIT_BASE_SIZE * 0.46, UNIT_BASE_SIZE * 0.14).fill({ color: 0x302817, alpha: 0.07 });
+    this.shadow.ellipse(0, 0, UNIT_BASE_SIZE * 0.35, UNIT_BASE_SIZE * 0.10).fill({ color: 0x302817, alpha: 0.10 });
+    this.shadow.ellipse(0, 0, UNIT_BASE_SIZE * 0.24, UNIT_BASE_SIZE * 0.06).fill({ color: 0x302817, alpha: 0.15 });
     this.addChild(this.shadow);
 
     // ── 폴백 색 사각형 (진영색 라운드 사각) ──
@@ -312,9 +319,14 @@ export class UnitView extends Container {
    * 지정된 뷰+포즈 텍스처를 spriteBase에 적용.
    * 텍스처가 없으면 폴백(fallbackBase)을 표시.
    */
-  private applySpriteTexture(view: "front" | "back", pose: string): void {
+  private applySpriteTexture(view: "front" | "back", pose: string, elapsedMs = 0, loop = false): void {
     if (this.externalSceneArt) return;
     if (this.skeletonView) return; // 스켈레톤 경로 — 스프라이트 포즈 텍스처 미사용
+    if (pose === "idle" && this.bars && isLowHealth(this.troops, this.maxTroops) &&
+        hasLoadedWeakPose(this.spriteCands,
+          sid => Boolean(this.textures.getSprite(sid, view, "idle")),
+          sid => Boolean(this.textures.getSpriteClip(sid, view, "weak")))) pose = "weak";
+    if (pose !== "weak" && pose !== "idle") this.spriteBase.tint = 0xffffff;
     this.pose = pose; // 미러 부호는 포즈에 따라 다름 (applyScale) — 폴백 경로에서도 추적
     if (this.spriteCands.length === 0) return; // 후보 없음 → 항상 색사각 폴백
 
@@ -322,13 +334,18 @@ export class UnitView extends Container {
     let tex = null;
     for (const sid of this.spriteCands) {
       tex = this.textures.getSprite(sid, view, pose);
-      if (tex) break;
+      if (tex) {
+        if (isSpriteClip(pose)) {
+          const frames = this.textures.getSpriteClip(sid, view, pose);
+          if (frames) tex = frames[spriteFrameAt(pose, elapsedMs, loop)]!;
+        }
+        break;
+      }
     }
     if (!tex) return; // 전부 미로드 → 폴백 유지
 
     // 텍스처 높이를 SPRITE_DISPLAY_H에 맞게 스케일
-    const src = tex.source;
-    const srcH = src ? src.height : tex.height;
+    const srcH = tex.height;
     this.baseScale = srcH > 0 ? this.spriteHeight / srcH : 1;
 
     this.spriteBase.texture = tex;
@@ -339,13 +356,12 @@ export class UnitView extends Container {
   }
 
   /** baseScale × facing × 호흡 변위를 spriteBase에 반영.
-   *  SD 아트는 전 포즈 좌향(screen-left, §4 생성 규약)이라 facing=+1(우향)일 때 미러(scale.x<0) → -facing.
-   *  (idle/move/attack 동일 — 종전 attack만 +facing은 "우향 그림" 옛 가정 잔재로 공격이 반대로 나왔음.) */
+   * Source sheets normally face left; per-frame native-facing metadata also normalizes right-facing cuts. */
   private applyScale(): void {
     if (this.skeletonView) return; // 스켈레톤은 자체 클립이 변형 담당 — 스프라이트 스쿼시 미적용
     const taller = (1 + this.breathV) * this.fxSquashY;
     const narrower = (1 - this.breathV * 0.5) * this.fxSquashX; // 부피 보존감 — 늘면 살짝 좁게
-    const mirror = -this.facing;
+    const mirror = this.textures.spriteNativeFacing(this.spriteBase.texture) * this.facing;
     this.spriteBase.scale.set(this.baseScale * mirror * narrower, this.baseScale * taller);
   }
 
@@ -389,7 +405,11 @@ export class UnitView extends Container {
       }
       return;
     }
+    this.spriteBase.tint = this.bars && isLowHealth(this.troops, this.maxTroops)
+      ? lowHealthTint(this.idleElapsed) : 0xffffff;
     this.breathPhase += (dtMS / BREATH_PERIOD_MS) * Math.PI * 2;
+    this.idleElapsed += dtMS;
+    this.applySpriteTexture(this.view, "idle", this.idleElapsed, true);
     this.breathV = BREATH_AMP * Math.sin(this.breathPhase);
     this.applyScale();
   }
@@ -510,7 +530,30 @@ export class UnitView extends Container {
 
   faceToward(target: Coord): void {
     if (target.x !== this.gridX) this.setFacing(target.x > this.gridX ? 1 : -1);
+    this.setView(this.gridY, target.y);
+    const dx = target.x - this.gridX, dy = target.y - this.gridY;
+    const length = Math.hypot(dx, dy);
+    if (length > 0) this.attackVector = { x: dx / length, y: dy / length };
   }
+
+  private hasSpriteClip(pose: SpriteClip): boolean {
+    if (this.skeletonView || this.externalSceneArt) return false;
+    for (const sid of this.spriteCands) {
+      if (this.textures.getSprite(sid, this.view, pose))
+        return Boolean(this.textures.getSpriteClip(sid, this.view, pose));
+    }
+    return false;
+  }
+
+  get attackContactMs(): number { return this.hasSpriteClip("attack") ? ATTACK_CONTACT_MS : 110; }
+  get attackDurationMs(): number { return this.hasSpriteClip("attack") ? ATTACK_CLIP_MS : ATTACK_MS; }
+  get signatureFx(): "dual" | "crescent" | "spear" | null {
+    const id = this.spriteId?.split("/")[0];
+    return id === "liubei" ? "dual" : id === "guanyu" ? "crescent" : id === "zhangfei" ? "spear" : null;
+  }
+
+  /** Supporting attackers can match the lead attack's contact moment. */
+  playCoordinatedAttack(durationMs: number): Promise<void> { return this.playAttack(durationMs); }
 
   /**
    * 뷰 방향 업데이트: 이동 벡터 dy < 0(위쪽)이면 back, 아니면 front.
@@ -580,8 +623,8 @@ export class UnitView extends Container {
    * 방향·강도 지정 피격 (§4) — BattleRenderer.damageDealt가 공격 방향·피해비례 강도로 호출.
    * fromDir: 공격이 들어온 x방향(+1=오른쪽 공격자, -1=왼쪽). intensity: 0~1+ 넉백 가중.
    */
-  playHitFrom(fromDir: 1 | -1, intensity: number): Promise<void> {
-    return this.playHit(fromDir, intensity);
+  playHitFrom(fromDir: 1 | -1, intensity: number, guarded = false): Promise<void> {
+    return this.playHit(fromDir, intensity, guarded);
   }
 
   /**
@@ -605,6 +648,7 @@ export class UnitView extends Container {
         this.position.set(wf.x + (wt.x - wf.x) * t, wf.y + (wt.y - wf.y) * t);
         // move 클립을 타일당 1주기로 진행(걸음). 결정론 — t로 구동.
         if (this.skeletonView) this.skeletonView.setPose("move", t);
+        else this.applySpriteTexture(this.view, "move", ((i - 1) + t) * msPerTile, true);
       });
       this.gridX = to.x;
       this.gridY = to.y;
@@ -620,19 +664,22 @@ export class UnitView extends Container {
    * 돌진 정점에 스쿼시/스트레치(가로로 늘고 세로로 눌림)로 "찰진" 무게감.
    * 순수 표현 — 게임상태 불변, TweenRunner 경유라 배속 존중.
    */
-  private playAttack(): Promise<void> {
+  private playAttack(durationMs = this.attackDurationMs): Promise<void> {
+    this.breathing = false;
+    const animated = this.hasSpriteClip("attack");
     if (this.skeletonView) {
       // 스켈레톤: attack 클립을 ATTACK_MS 동안 1회 재생 + 컨테이너 lunge(위치)는 그대로 유지.
       this.skeletonView.setClip("attack");
     }
     this.applySpriteTexture(this.view, "attack");
     const ox = this.position.x;
-    const dir = this.facing;
+    const oy = this.position.y;
     // 구간 비율: 0~ANT_END 당김 / ANT_END~LUNGE_END 돌진 / 이후 복귀
     const ANT_END = 0.22;
     const LUNGE_END = 0.5;
     return this.tweens
-      .run(ATTACK_MS, (t) => {
+      .run(durationMs, (t) => {
+        if (animated) this.applySpriteTexture(this.view, "attack", t * ATTACK_CLIP_MS);
         let dx: number;
         let stretch = 0; // -1(눌림)~+1(늘어남)
         if (t < ANT_END) {
@@ -648,20 +695,21 @@ export class UnitView extends Container {
           dx = LUNGE_PX * (1 - k); // 복귀
           stretch = 0.22 * (1 - k);
         }
-        this.position.x = ox + dir * dx;
+        this.position.set(ox + this.attackVector.x * dx, oy + this.attackVector.y * dx);
         // 스켈레톤: 같은 t로 attack 클립 진행(배속 존중 — TweenRunner가 t를 구동).
         if (this.skeletonView) this.skeletonView.setPose("attack", t);
         // 가로 늘면 세로 눌림(부피 보존). 돌진=가로 강조.
-        this.fxSquashX = 1 + stretch * 0.5;
-        this.fxSquashY = 1 - stretch * 0.35;
+        this.fxSquashX = 1 + stretch * (animated ? 0.12 : 0.5);
+        this.fxSquashY = 1 - stretch * (animated ? 0.08 : 0.35);
         this.applyScale();
       })
       .then(() => {
-        this.position.x = ox;
+        this.position.set(ox, oy);
         this.fxSquashX = 1;
         this.fxSquashY = 1;
         this.applyScale();
         this.applySpriteTexture(this.view, "idle");
+        this.breathing = true;
         if (this.skeletonView) this.skeletonView.setPose("idle", this.idleT());
       });
   }
@@ -677,14 +725,18 @@ export class UnitView extends Container {
    * @param fromDir  공격이 들어온 방향(+1=오른쪽에서, -1=왼쪽에서). 넉백은 그 반대로.
    * @param intensity 넉백/스쿼시 가중 (기본 0.4). 1+면 강한 타격.
    */
-  private playHit(fromDir: 1 | -1 = 1, intensity = 0.4): Promise<void> {
+  private playHit(fromDir: 1 | -1 = 1, intensity = 0.4, guarded = false): Promise<void> {
+    this.breathing = false;
+    const pose = guarded ? "guard" : "hit";
+    this.applySpriteTexture(this.view, pose);
     const ox = this.position.x;
     const push = -fromDir; // 맞은 쪽 반대로 밀림
     const dist = KNOCKBACK_PX * (0.5 + intensity); // intensity로 넉백 거리 가중
-    this.activeBase.tint = 0xff8080;
+    this.activeBase.tint = guarded ? 0xb7d7ff : 0xff8080;
     if (this.skeletonView) this.skeletonView.setClip("hit");
     return this.tweens
       .run(HIT_MS, (t) => {
+        this.applySpriteTexture(this.view, pose, t * 240);
         if (this.skeletonView) this.skeletonView.setPose("hit", t);
         // 0~0.3 급격히 밀림(easeOut) → 0.3~1 탄성 복귀 + 감쇠 진동
         let dx: number;
@@ -710,6 +762,8 @@ export class UnitView extends Container {
         this.fxSquashY = 1;
         this.applyScale();
         if (this.skeletonView) this.skeletonView.setPose("idle", this.idleT());
+        this.applySpriteTexture(this.view, "idle");
+        this.breathing = true;
       });
   }
 

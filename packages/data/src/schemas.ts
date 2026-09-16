@@ -6,6 +6,9 @@ export const Stat = z.number().int().min(1).max(100);
 export const CommanderSchema = z.object({
   id: z.string(),            // 한글 이름 기반 (동명이인은 _2 접미)
   name: z.string(),
+  /** Authoring defaults; an explicit roster or battle placement still owns its class. */
+  defaultClassId: z.string().optional(),
+  battleRole: z.enum(['lord', 'melee', 'ranged', 'caster', 'support']).optional(),
   leadership: Stat,          // 통솔 → 방어 공식
   war: Stat,                 // 무력 → 공격 공식
   intelligence: Stat,        // 지력 → 책략치(MP)
@@ -82,7 +85,7 @@ export const UnitClassSchema = z.object({
 export type UnitClass = z.infer<typeof UnitClassSchema>;
 
 /** 상태이상 종류 (Phase D: 부동·금책·중독. 확장: confuse/debuff 후속). */
-export const StatusKindSchema = z.enum(["poison", "seal", "immobilize"]);
+export const StatusKindSchema = z.enum(["poison", "seal", "immobilize", "stun"]);
 export type StatusKind = z.infer<typeof StatusKindSchema>;
 
 /** 활성 상태이상 1건 (런타임 부여분). turns = 남은 지속 턴. */
@@ -338,6 +341,8 @@ export const StageEventSchema = z.object({
 export type StageEvent = z.infer<typeof StageEventSchema>;
 
 export const StageUnitSchema = z.object({
+  facing: z.enum(["left", "right"]).optional(),
+  exp: z.number().int().min(0).optional(),
   commanderId: z.string(),
   classId: z.string(),
   level: z.number().int().min(1).max(99),
@@ -616,6 +621,10 @@ export const MapSceneLineSchema = z.object({
 export const MapSceneSchema = z.object({
   map: z.string(),                                  // 씬 맵 id(maps/scene-*.json — index.ts 레지스트리 등록 필요)
   label: z.string().optional(),                     // 좌상단 장소 라벨
+  camera: z.object({
+    zoom: z.number().min(0.5).max(4).optional(), // multiplier over fit; omitted = actor-sized framing
+    focus: SceneCellSchema.optional(), // omitted = follow the speaking/moving actor
+  }).optional(),
   units: z.array(SceneUnitSchema).min(1),
   decorations: z.array(DecorationSchema).optional(),// 씬 소품(실내 탁자 등)
   lines: z.array(MapSceneLineSchema).min(1),
@@ -689,6 +698,30 @@ export const StageScenarioSchema = z.object({
 });
 export type StageScenario = z.infer<typeof StageScenarioSchema>;
 
+const ScriptAreaSchema = z.object({ x: z.number().int().min(0), y: z.number().int().min(0), width: z.number().int().min(1).max(100), height: z.number().int().min(1).max(100) });
+const ScriptTargetSchema = z.object({ side: SideSchema.optional(), unitIds: z.array(z.string().min(1)).optional(), area: ScriptAreaSchema.optional() });
+export const BattleScriptSchema = z.object({
+  id: z.string().min(1), name: z.string().min(1), enabled: z.boolean().optional(), editingMode: z.enum(["simple", "complex"]).optional(),
+  trigger: z.discriminatedUnion("kind", [
+    z.object({ kind: z.literal("turn"), turn: z.number().int().min(1), phase: SideSchema.default("player") }),
+    z.object({ kind: z.literal("enterArea"), target: ScriptTargetSchema.extend({ area: ScriptAreaSchema }) }),
+    z.object({ kind: z.literal("unitRetreated"), unitId: z.string().min(1) }),
+    z.object({ kind: z.literal("hpBelow"), unitId: z.string().min(1), percent: z.number().min(0).max(100) }),
+    z.object({ kind: z.literal("eventFired"), eventId: z.string().min(1) }),
+  ]),
+  actions: z.array(z.discriminatedUnion("kind", [
+    z.object({ kind: z.literal("message"), text: z.string().min(1).max(1000) }),
+    z.object({ kind: z.literal("fire"), area: ScriptAreaSchema, duration: z.number().int().min(1).max(20).default(3), damagePercent: z.number().min(0).max(100).default(10), spread: z.boolean().default(false), extinguishInRain: z.boolean().default(true), flammableOnly: z.boolean().default(true) }),
+    z.object({ kind: z.literal("effect"), effect: z.enum(["fire", "water", "rock", "special"]), area: ScriptAreaSchema }),
+    z.object({ kind: z.literal("damage"), target: ScriptTargetSchema, amount: z.number().min(0).max(99999), percent: z.boolean().default(false), nonlethal: z.boolean().default(false) }),
+    z.object({ kind: z.literal("heal"), target: ScriptTargetSchema, amount: z.number().min(0).max(99999), percent: z.boolean().default(false) }),
+    z.object({ kind: z.literal("status"), target: ScriptTargetSchema, status: StatusKindSchema, turns: z.number().int().min(1).max(20) }),
+    z.object({ kind: z.literal("weather"), weather: WeatherSchema }),
+    z.object({ kind: z.literal("reinforcement"), reinforcementId: z.string().min(1) }),
+  ])).min(1).max(100),
+});
+export type BattleScript = z.infer<typeof BattleScriptSchema>;
+
 export const StageSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -728,10 +761,30 @@ export const StageSchema = z.object({
     z.object({ kind: z.literal("lordRetreat"), unitId: z.string() }),
   ]).optional(),
   events: z.array(StageEventSchema),
+  scriptEvents: z.array(BattleScriptSchema).max(200).optional(),
 }).refine(
   (s) => (s.objectives && s.objectives.length > 0) || s.victory !== undefined,
   { message: "stage must define objectives or legacy victory" },
-);
+).superRefine((stage, ctx) => {
+  const scriptIds = new Set<string>();
+  for (const [i, script] of (stage.scriptEvents ?? []).entries()) {
+    if (scriptIds.has(script.id)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["scriptEvents", i, "id"], message: "duplicate script event id" });
+    scriptIds.add(script.id);
+  }
+  for (const [i, script] of (stage.scriptEvents ?? []).entries()) {
+    if (script.trigger.kind === "eventFired" && (!scriptIds.has(script.trigger.eventId) || script.trigger.eventId === script.id)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["scriptEvents", i, "trigger"], message: "missing or self-referencing script event" });
+    script.actions.forEach((action, j) => {
+      if (action.kind === "reinforcement" && !stage.reinforcements?.some(r => r.id === action.reinforcementId)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["scriptEvents", i, "actions", j], message: "unknown reinforcement group" });
+    });
+  }
+  const seen = new Set<string>();
+  const check = (unit: { commanderId: string }, path: (string | number)[]) => {
+    if (seen.has(unit.commanderId)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: [...path, "commanderId"], message: `duplicate commanderId: ${unit.commanderId}` });
+    seen.add(unit.commanderId);
+  };
+  stage.units.forEach((unit, i) => check(unit, ["units", i]));
+  stage.reinforcements?.forEach((group, i) => group.units.forEach((unit, j) => check(unit, ["reinforcements", i, "units", j])));
+});
 export type Stage = z.infer<typeof StageSchema>;
 
 /**

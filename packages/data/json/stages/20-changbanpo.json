@@ -19,67 +19,253 @@
   },
   "levelCap": 30,
   "scenario": {
-    "intro": {
-      "bg": "20-changbanpo-intro",
-      "lines": [
-        {
-          "text": "장판. 조조의 철기 오천이 밤을 새워 달려와 피난 행렬을 덮쳤다. 유비군은 — 산산이 흩어졌다."
+    "intro": [
+      {
+        "bg": "20-changbanpo-intro",
+        "lines": [
+          {
+            "text": "장판. 조조의 철기 오천이 밤을 새워 달려와 피난 행렬을 덮쳤다. 유비군은 — 산산이 흩어졌다."
+          }
+        ]
+      },
+      {
+        "map": "scene-refugee-road",
+        "label": "장판 · 돌아서는 백마",
+        "camera": {
+          "zoom": 1.6,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "text": "난군의 한복판에서 백마의 장수가 홀로 말머리를 돌렸다. 주공의 핏덩이 아들과 감부인이, 저 불바다 속에 남아 있었다."
+        "units": [
+          {
+            "id": "zhaoyun",
+            "sprite": "zhaoyun-field",
+            "cell": [
+              5,
+              4
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "난군의 한복판에서 백마의 장수가 홀로 말머리를 돌렸다. 주공의 핏덩이 아들과 감부인이, 저 불바다 속에 남아 있었다.",
+            "pose": [
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "조운",
+            "side": "player",
+            "portraitId": "조운",
+            "text": "조자룡, 단기필마로 적진을 되짚는다. 공자를 반드시 주공 품에 돌려드린다 — 목숨을 걸고.",
+            "pose": [
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              }
+            ],
+            "move": [
+              {
+                "id": "zhaoyun",
+                "to": [
+                  6,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "speaker": "조운",
+            "side": "player",
+            "portraitId": "조운",
+            "text": "십만 난군... 두렵지 않다. 두려운 것은 단 하나 — 늦는 것이다.",
+            "pose": [
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "zhaoyun",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "조운",
+            "side": "player",
+            "portraitId": "조운",
+            "text": "창 한 자루, 말 한 필. ...그것이면 족하다.",
+            "pose": [
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "이 밤이 끝났을 때, 천하는 '조자룡'이라는 이름을 다시 부르게 된다.",
+            "pose": [
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              }
+            ],
+            "exit": [
+              {
+                "id": "zhaoyun",
+                "to": [
+                  1,
+                  4
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "20-changbanpo-outro",
+        "lines": [
+          {
+            "text": "동이 틀 무렵, 피투성이 백마가 진영으로 돌아왔다. 품에 안긴 강보 속에서 아기 울음이 터졌다."
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-day",
+        "label": "진영 · 돌아온 자룡",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "조운",
-          "side": "player",
-          "portraitId": "조운",
-          "text": "조자룡, 단기필마로 적진을 되짚는다. 공자를 반드시 주공 품에 돌려드린다 — 목숨을 걸고."
-        },
-        {
-          "speaker": "조운",
-          "side": "player",
-          "portraitId": "조운",
-          "text": "십만 난군... 두렵지 않다. 두려운 것은 단 하나 — 늦는 것이다."
-        },
-        {
-          "speaker": "조운",
-          "side": "player",
-          "portraitId": "조운",
-          "text": "창 한 자루, 말 한 필. ...그것이면 족하다."
-        },
-        {
-          "text": "이 밤이 끝났을 때, 천하는 '조자룡'이라는 이름을 다시 부르게 된다."
-        }
-      ]
-    },
-    "outro": {
-      "bg": "20-changbanpo-outro",
-      "lines": [
-        {
-          "text": "동이 틀 무렵, 피투성이 백마가 진영으로 돌아왔다. 품에 안긴 강보 속에서 아기 울음이 터졌다."
-        },
-        {
-          "speaker": "조운",
-          "side": "player",
-          "portraitId": "조운",
-          "text": "주공! 아두 공자, 무사히 모셨습니다!"
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "이 핏덩이 하나 때문에 하마터면 명장을 잃을 뻔했다!"
-        },
-        {
-          "speaker": "조운",
-          "side": "player",
-          "portraitId": "조운",
-          "text": "주공...! 이 한 몸, 주공을 위해 백 번이라도 바치겠습니다."
-        },
-        {
-          "text": "필마단기로 십만 난군을 뚫은 이야기는, 그날로 천하의 전설이 되었다."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-leader",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "zhaoyun",
+            "sprite": "zhaoyun-rescue",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left",
+            "hidden": true
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "조운",
+            "side": "player",
+            "portraitId": "조운",
+            "text": "주공! 아두 공자, 무사히 모셨습니다!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "talk"
+              }
+            ],
+            "enter": [
+              {
+                "id": "zhaoyun",
+                "from": [
+                  10,
+                  4
+                ],
+                "to": [
+                  7,
+                  4
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "zhaoyun",
+                "dir": "left"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "이 핏덩이 하나 때문에 하마터면 명장을 잃을 뻔했다!",
+            "pose": [
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "liubei",
+                "to": [
+                  5,
+                  4
+                ]
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "조운",
+            "side": "player",
+            "portraitId": "조운",
+            "text": "주공...! 이 한 몸, 주공을 위해 백 번이라도 바치겠습니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "text": "필마단기로 십만 난군을 뚫은 이야기는, 그날로 천하의 전설이 되었다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
@@ -98,7 +284,7 @@
     {
       "commanderId": "유선",
       "classId": "civilian",
-      "level": 6,
+      "level": 18,
       "troops": 60,
       "items": [],
       "side": "ally",
@@ -108,7 +294,7 @@
     {
       "commanderId": "미축",
       "classId": "civilian",
-      "level": 8,
+      "level": 18,
       "troops": 80,
       "items": [],
       "side": "ally",
@@ -118,7 +304,7 @@
     {
       "commanderId": "손건",
       "classId": "civilian",
-      "level": 8,
+      "level": 18,
       "troops": 80,
       "items": [],
       "side": "ally",
@@ -128,7 +314,7 @@
     {
       "commanderId": "하후은",
       "classId": "heavyCavalry",
-      "level": 13,
+      "level": 18,
       "troops": 170,
       "items": [
         "청강검"
@@ -140,7 +326,7 @@
     {
       "commanderId": "조순",
       "classId": "lightCavalry",
-      "level": 12,
+      "level": 18,
       "troops": 130,
       "items": [],
       "side": "enemy",
@@ -150,7 +336,7 @@
     {
       "commanderId": "하후돈",
       "classId": "heavyCavalry",
-      "level": 13,
+      "level": 18,
       "troops": 150,
       "items": [],
       "side": "enemy",
@@ -160,7 +346,7 @@
     {
       "commanderId": "우금",
       "classId": "archer",
-      "level": 12,
+      "level": 18,
       "troops": 120,
       "items": [],
       "side": "enemy",
@@ -170,7 +356,7 @@
     {
       "commanderId": "이전",
       "classId": "archer",
-      "level": 12,
+      "level": 18,
       "troops": 120,
       "items": [],
       "side": "enemy",
@@ -180,7 +366,7 @@
     {
       "commanderId": "악진",
       "classId": "footman",
-      "level": 12,
+      "level": 18,
       "troops": 130,
       "items": [],
       "side": "enemy",
@@ -190,7 +376,7 @@
     {
       "commanderId": "조인",
       "classId": "lightCavalry",
-      "level": 12,
+      "level": 18,
       "troops": 130,
       "items": [],
       "side": "enemy",
@@ -200,7 +386,7 @@
     {
       "commanderId": "하후연",
       "classId": "archer",
-      "level": 12,
+      "level": 18,
       "troops": 115,
       "items": [],
       "side": "enemy",
@@ -210,7 +396,7 @@
     {
       "commanderId": "조홍",
       "classId": "footman",
-      "level": 11,
+      "level": 18,
       "troops": 110,
       "items": [],
       "side": "enemy",
@@ -222,7 +408,7 @@
     {
       "kind": "reachTile",
       "unitId": "조운",
-      "x": 34,
+      "x": 33,
       "y": 18
     },
     {
@@ -260,7 +446,7 @@
         {
           "commanderId": "조진",
           "classId": "lightCavalry",
-          "level": 11,
+          "level": 18,
           "troops": 110,
           "items": [],
           "side": "enemy",
@@ -270,7 +456,7 @@
         {
           "commanderId": "조휴",
           "classId": "archer",
-          "level": 11,
+          "level": 18,
           "troops": 100,
           "items": [],
           "side": "enemy",

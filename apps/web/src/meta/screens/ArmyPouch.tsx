@@ -5,7 +5,7 @@
  * 칩 탭 = 효과 상세(ItemInfoPopup, 정보 전용). 장착 개념 없음.
  */
 import { useMemo, useState } from "react";
-import { gameData } from "@tk/data";
+import { gameData } from "../../game/data";
 import { ItemIcon } from "../../ui/ItemIcon";
 import { ItemInfoPopup } from "../../ui/ItemInfoPopup";
 import { INK_PANEL, GOLD, GOLD_BRIGHT, GOLD_DIM, DIM_TEXT, PARCHMENT, SEAL_RED, SERIF } from "./formationUi";
@@ -34,7 +34,7 @@ export function ArmyPouch({ consumables }: { consumables: readonly string[] }): 
       padding: "9px 12px 11px",
       fontFamily: SERIF,
     }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
         <span style={{
           width: 20, height: 20, borderRadius: 4, flexShrink: 0,
           background: `linear-gradient(135deg, ${SEAL_RED}, #6a1e14)`,
@@ -42,10 +42,10 @@ export function ArmyPouch({ consumables }: { consumables: readonly string[] }): 
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           fontSize: 12, fontWeight: 900, color: "#f0e2c8",
         }}>庫</span>
-        <span style={{ fontSize: 12.5, fontWeight: 700, color: GOLD_BRIGHT, letterSpacing: "0.1em" }}>
+        <span style={{ whiteSpace: "nowrap", fontSize: 13, fontWeight: 700, color: GOLD_BRIGHT, letterSpacing: "0.1em" }}>
           부대 소지품
         </span>
-        <span style={{ fontSize: 10.5, color: DIM_TEXT }}>
+        <span style={{ fontSize: 12, color: DIM_TEXT }}>
           전투 중 「도구」로 아무 아군이나 사용 (부대 공유)
         </span>
       </div>

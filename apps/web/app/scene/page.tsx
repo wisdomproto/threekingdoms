@@ -10,13 +10,13 @@
  */
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { isComicScene, normalizeSceneSlot, stages } from "@tk/data";
+import { isComicScene, normalizeSceneSlot, stages } from "../../src/game/data";
 import { ScenePlayer } from "../../src/scene/ScenePlayer";
 import { MapScenePlayer } from "../../src/scene/MapScenePlayer";
 import { ComicScenePlayer } from "../../src/scene/ComicScenePlayer";
 import { nextStageId } from "../../src/meta/campaign";
 import { useFadeNav } from "../../src/ui/useFadeNav";
-import { readLab, leaveSandbox, LAB_STAGE_ID, type LabPayload } from "../../src/lab/lab";
+import { readLab, completeSandbox, LAB_STAGE_ID, type LabPayload } from "../../src/lab/lab";
 
 type SceneType = "intro" | "outro" | "outroDefeat";
 
@@ -67,7 +67,7 @@ function SceneRoute(): React.ReactElement | null {
   useEffect(() => {
     if (labPending) return;
     if (parts.length === 0) {
-      if (lab) leaveSandbox((to) => router.push(to), lab);
+      if (lab) completeSandbox((to) => router.push(to), "completed", lab);
       else router.push(target());
     }
   }, [labPending, parts.length, router, target, lab]);
@@ -77,7 +77,7 @@ function SceneRoute(): React.ReactElement | null {
   const playerKey = `${stageId}:${type}:${replay}:${pi}`;
   const next = (): void => {
     if (pi >= parts.length - 1) {
-      if (lab) leaveSandbox((to) => router.push(to), lab);
+      if (lab) completeSandbox((to) => router.push(to), "completed", lab);
       else fadeTo(target());
     }
     else setPi((i) => i + 1);
@@ -87,7 +87,7 @@ function SceneRoute(): React.ReactElement | null {
       {isComicScene(part) ? (
         <ComicScenePlayer key={playerKey} scene={part} title={stage?.name} onComplete={next} />
       ) : "map" in part ? (
-        <MapScenePlayer key={playerKey} scene={part} title={stage?.name} onComplete={next} />
+        <MapScenePlayer key={playerKey} scene={part} maps={lab?.sceneMaps ?? (lab ? { [lab.map.id]: lab.map } : undefined)} title={stage?.name} onComplete={next} />
       ) : (
         <ScenePlayer key={playerKey} scene={part} title={stage?.name} onComplete={next} />
       )}

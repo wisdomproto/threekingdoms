@@ -2,7 +2,7 @@
   "id": "23-jiangxia",
   "name": "강하 방어전",
   "mapId": "jiangxia",
-  "turnLimit": 35,
+  "turnLimit": 21,
   "camera": {
     "zoom": 1.6,
     "focus": [
@@ -17,67 +17,261 @@
   },
   "levelCap": 44,
   "scenario": {
-    "intro": {
-      "bg": "23-jiangxia-intro",
-      "lines": [
-        {
-          "text": "강하에서 숨을 고르는 사이, 제갈량은 홀로 강동에 건너가 세 치 혀로 손권을 움직였다. 손유동맹 — 적벽의 판이 짜인 것이다."
+    "intro": [
+      {
+        "bg": "23-jiangxia-intro",
+        "lines": [
+          {
+            "text": "강하에서 숨을 고르는 사이, 제갈량은 홀로 강동에 건너가 세 치 혀로 손권을 움직였다. 손유동맹 — 적벽의 판이 짜인 것이다."
+          }
+        ]
+      },
+      {
+        "map": "scene-river-landing",
+        "label": "강하 · 동맹의 첫 싸움",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "제갈량",
-          "side": "player",
-          "portraitId": "제갈량",
-          "text": "손권이 주유에게 수군 삼만을 주어 서진시켰습니다. 이제 조조와 싸울 '판'이 생겼습니다."
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-leader",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-leader",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "zhugeliang",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "제갈량",
+            "side": "player",
+            "portraitId": "제갈량",
+            "text": "손권이 주유에게 수군 삼만을 주어 서진시켰습니다. 이제 조조와 싸울 '판'이 생겼습니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "허나 조조의 선봉이 먼저 왔소. 주유의 본대가 닿기 전에 강하가 뚫리면 — 동맹도 거기서 끝이오.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "수상전입니다. 배를 잇고 진을 짜서, 장무의 선봉을 물 위에서 꺾지요.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "적벽의 결전까지 — 강하를 사수한다!",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "liubei",
+                "to": [
+                  5,
+                  4
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "23-jiangxia-outro",
+        "lines": [
+          {
+            "text": "장무의 선단이 물러난 강 위로 — 동오의 대함대가 위용을 드러냈다. 주유의 본대가 당도한 것이다."
+          }
+        ]
+      },
+      {
+        "map": "scene-command-deck",
+        "label": "함상 · 두 천재",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "허나 조조의 선봉이 먼저 왔소. 주유의 본대가 닿기 전에 강하가 뚫리면 — 동맹도 거기서 끝이오."
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "수상전입니다. 배를 잇고 진을 짜서, 장무의 선봉을 물 위에서 꺾지요."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "적벽의 결전까지 — 강하를 사수한다!"
-        }
-      ]
-    },
-    "outro": {
-      "bg": "23-jiangxia-outro",
-      "lines": [
-        {
-          "text": "장무의 선단이 물러난 강 위로 — 동오의 대함대가 위용을 드러냈다. 주유의 본대가 당도한 것이다."
-        },
-        {
-          "speaker": "주유",
-          "side": "ally",
-          "portraitId": "주유",
-          "text": "과연 제갈공명의 군세로군. ...허나 이 적벽의 주인은 나, 주유요."
-        },
-        {
-          "speaker": "제갈량",
-          "side": "player",
-          "portraitId": "제갈량",
-          "text": "도독의 화공, 이 제갈량이 동남풍으로 돕지요."
-        },
-        {
-          "text": "두 천재의 시선이 강 위에서 맞부딪혔다. 동맹이면서 — 경쟁이었다."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "zhouyu",
+            "sprite": "zhouyu-robes",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right",
+            "hidden": true
+          },
+          {
+            "id": "zhugeliang",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "주유",
+            "side": "ally",
+            "portraitId": "주유",
+            "text": "과연 제갈공명의 군세로군. ...허나 이 적벽의 주인은 나, 주유요.",
+            "pose": [
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "zhouyu",
+                "pose": "talk"
+              }
+            ],
+            "enter": [
+              {
+                "id": "zhouyu",
+                "from": [
+                  10,
+                  4
+                ],
+                "to": [
+                  4,
+                  4
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "zhouyu",
+                "dir": "right"
+              }
+            ]
+          },
+          {
+            "speaker": "제갈량",
+            "side": "player",
+            "portraitId": "제갈량",
+            "text": "도독의 화공, 이 제갈량이 동남풍으로 돕지요.",
+            "pose": [
+              {
+                "id": "zhouyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "text": "두 천재의 시선이 강 위에서 맞부딪혔다. 동맹이면서 — 경쟁이었다.",
+            "pose": [
+              {
+                "id": "zhouyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "유비",
       "classId": "lord",
-      "level": 38,
+      "level": 23,
       "troops": 320,
       "items": [
         "옥새"
@@ -89,7 +283,7 @@
     {
       "commanderId": "관우",
       "classId": "lightCavalry",
-      "level": 39,
+      "level": 23,
       "troops": 350,
       "items": [
         "청룡언월도",
@@ -102,7 +296,7 @@
     {
       "commanderId": "장비",
       "classId": "lightCavalry",
-      "level": 39,
+      "level": 23,
       "troops": 350,
       "items": [
         "사모"
@@ -114,7 +308,7 @@
     {
       "commanderId": "조운",
       "classId": "lightCavalry",
-      "level": 38,
+      "level": 23,
       "troops": 340,
       "items": [
         "삼첨도"
@@ -126,7 +320,7 @@
     {
       "commanderId": "제갈량",
       "classId": "strategist",
-      "level": 37,
+      "level": 23,
       "troops": 250,
       "items": [
         "둔갑천서",
@@ -139,7 +333,7 @@
     {
       "commanderId": "관평",
       "classId": "lightCavalry",
-      "level": 35,
+      "level": 23,
       "troops": 280,
       "items": [],
       "side": "player",
@@ -149,7 +343,7 @@
     {
       "commanderId": "주창",
       "classId": "bandit",
-      "level": 35,
+      "level": 23,
       "troops": 270,
       "items": [],
       "side": "player",
@@ -159,7 +353,7 @@
     {
       "commanderId": "미축",
       "classId": "sorcerer",
-      "level": 34,
+      "level": 23,
       "troops": 220,
       "items": [
         "상약",
@@ -172,7 +366,7 @@
     {
       "commanderId": "손권",
       "classId": "lord",
-      "level": 36,
+      "level": 22,
       "troops": 300,
       "items": [],
       "side": "ally",
@@ -182,7 +376,7 @@
     {
       "commanderId": "주유",
       "classId": "strategist",
-      "level": 36,
+      "level": 22,
       "troops": 260,
       "items": [],
       "side": "ally",
@@ -192,7 +386,7 @@
     {
       "commanderId": "장무",
       "classId": "heavyCavalry",
-      "level": 38,
+      "level": 24,
       "troops": 330,
       "items": [
         "적로"
@@ -204,7 +398,7 @@
     {
       "commanderId": "진손",
       "classId": "lightCavalry",
-      "level": 38,
+      "level": 24,
       "troops": 320,
       "items": [],
       "side": "enemy",
@@ -214,7 +408,7 @@
     {
       "commanderId": "여건",
       "classId": "footman",
-      "level": 35,
+      "level": 22,
       "troops": 280,
       "items": [],
       "side": "enemy",
@@ -224,7 +418,7 @@
     {
       "commanderId": "왕개",
       "classId": "archer",
-      "level": 35,
+      "level": 22,
       "troops": 250,
       "items": [],
       "side": "enemy",
@@ -234,7 +428,7 @@
     {
       "commanderId": "양앙",
       "classId": "footman",
-      "level": 34,
+      "level": 22,
       "troops": 260,
       "items": [],
       "side": "enemy",
@@ -244,7 +438,7 @@
     {
       "commanderId": "조성",
       "classId": "archer",
-      "level": 34,
+      "level": 22,
       "troops": 240,
       "items": [],
       "side": "enemy",
@@ -255,7 +449,7 @@
   "objectives": [
     {
       "kind": "surviveTurns",
-      "turns": 35
+      "turns": 18
     },
     {
       "kind": "defeatUnit",
@@ -281,7 +475,7 @@
         {
           "commanderId": "학맹",
           "classId": "footman",
-          "level": 34,
+          "level": 22,
           "troops": 250,
           "items": [],
           "side": "enemy",
@@ -291,7 +485,7 @@
         {
           "commanderId": "조잠",
           "classId": "archer",
-          "level": 34,
+          "level": 22,
           "troops": 230,
           "items": [],
           "side": "enemy",

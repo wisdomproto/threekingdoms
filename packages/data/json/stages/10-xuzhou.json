@@ -19,81 +19,420 @@
   },
   "levelCap": 20,
   "scenario": {
-    "intro": {
-      "bg": "10-xuzhou-intro",
-      "lines": [
-        {
-          "text": "조조가 아버지의 원수를 갚겠다며 서주로 창끝을 돌렸다. 지나는 성마다 도륙 — 서주목 도겸은 사방에 구원의 사자를 띄웠다."
+    "intro": [
+      {
+        "bg": "10-xuzhou-intro",
+        "lines": [
+          {
+            "text": "조조가 아버지의 원수를 갚겠다며 서주로 창끝을 돌렸다. 지나는 성마다 도륙 — 서주목 도겸은 사방에 구원의 사자를 띄웠다."
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-day",
+        "label": "서주의 사자들",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "text": "유비의 진영에도 사자가 당도했다. 흙먼지를 뒤집어쓴 젊은 문관과, 그를 호위해 온 무장 하나."
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-official",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-official",
+            "cell": [
+              3,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-official",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "chendeng",
+            "sprite": "chendeng-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left",
+            "hidden": true
+          },
+          {
+            "id": "mifang",
+            "sprite": "mifang-robes",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left",
+            "hidden": true
+          }
+        ],
+        "lines": [
+          {
+            "text": "유비의 진영에도 사자가 당도했다. 흙먼지를 뒤집어쓴 젊은 문관과, 그를 호위해 온 무장 하나.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ],
+            "enter": [
+              {
+                "id": "chendeng",
+                "from": [
+                  10,
+                  4
+                ],
+                "to": [
+                  7,
+                  4
+                ]
+              },
+              {
+                "id": "mifang",
+                "from": [
+                  10,
+                  3
+                ],
+                "to": [
+                  7,
+                  3
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "chendeng",
+                "dir": "left"
+              },
+              {
+                "id": "mifang",
+                "dir": "left"
+              }
+            ]
+          },
+          {
+            "speaker": "진등",
+            "side": "ally",
+            "portraitId": "진등",
+            "text": "서주의 진등이라 합니다. 도겸 공을 대신해 엎드려 청합니다 — 서주 백성 수십만의 목숨이 경각에 달렸습니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "mifang",
+                "pose": "idle"
+              },
+              {
+                "id": "chendeng",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "미방",
+            "side": "ally",
+            "portraitId": "미방",
+            "text": "미방입니다. 형님께서 이미 공을 모시고 있지 않습니까 — 서주의 미가도 힘을 보태겠습니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "chendeng",
+                "pose": "idle"
+              },
+              {
+                "id": "mifang",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "조조가 백성을 도륙한다고? 그게 사람 새끼가 할 짓이오?!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "chendeng",
+                "pose": "idle"
+              },
+              {
+                "id": "mifang",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "talk"
+              }
+            ],
+            "bubble": {
+              "id": "zhangfei",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "조조의 군세는 우리 열 배입니다. 허나 성에 기대 보름만 버티면 — 군량이 다한 조조는 물러갑니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "chendeng",
+                "pose": "idle"
+              },
+              {
+                "id": "mifang",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "간다. 열닷새 — 서주를 지킨다. 수성이다!",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "chendeng",
+                "pose": "idle"
+              },
+              {
+                "id": "mifang",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "liubei",
+                "to": [
+                  5,
+                  4
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "10-xuzhou-outro",
+        "lines": [
+          {
+            "text": "보름째 아침, 조조군의 진영이 비어 있었다. 군량이 다한 것이다 — 서주는 지켜졌다."
+          }
+        ]
+      },
+      {
+        "map": "scene-council-hall",
+        "label": "서주 · 백성을 맡기다",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "진등",
-          "side": "ally",
-          "portraitId": "진등",
-          "text": "서주의 진등이라 합니다. 도겸 공을 대신해 엎드려 청합니다 — 서주 백성 수십만의 목숨이 경각에 달렸습니다."
-        },
-        {
-          "speaker": "미방",
-          "side": "ally",
-          "portraitId": "미방",
-          "text": "미방입니다. 형님께서 이미 공을 모시고 있지 않습니까 — 서주의 미가도 힘을 보태겠습니다."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "조조가 백성을 도륙한다고? 그게 사람 새끼가 할 짓이오?!"
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "조조의 군세는 우리 열 배입니다. 허나 성에 기대 보름만 버티면 — 군량이 다한 조조는 물러갑니다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "간다. 열닷새 — 서주를 지킨다. 수성이다!"
-        }
-      ]
-    },
-    "outro": {
-      "bg": "10-xuzhou-outro",
-      "lines": [
-        {
-          "text": "보름째 아침, 조조군의 진영이 비어 있었다. 군량이 다한 것이다 — 서주는 지켜졌다."
-        },
-        {
-          "speaker": "백성",
-          "side": "player",
-          "text": "성문이 열렸다! 유 사군께서 서주를 지켜내셨다!!"
-        },
-        {
-          "speaker": "도겸",
-          "side": "ally",
-          "portraitId": "도겸",
-          "text": "현덕... 이 늙은이가 부탁하오. 서주를, 이 백성들을 그대에게 맡기고 싶소."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "당치 않습니다. 허나... 백성을 버릴 수는 없지요. 곁에서 돕겠습니다."
-        },
-        {
-          "text": "서주 사람들은 그날부터 유비를 '사군(使君)'이라 불렀다."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-official",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "civilian",
+            "sprite": "civilian-scene",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "taoqian",
+            "sprite": "taoqian-robes",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "백성",
+            "side": "player",
+            "text": "성문이 열렸다! 유 사군께서 서주를 지켜내셨다!!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "taoqian",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "civilian",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "도겸",
+            "side": "ally",
+            "portraitId": "도겸",
+            "text": "현덕... 이 늙은이가 부탁하오. 서주를, 이 백성들을 그대에게 맡기고 싶소.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              },
+              {
+                "id": "taoqian",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "당치 않습니다. 허나... 백성을 버릴 수는 없지요. 곁에서 돕겠습니다.",
+            "pose": [
+              {
+                "id": "civilian",
+                "pose": "idle"
+              },
+              {
+                "id": "taoqian",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "text": "서주 사람들은 그날부터 유비를 '사군(使君)'이라 불렀다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              },
+              {
+                "id": "taoqian",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "유비",
       "classId": "lord",
-      "level": 8,
+      "level": 10,
       "troops": 150,
       "items": [],
       "side": "player",
@@ -103,7 +442,7 @@
     {
       "commanderId": "관우",
       "classId": "lightCavalry",
-      "level": 9,
+      "level": 10,
       "troops": 160,
       "items": [
         "청룡언월도"
@@ -115,7 +454,7 @@
     {
       "commanderId": "장비",
       "classId": "lightCavalry",
-      "level": 9,
+      "level": 10,
       "troops": 160,
       "items": [
         "사모"
@@ -127,7 +466,7 @@
     {
       "commanderId": "조운",
       "classId": "lightCavalry",
-      "level": 8,
+      "level": 10,
       "troops": 150,
       "items": [],
       "side": "player",
@@ -137,7 +476,7 @@
     {
       "commanderId": "미축",
       "classId": "strategist",
-      "level": 7,
+      "level": 10,
       "troops": 110,
       "items": [
         "쌀"
@@ -149,7 +488,7 @@
     {
       "commanderId": "손건",
       "classId": "strategist",
-      "level": 7,
+      "level": 10,
       "troops": 110,
       "items": [],
       "side": "player",
@@ -159,7 +498,7 @@
     {
       "commanderId": "도겸",
       "classId": "lord",
-      "level": 6,
+      "level": 8,
       "troops": 120,
       "items": [],
       "side": "ally",
@@ -169,7 +508,7 @@
     {
       "commanderId": "하후돈",
       "classId": "heavyCavalry",
-      "level": 9,
+      "level": 11,
       "troops": 135,
       "items": [],
       "side": "enemy",
@@ -179,7 +518,7 @@
     {
       "commanderId": "우금",
       "classId": "footman",
-      "level": 9,
+      "level": 11,
       "troops": 140,
       "items": [],
       "side": "enemy",
@@ -189,7 +528,7 @@
     {
       "commanderId": "하후연",
       "classId": "archer",
-      "level": 8,
+      "level": 10,
       "troops": 120,
       "items": [],
       "side": "enemy",
@@ -199,7 +538,7 @@
     {
       "commanderId": "이전",
       "classId": "footman",
-      "level": 8,
+      "level": 10,
       "troops": 120,
       "items": [],
       "side": "enemy",
@@ -209,7 +548,7 @@
     {
       "commanderId": "악진",
       "classId": "archer",
-      "level": 8,
+      "level": 10,
       "troops": 110,
       "items": [],
       "side": "enemy",
@@ -219,7 +558,7 @@
     {
       "commanderId": "조인",
       "classId": "lightCavalry",
-      "level": 8,
+      "level": 10,
       "troops": 110,
       "items": [],
       "side": "enemy",
@@ -262,7 +601,7 @@
         {
           "commanderId": "태사자",
           "classId": "lightCavalry",
-          "level": 10,
+          "level": 12,
           "troops": 160,
           "items": [],
           "side": "ally",

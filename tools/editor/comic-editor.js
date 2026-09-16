@@ -52,7 +52,7 @@ const THUMB_W = 300, DRAG_MIN = 3;   // 회색 박스 3:4 · 클릭(3px 미만)�
 const selected = new WeakMap();
 
 let comicFiles = null;   // GET /list-dir?path=assets/comics → 확장자 뗀 이름들. 디렉터리 없음·serve.py 아님 → []
-const loadComicFiles = () => (comicFiles ??= fetch("/list-dir?path=assets/comics").then((r) => r.json())
+const loadComicFiles = () => (comicFiles ??= fetch(location.pathname === '/api/studio/legacy/stage-editor.html' ? '/api/studio/legacy/comic-files' : "/list-dir?path=assets/comics").then((r) => r.json())
   .then((j) => (j?.files ?? []).filter((f) => /\.webp$/i.test(f)).map((f) => f.replace(/\.webp$/i, ""))).catch(() => []));
 
 const CSS = `

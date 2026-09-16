@@ -7,6 +7,6 @@ export function probeAssets(stage: Json, base: string): Promise<string[]>;
 export function describeDiff(d: StageDiff): string;
 export interface PublishResult { ok: boolean; wrote?: string[]; backup?: { stage?: boolean; map?: boolean }; at?: string; rolledBack?: boolean; output?: string; error?: string; restored?: string[] }
 export function openPublishModal(p: {
-  stage: Json; stageText: string; mapText?: string | null; repoStage: Json | null; localErrors: string[];
+  stage: Json; stageText: string; mapText?: string | null; baseRevision?: number | null; repoStage: Json | null; localErrors: string[];
   probe: () => Promise<string[]>; onPublished?: (r: PublishResult) => void; onRolledBack?: (r: PublishResult) => void;
 }): HTMLElement;

@@ -13,7 +13,11 @@ const TL_INPUT = `Array.from(document.querySelectorAll('input[type=number]')).fi
 const CHIP = "document.getElementById('saveState').textContent";
 const BADGE = "document.querySelector('[data-testid=draft-badge]').textContent";
 const POST = (ep, body) => `fetch(${JSON.stringify(ep)}, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(${body}) }).then(r => r.status)`;
-const DEL = POST("/draft-delete", `{ stageId: ${JSON.stringify(ID)} }`);
+const DEL = `(async () => {
+  const index = await fetch('/draft-list', { cache: 'no-store' }).then(r => r.json());
+  const revision = index.drafts[${JSON.stringify(ID)}]?.revision ?? null;
+  return ${POST("/draft-delete", `{ stageId: ${JSON.stringify(ID)}, baseRevision: revision }`)};
+})()`;
 const FILE_STATUS = `fetch(${JSON.stringify(DRAFT_URL)}, { cache: 'no-store' }).then(r => r.status)`;
 const FILE_TL = `fetch(${JSON.stringify(DRAFT_URL)}, { cache: 'no-store' }).then(r => r.ok ? r.json().then(j => j.turnLimit) : 'http ' + r.status)`;
 const tl0 = JSON.parse(readFileSync(path.join(REPO, `packages/data/json/stages/${ID}.json`), "utf8")).turnLimit;

@@ -10,6 +10,9 @@
  * commanderId는 packages/data/json/stages/*.json의 "commanderId" 값과 1:1.
  */
 import type { Side } from "@tk/data";
+import campaignSpriteVariants from './campaignSpriteVariants.json';
+import rejectedSpriteVariants from './rejectedSpriteVariants.json';
+const rejectedSprites = new Set<string>(rejectedSpriteVariants);
 
 /**
  * commanderId(한국어) → spriteId **override**. 기본 규칙은 "commanderId가 곧 spriteId"라
@@ -18,6 +21,17 @@ import type { Side } from "@tk/data";
  * 즉 포즈시트를 만들어 `sprites/{이름}/`에 넣으면 매핑 없이 자동 사용, 없으면 제네릭.
  */
 export const COMMANDER_SPRITE_MAP: Record<string, string> = {
+  // Troy uses its own artwork with the same shared animation clip contract.
+  achilles: "troia-achilles",
+  patroclus: "troia-patroclus",
+  diores: "troia-diores",
+  "greek-spear": "troia-greek-spear",
+  "greek-archer": "troia-greek-archer",
+  "trojan-spear-1": "troia-trojan-spear",
+  "trojan-spear-2": "troia-trojan-spear",
+  "trojan-spear-3": "troia-trojan-spear",
+  "trojan-archer-1": "troia-trojan-archer",
+  "trojan-archer-2": "troia-trojan-archer",
   관우: "guanyu",
   유비: "liubei",
   장비: "zhangfei",
@@ -84,6 +98,37 @@ const CLASS_LINE_REP: Record<string, string> = {
 export function spriteCandidates(commanderId: string, classId: string, side: Side, tier = 1): string[] {
   const out: string[] = [];
   if (commanderId) {
+    const variants = (campaignSpriteVariants as Record<string, Record<string, string>>)[commanderId];
+    let family = classId;
+    let campaignArt = variants?.[family];
+    while (!campaignArt && CLASS_LINE_REP[family]) {
+      family = CLASS_LINE_REP[family]!;
+      campaignArt = variants?.[family];
+    }
+    if (campaignArt) {
+      if (tier >= 2) out.push(`${campaignArt}/t${Math.min(3, tier)}`);
+      out.push(campaignArt);
+    }
+    const classArt = commanderId === "이숙" && ["archer", "crossbowman", "catapult"].includes(classId) ? "이숙-archer"
+      : commanderId === "호진" && ["footman", "pikeman", "chariot"].includes(classId) ? "호진-footman"
+      : commanderId === "호진" && ["lightCavalry", "heavyCavalry", "guardCavalry"].includes(classId) ? "호진-cavalry"
+      : commanderId === "이숙" && ["lightCavalry", "heavyCavalry", "guardCavalry"].includes(classId) ? "이숙-cavalry"
+      : commanderId === "이각" && ["footman", "pikeman", "chariot"].includes(classId) ? "lijue"
+      : commanderId === "곽사" && ["footman", "pikeman", "chariot"].includes(classId) ? "guosi-footman"
+      : commanderId === "곽사" && ["archer", "crossbowman", "catapult"].includes(classId) ? "guosi-archer"
+      : commanderId === "서영" && ["footman", "pikeman", "chariot"].includes(classId) ? "xurong-footman"
+      : commanderId === "서영" && ["lightCavalry", "heavyCavalry", "guardCavalry"].includes(classId) ? "xurong-cavalry"
+      : commanderId === "송겸" && ["footman", "pikeman", "chariot"].includes(classId) ? "송겸-footman"
+      : commanderId === "송겸" && ["archer", "crossbowman", "catapult"].includes(classId) ? "송겸-archer" : null;
+    if (classArt) {
+      if (tier >= 2) out.push(`${classArt}/t${Math.min(3, tier)}`);
+      out.push(classArt);
+    }
+    // Liu Pi appears as an archer at Guangzong and a bandit at Zhang Jue's battle.
+    if (commanderId === '유벽' && ['bandit','brigand','outlaw'].includes(classId)) {
+      if (tier >= 2) out.push(`유벽-bandit/t${Math.min(3,tier)}`);
+      out.push('유벽-bandit');
+    }
     const base = COMMANDER_SPRITE_MAP[commanderId] || commanderId;
     if (tier >= 2) out.push(`${base}/t${Math.min(3, tier)}`);
     out.push(base);
@@ -113,7 +158,7 @@ export function spriteCandidates(commanderId: string, classId: string, side: Sid
       out.push(lineTpl);
     }
   }
-  return [...new Set(out)];
+  return [...new Set(out)].filter(id => !rejectedSprites.has(id));
 }
 
 /**

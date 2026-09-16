@@ -122,6 +122,8 @@
 
 ### 레벨
 - 행동 기반 경험치 (막타 몰아주기 육성 유지)
+- 출진 시 저장된 경험치를 `StageUnit.exp`로 전달하고 초기 생성·증원에서 유지한다(생략 시 0). 2026-09-14: 출진 화면에 로드한 경험치가 전투 생성에서 다시 0이 되던 누락을 수정했다.
+- 공격 책략도 대상별 피해·격파 경험치를 일반 공격과 같은 공식으로 지급한다. 아군 책략의 격파마다 콤보·자금 보상을 한 번 지급하며, 한 번의 범위 책략은 시전 시작 시 능력치를 사용한다(대상 처리 중 레벨업이 남은 대상의 위력을 바꾸지 않음). 회복·날씨 책략의 경험치 규칙은 이번 변경에 포함하지 않는다.
 - **레벨캡 = 스테이지 진행 연동** (예: 스테이지번호 × 1.5 + 5) — 밸런스 시뮬레이션의 전제조건
 - 노가다 파밍 루트 없음
 - ✅ **레벨/경험치 영속(2026-06-28)**: 전투 후 아군 final level/exp를 `metaStore.rosterProgress`에 저장(결산 `applyRosterProgress`) → 다음 출진 `selectRoster`가 로드. 종전엔 결산이 골드/클리어/보물만 저장하고 레벨·exp는 안 써(+`UnitVM`에 exp 필드 누락) 레벨업이 출진 화면에 반영 안 되던 버그.
@@ -152,6 +154,12 @@
 
 ---
 ## 11. 난이도·회차 설계
+
+### 2026-09-15 campaign pacing revision
+
+User-approved direction: chapter 1 teaches basic play, chapter 2 introduces formation and protection, chapter 3 varies objectives, chapter 4 emphasizes escort/escape decisions, and chapter 5 combines terrain and events. Challenge peaks alternate with relief battles; do not increase every enemy's HP uniformly. Automatic battle may fail in later chapters; the casual manual-completion target remains. Correct blocked enemy navigation and duplicate Chibi demonstration events before calibration. Measure real roster progression and starting equipment separately from authored standalone stage levels. Preserve player saves and unrelated editor changes during synchronization.
+
+Implemented: authored player levels follow battle order (1–27). Reserve training sets a minimum level of `min(30, 1 + unique cleared battles)` at formation; existing higher levels and equipped items are retained. Replays do not raise this floor. Xiaopei holds for 9 turns and Jiangxia for 18; Chibi has one official fire event beginning on turn 4. The authored setup and the actual campaign are separate measurement cohorts. Multi-seed results and limitations: `docs/reference/difficulty-tuning-2026-09-15.md`.
 
 - **기본 난이도**: 막힘 없이 일주일 완주. 시뮬레이션 목표 = 승률 90%+, 진행 불가 구간 제로
 - **퍼즐 깊이는 분리 레이어**: S랭크 도전 / 챌린지 모드(주간 제약 조건) / 최소턴 기록
@@ -246,3 +254,6 @@
 ### 프로젝트 지속성 원칙 (취미 프로젝트 사망 방지)
 - 모든 작업은 몇 달 공백 후 복귀 가능하게: 문서화 우선, 데이터-코드 분리, 작은 단위 완결
 - 이 문서가 항상 최신 상태를 유지하도록 결정 변경 시 즉시 반영
+
+### Persistent scripted fire (2026-09-14)
+A fire action marks its initial rectangle and persists for 1–20 full turns. Starting with the next turn, spread advances one orthogonal cell and maximum-HP percentage damage is applied once to all occupants, including allies. Overlapping fires use the strongest damage rather than stacking. Fire expires after its configured number of ticks; spread never resets its lifetime. Rain extinguishes fire by default. The default spread restriction allows grass, forest, village, barracks, depot, and bridge terrain; unrestricted spread still excludes river, wall, and cliff. Initial rectangles are explicit author choices and may include other terrain (for authored ship battles). All processing is deterministic and state-serializable.

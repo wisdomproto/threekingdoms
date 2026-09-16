@@ -5,6 +5,7 @@
 // 빈 문자열 필드(speaker/portraitId/bg/side)는 키 삭제 — 파일에 무의미한 "" 를 남기지 않는다.
 import { newSceneLine, newVnPart, newDialogueId, slotParts, isMapScene, isComicScene, describeTrigger } from "./story-model.js";
 import { renderComicPart, newComicPart } from "./comic-editor.js";   // 순환 import — comic-editor 가 h/btn/moveBtns/renderLines 를 되가져간다(top-level 호출 없음)
+import { renderMapPart, newMapPart } from "./map-scene-editor.js";
 
 const SIDE_OPTS = [["", "(자동)"], ["player", "아군"], ["ally", "우군"], ["enemy", "적군"]];
 const KINDS = [["battleStart", "전투가 시작되면"], ["turn", "N턴이 시작되면"], ["unitRetreated", "유닛이 퇴각하면"], ["duelOccurred", "일기토가 일어나면"], ["battleEnd", "전투가 끝나면"]];
@@ -56,6 +57,7 @@ export function renderLines(el, lines, opts) {
     let por = null;
     if (narration) {
       por = h("input"); por.type = "text"; por.setAttribute("list", "tk-speakers"); por.placeholder = "초상 (기본=화자)"; por.value = line.portraitId ?? ""; por.title = "portraitId — 비우면 미기록";
+      por.classList.add('advanced-field');
       por.oninput = () => { setOrDel(line, "portraitId", por.value.trim()); commit(); };
       who.appendChild(por);
     }
@@ -118,6 +120,7 @@ export function renderSceneSlot(el, ctx) {
     const c = h("div", "card empty");
     c.appendChild(h("div", null, `아직 ${label}가 없습니다`));
     c.appendChild(btn("첫 장면 만들기", null, () => { setSlot(newVnPart()); again(); }));
+    c.appendChild(btn("+ 캐릭터 이동 장면", null, () => { setSlot([newMapPart()]); again(); }));
     el.appendChild(c);
     return;
   }
@@ -125,11 +128,14 @@ export function renderSceneSlot(el, ctx) {
   parts.forEach((part, i) => {
     const card = h("div", "card part");
     const head = h("div", "lrow head");
-    head.appendChild(h("h3", null, isMapScene(part) ? `맵 씬 (고급) — ${part.label ?? part.map}` : isComicScene(part) ? `만화 장면 ${i + 1}` : `장면 ${i + 1}`));
+    head.appendChild(h("h3", null, isMapScene(part) ? `캐릭터 이동 장면 — ${part.label ?? part.map}` : isComicScene(part) ? `만화 장면 ${i + 1}` : `장면 ${i + 1}`));
     head.appendChild(arr ? moveBtns(arr, i, afterParts) : btn("✕", "이 장면 삭제", () => { setSlot(undefined); again(); }));
     card.appendChild(head);
     if (isMapScene(part)) {   // 고급 JSON 카드 — 적용 = JSON.parse 성공 시 파트 교체 (MapScene 은 배열 안에만 존재)
+      const visual = h('div'); card.appendChild(visual);
+      renderMapPart(visual, part, { commit, assetBase, loadMaps: ctx.loadMaps, onPreview: ctx.onPreview });
       const det = h("details"); det.appendChild(h("summary", null, "JSON 편집 ▾"));
+      det.classList.add('advanced-field');
       const ta = h("textarea", "json"); ta.value = JSON.stringify(part, null, 2); ta.spellcheck = false;
       const err = h("div", "msg");
       const ap = btn("적용", "JSON 을 파싱해 이 파트를 교체", () => {
@@ -158,6 +164,7 @@ export function renderSceneSlot(el, ctx) {
   const add = h("button", "addbtn", "+ VN 장면 추가"); add.onclick = addPart(newVnPart);
   const addComic = h("button", "addbtn", "+ 만화 장면 추가"); addComic.onclick = addPart(newComicPart); addComic.style.marginTop = "4px";
   el.append(add, addComic);
+  const addMap = h('button', 'addbtn', '+ 캐릭터 이동 장면 추가'); addMap.onclick = addPart(newMapPart); el.append(addMap);
 }
 
 /** 전투 중 대사 목록. placed=[{id,name}] duels=[{id,label}]. 카드 전부 삭제 → stage.dialogue = undefined(키 삭제). */
@@ -165,7 +172,7 @@ export function renderDialogueList(el, ctx) {
   const { stage, placed = [], duels = [], speakers = [], commit } = ctx;
   el.innerHTML = "";
   datalist(el, "tk-speakers", speakers);
-  const again = () => { commit(); renderDialogueList(el, ctx); };
+  const again = () => { commit(); if (ctx.refresh) ctx.refresh(); else renderDialogueList(el, ctx); };
   const nameOf = (id) => placed.find((p) => p.id === id)?.name ?? id;
   const duelLabel = (id) => duels.find((d) => d.id === id)?.label ?? id;
   const list = stage.dialogue ?? [];
@@ -178,6 +185,7 @@ export function renderDialogueList(el, ctx) {
     return;
   }
   list.forEach((d, i) => {
+    if (ctx.selectedIndex != null && i !== ctx.selectedIndex) return;
     const card = h("div", "card dlg");
     const head = h("div", "lrow head");
     const title = h("h3", null, describeTrigger(d.trigger, nameOf, duelLabel));
@@ -205,5 +213,6 @@ export function renderDialogueList(el, ctx) {
     idw.appendChild(idi); det.appendChild(idw); card.appendChild(det);
     el.appendChild(card);
   });
+  if (ctx.selectedIndex != null) return;
   const ab = h("button", "addbtn", "+ 대사 추가"); ab.onclick = add; el.appendChild(ab);
 }

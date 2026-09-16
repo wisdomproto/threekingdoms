@@ -19,79 +19,329 @@
   },
   "levelCap": 46,
   "scenario": {
-    "intro": {
-      "bg": "27-huarongdao-intro",
-      "lines": [
-        {
-          "text": "적벽은 불탔다. 백만 선단이 하룻밤 새 재가 되어 강을 덮었고 — 조조는 몇 백 기의 패잔병을 이끌고 북으로 달아났다."
+    "intro": [
+      {
+        "bg": "27-huarongdao-intro",
+        "lines": [
+          {
+            "text": "적벽은 불탔다. 백만 선단이 하룻밤 새 재가 되어 강을 덮었고 — 조조는 몇 백 기의 패잔병을 이끌고 북으로 달아났다."
+          }
+        ]
+      },
+      {
+        "map": "scene-refugee-road",
+        "label": "화용도 · 의리의 무게",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "text": "그 마지막 길목, 화용도. 좁은 산길의 매복 하나가 조용히 조조를 기다리고 있었다."
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-leader",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-leader",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "zhugeliang",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "그 마지막 길목, 화용도. 좁은 산길의 매복 하나가 조용히 조조를 기다리고 있었다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "이 매복은... 제가 청한 자리입니다, 형님. 군령장까지 썼습니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "제갈량",
+            "side": "player",
+            "portraitId": "제갈량",
+            "text": "운장. 그대가 옛 은혜를 갚을 사람이라는 것까지 — 헤아려서 보낸 자리이기도 합니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "...조공에게 천 리를 배웅받은 옛 은혜. 오늘, 여기서 갚겠소.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "guanyu",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "운장의 선택이다. 의를 아는 자만이 질 수 있는 짐이지.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "덫을 놓은 사냥꾼과 덫에 걸린 효웅 — 1부 마지막 이야기가 시작된다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              }
+            ],
+            "exit": [
+              {
+                "id": "guanyu",
+                "to": [
+                  1,
+                  3
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "27-huarongdao-outro",
+        "lines": [
+          {
+            "text": "조조는 화용도를 벗어나 북으로 사라졌다. 관우는 빈 창을 든 채 오래도록 그 길 끝을 바라보았다."
+          }
+        ]
+      },
+      {
+        "map": "scene-refugee-road",
+        "label": "화용도 · 첫 이야기의 끝",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "이 매복은... 제가 청한 자리입니다, 형님. 군령장까지 썼습니다."
-        },
-        {
-          "speaker": "제갈량",
-          "side": "player",
-          "portraitId": "제갈량",
-          "text": "운장. 그대가 옛 은혜를 갚을 사람이라는 것까지 — 헤아려서 보낸 자리이기도 합니다."
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "...조공에게 천 리를 배웅받은 옛 은혜. 오늘, 여기서 갚겠소."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "운장의 선택이다. 의를 아는 자만이 질 수 있는 짐이지."
-        },
-        {
-          "text": "덫을 놓은 사냥꾼과 덫에 걸린 효웅 — 1부 마지막 이야기가 시작된다."
-        }
-      ]
-    },
-    "outro": {
-      "bg": "27-huarongdao-outro",
-      "lines": [
-        {
-          "text": "조조는 화용도를 벗어나 북으로 사라졌다. 관우는 빈 창을 든 채 오래도록 그 길 끝을 바라보았다."
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "형님, 군령을 어겼습니다. 조조를 놓아주었습니다. 군법대로 — 제 목을 치십시오."
-        },
-        {
-          "speaker": "제갈량",
-          "side": "player",
-          "portraitId": "제갈량",
-          "text": "됐습니다. 조조의 명운은 아직 하늘에 있고 — 운장의 의리는 오늘 천하에 남았으니."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "일어나라, 운장. 의를 아는 아우를 둔 것이, 이 형의 자랑이다."
-        },
-        {
-          "text": "황건의 들불에서 적벽의 불바다까지 — 세 형제의 첫 장이 여기서 막을 내린다. 천하는 이제, 셋으로 갈라진다."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-leader",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-foot",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "zhugeliang",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "형님, 군령을 어겼습니다. 조조를 놓아주었습니다. 군법대로 — 제 목을 치십시오.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "kneel"
+              }
+            ]
+          },
+          {
+            "speaker": "제갈량",
+            "side": "player",
+            "portraitId": "제갈량",
+            "text": "됐습니다. 조조의 명운은 아직 하늘에 있고 — 운장의 의리는 오늘 천하에 남았으니.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "일어나라, 운장. 의를 아는 아우를 둔 것이, 이 형의 자랑이다.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "liubei",
+                "to": [
+                  5,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "황건의 들불에서 적벽의 불바다까지 — 세 형제의 첫 장이 여기서 막을 내린다. 천하는 이제, 셋으로 갈라진다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "관우",
       "classId": "lightCavalry",
-      "level": 40,
+      "level": 27,
       "troops": 372,
       "items": [
         "청룡언월도",
@@ -104,7 +354,7 @@
     {
       "commanderId": "유비",
       "classId": "lord",
-      "level": 40,
+      "level": 27,
       "troops": 355,
       "items": [
         "의천검"
@@ -116,7 +366,7 @@
     {
       "commanderId": "장비",
       "classId": "lightCavalry",
-      "level": 40,
+      "level": 27,
       "troops": 330,
       "items": [
         "사모"
@@ -128,7 +378,7 @@
     {
       "commanderId": "조운",
       "classId": "lightCavalry",
-      "level": 40,
+      "level": 27,
       "troops": 320,
       "items": [
         "청강검"
@@ -140,7 +390,7 @@
     {
       "commanderId": "제갈량",
       "classId": "strategist",
-      "level": 40,
+      "level": 27,
       "troops": 230,
       "items": [
         "둔갑천서",
@@ -153,7 +403,7 @@
     {
       "commanderId": "관평",
       "classId": "lightCavalry",
-      "level": 38,
+      "level": 27,
       "troops": 260,
       "items": [],
       "side": "player",
@@ -163,7 +413,7 @@
     {
       "commanderId": "주창",
       "classId": "footman",
-      "level": 38,
+      "level": 27,
       "troops": 255,
       "items": [],
       "side": "player",
@@ -173,7 +423,7 @@
     {
       "commanderId": "유봉",
       "classId": "archer",
-      "level": 38,
+      "level": 27,
       "troops": 240,
       "items": [
         "연노"
@@ -185,8 +435,8 @@
     {
       "commanderId": "조조",
       "classId": "lord",
-      "level": 39,
-      "troops": 160,
+      "level": 27,
+      "troops": 256,
       "items": [
         "맹덕신서"
       ],
@@ -197,8 +447,8 @@
     {
       "commanderId": "허저",
       "classId": "heavyCavalry",
-      "level": 38,
-      "troops": 205,
+      "level": 26,
+      "troops": 328,
       "items": [],
       "side": "enemy",
       "x": 14,
@@ -207,8 +457,8 @@
     {
       "commanderId": "장요",
       "classId": "lightCavalry",
-      "level": 38,
-      "troops": 200,
+      "level": 26,
+      "troops": 320,
       "items": [],
       "side": "enemy",
       "x": 18,
@@ -217,8 +467,8 @@
     {
       "commanderId": "서황",
       "classId": "footman",
-      "level": 37,
-      "troops": 195,
+      "level": 26,
+      "troops": 312,
       "items": [],
       "side": "enemy",
       "x": 15,
@@ -227,8 +477,8 @@
     {
       "commanderId": "문빙",
       "classId": "archer",
-      "level": 36,
-      "troops": 175,
+      "level": 26,
+      "troops": 280,
       "items": [],
       "side": "enemy",
       "x": 17,
@@ -237,8 +487,8 @@
     {
       "commanderId": "악진",
       "classId": "footman",
-      "level": 36,
-      "troops": 170,
+      "level": 26,
+      "troops": 272,
       "items": [],
       "side": "enemy",
       "x": 13,
@@ -276,8 +526,8 @@
         {
           "commanderId": "조홍",
           "classId": "footman",
-          "level": 38,
-          "troops": 165,
+          "level": 26,
+          "troops": 264,
           "items": [],
           "side": "enemy",
           "x": 16,
@@ -286,8 +536,8 @@
         {
           "commanderId": "우금",
           "classId": "archer",
-          "level": 38,
-          "troops": 160,
+          "level": 26,
+          "troops": 256,
           "items": [],
           "side": "enemy",
           "x": 14,

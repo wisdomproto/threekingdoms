@@ -17,6 +17,17 @@
 // 끝 슬래시 정규화 — "https://cdn.x/" + "/assets" 이중 슬래시 방지.
 const ASSET_BASE = (process.env.NEXT_PUBLIC_ASSET_BASE ?? "").replace(/\/+$/, "");
 
+const PROJECT_ASSETS: Record<string, string> = {
+  "/assets/maps/troia-coast.webp": "/assets/maps/troia-coast.webp",
+  "/assets/scenes/troia-coast.webp": "/assets/maps/troia-coast.webp",
+  "/assets/scenes/troia-opening.webp": "/assets/troia/opening.png",
+  ...Object.fromEntries([
+    ["achilles", "아킬레우스", "achilles"],
+    ["patroclus", "파트로클로스", "patroclus"],
+    ["diores", "디오레스", "diores"],
+  ].flatMap(([id, name, art]) => [id, name].map(key => [`/assets/ui/portraits/${key}.webp`, `/assets/troia/${art}.png`]))),
+};
+
 /**
  * "/assets/scenes/x.webp" → `${ASSET_BASE}/assets/scenes/x.webp`.
  * 이미 완전한 http(s) URL이면 그대로 둔다(호출부가 절대 URL을 넘긴 경우 보호).
@@ -25,6 +36,13 @@ export function assetUrl(path: string): string {
   if (!path) return path;
   if (/^https?:\/\//i.test(path)) return path;
   const p = path.startsWith("/") ? path : `/${path}`;
+  let decoded = p;
+  try { decoded = decodeURIComponent(p); } catch { /* Preserve malformed paths for the normal loader. */ }
+  if (Object.hasOwn(PROJECT_ASSETS, decoded)) return PROJECT_ASSETS[decoded]!;
+  // Local authoring and battle previews share regenerated files before CDN publishing.
+  if (process.env.NODE_ENV === "development" && /^\/assets\/(maps|objects|sprites|fx|ui\/(items|portraits)|audio\/voices)(\/|$)/.test(p)) {
+    return p.replace(/^\/assets\//, "/api/local-assets/");
+  }
   return ASSET_BASE + p;
 }
 

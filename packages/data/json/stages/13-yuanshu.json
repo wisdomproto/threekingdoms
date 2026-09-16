@@ -17,66 +17,307 @@
   },
   "levelCap": 24,
   "scenario": {
-    "intro": {
-      "bg": "13-yuanshu-intro",
-      "lines": [
-        {
-          "text": "회남의 원술이 전국옥새를 끌어안고 스스로 황제를 칭했다. 천하가 비웃었으나 — 그 군세만은 웃어넘길 수 없었다."
+    "intro": [
+      {
+        "bg": "13-yuanshu-intro",
+        "lines": [
+          {
+            "text": "회남의 원술이 전국옥새를 끌어안고 스스로 황제를 칭했다. 천하가 비웃었으나 — 그 군세만은 웃어넘길 수 없었다."
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-day",
+        "label": "회남 · 토벌 명령",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "text": "조정의 이름으로 토벌령이 내렸다. 유비군도 창을 들고 회남으로 향했다."
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-official",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-official",
+            "cell": [
+              3,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-official",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "jianyong",
+            "sprite": "jianyong-robes",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "조정의 이름으로 토벌령이 내렸다. 유비군도 창을 들고 회남으로 향했다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "선봉은 기령 — 삼첨도를 쓰는 자입니다. 허나 명분 없는 군대, 본진만 꺾이면 스스로 흩어집니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "가짜 황제 놈! 그 옥좌째로 사모로 부숴주마!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "talk"
+              }
+            ],
+            "bubble": {
+              "id": "zhangfei",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "간옹",
+            "side": "player",
+            "portraitId": "간옹",
+            "text": "원술의 곳간은 황제 놀음의 사치로 이미 바닥났습니다. 오래 끌 것도 없는 싸움입니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "참칭의 대가를 치르게 한다. 원술을 끌어내려라!",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "13-yuanshu-outro",
+        "lines": [
+          {
+            "text": "본진이 무너지자 원술군은 스스로 흩어졌다. 황제를 참칭한 자의 군대는, 끝내 황제의 군대가 되지 못했다."
+          }
+        ]
+      },
+      {
+        "map": "scene-town-gate",
+        "label": "회남 · 민심과 옥새",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "선봉은 기령 — 삼첨도를 쓰는 자입니다. 허나 명분 없는 군대, 본진만 꺾이면 스스로 흩어집니다."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "가짜 황제 놈! 그 옥좌째로 사모로 부숴주마!"
-        },
-        {
-          "speaker": "간옹",
-          "side": "player",
-          "portraitId": "간옹",
-          "text": "원술의 곳간은 황제 놀음의 사치로 이미 바닥났습니다. 오래 끌 것도 없는 싸움입니다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "참칭의 대가를 치르게 한다. 원술을 끌어내려라!"
-        }
-      ]
-    },
-    "outro": {
-      "bg": "13-yuanshu-outro",
-      "lines": [
-        {
-          "text": "본진이 무너지자 원술군은 스스로 흩어졌다. 황제를 참칭한 자의 군대는, 끝내 황제의 군대가 되지 못했다."
-        },
-        {
-          "speaker": "병사",
-          "side": "player",
-          "text": "가짜 황제의 깃발이 넘어갔다! 와아——!"
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "원술의 망상도 끝이로구나. 옥새가 또 누구의 손에 피를 묻힐지."
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "난세입니다, 형님. 옥새보다 민심을 얻는 자가 천하를 얻겠지요."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-official",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-official",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "soldier",
+            "sprite": "soldier-story",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "병사",
+            "side": "player",
+            "text": "가짜 황제의 깃발이 넘어갔다! 와아——!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "soldier",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "soldier",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "원술의 망상도 끝이로구나. 옥새가 또 누구의 손에 피를 묻힐지.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "soldier",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "난세입니다, 형님. 옥새보다 민심을 얻는 자가 천하를 얻겠지요.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "soldier",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "salute"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
@@ -116,7 +357,7 @@
     {
       "commanderId": "조운",
       "classId": "lightCavalry",
-      "level": 12,
+      "level": 13,
       "troops": 175,
       "items": [],
       "side": "player",
@@ -139,7 +380,7 @@
     {
       "commanderId": "미방",
       "classId": "footman",
-      "level": 12,
+      "level": 13,
       "troops": 160,
       "items": [],
       "side": "player",
@@ -149,7 +390,7 @@
     {
       "commanderId": "원술",
       "classId": "pikeman",
-      "level": 24,
+      "level": 16,
       "troops": 288,
       "items": [],
       "side": "enemy",
@@ -159,7 +400,7 @@
     {
       "commanderId": "기령",
       "classId": "heavyCavalry",
-      "level": 22,
+      "level": 16,
       "troops": 215,
       "items": [],
       "side": "enemy",
@@ -169,7 +410,7 @@
     {
       "commanderId": "이풍",
       "classId": "footman",
-      "level": 21,
+      "level": 16,
       "troops": 165,
       "items": [],
       "side": "enemy",
@@ -179,7 +420,7 @@
     {
       "commanderId": "악취",
       "classId": "archer",
-      "level": 21,
+      "level": 16,
       "troops": 150,
       "items": [],
       "side": "enemy",
@@ -189,7 +430,7 @@
     {
       "commanderId": "한섬",
       "classId": "lightCavalry",
-      "level": 21,
+      "level": 16,
       "troops": 160,
       "items": [],
       "side": "enemy",
@@ -199,7 +440,7 @@
     {
       "commanderId": "원윤",
       "classId": "beastUnit",
-      "level": 19,
+      "level": 16,
       "troops": 140,
       "items": [],
       "side": "enemy",

@@ -78,6 +78,7 @@ function SoundRow({
 }
 
 export function PauseMenu({
+  onExit,
   open,
   onClose,
   exitTo = "/stages",
@@ -89,6 +90,7 @@ export function PauseMenu({
   editorUrl,
   mobileControls,
 }: {
+  onExit?: () => void;
   open: boolean;
   /** 패널을 닫는다(계속하기/백드롭/ESC). 실제 paused 상태는 BattleScreen이 소유. */
   onClose: () => void;
@@ -188,7 +190,7 @@ export function PauseMenu({
                 진행 중인 전투는 저장되지 않습니다.
               </span>
             </p>
-            <button type="button" onClick={() => (sandbox ? leaveSandbox((to) => router.push(to)) : router.push(exitTo))} style={{ ...MENU_BTN, color: "#e7b4ac" }}>
+            <button type="button" onClick={() => onExit ? onExit() : (sandbox ? leaveSandbox((to) => router.push(to)) : router.push(exitTo))} style={{ ...MENU_BTN, color: "#e7b4ac" }}>
               나가기
             </button>
             <button type="button" onClick={() => setConfirmExit(false)} style={MENU_BTN}>

@@ -8,7 +8,8 @@ export_chunks.py 가 만든 manifest + 조각별 생성 결과(painted_r{r}_c{c}
 조각 생성 규약: docs/art/chunks/painted_{mapId}_r{r}_c{c}.png (블록아웃과 같은 종횡비로 생성).
 산출: apps/web/public/assets/maps/{mapId}.webp (기존 배경 교체).
 
-사용: python stitch_chunks.py [mapId] [target_tile_px]   기본: sishuiguan 96
+사용: python stitch_chunks.py [mapId] [target_tile_px] [chunk_dir] [output_path]
+기본: sishuiguan 96. 선택 경로로 버전별 생성 세트를 원본과 분리해 합성할 수 있다.
 """
 import sys, json, os, glob
 from PIL import Image
@@ -18,7 +19,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 mapId = sys.argv[1] if len(sys.argv) > 1 else "sishuiguan"
 TARGET = int(sys.argv[2]) if len(sys.argv) > 2 else 96  # 출력 px/타일 (96 → 사수관 5376×3072)
 
-CHUNKDIR = rf"{ROOT}\docs\art\chunks"
+CHUNKDIR = os.path.abspath(sys.argv[3]) if len(sys.argv) > 3 else rf"{ROOT}\docs\art\chunks"
 man = json.load(open(rf"{CHUNKDIR}\{mapId}_manifest.json", encoding="utf-8"))
 W, H = man["width"], man["height"]
 COLS, ROWS, OV = man["cols"], man["rows"], man["overlap"]
@@ -73,6 +74,6 @@ if missing:
 wsum[wsum == 0] = 1
 out = (acc / wsum).clip(0, 255).astype("uint8")
 res = Image.fromarray(out, "RGB")
-outpath = rf"{ROOT}\apps\web\public\assets\maps\{mapId}.webp"
+outpath = os.path.abspath(sys.argv[4]) if len(sys.argv) > 4 else rf"{ROOT}\apps\web\public\assets\maps\{mapId}.webp"
 res.save(outpath, "WEBP", quality=88, method=6)
 print(f"\n합쳐짐: {outpath}  {outW}×{outH}px  ({os.path.getsize(outpath)//1024}KB)")

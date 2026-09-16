@@ -100,75 +100,375 @@
   },
   "levelCap": 14,
   "scenario": {
-    "intro": {
-      "bg": "07-luoyang-intro",
-      "lines": [
-        {
-          "text": "호로관의 기세가 꺾이자 동탁은 어린 천자를 끌고 장안 천도를 선포했다. 그리고 — 떠나는 길에 낙양에 불을 놓았다."
+    "intro": [
+      {
+        "bg": "07-luoyang-intro",
+        "lines": [
+          {
+            "text": "호로관의 기세가 꺾이자 동탁은 어린 천자를 끌고 장안 천도를 선포했다. 그리고 — 떠나는 길에 낙양에 불을 놓았다."
+          }
+        ]
+      },
+      {
+        "map": "scene-ruined-city",
+        "label": "낙양 · 사람부터 구한다",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "text": "사백 년 도읍이 통째로 타오르고 있었다. 성문 밖까지 매캐한 연기와 울음소리가 밀려왔다."
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-foot",
+            "cell": [
+              3,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "jianyong",
+            "sprite": "jianyong-robes",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left",
+            "hidden": true
+          }
+        ],
+        "lines": [
+          {
+            "text": "사백 년 도읍이 통째로 타오르고 있었다. 성문 밖까지 매캐한 연기와 울음소리가 밀려왔다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "간옹",
+            "side": "player",
+            "portraitId": "간옹",
+            "text": "주공, 성안에 백성들이 갇혀 있습니다. 동탁의 후군은 아직도 약탈 중입니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "talk"
+              }
+            ],
+            "enter": [
+              {
+                "id": "jianyong",
+                "from": [
+                  10,
+                  3
+                ],
+                "to": [
+                  7,
+                  3
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "jianyong",
+                "dir": "left"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "이런 개 같은...! 사람 사는 성에 불을 질러?!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "zhangfei",
+                "to": [
+                  6,
+                  5
+                ]
+              }
+            ],
+            "bubble": {
+              "id": "zhangfei",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "본대는 이미 서쪽으로 빠져나가고 있습니다. 불길이 길을 삼키기 전에 들이쳐야 합니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "재물은 버려라 — 사람부터다. 한 명이라도 더 구한다!",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "!"
+            }
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "07-luoyang-outro",
+        "lines": [
+          {
+            "text": "불은 사흘을 탔다. 사백 년 도읍이 숯이 되는 동안, 구해낸 백성들은 잿더미 앞에서 말을 잃었다."
+          }
+        ]
+      },
+      {
+        "map": "scene-ruined-city",
+        "label": "낙양 · 살아남은 사람들",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "간옹",
-          "side": "player",
-          "portraitId": "간옹",
-          "text": "주공, 성안에 백성들이 갇혀 있습니다. 동탁의 후군은 아직도 약탈 중입니다."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "이런 개 같은...! 사람 사는 성에 불을 질러?!"
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "본대는 이미 서쪽으로 빠져나가고 있습니다. 불길이 길을 삼키기 전에 들이쳐야 합니다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "재물은 버려라 — 사람부터다. 한 명이라도 더 구한다!"
-        }
-      ]
-    },
-    "outro": {
-      "bg": "07-luoyang-outro",
-      "lines": [
-        {
-          "text": "불은 사흘을 탔다. 사백 년 도읍이 숯이 되는 동안, 구해낸 백성들은 잿더미 앞에서 말을 잃었다."
-        },
-        {
-          "speaker": "백성",
-          "side": "player",
-          "text": "집이... 낙양이... 흑. 그래도, 장군님들 덕에 목숨은 건졌습니다..."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "동탁은 달아났고, 낙양은 잿더미가 됐다... 우리가 한발 늦었구나."
-        },
-        {
-          "speaker": "간옹",
-          "side": "player",
-          "portraitId": "간옹",
-          "text": "그래도 살릴 수 있는 이들은 살렸습니다. 백성들은 불길 속에서 내민 손을 기억할 겁니다."
-        },
-        {
-          "text": "서쪽 하늘 끝, 장안으로 이어진 길 위로 동탁의 행렬이 꼬리를 감추고 있었다."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "civilian",
+            "sprite": "civilian-scene",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left",
+            "hidden": true
+          },
+          {
+            "id": "jianyong",
+            "sprite": "jianyong-robes",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "백성",
+            "side": "player",
+            "text": "집이... 낙양이... 흑. 그래도, 장군님들 덕에 목숨은 건졌습니다...",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "idle"
+              }
+            ],
+            "enter": [
+              {
+                "id": "civilian",
+                "from": [
+                  10,
+                  3
+                ],
+                "to": [
+                  7,
+                  3
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "civilian",
+                "dir": "left"
+              }
+            ],
+            "bubble": {
+              "id": "civilian",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "동탁은 달아났고, 낙양은 잿더미가 됐다... 우리가 한발 늦었구나.",
+            "pose": [
+              {
+                "id": "civilian",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "간옹",
+            "side": "player",
+            "portraitId": "간옹",
+            "text": "그래도 살릴 수 있는 이들은 살렸습니다. 백성들은 불길 속에서 내민 손을 기억할 겁니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "text": "서쪽 하늘 끝, 장안으로 이어진 길 위로 동탁의 행렬이 꼬리를 감추고 있었다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              },
+              {
+                "id": "jianyong",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "유비",
       "classId": "lord",
-      "level": 6,
+      "level": 7,
       "troops": 125,
       "items": [],
       "side": "player",
@@ -178,7 +478,7 @@
     {
       "commanderId": "관우",
       "classId": "lightCavalry",
-      "level": 6,
+      "level": 7,
       "troops": 135,
       "items": [
         "청룡언월도"
@@ -190,7 +490,7 @@
     {
       "commanderId": "장비",
       "classId": "lightCavalry",
-      "level": 6,
+      "level": 7,
       "troops": 135,
       "items": [
         "사모"
@@ -202,7 +502,7 @@
     {
       "commanderId": "손건",
       "classId": "strategist",
-      "level": 5,
+      "level": 7,
       "troops": 120,
       "items": [],
       "side": "player",
@@ -212,7 +512,7 @@
     {
       "commanderId": "간옹",
       "classId": "strategist",
-      "level": 6,
+      "level": 7,
       "troops": 95,
       "items": [
         "쌀",
@@ -225,7 +525,7 @@
     {
       "commanderId": "미축",
       "classId": "strategist",
-      "level": 5,
+      "level": 7,
       "troops": 105,
       "items": [],
       "side": "player",
@@ -235,7 +535,7 @@
     {
       "commanderId": "이각",
       "classId": "footman",
-      "level": 7,
+      "level": 8,
       "troops": 130,
       "items": [],
       "side": "enemy",
@@ -245,7 +545,7 @@
     {
       "commanderId": "곽사",
       "classId": "archer",
-      "level": 7,
+      "level": 8,
       "troops": 110,
       "items": [],
       "side": "enemy",
@@ -255,7 +555,7 @@
     {
       "commanderId": "서영",
       "classId": "lightCavalry",
-      "level": 6,
+      "level": 7,
       "troops": 115,
       "items": [],
       "side": "enemy",
@@ -265,7 +565,7 @@
     {
       "commanderId": "호진",
       "classId": "footman",
-      "level": 5,
+      "level": 6,
       "troops": 95,
       "items": [],
       "side": "enemy",
@@ -275,7 +575,7 @@
     {
       "commanderId": "이숙",
       "classId": "archer",
-      "level": 5,
+      "level": 6,
       "troops": 90,
       "items": [],
       "side": "enemy",
@@ -285,7 +585,7 @@
     {
       "commanderId": "이유",
       "classId": "strategist",
-      "level": 6,
+      "level": 7,
       "troops": 100,
       "items": [
         "낙석서"
@@ -297,7 +597,7 @@
     {
       "commanderId": "동탁",
       "classId": "chariot",
-      "level": 8,
+      "level": 9,
       "troops": 160,
       "items": [],
       "side": "enemy",
@@ -331,7 +631,7 @@
         {
           "commanderId": "조잠",
           "classId": "footman",
-          "level": 5,
+          "level": 6,
           "troops": 90,
           "items": [],
           "side": "enemy",
@@ -341,7 +641,7 @@
         {
           "commanderId": "조성",
           "classId": "archer",
-          "level": 5,
+          "level": 6,
           "troops": 85,
           "items": [],
           "side": "enemy",
@@ -489,6 +789,63 @@
         "loserRetreats": false
       },
       "once": true
+    }
+  ],
+  "scriptEvents": [
+    {
+      "id": "campaign-fire-07-luoyang",
+      "name": "낙양 시가지 방화",
+      "editingMode": "complex",
+      "trigger": {
+        "kind": "turn",
+        "turn": 5,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "message",
+          "text": "동탁군이 시가지에 불을 놓았다! 불길을 피해 진격하라."
+        },
+        {
+          "kind": "effect",
+          "effect": "fire",
+          "area": {
+            "x": 19,
+            "y": 11,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "kind": "damage",
+          "target": {
+            "side": "enemy",
+            "area": {
+              "x": 19,
+              "y": 11,
+              "width": 4,
+              "height": 3
+            }
+          },
+          "amount": 8,
+          "percent": true,
+          "nonlethal": true
+        },
+        {
+          "kind": "fire",
+          "area": {
+            "x": 19,
+            "y": 11,
+            "width": 4,
+            "height": 3
+          },
+          "duration": 3,
+          "damagePercent": 5,
+          "spread": false,
+          "extinguishInRain": true,
+          "flammableOnly": true
+        }
+      ]
     }
   ]
 }

@@ -13,7 +13,7 @@ import { usePathname } from "next/navigation";
 import { audio } from "./engine";
 import { SFX, playSfx } from "./sfx";
 import { preloadSfxFiles } from "./sfx";
-import { playBgm, resumeBgm, preloadBgmFiles } from "./bgm";
+import { playBgm, stopBgm, resumeBgm, preloadBgmFiles } from "./bgm";
 import { loadAudioManifest } from "./manifest";
 import { bgmForPath } from "./bgmRoute";
 
@@ -60,7 +60,8 @@ export function AudioController(): React.ReactElement {
   // (3) 경로 → BGM. 미해제 시 desired만 저장되고 첫 제스처가 resumeBgm으로 켠다.
   // 보스곡(battleBoss)은 여기가 아니라 전투 중 교전 트리거(BattleRenderer)가 켠다.
   useEffect(() => {
-    playBgm(bgmForPath(pathname));
+    const track = bgmForPath(pathname);
+    if (track) playBgm(track); else stopBgm();
   }, [pathname]);
 
   return <AudioControl />;

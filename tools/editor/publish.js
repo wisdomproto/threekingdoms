@@ -103,7 +103,7 @@ async function postJson(url, body) {
  * 실패(ok:false, rolledBack)는 서버가 백업 meta 를 지우므로 [롤백] 을 제공하지 않는다.
  * @param p { stage, stageText, mapText?(바뀐 맵만), repoStage(null=새 스테이지), localErrors, probe():Promise<string[]>, onPublished(result), onRolledBack?(result) }
  */
-export function openPublishModal({ stage, stageText, mapText, repoStage, localErrors, probe, onPublished, onRolledBack }) {
+export function openPublishModal({ stage, stageText, mapText, baseRevision, repoStage, localErrors, probe, onPublished, onRolledBack }) {
   let modal = document.getElementById("publishModal");
   if (!modal) { modal = el("div"); modal.id = "publishModal"; document.body.appendChild(modal); }
   modal.innerHTML = ""; modal.classList.add("on");
@@ -154,7 +154,7 @@ export function openPublishModal({ stage, stageText, mapText, repoStage, localEr
   run.onclick = async () => {
     busy = true; run.disabled = true; cancel.disabled = true; run.textContent = "Publish 중… (전수 검사 5~15초)";
     let r;
-    try { r = await postJson("/publish-stage", mapText ? { stage: stageText, map: mapText } : { stage: stageText }); }
+    try { r = await postJson("/publish-stage", { stage: stageText, ...(mapText ? { map: mapText } : {}), baseRevision }); }
     catch (e) { r = { ok: false, error: "요청 실패: " + e.message }; }
     if (!r.ok) {
       showResult([el("div", "bad", `✗ Publish 실패${r.rolledBack ? " — 자동 롤백됨" : ""}${r.error ? " — " + r.error : ""}`), el("pre", null, r.output || ""), closeBtn()]);

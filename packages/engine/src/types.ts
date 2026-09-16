@@ -85,6 +85,8 @@ export interface BattleState {
   units: UnitState[];
   /** mulberry32 내부 상태(signed int32, 음수 가능). 시드 고정 전투 RNG의 스트림(2026-06-16 §2-1). 롤마다 nextRandom으로 전진 — Phase A는 소비처 0이라 불변, Phase B(명중/분산)부터 갱신. rng.ts 소비 계약 참조. */
   rngState: number;
+  fires?: { cells: Coord[]; remaining: number; lastTurn: number; damagePercent: number; spread: boolean; extinguishInRain: boolean; flammableOnly: boolean }[];
+  firedScripts?: string[];
   firedEvents: string[]; // once 이벤트 중복 발동 방지
   // ── M3① 목표 시스템 추적 필드 ──────────────────────────────────────────
   /** 발동된 일기토 id를 발동 순서대로 기록 — duelsInOrder 전략조건 판정용 */
@@ -127,6 +129,9 @@ export interface ReinforcedUnit {
 }
 
 export type BattleEvent =
+  | { type: "scriptMessage"; text: string }
+  | { type: "scriptEffect"; effect: "fire" | "water" | "rock" | "special"; area: { x: number; y: number; width: number; height: number } }
+  | { type: "scriptDamage"; unitId: string; damage: number }
   | { type: "unitMoved"; unitId: string; from: Coord; to: Coord }
   // crit = 회심(운 기반 시드 롤 — combat.crit) / guarded = 가드(통솔 기반 피해 반감 — combat.guard). 미설정=일반 타격(하위호환).
   | { type: "damageDealt"; attackerId: string; defenderId: string; damage: number; counter: boolean; hit: boolean; crit?: boolean; guarded?: boolean;
@@ -141,7 +146,7 @@ export type BattleEvent =
   | { type: "unitPromoted"; unitId: string; fromClassId: string; toClassId: string }
   | { type: "troopsHealed"; unitId: string; amount: number }
   // 협공 발동(결정론) — surround = 대상 포위도(공격자 포함), bonusPercent = 추가피해%. 연출용.
-  | { type: "flank"; attackerId: string; defenderId: string; surround: number; bonusPercent: number }
+  | { type: "flank"; attackerId: string; defenderId: string; surround: number; bonusPercent: number; participantIds?: string[] }
   // 연속공격(2중공격) 발동 — 이동력 우위로 개시 공격이 2회 타격. 연출용.
   | { type: "doubleStrike"; attackerId: string; defenderId: string }
   // 필살 발동 — SP 소진하며 대형 확정피해. name=네임드 시그니처명(있으면). 연출용.

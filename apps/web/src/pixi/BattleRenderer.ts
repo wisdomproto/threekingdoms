@@ -9,7 +9,7 @@
  *
  * 결선 순서: renderer 생성 → store 생성(presenter=renderer) → renderer.connect(store) → mount.
  */
-import { Application, Container, Graphics, Sprite, Texture } from "pixi.js";
+import { Application, ColorMatrixFilter, Container, Graphics, Sprite, Texture } from "pixi.js";
 import type { Side } from "@tk/data";
 import { spriteCandidates } from "./spriteMap";
 import type { BattleContext, BattleEvent, BattleState, Coord } from "@tk/engine";
@@ -29,9 +29,10 @@ import { HighlightLayer } from "./layers/HighlightLayer";
 import { ThreatLayer } from "./layers/ThreatLayer";
 import { UnitLayer } from "./layers/UnitLayer";
 import { FxLayer } from "./layers/FxLayer";
+import { FireLayer } from "./layers/FireLayer";
 import { threatTiles } from "../battle/threatRange";
 import { chooseMenuPreferRight } from "../battle/menuPlacement";
-import { playBgm, playSfx, SFX } from "../audio";
+import { playBgm, playSfx, SFX, BattleVoicePlayer } from "../audio";
 import { bossUnitId } from "../battle/bossOf";
 
 type Ev<T extends BattleEvent["type"]> = Extract<BattleEvent, { type: T }>;
@@ -113,6 +114,7 @@ interface Scene {
   threat: ThreatLayer;
   units: UnitLayer;
   fx: FxLayer;
+  fires: FireLayer;
   camera: CameraController;
   input: InputAdapter;
   unsubscribe: () => void;
@@ -148,7 +150,7 @@ export class BattleRenderer implements Presenter {
   readonly assetsReady: Promise<void>;
   private assetProgressCb: ((pct: number) => void) | null = null;
 
-  constructor(ctx: BattleContext) {
+  constructor(ctx: BattleContext, private readonly localAssets = false) {
     this.ctx = ctx;
     this.assetsReady = new Promise<void>((resolve) => {
       this.assetsReadyResolve = resolve;
@@ -200,7 +202,7 @@ export class BattleRenderer implements Presenter {
     const tweens = new TweenRunner(app.ticker);
     this.speed = store.speed > 0 ? store.speed : 1; // 재마운트 시 배속 보존
     tweens.setTimeScale(this.speed);
-    const textures = new TextureResolver(app.renderer);
+    const textures = new TextureResolver(app.renderer, this.localAssets);
     // 스프라이트 점진 로드는 units 생성 직후 시작한다(scheduleRefresh가 units를 참조하므로).
     //   → 아래 UnitLayer 선언부 참조. 도착하는 대로 표시해 "처음 색사각" 지연을 없앤다.
     // 지형 타일 비동기 로드 — 실패 시 폴백(단색 베이크) 유지, mount는 계속 진행.
@@ -211,6 +213,9 @@ export class BattleRenderer implements Presenter {
     // 씬그래프: stage → world(카메라 변환) → terrain/highlight/unit/fx.world, stage → fx.screen
     const world = new Container();
     world.sortableChildren = true;
+    const fires = new FireLayer(textures);
+    fires.zIndex = 1.9;
+    world.addChild(fires);
     const terrain = new TerrainLayer(this.ctx, textures);
     terrain.zIndex = 0;
     const highlights = new HighlightLayer(textures, {
@@ -249,6 +254,7 @@ export class BattleRenderer implements Presenter {
     };
     // 이 전투가 실제로 쓰는 스프라이트만(초기 배치 + 스테이지 증원, 후보 사다리 전부 = 폴백 보존).
     // 종전 매니페스트 전 종(174키) 로드는 Poki 초기 로드 8MB를 뚫었다. 승급분은 unitPromoted에서 추가.
+    void this.voices.preload([...store.settledState.units.map(u => u.id), ...(this.ctx.stage.reinforcements ?? []).flatMap(r => r.units.map(u => u.commanderId))]);
     const neededSprites = new Set<string>();
     const needUnit = (commanderId: string, classId: string, side: Side): void => {
       const tier = this.ctx.data.unitClasses[classId]?.tier ?? 1;
@@ -288,6 +294,12 @@ export class BattleRenderer implements Presenter {
     const mapBg = new Sprite();
     mapBg.zIndex = -1; // terrain(0) 아래
     mapBg.visible = false;
+    // Zhuojun is the visual reference map. Preserve source artwork and unit colors.
+    if (this.ctx.map.id === "zhuojun") {
+      const groundGrade = new ColorMatrixFilter();
+      groundGrade.saturate(-0.16);
+      mapBg.filters = [groundGrade];
+    }
     const gridOverlay = new Graphics();
     for (let gx = 0; gx <= mapW; gx++) {
       gridOverlay.moveTo(gx * TILE_SIZE, 0).lineTo(gx * TILE_SIZE, mapH * TILE_SIZE);
@@ -441,6 +453,7 @@ export class BattleRenderer implements Presenter {
       terrain.cull(camera.viewWorldRect());
       objects.cull(camera.viewWorldRect());
       units.tickIdle(app.ticker.deltaMS);
+      fires.tick(dt);
     };
     app.ticker.add(tick);
 
@@ -474,7 +487,7 @@ export class BattleRenderer implements Presenter {
     this.updateThreat(threat);
 
     this.scene = {
-      app, world, tweens, textures, terrain, objects, highlights, threat, units, fx, camera, input,
+      app, world, tweens, textures, terrain, objects, highlights, threat, units, fx, fires, camera, input,
       unsubscribe, onWheel, tick, resizeObserver,
     };
 
@@ -485,6 +498,9 @@ export class BattleRenderer implements Presenter {
   }
 
   destroy(): void {
+    this.voices.destroy();
+    this.pendingFlank = null;
+    this.pendingUltimate = null;
     this.destroyRequested = true;
     const s = this.scene;
     if (!s) return; // init 진행 중이면 mount()의 가드가 마무리한다
@@ -715,12 +731,53 @@ export class BattleRenderer implements Presenter {
     playBgm("battleBoss");
   }
 
+  async scriptMessage(e: Ev<"scriptMessage">): Promise<void> {
+    if (this.scene) await this.scene.fx.banner(e.text, 2200);
+  }
+  async scriptEffect(e: Ev<"scriptEffect">): Promise<void> {
+    const s = this.scene; if (!s) return;
+    const a = e.area;
+    this.autoFocus(gridToWorld({ x: a.x + a.width / 2, y: a.y + a.height / 2 }), FOCUS_MS);
+    playSfx(SFX.spell);
+    // Large areas use a regular grid of effects to keep particle work bounded.
+    const stride = Math.max(1, Math.ceil(Math.sqrt(a.width * a.height / 64)));
+    const effects: Promise<void>[] = [];
+    for (let y = a.y; y < Math.min(this.ctx.map.height, a.y + a.height); y += stride)
+      for (let x = a.x; x < Math.min(this.ctx.map.width, a.x + a.width); x += stride)
+        effects.push(s.fx.strategyEffect(e.effect === "rock" ? "earth" : e.effect, gridToWorld({ x, y })));
+    await Promise.all(effects);
+  }
+  async scriptDamage(e: Ev<"scriptDamage">): Promise<void> {
+    const s = this.scene; if (!s) return;
+    const u = s.units.view(e.unitId);
+    await Promise.all([u.flash(), s.fx.damagePopup(gridToWorld({ x: u.gridX, y: u.gridY }), e.damage, false)]);
+    u.setTroops(u.troops - e.damage);
+  }
+
+  private readonly voices = new BattleVoicePlayer();
+  private pendingFlank: Ev<"flank"> | null = null;
+  private pendingUltimate: Ev<"ultimate"> | null = null;
+
   async damageDealt(e: Ev<"damageDealt">): Promise<void> {
     const s = this.scene;
     if (!s) return;
     this.maybeBossBgm(e.attackerId, e.defenderId);
     const attacker = s.units.view(e.attackerId);
     const defender = s.units.view(e.defenderId);
+    const flank = this.pendingFlank;
+    this.pendingFlank = null;
+    const ultimate = this.pendingUltimate?.attackerId === e.attackerId
+      && this.pendingUltimate.defenderId === e.defenderId && !e.counter && !e.source;
+    this.pendingUltimate = null;
+    const helpers = flank?.attackerId === e.attackerId && flank.defenderId === e.defenderId && !e.counter && !e.source && e.hit !== false
+      ? [...new Set(flank.participantIds ?? [])].filter(id => id !== e.attackerId).map(id => s.units.view(id)) : [];
+    if (!e.source) {
+      void this.voices.play(e.attackerId, ultimate ? "ultimate" : "attack");
+      if (helpers.length) for (const id of flank?.participantIds ?? []) {
+        if (id !== e.attackerId) void this.voices.play(id, "attack", 0.45);
+      }
+    }
+    for (const helper of helpers) helper.faceToward({ x: defender.gridX, y: defender.gridY });
     attacker.faceToward({ x: defender.gridX, y: defender.gridY });
     defender.faceToward({ x: attacker.gridX, y: attacker.gridY });
     // 공격/반격 연출 전: 방어자 위치 포커스 (화면 중앙 ±35% 밖일 때만, scale 유지)
@@ -757,8 +814,14 @@ export class BattleRenderer implements Presenter {
     // 타격 프레임(공격자 돌진이 닿는 순간)에 임팩트·플래시·흔들림·히트스톱을 동기 발사.
     // 근접: 공격 모션 시작 후 ~110ms(lunge 정점) / 간접: 화살이 꽂히는 순간.
     const impact = (): void => {
+      if (guarded) {
+        playSfx(SFX.hit);
+        void s.fx.guardFlash(popupAt, aPos);
+        s.tweens.hitstop(HITSTOP_MS_HIT);
+        return;
+      }
       playSfx(big ? SFX.crit : SFX.hit); // 임팩트 — 큰 피해/반격/회심은 회심음
-      void s.fx.impactFlash(popupAt, big);
+      if (!crit && !ultimate) void s.fx.impactFlash(popupAt, big);
       void defender.flash();
       this.triggerShake(big ? SHAKE_PX_BIG : SHAKE_PX_HIT);
       s.tweens.hitstop(big ? HITSTOP_MS_BIG : HITSTOP_MS_HIT); // 묵직한 정지(배속 존중)
@@ -775,27 +838,30 @@ export class BattleRenderer implements Presenter {
       defender.setTroops(defender.troops - e.damage);
       return;
     }
-    if (indirect) {
-      // 발사(활시위 쉭) → 화살 비행 → 명중 순간 관통 톤 임팩트
-      void s.tweens.delay(90).then(() => {
+    const contact = async (): Promise<void> => {
+      await s.tweens.delay(attacker.attackContactMs);
+      if (this.scene !== s) return;
+      if (indirect) {
         playSfx(SFX.pierce);
-        void s.fx.arrowShot(aPos, popupAt).then(() => {
-          void s.fx.slashArc(aPos, popupAt, "pierce");
-          impact();
-        });
-      });
-    } else {
-      void s.tweens.delay(110).then(() => {
-        playSfx(SFX.slash); // 휘두름 쉭
-        void s.fx.slashArc(aPos, popupAt, meleeKind);
-        impact();
-      });
-    }
-
+        await s.fx.arrowShot(aPos, popupAt);
+        if (this.scene !== s) return;
+      } else playSfx(SFX.slash);
+      const trail = ultimate || crit
+        ? s.fx.specialImpact(ultimate ? "ultimate" : "critical", popupAt, aPos, attacker.signatureFx)
+        : !indirect && attacker.signatureFx
+        ? s.fx.heroWeaponArc(attacker.signatureFx, aPos, popupAt)
+        : s.fx.slashArc(aPos, popupAt, indirect ? "pierce" : meleeKind);
+      impact();
+      await Promise.all([
+        trail,
+        defender.playHitFrom(fromDir, guarded ? Math.min(intensity, 0.3) : intensity, guarded),
+        s.fx.damagePopup(popupAt, e.damage, e.counter, crit, guarded),
+      ]);
+    };
     await Promise.all([
       attacker.play("attack"),
-      defender.playHitFrom(fromDir, intensity),
-      s.fx.damagePopup(popupAt, e.damage, e.counter, crit, guarded),
+      ...helpers.map(helper => helper.playCoordinatedAttack(attacker.attackDurationMs)),
+      contact(),
     ]);
     defender.setTroops(defender.troops - e.damage);
   }
@@ -813,6 +879,7 @@ export class BattleRenderer implements Presenter {
   async statusApplied(e: Ev<"statusApplied">): Promise<void> {
     const s = this.scene;
     if (!s) return;
+    if (e.kind === "stun") await s.fx.banner(`${e.unitId} · 기절 ${e.turns}차례`, 650);
     await s.units.view(e.unitId).flash(); // 부여 순간 깜빡임(상태 아이콘 표시는 후속)
   }
 
@@ -896,7 +963,7 @@ export class BattleRenderer implements Presenter {
     playSfx(SFX.spell);
     // 카테고리별 대표 VFX(불/물/바람/땅/회복/디버프/특수) — 대상 칸에 펼친다(데미지/회복은 후속 이벤트가 처리).
     if (strat?.category) void s.fx.strategyEffect(strat.category, targetWorld);
-    await s.fx.banner(`책략 · ${name}!`, DUEL_BANNER_MS);
+    await s.fx.banner(name, DUEL_BANNER_MS, true);
   }
 
   async unitRetreated(e: Ev<"unitRetreated">): Promise<void> {
@@ -973,13 +1040,11 @@ export class BattleRenderer implements Presenter {
   async flank(e: Ev<"flank">): Promise<void> {
     const s = this.scene;
     if (!s) return;
-    // 협공 발동(데미지 직전) — 대상에 잭팟 플래시 + 가벼운 흔들림 + 짧은 「협공!」 배너.
-    const defender = s.units.view(e.defenderId);
-    const at = gridToWorld({ x: defender.gridX, y: defender.gridY });
-    void s.fx.impactFlash(at);
-    this.triggerShake(SHAKE_PX_HIT);
+    // Participants animate together on the following hit; impact is emitted only by damageDealt.
+    this.pendingFlank = e;
     playSfx(SFX.flank);
-    await s.fx.banner(`협공! +${e.bonusPercent}%`, FLANK_BANNER_MS);
+    const target = s.units.view(e.defenderId);
+    await s.fx.flankPopup(gridToWorld({ x: target.gridX, y: target.gridY }), e.bonusPercent);
   }
 
   async combo(e: Ev<"combo">): Promise<void> {
@@ -993,15 +1058,12 @@ export class BattleRenderer implements Presenter {
     const s = this.scene;
     if (!s) return;
     this.maybeBossBgm(e.attackerId, e.defenderId); // 필살로 보스와 첫 접전하는 경우
-    // 필살 발동(데미지 직전) — 큰 흔들림 + 대상 플래시 + 「필살!」 배너(일기토급 무게).
+    // Announce first; the following damage event plays the effect at contact.
+    this.pendingUltimate = e;
     const attacker = this.ctx.data.commanders[e.attackerId]?.name ?? e.attackerId;
-    const defender = s.units.view(e.defenderId);
-    const at = gridToWorld({ x: defender.gridX, y: defender.gridY });
-    this.triggerShake(SHAKE_PX_BIG);
     playSfx(SFX.ultimate);
-    void s.fx.impactFlash(at, true);
     // 네임드 시그니처면 그 이름(「청룡언월!」), 아니면 일반 「필살! 장수」
-    await s.fx.banner(e.name ? `${e.name}!  ${attacker}` : `필살! ${attacker}`, DUEL_BANNER_MS);
+    await s.fx.banner(e.name ? `${e.name}!  ${attacker}` : `필살! ${attacker}`, 650, true);
   }
 
   async phaseChanged(e: Ev<"phaseChanged">): Promise<void> {
@@ -1043,6 +1105,7 @@ export class BattleRenderer implements Presenter {
   }
 
   sync(state: BattleState): void {
+    this.scene?.fires.sync(state.fires);
     this.phase = state.phase;
     this.scene?.units.sync(state);
   }

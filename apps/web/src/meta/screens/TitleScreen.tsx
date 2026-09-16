@@ -4,7 +4,7 @@
  *
  * 수묵 톤 배경 + 로고 + "이어하기 / 새 게임" 메뉴.
  *  - 이어하기: clearedStages 또는 진행(roster/gold)이 있으면 활성 → /stages.
- *  - 새 게임: 진행이 있으면 1회 확인 후 metaStore.reset() → /stages.
+ *  - 새 게임: 클릭하면 metaStore.reset() → /stages.
  * 진행 유무 판단은 마운트 후(클라) 1회. SSR에서는 "새 게임"만 노출(이어하기 비활성)되어
  * 하이드레이션 불일치를 피한다.
  *
@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { BUTTON_FRAME } from "../../battle/hud/frames";
 import { earnedInventoryCount, getMeta, reset } from "../metaStore";
 import { adLifecycle } from "../adProviders";
+import { activeGame } from "../../game/data";
 
 /** 수묵·청동 공유 팔레트 (frames.ts 청동기 톤 + 먹빛 배경). */
 const INK = "#1a1714";
@@ -28,12 +29,6 @@ export function TitleScreen(): React.ReactElement {
   const router = useRouter();
   // 진행 유무는 클라에서만 확정(localStorage). 초기 false로 SSR/하이드레이션 일치.
   const [hasProgress, setHasProgress] = useState(false);
-  const [confirmingNew, setConfirmingNew] = useState(false);
-  // 확인창에 "뭘 지우게 되는지"를 보여주는 요약(예: "클리어 3 전장 · 1,240 金") —
-  // 안 보여주면 유저가 "첫판인데 왜 물어보지?"가 된다(2026-06-30 피드백. 확인 자체는
-  // 진행 있을 때만 뜨는 게 맞고, 이 요약이 그 근거를 화면에 드러낸다).
-  const [progressSummary, setProgressSummary] = useState("");
-
   useEffect(() => {
     // 포털 로딩 완료 신호(§13 — 타이틀 = 상호작용 가능 시점. stub이면 no-op, 내부 1회 가드).
     adLifecycle.loadingFinished();
@@ -46,15 +41,6 @@ export function TitleScreen(): React.ReactElement {
       Object.keys(m.rosterProgress).length > 0 ||
       earned > 0;
     setHasProgress(progressed);
-    if (progressed) {
-      const parts: string[] = [];
-      if (m.clearedStages.length > 0) parts.push(`클리어 ${m.clearedStages.length}개 전장`);
-      if (m.gold > 0) parts.push(`${m.gold.toLocaleString()} 金`);
-      const grown = Object.keys(m.rosterProgress).length;
-      if (grown > 0) parts.push(`육성 장수 ${grown}명`);
-      if (earned > 0) parts.push(`장비·보물 ${earned}개`);
-      setProgressSummary(parts.join(" · "));
-    }
   }, []);
 
   function onContinue(): void {
@@ -62,13 +48,8 @@ export function TitleScreen(): React.ReactElement {
   }
 
   function onNewGame(): void {
-    if (hasProgress && !confirmingNew) {
-      setConfirmingNew(true);
-      return;
-    }
     reset();
     setHasProgress(false);
-    setConfirmingNew(false);
     router.push("/stages");
   }
 
@@ -91,6 +72,11 @@ export function TitleScreen(): React.ReactElement {
       }}
     >
       {/* 로고 블록 */}
+      {activeGame && <div style={{fontSize:14,color:PARCHMENT}}>
+        <p>{activeGame.name} · 동기화된 버전 {activeGame.revision}</p>
+        <a href={`/studio?project=${activeGame.projectId}`} style={{color:BRONZE_GOLD}}>스튜디오로 돌아가기</a>
+        <p style={{fontSize:12,color:BRONZE_DIM}}>저장한 편집 내용은 게임을 다시 열 때 반영됩니다.</p>
+      </div>}
       <header style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <p
           style={{
@@ -154,44 +140,14 @@ export function TitleScreen(): React.ReactElement {
           primary={hasProgress}
         />
         <MenuButton
-          label={confirmingNew ? "정말 새로 시작?" : "새 게임"}
+          label="새 게임"
           onClick={onNewGame}
           primary={!hasProgress}
-          tone={confirmingNew ? "warn" : "default"}
         />
-        {confirmingNew ? (
-          <>
-            {/* 왜 확인을 받는지 = 지워질 진행을 그대로 보여준다 */}
-            <p style={{ margin: 0, fontSize: 12.5, color: "#e7c34a", lineHeight: 1.7 }}>
-              저장된 진행이 모두 삭제됩니다
-              {progressSummary && (
-                <>
-                  <br />
-                  <span style={{ color: BRONZE_DIM }}>{progressSummary}</span>
-                </>
-              )}
-            </p>
-            <button
-              type="button"
-              onClick={() => setConfirmingNew(false)}
-              style={{
-                background: "none",
-                border: "none",
-                color: BRONZE_DIM,
-                fontSize: 13,
-                cursor: "pointer",
-                padding: 4,
-              }}
-            >
-              취소 — 기존 진행 유지
-            </button>
-          </>
-        ) : (
-          hasProgress && (
-            <p style={{ margin: 0, fontSize: 12, color: BRONZE_DIM }}>
-              새 게임은 현재 진행을 모두 초기화합니다.
-            </p>
-          )
+        {hasProgress && (
+          <p style={{ margin: 0, fontSize: 12, color: BRONZE_DIM }}>
+            새 게임은 현재 진행을 모두 초기화합니다.
+          </p>
         )}
       </nav>
     </section>

@@ -31,9 +31,9 @@ export function DialoguePanel({
     <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "0 12px calc(20px + env(safe-area-inset-bottom))" }}>
       <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", alignItems: "flex-end", gap: 12 }}>
         {/* 화자 초상 */}
-        <div style={{ width: 96, height: 116, flexShrink: 0 }}>
+        {portraitSrc && <div style={{ width: 96, height: 116, flexShrink: 0 }}>
           <AssetImage src={portraitSrc} kind="portrait" label={line.speaker ?? ""} side={side} />
-        </div>
+        </div>}
         {/* 텍스트 패널 */}
         <div
           style={{

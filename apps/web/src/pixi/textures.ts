@@ -18,8 +18,11 @@
 import { Assets, Container, Graphics, Rectangle, Sprite, Texture, type Renderer } from "pixi.js";
 import type { Side } from "@tk/data";
 import { TILE_SIZE } from "./projection";
+import { SPECIAL_FX_KINDS } from "./specialFx";
 import { assetUrl } from "../assetUrl";
 import type { Skeleton } from "./skeleton";
+import { SPRITE_CLIPS, type SpriteClip } from "./spriteClips";
+import { loadSpriteQueue } from "./spriteLoading";
 
 /** 지형 14종 베이스 색 (terrains.json의 id와 1:1) */
 export const TERRAIN_COLORS: Record<string, number> = {
@@ -51,6 +54,7 @@ export type TextureKind = "terrain" | "side" | "white";
 /** manifest.json 형식 (slice_sheets.py 출력) */
 interface ManifestEntry {
   poses: string[];
+  rightFacingPoses?: string[];
   source: string;
   method: string;
   note?: string;
@@ -111,8 +115,15 @@ const OBJECT_BASE = assetUrl("/assets/objects");
 // 전투 타격 fx 텍스처(검은배경 발광, additive). 미보유 키는 FxLayer가 절차적 폴백.
 // arrow(화살 투사체)·thrust(창 찌르기)는 공격 종류별 FX(2026-07-03) — 시트 미생성 시 절차적 폴백.
 const FX_FILES: Record<string, string> = {
+  ...Object.fromEntries(Array.from({ length: 8 }, (_, i) => [`burn-loop-${i}`, `burn-loop-${i}.webp`])),
+  ...Object.fromEntries(["fire", "water", "earth", "wind", "heal", "debuff", "weather", "special"].flatMap(kind =>
+    Array.from({ length: 8 }, (_, frame) => [`strategy-${kind}-${frame}`, `strategy-${kind}-${frame}.webp`]))),
   slash: "slash.png", flash: "flash.png", sparkle: "sparkle.png", coin: "coin.png",
   arrow: "arrow.png", thrust: "thrust.png",
+  ...Object.fromEntries(SPECIAL_FX_KINDS.flatMap(kind =>
+    Array.from({ length: 4 }, (_, frame) => [`special-${kind}-${frame}`, `special-${kind}-${frame}.png`]))),
+  ...Object.fromEntries(["dual", "crescent", "spear", "impact"].flatMap(kind =>
+    Array.from({ length: 4 }, (_, frame) => [`hero-${kind}-${frame}`, `hero-${kind}-${frame}.png`]))),
 };
 const FX_BASE = assetUrl("/assets/fx");
 
@@ -164,6 +175,7 @@ export class TextureResolver {
   private readonly baked = new Map<string, Texture>();
   /** spriteId → pose → Texture. loadSprites() 완료 후에만 채워진다 */
   private readonly sprites = new Map<string, Map<string, Texture>>();
+  private readonly rightFacingTextures = new WeakSet<Texture>();
   /**
    * spriteId → 리그(스켈레톤 + 파트 텍스처) | null(미보유/부분실패 → 베이크 폴백).
    * loadSkeleton() 결과 캐시 — 같은 spriteId 유닛이 여럿이어도 1회만 로드. null도 캐시(재시도 안 함).
@@ -288,8 +300,7 @@ export class TextureResolver {
     //   실패(404)도 done에 센다 — 게이지가 100%에 도달 못 하는 구멍 방지(전투 부트 게이트 §13 무손실).
     let done = 0;
     const total = loadQueue.length;
-    await Promise.allSettled(
-      loadQueue.map((q) =>
+    await loadSpriteQueue(loadQueue, (q) =>
         Assets.load<Texture>(q.url)
           .then((tex) => {
             if (!tex) return;
@@ -297,6 +308,8 @@ export class TextureResolver {
               this.sprites.set(q.spriteId, new Map());
             }
             this.sprites.get(q.spriteId)!.set(q.pose, tex);
+            if (manifest[q.spriteId]?.rightFacingPoses?.includes(q.pose)) this.rightFacingTextures.add(tex);
+            else this.rightFacingTextures.delete(tex);
           })
           .catch(() => {
             /* 404 = 그 포즈만 생략(폴백 유지) */
@@ -305,7 +318,6 @@ export class TextureResolver {
             done += 1;
             onProgress?.(done, total);
           }),
-      ),
     );
 
     const loadedCount = [...this.sprites.values()].reduce((s, m) => s + m.size, 0);
@@ -499,19 +511,11 @@ export class TextureResolver {
   }
 
   /** fx 텍스처 로드 (실패해도 빈 맵 유지 — throw 안 함, 전부 폴백). */
-  private async loadFx(): Promise<void> {
-    const entries = Object.entries(FX_FILES);
-    const urls = entries.map(([, f]) => `${this.fxBase}/${f}`);
-    try {
-      const loaded = await Assets.load<Texture>(urls);
-      for (const [key, f] of entries) {
-        const tex = loaded[`${this.fxBase}/${f}`];
-        if (tex) this.fxTex.set(key, tex);
-      }
-      console.info(`[TextureResolver] fx 로드 완료: ${this.fxTex.size}종`);
-    } catch (e) {
-      console.warn("[TextureResolver] fx 로드 오류(아트 미보유 단계 정상):", e);
-    }
+  async loadFx(): Promise<void> {
+    await Promise.allSettled(Object.entries(FX_FILES).map(async ([key, file]) => {
+      const texture = await Assets.load<Texture>(`${this.fxBase}/${file}`);
+      if (texture) this.fxTex.set(key, texture);
+    }));
   }
 
   async loadTiles(): Promise<void> {
@@ -704,6 +708,19 @@ export class TextureResolver {
       poseMap.get("front_idle") ??
       null
     );
+  }
+
+  /** Use complete clips only: partially loaded/missing frames keep the static fallback. */
+  getSpriteClip(spriteId: string, view: "front" | "back", pose: SpriteClip): Texture[] | null {
+    const poses = this.sprites.get(spriteId);
+    if (!poses) return null;
+    const frames = SPRITE_CLIPS[pose].map((_, i) => poses.get(`${view}_${pose}_${i}`));
+    return frames.every((frame): frame is Texture => Boolean(frame)) ? frames : null;
+  }
+
+  /** Most sheets face left; explicit frame metadata handles differently drawn source poses. */
+  spriteNativeFacing(texture: Texture): -1 | 1 {
+    return this.rightFacingTextures.has(texture) ? 1 : -1;
   }
 
   destroy(): void {

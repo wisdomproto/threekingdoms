@@ -7,8 +7,11 @@
 import type { Action, BattleState } from "@tk/engine";
 import type { SortiePayload } from "../meta/sortie";
 import type { InputState } from "./inputMachine";
+import { activeGame } from "../game/data";
+import { snapshotKey } from "../game/snapshot";
 
 export interface SuspendedBattle {
+  gameVersion?: string;
   version: 1;
   stageId: string;
   seed: number;
@@ -33,7 +36,8 @@ export function isResumable(
   s: SuspendedBattle | null,
   env: { playthroughCount: number; hasStage: (id: string) => boolean },
 ): s is SuspendedBattle {
-  return s?.version === 1 && env.hasStage(s.stageId) && s.playthroughCount === env.playthroughCount;
+  return s?.version === 1 && env.hasStage(s.stageId) && s.playthroughCount === env.playthroughCount
+    && (!s.gameVersion || s.gameVersion.split(".")[0] === activeGame?.projectId);
 }
 
 function hasStorage(): boolean {
@@ -66,7 +70,7 @@ export function readSuspend(): SuspendedBattle | null {
 export function writeSuspend(s: SuspendedBattle): boolean {
   if (!hasStorage()) return false;
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...s, ...(activeGame ? { gameVersion:snapshotKey(activeGame) } : {}) }));
     return true;
   } catch {
     return false;

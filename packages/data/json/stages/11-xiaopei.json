@@ -2,7 +2,7 @@
   "id": "11-xiaopei",
   "name": "소패 공방전",
   "mapId": "xiaopei",
-  "turnLimit": 14,
+  "turnLimit": 12,
   "camera": {
     "zoom": 1.4,
     "focus": [
@@ -19,84 +19,387 @@
   },
   "levelCap": 18,
   "scenario": {
-    "intro": {
-      "bg": "11-xiaopei-intro",
-      "lines": [
-        {
-          "text": "서주는 지켜냈다. 허나 평온은 짧았다 — 갈 곳 잃은 맹수, 여포를 거두어 준 것이 화근이었다."
+    "intro": [
+      {
+        "bg": "11-xiaopei-intro",
+        "lines": [
+          {
+            "text": "서주는 지켜냈다. 허나 평온은 짧았다 — 갈 곳 잃은 맹수, 여포를 거두어 준 것이 화근이었다."
+          }
+        ]
+      },
+      {
+        "map": "scene-council-hall",
+        "label": "소패 · 지켜야 할 성",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "text": "여포는 주인이 성을 비운 사이 서주를 삼키고, 유비를 소패의 작은 성으로 내몰았다."
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-official",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-official",
+            "cell": [
+              3,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-official",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "chendeng",
+            "sprite": "chendeng-robes",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left",
+            "hidden": true
+          }
+        ],
+        "lines": [
+          {
+            "text": "여포는 주인이 성을 비운 사이 서주를 삼키고, 유비를 소패의 작은 성으로 내몰았다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "내 그놈을 믿지 말랬지 않소! 은혜를 원수로 갚아도 유분수지!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "zhangfei",
+                "to": [
+                  6,
+                  5
+                ]
+              }
+            ],
+            "bubble": {
+              "id": "zhangfei",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "...내 사람 보는 눈이 모자랐던 게다. 자책은 나중이다 — 지금은 성을 지킨다.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "진등",
+            "side": "player",
+            "portraitId": "진등",
+            "text": "주공, 고순의 함진영이 성문을 두드립니다. 저 부대는 창칼로 이름난 무패의 정예 — 정면으론 못 막습니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "chendeng",
+                "pose": "talk"
+              }
+            ],
+            "enter": [
+              {
+                "id": "chendeng",
+                "from": [
+                  10,
+                  3
+                ],
+                "to": [
+                  7,
+                  3
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "chendeng",
+                "dir": "left"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "성벽과 목책에 기대 소모전으로 갑니다. 함진영도 사람 — 지치면 반드시 빈틈이 납니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "chendeng",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "열이틀이다. 거점을 사수하라 — 소패가 무너지면 더는 물러설 곳이 없다!",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "chendeng",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "11-xiaopei-outro",
+        "lines": [
+          {
+            "text": "열이틀의 공방 끝에 고순의 함진영이 물러났다. 성벽은 곳곳이 무너졌으나 — 소패는 버텼다."
+          }
+        ]
+      },
+      {
+        "map": "scene-town-gate",
+        "label": "소패 · 다음 길",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "내 그놈을 믿지 말랬지 않소! 은혜를 원수로 갚아도 유분수지!"
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "...내 사람 보는 눈이 모자랐던 게다. 자책은 나중이다 — 지금은 성을 지킨다."
-        },
-        {
-          "speaker": "진등",
-          "side": "player",
-          "portraitId": "진등",
-          "text": "주공, 고순의 함진영이 성문을 두드립니다. 저 부대는 창칼로 이름난 무패의 정예 — 정면으론 못 막습니다."
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "성벽과 목책에 기대 소모전으로 갑니다. 함진영도 사람 — 지치면 반드시 빈틈이 납니다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "열이틀이다. 거점을 사수하라 — 소패가 무너지면 더는 물러설 곳이 없다!"
-        }
-      ]
-    },
-    "outro": {
-      "bg": "11-xiaopei-outro",
-      "lines": [
-        {
-          "text": "열이틀의 공방 끝에 고순의 함진영이 물러났다. 성벽은 곳곳이 무너졌으나 — 소패는 버텼다."
-        },
-        {
-          "speaker": "병사",
-          "side": "player",
-          "text": "물러간다! 함진영이 물러간다!!"
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "겨우 막아냈으나... 소패도 오래는 못 버틴다."
-        },
-        {
-          "speaker": "진등",
-          "side": "player",
-          "portraitId": "진등",
-          "text": "주공, 일단 조조에게 의탁함이 어떻습니까. 여포를 치려면 힘을 빌려야 합니다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "...호랑이를 잡으려 다른 호랑이의 굴에 드는 격이군. 허나 지금은, 그 길뿐인가."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-official",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "soldier",
+            "sprite": "soldier-story",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "chendeng",
+            "sprite": "chendeng-robes",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "병사",
+            "side": "player",
+            "text": "물러간다! 함진영이 물러간다!!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "chendeng",
+                "pose": "idle"
+              },
+              {
+                "id": "soldier",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "soldier",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "겨우 막아냈으나... 소패도 오래는 못 버틴다.",
+            "pose": [
+              {
+                "id": "soldier",
+                "pose": "idle"
+              },
+              {
+                "id": "chendeng",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "진등",
+            "side": "player",
+            "portraitId": "진등",
+            "text": "주공, 일단 조조에게 의탁함이 어떻습니까. 여포를 치려면 힘을 빌려야 합니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "soldier",
+                "pose": "idle"
+              },
+              {
+                "id": "chendeng",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "chendeng",
+                "to": [
+                  6,
+                  5
+                ]
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "...호랑이를 잡으려 다른 호랑이의 굴에 드는 격이군. 허나 지금은, 그 길뿐인가.",
+            "pose": [
+              {
+                "id": "soldier",
+                "pose": "idle"
+              },
+              {
+                "id": "chendeng",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "유비",
       "classId": "lord",
-      "level": 9,
+      "level": 11,
       "troops": 150,
       "items": [],
       "side": "player",
@@ -106,7 +409,7 @@
     {
       "commanderId": "관우",
       "classId": "lightCavalry",
-      "level": 9,
+      "level": 11,
       "troops": 160,
       "items": [
         "청룡언월도"
@@ -118,7 +421,7 @@
     {
       "commanderId": "장비",
       "classId": "lightCavalry",
-      "level": 9,
+      "level": 11,
       "troops": 160,
       "items": [
         "사모"
@@ -130,7 +433,7 @@
     {
       "commanderId": "조운",
       "classId": "lightCavalry",
-      "level": 8,
+      "level": 11,
       "troops": 145,
       "items": [],
       "side": "player",
@@ -140,7 +443,7 @@
     {
       "commanderId": "간옹",
       "classId": "strategist",
-      "level": 9,
+      "level": 11,
       "troops": 110,
       "items": [
         "쌀",
@@ -153,7 +456,7 @@
     {
       "commanderId": "미방",
       "classId": "footman",
-      "level": 8,
+      "level": 11,
       "troops": 120,
       "items": [],
       "side": "player",
@@ -163,7 +466,7 @@
     {
       "commanderId": "미축",
       "classId": "strategist",
-      "level": 8,
+      "level": 11,
       "troops": 110,
       "items": [],
       "side": "player",
@@ -173,7 +476,7 @@
     {
       "commanderId": "진등",
       "classId": "strategist",
-      "level": 7,
+      "level": 11,
       "troops": 95,
       "items": [],
       "side": "player",
@@ -183,8 +486,8 @@
     {
       "commanderId": "여포",
       "classId": "heavyCavalry",
-      "level": 10,
-      "troops": 175,
+      "level": 12,
+      "troops": 140,
       "items": [
         "방천화극",
         "적토마"
@@ -196,8 +499,8 @@
     {
       "commanderId": "고순",
       "classId": "footman",
-      "level": 9,
-      "troops": 140,
+      "level": 11,
+      "troops": 112,
       "items": [],
       "side": "enemy",
       "x": 12,
@@ -206,8 +509,8 @@
     {
       "commanderId": "장요",
       "classId": "lightCavalry",
-      "level": 9,
-      "troops": 140,
+      "level": 11,
+      "troops": 112,
       "items": [],
       "side": "enemy",
       "x": 34,
@@ -216,8 +519,8 @@
     {
       "commanderId": "진궁",
       "classId": "strategist",
-      "level": 8,
-      "troops": 100,
+      "level": 10,
+      "troops": 80,
       "items": [],
       "side": "enemy",
       "x": 24,
@@ -226,8 +529,8 @@
     {
       "commanderId": "위속",
       "classId": "footman",
-      "level": 7,
-      "troops": 110,
+      "level": 9,
+      "troops": 88,
       "items": [],
       "side": "enemy",
       "x": 12,
@@ -236,8 +539,8 @@
     {
       "commanderId": "후성",
       "classId": "lightCavalry",
-      "level": 7,
-      "troops": 110,
+      "level": 9,
+      "troops": 88,
       "items": [],
       "side": "enemy",
       "x": 34,
@@ -246,8 +549,8 @@
     {
       "commanderId": "학맹",
       "classId": "archer",
-      "level": 7,
-      "troops": 100,
+      "level": 9,
+      "troops": 80,
       "items": [],
       "side": "enemy",
       "x": 18,
@@ -256,8 +559,8 @@
     {
       "commanderId": "조성",
       "classId": "archer",
-      "level": 7,
-      "troops": 100,
+      "level": 9,
+      "troops": 80,
       "items": [],
       "side": "enemy",
       "x": 30,
@@ -267,7 +570,7 @@
   "objectives": [
     {
       "kind": "surviveTurns",
-      "turns": 12
+      "turns": 9
     },
     {
       "kind": "defeatUnit",
@@ -293,8 +596,8 @@
         {
           "commanderId": "조표",
           "classId": "footman",
-          "level": 7,
-          "troops": 100,
+          "level": 9,
+          "troops": 80,
           "items": [],
           "side": "enemy",
           "x": 12,
@@ -303,8 +606,8 @@
         {
           "commanderId": "송겸",
           "classId": "archer",
-          "level": 7,
-          "troops": 95,
+          "level": 9,
+          "troops": 76,
           "items": [],
           "side": "enemy",
           "x": 34,
@@ -323,8 +626,8 @@
         {
           "commanderId": "경무",
           "classId": "lightCavalry",
-          "level": 7,
-          "troops": 105,
+          "level": 9,
+          "troops": 84,
           "items": [],
           "side": "enemy",
           "x": 18,
@@ -333,8 +636,8 @@
         {
           "commanderId": "진기",
           "classId": "footman",
-          "level": 7,
-          "troops": 105,
+          "level": 9,
+          "troops": 84,
           "items": [],
           "side": "enemy",
           "x": 30,

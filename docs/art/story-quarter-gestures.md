@@ -1,0 +1,13 @@
+# Story quarter-view gestures
+
+Built-in image generation, 2026-09-15. Reference: first Cao Cao Online video, 02:19; rear three-quarter emphasis gesture held during dialogue.
+
+Runtime assets: `apps/web/public/assets/scene-motions/brothers-quarter-v1/*.webp` (24 transparent frames). Actors: `liubei-foot`, `guanyu-foot`, `zhangfei-foot`. Existing walking and seated clips are retained. Left/right use mirrored front-quarter artwork; down uses front-quarter, up uses rear-quarter. This is not a new eight-direction movement system.
+
+`talk`, `emphasize`, and `salute` play a 180ms idle frame followed by a held gesture. Author an explicit `idle` pose on the following line when the gesture should end. These are two-pose transitions, not fully interpolated arm animation. Map scene editor exposes emphasis under poses; motion editor labels it in Korean.
+
+Source atlas: `exec-5d2a9bc4-85bc-4a5c-993f-beb50c3087e9.png`, retained in Codex generated images. Atlas row boundaries were adjusted to its actual artwork; adjacent-cell fragments excluded when slicing. Lossless WebP retains source alpha. No battle sprites changed.
+
+## Generation prompt
+
+Create one production transparent RGBA sprite atlas, 2048x1024 landscape, exactly 8 equal columns and 3 equal rows, 24 isolated full body sprites. Reference image supplies ONLY character identities/costumes/clean illustrated chibi style. No checkerboard painted into image, actual transparent alpha background. Three-head-tall cute historical Chinese SRPG story characters, no weapons. Camera quarter-view looking down 25 degrees, see top of head and shoulders. Row1 Liu Bei ivory robe red/gold trim crown short black beard; row2 Guan Yu green robe/headscarf red face long beard; row3 Zhang Fei tan cloth leopard waistcloth beard headband. Preserve same costume/identity each row. ALL sprites standing, identical scale and baseline 94% of each cell, full body within cell with 8% margin, no overlaps, no text/grid. Columns 1-4 face diagonally towards lower-left viewer, columns5-8 face diagonally away towards upper-left, clearly showing back of head and clothing BACK, not side or front face. Column1 front-quarter idle arms lowered; col2 front-quarter speaking extend one palm at waist height; col3 front-quarter emphatic gesture lift open hand at head height elbow bent; col4 front-quarter formal salute clasp both hands at chest. Col5 rear-quarter idle; col6 rear-quarter talking extend hand toward upper-left; col7 rear-quarter emphatic raised hand visible above shoulder; col8 rear-quarter formal clasp hands forward at chest. Rear poses must visibly differ in arm silhouette. Feet stay fixed in same stance within each four-frame group. Crisp readable hands, soft top-left lighting, no cast floor shadow.

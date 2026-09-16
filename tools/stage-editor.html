@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<script>
+  if (new URLSearchParams(location.search).get('kind') === 'battle') document.documentElement.classList.add('battle-document');
+</script>
+<style>html.battle-document [data-tab^="story-"]{display:none!important}</style>
 <meta charset="UTF-8">
 <title>맵·스테이지 통합 에디터 — 삼국지 SRPG</title>
 <style>
@@ -250,18 +254,33 @@
       <button class="btn go" id="expBlock">⬇ 블록아웃 PNG</button>
       <div class="menu-sec">도구</div>
       <button class="btn" id="publishCheck" title="레포에 저장된 packages/data/json/* 을 zod 로 전수 검사 (pnpm --filter @tk/data test). index.ts 에 등록되지 않은 새 스테이지/맵 파일은 검사 대상이 아님">Publish 검사 (레포 전수)</button>
-      <label>셀px <input type="number" id="cellpx" min="6" max="40" value="15" style="width:44px"> <span id="dims" style="color:var(--dim); font-size:12px; margin-left:auto"></span></label>
+      <label>셀px <input type="number" id="cellpx" min="3" max="60" value="15" style="width:44px"> <span id="dims" style="color:var(--dim); font-size:12px; margin-left:auto"></span></label>
     </div>
   </span>
 </header>
 <main>
   <aside id="rail" title="장 목록"></aside>
   <div id="left">
+    <label id="mapViewControl" style="display:block;margin-bottom:12px">맵 표시
+      <select id="mapView" aria-label="맵 표시" style="width:100%;margin-top:6px;min-height:36px"><option value="plain">지형 격자</option><option value="art">맵 이미지 + 캐릭터</option></select>
+    </label>
+    <div role="group" aria-label="맵 확대·축소" style="margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:5px">
+        <button class="btn" id="mapZoomOut" aria-label="맵 축소" title="맵 축소" style="min-width:36px;min-height:36px">−</button>
+        <output id="mapZoomValue" aria-label="맵 배율" style="flex:1;text-align:center;font-size:13px">100%</output>
+        <button class="btn" id="mapZoomIn" aria-label="맵 확대" title="맵 확대" style="min-width:36px;min-height:36px">＋</button>
+      </div>
+      <div style="display:flex;gap:5px;margin-top:6px"><button class="btn" id="mapZoomFit" style="flex:1">전체 보기</button><button class="btn" id="mapZoomReset" style="flex:1">100%</button></div>
+      <small style="display:block;margin-top:6px;color:var(--dim)">Ctrl + 휠로 확대·축소</small>
+    </div>
+    <small id="mapViewNote" style="display:block;color:var(--dim);line-height:1.5;margin-bottom:10px"></small>
     <div class="moderow">
-      <button class="btn on" data-mode="terrain" id="m-terrain">지형</button>
+      <button class="btn on" data-mode="select" id="m-select">선택</button>
+      <button class="btn" data-mode="terrain" id="m-terrain">지형</button>
       <button class="btn" data-mode="unit" id="m-unit">유닛</button>
     </div>
-    <div id="terrainPanel">
+    <div id="selectionHint" style="font-size:12px;line-height:1.6;color:var(--dim);margin-bottom:12px">클릭·드래그로 선택과 이동<br>Shift+클릭: 추가 선택<br>빈 곳 드래그: 영역 선택<br>Ctrl+C / V: 복사·붙여넣기<br>Delete: 삭제 · 우클릭: 추가</div>
+    <div id="terrainPanel" style="display:none">
       <div class="moderow">
         <button class="btn on" data-tool="paint" id="t-paint">칠하기</button>
         <button class="btn" data-tool="fill" id="t-fill">채우기</button>
@@ -302,17 +321,17 @@
       <div class="tabs">
         <div class="tab" data-tab="story-intro">전투 전 이야기</div>
         <div class="tab on" data-tab="battle">전투</div>
-        <div class="tab" data-tab="dialogue">전투 중 대사</div>
+        <div class="tab" data-tab="dialogue">전투 이벤트</div>
         <div class="tab" data-tab="story-outro">전투 후 이야기</div>
         <div class="tab" data-tab="reward">보상</div>
+        <div class="tab" data-tab="assets" id="assetTab">이미지·에셋</div>
       </div>
       <div class="tabs sub" id="subtabs">
-        <div class="tab" data-sub="quick">빠른 편집</div>
-        <div class="tab on" data-sub="meta">메타</div>
-        <div class="tab" data-sub="unit">유닛</div>
+        <div class="tab on" data-sub="meta">전투 설정</div>
+        <div class="tab" data-sub="unit">장수·배치</div>
         <div class="tab" data-sub="obj">목표·패배</div>
         <div class="tab" data-sub="duel">일기토</div>
-        <div class="tab" data-sub="adv">증원·전략</div>
+        <div class="tab" data-sub="adv" id="legacyAdvTab">증원·전략</div>
       </div>
     </div>
     <div id="valbanner"></div>
@@ -353,12 +372,21 @@ import { createHistory } from './editor/history.js';
 import { CHAPTERS, chapterOf } from './editor/chapters.js';
 import { slotParts, sceneCount, collectSceneBgs } from './editor/story-model.js';
 import { validateStory } from './editor/validate-story.js';
+import { assetImageEditor, assetGallery } from './editor/asset-image-editor.js';
+import { renderScriptEvent } from './editor/battle-events.js';
 import { renderSceneSlot, renderDialogueList } from './editor/story-editor.js';
 import { openPublishModal, probeAssets } from './editor/publish.js';
 import { renderRail } from './editor/rail.js';
 import { createDraftSaver, saveState } from './editor/draft-store.js';
-import { renderQuick } from './editor/quick-edit.js';
-const GAME_ORIGIN = 'http://localhost:3000'; // next dev. 보드의 「🎮 게임 열기」와 같은 값
+import { renderQuick, primaryObjectiveText } from './editor/quick-edit.js';
+import { studioContext, studioLoad, studioSave, studioNotify } from './editor/studio-bridge.js';
+import { installEditorMode } from './editor/editor-mode.js';
+const studio = studioContext(location.search, location.pathname);
+if (studio) window.addEventListener('message', event => {
+  if (event.origin === location.origin && event.source === parent && event.data?.type === 'tk-studio:request-close' && !studioReady) studioNotify('close');
+});
+let studioReady = false, studioClosing = false, editorMode = null;
+const GAME_ORIGIN = studio ? location.origin : 'http://localhost:3000';
 document.getElementById('modfail').remove();
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -383,6 +411,7 @@ const FALLBACK_COMMANDERS = ['유비','관우','장비','조운','제갈량','�
 const FALLBACK_CLASSES = ['footman','pikeman','chariot','archer','crossbowman','catapult','lightCavalry','heavyCavalry','guardCavalry','bandit','brigand','outlaw','band','beastUnit','brawler','sorcerer','tribesman','civilian','transport','strategist','lord'];
 const FALLBACK_ITEMS = ['청룡언월도','사모','쌀','폭탄','무술교본'];
 
+let ROSTERS = {};
 let COMMANDERS = FALLBACK_COMMANDERS.map(id => ({ id, name: id }));
 let CLASSES = FALLBACK_CLASSES.map(id => ({ id, name: id }));
 let ITEMS = FALLBACK_ITEMS.map(id => ({ id, name: id }));
@@ -394,7 +423,7 @@ let tiles = [];               // H개의 char[] (W)
 let loadedLegend = null;      // 불러온 map의 tileLegend(키 순서/미사용 키 보존 → round-trip 무파손)
 let stage = newStageMeta();   // 스테이지 메타·목표 등 (units는 stage.units)
 let curChar = '.';
-let mode = 'terrain';         // 'terrain' | 'unit'
+let mode = 'select';         // 'terrain' | 'unit'
 let tool = 'paint';
 let cellPx = 15;
 let painting = false;
@@ -418,39 +447,49 @@ const hhmm = (d) => { d = d instanceof Date ? d : new Date(d); return `${String(
 const saver = createDraftSaver({
   debounceMs: 1500, retryMs: 30000,
   post: async ({ baseRevision }) => {
+    draftSent = history.current();
+    if (studio) return studioSave(studio, baseRevision, JSON.parse(draftSent));
     if (sameAsRepo()) {   // undo 로 레포와 같아짐 — Draft 는 유령이라 지운다 (Published 가 곧 현재 상태)
-      if (draftRevision != null) await fetch('/draft-delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stageId: stage.id }) });
+      if (draftRevision != null) {
+        const response = await fetch('/draft-delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stageId: stage.id, baseRevision }) });
+        const result = await response.json();
+        if (!response.ok || !result.ok) return { ...result, ok: false };
+      }
       return { ok: true, revision: null, deleted: true };
     }
     if (!history.isDirty()) return { ok: true, revision: baseRevision };   // Draft 가 baseline 인 clean — 보낼 것 없음
-    draftSent = history.current();
     const r = await fetch('/draft-save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stageId: stage.id, stage: serializeStage(), map: serializeMap(), baseRevision }) });
     return r.json();
   },
   onSaved: (res) => {
     draftRevision = res.revision ?? null;
     if (res.deleted) draftAt = null; else if (res.savedAt) draftAt = hhmm(res.savedAt);
-    if (res.deleted || history.current() === draftSent) { history.markSaved(); clearRecovery(); }   // 저장 중 편집이 끼었으면 다음 post 가 마크한다
+    if (history.current() === draftSent) { history.markSaved(); clearRecovery(); }   // Deletion acknowledgements must also preserve edits made in flight.
     refreshDraftIndex(); updateSaveState();
+    if (studio && studioClosing && !history.isDirty()) studioNotify('close');
   },
   onState: () => updateSaveState(),
 });
 function touchDraft() {   // 모델이 바뀐 모든 경로: push 성공·undo/redo·복구본 복원
+  if (studio && !studioReady) return;
   if (mapOnlyMode || DRAFT_OFF) return;
   if (sameAsRepo()) { history.markSaved(); saver.touch(); saver.flush(); return; }   // Published 와 같아짐(undo 등) = 저장된 상태 — 유령 Draft 는 디바운스 없이 즉시 삭제
   saver.touch();
 }
 function sameAsRepo() {
+  if (studio) return false;
   const rs = repoStageCache.get(stage.id), rm = repoMapCache.get(mapId);
   return !!rs && !!rm && JSON.stringify(JSON.parse(serializeStage())) === JSON.stringify(rs) && JSON.stringify(JSON.parse(serializeMap())) === JSON.stringify(rm);
 }
 async function refreshDraftIndex() {
+  if (studio) return;
   if (DRAFT_OFF) return;
   try { const r = await fetch('/draft-list', { cache: 'no-store' }); const j = await r.json(); draftIndex = (j && j.drafts) || {}; } catch { /* serve.py 아님(file://) — Draft 없음으로 */ }
   railKey = ''; updateRail(); updateDraftBadge();
 }
 /* 모든 로드 경로의 꼬리 — 서버 index 기준으로 saver revision 을 맞춘다. (/draft-save 는 baseRevision null = "Draft 없음 기대" → 있으면 409라, 파일/붙여넣기/새로 로드도 기존 Draft 의 revision 을 물려받아야 한다) */
 function applyDraftSeed() {
+  if (studio) return;
   const m = mapOnlyMode ? null : draftIndex[stage.id];
   draftRevision = m ? (m.revision ?? null) : null; draftAt = m && m.savedAt ? hhmm(m.savedAt) : null;
   saver.reset({ revision: draftRevision, draftAt });
@@ -470,7 +509,7 @@ async function discardDraft() {
   if (draftRevision == null && !draftIndex[stage.id]) { toast('이 장의 Draft 없음'); return; }
   if (!confirm(`"${stage.id}" 의 Draft 를 버리고 Published(레포)로 되돌릴까요? (편집 내용은 사라집니다)`)) return;
   try {
-    const r = await fetch('/draft-delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stageId: stage.id }) });
+    const r = await fetch('/draft-delete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stageId: stage.id, baseRevision: draftRevision }) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !j.ok) { toast(`Draft 삭제 실패: ${j.error || r.status}`, true); return; }
   } catch (e) { toast('Draft 삭제 실패: ' + e.message, true); return; }
@@ -484,7 +523,20 @@ let railCollapsed = localStorage.getItem('tk.editor.rail') === 'collapsed';
 let railKey = '';                 // 마지막 렌더 키 — 바뀔 때만 리렌더
 const repoStageCache = new Map(); // stageId → 레포 원본 JSON (rail fetch·loadStageFromServer·Publish 성공이 채움) — 씬 bg datalist·Publish diff 기준
 const repoMapCache = new Map();   // mapId → 레포 원본 맵 JSON
-const ASSET_BASE = '/apps/web/public';   // serve.py 가 레포 루트를 서빙 — 씬 썸네일·에셋 프로브
+let previewAssetBase = "";
+let mapPreviewVersion = Date.now();
+function localObjectPreviews(urls) {
+  if (!studio) return urls;
+  return urls.flatMap(url => {
+    const path = new URL(url, location.href).pathname;
+    return path.startsWith('/assets/objects/') ? [`${path}?v=${mapPreviewVersion}`, url] : [url];
+  });
+}
+let mapView = "plain";
+let objectPreviewKey = "", objectPlacements = [], objectPreviewTimer;
+const previewImages = new Map();
+const previewSprites = new Map();
+const ASSET_BASE = studio ? '' : '/apps/web/public';
 const hasFS = 'showOpenFilePicker' in window;
 let stageHandle = null, mapHandle = null;
 
@@ -515,11 +567,46 @@ async function init() {
   renderTab();
   refreshValidation();
   history.reset(snapshot());
+  if (studio) {
+    document.body.classList.add('studio-linked');
+    document.body.classList.add(studio.target.kind === 'scene' ? 'studio-scene' : 'studio-battle');
+    document.getElementById('playtestBtn').textContent = studio.target.kind === 'scene' ? '▶ 장면 미리보기' : '▶ 전투 테스트';
+    document.getElementById('saveDraft').title = '현재 Studio 프로젝트에 저장';
+    try {
+      const loaded = await studioLoad(studio);
+      previewAssetBase = loaded.assetBase ?? "";
+      loadMapObject(loaded.map); loadStageObject(loaded.stage);
+      draftRevision = loaded.revision; draftAt = hhmm(loaded.updatedAt);
+      saver.reset({ revision: draftRevision, draftAt }); studioReady = true;
+      const requestedSection = new URLSearchParams(location.search).get('section');
+      switchTab(studio.target.kind === 'scene' ? 'story-intro' : ['dialogue','battle:adv'].includes(requestedSection) ? requestedSection : 'battle:unit');
+      editorMode = installEditorMode({ getTab: () => activeTab, switchTab, getStage: () => stage, linked: true });
+      const close = document.createElement('button'); close.className = 'btn'; close.textContent = 'Studio로 돌아가기';
+      const finish = () => {
+        const state = saver.state();
+        if (state.conflict) {
+          if (confirm('다른 창의 최신 저장본으로 돌아갈까요? 현재 수정은 브라우저 복구본으로 남습니다. 필요하면 취소하고 먼저 편집본 JSON을 보관하세요.')) studioNotify('close');
+          return;
+        }
+        studioClosing = true;
+        if (history.isDirty() || state.saving || state.lastError) { saver.touch(); saver.flush(); }
+        else studioNotify('close');
+      };
+      close.onclick = finish; if (parent === window) document.querySelector('header').append(close);
+      window.addEventListener('message', e => { if (e.origin === location.origin && e.source === parent && e.data?.type === 'tk-studio:request-close') finish(); });
+      const backup = document.createElement('button'); backup.className = 'btn'; backup.textContent = '편집본 JSON 보관';
+      backup.onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([snapshot()], {type:'application/json'})); a.download = 'studio-detail-recovery.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); };
+      document.querySelector('header').append(backup);
+      checkRecovery(); updateSaveState();
+    } catch (error) { document.querySelector('main').textContent = String(error); }
+    return;
+  }
   const q = new URLSearchParams(location.search);   // ?stage=ID&quick=1 (spec §8)
   const wanted = q.get('stage') || DEFAULT_STAGE;
   const [, ok] = await Promise.all([loadRailStages(), loadStageFromServer(wanted)]);
   if (!ok && wanted !== DEFAULT_STAGE) { toast(`스테이지 ${wanted} 없음 — 기본 장으로`, true); await loadStageFromServer(DEFAULT_STAGE); }
   if (q.get('quick') === '1') { setRailCollapsed(true); switchTab('battle:quick'); }   // 게임 ☰ → ✏ 편집 진입
+  editorMode = installEditorMode({ getTab: () => activeTab, switchTab, getStage: () => stage });
 }
 
 async function loadRefData() {
@@ -527,10 +614,13 @@ async function loadRefData() {
     try { const r = await fetch(rel); if (!r.ok) return null; return await r.json(); }
     catch { return null; }
   };
-  const recToList = (obj) => Object.entries(obj).map(([k, v]) => ({ id: (v && v.id) || k, name: (v && v.name) || k }));
-  const c = await tryLoad('../packages/data/json/commanders.json');
-  const u = await tryLoad('../packages/data/json/unitClasses.json');
-  const it = await tryLoad('../packages/data/json/items.json');
+  const recToList = (obj) => Object.entries(obj).map(([k, v]) => ({ ...v, id: (v && v.id) || k, name: (v && v.name) || k }));
+  const base = studio ? '/api/studio/legacy/data/' : '../packages/data/json/';
+  const suffix = studio ? `?project=${encodeURIComponent(studio.project)}` : '';
+  const c = await tryLoad(base + 'commanders.json' + suffix);
+  const u = await tryLoad(base + 'unitClasses.json');
+  const it = await tryLoad(base + 'items.json' + suffix);
+  ROSTERS = await tryLoad(base + 'rosters.json' + suffix) ?? {};
   if (c) COMMANDERS = recToList(c);
   if (u) CLASSES = recToList(u);
   if (it) ITEMS = recToList(it);
@@ -570,8 +660,84 @@ const gx = gridC.getContext('2d');
 function resizeCanvas() {
   for (const c of [terrC, unitC, gridC]) { c.width = W * cellPx; c.height = H * cellPx; }
   document.getElementById('dims').textContent = `${W} × ${H}  (${cellPx}px)`;
+  document.getElementById('mapZoomValue').textContent = `${Math.round(cellPx / 15 * 100)}%`;
+  document.getElementById('mapZoomOut').disabled = cellPx <= 3;
+  document.getElementById('mapZoomIn').disabled = cellPx >= 60;
 }
 
+// Keep the viewed map point fixed; zoom is a display preference, never an edit.
+function setMapScale(value, pointer) {
+  if (painting || selectionDrag || selectionBox) return;
+  if (!Number.isFinite(value)) return;
+  const viewport=document.getElementById('stage'), bounds=viewport.getBoundingClientRect();
+  const anchorX=pointer ? pointer.clientX-bounds.left : viewport.clientWidth/2;
+  const anchorY=pointer ? pointer.clientY-bounds.top : viewport.clientHeight/2;
+  const worldX=(viewport.scrollLeft+anchorX-16)/cellPx;
+  const worldY=(viewport.scrollTop+anchorY-16)/cellPx;
+  cellPx=Math.max(3,Math.min(60,Math.round(value)));
+  document.getElementById('cellpx').value=cellPx;
+  resizeCanvas();renderAll();
+  viewport.scrollLeft=16+worldX*cellPx-anchorX;
+  viewport.scrollTop=16+worldY*cellPx-anchorY;
+}
+// Preview caches never enter stage/map snapshots or alter editing coordinates.
+function previewImage(urls) {
+  const key = urls.join("|");
+  if (previewImages.has(key)) return previewImages.get(key);
+  previewImages.set(key, null);
+  const attempt = index => {
+    if (index >= urls.length) { previewImages.set(key, false); renderTerrain(); renderUnits(); return; }
+    const image = new Image();
+    image.onload = () => { previewImages.set(key, image); renderTerrain(); renderUnits(); };
+    image.onerror = () => attempt(index + 1);
+    image.src = urls[index];
+  };
+  attempt(0);
+  return null;
+}
+function previewSprite(unit) {
+  const key = `${unit.commanderId}:${unit.classId}:${unit.side}`;
+  if (!previewSprites.has(key)) {
+    previewSprites.set(key, null);
+    const q = new URLSearchParams({commander:unit.commanderId, class:unit.classId, side:unit.side});
+    if (studio) fetch(`/api/studio/legacy/sprite-preview?${q}`).then(r => { if (!r.ok) throw new Error(); return r.json(); }).then(urls => { previewSprites.set(key, urls); renderUnits(); }).catch(() => { previewSprites.set(key, []); });
+    else previewSprites.set(key, [`${ASSET_BASE}/assets/sprites/${encodeURIComponent(unit.commanderId)}/front_idle.webp`]);
+  }
+  const urls = previewSprites.get(key);
+  return urls?.length ? previewImage(urls) : null;
+}
+document.getElementById('mapView').onchange = event => {
+  mapView = event.target.value; objectPreviewKey = "";
+  // Increase only visual scale so characters are readable; map cells and drag/drop stay unchanged.
+  if (mapView === 'art' && cellPx < 24) { cellPx = 24; document.getElementById('cellpx').value = cellPx; resizeCanvas(); }
+  renderAll();
+};
+function renderObjects() {
+  if (!studio) return;
+  const payload = JSON.stringify({tiles:tiles.map(row => Array.isArray(row) ? row.join('') : row), legend:{...Object.fromEntries(TERRAINS.map(t => [t[0],t[1]])),...loadedLegend}, decorations:serializeStageModel(stage).decorations});
+  if (payload !== objectPreviewKey) {
+    objectPreviewKey = payload; objectPlacements = []; clearTimeout(objectPreviewTimer);
+    objectPreviewTimer = setTimeout(() => fetch('/api/studio/legacy/object-preview', {method:'POST',headers:{'Content-Type':'application/json'},body:payload})
+      .then(r => {if (!r.ok) throw new Error(); return r.json();})
+      .then(data => {if (objectPreviewKey === payload) {objectPlacements = data;renderTerrain();}})
+      .catch(() => {if (objectPreviewKey === payload) document.getElementById('mapViewNote').textContent = '지형지물을 불러오지 못했습니다. 맵 표시를 다시 선택해 주세요.';}), 120);
+  }
+  for (const d of objectPlacements) {
+    const image = previewImage(localObjectPreviews(d.urls)); if (!image) continue;
+    if(d.courtyard) {
+      tx.fillStyle='rgba(185,165,120,.24)'; tx.beginPath();
+      tx.roundRect(d.x*cellPx+cellPx/16,(d.y+.3)*cellPx,(d.width??1)*cellPx-cellPx/8,((d.height??1)-.35)*cellPx,cellPx/6); tx.fill();
+    }
+    const width = Math.min(cellPx * (d.tile || d.gate ? 1 : 1.18) * (d.scale ?? 1),
+      d.maxHeight == null ? Infinity : cellPx*d.maxHeight*image.naturalWidth/image.naturalHeight);
+    const height = d.tile ? width : width * image.naturalHeight / image.naturalWidth;
+    const cx = (d.x + .5 + (d.dx ?? 0)) * cellPx;
+    const cy = (d.y + (d.tile ? .5 : 1) + (d.dy ?? 0)) * cellPx - (d.tile ? 0 : cellPx / 48);
+    tx.save(); tx.translate(cx,cy); tx.rotate((d.rotation ?? 0)*Math.PI/180); tx.scale(d.flip ? -1 : 1,1);
+    if (!d.tile && !d.gate) {tx.fillStyle='rgba(0,0,0,.18)';tx.beginPath();tx.ellipse(0,-cellPx/24,width*.32,cellPx*.16*Math.min(1,d.scale??1),0,0,Math.PI*2);tx.fill();}
+    tx.drawImage(image,-width/2,d.tile ? -height/2 : -height,width,height);tx.restore();
+  }
+}
 function renderTerrain() {
   tx.clearRect(0, 0, terrC.width, terrC.height);
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
@@ -579,6 +745,16 @@ function renderTerrain() {
     tx.fillStyle = rgb(t[2]);
     tx.fillRect(x * cellPx, y * cellPx, cellPx, cellPx);
   }
+  if (mapView === 'art') {
+    const root = studio ? previewAssetBase : ASSET_BASE;
+    const mapPath = `/assets/maps/${encodeURIComponent(mapId)}`;
+    // Authoring previews prefer local regenerated art before published CDN assets.
+    const localMaps = studio ? [`/api/local-assets/maps/${encodeURIComponent(mapId)}.webp?v=${mapPreviewVersion}`, `${mapPath}.webp?v=${mapPreviewVersion}`, `${mapPath}.png?v=${mapPreviewVersion}`] : [];
+    const image = previewImage([...localMaps, `${root}${mapPath}.webp`, `${root}${mapPath}.png`]);
+    if (image) { tx.imageSmoothingEnabled = true; tx.drawImage(image, 0, 0, terrC.width, terrC.height); }
+    document.getElementById('mapViewNote').textContent = image ? '맵 이미지는 지형 수정에 따라 자동으로 바뀌지 않습니다. 판정·편집은 격자 기준입니다.' : image === false ? '맵 이미지가 없어 지형 격자로 표시합니다.' : '맵 이미지를 불러오는 중…';
+  } else document.getElementById('mapViewNote').textContent = '';
+  if (mapView === 'art') renderObjects();
   refreshStats();
 }
 function renderGrid() {
@@ -590,6 +766,9 @@ function renderGrid() {
     for (let y = 0; y <= H; y++) { gx.moveTo(0, y * cellPx + .5); gx.lineTo(W * cellPx, y * cellPx + .5); }
     gx.stroke();
   }
+  gx.strokeStyle='#ffe291';gx.fillStyle='rgba(255,226,145,.16)';gx.lineWidth=2;
+  for(const item of mapSelection){const [x,y]=selectionXY(item);gx.fillRect(x*cellPx,y*cellPx,cellPx,cellPx);gx.strokeRect(x*cellPx+1,y*cellPx+1,cellPx-2,cellPx-2);}
+  if(selectionBox){const {start:a,end:b}=selectionBox;gx.strokeRect(Math.min(a[0],b[0])*cellPx,Math.min(a[1],b[1])*cellPx,(Math.abs(a[0]-b[0])+1)*cellPx,(Math.abs(a[1]-b[1])+1)*cellPx);}
   // 좌표 집기 모드 표시
   if (coordPick) {
     gx.fillStyle = 'rgba(212,168,67,.12)';
@@ -612,10 +791,24 @@ function renderUnits() {
       ux.setLineDash([3, 2]); ux.lineWidth = 2; ux.strokeStyle = '#fff';
       ux.beginPath(); ux.arc(cx, cy, r + 2.5, 0, Math.PI * 2); ux.stroke(); ux.setLineDash([]);
     }
+    if (mapView === 'art') {
+      const image = previewSprite(u);
+      if (image) {
+        const size = cellPx * 1.6;
+        const scale = size / Math.max(image.naturalWidth, image.naturalHeight);
+        const width = image.naturalWidth * scale, height = image.naturalHeight * scale;
+        ux.imageSmoothingEnabled = true;
+        const facing=u.facing ?? (u.x < (W-1)/2 ? 'right' : 'left');
+        ux.save();ux.translate(cx,cy+cellPx*.4);ux.scale(facing==='right'?-1:1,1);
+        ux.drawImage(image,-width/2,-height,width,height);ux.restore();
+      }
+    }
     if (cellPx >= 13) {
       ux.fillStyle = '#fff'; ux.font = `${Math.max(8, cellPx * 0.5)}px 'Malgun Gothic'`;
       ux.textAlign = 'center'; ux.textBaseline = 'bottom';
-      ux.fillText((u.commanderId || '').slice(0, 3), cx, u.y * cellPx - 1);
+      const labelY = mapView === 'art' ? cy + cellPx * .85 : u.y * cellPx - 1;
+      ux.strokeStyle = '#101510'; ux.lineWidth = 3; ux.strokeText((u.commanderId || '').slice(0, 6), cx, labelY);
+      ux.fillText((u.commanderId || '').slice(0, 6), cx, labelY);
     }
   });
 }
@@ -660,11 +853,26 @@ function unitAt(x, y) {
   const hit = allPlacedUnits().find(({ u }) => u.x === x && u.y === y);
   return hit ? hit.u : null;
 }
+function unitAtPointer(event) {
+  const cell=cellAt(event); if (!cell) return null;
+  const exact=unitAt(cell[0],cell[1]); if (exact || mapView !== 'art') return exact;
+  const rect=gridC.getBoundingClientRect(), px=event.clientX-rect.left, py=event.clientY-rect.top;
+  return allPlacedUnits().map(({u})=>u).reverse().find(u=>{
+    const urls=previewSprites.get(`${u.commanderId}:${u.classId}:${u.side}`);
+    const image=urls?.length ? previewImages.get(urls.join('|')) : null; if (!image) return false;
+    const scale=cellPx*1.6/Math.max(image.naturalWidth,image.naturalHeight);
+    const width=image.naturalWidth*scale,height=image.naturalHeight*scale;
+    const cx=(u.x+.5)*cellPx, bottom=(u.y+.9)*cellPx;
+    return px>=cx-width/2 && px<=cx+width/2 && py>=bottom-height && py<=bottom;
+  }) ?? null;
+}
 function placeOrSelect(x, y) {
   const existing = unitAt(x, y);
   if (existing) { selUnit = existing; switchTab('battle:unit'); renderUnits(); return; }
+  const available=COMMANDERS.find(c=>!allPlacedUnits().some(({u})=>u.commanderId===c.id));
+  if(!available){toast('추가할 수 있는 미배치 캐릭터가 없습니다',true);return;}
   const u = {
-    commanderId: COMMANDERS[0] ? COMMANDERS[0].id : '',
+    commanderId: available.id,
     classId: document.getElementById('placeClass').value || 'footman',
     level: 1, troops: 100, items: [],
     side: document.getElementById('placeSide').value || 'enemy',
@@ -677,35 +885,191 @@ function placeOrSelect(x, y) {
   toast(`${SIDES[u.side].label} 유닛 배치 (${x},${y})`);
 }
 
+
+const PROP_OPTIONS = [['banner_command','지휘 깃발'],['pennants','깃발 무리'],['signal_flag','신호기'],['campfire','모닥불'],['brazier','화로'],['supply_cart','보급 수레'],['debris_pile','잔해'],['debris_cart','부서진 수레'],['debris_weapons','버려진 무기'],['debris_siege','공성 잔해'],['shrub','수풀'],['reeds','갈대'],['table','탁자'],['carpet','깔개'],['screen','병풍'],['counter','주안상'],['stool','걸상']];
+let mapMenu = null;
+let mapSelection = [], mapClipboard = [], selectionDrag = null, selectionBox = null, hoverCell = null;
+const objectTerrains = new Set(['forest','mountain','cliff','village','barracks','depot','wall','gate','bridge']);
+function terrainObjectAt(x,y) { return objectTerrains.has(loadedLegend?.[tiles[y]?.[x]] ?? BY_CHAR[tiles[y]?.[x]]?.[1]); }
+function selectionXY(item) { return item.kind === 'unit' ? [item.ref.x,item.ref.y] : item.kind === 'prop' ? item.ref.cell : [item.x,item.y]; }
+function sameSelection(a,b) { return a.kind===b.kind && (a.kind==='terrain' ? a.x===b.x && a.y===b.y : a.ref===b.ref); }
+function mapHit(event) {
+  const cell=cellAt(event); if (!cell) return null;
+  const unit=!mapOnlyMode && unitAtPointer(event); if(unit) return {kind:'unit',ref:unit};
+  const props=stage.decorations ?? [];
+  const prop=[...props].reverse().find(d=>d.cell?.[0]===cell[0] && d.cell?.[1]===cell[1]);
+  if(prop) return {kind:'prop',ref:prop};
+  if(terrainObjectAt(...cell)) return {kind:'terrain',x:cell[0],y:cell[1]};
+  return null;
+}
+function updateSelection() {
+  selUnit=mapSelection.find(item=>item.kind==='unit')?.ref ?? null;
+  const hint=document.getElementById('selectionHint');
+  hint.textContent=mapSelection.length ? `${mapSelection.length}개 선택 · 드래그 이동 / Ctrl+C 복사 / Delete 삭제` : '클릭·드래그로 선택과 이동 · Shift+클릭 추가 선택 · 빈 곳 드래그 영역 선택 · Ctrl+C / V 복사·붙여넣기 · 우클릭 추가';
+  renderUnits(); renderGrid();
+}
+function copySelection() {
+  const excluded=mapSelection.filter(item=>item.kind==='unit').length;
+  mapClipboard=mapSelection.filter(item=>item.kind!=='unit').map(item=>{
+    const [x,y]=selectionXY(item);
+    return {kind:item.kind,x,y,data:item.kind==='prop' ? structuredClone(item.ref) : tiles[y][x]};
+  });
+  toast(mapClipboard.length ? `${mapClipboard.length}개 지형지물 복사${excluded ? ' · 캐릭터 제외' : ''} · 원하는 칸에서 붙여넣기` : '캐릭터는 복제할 수 없습니다. 지형지물을 선택해 주세요.');
+}
+function pasteSelection(cell) {
+  if(!mapClipboard.length || !cell) return;
+  mapClipboard=mapClipboard.filter(item=>item.kind==='prop'||item.kind==='terrain');
+  const ox=Math.min(...mapClipboard.map(d=>d.x)),oy=Math.min(...mapClipboard.map(d=>d.y));
+  const entries=mapClipboard.map(d=>({...d,x:d.x-ox+cell[0],y:d.y-oy+cell[1]}));
+  if(entries.some(d=>!inBounds(d.x,d.y) || d.kind==='unit' && unitAt(d.x,d.y) || d.kind==='terrain' && terrainObjectAt(d.x,d.y))) {toast('맵 밖이거나 다른 캐릭터·지형지물과 겹칩니다',true);return;}
+  mapSelection=entries.map(d=>{
+    if(d.kind==='prop') {const ref={...structuredClone(d.data),cell:[d.x,d.y]};(stage.decorations??=[]).push(ref);return {kind:'prop',ref};}
+    tiles[d.y][d.x]=d.data;return {kind:'terrain',x:d.x,y:d.y};
+  });
+  renderAll();updateSelection();renderTab();refreshUnitList();refreshValidation();toast(`${entries.length}개 붙여넣기`);
+}
+function deleteMapSelection() {
+  if(!mapSelection.length) {deleteSelectedUnit();return;}
+  for(const item of mapSelection) {
+    if(item.kind==='unit') removeUnit(item.ref);
+    else if(item.kind==='prop') stage.decorations.splice(stage.decorations.indexOf(item.ref),1);
+    else tiles[item.y][item.x]='.';
+  }
+  mapSelection=[];selUnit=null;renderAll();updateSelection();renderTab();refreshUnitList();refreshValidation();toast('선택 항목 삭제 · Ctrl+Z로 복구');
+}
+function moveMapSelection(dx,dy) {
+  if(!dx&&!dy) return false;
+  const positions=mapSelection.map(item=>({item,from:selectionXY(item),tile:item.kind==='terrain'?tiles[item.y][item.x]:null}));
+  if(positions.some(({item,from:[x,y]})=>!inBounds(x+dx,y+dy) || item.kind==='unit' && allPlacedUnits().some(({u})=>u.x===x+dx && u.y===y+dy && !mapSelection.some(i=>i.ref===u)) || item.kind==='terrain' && terrainObjectAt(x+dx,y+dy) && !mapSelection.some(i=>i.kind==='terrain'&&i.x===x+dx&&i.y===y+dy))) return false;
+  for(const p of positions) if(p.item.kind==='terrain') tiles[p.from[1]][p.from[0]]='.';
+  for(const {item,from:[x,y],tile} of positions) {
+    if(item.kind==='unit') {item.ref.x=x+dx;item.ref.y=y+dy;}
+    else if(item.kind==='prop') item.ref.cell=[x+dx,y+dy];
+    else {item.x=x+dx;item.y=y+dy;tiles[y+dy][x+dx]=tile;}
+  }
+  renderAll();updateSelection();return true;
+}
+
+function closeMapMenu() { if (mapMenu) { mapMenu.remove(); mapMenu = null; gridC.focus({preventScroll:true}); } }
+function deleteSelectedUnit() {
+  if (!selUnit) return;
+  removeUnit(selUnit); mapSelection=[]; selUnit = null; renderAll(); renderTab(); refreshUnitList(); refreshValidation(); toast('캐릭터 삭제 · 실행 취소로 복구할 수 있습니다');
+}
+function openMapMenu(event, x, y) {
+  closeMapMenu();
+  const box=document.createElement('div');mapMenu=box;
+  box.setAttribute('role','dialog');box.setAttribute('aria-label',`맵 편집 (${x}, ${y})`);
+  box.style.cssText='position:fixed;z-index:100;max-height:80vh;overflow:auto;width:280px;padding:14px;background:var(--panel);border:1px solid var(--acc);border-radius:10px;box-shadow:0 8px 30px #0008;display:grid;gap:10px';
+  box.style.left=Math.max(8,Math.min(event.clientX,innerWidth-296))+'px';
+  box.style.top=Math.max(8,Math.min(event.clientY,innerHeight-450))+'px';
+  const action=(label,cb)=>{const button=document.createElement('button');button.className='btn';button.textContent=label;button.onclick=cb;box.append(button);return button;};
+  const select=(label,options)=>{const el=selectEl(options,options[0]?.value,()=>{});el.setAttribute('aria-label',label);el.style.cssText='width:100%;min-height:36px;background:var(--panel2);color:var(--txt)';const l=document.createElement('label');l.textContent=label;l.append(el);box.append(l);return el;};
+  const page=title=>{box.replaceChildren();action('‹ 추가 종류 선택',choose);const h=document.createElement('strong');h.textContent=`${title} · (${x}, ${y})`;box.append(h);};
+  function characters() {
+    page('캐릭터 추가');
+    const options=commanderOptions().filter(o=>!allPlacedUnits().some(({u})=>u.commanderId===o.value));
+    const search=document.createElement('input');search.type='search';search.placeholder='캐릭터 이름 검색';search.setAttribute('aria-label','캐릭터 검색');search.style.cssText='width:100%;padding:9px;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:6px';box.append(search);
+    const commander=select('검색 결과',options);commander.size=6;
+    const count=document.createElement('small');box.append(count);
+    const side=select('진영',SIDE_KEYS.map(k=>({value:k,label:SIDES[k].label})));
+    const cls=select('병종 변경',classOptions());
+    const advanced=document.createElement('details');const summary=document.createElement('summary');summary.textContent='고급 설정';advanced.append(summary,cls.parentElement);box.append(advanced);
+    const classNote=document.createElement('small');box.insertBefore(classNote,advanced);
+    const updateClass=()=>{const roster=ROSTERS[commander.value];const known=roster?.classId||COMMANDERS.find(c=>c.id===commander.value)?.defaultClassId;cls.value=known || 'footman';classNote.textContent=known ? `기본 병종: ${CLASSES.find(c=>c.id===known)?.name ?? known}` : '기본 병종 미지정 · 단병으로 시작 (고급 설정에서 변경)';};
+    const add=action('선택한 캐릭터 추가',()=>{
+      if(unitAt(x,y)||!commander.value||allPlacedUnits().some(({u})=>u.commanderId===commander.value)){toast('빈 칸에 미배치 캐릭터를 선택해 주세요',true);return;}
+      const u={commanderId:commander.value,classId:cls.value,side:side.value,level:1,troops:100,items:[],x,y};
+      stage.units.push(u);selUnit=u;mapSelection=[{kind:'unit',ref:u}];closeMapMenu();switchTab('battle:unit');renderAll();updateSelection();refreshUnitList();refreshValidation();toast('캐릭터 추가');
+    });
+    const filter=()=>{const previous=commander.value;const q=search.value.trim().toLocaleLowerCase();const found=options.filter(o=>o.label.toLocaleLowerCase().includes(q)||o.value.toLocaleLowerCase().includes(q));commander.replaceChildren(...found.map(o=>{const el=document.createElement('option');el.value=o.value;el.textContent=o.label;return el;}));if(found.some(o=>o.value===previous))commander.value=previous;else if(found.length)commander.value=found[0].value;count.textContent=found.length?`${found.length}명 · 이미 배치된 캐릭터 제외`:'검색 결과가 없습니다';add.disabled=!found.length||!!unitAt(x,y);updateClass();};
+    search.oninput=filter;commander.addEventListener('change',updateClass);filter();search.focus();
+  }
+  function objects() {
+    page('지형지물 추가');
+  const terrain = select('지형지물',[
+    ...TERRAINS.filter(t=>['forest','mountain','cliff','village','barracks','depot','wall','gate','bridge'].includes(t[1])).map(t=>({value:'terrain:'+t[0],label:({forest:'나무·숲',mountain:'바위·산',cliff:'절벽',village:'민가',barracks:'병영',depot:'창고',wall:'성벽',gate:'성문',bridge:'다리'})[t[1]]+' (지형)'})),
+    ...(!mapOnlyMode ? PROP_OPTIONS.map(([value,label])=>({value:'prop:'+value,label:label+' (소품)'})) : [])
+  ]);
+  const preview=document.createElement('figure');preview.style.cssText='margin:0;padding:10px;background:#303a2d;border:1px solid var(--line);border-radius:7px;text-align:center';
+  const previewImg=document.createElement('img');previewImg.style.cssText='display:block;width:100%;height:128px;object-fit:contain;margin:auto';
+  const caption=document.createElement('figcaption');caption.style.cssText='font-size:12px;margin-top:6px';preview.append(previewImg,caption);box.append(preview);
+  let previewVersion=0;
+  const showPreview=()=>{
+    const version=++previewVersion;
+    const [kind,value]=terrain.value.split(':');
+    const label=terrain.selectedOptions[0]?.textContent ?? value;
+    const terrainId=BY_CHAR[value]?.[1];
+    const keys={forest:'tree_leafy',mountain:'rock_cluster',cliff:'rock_cliff',village:'village_hut',barracks:'camp_tent',depot:'depot_store',wall:'wall_straight',gate:'gate_closed',bridge:'bridge_h'};
+    const fallback={mountain:'mountain',village:'hut',barracks:'camp',depot:'storehouse',gate:'gate'};
+    const root=studio?previewAssetBase:ASSET_BASE;
+    const key=kind==='prop'?value:keys[terrainId];
+    const urls=localObjectPreviews([`${root}/assets/objects/${encodeURIComponent(key)}.webp`]);
+    if(kind==='terrain' && fallback[terrainId])urls.push(`${root}/assets/tiles/${fallback[terrainId]}.webp`);
+    previewImg.alt=`${label} 미리보기`;previewImg.hidden=false;caption.textContent=label;
+    const load=index=>{
+      if(version!==previewVersion)return;
+      if(index>=urls.length){previewImg.hidden=true;caption.textContent=`${label} · 등록된 이미지가 없습니다`;return;}
+      previewImg.onerror=()=>load(index+1);previewImg.src=urls[index];
+    };load(0);
+  };
+  terrain.addEventListener('change',showPreview);showPreview();
+  const note=document.createElement('small');note.textContent='지형은 이동·전투 판정도 바뀝니다. 소품은 장식만 추가합니다.';box.append(note);
+  action('지형지물 추가',()=>{
+    const [kind,value]=terrain.value.split(':');
+    if (kind==='terrain') tiles[y][x]=value;
+    else { if (!Array.isArray(stage.decorations)) stage.decorations=[];stage.decorations.push({kind:value,cell:[x,y]}); }
+    if (studio && mapView !== 'art') { document.getElementById('mapView').value='art';document.getElementById('mapView').onchange({target:{value:'art'}}); }
+    closeMapMenu();renderAll();refreshValidation();toast('지형지물 추가');
+  });
+
+  }
+  function choose() {
+    box.replaceChildren();
+    const add=action('캐릭터 추가',characters);add.disabled=mapOnlyMode || !!unitAt(x,y);if(unitAt(x,y))add.title='빈 칸을 선택해 주세요';
+    action('지형지물 추가',objects);
+  }
+  document.body.append(box);choose();box.querySelector('button:not(:disabled)')?.focus();
+}
+
 function bind() {
+  gridC.tabIndex=0; gridC.setAttribute('aria-label','전투 맵 · 캐릭터 선택 및 드래그 이동, Delete 삭제, 우클릭 추가');
+  gridC.addEventListener('contextmenu', e => {e.preventDefault();const c=cellAt(e);if(c) openMapMenu(e,c[0],c[1]);});
+  document.addEventListener('mousedown', e => {if(mapMenu && !mapMenu.contains(e.target)) closeMapMenu();});
   gridC.addEventListener('mousedown', e => {
-    const c = cellAt(e); if (!c) return;
-    if (coordPick) { const cb = coordPick.cb; coordPick = null; renderGrid(); cb(c[0], c[1]); return; }
-    if (mode === 'terrain') {
-      if (tool === 'fill') { floodFill(c[0], c[1]); refreshValidation(); } else { painting = true; paintAt(c[0], c[1]); }
-      renderTerrain(); renderUnits();
-    } else {
-      // 유닛 모드: 기존 유닛 위에서 누르면 선택 + 드래그 시작(빈 칸으로 끌어 이동), 빈 칸이면 신규 배치
-      dragU = unitAt(c[0], c[1]); dragFrom = c; dragMoved = false;
-      placeOrSelect(c[0], c[1]);
-      if (dragU) gridC.style.cursor = 'grabbing';
+    if(e.button!==0) return;
+    gridC.focus({preventScroll:true});const c=cellAt(e);if(!c)return;
+    hoverCell=c;
+    if(coordPick) {const cb=coordPick.cb;coordPick=null;renderGrid();cb(...c);return;}
+    const hit=mapHit(e);
+    if(hit && mode!=='terrain' || hit?.kind==='unit') {
+      if(e.shiftKey) {const index=mapSelection.findIndex(i=>sameSelection(i,hit));if(index>=0)mapSelection.splice(index,1);else mapSelection.push(hit);}
+      else if(!mapSelection.some(i=>sameSelection(i,hit))) mapSelection=[hit];
+      updateSelection();if(selUnit) switchTab('battle:unit');
+      if(mapSelection.length) selectionDrag={cell:c,moved:false};return;
     }
+    if(mode==='select' || e.shiftKey) {selectionBox={start:c,end:c,base:e.shiftKey?[...mapSelection]:[]};if(!e.shiftKey)mapSelection=[];updateSelection();return;}
+    if(mode==='terrain') {
+      mapSelection=[];updateSelection();
+      if(tool==='fill'){floodFill(...c);refreshValidation();}else{painting=true;paintAt(...c);}renderAll();
+    } else {placeOrSelect(...c);mapSelection=selUnit?[{kind:'unit',ref:selUnit}]:[];updateSelection();}
   });
   window.addEventListener('mousemove', e => {
-    if (dragU) {
-      const c = cellAt(e);
-      if (c && (c[0] !== dragU.x || c[1] !== dragU.y) && !unitAt(c[0], c[1])) { dragU.x = c[0]; dragU.y = c[1]; dragMoved = true; renderUnits(); }
-      return;
-    }
-    if (!painting) return;
-    const c = cellAt(e); if (c) { paintAt(c[0], c[1]); renderTerrain(); }
+    const c=cellAt(e);if(c)hoverCell=c;
+    if(selectionDrag) {if(c && moveMapSelection(c[0]-selectionDrag.cell[0],c[1]-selectionDrag.cell[1])) {selectionDrag.cell=c;selectionDrag.moved=true;}return;}
+    if(selectionBox) {if(c)selectionBox.end=c;renderGrid();return;}
+    if(painting && c){paintAt(...c);renderTerrain();}
   });
-  window.addEventListener('mouseup', () => {
-    if (painting) { painting = false; refreshValidation(); }
-    if (dragU) {
-      if (dragMoved) { refreshUnitList(); renderTab(); refreshValidation(); toast(`${dragU.commanderId} (${dragFrom[0]},${dragFrom[1]}) → (${dragU.x},${dragU.y})`); }   // 드롭 1회 = Undo 1단계
-      dragU = null; dragFrom = null; dragMoved = false;
-      gridC.style.cursor = mode === 'terrain' ? 'crosshair' : 'pointer';
+  window.addEventListener('mouseup',()=>{
+    if(painting){painting=false;refreshValidation();}
+    if(selectionDrag){if(selectionDrag.moved){refreshUnitList();renderTab();refreshValidation();toast(`${mapSelection.length}개 이동`);}selectionDrag=null;}
+    if(selectionBox) {
+      const {start,end,base}=selectionBox;
+      const inside=(x,y)=>x>=Math.min(start[0],end[0])&&x<=Math.max(start[0],end[0])&&y>=Math.min(start[1],end[1])&&y<=Math.max(start[1],end[1]);
+      const found=[];
+      if(!mapOnlyMode) for(const {u} of allPlacedUnits()) if(inside(u.x,u.y))found.push({kind:'unit',ref:u});
+      for(const d of stage.decorations??[])if(inside(...d.cell))found.push({kind:'prop',ref:d});
+      for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(inside(x,y)&&terrainObjectAt(x,y))found.push({kind:'terrain',x,y});
+      mapSelection=[...base,...found.filter(item=>!base.some(i=>sameSelection(i,item)))];selectionBox=null;updateSelection();
     }
   });
 
@@ -726,9 +1090,12 @@ function bind() {
   document.getElementById('undo').onclick = doUndo;
   document.getElementById('redo').onclick = doRedo;
   window.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && mapMenu) {closeMapMenu();return;}
+    if (e.key === 'Delete' && document.activeElement === gridC && !selectionDrag && !coordPick) {e.preventDefault();deleteMapSelection();return;}
     if (e.key === 'Escape' && coordPick) { coordPick = null; renderGrid(); toast('좌표 집기 취소'); return; }
     if ((e.ctrlKey || e.metaKey) && !e.altKey) {
       const k = e.key.toLowerCase();
+      if(document.activeElement===gridC && !selectionDrag && !coordPick && (k==='c'||k==='v')) {e.preventDefault();if(k==='c')copySelection();else pasteSelection(hoverCell);return;}
       if (k === 's') { e.preventDefault(); saver.flush(); return; }   // 텍스트 포커스 여부 무관 — Draft 즉시 저장
       if (isTextLike(document.activeElement)) { /* 텍스트 undo 는 브라우저에 양보 */ }
       else if (k === 'z' && e.shiftKey) { e.preventDefault(); if (!coordPick) doRedo(); return; }
@@ -738,7 +1105,18 @@ function bind() {
     if (isTextLike(document.activeElement)) return;   // 1~9 지형 단축키도 텍스트 입력 중엔 무시
     if (mode === 'terrain' && e.key >= '1' && e.key <= '9') { const t = TERRAINS[+e.key - 1]; if (t) selectTerrain(t[0]); }
   });
-  document.getElementById('cellpx').onchange = e => { cellPx = Math.max(6, Math.min(40, +e.target.value)); resizeCanvas(); renderAll(); };
+  document.getElementById('cellpx').onchange = e => setMapScale(+e.target.value);
+  document.getElementById('mapZoomOut').onclick = () => setMapScale(cellPx-3);
+  document.getElementById('mapZoomIn').onclick = () => setMapScale(cellPx+3);
+  document.getElementById('mapZoomReset').onclick = () => setMapScale(15);
+  document.getElementById('mapZoomFit').onclick = () => {
+    const viewport=document.getElementById('stage');
+    setMapScale(Math.floor(Math.min((viewport.clientWidth-32)/W,(viewport.clientHeight-32)/H)));
+    viewport.scrollLeft=0;viewport.scrollTop=0;
+  };
+  document.getElementById('stage').addEventListener('wheel',e=>{
+    if(!e.ctrlKey) return;e.preventDefault();setMapScale(cellPx+(e.deltaY<0?3:-3),e);
+  },{passive:false});
 
   document.getElementById('newStage').onclick = doNew;
   document.getElementById('openStage').onclick = () => openFile('stage');
@@ -769,14 +1147,22 @@ function bind() {
   document.getElementById('pasteModal').onclick = e => { if (e.target.id === 'pasteModal') closePaste(); };
 }
 
-function switchTab(t) {   // 'battle' 단독이면 마지막 서브탭으로
+function switchTab(t) {
+  if (studio?.target.kind === 'battle' && t === 'battle:adv') t = 'dialogue';
+  if (studio?.target.kind === 'battle' && String(t).startsWith('story-')) return;
   let [top, sub] = String(t).split(':');
+  if (top === 'battle' && sub === 'quick') sub = 'unit';
   if (top === 'battle') { sub = sub || battleSub; battleSub = sub; t = `battle:${sub}`; }
   activeTab = t;
+  if (studio?.target.kind === 'battle') {
+    const labels = { 'battle:quick': '맵·배치', 'battle:meta': '전투 기본 설정', 'battle:unit': '장수 배치', 'battle:obj': '승패 조건', 'battle:duel': '일기토', 'battle:adv': '증원·전략', dialogue: '전투 이벤트', reward: '보상' };
+    parent.postMessage({ type: 'tk-studio:section', label: labels[t] || '전투 설정' }, location.origin);
+  }
   document.querySelectorAll('.tab[data-tab]').forEach(x => x.classList.toggle('on', x.dataset.tab === top));
   document.querySelectorAll('.tab[data-sub]').forEach(x => x.classList.toggle('on', x.dataset.sub === sub));
   document.getElementById('subtabs').style.display = top === 'battle' ? '' : 'none';
   renderTab();
+  editorMode?.refresh();
 }
 
 /* ═══════════════════════ 통계 / 정보 ═══════════════════════ */
@@ -824,14 +1210,16 @@ function renderTab() {
     else if (sub === 'adv') renderAdvTab(body);
   }
   else if (top === 'reward') renderRewardTab(body);
+  else if (top === 'assets') renderAssetTab(body);
   else if (top === 'story-intro') renderStoryTab(body, 'intro');
   else if (top === 'story-outro') renderStoryTab(body, 'outro');
-  else if (top === 'dialogue') renderDialogueTab(body);
+  else if (top === 'dialogue') renderBattleEventsTab(body);
   refreshValidation();
 }
 
 /* 폼 헬퍼들 */
 function field(parent, label, hint, inputEl) {
+  if (studio && ['stage id', 'mapId', 'map id'].includes(label)) inputEl.readOnly = true;
   const w = document.createElement('div'); w.className = 'field';
   const l = document.createElement('label'); l.textContent = label; w.appendChild(l);
   w.appendChild(inputEl);
@@ -887,12 +1275,29 @@ function coordPickRow(parent, label, getX, getY, setXY) {
 }
 
 /* ── 메타 탭 ── */
+let assetKind = 'maps';
+function renderAssetTab(b) {
+  const heading=document.createElement('h3');heading.textContent='이미지·에셋';b.appendChild(heading);
+  if(!studio){b.appendChild(document.createTextNode('Studio에서 전투를 열면 이미지를 교체할 수 있습니다.'));return;}
+  const tabs=document.createElement('div');tabs.style.cssText='display:flex;gap:6px;flex-wrap:wrap';b.appendChild(tabs);
+  for(const [kind,label] of [['maps','맵'],['objects','지형지물'],['fx','이펙트']]){const button=document.createElement('button');button.className='btn';button.textContent=label;button.setAttribute('aria-pressed',String(assetKind===kind));if(assetKind===kind)button.style.background='#645432';button.onclick=()=>{assetKind=kind;renderTab();};tabs.appendChild(button);}
+  const onSaved=()=>{mapPreviewVersion=Date.now();previewImages.clear();objectPreviewKey='';renderTerrain();renderUnits();};
+  if(assetKind==='maps'){
+    const note=document.createElement('p');note.textContent='여러 조각을 합친 최종 맵 이미지입니다. 여기서는 완성본을 교체합니다. 조각별 수정·재합성은 지원하지 않습니다.';b.appendChild(note);
+    assetImageEditor(b,{kind:'maps',id:mapId,onSaved});
+  }else void assetGallery(b,{kind:assetKind,onSaved});
+}
 function renderMetaTab(b) {
-  field(b, 'stage id', '파일명 기준. 예: 05-sishuiguan', inputText(stage.id, v => { stage.id = v.trim(); refreshValidation(); applyDraftSeed(); }));
-  field(b, 'name', '표시 이름', inputText(stage.name, v => { stage.name = v; refreshValidation(); }));
-  field(b, 'mapId', 'map JSON의 id와 일치해야 함', inputText(stage.mapId, v => { stage.mapId = v.trim(); refreshValidation(); }));
-  field(b, 'turnLimit', '턴 제한 (정수 ≥1)', inputNum(stage.turnLimit, v => { stage.turnLimit = v; refreshValidation(); }, { min: 1 }));
-  field(b, 'levelCap (선택)', '이 스테이지 레벨캡 1~99. 비우면 미지정', inputNum(stage.levelCap, v => { stage.levelCap = v; refreshValidation(); }, { min: 1, max: 99 }));
+  const goal = document.createElement('div'); goal.className = 'field';
+  const label = document.createElement('label'); label.textContent = '주 목표';
+  const summary = document.createElement('div'); summary.className = 'quick-goal'; summary.textContent = primaryObjectiveText(stage, COMMANDERS);
+  const edit = document.createElement('button'); edit.className = 'btn'; edit.textContent = '승패 조건 편집'; edit.onclick = () => switchTab('battle:obj');
+  goal.append(label, summary, edit); b.appendChild(goal);
+  field(b, '전투 ID', '파일명 기준. 예: 05-sishuiguan', inputText(stage.id, v => { stage.id = v.trim(); refreshValidation(); applyDraftSeed(); }));
+  field(b, '전투 이름', '표시 이름', inputText(stage.name, v => { stage.name = v; refreshValidation(); }));
+  field(b, '연결 맵 ID', 'map JSON의 id와 일치해야 함', inputText(stage.mapId, v => { stage.mapId = v.trim(); refreshValidation(); }));
+  field(b, '제한 턴', '턴 제한 (정수 ≥1)', inputNum(stage.turnLimit, v => { stage.turnLimit = v; refreshValidation(); }, { min: 1 }));
+  field(b, '최대 레벨 (선택)', '이 스테이지 레벨캡 1~99. 비우면 미지정', inputNum(stage.levelCap, v => { stage.levelCap = v; refreshValidation(); }, { min: 1, max: 99 }));
 
   const camHdr = document.createElement('div'); camHdr.className = 'sectlabel'; camHdr.textContent = '카메라 (선택)'; b.appendChild(camHdr);
   const camChk = document.createElement('label'); camChk.style.cssText = 'display:flex;gap:6px;font-size:11.5px;color:var(--dim);margin-bottom:8px';
@@ -900,22 +1305,22 @@ function renderMetaTab(b) {
   cc.onchange = () => { stage.camera = cc.checked ? { zoom: 1.5, focus: null } : null; renderTab(); };
   camChk.appendChild(cc); camChk.appendChild(document.createTextNode('카메라 지정')); b.appendChild(camChk);
   if (stage.camera) {
-    field(b, 'zoom', '초기 배율 (양수)', (() => { const i = document.createElement('input'); i.type = 'number'; i.step = '0.1'; i.value = stage.camera.zoom ?? ''; i.oninput = () => { stage.camera.zoom = i.value === '' ? undefined : Number(i.value); refreshValidation(); }; return i; })());
+    field(b, '시작 배율', '초기 배율 (양수)', (() => { const i = document.createElement('input'); i.type = 'number'; i.step = '0.1'; i.value = stage.camera.zoom ?? ''; i.oninput = () => { stage.camera.zoom = i.value === '' ? undefined : Number(i.value); refreshValidation(); }; return i; })());
     const hasFocus = Array.isArray(stage.camera.focus);
     const fchk = document.createElement('label'); fchk.style.cssText = 'display:flex;gap:6px;font-size:11.5px;color:var(--dim);margin-bottom:6px';
     const fc = document.createElement('input'); fc.type = 'checkbox'; fc.style.width = 'auto'; fc.checked = hasFocus;
     fc.onchange = () => { stage.camera.focus = fc.checked ? [Math.floor(W / 2), Math.floor(H / 2)] : null; renderTab(); };
-    fchk.appendChild(fc); fchk.appendChild(document.createTextNode('focus 지정')); b.appendChild(fchk);
-    if (hasFocus) coordPickRow(b, 'focus [x,y]', () => stage.camera.focus[0], () => stage.camera.focus[1], (x, y) => { stage.camera.focus = [x, y]; refreshValidation(); });
+    fchk.appendChild(fc); fchk.appendChild(document.createTextNode('시작 위치 지정')); b.appendChild(fchk);
+    if (hasFocus) coordPickRow(b, '시작 위치 [x,y]', () => stage.camera.focus[0], () => stage.camera.focus[1], (x, y) => { stage.camera.focus = [x, y]; refreshValidation(); });
   }
 
   // 맵 메타 (블록아웃/맵 export용)
-  const mpHdr = document.createElement('div'); mpHdr.className = 'sectlabel'; mpHdr.textContent = '맵 (map JSON)'; b.appendChild(mpHdr);
-  field(b, 'map id', 'mapId와 보통 동일', inputText(mapId, v => { mapId = v.trim() || 'newmap'; refreshValidation(); }));
-  field(b, 'map name', '', inputText(mapName, v => { mapName = v; refreshValidation(); }));
+  const mpHdr = document.createElement('div'); mpHdr.className = 'sectlabel'; mpHdr.textContent = '맵 설정'; b.appendChild(mpHdr);
+  field(b, '맵 ID', 'mapId와 보통 동일', inputText(mapId, v => { mapId = v.trim() || 'newmap'; refreshValidation(); }));
+  field(b, '맵 이름', '', inputText(mapName, v => { mapName = v; refreshValidation(); }));
   const sizeRow = document.createElement('div'); sizeRow.className = 'row2';
-  sizeRow.appendChild((() => { const w = document.createElement('div'); w.className = 'field'; const l = document.createElement('label'); l.textContent = 'width'; w.appendChild(l); w.appendChild(inputNum(W, v => resizeGrid(v == null ? W : v, H), { min: 1, max: 120 })); return w; })());
-  sizeRow.appendChild((() => { const w = document.createElement('div'); w.className = 'field'; const l = document.createElement('label'); l.textContent = 'height'; w.appendChild(l); w.appendChild(inputNum(H, v => resizeGrid(W, v == null ? H : v), { min: 1, max: 120 })); return w; })());
+  sizeRow.appendChild((() => { const w = document.createElement('div'); w.className = 'field'; const l = document.createElement('label'); l.textContent = '가로 칸 수'; w.appendChild(l); w.appendChild(inputNum(W, v => resizeGrid(v == null ? W : v, H), { min: 1, max: 120 })); return w; })());
+  sizeRow.appendChild((() => { const w = document.createElement('div'); w.className = 'field'; const l = document.createElement('label'); l.textContent = '세로 칸 수'; w.appendChild(l); w.appendChild(inputNum(H, v => resizeGrid(W, v == null ? H : v), { min: 1, max: 120 })); return w; })());
   b.appendChild(sizeRow);
 }
 
@@ -938,6 +1343,8 @@ function renderRewardTab(b) {
 function renderQuickTab(b) {
   renderQuick(b, {
     stage, commanders: COMMANDERS, classes: CLASSES, sides: SIDES,
+    unitsOnly: true,
+    onSelect: u => {selUnit = u; renderUnits(); switchTab('battle:unit');},
     onChange: () => { renderUnits(); refreshUnitList(); refreshValidation(); },
     onPick: (u) => {   // 기존 coordPick 패턴
       selUnit = u; renderUnits();
@@ -952,7 +1359,18 @@ function renderQuickTab(b) {
 const commanderName = (id) => (COMMANDERS.find(c => c.id === id) || {}).name || id;
 function storyCtx(key) {
   const bgs = new Set(collectSceneBgs([...repoStageCache.values(), stage]));
-  return { stage, key, bgOptions: [...bgs].sort(), assetBase: ASSET_BASE, speakers: [...new Set(COMMANDERS.map(c => c.name))], commit: refreshValidation };
+  return { stage, key, bgOptions: [...bgs].sort(), assetBase: ASSET_BASE, speakers: [...new Set(COMMANDERS.map(c => c.name))], commit: refreshValidation,
+    onPreview: () => runPlaytest(key),
+    loadMaps: async () => {
+      if (studio) {
+        const r = await fetch(`/api/studio/legacy/scene-maps?project=${encodeURIComponent(studio.project)}`);
+        if (!r.ok) throw new Error('장면 맵을 불러오지 못했습니다');
+        return r.json();
+      }
+      const ids = new Set(['scene-01-street', 'scene-01-tavern', 'scene-01-orchard', ...slotParts(stage.scenario?.[key]).filter(p => p.map).map(p => p.map)]);
+      const rows = await Promise.all([...ids].map(async id => { const r = await fetch(`/packages/data/json/maps/${encodeURIComponent(id)}.json`); if (!r.ok) return null; return r.json(); }));
+      return Object.fromEntries(rows.filter(Boolean).map(m => [m.id, m]));
+    } };
 }
 function renderStoryTab(b, key) {
   const el = document.createElement('div'); b.appendChild(el);
@@ -963,13 +1381,62 @@ function renderStoryTab(b, key) {
   const inner = document.createElement('div'); det.appendChild(sum); det.appendChild(inner); b.appendChild(det);
   renderSceneSlot(inner, storyCtx('outroDefeat'));
 }
+function pickEventArea(done) {
+  toast('화재 구역의 첫 번째 모서리를 클릭하세요. Esc: 취소');
+  coordPick={cb:(x,y)=>{
+    toast('반대쪽 모서리를 클릭하세요. Esc: 취소');
+    coordPick={cb:(ex,ey)=>{done({x:Math.min(x,ex),y:Math.min(y,ey),width:Math.abs(ex-x)+1,height:Math.abs(ey-y)+1});toast('화재 구역을 지정했습니다.');}};
+  }};
+}
+let selectedBattleEvent = null;
+function renderBattleEventsTab(b) {
+  const heading = document.createElement('h3'); heading.textContent = '전투 이벤트'; b.appendChild(heading);
+  const entries = [];
+  for (const [key, label] of [['scriptEvents','사건'],['dialogue','대사'],['reinforcements','증원'],['strategyConditions','전략 목표']]) {
+    if (!Array.isArray(stage[key])) continue;
+    stage[key].forEach((value,index) => entries.push({key,index,value,label}));
+  }
+  const list = document.createElement('div'); list.style.cssText = 'display:grid;gap:4px;margin-bottom:12px'; b.appendChild(list);
+  if (!entries.some(e => e.value === selectedBattleEvent)) selectedBattleEvent = entries[0]?.value ?? null;
+  for (const entry of entries) {
+    const button = document.createElement('button'); button.className = 'btn';
+    button.textContent = `${entry.label} · ${entry.value.name || entry.value.description || entry.value.lines?.[0]?.text || entry.value.id}`;
+    button.style.cssText = 'text-align:left;white-space:normal';
+    button.setAttribute('aria-pressed',String(entry.value === selectedBattleEvent));
+    if (entry.value === selectedBattleEvent) button.style.borderColor = 'var(--acc)';
+    button.onclick = () => {selectedBattleEvent=entry.value;renderTab();}; list.appendChild(button);
+  }
+  const add = selectEl([{value:'',label:'＋ 이벤트 추가…'},{value:'script',label:'복합 이벤트 · 조건과 효과 직접 구성'},{value:'fire',label:'간단 이벤트 · 화공'},{value:'dialogue',label:'간단 이벤트 · 대사'},{value:'reinforcements',label:'간단 이벤트 · 증원'},{value:'strategyConditions',label:'전략 목표'}], '', kind => {
+    if (!kind) return;
+    let key=kind, value;
+    if (kind==='script'||kind==='fire') {
+      key='scriptEvents'; value={id:crypto.randomUUID(),editingMode:kind==='fire'?'simple':'complex',name:kind==='fire'?'화공':'새 사건',trigger:{kind:'turn',turn:4,phase:'player'},actions:[{kind:'message',text:'사건이 발생했습니다.'}]};
+      if(kind==='fire') value.actions=[{kind:'fire',area:{x:0,y:0,width:3,height:3},duration:3,damagePercent:10,spread:false,extinguishInRain:true,flammableOnly:true}];
+    } else if(kind==='dialogue') value={id:crypto.randomUUID(),trigger:{kind:'battleStart'},lines:[{speaker:'',text:''}]};
+    else if(kind==='reinforcements') value={id:uniqueReinforceId(),side:'enemy',units:[],trigger:{kind:'turn',turn:5},once:true};
+    else value={id:uniqueStratId(),description:'새 전략 목표',trigger:{kind:'duelOccurred',duelId:stage.events[0]?.id||''},reward:{treasures:[]}};
+    if(stage[key]!==undefined&&!Array.isArray(stage[key])) {toast('기존 데이터 형식을 확인해 주세요. 원본은 유지됩니다.');return;}
+    (stage[key]??=[]).push(value);selectedBattleEvent=value;renderTab();
+  }); add.setAttribute('aria-label','이벤트 추가'); add.style.cssText='width:100%;background:var(--panel2);color:var(--txt);padding:8px'; b.appendChild(add);
+  const entry=entries.find(e=>e.value===selectedBattleEvent);
+  if(!entry) {const note=document.createElement('p');note.textContent='이벤트를 추가하고 발동 조건과 실행 내용을 설정하세요.';b.appendChild(note);return;}
+  const content=document.createElement('div'); content.style.marginTop='12px';b.appendChild(content);
+  if(entry.key==='scriptEvents') renderScriptEvent(content,entry.value,{stage,commit:refreshValidation,refresh:renderTab,pickArea:pickEventArea,remove:()=>{stage.scriptEvents.splice(entry.index,1);renderTab();}});
+  else if(entry.key==='reinforcements') content.appendChild(reinforceCard(entry.value,entry.index));
+  else if(entry.key==='strategyConditions') content.appendChild(strategyCard(entry.value,entry.index));
+  else {
+    const placed=allPlacedUnits().map(({u})=>({id:u.commanderId,name:commanderName(u.commanderId)}));
+    const duels=(stage.events||[]).map(e=>({id:e.id,label:e.id}));
+    renderDialogueList(content,{stage,placed,duels,speakers:[...new Set(COMMANDERS.map(c=>c.name))],commit:refreshValidation,selectedIndex:entry.index,refresh:renderTab});
+  }
+}
 function renderDialogueTab(b) {
+  const content = document.createElement('div'); b.appendChild(content);
   const seen = new Set(); const placed = [];
   allPlacedUnits().forEach(({ u }) => { if (u.commanderId && !seen.has(u.commanderId)) { seen.add(u.commanderId); placed.push({ id: u.commanderId, name: commanderName(u.commanderId) }); } });
   const duels = (stage.events || []).map(e => ({ id: e.id, label: `${commanderName(e.trigger.attackerId)} vs ${commanderName(e.trigger.defenderId)}` }));
-  renderDialogueList(b, { stage, placed, duels, speakers: [...new Set(COMMANDERS.map(c => c.name))], commit: refreshValidation });
+  renderDialogueList(content, { stage, placed, duels, speakers: [...new Set(COMMANDERS.map(c => c.name))], commit: refreshValidation });
 }
-
 function resizeGrid(nw, nh) {
   nw = Math.max(1, Math.min(120, nw | 0)); nh = Math.max(1, Math.min(120, nh | 0));
   const nt = blankTiles(nw, nh);
@@ -1004,16 +1471,23 @@ function multiItem(selected, onchange) {
 
 /* ── 유닛 탭 ── */
 function renderUnitTab(b) {
-  if (!selUnit) { b.innerHTML = '<div style="color:var(--dim);padding:14px 2px;line-height:1.6">유닛 모드(좌측)에서 격자 칸을 클릭해 배치하거나, 배치된 유닛을 클릭해 선택하세요.</div>'; return; }
+  if (!selUnit) {
+    renderQuickTab(b);
+    const note = document.createElement('p'); note.className = 'hint'; note.textContent = '장수 이름이나 맵의 캐릭터를 선택하면 상세 설정을 편집합니다. 추가는 맵 우클릭 → 캐릭터 추가.'; b.appendChild(note);
+    return;
+  }
+  const back = document.createElement('button'); back.className = 'btn'; back.textContent = '← 장수 목록';
+  back.onclick = () => {selUnit = null; renderUnits(); renderTab();}; b.appendChild(back);
   const u = selUnit;
   const head = document.createElement('div'); head.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:9px';
   const s = SIDES[u.side];
   head.innerHTML = `<span class="ptag" style="background:${s.raw};color:#fff">${s.label}</span>`;
   const del = document.createElement('button'); del.className = 'btn warn'; del.textContent = '삭제'; del.style.padding = '3px 9px';
-  del.onclick = () => { removeUnit(u); selUnit = null; renderUnits(); renderTab(); refreshUnitList(); toast('유닛 삭제'); };
+  del.onclick = () => { removeUnit(u); mapSelection=mapSelection.filter(item=>item.ref!==u); selUnit = null; renderGrid(); renderUnits(); renderTab(); refreshUnitList(); toast('유닛 삭제'); };
   head.appendChild(del); b.appendChild(head);
 
-  field(b, 'commanderId', 'commanders.json 참조', selectEl(commanderOptions(), u.commanderId, v => { u.commanderId = v; renderUnits(); refreshUnitList(); refreshValidation(); }));
+  field(b, '캐릭터', '이미 배치된 캐릭터는 중복 추가할 수 없습니다', selectEl(commanderOptions().filter(option=>option.value===u.commanderId || !allPlacedUnits().some(({u:other})=>other.commanderId===option.value)), u.commanderId, v => { if(allPlacedUnits().some(({u:other})=>other!==u && other.commanderId===v)){toast('이미 배치된 캐릭터입니다',true);renderTab();return;} u.commanderId = v; renderUnits(); refreshUnitList(); refreshValidation(); }));
+  field(b, '시작 방향', '자동은 맵 중앙을 바라봅니다. 이동·공격 중에는 진행 방향을 따릅니다.', selectEl([{value:'',label:'자동 · 중앙 바라보기'},{value:'left',label:'왼쪽'},{value:'right',label:'오른쪽'}],u.facing ?? '',v=>{if(v)u.facing=v;else delete u.facing;renderUnits();refreshValidation();}));
   field(b, 'classId', 'unitClasses.json 참조', selectEl(classOptions(), u.classId, v => { u.classId = v; refreshValidation(); }));
   field(b, 'side', '아군/우군/적군', selectEl(SIDE_KEYS.map(k => ({ value: k, label: `${SIDES[k].label} (${k})` })), u.side, v => { u.side = v; renderUnits(); refreshUnitList(); renderTab(); }));
   const lr = document.createElement('div'); lr.className = 'row2';
@@ -1251,6 +1725,7 @@ function multiDuel(selected, onchange) {
 
 /* ═══════════════════════ 검증 (StageSchema 규칙 인라인) ═══════════════════════ */
 function validate() {
+  if (studio?.target.kind === 'scene') return validateStory(stage, { placedIds: [], duelIds: [] }).filter(message => message.startsWith('전투 전'));
   const errs = [];
   const E = m => errs.push(m);
   // 메타
@@ -1284,6 +1759,11 @@ function validate() {
   });
   // 좌표 중복 (같은 칸 2유닛 — 경고)
   const occ = {};
+  const uniqueCommanders = new Set();
+  allPlacedUnits().forEach(({ u }) => {
+    if (uniqueCommanders.has(u.commanderId)) E(`장수 ${u.commanderId} 중복 배치 — 초기 유닛과 증원을 통틀어 한 번만 배치할 수 있습니다.`);
+    uniqueCommanders.add(u.commanderId);
+  });
   allPlacedUnits().forEach(({ u }) => { const k = `${u.x},${u.y}`; if (occ[k]) E(`칸 (${k}) 에 유닛이 겹쳐 있습니다 (${occ[k]}, ${u.commanderId}).`); else occ[k] = u.commanderId; });
   // 목표 좌표/참조
   const placedIds = new Set(allPlacedUnits().map(({ u }) => u.commanderId));
@@ -1343,13 +1823,13 @@ function restore(snap) {  // Undo/Redo/복구본 공용 — 복원된 모델은 
     stage = loadStageModel(s.stage);
     const mm = loadMapModel(s.map);
     W = mm.width; H = mm.height; mapId = mm.id; mapName = mm.name; loadedLegend = mm.tileLegend; tiles = mm.tiles;
-    selUnit = null; resizeCanvas(); renderAll(); renderTab(); refreshUnitList(); refreshValidation();
+    mapSelection=[];selectionDrag=null;selectionBox=null;selUnit = null; resizeCanvas(); renderAll(); renderTab(); refreshUnitList(); refreshValidation();
   } finally { suspendHistory = prev; }
   updateSaveState();
 }
 function doUndo() { const s = history.undo(); if (s != null) { restore(s); scheduleRecovery(); touchDraft(); toast('되돌리기'); } }  // 복구본·Draft 는 항상 현재 상태를 따른다(레포와 같으면 삭제)
 function doRedo() { const s = history.redo(); if (s != null) { restore(s); scheduleRecovery(); touchDraft(); toast('다시 하기'); } }
-function recoveryKey() { return mapOnlyMode ? `tk.editor.recovery.map:${mapId}` : `tk.editor.recovery.stage:${stage.id}`; }
+function recoveryKey() { return studio ? `tk.studio.detail.${studio.project}.${studio.target.kind}.${studio.target.id}` : mapOnlyMode ? `tk.editor.recovery.map:${mapId}` : `tk.editor.recovery.stage:${stage.id}`; }
 function scheduleRecovery() {
   if (recoveryTimer) clearTimeout(recoveryTimer);
   recoveryTimer = setTimeout(() => {
@@ -1357,7 +1837,7 @@ function scheduleRecovery() {
     if (!history.isDirty()) { clearRecovery(); updateSaveState(); return; } // 울리는 시점에 판정 — undo로 clean이면 옛 복구본도 제거
     if (document.getElementById('recoveryBar').style.display !== 'none') return; // 복구 결정 전엔 옛 복구본을 덮지 않는다
     try {
-      localStorage.setItem(recoveryKey(), JSON.stringify({ savedAt: new Date().toISOString(), snapshot: history.current() }));
+      localStorage.setItem(recoveryKey(), JSON.stringify({ savedAt: new Date().toISOString(), revision: draftRevision, snapshot: history.current() }));
       lastRecoveryAt = new Date();
     } catch { lastRecoveryAt = 'fail'; }
     updateSaveState();
@@ -1373,6 +1853,7 @@ function checkRecovery() {  // 진입점 4곳의 꼬리에서 1회
   document.getElementById('recoveryTime').textContent = new Date(rec.savedAt).toLocaleTimeString();
   bar.style.display = '';
   document.getElementById('recoveryRestore').onclick = () => {
+    if (studio) { draftRevision = rec.revision; saver.reset({ revision: rec.revision }); }
     restore(rec.snapshot);                                  // suspend 하에 복원
     history.push(rec.snapshot, { coalesce: false });        // 스택 [로드 시점, 복구본] → dirty, Undo 1회면 디스크 상태
     scheduleRecovery(); touchDraft();
@@ -1393,6 +1874,11 @@ function updateSaveState() {
   // 복구본 문구는 Draft 저장이 막힌 동안만 의미 있다 (성공 = 복구본 삭제)
   chip.textContent = text + (st.lastError && lastRecoveryAt ? (lastRecoveryAt === 'fail' ? ' · 복구본 보관 실패' : ` · 복구본 ${lastRecoveryAt.toLocaleTimeString()}`) : '');
   updateDraftBadge();
+  if (studio) {
+    chip.textContent = st.conflict ? '저장 충돌 · 편집본을 보관해 주세요' : st.lastError ? '저장 실패 · 다시 저장해 주세요' : st.saving ? '프로젝트 저장 중…' : history.isDirty() ? '수정됨 · 자동저장 대기' : '프로젝트에 저장됨';
+    document.getElementById('draftBadge').textContent = 'Studio 프로젝트';
+    document.getElementById('draftBadge').title = '현재 Studio 프로젝트를 편집 중입니다';
+  }
 }
 
 function refreshValidation() {
@@ -1404,7 +1890,7 @@ function refreshValidation() {
       b.innerHTML = `⚠ 테스트 불가 ${errs.length}건 (저장은 가능):<br>` + errs.slice(0, 8).map(esc).join('<br>') + (errs.length > 8 ? '<br>…' : '');
     } else {
       b.className = 'on ok';
-      b.innerHTML = '✓ 테스트 가능 — Publish 검사는 레포에 저장 후 「Publish 검사」';
+      b.textContent = studio ? '✓ 미리보기 가능 · 현재 프로젝트에 자동저장됩니다' : '✓ 테스트 가능 — 게임에 반영하기 전에 전체 검사를 진행합니다';
     }
   }
   if (!suspendHistory) {
@@ -1412,6 +1898,7 @@ function refreshValidation() {
     catch (e) { console.warn('history snapshot skipped:', e); }
   }
   updateSaveState();
+  editorMode?.refresh();
   return errs.length === 0;
 }
 
@@ -1686,6 +2173,16 @@ document.getElementById('publishCheck').onclick = async function () {
   finally { this.disabled = false; }
 };
 async function runPlaytest(scene) {   // scene: undefined=전투 | 'intro'|'outro'|'outroDefeat' = 씬 미리보기 (spec §6)
+  if (studio) {
+    if (!studioReady || saver.state().saving) { toast('저장이 끝난 뒤 다시 테스트해 주세요.'); return; }
+    const preview = window.open('about:blank');
+    try {
+      const response = await fetch(studio.api, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({target:studio.target, baseRevision:draftRevision, ...JSON.parse(snapshot()), scene})});
+      const result = await response.json(); if (!response.ok) throw new Error(result.error);
+      if (preview) preview.location.href = result.url; else toast('팝업을 허용한 뒤 다시 테스트해 주세요.', true);
+    } catch(error) { preview?.close(); toast(String(error), true); }
+    return;
+  }
   const btn = document.getElementById('playtestBtn');
   const menuBtns = Array.from(document.querySelectorAll('#playtestMenu [data-scene]'));
   // 씬 미리보기는 이야기 오류만 막는다 — 유닛 겹침 등 전투 오류는 VN 재생과 무관
@@ -1695,7 +2192,7 @@ async function runPlaytest(scene) {   // scene: undefined=전투 | 'intro'|'outr
   if (errs.length) { toast(`테스트 불가 ${errs.length}건 — 배너의 오류를 먼저 고치세요`, true); return; }
   const stamp = Date.now();
   const draftId = `${String(stage.id).replace(/[^A-Za-z0-9_-]/g, '_')}-${stamp}`;
-  const snapshot = {
+  const playtestSnapshot = {
     kind: 'tk-playtest-snapshot', version: 1, draftId, revision: stamp,
     stage: serializeStageModel(stage),
     map: serializeMapModel({ id: mapId, name: mapName, width: W, height: H, tileLegend: loadedLegend, tiles }),
@@ -1703,7 +2200,7 @@ async function runPlaytest(scene) {   // scene: undefined=전투 | 'intro'|'outr
   };
   btn.disabled = true; menuBtns.forEach(b => { b.disabled = true; });
   try {
-    const r = await fetch('/playtest-draft', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(snapshot) });
+    const r = await fetch('/playtest-draft', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(playtestSnapshot) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !j.ok) { toast(`드래프트 저장 실패: ${j.error || r.status}`, true); return; }
     // noopener 금지 — window.opener 가 있어야 게임이 window.close() 로 이 탭에 복귀한다 (spec §6)
@@ -1738,17 +2235,20 @@ async function openPublish() {
   const localErrors = validate();
   const stageText = serializeStage(), mapTxt = serializeMap();
   const sentSnap = history.current();   // 검사 중 편집이 끼면 그 편집은 Draft 로 남아야 한다
+  const publishRevision = draftRevision;
   const repoStage = await fetchRepo('stages', stage.id, repoStageCache);
   const repoMap = await fetchRepo('maps', mapId, repoMapCache);
   const mapChanged = !repoMap || JSON.stringify(JSON.parse(mapTxt)) !== JSON.stringify(repoMap);   // 바뀐 맵만 함께 쓴다
   openPublishModal({
-    stage, stageText, mapText: mapChanged ? mapTxt : null, repoStage, localErrors,
+    stage, stageText, mapText: mapChanged ? mapTxt : null, baseRevision: publishRevision, repoStage, localErrors,
     probe: () => probeAssets(stage, ASSET_BASE),
-    onPublished: () => {
+    onPublished: (result) => {
       repoStageCache.set(stage.id, JSON.parse(stageText)); if (mapChanged) repoMapCache.set(mapId, JSON.parse(mapTxt));   // 다음 변경사항 비교 기준
-      draftRevision = null; draftAt = null; publishedAt = hhmm(new Date()); saver.reset();   // 서버가 Draft 를 지웠다 — 옛 revision 으로 409 나지 않게 즉시
+      publishedAt = hhmm(new Date());
+      if (result.draftDeleted) { draftRevision = null; draftAt = null; saver.reset(); }
       if (history.current() === sentSnap) { history.markSaved(); clearRecovery(); }   // 검사 중 편집했으면 dirty 유지 → seedSaver 가 touch → 새 Draft
-      updateSaveState(); seedSaver();   // 서버가 Draft 를 지웠다(draftDeleted) — index 갱신 후 reset({revision:null})
+      updateSaveState(); refreshDraftIndex();
+      if (history.isDirty()) saver.touch();
       toast(`Publish 완료 · ${stage.id}`);
     },
     onRolledBack: (x) => {   // 레포는 publish 전으로 — 캐시도 되돌린다 (에디터 초안은 그대로)

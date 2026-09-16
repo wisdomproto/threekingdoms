@@ -10,6 +10,8 @@
 |---|---|---|
 | [docs/design/master-plan.md](docs/design/master-plan.md) | 제품 방향·플랫폼 로드맵·구현 우선순위 P0~P3 + **Character Presentation System**(리그·장비 비주얼·스킨, v2) + 구 SSOT 충돌 정리 부록 | 방향·우선순위 판단 |
 | [docs/design/design-guide.md](docs/design/design-guide.md) | UX 원칙·디자인 토큰·HUD·Creator·Story 규칙 + **Character Studio/Skin/Rig 가이드**(v2)·QA 체크리스트 | UI 작업 전 |
+| [docs/design/studio-ui-v1.md](docs/design/studio-ui-v1.md) | Codex 후속 구현: `/studio` 프로젝트 저장·챕터/스토리/전투 편집·선택 전투 테스트·검증 범위 | 프로젝트 스튜디오 작업 |
+| [docs/design/authoring-project-bridge.md](docs/design/authoring-project-bridge.md) | 기존 JSON과 이관용 프로젝트의 무손실 호환 계층. 첨부 native Project 0.2.0과 구분 | 데이터/프로젝트 이관 |
 | [docs/design/game-design.md](docs/design/game-design.md) | 게임 설계 결정 §1·2·7~12·14~16 (철학·병종·일기토·성장·난이도·밸런스·도파민·범위·금지 목록) | 규칙·시스템 작업 |
 | [docs/design/scenario.md](docs/design/scenario.md) | §5 27스테이지 + 캠페인 루프·막간 씬 이력, §6 로스터 | 콘텐츠 작업 |
 | [docs/design/bm.md](docs/design/bm.md) | §13 광고·IAP·불가침선 | 수익·광고 |

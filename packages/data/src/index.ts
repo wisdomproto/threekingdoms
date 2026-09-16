@@ -48,6 +48,15 @@ import huarongdaoJson from "../json/maps/huarongdao.json";
 import scene01StreetJson from "../json/maps/scene-01-street.json";
 import scene01TavernJson from "../json/maps/scene-01-tavern.json";
 import scene01OrchardJson from "../json/maps/scene-01-orchard.json";
+import sceneCampDayJson from "../json/maps/scene-camp-day.json";
+import sceneTownGateJson from "../json/maps/scene-town-gate.json";
+import sceneCampNightJson from "../json/maps/scene-camp-night.json";
+import sceneCouncilHallJson from "../json/maps/scene-council-hall.json";
+import sceneRefugeeRoadJson from "../json/maps/scene-refugee-road.json";
+import sceneRuinedCityJson from "../json/maps/scene-ruined-city.json";
+import sceneRiverLandingJson from "../json/maps/scene-river-landing.json";
+import sceneCommandDeckJson from "../json/maps/scene-command-deck.json";
+import sceneChangbanBridgeJson from "../json/maps/scene-changban-bridge.json";
 // ── 스테이지 (27, 챕터 순) ─────────────────────────────────────────────────
 import stage01Json from "../json/stages/01-zhuojun.json";
 import stage02Json from "../json/stages/02-yingchuan.json";
@@ -144,6 +153,15 @@ export const gameData: GameData = {
     "scene-01-street": loadJson(BattleMapSchema, scene01StreetJson, "maps/scene-01-street.json"),
     "scene-01-tavern": loadJson(BattleMapSchema, scene01TavernJson, "maps/scene-01-tavern.json"),
     "scene-01-orchard": loadJson(BattleMapSchema, scene01OrchardJson, "maps/scene-01-orchard.json"),
+    "scene-camp-day": loadJson(BattleMapSchema, sceneCampDayJson, "maps/scene-camp-day.json"),
+    "scene-town-gate": loadJson(BattleMapSchema, sceneTownGateJson, "maps/scene-town-gate.json"),
+    "scene-council-hall": loadJson(BattleMapSchema, sceneCouncilHallJson, "maps/scene-council-hall.json"),
+    "scene-refugee-road": loadJson(BattleMapSchema, sceneRefugeeRoadJson, "maps/scene-refugee-road.json"),
+    "scene-ruined-city": loadJson(BattleMapSchema, sceneRuinedCityJson, "maps/scene-ruined-city.json"),
+    "scene-river-landing": loadJson(BattleMapSchema, sceneRiverLandingJson, "maps/scene-river-landing.json"),
+    "scene-command-deck": loadJson(BattleMapSchema, sceneCommandDeckJson, "maps/scene-command-deck.json"),
+    "scene-changban-bridge": loadJson(BattleMapSchema, sceneChangbanBridgeJson, "maps/scene-changban-bridge.json"),
+    "scene-camp-night": loadJson(BattleMapSchema, sceneCampNightJson, "maps/scene-camp-night.json"),
   },
   stages: {
     "01-zhuojun": loadJson(StageSchema, stage01Json, "stages/01-zhuojun.json"),

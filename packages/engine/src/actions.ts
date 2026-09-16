@@ -1,3 +1,4 @@
+import { applyBattleScripts } from "./battleScripts";
 import type { Side, Objective, FailCondition } from "@tk/data";
 import type { Action, ActionResult, BattleContext, BattleEvent, BattleState, UnitState } from "./types";
 import { areFoes, camp } from "./types";
@@ -548,7 +549,8 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
         const r = resolveStrike(ctx, next, unit.id, target.id, { counter: false, mult, ratio: 1 });
         next = r.state;
         if (r.hit && !flankShown && flankMult > 1) {
-          events.push({ type: "flank", attackerId: unit.id, defenderId: target.id, surround: flankN, bonusPercent: Math.round((flankMult - 1) * 100) });
+          const participantIds = state.units.filter(u => !u.retreated && !areFoes(u.side, unit.side) && Math.abs(u.x-target.x)+Math.abs(u.y-target.y)===1).map(u=>u.id);
+          events.push({ type: "flank", attackerId: unit.id, defenderId: target.id, surround: flankN, bonusPercent: Math.round((flankMult - 1) * 100), participantIds });
           flankShown = true;
         }
         events.push(...r.events);
@@ -670,7 +672,8 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
         // target "enemy" = 적대 진영(camp 다름), "ally" = 같은 진영(우군 포함)
         const isTarget = strat.target === "enemy" ? areFoes(t.side, unit.side) : !areFoes(t.side, unit.side);
         if (!isTarget) continue;
-        const caster = getUnit(next, unit.id);
+        // One cast uses one stat snapshot, even if an earlier AoE target grants a level.
+        const caster = unit;
         if (strat.category === "heal") {
           // 회복 책략: 회복량 = power + round(시전 정신력 × power / 10), 상한 = maxTroops (결정론).
           // 정신력이 높을수록 회복 효율이 커진다 — 책사/도사 지원 가치. 화계(데미지)는 불변.
@@ -689,6 +692,13 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
           const hit = dealDamage(next, caster, getUnit(next, t.id), dmg, false, true, false, false, "strategy");
           next = hit.state;
           events.push(...hit.events);
+          const killed = getUnit(next, t.id).retreated;
+          const exp = grantExp(ctx, next, unit.id, dmg, killed, t.level);
+          next = exp.state;
+          events.push(...exp.events);
+          const combo = registerComboKill(ctx, next, unit.side, killed);
+          next = combo.state;
+          events.push(...combo.events);
         }
         // 상태이상(debuff 책략) — 데미지/회복 후 chance 시드 롤 → 발동 시 대상에 부여.
         // heal 계열에는 statusEffect 없음(데이터 보증). rngState를 소비하므로 시드 시퀀스 일관.
@@ -766,6 +776,10 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
   next = reinf.state;
   events.push(...reinf.events);
 
+  const scripted = applyBattleScripts(ctx, next);
+  next = scripted.state; events.push(...scripted.events);
+  const scriptReinforcements = applyReinforcements(ctx, next);
+  next = scriptReinforcements.state; events.push(...scriptReinforcements.events);
   const sc = evaluateStrategyConditions(ctx, next);
   next = sc.state;
   events.push(...sc.events);
@@ -774,6 +788,7 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
   next = outcome.state;
   events.push(...outcome.events);
 
+  for (let skipped = 0; skipped < 64; skipped++) {
   const phase = maybeAdvancePhase(ctx, next);
   next = phase.state;
   events.push(...phase.events);
@@ -783,6 +798,10 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
   next = reinf2.state;
   events.push(...reinf2.events);
 
+  const scripted2 = applyBattleScripts(ctx, next);
+  next = scripted2.state; events.push(...scripted2.events);
+  const scriptReinforcements2 = applyReinforcements(ctx, next);
+  next = scriptReinforcements2.state; events.push(...scriptReinforcements2.events);
   const sc2 = evaluateStrategyConditions(ctx, next);
   next = sc2.state;
   events.push(...sc2.events);
@@ -792,6 +811,8 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
   const lateOutcome = checkOutcome(ctx, next);
   next = lateOutcome.state;
   events.push(...lateOutcome.events);
+  if (next.status !== "ongoing" || next.units.some(u => u.side === next.phase && !u.retreated && !u.acted)) break;
+  }
 
   return { state: next, events };
 }

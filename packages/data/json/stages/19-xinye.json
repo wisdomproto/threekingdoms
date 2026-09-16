@@ -19,84 +19,368 @@
   },
   "levelCap": 32,
   "scenario": {
-    "intro": {
-      "bg": "19-xinye-intro",
-      "lines": [
-        {
-          "text": "박망파의 불맛에도 조조는 멈추지 않았다. 이번엔 조조 그 자신이 — 백만이라 일컫는 대군을 몰고 남하했다."
+    "intro": [
+      {
+        "bg": "19-xinye-intro",
+        "lines": [
+          {
+            "text": "박망파의 불맛에도 조조는 멈추지 않았다. 이번엔 조조 그 자신이 — 백만이라 일컫는 대군을 몰고 남하했다."
+          }
+        ]
+      },
+      {
+        "map": "scene-town-gate",
+        "label": "신야 · 백성과 함께",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "제갈량",
-          "side": "player",
-          "portraitId": "제갈량",
-          "text": "신야는 버립니다. 강릉으로 물러나 물을 등지고 싸워야 합니다."
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-leader",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "zhugeliang",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "zhaoyun",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "제갈량",
+            "side": "player",
+            "portraitId": "제갈량",
+            "text": "신야는 버립니다. 강릉으로 물러나 물을 등지고 싸워야 합니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "...알겠소. 헌데 군사, 저 소리가 들리시오?",
+            "pose": [
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "?"
+            }
+          },
+          {
+            "text": "성문 밖 — 피난 봇짐을 인 백성들이 끝없이 늘어서 있었다. 십만이 넘는 행렬이 유비를 따라나선 것이다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "제갈량",
+            "side": "player",
+            "portraitId": "제갈량",
+            "text": "주공, 백성과 함께라면 하루 십 리도 못 갑니다. 조조의 기병은 하루 삼백 리를 달립니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "그래도 — 버릴 수 없소. 나를 믿고 따라나선 사람들이오. 더디더라도, 함께 간다.",
+            "pose": [
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "liubei",
+                "to": [
+                  5,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "speaker": "조운",
+            "side": "player",
+            "portraitId": "조운",
+            "text": "후미와 백성은 제가 지키겠습니다, 주공.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "text": "훗날 사람들이 두고두고 이야기할 십만 행렬이, 그렇게 남쪽으로 움직이기 시작했다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "zhaoyun",
+                "pose": "idle"
+              }
+            ],
+            "exit": [
+              {
+                "id": "zhaoyun",
+                "to": [
+                  1,
+                  5
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "19-xinye-outro",
+        "lines": [
+          {
+            "text": "십만 행렬이 강을 건넜다. 하루 십 리 — 더딘 걸음이었지만, 버려진 사람은 없었다."
+          }
+        ]
+      },
+      {
+        "map": "scene-river-landing",
+        "label": "강가 · 버리지 않은 사람들",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "...알겠소. 헌데 군사, 저 소리가 들리시오?"
-        },
-        {
-          "text": "성문 밖 — 피난 봇짐을 인 백성들이 끝없이 늘어서 있었다. 십만이 넘는 행렬이 유비를 따라나선 것이다."
-        },
-        {
-          "speaker": "제갈량",
-          "side": "player",
-          "portraitId": "제갈량",
-          "text": "주공, 백성과 함께라면 하루 십 리도 못 갑니다. 조조의 기병은 하루 삼백 리를 달립니다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "그래도 — 버릴 수 없소. 나를 믿고 따라나선 사람들이오. 더디더라도, 함께 간다."
-        },
-        {
-          "speaker": "조운",
-          "side": "player",
-          "portraitId": "조운",
-          "text": "후미와 백성은 제가 지키겠습니다, 주공."
-        },
-        {
-          "text": "훗날 사람들이 두고두고 이야기할 십만 행렬이, 그렇게 남쪽으로 움직이기 시작했다."
-        }
-      ]
-    },
-    "outro": {
-      "bg": "19-xinye-outro",
-      "lines": [
-        {
-          "text": "십만 행렬이 강을 건넜다. 하루 십 리 — 더딘 걸음이었지만, 버려진 사람은 없었다."
-        },
-        {
-          "speaker": "백성",
-          "side": "player",
-          "text": "사군께서 우리를 버리지 않으셨다... 이 은혜를 어찌 갚소, 흑흑."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "백성과 함께 강을 건넜다. 더디지만... 한 사람도 버리지 않았다."
-        },
-        {
-          "speaker": "제갈량",
-          "side": "player",
-          "portraitId": "제갈량",
-          "text": "주공의 인덕이 곧 군세입니다. 천하가 그 마음을 보고 있습니다."
-        },
-        {
-          "text": "허나 조조의 철기는 하루 삼백 리를 달린다 — 추격의 그림자가 장판 언덕에 드리우고 있었다."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-leader",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "civilian",
+            "sprite": "civilian-scene",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left",
+            "hidden": true
+          },
+          {
+            "id": "zhugeliang",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "백성",
+            "side": "player",
+            "text": "사군께서 우리를 버리지 않으셨다... 이 은혜를 어찌 갚소, 흑흑.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              }
+            ],
+            "enter": [
+              {
+                "id": "civilian",
+                "from": [
+                  10,
+                  3
+                ],
+                "to": [
+                  7,
+                  3
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "civilian",
+                "dir": "left"
+              }
+            ],
+            "bubble": {
+              "id": "civilian",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "백성과 함께 강을 건넜다. 더디지만... 한 사람도 버리지 않았다.",
+            "pose": [
+              {
+                "id": "civilian",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "제갈량",
+            "side": "player",
+            "portraitId": "제갈량",
+            "text": "주공의 인덕이 곧 군세입니다. 천하가 그 마음을 보고 있습니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "text": "허나 조조의 철기는 하루 삼백 리를 달린다 — 추격의 그림자가 장판 언덕에 드리우고 있었다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "civilian",
+                "pose": "idle"
+              },
+              {
+                "id": "zhugeliang",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "유비",
       "classId": "lord",
-      "level": 14,
+      "level": 19,
       "troops": 220,
       "items": [],
       "side": "player",
@@ -106,7 +390,7 @@
     {
       "commanderId": "관우",
       "classId": "lightCavalry",
-      "level": 15,
+      "level": 19,
       "troops": 230,
       "items": [
         "청룡언월도"
@@ -118,7 +402,7 @@
     {
       "commanderId": "장비",
       "classId": "lightCavalry",
-      "level": 15,
+      "level": 19,
       "troops": 230,
       "items": [
         "사모"
@@ -130,7 +414,7 @@
     {
       "commanderId": "조운",
       "classId": "lightCavalry",
-      "level": 14,
+      "level": 19,
       "troops": 210,
       "items": [],
       "side": "player",
@@ -140,7 +424,7 @@
     {
       "commanderId": "제갈량",
       "classId": "strategist",
-      "level": 13,
+      "level": 19,
       "troops": 160,
       "items": [
         "쌀"
@@ -152,7 +436,7 @@
     {
       "commanderId": "미축",
       "classId": "strategist",
-      "level": 12,
+      "level": 19,
       "troops": 150,
       "items": [],
       "side": "player",
@@ -162,7 +446,7 @@
     {
       "commanderId": "관평",
       "classId": "lightCavalry",
-      "level": 12,
+      "level": 19,
       "troops": 180,
       "items": [],
       "side": "player",
@@ -172,7 +456,7 @@
     {
       "commanderId": "유봉",
       "classId": "archer",
-      "level": 12,
+      "level": 19,
       "troops": 160,
       "items": [],
       "side": "player",
@@ -182,7 +466,7 @@
     {
       "commanderId": "유벽",
       "classId": "civilian",
-      "level": 5,
+      "level": 17,
       "troops": 70,
       "items": [],
       "side": "ally",
@@ -192,7 +476,7 @@
     {
       "commanderId": "공지",
       "classId": "civilian",
-      "level": 5,
+      "level": 17,
       "troops": 70,
       "items": [],
       "side": "ally",
@@ -202,7 +486,7 @@
     {
       "commanderId": "이적",
       "classId": "civilian",
-      "level": 5,
+      "level": 17,
       "troops": 70,
       "items": [],
       "side": "ally",
@@ -212,7 +496,7 @@
     {
       "commanderId": "진응",
       "classId": "civilian",
-      "level": 5,
+      "level": 17,
       "troops": 70,
       "items": [],
       "side": "ally",
@@ -222,7 +506,7 @@
     {
       "commanderId": "진진",
       "classId": "civilian",
-      "level": 5,
+      "level": 17,
       "troops": 70,
       "items": [],
       "side": "ally",
@@ -232,7 +516,7 @@
     {
       "commanderId": "조인",
       "classId": "heavyCavalry",
-      "level": 15,
+      "level": 20,
       "troops": 240,
       "items": [],
       "side": "enemy",
@@ -242,7 +526,7 @@
     {
       "commanderId": "조홍",
       "classId": "lightCavalry",
-      "level": 14,
+      "level": 19,
       "troops": 210,
       "items": [],
       "side": "enemy",
@@ -252,7 +536,7 @@
     {
       "commanderId": "이전",
       "classId": "archer",
-      "level": 13,
+      "level": 18,
       "troops": 180,
       "items": [],
       "side": "enemy",
@@ -262,7 +546,7 @@
     {
       "commanderId": "악진",
       "classId": "footman",
-      "level": 13,
+      "level": 18,
       "troops": 190,
       "items": [],
       "side": "enemy",
@@ -272,7 +556,7 @@
     {
       "commanderId": "우금",
       "classId": "lightCavalry",
-      "level": 13,
+      "level": 18,
       "troops": 190,
       "items": [],
       "side": "enemy",
@@ -325,7 +609,7 @@
         {
           "commanderId": "하후돈",
           "classId": "heavyCavalry",
-          "level": 16,
+          "level": 21,
           "troops": 250,
           "items": [],
           "side": "enemy",
@@ -335,7 +619,7 @@
         {
           "commanderId": "하후연",
           "classId": "archer",
-          "level": 14,
+          "level": 19,
           "troops": 190,
           "items": [],
           "side": "enemy",

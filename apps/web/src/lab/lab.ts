@@ -11,11 +11,15 @@
  * 전투 중 레벨업으로 관찰한다.
  */
 import type { Stage, StageUnit, BattleMap, Weather } from "@tk/data";
+import type { RuntimeCatalogs } from "./catalog-data";
 
 export const LAB_STAGE_ID = "__lab";
 const LAB_KEY = "tk.lab";
 
 export interface LabPayload {
+  sceneMaps?: Record<string, BattleMap>;
+  chapterRun?: { runId: string; nodeId: string; visit: number };
+  catalogs?: RuntimeCatalogs;
   stage: Stage;
   map: BattleMap;
   /** friendly 공유 소모품 풀(원작 창고 §7) — 전투 「도구」 테스트용. */
@@ -91,12 +95,13 @@ function hasSession(): boolean {
   return typeof window !== "undefined" && typeof window.sessionStorage !== "undefined";
 }
 
-export function writeLab(payload: LabPayload): void {
-  if (!hasSession()) return;
+export function writeLab(payload: LabPayload): boolean {
+  if (!hasSession()) return false;
   try {
     window.sessionStorage.setItem(LAB_KEY, JSON.stringify(payload));
+    return true;
   } catch {
-    // 저장 실패 — /battle 진입 시 페이로드 없음으로 흘러 기본 스테이지 로드(무해).
+    return false;
   }
 }
 
@@ -135,8 +140,9 @@ export function exitTarget(
  */
 export function leaveSandbox(
   navigate: (to: string) => void,
-  payload: Pick<LabPayload, "returnUrl"> | null = readLab(),
+  payload: Pick<LabPayload, "returnUrl" | "chapterRun"> | null = readLab(),
 ): void {
+  if (sendChapterResult(payload, "cancelled")) return;
   // opener 가 이미 닫혔으면(에디터 탭을 유저가 먼저 닫은 경우) close 대신 returnUrl 로 이동 — closed 는 cross-origin에서도 읽을 수 있다.
   const hasOpener = typeof window !== "undefined" && window.opener != null && !window.opener.closed;
   const target = exitTarget(payload, hasOpener);
@@ -145,4 +151,13 @@ export function leaveSandbox(
   window.setTimeout(() => {
     if (!window.closed && payload?.returnUrl) navigate(payload.returnUrl);
   }, 100);
+}
+
+function sendChapterResult(payload: Pick<LabPayload, "chapterRun"> | null, result: string, progress?: unknown): boolean {
+  if (!payload?.chapterRun || typeof window === "undefined" || window.parent === window) return false;
+  window.parent.postMessage({ type: "tk-chapter:result", ...payload.chapterRun, result, ...(progress ? { progress } : {}) }, window.location.origin);
+  return true;
+}
+export function completeSandbox(navigate: (to: string) => void, result: "completed" | "victory" | "defeat", payload: LabPayload | null = readLab(), progress?: unknown): void {
+  if (!sendChapterResult(payload, result, progress)) leaveSandbox(navigate, payload);
 }

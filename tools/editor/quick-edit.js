@@ -20,7 +20,7 @@ export function primaryObjectiveText(stage, commanders) {
   }
 }
 
-export function renderQuick(el, { stage, commanders, classes, sides, onChange, onPick, onPlaytest }) {
+export function renderQuick(el, { stage, commanders, classes, sides, onChange, onPick, onPlaytest, onSelect, unitsOnly = false }) {
   el.innerHTML = "";
   const tbl = document.createElement("table"); tbl.className = "quick";
   tbl.innerHTML = "<thead><tr><th></th><th>이름</th><th>병종</th><th>Lv</th><th>병력</th><th>위치</th></tr></thead>";
@@ -31,7 +31,13 @@ export function renderQuick(el, { stage, commanders, classes, sides, onChange, o
     const s = sides[u.side] || sides.enemy;
     const td = () => tr.appendChild(document.createElement("td"));
     { const dot = document.createElement("span"); dot.className = "dot"; dot.style.background = s.raw; dot.title = s.label; td().appendChild(dot); }
-    td().textContent = nameOf(commanders, u.commanderId);
+    const nameCell = td();
+    if (onSelect) {
+      const select = document.createElement('button'); select.className = 'btn';
+      select.textContent = nameOf(commanders, u.commanderId);
+      select.title = `${select.textContent} 상세 설정`;
+      select.onclick = () => onSelect(u); nameCell.appendChild(select);
+    } else nameCell.textContent = nameOf(commanders, u.commanderId);
     td().textContent = nameOf(classes, u.classId);
     // Lv [−][n][+]
     const lv = td(); lv.className = "lv";
@@ -54,6 +60,7 @@ export function renderQuick(el, { stage, commanders, classes, sides, onChange, o
   tbl.appendChild(tb); el.appendChild(tbl);
   if (!stage.units.length) { const e = document.createElement("div"); e.style.cssText = "color:var(--dim);padding:8px 2px"; e.textContent = "배치된 유닛이 없습니다 — 좌측 유닛 모드에서 칸을 클릭해 배치."; el.appendChild(e); }
 
+  if (unitsOnly) return;
   const goal = document.createElement("div"); goal.className = "field";
   goal.innerHTML = `<label>주 목표</label><div class="quick-goal"></div><div class="hint">자세한 조건은 전투 › 목표·패배</div>`;
   goal.querySelector(".quick-goal").textContent = primaryObjectiveText(stage, commanders);

@@ -48,6 +48,18 @@ export function validateStory(stage, { placedIds = [], duelIds = [] } = {}) {
         if (blank(part.map)) errs.push(`${at}(맵 씬): map이 비어 있습니다`);
         if (!Array.isArray(part.units) || part.units.length === 0) errs.push(`${at}(맵 씬): 등장 유닛이 없습니다`);
         if (lines.length === 0) errs.push(`${at}(맵 씬): 줄이 없습니다`);
+        const ids = new Set();
+        for (const unit of part.units ?? []) {
+          if (blank(unit.id) || ids.has(unit.id)) errs.push(`${at}: 캐릭터 ID가 비어 있거나 중복됩니다`);
+          ids.add(unit.id);
+          if (blank(unit.sprite)) errs.push(`${at}: 캐릭터 이미지가 없습니다`);
+        }
+        lines.forEach((line, li) => {
+          for (const kind of ['move', 'enter', 'exit', 'face', 'pose']) {
+            for (const action of line[kind] ?? []) if (!ids.has(action.id)) errs.push(`${at} ${li + 1}번째 줄: ${action.id} 캐릭터를 찾을 수 없습니다`);
+          }
+          if (line.bubble && !ids.has(line.bubble.id)) errs.push(`${at} ${li + 1}번째 줄: 말풍선 캐릭터를 찾을 수 없습니다`);
+        });
         return;
       }
       if (lines.length === 0) errs.push(`${at}: 줄이 없습니다`);

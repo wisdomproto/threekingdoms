@@ -19,81 +19,364 @@
   },
   "levelCap": 14,
   "scenario": {
-    "intro": {
-      "bg": "06-huluguan-intro",
-      "lines": [
-        {
-          "text": "사수관이 뚫리자 동탁은 낙양의 마지막 방패, 호로관에 최강의 패를 세웠다 — 여포 봉선."
+    "intro": [
+      {
+        "bg": "06-huluguan-intro",
+        "lines": [
+          {
+            "text": "사수관이 뚫리자 동탁은 낙양의 마지막 방패, 호로관에 최강의 패를 세웠다 — 여포 봉선."
+          }
+        ]
+      },
+      {
+        "map": "scene-town-gate",
+        "label": "호로관 · 셋이서 간다",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "text": "관문 앞은 이상하리만치 조용했다. 붉은 적토마 위의 그림자 하나가, 제후 연합 전체를 멈춰 세우고 있었다."
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-foot",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "관문 앞은 이상하리만치 조용했다. 붉은 적토마 위의 그림자 하나가, 제후 연합 전체를 멈춰 세우고 있었다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "인중여포, 마중적토라... 헛소문이 아니었군요. 혼자서는 어렵습니다, 형님.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "흥! 아비를 둘씩이나 갈아치운 패륜아 놈! 내가 먼저 간을 보고 오겠소!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "zhangfei",
+                "to": [
+                  6,
+                  5
+                ]
+              }
+            ],
+            "bubble": {
+              "id": "zhangfei",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "익덕! ...혼자는 안 된다. 셋이 간다.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "삼형제가 한 몸으로 움직인다 — 에워싸고, 지치게 하고, 빈틈을 문다. 도원의 맹세를 여기서 보여주자.",
+            "pose": [
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              },
+              {
+                "id": "guanyu",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "text": "뒷날 천하가 두고두고 입에 올릴 싸움이 시작되려 하고 있었다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ],
+            "exit": [
+              {
+                "id": "zhangfei",
+                "to": [
+                  1,
+                  5
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "06-huluguan-outro",
+        "lines": [
+          {
+            "text": "여포가 말머리를 돌려 관 안으로 사라지자, 연합군 진영에서 뒤늦은 함성이 터졌다. 셋이서 천하의 여포를 물러세운 것이다."
+          }
+        ]
+      },
+      {
+        "map": "scene-town-gate",
+        "label": "호로관 · 물러난 여포",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "인중여포, 마중적토라... 헛소문이 아니었군요. 혼자서는 어렵습니다, 형님."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "흥! 아비를 둘씩이나 갈아치운 패륜아 놈! 내가 먼저 간을 보고 오겠소!"
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "익덕! ...혼자는 안 된다. 셋이 간다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "삼형제가 한 몸으로 움직인다 — 에워싸고, 지치게 하고, 빈틈을 문다. 도원의 맹세를 여기서 보여주자."
-        },
-        {
-          "text": "뒷날 천하가 두고두고 입에 올릴 싸움이 시작되려 하고 있었다."
-        }
-      ]
-    },
-    "outro": {
-      "bg": "06-huluguan-outro",
-      "lines": [
-        {
-          "text": "여포가 말머리를 돌려 관 안으로 사라지자, 연합군 진영에서 뒤늦은 함성이 터졌다. 셋이서 천하의 여포를 물러세운 것이다."
-        },
-        {
-          "speaker": "병사",
-          "side": "player",
-          "text": "물러났다! 여포가 물러났다! 저 세 분이 해냈다!!"
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "헉헉... 과연 여포, 사람이 아니구려. 셋이서 겨우 물렸소."
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "놓쳤으나 기세는 꺾었다. 동탁은 이제 낙양을 지킬 패가 없다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "...천하가 무너지는 소리가 들리는구나. 낙양으로 — 쫓는다."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-foot",
+            "cell": [
+              3,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "soldier",
+            "sprite": "soldier-story",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "병사",
+            "side": "player",
+            "text": "물러났다! 여포가 물러났다! 저 세 분이 해냈다!!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "soldier",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "soldier",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "헉헉... 과연 여포, 사람이 아니구려. 셋이서 겨우 물렸소.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "soldier",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "놓쳤으나 기세는 꺾었다. 동탁은 이제 낙양을 지킬 패가 없다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "soldier",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "...천하가 무너지는 소리가 들리는구나. 낙양으로 — 쫓는다.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "soldier",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "유비",
       "classId": "lord",
-      "level": 5,
+      "level": 6,
       "troops": 110,
       "items": [],
       "side": "player",
@@ -103,7 +386,7 @@
     {
       "commanderId": "관우",
       "classId": "lightCavalry",
-      "level": 5,
+      "level": 6,
       "troops": 120,
       "items": [
         "청룡언월도"
@@ -115,7 +398,7 @@
     {
       "commanderId": "장비",
       "classId": "lightCavalry",
-      "level": 5,
+      "level": 6,
       "troops": 120,
       "items": [
         "사모"
@@ -127,7 +410,7 @@
     {
       "commanderId": "간옹",
       "classId": "strategist",
-      "level": 5,
+      "level": 6,
       "troops": 90,
       "items": [
         "쌀",
@@ -140,7 +423,7 @@
     {
       "commanderId": "미축",
       "classId": "strategist",
-      "level": 5,
+      "level": 6,
       "troops": 100,
       "items": [],
       "side": "player",
@@ -150,7 +433,7 @@
     {
       "commanderId": "손건",
       "classId": "strategist",
-      "level": 5,
+      "level": 6,
       "troops": 90,
       "items": [],
       "side": "player",
@@ -160,7 +443,7 @@
     {
       "commanderId": "공손찬",
       "classId": "lightCavalry",
-      "level": 4,
+      "level": 5,
       "troops": 110,
       "items": [],
       "side": "ally",
@@ -170,8 +453,8 @@
     {
       "commanderId": "여포",
       "classId": "heavyCavalry",
-      "level": 4,
-      "troops": 125,
+      "level": 5,
+      "troops": 106,
       "items": [
         "방천화극",
         "적토마"
@@ -183,8 +466,8 @@
     {
       "commanderId": "장요",
       "classId": "lightCavalry",
-      "level": 3,
-      "troops": 105,
+      "level": 4,
+      "troops": 89,
       "items": [],
       "side": "enemy",
       "x": 13,
@@ -193,8 +476,8 @@
     {
       "commanderId": "송겸",
       "classId": "archer",
-      "level": 3,
-      "troops": 90,
+      "level": 4,
+      "troops": 77,
       "items": [],
       "side": "enemy",
       "x": 17,
@@ -203,8 +486,8 @@
     {
       "commanderId": "이각",
       "classId": "footman",
-      "level": 3,
-      "troops": 95,
+      "level": 4,
+      "troops": 81,
       "items": [],
       "side": "enemy",
       "x": 15,
@@ -213,8 +496,8 @@
     {
       "commanderId": "곽사",
       "classId": "footman",
-      "level": 2,
-      "troops": 85,
+      "level": 4,
+      "troops": 72,
       "items": [],
       "side": "enemy",
       "x": 9,
@@ -223,8 +506,8 @@
     {
       "commanderId": "이숙",
       "classId": "archer",
-      "level": 2,
-      "troops": 80,
+      "level": 4,
+      "troops": 68,
       "items": [],
       "side": "enemy",
       "x": 21,
@@ -233,8 +516,8 @@
     {
       "commanderId": "호진",
       "classId": "lightCavalry",
-      "level": 2,
-      "troops": 85,
+      "level": 4,
+      "troops": 72,
       "items": [],
       "side": "enemy",
       "x": 11,
@@ -243,8 +526,8 @@
     {
       "commanderId": "서영",
       "classId": "footman",
-      "level": 2,
-      "troops": 85,
+      "level": 4,
+      "troops": 72,
       "items": [],
       "side": "enemy",
       "x": 19,
@@ -275,8 +558,8 @@
         {
           "commanderId": "서상",
           "classId": "footman",
-          "level": 2,
-          "troops": 80,
+          "level": 4,
+          "troops": 68,
           "items": [],
           "side": "enemy",
           "x": 14,
@@ -285,8 +568,8 @@
         {
           "commanderId": "조성",
           "classId": "archer",
-          "level": 2,
-          "troops": 75,
+          "level": 4,
+          "troops": 64,
           "items": [],
           "side": "enemy",
           "x": 16,

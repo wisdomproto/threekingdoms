@@ -143,11 +143,10 @@ describe("reinforcements", () => {
       reinforcements: [{
         id: "r1", side: "enemy", once: true,
         trigger: { kind: "turn", turn: 2 },
-        units: [{ commanderId: "이숙", classId: "archer", level: 2, troops: 100, items: [], side: "enemy", x: 7, y: 1 }],
+        units: [{ commanderId: "장비", classId: "archer", level: 2, troops: 100, items: [], side: "enemy", x: 7, y: 1 }],
       }],
     }));
-    // ⚠️ 이숙은 baseUnits에도 있으므로 중복 id 회피 위해 증원은 다른 commander가 이상적이나,
-    // 픽스처 commander 한정 → 동일 id 스폰을 허용하되 존재 검증만 한다(엔진은 id 유일성 강제 안 함).
+    // Reinforcements use a distinct commander ID from the initial deployment.
     let s = createBattle(ctx, 1);
     const before = s.units.length;
     s = applyAction(ctx, s, { type: "wait", unitId: "유비" }).state;
@@ -168,7 +167,7 @@ describe("reinforcements", () => {
       reinforcements: [{
         id: "r1", side: "enemy", once: true,
         trigger: { kind: "turn", turn: 1 }, // 즉시 충족 — 매 액션 평가돼도 1회만
-        units: [{ commanderId: "이숙", classId: "archer", level: 2, troops: 100, items: [], side: "enemy", x: 7, y: 1 }],
+        units: [{ commanderId: "장비", classId: "archer", level: 2, troops: 100, items: [], side: "enemy", x: 7, y: 1 }],
       }],
     }));
     let s = createBattle(ctx, 1);

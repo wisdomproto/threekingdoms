@@ -2,11 +2,12 @@
  * FxLayer (설계 §2.2) — 데미지 팝업(월드 공간) + 배너(스크린 공간) 이펙트. Text 풀링.
  * world는 카메라 변환 컨테이너 아래에, screen은 stage 직속(카메라 무관)에 부착한다.
  */
-import { Container, Graphics, Sprite, Text } from "pixi.js";
+import { Container, Graphics, Sprite, Text, type Texture } from "pixi.js";
 import type { WorldPoint } from "../projection";
 import { easeOut, type TweenRunner } from "../tweens";
 import type { TextureResolver } from "../textures";
 import { FX, pickFlashKey } from "../fxKeys";
+import { specialFxCandidates, type SpecialHit, type HeroWeapon } from "../specialFx";
 
 const POPUP_MS = 650;
 const POPUP_RISE_PX = 28;
@@ -29,7 +30,6 @@ const SLASH_BOW = 16; // 호의 활 휘는 정도 (px)
 const SLASH_GOLD = 0xfff2c4; // 흰금빛 베기
 const PIERCE_TINT = 0x9fd8ff; // 간접(궁/포) 충격 — 차가운 청백
 const FLASH_MS = 110; // 임팩트 플래시 수명
-const FLASH_R = 22; // 임팩트 플래시 반경 (px)
 
 // ── 책략 카테고리별 대표 VFX (§8, 절차적 — 에셋 0, 전투 타격 FX와 동형. 생성 FX 드롭인 여지) ──
 const STRATEGY_MS = 640;
@@ -119,7 +119,9 @@ export class FxLayer {
     }
     text.text = crit ? `회심! ${amount}` : guarded ? `막음 ${amount}` : String(amount);
     text.tint = crit ? 0xffd75e : guarded ? 0x9fd8ff : counter ? COUNTER_TINT : NORMAL_TINT;
-    text.scale.set(crit ? 1.3 : 1); // 풀 공유라 매 사용 시 리셋
+    text.style.fontSize = 14;
+    text.style.stroke = { color: 0x000000, width: 3 };
+    text.scale.set(crit ? 1.1 : 1);
     text.visible = true;
     text.alpha = 1;
     const startY = at.y - 18;
@@ -127,6 +129,7 @@ export class FxLayer {
     const captured = text;
     return this.tweens
       .run(POPUP_MS, (t) => {
+        captured.scale.set(this.labelScale() * (crit ? 1.1 : 1));
         captured.position.y = startY - POPUP_RISE_PX * t;
         captured.alpha = t < 0.6 ? 1 : 1 - (t - 0.6) / 0.4;
       })
@@ -151,6 +154,7 @@ export class FxLayer {
       this.world.addChild(text);
     }
     text.text = `레벨 업! Lv.${newLevel}`;
+    text.style.fontSize = 18;
     text.tint = 0xffe27a;
     text.scale.set(1.15);
     text.visible = true;
@@ -185,6 +189,8 @@ export class FxLayer {
       this.world.addChild(text);
     }
     text.text = "빗나감";
+    text.style.fontSize = 16;
+    text.scale.set(1);
     text.tint = 0xaab2bd;
     text.visible = true;
     text.alpha = 1;
@@ -220,6 +226,8 @@ export class FxLayer {
       this.world.addChild(text);
     }
     text.text = `+${amount}`;
+    text.style.fontSize = 18;
+    text.scale.set(1);
     text.tint = HEAL_TINT;
     text.visible = true;
     text.alpha = 1;
@@ -248,7 +256,7 @@ export class FxLayer {
       ? this.playFxSprite(FX.coin, { x: at.x, y: at.y - 4 }, RETREAT_MS, (t, s) => {
           const e = 1 - (1 - t) * (1 - t);              // ease-out
           s.position.y = at.y - 4 - 18 * e;             // 튀어오름
-          s.scale.set(0.6 + e * 0.7);
+          s.scale.set((40 / Math.max(1, s.texture.width, s.texture.height)) * (0.6 + e * 0.7));
           s.alpha = t < 0.5 ? 1 : 1 - (t - 0.5) / 0.5;
         })
       : null;
@@ -351,10 +359,10 @@ export class FxLayer {
     const ang0 = Math.atan2(dy0, dx0);   // 공격 방향
     if (kind === "thrust") {
       // 찌르기: 전용 스프라이트(있으면) — 방향 고정 + 전진 스트레치. 없으면 절차적 창 스트로크(아래).
-      // 생성 시트는 고해상 — 월드 창광 길이 ~64px 기준으로 텍스처 폭 정규화 후 런지 스트레치.
+      // Normalize high-resolution art to 44 world pixels before lunge stretching.
       const img = this.playFxSprite(FX.thrust, { x: to.x, y: to.y - 8 }, SLASH_MS, (t, s) => {
         const e = easeOut(t);
-        const k = 64 / Math.max(1, s.texture.width);
+        const k = 44 / Math.max(1, s.texture.width, s.texture.height);
         s.rotation = ang0;
         s.scale.set(k * (0.7 + e * 0.65), k * 0.9);
         s.alpha = t < 0.4 ? 1 : 1 - (t - 0.4) / 0.6;
@@ -364,7 +372,7 @@ export class FxLayer {
       const img = this.playFxSprite(FX.slash, { x: to.x, y: to.y - 8 }, SLASH_MS, (t, s) => {
         const e = easeOut(t);
         s.rotation = ang0 + (e - 0.5) * 0.9;          // 휘두르는 쓸기
-        s.scale.set(0.8 + e * 0.5);
+        s.scale.set((44 / Math.max(1, s.texture.width, s.texture.height)) * (0.8 + e * 0.5));
         s.alpha = t < 0.35 ? 1 : 1 - (t - 0.35) / 0.65;
         if (indirect) s.tint = 0x9fd8ff;              // 간접=청백(PIERCE_TINT 톤)
       }, ang0);
@@ -427,22 +435,95 @@ export class FxLayer {
    * 임팩트 플래시 (§4 타격 주스) — 타격점에 짧고 강한 흰빛 원 1회(빠르게 확장·소멸).
    * 묵직한 "맞았다" 신호. 월드 공간, 순수 표현, 배속 존중.
    */
+  heroWeaponArc(kind: "dual" | "crescent" | "spear", from: WorldPoint, to: WorldPoint): Promise<void> {
+    return this.heroFrames(kind, { x: to.x, y: to.y - 12 }, kind === "crescent" ? 64 : 54,
+      Math.atan2(to.y - from.y, to.x - from.x), 200)
+      ?? this.slashArc(from, to, kind === "spear" ? "thrust" : "slash");
+  }
+
+  /** Keep combat labels readable without magnifying them over nearby units. */
+  private labelScale(): number {
+    const transform = this.world.worldTransform;
+    const zoom = Math.hypot(transform.a, transform.b) || 1;
+    return Math.min(1, 1.5 / zoom);
+  }
+
+  flankPopup(at: WorldPoint, bonusPercent: number): Promise<void> {
+    const text = new Text({ text: `협공 +${bonusPercent}%`, style: {
+      fontFamily: "sans-serif", fontSize: 12, fontWeight: "bold",
+      fill: 0xffdc86, stroke: { color: 0x192019, width: 3 },
+    } });
+    text.anchor.set(0.5);
+    text.position.set(at.x, at.y - 42);
+    this.world.addChild(text);
+    return this.tweens.run(380, t => {
+      text.scale.set(this.labelScale());
+      text.y = at.y - 42 - t * 8;
+      text.alpha = Math.min(1, (1 - t) * 4);
+    }).then(() => { this.world.removeChild(text); text.destroy(); });
+  }
+
+  /** A short shield edge at contact, contained within one tile. */
+  guardFlash(at: WorldPoint, from: WorldPoint): Promise<void> {
+    const shield = new Graphics();
+    shield.moveTo(-8, -10).lineTo(8, -10).lineTo(7, 3)
+      .quadraticCurveTo(4, 9, 0, 12).quadraticCurveTo(-4, 9, -7, 3).closePath()
+      .fill({ color: 0x9fd8ff, alpha: 0.16 }).stroke({ color: 0xc8efff, width: 2 });
+    shield.position.set(at.x + (from.x < at.x ? -10 : 10), at.y - 16);
+    this.world.addChild(shield);
+    return this.tweens.run(180, t => {
+      shield.scale.set(0.85 + t * 0.15);
+      shield.alpha = Math.min(1, (1 - t) * 2);
+    }).then(() => { this.world.removeChild(shield); shield.destroy(); });
+  }
+
+  specialImpact(hit: SpecialHit, at: WorldPoint, from: WorldPoint, weapon?: HeroWeapon | null): Promise<void> {
+    for (const kind of specialFxCandidates(hit, weapon)) {
+      const animation = this.heroFrames(kind, { x: at.x, y: at.y - 12 },
+        hit === "critical" ? 44 : 68,
+        // Both source sheets advance toward screen-right; orient the leading edge toward the target.
+        kind === "ultimate-spear" || kind === "ultimate-crescent"
+          ? Math.atan2(at.y - from.y, at.x - from.x) : 0,
+        hit === "critical" ? 220 : 360, "special");
+      if (animation) return animation;
+    }
+    return this.impactFlash(at, true);
+  }
+
+  private heroFrames(kind: string, at: WorldPoint, size: number, rotation: number, duration: number, prefix = "hero"): Promise<void> | null {
+    const frames = Array.from({ length: 4 }, (_, i) => this.textures?.getFx(`${prefix}-${kind}-${i}`));
+    if (!frames.every((frame): frame is Texture => Boolean(frame))) return null;
+    const sprite = new Sprite(frames[0]);
+    sprite.anchor.set(0.5);
+    sprite.position.set(at.x, at.y);
+    sprite.rotation = rotation;
+    sprite.blendMode = "add";
+    this.world.addChild(sprite);
+    return this.tweens.run(duration, t => {
+      sprite.texture = frames[Math.min(3, Math.floor(t * 4))]!;
+      sprite.scale.set(size / Math.max(1, sprite.texture.width, sprite.texture.height));
+      sprite.alpha = t < 0.65 ? 1 : Math.max(0, (1 - t) / 0.35);
+    }).then(() => { this.world.removeChild(sprite); sprite.destroy(); });
+  }
+
   impactFlash(at: WorldPoint, big = false): Promise<void> {
+    const animated = this.heroFrames("impact", { x: at.x, y: at.y - 10 }, big ? 40 : 28, 0, 160);
+    if (animated) return animated;
     const key = pickFlashKey(big);                  // big→sparkle, else flash
-    const scaleTo = big ? 2.0 : 1.3;
+    const size = big ? 40 : 28;
     const img = this.playFxSprite(key, { x: at.x, y: at.y - 6 }, big ? 220 : FLASH_MS, (t, s) => {
-      s.scale.set(0.5 + t * scaleTo);
+      s.scale.set((size / Math.max(1, s.texture.width, s.texture.height)) * (0.65 + t * 0.35));
       s.alpha = Math.max(0, 1 - t);
     });
     if (img) return img;
     // ── 폴백: 기존 흰 원 ──
     const flash = new Graphics();
-    flash.circle(0, 0, FLASH_R).fill({ color: 0xffffff, alpha: 1 });
+    flash.circle(0, 0, size / 2).fill({ color: 0xffffff, alpha: 1 });
     flash.position.set(at.x, at.y - 6);
     this.world.addChild(flash);
     return this.tweens
       .run(FLASH_MS, (t) => {
-        flash.scale.set(0.5 + t * 1.1);
+        flash.scale.set(0.65 + t * 0.35);
         flash.alpha = Math.max(0, 1 - t);
       })
       .then(() => {
@@ -457,6 +538,23 @@ export class FxLayer {
    * 데미지/회복 수치는 후속 damageDealt/troopsHealed가 처리 — 여기선 "주문이 펼쳐졌다" 연출만.
    */
   strategyEffect(category: string, at: WorldPoint): Promise<void> {
+    const frames = Array.from({ length: 8 }, (_, frame) => this.textures?.getFx(`strategy-${category}-${frame}`));
+    if (frames.every((frame): frame is Texture => !!frame)) {
+      const sprite = new Sprite(frames[0]);
+      // Preserve the atlas canvas: trimming each frame makes growing spells jump in size.
+      sprite.anchor.set(0.5, category === "special" ? 0.5 : 0.86);
+      sprite.position.set(at.x, at.y + (category === "special" ? -8 : 24));
+      sprite.width = 88;
+      sprite.height = 88;
+      this.world.addChild(sprite);
+      return this.tweens.run(STRATEGY_MS, (t) => {
+        sprite.texture = frames[Math.min(7, Math.floor(t * 8))]!;
+        sprite.alpha = Math.min(1, (1 - t) * 8);
+      }).then(() => {
+        this.world.removeChild(sprite);
+        sprite.destroy();
+      });
+    }
     const spec = STRATEGY_FX[category] ?? STRATEGY_FX.special!;
     const root = new Container();
     root.position.set(at.x, at.y - 8);
@@ -522,15 +620,15 @@ export class FxLayer {
   }
 
   /** 중앙 배너 — ms 동안 표시 후 제거. 직렬 연출이라 동시 1개 가정 */
-  banner(message: string, ms: number): Promise<void> {
+  banner(message: string, ms: number, action = false): Promise<void> {
     const container = new Container();
     const text = new Text({
       text: message,
       style: {
-        fontFamily: "sans-serif",
-        fontSize: 22,
+        fontFamily: action ? "Noto Serif KR, serif" : "sans-serif",
+        fontSize: action ? 28 : 22,
         fontWeight: "bold",
-        fill: 0xffffff,
+        fill: action ? 0xffedb0 : 0xffffff,
         align: "center",
       },
     });
@@ -546,7 +644,17 @@ export class FxLayer {
       10,
     ).fill({ color: 0x000000, alpha: 0.65 });
     container.addChild(bg, text);
-    container.position.set(this.screenW / 2, this.screenH / 2);
+    if (action) {
+      bg.moveTo(-text.width / 2 - padX, text.height / 2 + padY)
+        .lineTo(text.width / 2 + padX, text.height / 2 + padY)
+        .stroke({ color: 0xcba85d, width: 2 });
+    }
+    container.position.set(action ? text.width / 2 + padX + 12 : this.screenW / 2, action ? 36 : this.screenH / 2);
+    if (action) {
+      const scale = Math.min(1, (this.screenW * 0.52) / (text.width + padX * 2));
+      container.scale.set(scale);
+      container.x = 12 + (text.width / 2 + padX) * scale;
+    }
     container.alpha = 0;
     this.screen.addChild(container);
 

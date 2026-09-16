@@ -13,8 +13,9 @@
  * 맵 미등록(scene.map 오타 등) = 빈 씬 가드처럼 즉시 onComplete(무붕괴 no-op 계약).
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { gameData, type BattleMap, type MapScene, type MapSceneLine } from "@tk/data";
+import { gameData, type BattleMap, type MapScene, type MapSceneLine } from "../game/data";
 import { moveCostFor } from "@tk/engine";
+import { resolveSceneMap } from "../lab/scene-maps";
 import { SceneStage } from "./map/SceneStage";
 import { sceneUnitStates, type Cell, type Walkable } from "./map/interpreter";
 import { useTypewriter } from "./useTypewriter";
@@ -40,15 +41,17 @@ type Phase =
 
 export function MapScenePlayer({
   scene,
+  maps,
   title,
   onComplete,
 }: {
   scene: MapScene;
+  maps?: Record<string, BattleMap>;
   /** 상단 표시용(스테이지명 등). */
   title?: string;
   onComplete: () => void;
 }): React.ReactElement | null {
-  const map = gameData.maps[scene.map];
+  const map = resolveSceneMap(scene.map, maps);
   // 미등록 맵 = 빈 씬 가드와 동일 — 즉시 다음 단계(크래시 금지, 점진적 콘텐츠).
   useEffect(() => {
     if (!map) onComplete();

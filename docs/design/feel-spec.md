@@ -73,3 +73,6 @@
 1. **조조전 플레이/녹화 1패스** → 위 표의 "목표" 칸 구체화(이징 곡선, 줌 배율, UI 위치 등 수치까지).
 2. 배치 단위로 burn-down (A 카메라 → B 유닛 → C UI → D 즙). 각 배치 = 한 세션.
 3. 새로 발견되는 "세세한 것"은 반응형으로 고치지 말고 **이 표에 추가** 후 배치에 흡수.
+
+### Village courtyards (2026-09-14)
+Village collision, healing, and unit coordinates remain unchanged. Automatic village buildings now sit along the northern edge of their terrain patch and are height-limited to 0.72 tiles, ending at 0.78 tiles (minus the renderer's one-pixel baseline). This leaves rendered unit feet at each tile's bottom outside the roof footprint, including the neighboring northern row. A subtle courtyard marks the walkable village area. Pixi and the Studio canvas preview use the same placement metadata; authored decorations remain unchanged.

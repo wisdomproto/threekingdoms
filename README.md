@@ -32,6 +32,10 @@ pnpm --filter @tk/web dev   # http://localhost:3000/battle
 팬·핀치(터치) / 드래그·휠(마우스)로 카메라 이동·줌. 설계 문서:
 `docs/superpowers/specs/2026-06-12-renderer-v0-design.md`
 
+## 프로젝트 스튜디오 (/studio)
+
+`pnpm --filter @tk/web dev` 실행 후 `http://localhost:3000/studio`에서 프로젝트를 만들고 챕터·스토리·전투를 편집한다. 자동저장본은 `.studio/projects/`에 보관하며 게임 원본은 변경하지 않는다. 개발 서버에서만 제공한다. 상세 기능과 검증은 [Studio UI v1](docs/design/studio-ui-v1.md)을 참고한다.
+
 ## 개발 규칙
 
 - 전투 룰 변경은 CLAUDE.md(기획 문서) 먼저 업데이트

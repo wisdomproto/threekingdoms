@@ -10,7 +10,7 @@
  */
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { gameData, stages } from "@tk/data";
+import { gameData, stages } from "../../game/data";
 import { getMeta } from "../metaStore";
 import { isSerendipityTreasure } from "../serendipity";
 import { PANEL_FRAME } from "../../battle/hud/frames";

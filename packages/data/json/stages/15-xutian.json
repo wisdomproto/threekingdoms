@@ -17,76 +17,295 @@
   },
   "levelCap": 22,
   "scenario": {
-    "intro": {
-      "bg": "15-xutian-intro",
-      "lines": [
-        {
-          "text": "여포가 백문루에서 최후를 맞은 뒤, 유비는 조조를 따라 허도로 들어갔다. 천자를 곁에 낀 조조의 위세는 — 이미 황제의 그것이었다."
+    "intro": [
+      {
+        "bg": "15-xutian-intro",
+        "lines": [
+          {
+            "text": "여포가 백문루에서 최후를 맞은 뒤, 유비는 조조를 따라 허도로 들어갔다. 천자를 곁에 낀 조조의 위세는 — 이미 황제의 그것이었다."
+          }
+        ]
+      },
+      {
+        "map": "scene-refugee-road",
+        "label": "허전 · 참아야 하는 칼",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "text": "허전. 천자를 모신 대사냥이 열렸다. 조조는 천자의 활을 제 손으로 당겨 사슴을 쏘았고 — 만세 소리는 천자가 아니라 조조를 향했다."
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-official",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-official",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-official",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "허전. 천자를 모신 대사냥이 열렸다. 조조는 천자의 활을 제 손으로 당겨 사슴을 쏘았고 — 만세 소리는 천자가 아니라 조조를 향했다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "형님, 지금입니다. 저 역적을 베면 한실이 삽니다. 이 거리라면 제 칼이 닿습니다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "guanyu",
+                "to": [
+                  6,
+                  3
+                ]
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "(운장의 손을 지그시 누른다) ...참아라. 여기서 칼을 빼면 천자께서 위험해진다.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "liubei",
+                "to": [
+                  5,
+                  4
+                ]
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "으드득... 분하오! 사냥이고 뭐고 입맛이 뚝 떨어졌소!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "zhangfei",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "오늘은 짐승을 쫓는 사냥이다. ...허나 진짜 사냥감이 누구인지는, 하늘이 알고 있겠지.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "15-xutian-outro",
+        "lines": [
+          {
+            "text": "사냥이 파하고 진영으로 돌아온 밤 — 은밀한 손님이 유비의 처소를 찾았다. 소맷자락에서 나온 것은, 천자의 옥대였다."
+          }
+        ]
+      },
+      {
+        "map": "scene-council-hall",
+        "label": "허도 · 밀명",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "형님, 지금입니다. 저 역적을 베면 한실이 삽니다. 이 거리라면 제 칼이 닿습니다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "(운장의 손을 지그시 누른다) ...참아라. 여기서 칼을 빼면 천자께서 위험해진다."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "으드득... 분하오! 사냥이고 뭐고 입맛이 뚝 떨어졌소!"
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "오늘은 짐승을 쫓는 사냥이다. ...허나 진짜 사냥감이 누구인지는, 하늘이 알고 있겠지."
-        }
-      ]
-    },
-    "outro": {
-      "bg": "15-xutian-outro",
-      "lines": [
-        {
-          "text": "사냥이 파하고 진영으로 돌아온 밤 — 은밀한 손님이 유비의 처소를 찾았다. 소맷자락에서 나온 것은, 천자의 옥대였다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "...의대조. 천자께서 조조를 치라 하셨다."
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "형님, 이제 길이 갈립니다. 조조와는 더 이상 한 하늘 아래 설 수 없겠군요."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "목숨이 걸린 밀명이다. 서두르지 마라 — 때를 기다린다."
-        },
-        {
-          "text": "붉은 밀서는 그날 밤 깊이 감춰졌다. 허나 비밀이란, 오래 지켜지는 법이 없다."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-official",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-official",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "...의대조. 천자께서 조조를 치라 하셨다.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "형님, 이제 길이 갈립니다. 조조와는 더 이상 한 하늘 아래 설 수 없겠군요.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "목숨이 걸린 밀명이다. 서두르지 마라 — 때를 기다린다.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "붉은 밀서는 그날 밤 깊이 감춰졌다. 허나 비밀이란, 오래 지켜지는 법이 없다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "유비",
       "classId": "lord",
-      "level": 19,
+      "level": 15,
       "troops": 175,
       "items": [],
       "side": "player",
@@ -96,7 +315,7 @@
     {
       "commanderId": "관우",
       "classId": "lightCavalry",
-      "level": 20,
+      "level": 15,
       "troops": 190,
       "items": [
         "청룡언월도",
@@ -109,7 +328,7 @@
     {
       "commanderId": "장비",
       "classId": "lightCavalry",
-      "level": 20,
+      "level": 15,
       "troops": 185,
       "items": [
         "사모"
@@ -121,7 +340,7 @@
     {
       "commanderId": "조운",
       "classId": "lightCavalry",
-      "level": 19,
+      "level": 15,
       "troops": 180,
       "items": [],
       "side": "player",
@@ -131,7 +350,7 @@
     {
       "commanderId": "간옹",
       "classId": "strategist",
-      "level": 19,
+      "level": 15,
       "troops": 130,
       "items": [
         "쌀"
@@ -143,7 +362,7 @@
     {
       "commanderId": "미축",
       "classId": "sorcerer",
-      "level": 18,
+      "level": 15,
       "troops": 120,
       "items": [],
       "side": "player",
@@ -153,7 +372,7 @@
     {
       "commanderId": "허저",
       "classId": "heavyCavalry",
-      "level": 21,
+      "level": 17,
       "troops": 240,
       "items": [],
       "side": "enemy",
@@ -163,7 +382,7 @@
     {
       "commanderId": "왕충",
       "classId": "footman",
-      "level": 17,
+      "level": 13,
       "troops": 130,
       "items": [],
       "side": "enemy",
@@ -173,7 +392,7 @@
     {
       "commanderId": "유대",
       "classId": "footman",
-      "level": 17,
+      "level": 13,
       "troops": 130,
       "items": [],
       "side": "enemy",
@@ -183,7 +402,7 @@
     {
       "commanderId": "채양",
       "classId": "archer",
-      "level": 17,
+      "level": 13,
       "troops": 115,
       "items": [],
       "side": "enemy",
@@ -193,7 +412,7 @@
     {
       "commanderId": "하후걸",
       "classId": "archer",
-      "level": 16,
+      "level": 13,
       "troops": 110,
       "items": [],
       "side": "enemy",
@@ -203,7 +422,7 @@
     {
       "commanderId": "하후란",
       "classId": "lightCavalry",
-      "level": 16,
+      "level": 13,
       "troops": 120,
       "items": [],
       "side": "enemy",
@@ -213,7 +432,7 @@
     {
       "commanderId": "하후상",
       "classId": "lightCavalry",
-      "level": 16,
+      "level": 13,
       "troops": 120,
       "items": [],
       "side": "enemy",
@@ -248,7 +467,7 @@
         {
           "commanderId": "하후은",
           "classId": "lightCavalry",
-          "level": 17,
+          "level": 13,
           "troops": 120,
           "items": [],
           "side": "enemy",
@@ -258,7 +477,7 @@
         {
           "commanderId": "하후덕",
           "classId": "footman",
-          "level": 17,
+          "level": 13,
           "troops": 125,
           "items": [],
           "side": "enemy",

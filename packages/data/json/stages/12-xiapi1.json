@@ -17,79 +17,341 @@
   },
   "levelCap": 22,
   "scenario": {
-    "intro": {
-      "bg": "12-xiapi1-intro",
-      "lines": [
-        {
-          "text": "소패는 끝내 버티지 못했다. 성벽 한 귀퉁이가 무너지던 밤 — 유비군은 어둠을 틈타 성을 빠져나왔다."
+    "intro": [
+      {
+        "bg": "12-xiapi1-intro",
+        "lines": [
+          {
+            "text": "소패는 끝내 버티지 못했다. 성벽 한 귀퉁이가 무너지던 밤 — 유비군은 어둠을 틈타 성을 빠져나왔다."
+          }
+        ]
+      },
+      {
+        "map": "scene-refugee-road",
+        "label": "소패 밖 · 탈출",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "text": "등 뒤에서 여포 기병의 말발굽 소리가 지척까지 따라붙고 있었다."
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-official",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-official",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-official",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "등 뒤에서 여포 기병의 말발굽 소리가 지척까지 따라붙고 있었다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "형님, 후미는 제가 끊겠습니다. 먼저 가십시오!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "guanyu",
+                "to": [
+                  6,
+                  3
+                ]
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "젠장, 쫓기는 거야 이골이 났지만 — 형님, 가족들이 성안에 남았소!",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "talk"
+              }
+            ],
+            "bubble": {
+              "id": "zhangfei",
+              "mark": "!"
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "...알고 있다. 허나 지금 돌아서면 전부 죽는다. 살아남아야 되찾을 수도 있는 것이다.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "idle"
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "흩어지지 마라. 한 명도 잃지 않는다 — 하비 방면으로, 뚫는다!",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "난세는 때로, 도망치는 용기를 먼저 요구했다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ],
+            "exit": [
+              {
+                "id": "liubei",
+                "to": [
+                  1,
+                  4
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "bg": "12-xiapi1-outro",
+        "lines": [
+          {
+            "text": "어둠을 뚫고 나온 무리가 하나둘 강가에 모였다. 서로의 얼굴을 확인하는 손길이 떨렸다."
+          }
+        ]
+      },
+      {
+        "map": "scene-river-landing",
+        "label": "강가 · 살아남은 형제",
+        "camera": {
+          "zoom": 1.3,
+          "focus": [
+            5,
+            4
+          ]
         },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "형님, 후미는 제가 끊겠습니다. 먼저 가십시오!"
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "젠장, 쫓기는 거야 이골이 났지만 — 형님, 가족들이 성안에 남았소!"
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "...알고 있다. 허나 지금 돌아서면 전부 죽는다. 살아남아야 되찾을 수도 있는 것이다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "흩어지지 마라. 한 명도 잃지 않는다 — 하비 방면으로, 뚫는다!"
-        },
-        {
-          "text": "난세는 때로, 도망치는 용기를 먼저 요구했다."
-        }
-      ]
-    },
-    "outro": {
-      "bg": "12-xiapi1-outro",
-      "lines": [
-        {
-          "text": "어둠을 뚫고 나온 무리가 하나둘 강가에 모였다. 서로의 얼굴을 확인하는 손길이 떨렸다."
-        },
-        {
-          "speaker": "유비",
-          "side": "player",
-          "portraitId": "유비",
-          "text": "...겨우 빠져나왔구나. 흩어진 식솔들은 어찌 됐을까."
-        },
-        {
-          "speaker": "관우",
-          "side": "player",
-          "portraitId": "관우",
-          "text": "반드시 다시 모일 겁니다, 형님. 살아 있는 한."
-        },
-        {
-          "speaker": "장비",
-          "side": "player",
-          "portraitId": "장비",
-          "text": "여포 이놈... 이 빚, 반드시 백 배로 갚아주마."
-        },
-        {
-          "text": "패주의 밤은 길었다. 허나 세 사람의 불씨는 꺼지지 않았다."
-        }
-      ]
-    }
+        "units": [
+          {
+            "id": "liubei",
+            "sprite": "liubei-official",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "guanyu",
+            "sprite": "guanyu-official",
+            "cell": [
+              7,
+              3
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "zhangfei",
+            "sprite": "zhangfei-official",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "speaker": "유비",
+            "side": "player",
+            "portraitId": "유비",
+            "text": "...겨우 빠져나왔구나. 흩어진 식솔들은 어찌 됐을까.",
+            "pose": [
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "liubei",
+                "pose": "rest"
+              }
+            ],
+            "bubble": {
+              "id": "liubei",
+              "mark": "..."
+            }
+          },
+          {
+            "speaker": "관우",
+            "side": "player",
+            "portraitId": "관우",
+            "text": "반드시 다시 모일 겁니다, 형님. 살아 있는 한.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "side": "player",
+            "portraitId": "장비",
+            "text": "여포 이놈... 이 빚, 반드시 백 배로 갚아주마.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "talk"
+              }
+            ],
+            "bubble": {
+              "id": "zhangfei",
+              "mark": "!"
+            }
+          },
+          {
+            "text": "패주의 밤은 길었다. 허나 세 사람의 불씨는 꺼지지 않았다.",
+            "pose": [
+              {
+                "id": "liubei",
+                "pose": "idle"
+              },
+              {
+                "id": "guanyu",
+                "pose": "idle"
+              },
+              {
+                "id": "zhangfei",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "units": [
     {
       "commanderId": "유비",
       "classId": "lord",
-      "level": 18,
+      "level": 12,
       "troops": 240,
       "items": [],
       "side": "player",
@@ -99,7 +361,7 @@
     {
       "commanderId": "관우",
       "classId": "lightCavalry",
-      "level": 18,
+      "level": 12,
       "troops": 255,
       "items": [
         "청룡언월도"
@@ -111,7 +373,7 @@
     {
       "commanderId": "장비",
       "classId": "lightCavalry",
-      "level": 18,
+      "level": 12,
       "troops": 255,
       "items": [
         "사모"
@@ -123,7 +385,7 @@
     {
       "commanderId": "간옹",
       "classId": "strategist",
-      "level": 16,
+      "level": 12,
       "troops": 180,
       "items": [
         "쌀"
@@ -135,7 +397,7 @@
     {
       "commanderId": "여포",
       "classId": "guardCavalry",
-      "level": 24,
+      "level": 15,
       "troops": 360,
       "items": [
         "방천화극",
@@ -148,7 +410,7 @@
     {
       "commanderId": "장요",
       "classId": "heavyCavalry",
-      "level": 21,
+      "level": 15,
       "troops": 280,
       "items": [],
       "side": "enemy",
@@ -158,7 +420,7 @@
     {
       "commanderId": "고순",
       "classId": "footman",
-      "level": 20,
+      "level": 14,
       "troops": 240,
       "items": [],
       "side": "enemy",
@@ -168,7 +430,7 @@
     {
       "commanderId": "후성",
       "classId": "archer",
-      "level": 18,
+      "level": 12,
       "troops": 200,
       "items": [],
       "side": "enemy",
@@ -178,7 +440,7 @@
     {
       "commanderId": "위속",
       "classId": "lightCavalry",
-      "level": 18,
+      "level": 12,
       "troops": 200,
       "items": [],
       "side": "enemy",
@@ -219,7 +481,7 @@
         {
           "commanderId": "조성",
           "classId": "lightCavalry",
-          "level": 18,
+          "level": 12,
           "troops": 200,
           "items": [],
           "side": "enemy",
@@ -229,7 +491,7 @@
         {
           "commanderId": "학맹",
           "classId": "heavyCavalry",
-          "level": 19,
+          "level": 13,
           "troops": 220,
           "items": [],
           "side": "enemy",

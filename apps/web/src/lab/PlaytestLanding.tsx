@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { writeLab, leaveSandbox, LAB_STAGE_ID } from "./lab";
 import { parsePlaytestSnapshot, parseSceneParam } from "./playtest";
+import { parseChapterTest } from "../studio/chapter-playtest";
+import { applyChapterProgress, readChapterProgress } from "../studio/chapter-progress";
 
 export default function PlaytestLanding(): React.ReactElement {
   const router = useRouter();
@@ -19,19 +21,31 @@ export default function PlaytestLanding(): React.ReactElement {
     const params = new URLSearchParams(window.location.search);
     const draftId = params.get("draft");
     // P2 spec §6: scene=intro|outro|outroDefeat → 씬 미리보기, 그 외 → 전투.
-    const scene = parseSceneParam(params.get("scene"));
+    let scene = parseSceneParam(params.get("scene"));
     if (!draftId) { setMessage("draft 파라미터가 없습니다 — 에디터에서 ▶ 테스트를 누르세요"); return; }
     (async () => {
       try {
         const res = await fetch(`/_draft/${encodeURIComponent(draftId)}.json`, { cache: "no-store" });
         if (!res.ok) { if (alive) setMessage("드래프트가 없습니다 — 에디터에서 ▶ 테스트를 다시 누르세요"); return; }
-        const json: unknown = await res.json();
+        let json: unknown = await res.json();
+        let chapterRun;
+        const chapterNode = params.get("chapterNode");
+        if (chapterNode) {
+          const chapter = parseChapterTest(json);
+          const node = chapter.nodes.find(n => n.id === chapterNode);
+          const visit = Number(params.get("visit"));
+          if (chapter.id !== draftId || !node?.snapshot || !Number.isSafeInteger(visit) || visit < 0) throw new Error("챕터 실행 단계를 확인해 주세요.");
+          json = node.snapshot;
+          scene = node.kind === "scene" ? "intro" : null;
+          chapterRun = { runId: chapter.id, nodeId: node.id, visit };
+        }
         const ru = json && typeof json === "object" ? (json as { returnUrl?: unknown }).returnUrl : undefined;
         if (alive && typeof ru === "string") setReturnUrl(ru);
         const parsed = parsePlaytestSnapshot(json);
         if (!parsed.ok) { if (alive) setMessage(parsed.message); return; }
         if (!alive) return;
-        writeLab(parsed.payload);
+        const payload = chapterRun ? applyChapterProgress(parsed.payload, readChapterProgress(chapterRun.runId, chapterRun.nodeId, chapterRun.visit)) : parsed.payload;
+        if (!writeLab({ ...payload, ...(chapterRun ? { chapterRun } : {}) })) throw new Error("브라우저에 테스트 데이터를 저장하지 못했습니다. 저장 공간을 확인해 주세요.");
         router.replace(scene ? `/scene?stage=${LAB_STAGE_ID}&type=${scene}` : `/battle?stage=${LAB_STAGE_ID}`);
       } catch (e) {
         if (alive) setMessage(`드래프트를 읽지 못했습니다: ${String(e)}`);

@@ -25,7 +25,7 @@ export class ActorView extends Container {
     this.art.texture = tex;
     const seated = this.pose === "sit" || this.pose === "sit-talk";
     this.art.position.set(seated ? this.seatOffset.x : 0, 24 + (seated ? this.seatOffset.y : 0));
-    const scale = SCENE_ACTOR_HEIGHT / tex.height;
+    const scale = SCENE_ACTOR_HEIGHT * (this.actor.displayScale ?? 1) / tex.height;
     this.art.scale.set(this.direction === "right" ? -scale : scale, scale);
   }
 }

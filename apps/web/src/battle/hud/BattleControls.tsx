@@ -10,7 +10,7 @@
  */
 import { useEffect, useState } from "react";
 import { audio, DEFAULT_SETTINGS } from "../../audio";
-import { HUD_FONT, HUD_INK, HUD_BRONZE, HUD_BRONZE_DIM, HUD_PARCHMENT } from "./frames";
+import { HUD_FONT, HUD_BRONZE, HUD_BRONZE_DIM } from "./frames";
 
 // 우측 컬럼(미니맵 아래)에 흐르도록 — 위치는 BattleScreen의 래퍼가 잡는다
 const STACK_STYLE: React.CSSProperties = {
@@ -23,15 +23,15 @@ const STACK_STYLE: React.CSSProperties = {
 };
 
 const BTN_STYLE: React.CSSProperties = {
-  minHeight: 40,
+  minHeight: 44,
   minWidth: 104,
   padding: "0 14px",
   borderRadius: 8,
   borderWidth: 1,
   borderStyle: "solid",
   borderColor: HUD_BRONZE_DIM,
-  background: HUD_INK,
-  color: HUD_PARCHMENT,
+  background: "linear-gradient(#f0e7cc, #d9cba6)",
+  color: "#3e3928",
   fontSize: 14,
   fontWeight: 700,
   letterSpacing: "0.05em",
@@ -39,7 +39,7 @@ const BTN_STYLE: React.CSSProperties = {
   cursor: "pointer",
   pointerEvents: "auto",
   touchAction: "manipulation",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
+  boxShadow: "inset 0 1px rgba(255,255,255,0.5), 0 2px 5px rgba(47,39,20,0.22)",
 };
 
 export function BattleControls({
@@ -67,7 +67,7 @@ export function BattleControls({
       : BTN_STYLE;
   const dimmed: React.CSSProperties = {
     ...BTN_STYLE,
-    opacity: 0.4,
+    opacity: 0.65,
     cursor: "not-allowed",
   };
   return (

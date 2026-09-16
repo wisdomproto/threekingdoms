@@ -18,7 +18,7 @@
  * 표적 조준(targetSelect/strategyTarget/itemTarget)·하위 메뉴(strategyMenu/itemMenu)도
  * 같은 앵커에 세로로 뜬다. menuAnchor 미수신(헤드리스/마운트 전)이면 렌더 생략.
  */
-import { gameData } from "@tk/data";
+import { gameData, type GameData } from "../../game/data";
 import type { CSSProperties } from "react";
 import type { InputState, UiEvent } from "../inputMachine";
 import type { MenuAnchor } from "../store";
@@ -126,7 +126,7 @@ export function placeMenu(
 }
 
 /** 현재 ui 상태에서 보여줄 세로 메뉴 항목 목록 (8항목 고정 레이아웃 or 하위/표적 메뉴). 모바일 BottomPanel도 같은 모델을 큰 버튼으로 그린다 */
-export function itemsFor(ui: InputState, dispatch: (e: UiEvent) => void): Item[] {
+export function itemsFor(ui: InputState, dispatch: (e: UiEvent) => void, data: GameData = gameData): Item[] {
   if (ui.kind === "postMoveMenu") {
     // 레퍼런스 §9: 공격/책략/도구/교환/협공/필살/대기/취소 — 8항목 고정.
     // 교환/협공/필살은 우리 차별화 백로그(CLAUDE.md §7) → 자리만 두고 항상 dim.
@@ -184,7 +184,7 @@ export function itemsFor(ui: InputState, dispatch: (e: UiEvent) => void): Item[]
   if (ui.kind === "strategyMenu") {
     return [
       ...ui.strategies.map((id): Item => {
-        const s = gameData.strategies[id];
+        const s = data.strategies[id];
         return {
           key: id,
           label: `${s?.name ?? id}(MP${s?.mp ?? "?"})`,
@@ -199,7 +199,7 @@ export function itemsFor(ui: InputState, dispatch: (e: UiEvent) => void): Item[]
   if (ui.kind === "itemMenu") {
     return [
       ...ui.items.map((id): Item => {
-        const it = gameData.items[id];
+        const it = data.items[id];
         const isHeal = it?.category === "supplyItem";
         return {
           key: id,
@@ -223,12 +223,14 @@ export function itemsFor(ui: InputState, dispatch: (e: UiEvent) => void): Item[]
 }
 
 export function ActionMenu({
+  data = gameData,
   ui,
   dispatch,
   anchor,
   viewport,
   previewWalking = false,
 }: {
+  data?: GameData;
   ui: InputState;
   dispatch: (e: UiEvent) => void;
   /** 활성 유닛 스크린 좌표 (store.menuAnchor) — 렌더러가 매 틱 push. 없으면 미표시 */
@@ -242,7 +244,7 @@ export function ActionMenu({
   if (previewWalking) return null;
   if (!anchor) return null;
 
-  const items = itemsFor(ui, dispatch);
+  const items = itemsFor(ui, dispatch, data);
   if (items.length === 0) return null;
 
   const { left, top } = placeMenu(anchor, items.length, viewport);
