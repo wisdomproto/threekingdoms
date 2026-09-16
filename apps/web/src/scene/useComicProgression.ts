@@ -1,13 +1,13 @@
 "use client";
 /**
  * 모션코믹 진행(spec 2026-09-12-story-editor-v2-comic-design §3). 위치 = {pi, ci, li}(페이지·칸·줄).
- * 탭: 타자기 중 → 완성 / 줄 남음 → 다음 줄 / 칸 끝 → 다음 칸 / 페이지 끝 → 다음 페이지(350ms 검정 페이드) / 끝 → onComplete.
+ * 탭: 줄 남음 → 다음 줄 / 칸 끝 → 다음 칸 / 페이지 끝 → 다음 페이지(350ms 검정 페이드) / 끝 → onComplete.
  * 무대사 칸·hold 칸은 타이머 자동 진행(탭 = 즉시). AUTO = hold 없는 줄도 text.length*45+900ms.
  * 순수 부분(comicStep/autoAdvanceMs)은 node 테스트, 훅은 그 위 얇은 껍데기.
  */
 import type { ComicPanel, ComicScene } from "@tk/data";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTypewriter } from "./useTypewriter";
+import { useDialogueText } from "./useDialogueText";
 
 export interface ComicPos { pi: number; ci: number; li: number }
 export type ComicStep =
@@ -30,7 +30,7 @@ export function comicStep(scene: ComicScene, pos: ComicPos): ComicStep {
   return { kind: "complete" };
 }
 
-/** 현재 칸/줄의 자동 진행 대기(ms). null = 탭 대기. 대사 줄은 타자기 완료 후부터 잰다. */
+/** 현재 칸/줄의 자동 진행 대기(ms). null = 탭 대기. 대사 줄은 문장 표시 후부터 잰다. */
 export function autoAdvanceMs(panel: ComicPanel, li: number, auto: boolean): number | null {
   const line = panel.lines?.[li];
   if (!line) return panel.hold ?? SILENT_HOLD_MS;
@@ -48,7 +48,7 @@ export function useComicProgression(scene: ComicScene, onComplete: () => void) {
   const page = scene.pages[Math.min(pos.pi, scene.pages.length - 1)]!;
   const panel = page.panels[Math.min(pos.ci, page.panels.length - 1)]!;
   const line = panel.lines?.[pos.li];
-  const { shown, done, reveal } = useTypewriter(line?.text ?? "");
+  const { shown, done, reveal } = useDialogueText(line?.text ?? "");
 
   const completed = useRef(false);
   const advance = useCallback(() => {

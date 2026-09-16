@@ -48,6 +48,7 @@ import huarongdaoJson from "../json/maps/huarongdao.json";
 import scene01StreetJson from "../json/maps/scene-01-street.json";
 import scene01TavernJson from "../json/maps/scene-01-tavern.json";
 import scene01OrchardJson from "../json/maps/scene-01-orchard.json";
+import sceneLongzhongJson from "../json/maps/scene-longzhong-courtyard.json";
 import sceneCampDayJson from "../json/maps/scene-camp-day.json";
 import sceneTownGateJson from "../json/maps/scene-town-gate.json";
 import sceneCampNightJson from "../json/maps/scene-camp-night.json";
@@ -153,6 +154,7 @@ export const gameData: GameData = {
     "scene-01-street": loadJson(BattleMapSchema, scene01StreetJson, "maps/scene-01-street.json"),
     "scene-01-tavern": loadJson(BattleMapSchema, scene01TavernJson, "maps/scene-01-tavern.json"),
     "scene-01-orchard": loadJson(BattleMapSchema, scene01OrchardJson, "maps/scene-01-orchard.json"),
+    "scene-longzhong-courtyard": loadJson(BattleMapSchema, sceneLongzhongJson, "maps/scene-longzhong-courtyard.json"),
     "scene-camp-day": loadJson(BattleMapSchema, sceneCampDayJson, "maps/scene-camp-day.json"),
     "scene-town-gate": loadJson(BattleMapSchema, sceneTownGateJson, "maps/scene-town-gate.json"),
     "scene-council-hall": loadJson(BattleMapSchema, sceneCouncilHallJson, "maps/scene-council-hall.json"),

@@ -10,6 +10,7 @@ import { renderMapPart, newMapPart } from "./map-scene-editor.js";
 const SIDE_OPTS = [["", "(자동)"], ["player", "아군"], ["ally", "우군"], ["enemy", "적군"]];
 const KINDS = [["battleStart", "전투가 시작되면"], ["turn", "N턴이 시작되면"], ["unitRetreated", "유닛이 퇴각하면"], ["duelOccurred", "일기토가 일어나면"], ["battleEnd", "전투가 끝나면"]];
 const SLOT_LABEL = { intro: "전투 전 이야기", outro: "전투 후 이야기", outroDefeat: "패배 후 이야기" };
+KINDS.push(["scriptFired", "전투 이벤트 발동 후"], ["reinforcementArrived", "증원 도착 후"]);
 
 export const h = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 export const btn = (text, title, onclick) => { const b = h("button", "btn", text); if (title) b.title = title; b.onclick = onclick; return b; };
@@ -198,6 +199,8 @@ export function renderDialogueList(el, ctx) {
     const row = h("div", "lrow");
     row.appendChild(sel(KINDS, t.kind, (k) => {
       d.trigger = k === "turn" ? { kind: k, n: 1 } : k === "unitRetreated" ? { kind: k, unitId: placed[0]?.id ?? "" } : k === "duelOccurred" ? { kind: k, duelId: duels[0]?.id ?? "" } : { kind: k };
+      if (k === "scriptFired") d.trigger.scriptId = stage.scriptEvents?.[0]?.id ?? "";
+      if (k === "reinforcementArrived") d.trigger.reinforcementId = stage.reinforcements?.[0]?.id ?? "";
       again();
     }));
     if (t.kind === "turn") { const n = h("input"); n.type = "number"; n.min = 1; n.step = 1; n.value = t.n ?? ""; n.oninput = () => { t.n = n.value === "" ? 0 : Number(n.value); refreshHead(); commit(); }; row.append(n, h("span", "dim", "턴")); }
@@ -205,6 +208,12 @@ export function renderDialogueList(el, ctx) {
     else if (t.kind === "duelOccurred") row.appendChild(sel(duels.length ? duels.map((x) => [x.id, x.label]) : [["", "(정의된 일기토 없음)"]], t.duelId, (v) => { t.duelId = v; refreshHead(); commit(); }));
     else if (t.kind === "battleEnd") row.appendChild(sel([["", "모두"], ["victory", "승리"], ["defeat", "패배"]], t.result, (v) => { setOrDel(t, "result", v); refreshHead(); commit(); }));
     when.appendChild(row); card.appendChild(when);
+    if (t.kind === "scriptFired" || t.kind === "reinforcementArrived") {
+      const scripts = t.kind === "scriptFired";
+      const entries = (scripts ? stage.scriptEvents : stage.reinforcements) ?? [];
+      const key = scripts ? "scriptId" : "reinforcementId";
+      row.appendChild(sel(entries.length ? entries.map(e => [e.id, e.name ?? e.id]) : [["", "(정의된 사건 없음)"]], t[key], v => { t[key] = v; refreshHead(); commit(); }));
+    }
     const ln = h("div", "lines"); card.appendChild(ln);
     renderLines(ln, (d.lines ??= []), { narration: false, withBg: false, commit });
     const det = h("details", "adv"); det.appendChild(h("summary", null, "Advanced ▾"));

@@ -28,6 +28,165 @@
       },
       {
         "map": "scene-river-landing",
+        "label": "약속한 물가",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "간옹",
+            "sprite": "jianyong-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "한진으로 가는 길에는 강이 보이지 않는 곳에서도 사람들이 물소리를 들었다고 말했다. 배가 기다릴 것이라는 희망이 귀를 앞서 가게 했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "유비는 약속한 물가를 잘못 찾은 것은 아닌지 지도를 여러 번 폈다. 관우에게 보낸 사자가 모두 돌아오지는 않았다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ],
+            "face": [
+              {
+                "id": "유비",
+                "dir": "up"
+              }
+            ]
+          },
+          {
+            "speaker": "간옹",
+            "text": "운장은 길을 잊을 사람이 아니네.",
+            "portraitId": "간옹",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "talk"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "사람은 길을 기억해도 길이 사람을 남겨 두지 않을 때가 있지.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "뒤쪽에서 다시 추격 소식이 왔다. 조운은 말에 올랐고, 장비는 아직 쉰 목소리로 병사들을 불렀다. 누구에게도 충분히 쉰 몸은 없었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "마침내 강바람이 닿았다. 사람들은 일제히 속도를 높이려 했고 수레가 다시 엉켰다. 유비는 배가 보여도 줄을 지키라고 외쳤다. 도착했다는 안도가 마지막 위험이 될 수 있었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ],
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  6,
+                  4
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-river-landing",
         "label": "한진 · 강 위의 마중",
         "camera": {
           "zoom": 1.3,
@@ -310,6 +469,182 @@
                   1,
                   4
                 ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-river-landing",
+        "label": "건너온 사람의 숫자",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-foot",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "미축",
+            "sprite": "mizhu-robes",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "관우는 배 위에서 형을 알아보았다. 두 사람은 손을 들어 보였지만 곧 각자 명령을 내렸다. 재회는 승선이 끝난 뒤에 해도 늦지 않았다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "미축",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "미축은 아이와 부상자부터 태웠다. 자기 짐을 내려야 하는 사람들이 항의했고, 이미 짐을 버린 사람들이 그들을 설득했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "미축",
+                "pose": "idle"
+              }
+            ],
+            "move": [
+              {
+                "id": "미축",
+                "to": [
+                  6,
+                  5
+                ]
+              }
+            ]
+          },
+          {
+            "text": "유비가 마지막 배에 오를 때 강가에는 빈 자루들이 남았다. 사람들이 끝까지 가져오려 했던 것의 자국이었다. 물결이 닿으면 조금씩 젖어 무거워졌다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "미축",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "text": "늦지 않았소?",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              },
+              {
+                "id": "미축",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "와 주었소. 그 말을 먼저 하겠소.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "미축",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "밤에 배 안에서 사람을 셌다. 출발할 때의 숫자와 맞지 않았다. 간옹은 틀린 셈인지 잃은 사람인지 알아내기 위해 다시 셌다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "미축",
+                "pose": "idle"
+              }
+            ],
+            "face": [
+              {
+                "id": "유비",
+                "dir": "down"
+              }
+            ]
+          },
+          {
+            "text": "유비는 두 번째 셈도 끝날 때까지 기다렸다. 강을 건넌 사람들에게는 밥을 주고, 건너지 못한 이름을 위해서는 등불을 하나 더 켰다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "미축",
+                "pose": "idle"
               }
             ]
           }
@@ -631,8 +966,8 @@
     {
       "id": "22-hanjin_turn4",
       "trigger": {
-        "kind": "turn",
-        "n": 4
+        "kind": "reinforcementArrived",
+        "reinforcementId": "guan_yu_relief"
       },
       "lines": [
         {
@@ -693,6 +1028,21 @@
           "speaker": "유비",
           "side": "player",
           "text": "운장... 살아 있었구나. 하늘은 아직 우리를 버리지 않았다."
+        }
+      ]
+    },
+    {
+      "id": "cao_pursuit_north-dialogue",
+      "trigger": {
+        "kind": "reinforcementArrived",
+        "reinforcementId": "cao_pursuit_north"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "북쪽에서 적 추격대가 나타났다! 나루로 향하는 길을 지켜라!"
         }
       ]
     }

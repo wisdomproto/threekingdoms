@@ -14,7 +14,7 @@
  * 이 컴포넌트는 **연출/배선만** — router.push는 부모(PrepShell)가 onEnter에서 수행한다.
  * 청동/수묵 팔레트는 TitleScreen/HUD frames와 톤 일치.
  */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { stages } from "../../game/data";
 import { BUTTON_FRAME } from "../../battle/hud/frames";
 import { getAdService } from "../adService";
@@ -130,6 +130,7 @@ export function LoadingTransition({
   }, [stageId]);
 
   const ready = !adPending && assetsReady;
+  const [entering, startEntering] = useTransition();
   const pct = Math.round(progress * 100);
 
   return (
@@ -232,8 +233,9 @@ export function LoadingTransition({
         ) : null}
         <button
           type="button"
-          onClick={onEnter}
-          disabled={!ready}
+          onClick={() => { if (ready && !entering) startEntering(onEnter); }}
+          disabled={!ready || entering}
+          aria-busy={entering}
           style={{
             ...BUTTON_FRAME,
             background: "transparent",
@@ -249,7 +251,7 @@ export function LoadingTransition({
             transition: "color 120ms, opacity 120ms",
           }}
         >
-          전장으로 ▶
+          {entering ? "전장 여는 중…" : "전장으로 ▶"}
         </button>
       </div>
     </section>

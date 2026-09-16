@@ -1,0 +1,20 @@
+.reader { min-height: 100svh; background: #f3eddf; color: #302b25; font-family: "Noto Serif KR", "Nanum Myeongjo", Georgia, serif; }
+.toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 24px; border-bottom: 1px solid #d6c9b2; font: 14px sans-serif; }
+.reader a { color: #66512c; }
+.reader button, .reader select { color: #403722; background: #fffaf0; border: 1px solid #bca780; border-radius: 6px; padding: 12px; font: inherit; cursor: pointer; }
+.reader button:focus-visible, .reader select:focus-visible, .reader a:focus-visible { outline: 3px solid #8c6527; outline-offset: 3px; }
+.reader button:disabled { opacity: .4; cursor: default; }
+.book { max-width: 740px; margin: auto; padding: 32px 24px 100px; }
+.contents { display: flex; align-items: center; gap: 16px; font: 15px sans-serif; }
+.contents select { flex: 1; min-width: 0; }
+.note { color: #756854; font: 13px/1.8 sans-serif; margin: 16px 0 56px; }
+.reader h1 { font-size: 2em; margin-bottom: 48px; }
+.reader h2 { font: 14px sans-serif; letter-spacing: .18em; color: #80683e; margin: 36px 0; }
+.reader article p { line-height: 2; margin: 0 0 1.4em; word-break: keep-all; overflow-wrap: anywhere; }
+.dialogue { padding-left: 20px; border-left: 2px solid #c6ad7b; }
+.dialogue strong { display: block; font: 600 13px/2 sans-serif; color: #86602d; }
+.battle { text-align: center; padding: 32px 0; margin: 40px 0; border-block: 1px solid #d6c9b2; color: #80683e; }
+.navigation { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 64px; font: 14px sans-serif; }
+.choice { margin: 24px 0; padding: 14px; border: 1px solid #d6c9b2; border-radius: 6px; }
+.choice summary { cursor: pointer; margin-bottom: 12px; font-size: 15px; }
+@media (max-width: 540px) { .toolbar { padding: 12px; flex-wrap: wrap; } .toolbar span { display: none; } .book { padding: 24px 20px 90px; } }

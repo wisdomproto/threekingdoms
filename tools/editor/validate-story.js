@@ -81,6 +81,8 @@ export function validateStory(stage, { placedIds = [], duelIds = [] } = {}) {
     if (t.kind === "turn" && !(Number.isInteger(t.n) && t.n >= 1)) errs.push(`${at}: 턴은 1 이상이어야 합니다`);
     if (t.kind === "unitRetreated" && !placed.has(t.unitId)) errs.push(`${at}: 퇴각 유닛 "${t.unitId}"가 배치되어 있지 않습니다`);
     if (t.kind === "duelOccurred" && !duels.has(t.duelId)) errs.push(`${at}: 일기토 "${t.duelId}"가 없습니다`);
+    if (t.kind === "scriptFired" && !(stage.scriptEvents ?? []).some(e => e.id === t.scriptId)) errs.push(`${at}: 전투 이벤트 "${t.scriptId}"가 없습니다`);
+    if (t.kind === "reinforcementArrived" && !(stage.reinforcements ?? []).some(e => e.id === t.reinforcementId)) errs.push(`${at}: 증원 "${t.reinforcementId}"가 없습니다`);
     const lines = Array.isArray(d.lines) ? d.lines : [];
     if (lines.length === 0) errs.push(`${at}: 줄이 없습니다`);
     lines.forEach((l, li) => {

@@ -30,6 +30,131 @@
       },
       {
         "map": "scene-changban-bridge",
+        "label": "뒤에 있는 것",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "장비",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "병사",
+            "sprite": "soldier-story",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "장비는 다리 앞에서 말머리를 돌렸다. 뒤에서는 형의 행렬이 멀어지고 있었다. 앞에서는 먼지가 가까워졌다. 그 둘 사이에 자신이 얼마나 오래 서 있을 수 있는지가 남았다.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "그는 기병들에게 나뭇가지를 말 뒤에 달게 했다. 숲 안을 달리며 먼지를 일으키되 함부로 모습을 드러내지 말라고 했다. 적이 세어야 할 숫자를 흐리려는 것이었다.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "병사",
+            "text": "장군은 어디 계십니까?",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "text": "여기 있다. 너희가 돌아볼 때마다 여기 있을 것이다.",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "talk"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "그 말은 부하들에게 한 약속이었고 자신에게 한 명령이었다. 성을 잃고 형 앞에 무릎 꿇던 밤을 장비는 떠올렸다. 오늘도 모두 지킬 수는 없었다. 그러나 맡은 자리에서 물러나는 때만큼은 스스로 고를 수 있었다.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              }
+            ],
+            "exit": [
+              {
+                "id": "병사",
+                "to": [
+                  10,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "물 아래에는 부러진 수레 조각이 떠내려갔다. 장비는 창을 고쳐 잡았다. 외칠 말은 많았지만, 먼저 자기 이름을 말하기로 했다.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              }
+            ],
+            "face": [
+              {
+                "id": "장비",
+                "dir": "up"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-changban-bridge",
         "label": "장판교 · 혼자 남다",
         "camera": {
           "zoom": 1.6,
@@ -189,6 +314,201 @@
                   1,
                   3
                 ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "목소리가 멎은 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "장비",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "병사",
+            "sprite": "soldier-story",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "다리에서 물러나온 장비는 말을 하려다 기침했다. 목에서 피 맛이 났다. 곁의 병사가 무슨 명령인지 묻자 그는 고개를 저었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "강을 건넌 아이 하나가 그를 보고 울음을 멈췄다. 커다란 목소리의 주인이 가까이서는 말을 못 한다는 것이 이상한 모양이었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "잘 왔다.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "형의 말이 짧아서 장비는 다행이라고 생각했다. 무엇을 얼마나 잘했는지 들으면 버티고 있던 것이 무너질 것 같았다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "관우가 없는 자리에서 유비가 물그릇을 건넸다. 장비는 받아 들고 조금 웃었다. 형제들은 늘 같은 방식으로 돌아온 사람을 맞았다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ],
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  6,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "text": "다리는 끊었소. 하지만 오래 막지는 못할 것이오.",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest-talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "그동안 건넌 사람들이 있다. 오늘 네가 지킨 시간은 그 사람들에게 남았다.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "밤이 되자 장비는 처음으로 깊이 잠들었다. 깨어 있는 사람들은 여전히 사라진 가족을 찾았다. 한 사람이 지킨 시간만으로 모든 상실이 사라지지는 않았다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ],
+            "face": [
+              {
+                "id": "유비",
+                "dir": "down"
               }
             ]
           }
@@ -427,8 +747,8 @@
     {
       "id": "21-changbanqiao_turn2",
       "trigger": {
-        "kind": "turn",
-        "n": 2
+        "kind": "reinforcementArrived",
+        "reinforcementId": "cao_vanguard_turn2"
       },
       "lines": [
         {
@@ -489,6 +809,27 @@
           "speaker": "장비",
           "side": "player",
           "text": "크하하!! 조조군이 멈췄다! — 다리를 끊고 물러난다!"
+        }
+      ]
+    },
+    {
+      "id": "campaign-roar-21-changbanqiao-dialogue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "campaign-roar-21-changbanqiao"
+      },
+      "lines": [
+        {
+          "speaker": "장비",
+          "side": "player",
+          "portraitId": "장비",
+          "text": "연인 장익덕이 여기 있다! 목숨을 버릴 놈부터 건너와라!"
+        },
+        {
+          "speaker": "문빙",
+          "side": "enemy",
+          "portraitId": "문빙",
+          "text": "선봉이 멈췄다! 뒤에서 떠밀지 마라!"
         }
       ]
     }

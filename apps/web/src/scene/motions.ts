@@ -30,8 +30,25 @@ export function validateLibrary(value: unknown): value is MotionLibrary {
         f.col >= 0 && f.col < f.columns && f.row >= 0 && f.row < f.rows && f.ms >= 40 && f.ms <= 10000)));
 }
 
-/** Atlas slicing and edge-connected matte removal, shared by preview and game.
- * Only the outside background is removed; enclosed pale clothing stays opaque. */
+/** Preserve authored alpha; color-key only legacy, fully opaque sheets. */
+export function removeLegacyMotionMatte(p: Uint8ClampedArray, w: number, h: number): void {
+  for (let i = 3; i < p.length; i += 4) {
+    if (p[i]! < 255) return;
+  }
+  const seen = new Uint8Array(w * h), queue: number[] = [];
+  const push = (i: number) => {
+    if (seen[i]) return; seen[i] = 1;
+    const k = i * 4, r = p[k]!, g = p[k + 1]!, b = p[k + 2]!;
+    if (p[k + 3]! < 12 || (Math.min(r, g, b) > 175 && Math.max(r,g,b) - Math.min(r,g,b) < 24) || (r > 180 && b > 180 && g < 100)) queue.push(i);
+  };
+  for (let xx=0; xx<w; xx++) { push(xx); push((h-1)*w+xx); }
+  for (let yy=0; yy<h; yy++) { push(yy*w); push(yy*w+w-1); }
+  for(let q=0;q<queue.length;q++) {
+    const i=queue[q]!; p[i*4+3]=0;
+    if(i%w)push(i-1); if(i%w<w-1)push(i+1); if(i>=w)push(i-w); if(i<w*(h-1))push(i+w);
+  }
+}
+
 const sources = new Map<string, Promise<HTMLImageElement>>();
 const frames = new Map<string, Promise<HTMLCanvasElement>>();
 export function loadMotionFrame(f: MotionFrame): Promise<HTMLCanvasElement> {
@@ -52,18 +69,7 @@ export function loadMotionFrame(f: MotionFrame): Promise<HTMLCanvasElement> {
     const canvas = document.createElement("canvas"); canvas.width = w; canvas.height = h;
     const ctx = canvas.getContext("2d")!; ctx.drawImage(img, x, y, w, h, 0, 0, w, h);
     const data = ctx.getImageData(0, 0, w, h), p = data.data;
-    const seen = new Uint8Array(w * h), queue: number[] = [];
-    const push = (i: number) => {
-      if (seen[i]) return; seen[i] = 1;
-      const k = i * 4, r = p[k]!, g = p[k + 1]!, b = p[k + 2]!;
-      if (p[k + 3]! < 12 || (Math.min(r, g, b) > 175 && Math.max(r,g,b) - Math.min(r,g,b) < 24) || (r > 180 && b > 180 && g < 100)) queue.push(i);
-    };
-    for (let xx=0; xx<w; xx++) { push(xx); push((h-1)*w+xx); }
-    for (let yy=0; yy<h; yy++) { push(yy*w); push(yy*w+w-1); }
-    for(let q=0;q<queue.length;q++) {
-      const i=queue[q]!; p[i*4+3]=0;
-      if(i%w)push(i-1); if(i%w<w-1)push(i+1); if(i>=w)push(i-w); if(i<w*(h-1))push(i+w);
-    }
+    removeLegacyMotionMatte(p, w, h);
     ctx.putImageData(data, 0, 0); return canvas;
   })();
   frames.set(key, task); task.catch(() => frames.delete(key)); return task;

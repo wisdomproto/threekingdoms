@@ -8,9 +8,9 @@ export function NarrationPanel({
   idx,
   total,
 }: {
-  /** 타자기 표시 중 텍스트. */
+  /** 현재 대사 또는 서술 문장. */
   shown: string;
-  /** 타자기 완료 여부(캐럿 ▼ 표시). */
+  /** 진행 가능 여부(캐럿 ▼ 표시). */
   done: boolean;
   /** 현재 줄 인덱스(0-base). */
   idx: number;

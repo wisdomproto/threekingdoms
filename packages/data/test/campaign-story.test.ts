@@ -18,7 +18,8 @@ describe('complete campaign story staging', () => {
         if (!('map' in raw)) continue;
         const part=MapSceneSchema.parse(raw), map=gameData.maps[part.map]!;
         expect(map,part.map).toBeDefined();
-        expect(existsSync(resolve('../../apps/web/public/assets/maps',part.map+'.webp'))).toBe(true);
+        // The scene renderer supports WebP first and PNG for legacy scene sets.
+        expect(['.webp', '.png'].some(ext => existsSync(resolve('../../apps/web/public/assets/maps',part.map+ext))), part.map).toBe(true);
         const clear=(cell: readonly number[])=>{
           const [x,y]=cell as [number,number];
           return x>=0&&x<map.width&&y>=0&&y<map.height&&map.tileLegend[map.tiles[y]![x]!]==='plain';

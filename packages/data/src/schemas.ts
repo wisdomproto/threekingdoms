@@ -483,9 +483,12 @@ export type StrategyCondition = z.infer<typeof StrategyConditionSchema>;
  *  - turn: 그 turn(아군 페이즈 진입)에 도달하면 1회.
  *  - unitRetreated: 그 unitId가 퇴각하면 1회.
  *  - duelOccurred: 그 duelId 일기토가 발동되면 1회 (duelHistory 기준).
+ *  - scriptFired / reinforcementArrived: 실제 전투 이벤트 / 증원이 처리된 뒤 1회.
  * 각 dialogue는 한 번만 재생된다(디렉터가 id로 중복 방지).
  */
 export const DialogueTriggerSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("scriptFired"), scriptId: z.string().min(1) }),
+  z.object({ kind: z.literal("reinforcementArrived"), reinforcementId: z.string().min(1) }),
   z.object({ kind: z.literal("battleStart") }),
   z.object({ kind: z.literal("battleEnd"), result: z.enum(["victory", "defeat"]).optional() }),
   z.object({ kind: z.literal("turn"), n: z.number().int().min(1) }),

@@ -5,8 +5,8 @@
  *
  * 줄 진행 계약(스펙):
  *  줄 시작 → SceneStage.runLineActions(탭 = skipToState 즉시 완료) →
- *  text 있으면 타자기(탭1=전체, 탭2=다음 줄) / 없으면 자동 다음 줄 →
- *  choice 있으면 타자기 완료 후 두루마리 오버레이(옵션 → react 대사 재생 → 다음 줄 합류) →
+ *  text 있으면 전체 문장 표시(탭=다음 줄) / 없으면 자동 다음 줄 →
+ *  choice 있으면 문장 표시 후 두루마리 오버레이(옵션 → react 대사 재생 → 다음 줄 합류) →
  *  마지막 줄 다음 = onComplete. 스킵 = 인터프리터 최종 상태 적용 후 onComplete.
  *
  * 상태의 진실 = 순수 인터프리터(sceneUnitStates) — 탭 스킵·잔여 걷기는 항상 그 상태로 수렴.
@@ -18,7 +18,7 @@ import { moveCostFor } from "@tk/engine";
 import { resolveSceneMap } from "../lab/scene-maps";
 import { SceneStage } from "./map/SceneStage";
 import { sceneUnitStates, type Cell, type Walkable } from "./map/interpreter";
-import { useTypewriter } from "./useTypewriter";
+import { useDialogueText } from "./useDialogueText";
 import { DialoguePanel } from "./parts/DialoguePanel";
 import { NarrationPanel } from "./parts/NarrationPanel";
 import { SkipBar } from "./parts/SkipBar";
@@ -163,7 +163,7 @@ function MapSceneInner({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, idx]);
 
-  // ── 타자기 (대사/react — 액션·선택 단계엔 빈 문자열 = 즉시 done) ──
+  // ── 문장 표시 (대사/react — 액션·선택 단계엔 빈 문자열 = 즉시 done) ──
   const reactLine = phase.kind === "react" ? phase.lines[phase.ri] : undefined;
   const text =
     phase.kind === "react"
@@ -171,9 +171,9 @@ function MapSceneInner({
       : phase.kind === "line" || phase.kind === "choice"
         ? line.text ?? ""
         : "";
-  const { shown, done, reveal } = useTypewriter(text);
+  const { shown, done, reveal } = useDialogueText(text);
 
-  // 타자기 완료 + choice 보유 → 두루마리 자동 표시(스펙 — 탭 불필요).
+  // 문장 표시 + choice 보유 → 두루마리 자동 표시(스펙 — 탭 불필요).
   useEffect(() => {
     if (phase.kind === "line" && done && line.choice) setPhase({ kind: "choice" });
   }, [phase.kind, done, line]);

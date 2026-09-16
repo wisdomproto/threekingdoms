@@ -22,7 +22,782 @@
         "bg": "18-bowangpo-intro",
         "lines": [
           {
-            "text": "신야의 작은 성에서, 유비는 세 번 초려를 찾은 끝에 스물일곱의 와룡 — 제갈량 공명을 얻었다."
+            "text": "형주에 몸을 의탁한 유비는 신야에 자리를 잡았다. 잠시 찾아온 평온 속에서 뜻밖의 만남과 이별이 기다리고 있었다."
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "신야 · 마지막 등불",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "서서",
+            "sprite": "xushu-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "신야에서는 문을 열면 어제 본 사람을 다시 볼 수 있었다. 유비는 그 평범한 일이 반가워 아침마다 거리를 걸었다. 서서는 그런 유비에게 군량과 군진을 가르쳤고, 유비는 오래 비어 있던 자리를 찾은 듯 그를 곁에 두었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "서서",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "그러던 어느 날 서서에게 편지가 왔다. 어머니의 필체였다. 허도로 오라는 짧은 말 앞에서 그는 며칠 동안 익혀 온 지도를 접었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "서서",
+                "pose": "idle"
+              }
+            ],
+            "face": [
+              {
+                "id": "서서",
+                "dir": "down"
+              }
+            ]
+          },
+          {
+            "speaker": "서서",
+            "text": "주공을 만나 이제야 제 뜻을 펼칠 줄 알았습니다. 그러나 어머니를 두고는…….",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "서서",
+                "pose": "talk"
+              }
+            ],
+            "portraitId": "서서"
+          },
+          {
+            "speaker": "유비",
+            "text": "효를 저버리고 나를 따르라 하면, 내가 그대를 얻어 어디에 쓰겠소.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "서서",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "마지막 밤 두 사람은 등불 아래 오래 앉았다. 서서는 본래의 이름과 숨어 살아야 했던 지난 일을 말했다. 유비는 더 캐묻지 않고 이제 그 이름으로 불러도 되겠느냐고 했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "sit"
+              },
+              {
+                "id": "서서",
+                "pose": "rest"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-refugee-road",
+        "label": "신야 밖 · 돌아온 말발굽",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "서서",
+            "sprite": "xushu-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "이튿날 유비는 말을 끌고 멀리까지 배웅했다. 숲 뒤로 서서가 사라지자 빈 길을 계속 보았다. 잠시 뒤 말발굽 소리가 되돌아왔다. 유비는 뜻이 바뀐 줄 알고 앞으로 나섰다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "서서",
+                "pose": "idle"
+              }
+            ],
+            "move": [
+              {
+                "id": "서서",
+                "to": [
+                  9,
+                  4
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "유비",
+                "dir": "right"
+              }
+            ]
+          },
+          {
+            "speaker": "서서",
+            "text": "제 마음을 돌린 것이 아닙니다. 미처 말씀드리지 못한 사람이 있습니다. 융중의 제갈량을 찾아가십시오. 부르지 마시고, 직접 가셔야 합니다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "서서",
+                "pose": "talk"
+              }
+            ],
+            "move": [
+              {
+                "id": "서서",
+                "to": [
+                  6,
+                  4
+                ]
+              }
+            ],
+            "portraitId": "서서"
+          },
+          {
+            "text": "서서는 깊이 고개를 숙였다. 유비는 이번에는 붙잡지 않았다. 말발굽 소리가 멀어진 뒤에도 길은 한동안 비어 있었다.",
+            "pose": [
+              {
+                "id": "서서",
+                "pose": "salute"
+              },
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ],
+            "exit": [
+              {
+                "id": "서서",
+                "to": [
+                  10,
+                  6
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "유비",
+                "dir": "right"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "신야 · 함께 찾아갈 사람",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              1,
+              6
+            ],
+            "facing": "right",
+            "hidden": true
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-foot",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "장비",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              7,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "유비가 신야로 돌아왔을 때는 저녁이었다. 관우와 장비는 식사를 미룬 채 기다리고 있었다. 나갈 때 둘이었던 사람이 혼자 돌아온 것을 보고, 장비가 먼저 자리에서 일어났다.",
+            "enter": [
+              {
+                "id": "유비",
+                "from": [
+                  1,
+                  6
+                ],
+                "to": [
+                  4,
+                  4
+                ]
+              }
+            ],
+            "move": [
+              {
+                "id": "장비",
+                "to": [
+                  5,
+                  5
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "유비",
+                "dir": "right"
+              },
+              {
+                "id": "장비",
+                "dir": "up"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "portraitId": "장비",
+            "text": "끝내 가셨소? 군영에 들어설 때마다 원직 선생부터 찾았는데, 내일부터는 누구를 찾아야 하나.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "portraitId": "유비",
+            "text": "나도 붙잡고 싶었다. 그래도 보내 드려야지. 다만 떠나기 전에 꼭 만나 보라며 한 사람을 일러 주었어.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "portraitId": "관우",
+            "text": "어떤 사람이오? 원직이 그렇게 말할 정도면 까닭이 있을 것이오.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "portraitId": "유비",
+            "text": "융중에 사는 제갈량, 자는 공명이라 하더구나. 세상이 와룡이라 부르는 선비라는데, 원직은 자기보다 훨씬 큰 재주를 지녔다고 했어.",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "portraitId": "장비",
+            "text": "그럼 사람을 보내 모셔 오면 되지 않소? 형님도 먼 길을 다녀오셨는데, 또 직접 가시려는 것이오?",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "emphasize"
+              }
+            ],
+            "face": [
+              {
+                "id": "장비",
+                "dir": "left"
+              }
+            ]
+          },
+          {
+            "text": "유비는 갑옷 대신 걸쳤던 겉옷의 먼지를 털었다. 서서를 따라 걸었던 길의 흙이 떨어졌다. 그는 잠시 빈자리를 보다가 아우들 쪽으로 몸을 돌렸다.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ],
+            "face": [
+              {
+                "id": "유비",
+                "dir": "down"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "portraitId": "유비",
+            "text": "우리가 아쉬워 찾아가는 사람이다. 아직 우리에게 아무것도 약속하지 않은 분을, 내 부하 부르듯 불러서는 안 되겠지.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ],
+            "face": [
+              {
+                "id": "유비",
+                "dir": "right"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "portraitId": "관우",
+            "text": "형님이 직접 가시겠다면 함께 가겠소. 만나서 어떤 뜻을 가진 분인지 나도 듣고 싶구려.",
+            "move": [
+              {
+                "id": "관우",
+                "to": [
+                  6,
+                  4
+                ]
+              }
+            ],
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "portraitId": "장비",
+            "text": "나도 가겠소. 다만 이름이 크다고 곧이곧대로 믿지는 않을 것이오. 원직 선생만큼 우리 사람들을 생각해 주는지, 내 눈으로 보겠소.",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "portraitId": "유비",
+            "text": "그러자. 나도 아직 그분을 모른다. 그러니 먼저 만나서 이야기를 듣자꾸나. 내일은 너희 둘과 함께 가고 싶다.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "장비가 식은 밥그릇을 형 앞으로 밀었다. 찾아갈 길은 날이 밝으면 물으면 되었다. 오늘은 먼저 함께 밥을 먹기로 했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "sit"
+              },
+              {
+                "id": "장비",
+                "pose": "sit"
+              },
+              {
+                "id": "관우",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "이튿날 아침, 세 형제는 군영의 일을 맡기고 융중으로 길을 나섰다. 작은 초가의 주인이 자기들을 기다리고 있을지는 아직 알 수 없었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ],
+            "exit": [
+              {
+                "id": "유비",
+                "to": [
+                  1,
+                  6
+                ]
+              },
+              {
+                "id": "관우",
+                "to": [
+                  2,
+                  6
+                ]
+              },
+              {
+                "id": "장비",
+                "to": [
+                  3,
+                  6
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-longzhong-courtyard",
+        "label": "융중 · 초려 앞 뜰",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              9,
+              3
+            ],
+            "facing": "left",
+            "hidden": true
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-foot",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "장비",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              8,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "첫 방문에는 주인이 없었다. 두 번째에는 눈이 내렸다. 장비는 사람 하나 만나려 몇 번을 헛걸음하느냐고 투덜거렸고, 유비는 문 앞에서 신발의 눈을 털었다. 헛걸음인지 아닌지는 아직 모른다고 했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "세 번째 방문에서 제갈량은 낮잠을 자고 있었다. 처마의 그림자가 마당을 가로질렀다. 장비가 하인을 부르려 하자 유비는 손을 들었다. 전장에서 사람을 기다리게 하는 자신이, 이곳에서는 기다려야 했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "emphasize"
+              }
+            ],
+            "face": [
+              {
+                "id": "유비",
+                "dir": "right"
+              }
+            ]
+          },
+          {
+            "speaker": "제갈량",
+            "text": "작은 초가까지 세 번이나 오신 까닭을 듣고 싶습니다.",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "salute"
+              }
+            ],
+            "move": [],
+            "enter": [
+              {
+                "id": "제갈량",
+                "from": [
+                  9,
+                  3
+                ],
+                "to": [
+                  7,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "여러 번 사람을 모았고 여러 번 잃었소. 사람을 버리지 않겠다는 마음만으로는 사람을 지킬 수 없었소. 이제 무엇을 배워야 하오?",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "제갈량은 천하를 그렸다. 북쪽의 조조, 강동의 손권, 길이 만나는 형주와 먹을 것이 나는 익주. 당장 이길 곳이 아니라 오래 버틸 곳을 먼저 짚었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "제갈량",
+            "text": "뜻을 지킬 땅과 때가 필요합니다. 손권과 손을 잡고, 기반을 세우며, 북쪽이 흔들릴 때를 기다리십시오. 다만 지도 위의 빈 곳에도 이미 사는 사람들이 있습니다.",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "유비는 그 마지막 말까지 듣고 절했다. 젊은 선비는 사양하다 함께 몸을 낮추었다. 문밖의 관우와 장비는 누가 누구를 얻은 것인지 알 수 없었지만, 돌아오는 사람이 넷이라는 것은 알았다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "kneel"
+              }
+            ]
+          },
+          {
+            "text": "마당을 나설 때 유비는 한 걸음 기다렸다. 제갈량이 곁에 서자 네 사람은 함께 산 아래로 향했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ],
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  6,
+                  6
+                ]
+              },
+              {
+                "id": "제갈량",
+                "to": [
+                  7,
+                  6
+                ]
+              }
+            ],
+            "face": [
+              {
+                "id": "관우",
+                "dir": "down"
+              },
+              {
+                "id": "장비",
+                "dir": "down"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "bg": "18-bowangpo-intro",
+        "lines": [
+          {
+            "text": "며칠 뒤 조조군이 남하한다는 소식이 왔다. 유비는 군령을 내릴 인장과 검을 제갈량 앞에 놓았다. 형제들의 불만도 숨기지 않았다. 이제 기다림으로 얻은 사람을 믿는 데도 용기가 필요했다."
           }
         ]
       },
@@ -65,15 +840,6 @@
             "facing": "right"
           },
           {
-            "id": "xushu",
-            "sprite": "xushu-robes",
-            "cell": [
-              7,
-              4
-            ],
-            "facing": "left"
-          },
-          {
             "id": "zhugeliang",
             "sprite": "zhugeliang-robes",
             "cell": [
@@ -84,34 +850,6 @@
           }
         ],
         "lines": [
-          {
-            "speaker": "서서",
-            "side": "player",
-            "portraitId": "서서",
-            "text": "주공, 제 벗 공명은 저와는 그릇이 다릅니다. 이 서서, 이제야 마음 놓고 어머님께 갈 수 있겠습니다.",
-            "pose": [
-              {
-                "id": "liubei",
-                "pose": "idle"
-              },
-              {
-                "id": "guanyu",
-                "pose": "idle"
-              },
-              {
-                "id": "zhangfei",
-                "pose": "idle"
-              },
-              {
-                "id": "zhugeliang",
-                "pose": "idle"
-              },
-              {
-                "id": "xushu",
-                "pose": "salute"
-              }
-            ]
-          },
           {
             "speaker": "제갈량",
             "side": "player",
@@ -128,10 +866,6 @@
               },
               {
                 "id": "zhangfei",
-                "pose": "idle"
-              },
-              {
-                "id": "xushu",
                 "pose": "idle"
               },
               {
@@ -152,10 +886,6 @@
               },
               {
                 "id": "guanyu",
-                "pose": "idle"
-              },
-              {
-                "id": "xushu",
                 "pose": "idle"
               },
               {
@@ -196,10 +926,6 @@
                 "pose": "idle"
               },
               {
-                "id": "xushu",
-                "pose": "idle"
-              },
-              {
                 "id": "zhugeliang",
                 "pose": "idle"
               },
@@ -228,10 +954,6 @@
                 "pose": "idle"
               },
               {
-                "id": "xushu",
-                "pose": "idle"
-              },
-              {
                 "id": "zhugeliang",
                 "pose": "salute"
               }
@@ -252,10 +974,6 @@
                 "pose": "idle"
               },
               {
-                "id": "xushu",
-                "pose": "idle"
-              },
-              {
                 "id": "zhugeliang",
                 "pose": "idle"
               },
@@ -273,13 +991,13 @@
         "bg": "18-bowangpo-outro",
         "lines": [
           {
-            "text": "골짜기의 불은 밤새 탔다. 하후돈의 대군은 절반으로 줄어 북으로 물러났다."
+            "text": "박망파의 싸움이 끝났다. 물러나는 적을 뒤로하고, 유비군은 흩어진 병사와 부상자를 거두었다."
           }
         ]
       },
       {
         "map": "scene-camp-day",
-        "label": "박망파 · 벗의 작별",
+        "label": "박망파 · 첫 군령 뒤에",
         "camera": {
           "zoom": 1.3,
           "focus": [
@@ -305,15 +1023,6 @@
               3
             ],
             "facing": "left"
-          },
-          {
-            "id": "xushu",
-            "sprite": "xushu-robes",
-            "cell": [
-              7,
-              5
-            ],
-            "facing": "left"
           }
         ],
         "lines": [
@@ -321,14 +1030,10 @@
             "speaker": "장비",
             "side": "player",
             "portraitId": "장비",
-            "text": "...불바다가 됐구려. 하후돈의 대군이 통째로! 와룡 선생, 이 장비가 잘못 봤소!",
+            "text": "…적이 물러갔구려. 와룡 선생, 이 장비가 잘못 봤소!",
             "pose": [
               {
                 "id": "zhugeliang",
-                "pose": "idle"
-              },
-              {
-                "id": "xushu",
                 "pose": "idle"
               },
               {
@@ -348,20 +1053,13 @@
                 "pose": "idle"
               },
               {
-                "id": "xushu",
-                "pose": "idle"
-              },
-              {
                 "id": "zhugeliang",
                 "pose": "talk"
               }
             ]
           },
           {
-            "speaker": "서서",
-            "side": "player",
-            "portraitId": "서서",
-            "text": "공명이 왔으니, 주공은 이제 날개를 얻으셨습니다. ...어머님, 이 불효자가 갑니다.",
+            "text": "군사들이 돌아오는 동안 공명은 부상자를 확인했다. 승리 다음에 맡아야 할 일도 이제 그의 일이었다.",
             "pose": [
               {
                 "id": "zhangfei",
@@ -370,36 +1068,245 @@
               {
                 "id": "zhugeliang",
                 "pose": "idle"
+              }
+            ],
+            "exit": []
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "군령 뒤의 사람",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "장비",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-foot",
+            "cell": [
+              8,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "전장의 소란이 가라앉은 뒤에야 제갈량은 손에 힘이 들어가 있었다는 것을 알았다. 군령을 내리는 동안에는 보이지 않던 손톱 자국이 손바닥에 남았다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
               },
               {
-                "id": "xushu",
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "장비는 보고를 마친 뒤 한 번 더 고개를 숙였다. 싸움 전의 불평을 군사 앞에서 거두겠다는 뜻이었다. 제갈량은 승리를 혼자 받은 것처럼 대하지 않았다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
                 "pose": "salute"
               }
             ]
           },
           {
-            "text": "서서는 그 길로 북쪽으로 떠났다. 벗에게 주군을 맡기고.",
+            "speaker": "제갈량",
+            "text": "정한 때를 지켜 주셨습니다. 불을 놓는 것보다 기다리는 일이 어려웠을 것입니다.",
+            "portraitId": "제갈량",
             "pose": [
               {
-                "id": "zhangfei",
+                "id": "유비",
                 "pose": "idle"
               },
               {
-                "id": "zhugeliang",
+                "id": "제갈량",
+                "pose": "talk"
+              },
+              {
+                "id": "장비",
                 "pose": "idle"
               },
               {
-                "id": "xushu",
+                "id": "관우",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "text": "어려웠소. 다시는 쉬운 척하지 않겠소.",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "talk"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "관우는 웃지 않고 부상자 수를 보고했다. 제갈량은 그 숫자를 다시 물었다. 승리한 날에도 숫자를 한 번 더 확인하는 사람이 필요했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
                 "pose": "idle"
               }
             ],
-            "exit": [
+            "move": [
               {
-                "id": "xushu",
+                "id": "관우",
                 "to": [
-                  1,
+                  6,
                   5
                 ]
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "원직이 그대를 만나러 가라 했소. 오늘 그에게 편지를 쓰고 싶구려.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "제갈량",
+            "text": "잘 지내시는지부터 물어 주십시오. 전공은 그 뒤에 적으셔도 됩니다.",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "유비는 편지의 첫 줄을 바꾸었다. 군사를 얻었다는 말 대신 어머니는 평안하시냐고 썼다. 그 편지가 허도의 서서에게 어떤 얼굴로 읽힐지는 알 수 없었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ],
+            "face": [
+              {
+                "id": "유비",
+                "dir": "down"
               }
             ]
           }
@@ -658,22 +1565,35 @@
     {
       "id": "18-bowangpo_turn4",
       "trigger": {
-        "kind": "turn",
-        "n": 4
+        "kind": "scriptFired",
+        "scriptId": "campaign-fire-18-bowangpo"
       },
       "lines": [
         {
+          "speaker": "제갈량",
+          "side": "player",
+          "portraitId": "제갈량",
+          "text": "신호가 올랐습니다. 적의 선두가 골짜기에 든 지금, 불을 놓으십시오!"
+        },
+        {
           "speaker": "관우",
           "side": "player",
-          "text": "복병, 지금입니다! 퇴로를 끊는다!"
+          "portraitId": "관우",
+          "text": "복병, 나와라! 불길을 피해 빠져나오는 적을 막는다!"
+        },
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "portraitId": "제갈량",
+          "text": "불붙은 구역의 적들이 타격을 입고 움직임을 잃었습니다. 아군도 불길에 들어가지 않도록 하십시오."
         }
       ]
     },
     {
       "id": "18-bowangpo_turn6",
       "trigger": {
-        "kind": "turn",
-        "n": 6
+        "kind": "reinforcementArrived",
+        "reinforcementId": "xiahoudun_rearguard"
       },
       "lines": [
         {
@@ -700,7 +1620,7 @@
           "speaker": "관우",
           "side": "player",
           "portraitId": "관우",
-          "text": "이미 늦었다. 골짜기가 곧 불바다가 되리라."
+          "text": "골짜기로 들어선 이상, 내 칼을 피할 길은 없다."
         }
       ]
     },
@@ -714,12 +1634,8 @@
         {
           "speaker": "하후돈",
           "side": "enemy",
-          "text": "촌부의 불장난에... 이 하후돈이...!"
-        },
-        {
-          "speaker": "제갈량",
-          "side": "player",
-          "text": "불은 계산대로 탔습니다. 남은 것은 바람이 거둘 것입니다."
+          "portraitId": "하후돈",
+          "text": "물러나라! 대열을 수습하라. 이대로 흩어져서는 안 된다!"
         }
       ]
     },
@@ -739,6 +1655,21 @@
           "speaker": "유비",
           "side": "player",
           "text": "와룡이 날개를 폈다. 이제부터가 시작이다."
+        }
+      ]
+    },
+    {
+      "id": "huoshao_liufeng_guanping-dialogue",
+      "trigger": {
+        "kind": "reinforcementArrived",
+        "reinforcementId": "huoshao_liufeng_guanping"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "유봉과 관평의 부대가 도착했다! 퇴로를 지키며 매복군과 합류하라!"
         }
       ]
     }

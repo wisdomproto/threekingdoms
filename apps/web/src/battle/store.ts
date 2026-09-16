@@ -25,8 +25,11 @@ import { reduceInput, type InputState, type UiEvent } from "./inputMachine";
 import { EventPlayer, type Presenter } from "./eventPlayer";
 import { runAiPhases, runGreedyPhase } from "./enemyTurnDriver";
 import { battleVM, type BattleVM } from "./viewmodel";
+import { firedDialogues, toDialogueSnapshot } from "./dialogue/director";
 
 export interface BattleStoreOptions {
+  /** Interactive sessions wait for their dialogue overlay; headless simulations do not. */
+  pauseForDialogue?: boolean;
   presenter?: Presenter;
   /** dev 단언 (드레인 정합·battleEnded 최후 계약) 활성화 */
   dev?: boolean;
@@ -155,6 +158,10 @@ export class BattleStore {
   private snapshotCache: StoreSnapshot | null = null;
   private idleWaiters: Array<{ resolve: () => void; reject: (e: unknown) => void }> = [];
   private driverError: unknown = null;
+  private dialogueWait: Promise<void> | null = null;
+  private dialogueResolve: (() => void) | null = null;
+  private dialoguePlayed = new Set<string>();
+  private deferredDrain = false;
 
   constructor(ctx: BattleContext, seed: number, opts: BattleStoreOptions = {}) {
     this.ctx = ctx;
@@ -166,11 +173,29 @@ export class BattleStore {
       this.log.push(a);
     }
     this.settled = this.committed;
+    if (opts.pauseForDialogue) {
+      const initial = firedDialogues(ctx.stage.dialogue ?? [], null, toDialogueSnapshot(this.settled), this.dialoguePlayed)
+        .filter(d => d.trigger.kind !== "duelOccurred");
+      initial.forEach(d => this.dialoguePlayed.add(d.id));
+      if (!opts.replayLog?.length && initial.length) this.holdDialogue();
+    }
     this.player = new EventPlayer({
       presenter: opts.presenter ?? createInstantPresenter(),
       getCommitted: () => this.committed,
       onDrained: () => {
+        const previous = this.settled;
         this.settled = this.committed;
+        if (this.opts.pauseForDialogue) {
+          const pending = firedDialogues(this.ctx.stage.dialogue ?? [], toDialogueSnapshot(previous), toDialogueSnapshot(this.settled), this.dialoguePlayed)
+            .filter(d => d.trigger.kind !== "duelOccurred");
+          pending.forEach(d => this.dialoguePlayed.add(d.id));
+          if (pending.length) this.holdDialogue();
+        }
+        if (this.dialogueWait) {
+          this.deferredDrain = true;
+          this.notify();
+          return;
+        }
         this.dispatchUi({ type: "drained" });
       },
       ...(opts.dev !== undefined ? { dev: opts.dev } : {}),
@@ -294,6 +319,7 @@ export class BattleStore {
   }
 
   dispatchUi(event: UiEvent): void {
+    if (this.dialogueWait) return;
     const prevUi = this.ui;
     const prevKind = this.ui.kind;
     const { next, effects } = reduceInput(
@@ -471,7 +497,7 @@ export class BattleStore {
       ctx: this.ctx,
       getState: () => this.committed,
       commit: (a) => this.commit(a),
-      play: (events) => this.player.enqueue(events),
+      play: (events) => this.playAndWaitForDialogue(events),
       ...(this.opts.onFocus ? { onFocus: this.opts.onFocus } : {}),
     }).catch((err: unknown) => this.onDriverError(err));
   }
@@ -483,7 +509,7 @@ export class BattleStore {
       side: "player",
       getState: () => this.committed,
       commit: (a) => this.commit(a),
-      play: (events) => this.player.enqueue(events),
+      play: (events) => this.playAndWaitForDialogue(events),
       shouldStop: () => !this._autoBattle,
       ...(this.opts.onFocus ? { onFocus: this.opts.onFocus } : {}),
     }).catch((err: unknown) => this.onDriverError(err));
@@ -495,6 +521,29 @@ export class BattleStore {
     const ws = this.idleWaiters;
     this.idleWaiters = [];
     for (const w of ws) w.reject(err);
+  }
+
+  private holdDialogue(): void {
+    if (!this.dialogueWait) this.dialogueWait = new Promise(resolve => { this.dialogueResolve = resolve; });
+  }
+
+  /** Called only after the complete visible dialogue queue has been read. */
+  releaseDialogue(): void {
+    const resolve = this.dialogueResolve;
+    this.dialogueWait = null;
+    this.dialogueResolve = null;
+    if (this.deferredDrain) {
+      this.deferredDrain = false;
+      this.dispatchUi({ type: "drained" });
+    } else if (this._autoBattle && this.ui.kind === "idle") {
+      this.dispatchUi({ type: "autoStart" });
+    }
+    resolve?.();
+  }
+
+  private async playAndWaitForDialogue(events: readonly BattleEvent[]): Promise<void> {
+    await this.player.enqueue(events);
+    if (this.dialogueWait) await this.dialogueWait;
   }
 
   private flushIdleWaiters(): void {

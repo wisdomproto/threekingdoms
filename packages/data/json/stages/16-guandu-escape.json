@@ -27,6 +27,136 @@
         ]
       },
       {
+        "map": "scene-camp-night",
+        "label": "서로 다른 이름으로 듣는 소식",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "밀모가 드러나고 군대가 흩어지는 동안, 유비는 가족의 소식을 한 번도 끝까지 듣지 못했다. 사자마다 본 곳과 들은 사람이 달랐다. 살아 있다는 말 뒤에는 늘 다른 조건이 붙었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "원소의 진영은 넓었다. 머물 방도 식량도 있었지만, 유비는 자기 사람들을 한자리로 부를 수 없었다. 남의 군영에서 기다리는 시간은 배고픈 행군보다 길었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "조운",
+            "text": "운장 공의 소식을 확인할 길을 찾고 있습니다. 소문만으로 판단하지 마십시오.",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "관우가 조조에게 몸을 의탁했다는 말이 돌았다. 누군가는 배신이라 했고 누군가는 형수들을 지키기 위해서라 했다. 유비는 둘째 동생이 없는 자리에서 둘째의 마음을 재단하지 않았다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "내가 살아 있다는 것부터 전해 주시오. 그 뒤의 일은 운장이 판단할 것이오.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "진영 밖에서는 원소와 조조의 전쟁이 커지고 있었다. 유비는 어느 쪽이 이길지보다 어느 길이 아직 열려 있는지 지도를 더 자주 보았다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ],
+            "face": [
+              {
+                "id": "유비",
+                "dir": "down"
+              }
+            ]
+          },
+          {
+            "text": "도원에서 함께 죽기를 맹세한 사람들은 살아서 서로를 찾는 방법까지 정해 놓지 않았다. 이제는 남의 소문 속에서 서로의 이름을 건져야 했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
         "map": "scene-refugee-road",
         "label": "관도 · 멈추지 마라",
         "camera": {
@@ -265,6 +395,176 @@
               {
                 "id": "zhaoyun",
                 "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "돌아오게 하는 소식",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "간옹",
+            "sprite": "jianyong-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "추격을 벗어나자 유비는 처음으로 말에서 내려 오래 걸었다. 멀리 왔다는 사실보다 어디로 가야 하는지 정할 수 있다는 사실이 숨을 돌리게 했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "길가 주막에서 관우의 이야기를 들었다. 좋은 말과 금을 받았고, 그것들을 남겨 두고 떠났으며, 관문마다 길을 막는 사람이 있었다고 했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "간옹",
+            "text": "이야기를 옮길 때마다 목이 하나씩 더해지는 것 같네.",
+            "portraitId": "간옹",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "talk"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "칼을 몇 번 썼는지는 나중에 물으면 된다. 누구를 데리고 오는지부터 알아보게.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "가족이 함께 있다는 대답에 유비는 눈을 감았다. 안도는 짧았고 곧 미안함이 뒤따랐다. 자기가 지키지 못한 사람들을 동생이 남의 집에서 지켜 냈다.",
+            "pose": [
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "조운은 남쪽 길로 보낼 사자들을 골랐다. 같은 소식을 여러 갈래로 보냈다. 한 사람이 길을 잃어도 소식까지 잃어버리지 않게 하려는 것이었다.",
+            "pose": [
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "rest"
+              }
+            ],
+            "exit": [
+              {
+                "id": "조운",
+                "to": [
+                  10,
+                  6
+                ]
+              }
+            ]
+          },
+          {
+            "text": "그날 밤 유비는 장비에게 보낼 편지를 직접 썼다. 둘째를 만나면 내 말을 듣듯 그의 말을 먼저 들어 달라고 했다. 편지는 사람보다 빨리 도착해야 했다.",
+            "pose": [
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "rest"
               }
             ]
           }
@@ -560,8 +860,8 @@
     {
       "id": "16-guandu-escape_turn5",
       "trigger": {
-        "kind": "turn",
-        "n": 5
+        "kind": "reinforcementArrived",
+        "reinforcementId": "caocao_pursuit_north"
       },
       "lines": [
         {
@@ -622,6 +922,21 @@
           "speaker": "유비",
           "side": "player",
           "text": "관도를 벗어났다... 여남으로. 흩어진 형제들이 기다린다."
+        }
+      ]
+    },
+    {
+      "id": "caocao_pursuit_rear-dialogue",
+      "trigger": {
+        "kind": "reinforcementArrived",
+        "reinforcementId": "caocao_pursuit_rear"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "후미에 추격대가 붙었다! 퇴로를 지키며 움직여라!"
         }
       ]
     }

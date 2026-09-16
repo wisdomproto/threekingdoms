@@ -27,6 +27,233 @@
         ]
       },
       {
+        "map": "scene-town-gate",
+        "label": "빌린 지붕",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "간옹",
+            "sprite": "jianyong-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-foot",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              8,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "소패의 집들은 서주의 관사보다 낮았다. 유비는 머리를 숙여 문턱을 넘을 때마다 이곳이 잠시 빌린 지붕이라는 사실을 떠올렸다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "미축이 가져온 돈은 군량으로 바뀌고, 군량은 며칠 만에 빈 자루로 바뀌었다. 도움을 받는 사람보다 도움을 청하러 가는 사람이 먼저 지쳤다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "간옹",
+            "text": "이번에는 차용증에 무엇을 적을까? 서주를 되찾으면 갚겠다고?",
+            "portraitId": "간옹",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "talk"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "되찾지 못해도 갚아야 할 빚이다. 그렇게 적지는 마라.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "조운이 새로 모인 병사들을 훈련시키고 있었다. 반하에서 헤어진 뒤 각자 지나온 길은 길었지만, 다시 만난 자리에서 두 사람은 긴 인사를 하지 않았다. 지금 필요한 일부터 맡겼다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "성 밖의 소식은 점점 나빠졌다. 여포는 작은 양보를 큰 은혜처럼 되풀이했고, 원술은 그 틈을 헤아렸다. 사람을 들이는 문은 낮아졌는데, 적이 들어올 길은 넓어져 있었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "text": "이곳에서 모든 것을 지키려 하면 길을 잃을 수 있소.",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "유비는 장부와 군기를 따로 꾸리게 했다. 싸움에서 물러나는 준비를 하면서도, 사람들을 데리고 나갈 준비만큼은 패배라고 부르지 않기로 했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ],
+            "face": [
+              {
+                "id": "유비",
+                "dir": "down"
+              }
+            ]
+          }
+        ]
+      },
+      {
         "map": "scene-refugee-road",
         "label": "소패 밖 · 탈출",
         "camera": {
@@ -344,6 +571,252 @@
             ]
           }
         ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "남의 처마 아래",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-foot",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "장비",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "간옹",
+            "sprite": "jianyong-robes",
+            "cell": [
+              8,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "허도로 향하는 길에서 장비는 조조의 이름이 나올 때마다 입을 다물었다. 얼마 전까지 서주를 불태우던 군대에 기대야 한다는 사실이 목에 걸렸다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "text": "다른 길은 없소?",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "talk"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "있다면 나도 그 길을 택하고 싶다.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "text": "몸을 맡기는 것과 뜻을 맡기는 것은 같지 않소. 다만 저쪽도 그 차이를 알고 있을 것이오.",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "조조의 사자는 정중했다. 숙소와 군량, 말을 바꿀 곳까지 준비되어 있었다. 유비는 빈틈없는 호의가 오히려 얼마나 많은 눈을 뜻하는지 생각했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "그날 밤 유비는 젖은 신을 화로에 말렸다. 조조가 보낸 새 신이 곁에 있었지만, 헌 신 안에 남은 흙을 먼저 털었다.",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "sit"
+              }
+            ]
+          },
+          {
+            "speaker": "간옹",
+            "text": "신까지 의리를 지킬 필요는 없네.",
+            "portraitId": "간옹",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "talk"
+              },
+              {
+                "id": "유비",
+                "pose": "sit"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "어디서 왔는지 잊을까 봐 그러는 건 아니다. 아직 신을 사람이 있어서 그래.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "sit-talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 마른 신을 문지기에게 건넸다. 다음 날부터는 남의 처마 아래서 자기 사람들을 지키는 법을 배워야 했다.",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "간옹",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -528,8 +1001,8 @@
     {
       "id": "12-xiapi1_turn4",
       "trigger": {
-        "kind": "turn",
-        "n": 4
+        "kind": "reinforcementArrived",
+        "reinforcementId": "reinf_lubu_pursuit_t4"
       },
       "lines": [
         {

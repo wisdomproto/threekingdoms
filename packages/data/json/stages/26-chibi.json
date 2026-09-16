@@ -30,6 +30,130 @@
       },
       {
         "map": "scene-command-deck",
+        "label": "깃발이 먼저 알았다",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "황개",
+            "sprite": "huanggai-robes",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "병사",
+            "sprite": "soldier-story",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "바람이 바뀐 것을 가장 먼저 알린 것은 사람이 아니라 깃발이었다. 줄에 늘어져 있던 천이 다른 쪽으로 팽팽해졌다. 초병이 소리치기 전에 강물 위의 잔물결부터 달라졌다.",
+            "pose": [
+              {
+                "id": "황개",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              }
+            ],
+            "face": [
+              {
+                "id": "황개",
+                "dir": "up"
+              }
+            ]
+          },
+          {
+            "text": "제단에서 내려오는 제갈량을 조운의 배가 기다렸다. 제갈량은 하늘을 움직였다고 말하지 않았다. 다만 오늘을 놓치지 말아야 한다고 했다.",
+            "pose": [
+              {
+                "id": "황개",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "북쪽 진영에서는 다가오는 배를 항복의 증거로 보고 있었다. 황개는 그들이 그렇게 보아 주기를 바랐다. 너무 늦게 알아보아야 자신의 병사들이 돌아갈 틈이 생겼다.",
+            "pose": [
+              {
+                "id": "황개",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "황개",
+            "text": "약속한 거리에서 옮겨 탄다. 누구든 뒤에 남은 사람이 있는지 보고 떠나라.",
+            "portraitId": "황개",
+            "pose": [
+              {
+                "id": "황개",
+                "pose": "talk"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "주유의 군령이 물 위를 건넜다. 거짓 편지와 진짜 상처, 안개 속에서 얻은 화살, 오래 묶어 둔 배가 한순간으로 모였다.",
+            "pose": [
+              {
+                "id": "황개",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              }
+            ],
+            "exit": [
+              {
+                "id": "병사",
+                "to": [
+                  10,
+                  6
+                ]
+              }
+            ]
+          },
+          {
+            "text": "유비는 남은 길을 확인했다. 불을 놓는 쪽에도, 불에서 도망치는 쪽에도 사람이 있었다. 그 사실을 잊지 않은 채 이겨야 했으나 어떻게 가능할지는 아직 알지 못했다.",
+            "pose": [
+              {
+                "id": "황개",
+                "pose": "idle"
+              },
+              {
+                "id": "병사",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-command-deck",
         "label": "적벽 · 바람을 기다리다",
         "camera": {
           "zoom": 1.3,
@@ -378,6 +502,223 @@
               "id": "liubei",
               "mark": "..."
             }
+          }
+        ]
+      },
+      {
+        "map": "scene-river-landing",
+        "label": "강 건너의 불빛",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-foot",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "장비",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              8,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "불은 한 배에서 다음 배로 건너갔다. 배를 안정시키던 사슬이 이제는 도망갈 방향을 묶었다. 물이 많은 곳에서 사람들이 불을 피해 갈 곳을 찾지 못했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "강 건너를 보는 유비군 진영에서는 한동안 환호가 나오지 않았다. 누구의 배가 타는지 멀리서는 구별할 수 없었고, 물 위의 작은 점들이 무엇인지 알고 싶지 않았다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ],
+            "face": [
+              {
+                "id": "유비",
+                "dir": "up"
+              },
+              {
+                "id": "관우",
+                "dir": "up"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "text": "이겼소.",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "talk"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "그 말은 확인에 가까웠다. 관우는 고개를 끄덕였고, 유비는 구조할 배를 보낼 수 있는지 물었다. 추격할 군사도 필요했다. 두 명령이 같은 밤에 나갔다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "제갈량은 도주로를 짚었다. 조조가 살아 빠져나가면 전쟁은 끝나지 않았다. 그러나 그를 여기서 끝낸 뒤의 천하도 저절로 평안해지는 것은 아니었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ],
+            "move": [
+              {
+                "id": "제갈량",
+                "to": [
+                  6,
+                  5
+                ]
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "오늘 돌아오지 않은 우리 사람부터 확인하시오. 적의 숫자는 아침에도 셀 수 있소.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "승리를 전할 편지가 쓰였다. 강의 불빛이 종이 위까지 닿았다. 붓을 든 사람은 크게 이겼다고 쓰고, 잠시 멈춘 뒤 돌아온 배의 수를 덧붙였다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
           }
         ]
       }
@@ -760,28 +1101,14 @@
     {
       "id": "26-chibi_turn4",
       "trigger": {
-        "kind": "turn",
-        "n": 4
+        "kind": "reinforcementArrived",
+        "reinforcementId": "huangkai_fire_ships"
       },
       "lines": [
         {
           "speaker": "주유",
           "side": "ally",
           "text": "오군 본대 도착이다! 몰아쳐라!"
-        }
-      ]
-    },
-    {
-      "id": "26-chibi_turn8",
-      "trigger": {
-        "kind": "turn",
-        "n": 4
-      },
-      "lines": [
-        {
-          "speaker": "조조",
-          "side": "enemy",
-          "text": "배가... 배가 전부 불탄다! 사슬을 끊어라! 끊으란 말이다!"
         }
       ]
     },
@@ -857,6 +1184,42 @@
           "speaker": "유비",
           "side": "player",
           "text": "이겼다... 천하가 오늘 밤 바뀌었다."
+        }
+      ]
+    },
+    {
+      "id": "campaign-fire-26-chibi-dialogue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "campaign-fire-26-chibi"
+      },
+      "lines": [
+        {
+          "speaker": "조조",
+          "side": "enemy",
+          "portraitId": "조조",
+          "text": "배가… 배가 불탄다! 사슬을 끊어라! 끊으란 말이다!"
+        },
+        {
+          "speaker": "주유",
+          "side": "ally",
+          "portraitId": "주유",
+          "text": "연결된 배에 화선이 닿았다! 불길에 갇힌 적을 몰아치되, 아군 함대는 거리를 벌려라!"
+        }
+      ]
+    },
+    {
+      "id": "cao_rear_guard-dialogue",
+      "trigger": {
+        "kind": "reinforcementArrived",
+        "reinforcementId": "cao_rear_guard"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "조조군 후위대가 나타났다! 퇴로를 열어 주지 마라!"
         }
       ]
     }

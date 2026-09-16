@@ -286,6 +286,7 @@ function createSession(resume: boolean, setup?: BattleSetup): Session {
   }
   const make = (log: readonly Action[] | undefined): BattleStore =>
     new BattleStore(ctx, battleSeed, {
+      pauseForDialogue: true,
       presenter: delegate,
       dev: process.env.NODE_ENV !== "production",
       onDevViolation: (m) => console.error(`[battle dev 단언] ${m}`),
@@ -597,6 +598,7 @@ export default function BattleScreen({ setup, onComplete, onExit }: {
             if (unit) delegate.target?.focusOn({ x: unit.x, y: unit.y }, 500);
           }}
           onQueueDrained={() => {
+            store.releaseDialogue();
             // 전투 중 드레인=개전 나레이션 완료 신호, 종료 후 드레인=마무리 대사 완료 → 결산 개방.
             if (store.committedState.status !== "ongoing") setEndDialogueDone(true);
             else setIntroDone(true);

@@ -1,0 +1,47 @@
+{
+  "tool": "image_gen (built-in)",
+  "items": [
+    {
+      "name": "제갈량",
+      "reference": "apps/web/public/assets/sprites/제갈량-strategist/front_idle.webp",
+      "output": "apps/web/public/assets/ui/portraits/제갈량.webp",
+      "source": "C:\\Users\\101024\\.codex\\generated_images\\01a09d5e-5c60-7bc3-a7f2-c46d9930ab0f\\exec-2ac5a9fd-922c-4f96-8684-e3db71e96f53.png",
+      "prompt": "Create one polished game dialogue PORTRAIT, a new head-and-upper-chest illustration based on the provided character sprite as the sole identity reference. Zhuge Liang: the EXACT teal ribbed scholar cap with jade gold circlet, white feather fan, pale robe and teal lapels, small pointed goatee, youthful clever eyes. Translate the cute SD character into a close-up that is recognizably the SAME character: retain rounded stylized proportions, large expressive eyes, short face, exact hair, beard silhouette, hat and clothing colors. Clean confident 2D painted cartoon linework, warm highlights, controlled soft shading, not photorealistic, not a different realistic older actor. Mature adult character, charming rather than babyish. Portrait facing slightly left, head and hat fully in frame, shoulders crop at bottom, centered with minimal margins, portrait 3:4 composition. Real transparent alpha background, no checkerboard drawn, no scenery, no text, no border, no horse, no full body. Designed to read clearly at 112 by 132 pixels in a strategy game dialogue window."
+    },
+    {
+      "name": "조인",
+      "reference": "apps/web/public/assets/sprites/조인/front_idle.webp",
+      "output": "apps/web/public/assets/ui/portraits/조인.webp",
+      "source": "C:\\Users\\101024\\.codex\\generated_images\\01a09d5e-5c60-7bc3-a7f2-c46d9930ab0f\\exec-e8ad9a1e-79f1-4c22-a04c-b89e9dd0f803.png",
+      "prompt": "Create one polished game dialogue PORTRAIT, a new head-and-upper-chest illustration based on the provided character sprite as the sole identity reference. Cao Ren: the EXACT small dark red segmented crown, broad heavy eyebrows, neat short squared full black beard, charcoal lamellar armor, red scarf and cape. Strong serious compact face. Translate the cute SD character into a close-up that is recognizably the SAME character: retain rounded stylized proportions, large expressive eyes, short face, exact hair, beard silhouette, hat and clothing colors. Clean confident 2D painted cartoon linework, warm highlights, controlled soft shading, not photorealistic, not a different realistic older actor. Mature adult character, charming rather than babyish. Portrait facing slightly left, head and hat fully in frame, shoulders crop at bottom, centered with minimal margins, portrait 3:4 composition. Real transparent alpha background, no checkerboard drawn, no scenery, no text, no border, no horse, no full body. Designed to read clearly at 112 by 132 pixels in a strategy game dialogue window."
+    },
+    {
+      "name": "하후돈",
+      "reference": "apps/web/public/assets/sprites/하후돈/front_idle.webp",
+      "output": "apps/web/public/assets/ui/portraits/하후돈.webp",
+      "source": "C:\\Users\\101024\\.codex\\generated_images\\01a09d5e-5c60-7bc3-a7f2-c46d9930ab0f\\exec-096a09d4-5560-4298-b34d-7e607833e0cf.png",
+      "prompt": "Create one polished game dialogue PORTRAIT, a new head-and-upper-chest illustration based on the provided character sprite as the sole identity reference. Xiahou Dun: the EXACT cobalt blue gold-trimmed armor, blue head ribbon and topknot, thick eyebrows and short pointed black beard, confident stern expression. Preserve the face and visible eye configuration FROM THE SPRITE, no invented aged scarred face, no black armor. Translate the cute SD character into a close-up that is recognizably the SAME character: retain rounded stylized proportions, large expressive eyes, short face, exact hair, beard silhouette, hat and clothing colors. Clean confident 2D painted cartoon linework, warm highlights, controlled soft shading, not photorealistic, not a different realistic older actor. Mature adult character, charming rather than babyish. Portrait facing slightly left, head and hat fully in frame, shoulders crop at bottom, centered with minimal margins, portrait 3:4 composition. Real transparent alpha background, no checkerboard drawn, no scenery, no text, no border, no horse, no full body. Designed to read clearly at 112 by 132 pixels in a strategy game dialogue window."
+    },
+    {
+      "name": "간옹",
+      "reference": "apps/web/public/assets/sprites/간옹/front_idle.webp",
+      "output": "apps/web/public/assets/ui/portraits/간옹.webp",
+      "source": "C:\\Users\\101024\\.codex\\generated_images\\01a09d5e-5c60-7bc3-a7f2-c46d9930ab0f\\exec-55c3ce90-33cd-4d09-bf87-08f5a3eb66e7.png",
+      "prompt": "Create one polished game dialogue PORTRAIT, a new head-and-upper-chest illustration based on the provided character sprite as the sole identity reference. Jian Yong: the EXACT black soft scholar cap, teal and cream robe, warm rounded face, small curled moustache and short goatee, bamboo scroll held near chest. Translate the cute SD character into a close-up that is recognizably the SAME character: retain rounded stylized proportions, large expressive eyes, short face, exact hair, beard silhouette, hat and clothing colors. Clean confident 2D painted cartoon linework, warm highlights, controlled soft shading, not photorealistic, not a different realistic older actor. Mature adult character, charming rather than babyish. Portrait facing slightly left, head and hat fully in frame, shoulders crop at bottom, centered with minimal margins, portrait 3:4 composition. Real transparent alpha background, no checkerboard drawn, no scenery, no text, no border, no horse, no full body. Designed to read clearly at 112 by 132 pixels in a strategy game dialogue window."
+    },
+    {
+      "name": "미축",
+      "reference": "apps/web/public/assets/sprites/미축/front_idle.webp",
+      "output": "apps/web/public/assets/ui/portraits/미축.webp",
+      "source": "C:\\Users\\101024\\.codex\\generated_images\\01a09d5e-5c60-7bc3-a7f2-c46d9930ab0f\\exec-aec29288-50da-464b-8341-e44157224f3d.png",
+      "prompt": "Create one polished game dialogue PORTRAIT, a new head-and-upper-chest illustration based on the provided character sprite as the sole identity reference. Mi Zhu: the EXACT blue scholar cap with gold band and oval jade, blue and white silk robe with gold edging, delicate moustache and pointed goatee, bamboo tablet held near chest. Translate the cute SD character into a close-up that is recognizably the SAME character: retain rounded stylized proportions, large expressive eyes, short face, exact hair, beard silhouette, hat and clothing colors. Clean confident 2D painted cartoon linework, warm highlights, controlled soft shading, not photorealistic, not a different realistic older actor. Mature adult character, charming rather than babyish. Portrait facing slightly left, head and hat fully in frame, shoulders crop at bottom, centered with minimal margins, portrait 3:4 composition. Real transparent alpha background, no checkerboard drawn, no scenery, no text, no border, no horse, no full body. Designed to read clearly at 112 by 132 pixels in a strategy game dialogue window."
+    },
+    {
+      "name": "서서",
+      "reference": "apps/web/public/assets/sprites/xushu-strategist-v1/front_idle.webp",
+      "output": "apps/web/public/assets/ui/portraits/서서.webp",
+      "source": "C:\\Users\\101024\\.codex\\generated_images\\01a09d5e-5c60-7bc3-a7f2-c46d9930ab0f\\exec-9cc63ecd-7650-4146-9a1e-a7742bbca1fe.png",
+      "prompt": "Create one polished game dialogue PORTRAIT, a new head-and-upper-chest illustration based on the provided character sprite as the sole identity reference. Xu Shu: the EXACT slate-blue cloth headwrap with knot and tails, olive-gray simple robe, ivory collar, brown belt, medium-length black beard, thoughtful eyebrows and slightly weathered but youthful face. Translate the cute SD character into a close-up that is recognizably the SAME character: retain rounded stylized proportions, large expressive eyes, short face, exact hair, beard silhouette, hat and clothing colors. Clean confident 2D painted cartoon linework, warm highlights, controlled soft shading, not photorealistic, not a different realistic older actor. Mature adult character, charming rather than babyish. Portrait facing slightly left, head and hat fully in frame, shoulders crop at bottom, centered with minimal margins, portrait 3:4 composition. Real transparent alpha background, no checkerboard drawn, no scenery, no text, no border, no horse, no full body. Designed to read clearly at 112 by 132 pixels in a strategy game dialogue window."
+    }
+  ]
+}

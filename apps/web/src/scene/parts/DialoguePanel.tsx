@@ -1,5 +1,5 @@
 "use client";
-/** 대사 패널 — 화자 초상 + 진영색 화자명 + 타자기 텍스트 박스. */
+/** 대사 패널 — 화자 초상 + 진영색 화자명 + 대사 텍스트 박스. */
 import type { ScenarioLine } from "@tk/data";
 import { AssetImage } from "../../ui/AssetImage";
 import { assetUrl } from "../../assetUrl";
@@ -14,9 +14,9 @@ export function DialoguePanel({
 }: {
   /** 현재 줄(speaker/side/portraitId 참조). */
   line: ScenarioLine;
-  /** 타자기 표시 중 텍스트. */
+  /** 현재 대사 또는 서술 문장. */
   shown: string;
-  /** 타자기 완료 여부(캐럿 ▼ 표시). */
+  /** 진행 가능 여부(캐럿 ▼ 표시). */
   done: boolean;
   /** 현재 줄 인덱스(0-base). */
   idx: number;

@@ -1,9 +1,9 @@
 "use client";
 /**
- * ScenePlayer (캠페인 루프 W1) — 막간 시나리오 씬(VN 톤). 풀스크린 배경 + 화자 초상 + 타자기 대사.
+ * ScenePlayer (캠페인 루프 W1) — 막간 시나리오 씬(VN 톤). 풀스크린 배경 + 화자 초상 + 전체 문장 대사.
  *
  * 데이터 = stage.scenario.intro/outro(ScenarioScene). 전투 밖 컷신이라 엔진/결정론 무관(§2-1).
- * 진행: 탭/클릭 → 타자기 중이면 즉시 전체, 아니면 다음 줄. 마지막 줄 다음 → onComplete.
+ * 진행: 탭/클릭 → 다음 줄. 마지막 줄 다음 → onComplete.
  * 스킵 버튼 → 즉시 onComplete. 배경/초상은 AssetImage(placeholder + 드롭-인).
  *
  * 씬 문법 v2 (서사 리듬 — "갑자기 전투" 해소):

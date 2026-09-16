@@ -1,5 +1,21 @@
 import { expect, it } from 'vitest';
 import { spriteCandidates } from '../../pixi/spriteMap';
+import rosters from '../../../../../packages/data/json/rosters.json';
+import manifest from '../../../public/assets/sprites/manifest.json';
+
+it('has an available standing sprite for every campaign roster commander', () => {
+  const entries = manifest as Record<string, { poses: string[] }>;
+  for (const unit of Object.values(rosters)) {
+    const available = spriteCandidates(unit.commanderId, unit.classId, 'player')
+      .some(id => entries[id]?.poses.includes('front_idle'));
+    expect(available, unit.commanderId).toBe(true);
+  }
+});
+
+it('uses Xu Shu battle artwork in preparation and combat', () => {
+  expect(spriteCandidates('서서', 'strategist', 'player')[0]).toBe('xushu-strategist-v1');
+  expect(spriteCandidates('서서', 'strategist', 'ally', 2)).toContain('xushu-strategist-v1');
+});
 
 it('keeps promoted Changban commanders on their reviewed SD class artwork', () => {
   expect(spriteCandidates('허저', 'pikeman', 'enemy', 2)[1]).toBe('허저-footman');

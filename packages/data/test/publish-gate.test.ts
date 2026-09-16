@@ -50,6 +50,9 @@ describe("publish gate — 레포 JSON 스키마 전수", () => {
       for (const d of s.dialogue ?? []) {
         if (seen.has(d.id)) bad.push(`${file}: dialogue id 중복 ${d.id}`);
         seen.add(d.id);
+        const trigger = d.trigger;
+        if (trigger.kind === "scriptFired" && !s.scriptEvents?.some(e => e.id === trigger.scriptId)) bad.push(`${file}: missing script for ${d.id}`);
+        if (trigger.kind === "reinforcementArrived" && !s.reinforcements?.some(e => e.id === trigger.reinforcementId)) bad.push(`${file}: missing reinforcement for ${d.id}`);
         if (d.trigger.kind === "unitRetreated" && !placedIds.has(d.trigger.unitId)) bad.push(`${file}: dialogue ${d.id} unitRetreated ${d.trigger.unitId} 미배치`);
         if (d.trigger.kind === "duelOccurred" && !duelIds.has(d.trigger.duelId)) bad.push(`${file}: dialogue ${d.id} duelOccurred ${d.trigger.duelId} 없음`);
       }

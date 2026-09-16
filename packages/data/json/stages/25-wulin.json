@@ -30,6 +30,130 @@
       },
       {
         "map": "scene-command-deck",
+        "label": "맞아야 믿는 말",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "주유",
+            "sprite": "zhouyu-robes",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "황개",
+            "sprite": "huanggai-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "황개와 주유가 다투었다는 소문은 강을 건너갔다. 오래 싸운 장수가 사람들 앞에서 매를 맞았다는 이야기는 군사들 사이에서 명령보다 빠르게 퍼졌다.",
+            "pose": [
+              {
+                "id": "주유",
+                "pose": "idle"
+              },
+              {
+                "id": "황개",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "막사 안에서 황개는 약을 바르는 손을 피하지 않았다. 계획을 알고 있어도 아픈 것은 같았다. 충성이라는 이름이 상처를 덜 아프게 하지는 못했다.",
+            "pose": [
+              {
+                "id": "주유",
+                "pose": "idle"
+              },
+              {
+                "id": "황개",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "speaker": "주유",
+            "text": "다른 사람에게 맡겨도 되었을 일이었습니다.",
+            "portraitId": "주유",
+            "pose": [
+              {
+                "id": "주유",
+                "pose": "talk"
+              },
+              {
+                "id": "황개",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "speaker": "황개",
+            "text": "제가 오래 모신 사람이라는 것을 저쪽도 알아야 하지 않겠습니까.",
+            "portraitId": "황개",
+            "pose": [
+              {
+                "id": "주유",
+                "pose": "idle"
+              },
+              {
+                "id": "황개",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "감택은 항복의 편지를 품었다. 조조가 의심할 대목을 한 번씩 짚었다. 너무 매끄러운 거짓말은 진짜 고통보다 덜 믿음직할 수 있었다.",
+            "pose": [
+              {
+                "id": "주유",
+                "pose": "idle"
+              },
+              {
+                "id": "황개",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "강가에서는 배 안에 마른 섶과 기름을 숨겼다. 멀리서 보면 군량을 싣는 배였다. 가까이 있는 병사들은 자신이 어디에서 작은 배로 옮겨 타야 하는지 외웠다.",
+            "pose": [
+              {
+                "id": "주유",
+                "pose": "idle"
+              },
+              {
+                "id": "황개",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "불을 놓는 사람도 살아 돌아와야 했다. 주유는 퇴로를 다시 확인한 뒤에야 군령을 접었다.",
+            "pose": [
+              {
+                "id": "주유",
+                "pose": "idle"
+              },
+              {
+                "id": "황개",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-command-deck",
         "label": "출항 전 · 노장의 각오",
         "camera": {
           "zoom": 1.3,
@@ -197,13 +321,13 @@
         "bg": "25-wulin-outro",
         "lines": [
           {
-            "text": "오림의 하늘이 붉게 물들었다. 황개의 화선이 조조 본진의 턱밑까지 파고든 것이다."
+            "text": "오림의 교전이 끝나고 강변의 길이 열렸다. 황개는 결전에 쓸 화선을 숨겨 둔 물가로 돌아왔다."
           }
         ]
       },
       {
         "map": "scene-river-landing",
-        "label": "오림 · 매값",
+        "label": "오림 · 결전을 기다리는 배",
         "camera": {
           "zoom": 1.3,
           "focus": [
@@ -236,7 +360,7 @@
             "speaker": "황개",
             "side": "ally",
             "portraitId": "황개",
-            "text": "이 늙은 등짝의 매값, 오늘 다 받았소! 불길이 강을 삼키는구려!",
+            "text": "길은 열렸소. 이제 배와 사람을 다시 살펴야겠구려. 바람이 불 때 빈틈이 없어야 하오.",
             "pose": [
               {
                 "id": "liubei",
@@ -256,7 +380,7 @@
             "speaker": "유비",
             "side": "player",
             "portraitId": "유비",
-            "text": "노장군의 충의, 천추에 남을 것이오.",
+            "text": "함께 돌아올 길도 살피겠습니다. 노장군, 끝까지 몸을 아껴 주시오.",
             "pose": [
               {
                 "id": "huanggai",
@@ -280,6 +404,38 @@
                 "pose": "idle"
               }
             ]
+          }
+        ]
+      },
+      {
+        "bg": "25-wulin-outro",
+        "lines": [
+          {
+            "text": "강변의 교전이 끝나자 준비한 배를 다시 살폈다. 오늘 얻은 길과 정보는 쓸모가 있었으나, 그것만으로 북군의 함대가 불타지는 않았다."
+          },
+          {
+            "text": "횃불을 가져온 병사를 황개가 멈춰 세웠다. 배에는 아직 불을 가까이할 수 없었다. 바람이 잘못 불면 그토록 준비한 싸움이 자기 진영에서 먼저 끝날 터였다."
+          },
+          {
+            "speaker": "황개",
+            "text": "서두르는 것과 때를 놓치지 않는 것은 다르다. 오늘은 묶어 두어라.",
+            "portraitId": "황개"
+          },
+          {
+            "text": "주유는 강물을 오래 보았다. 모든 것을 준비하고도 손댈 수 없는 한 가지가 남았다. 사람들은 지휘관이 그것까지 준비했으리라 믿고 있었다."
+          },
+          {
+            "speaker": "노숙",
+            "text": "바람이 바뀌지 않으면 어찌합니까?",
+            "portraitId": "노숙"
+          },
+          {
+            "speaker": "제갈량",
+            "text": "그때의 길도 살펴야지요. 기다린다고 하늘이 빚을 갚아 주지는 않습니다.",
+            "portraitId": "제갈량"
+          },
+          {
+            "text": "밤이 깊어도 불씨는 화로 안에 머물렀다. 배마다 탈 사람의 이름을 확인했다. 새벽이 오면 이름을 부를 수 있을지 모르는 밤이었다."
           }
         ]
       }
@@ -710,8 +866,8 @@
     {
       "id": "25-wulin_turn4",
       "trigger": {
-        "kind": "turn",
-        "n": 4
+        "kind": "reinforcementArrived",
+        "reinforcementId": "huanggai_fireship"
       },
       "lines": [
         {
@@ -767,6 +923,42 @@
           "speaker": "유비",
           "side": "player",
           "text": "불길이 조조의 진영을 삼킨다... 결전이 다가온다."
+        }
+      ]
+    },
+    {
+      "id": "campaign-fire-25-wulin-dialogue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "campaign-fire-25-wulin"
+      },
+      "lines": [
+        {
+          "speaker": "황개",
+          "side": "ally",
+          "portraitId": "황개",
+          "text": "화선이 닿았다! 불길을 등지고 물러나라. 우리 배도 휘말려서는 안 된다!"
+        },
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "군영에 불이 붙었다! 타오르는 구역을 피해 적의 퇴로를 막아라!"
+        }
+      ]
+    },
+    {
+      "id": "caocao_rally-dialogue",
+      "trigger": {
+        "kind": "reinforcementArrived",
+        "reinforcementId": "caocao_rally"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "portraitId": "유비",
+          "text": "적의 잔여 부대가 다시 모였다! 아직 전투는 끝나지 않았다!"
         }
       ]
     }

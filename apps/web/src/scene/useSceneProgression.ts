@@ -1,15 +1,15 @@
 "use client";
-/** 막간 씬 진행 상태(VN·스테이지 공유). idx·타자기·advance·현재 배경·내레이션 판정. */
+/** 막간 씬 진행 상태(VN·스테이지 공유). idx·문장 표시·advance·현재 배경·내레이션 판정. */
 import type { ScenarioScene } from "@tk/data";
 import { useState } from "react";
-import { useTypewriter } from "./useTypewriter";
+import { useDialogueText } from "./useDialogueText";
 
 export function useSceneProgression(scene: ScenarioScene, onComplete: () => void) {
   const [idx, setIdx] = useState(0);
   // 연속 탭 가드: 같은 렌더에 바인딩된 클릭 2발이 setIdx(i=>i+1)를 겹쳐 쌓으면 범위를 넘는다
   // (VN 씬은 연타가 기본 조작) — 인덱스를 항상 마지막 줄로 클램프.
   const line = scene.lines[Math.min(idx, scene.lines.length - 1)]!;
-  const { shown, done, reveal } = useTypewriter(line.text);
+  const { shown, done, reveal } = useDialogueText(line.text);
 
   const advance = () => {
     if (!done) {

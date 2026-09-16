@@ -29,6 +29,249 @@
         ]
       },
       {
+        "map": "scene-camp-day",
+        "label": "혼자서는 닿지 않는 곳",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-foot",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "장비",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "여포가 나타났다는 소문은 본대보다 먼저 왔다. 화웅을 쓰러뜨린 날 저녁에는 관우의 칼을 이야기하던 병사들이, 오늘은 적토마가 한 번 뛰면 어디까지 가는지를 이야기했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ],
+            "face": [
+              {
+                "id": "관우",
+                "dir": "left"
+              }
+            ]
+          },
+          {
+            "text": "장비는 그 소문을 들을 때마다 코웃음을 쳤다. 그러나 아무도 없는 곳에서 말의 배띠를 세 번 고쳐 맸다. 관우는 그것을 보고도 모른 척했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "text": "네 말은 왼쪽으로 돌 때 조금 늦는다. 무리해 좇지 마라.",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "text": "그걸 언제 보았소?",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "text": "네가 앞서 나갈 때마다.",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "장비는 대꾸하려다가 말의 목을 쓰다듬었다. 형제가 된다는 것은 자신의 등 뒤를 누군가가 계속 보고 있다는 뜻이었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "유비는 짧은 칼 두 자루를 뽑아 무게를 확인했다. 두 아우와 견주어 제 무예가 어디쯤인지 알았다. 그래서 더 늦게 나서도 되는 것이 아니라, 어디를 메워야 하는지 먼저 알아야 했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "내가 신호하면 각자 잘하는 쪽으로 움직여라. 같은 칼을 흉내 내지 말고.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "text": "형님은 무엇을 하시려고?",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "너희가 서로의 길을 막지 않게 보겠다.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "관문 위 깃발이 팽팽하게 펴졌다. 세 사람은 잠깐 서로를 보았다. 도원의 나무 그늘에서는 쉬웠던 말들이, 쇠와 말발굽 앞에서 다시 무게를 얻었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
         "map": "scene-town-gate",
         "label": "호로관 · 셋이서 간다",
         "camera": {
@@ -369,6 +612,241 @@
             ]
           }
         ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "손이 떨리는 저녁",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-foot",
+            "cell": [
+              4,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-foot",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "장비",
+            "sprite": "zhangfei-foot",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "막사에 돌아온 장비는 투구 끈을 풀지 못했다. 손이 떨렸다. 끈이 젖어 매듭이 굳었다고 투덜거리자 관우가 말없이 풀어 주었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "text": "셋이 달려들었으니 사람들이 웃겠지요.",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest-talk"
+              }
+            ]
+          },
+          {
+            "speaker": "유비",
+            "text": "살아 돌아온 것을 보고 웃는다면, 같이 웃어 주마.",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "text": "저자는 우리가 셋인 줄 알고도 물러서지 않았다. 다음에도 오늘처럼 빈틈을 줄 거라 생각하지 마라.",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "세 사람은 여포의 창이 지나간 자리를 차례로 짚었다. 자랑이 아니라 복기였다. 장비가 본 것과 관우가 본 것이 달랐고, 유비는 두 사람이 보지 못한 적토마의 움직임을 기억했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "그렇게 말하다 보니 떨리던 손이 조금 가라앉았다. 두려움은 혼자 숨기면 수치가 되었지만, 나누어 말하면 다음에 살아남을 방법이 되었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "speaker": "장비",
+            "text": "다음에도 셋이오.",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest-talk"
+              }
+            ]
+          },
+          {
+            "speaker": "관우",
+            "text": "필요하면 넷이라도 좋다.",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "장비가 눈을 동그랗게 뜨자 관우는 피 묻은 천을 접었다. 이기는 일보다 돌아오는 일이 먼저라는 것을, 오늘은 누구도 거들먹거리며 말할 수 없었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "새벽 무렵 서쪽 하늘이 붉어졌다. 처음에는 아침이 빨리 오는 줄 알았다. 그러나 해가 뜰 방향이 아니었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "전령이 낙양이라는 이름을 말했을 때 유비는 벌떡 일어났다. 사람 하나를 물리쳤다는 안도는, 도시 하나가 불탄다는 소식 앞에서 너무 작았다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "rest"
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -635,8 +1113,8 @@
     {
       "id": "06-huluguan_turn5",
       "trigger": {
-        "kind": "turn",
-        "n": 5
+        "kind": "reinforcementArrived",
+        "reinforcementId": "reinf_lubu_guards_turn5"
       },
       "lines": [
         {

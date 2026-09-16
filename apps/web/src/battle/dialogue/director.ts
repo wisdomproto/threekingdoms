@@ -9,6 +9,7 @@
  *  - battleStart   : 최초 구독 시 1회 (전투 개시 인트로 컷).
  *  - turn(n)       : settled.turn 이 n 에 처음 도달(아군 페이즈)하면.
  *  - duelOccurred  : settled.duelHistory 에 그 duelId 가 처음 나타나면.
+ *  - scriptFired / reinforcementArrived: settled event history first contains the authored ID.
  *  - unitRetreated : 그 유닛의 retreated 가 false→true 로 바뀌면.
  *  - battleEnd     : status 가 ongoing→(victory|defeat) 로 바뀌면. result 지정 시 그 결과에만.
  *
@@ -28,13 +29,16 @@ export interface DialogueSnapshot {
   duelHistory: readonly string[];
   /** 퇴각한 유닛 id 집합 (retreated=true) */
   retreatedIds: ReadonlySet<string>;
+  firedScripts?: readonly string[];
+  spawnedReinforcements?: readonly string[];
 }
 
 /** BattleState → 디렉터 스냅샷 (read-only 추출, 상태 비변경) */
 export function toDialogueSnapshot(s: BattleState): DialogueSnapshot {
   const retreatedIds = new Set<string>();
   for (const u of s.units) if (u.retreated) retreatedIds.add(u.id);
-  return { turn: s.turn, status: s.status, duelHistory: s.duelHistory, retreatedIds };
+  return { turn: s.turn, status: s.status, duelHistory: s.duelHistory, retreatedIds,
+    firedScripts: s.firedScripts ?? [], spawnedReinforcements: s.spawnedReinforcements };
 }
 
 /**
@@ -48,6 +52,12 @@ export function triggerFired(
   next: DialogueSnapshot,
 ): boolean {
   switch (trigger.kind) {
+    case "scriptFired":
+      return (next.firedScripts ?? []).includes(trigger.scriptId)
+        && !(prev?.firedScripts ?? []).includes(trigger.scriptId);
+    case "reinforcementArrived":
+      return (next.spawnedReinforcements ?? []).includes(trigger.reinforcementId)
+        && !(prev?.spawnedReinforcements ?? []).includes(trigger.reinforcementId);
     case "battleStart":
       // 최초 스냅샷에서만 (prev 없음 = 첫 구독)
       return prev === null;

@@ -144,6 +144,7 @@ export function TitleScreen(): React.ReactElement {
           onClick={onNewGame}
           primary={!hasProgress}
         />
+        <MenuButton label="이야기 읽기" onClick={() => router.push("/chronicle")} />
         {hasProgress && (
           <p style={{ margin: 0, fontSize: 12, color: BRONZE_DIM }}>
             새 게임은 현재 진행을 모두 초기화합니다.

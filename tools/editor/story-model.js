@@ -10,6 +10,8 @@ export function describeTrigger(trigger, nameOf = id, duelLabel = id) {
     case "turn": return `${trigger.n}턴이 시작되면`;
     case "unitRetreated": return `${nameOf(trigger.unitId)}이(가) 퇴각하면`;
     case "duelOccurred": return `일기토 ${duelLabel(trigger.duelId)}이(가) 일어나면`;
+    case "scriptFired": return `전투 이벤트 ${trigger.scriptId} 발동 후`;
+    case "reinforcementArrived": return `증원 ${trigger.reinforcementId} 도착 후`;
     case "battleEnd":
       return trigger.result === "victory" ? "전투에서 이기면" : trigger.result === "defeat" ? "전투에서 지면" : "전투가 끝나면";
     default: return String(trigger?.kind ?? "?");

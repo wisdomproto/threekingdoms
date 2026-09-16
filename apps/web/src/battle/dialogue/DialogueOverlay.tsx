@@ -5,8 +5,8 @@
  * 레퍼런스 동작 그대로:
  *  - 둥근 회색 말풍선 + 화자명=파랑 글씨(적/중립도 파랑) + 본문 검정.
  *  - 초상 좌/우 코너 가변(side: player/ally=좌, enemy=우) — 말풍선 꼬리가 초상을 가리킴(§344).
- *  - 타이핑 출력(한 글자씩 점진, §345). 좌하단 파란 "다음" 화살표 인디케이터(§346).
- *  - 탭 → 다음 줄(타이핑 중 탭이면 즉시 완성, 완성 상태 탭이면 진행).
+ *  - 대사 한 줄을 즉시 표시. 좌하단 파란 "다음" 화살표 인디케이터(§346).
+ *  - 탭 → 다음 줄.
  * 아트 스킨만 청동 액자(독자) — 동작/레이아웃/정보위계는 레퍼런스 동일.
  *
  * ⚠️ **순수 표현 — engine·store 미수정.** BattleStore.settledState/subscribe만 read-only로
@@ -25,9 +25,6 @@ import {
   toDialogueSnapshot,
   firedDialogues,
 } from "./director";
-
-/** 타이핑 속도 (글자당 ms). 레퍼런스 점진 출력(§345) 재현 — 짧게 둬 캐주얼 페이싱. */
-const TYPE_MS = 28;
 
 /** 디렉터 큐 상태 — 재생 대기 라인 평탄화 + 이미 재생한 dialogue id */
 interface QueueState {
@@ -60,42 +57,6 @@ function queueReducer(state: QueueState, action: QueueAction): QueueState {
     default:
       return state;
   }
-}
-
-/**
- * 한 줄 타이핑 재생 + 탭 진행 훅.
- * @returns shown=화면에 노출된 글자, done=타이핑 완료 여부, onTap=탭 핸들러.
- */
-function useTypewriter(text: string, onComplete: () => void) {
-  const [count, setCount] = useState(0);
-  const doneRef = useRef(false);
-
-  // 새 줄 진입 시 리셋
-  useEffect(() => {
-    setCount(0);
-    doneRef.current = false;
-  }, [text]);
-
-  useEffect(() => {
-    if (count >= text.length) {
-      doneRef.current = true;
-      return;
-    }
-    const id = window.setTimeout(() => setCount((c) => c + 1), TYPE_MS);
-    return () => window.clearTimeout(id);
-  }, [count, text]);
-
-  const done = count >= text.length;
-  const onTap = useCallback(() => {
-    if (!done) {
-      // 타이핑 중 탭 → 즉시 완성
-      setCount(text.length);
-    } else {
-      onComplete();
-    }
-  }, [done, text.length, onComplete]);
-
-  return { shown: text.slice(0, count), done, onTap };
 }
 
 const OVERLAY_STYLE: React.CSSProperties = {
@@ -169,7 +130,9 @@ function DialogueBubble({
   isLast: boolean;
   onTap: () => void;
 }): React.ReactElement {
-  const { shown, done, onTap: tap } = useTypewriter(line.text, onTap);
+  const shown = line.text;
+  const done = true;
+  const tap = onTap;
   // 초상 좌/우 코너 가변(§344): player/ally=좌, enemy=우. side 미지정 시 좌(기본).
   const portraitRight = line.side === "enemy";
 

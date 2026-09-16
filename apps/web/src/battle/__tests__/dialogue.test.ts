@@ -19,6 +19,8 @@ function makeState(p: {
   status?: BattleState["status"];
   duelHistory?: string[];
   retreated?: string[];
+  firedScripts?: string[];
+  spawnedReinforcements?: string[];
 }): BattleState {
   const retreated = new Set(p.retreated ?? []);
   return {
@@ -30,7 +32,8 @@ function makeState(p: {
     firedEvents: [],
     duelHistory: p.duelHistory ?? [],
     metStrategyConditions: [],
-    spawnedReinforcements: [],
+    spawnedReinforcements: p.spawnedReinforcements ?? [],
+    firedScripts: p.firedScripts ?? [],
     pendingRewards: [],
     levelUps: [],
     sharedItems: { friendly: [], hostile: [] },
@@ -41,6 +44,25 @@ const snap = (p: Parameters<typeof makeState>[0]): DialogueSnapshot =>
   toDialogueSnapshot(makeState(p));
 
 describe("대사 디렉터 트리거 판정", () => {
+  it("waits for the actual fire event, not its original turn or an early victory", () => {
+    const trigger = { kind: "scriptFired", scriptId: "fire" } as const;
+    const before = snap({ turn: 4 });
+    expect(triggerFired(trigger, snap({ turn: 3 }), before)).toBe(false);
+    expect(triggerFired(trigger, before, snap({ status: "victory" }))).toBe(false);
+    const after = snap({ turn: 7, firedScripts: ["fire"] });
+    expect(triggerFired(trigger, before, after)).toBe(true);
+    expect(triggerFired(trigger, after, after)).toBe(false);
+    const dialogue = [{ id: "fire-line", trigger, lines: [{ speaker: "공명", text: "불을 놓아라!" }] }];
+    expect(firedDialogues(dialogue, null, after, new Set(["fire-line"]))).toEqual([]);
+  });
+  it("announces conditional reinforcements only on their arrival edge", () => {
+    const trigger = { kind: "reinforcementArrived", reinforcementId: "ambush" } as const;
+    const before = snap({ turn: 9 });
+    expect(triggerFired(trigger, null, before)).toBe(false);
+    const after = snap({ turn: 9, spawnedReinforcements: ["ambush"] });
+    expect(triggerFired(trigger, before, after)).toBe(true);
+    expect(triggerFired(trigger, after, after)).toBe(false);
+  });
   it("battleStart: 최초 구독(prev=null)에서만 발동", () => {
     const s = snap({});
     expect(triggerFired({ kind: "battleStart" }, null, s)).toBe(true);

@@ -25,6 +25,39 @@ function pureGreedyEnd(c: BattleContext, seed: number) {
 }
 
 describe("자동전투 토글", () => {
+  it.each(["player", "enemy"] as const)("waits for event dialogue in the %s phase, then resumes deterministically", async (phase) => {
+    const gatedCtx: BattleContext = { ...ctx, stage: { ...ctx.stage,
+      dialogue: [{ id: "pause-cue", trigger: { kind: "scriptFired", scriptId: "pause" }, lines: [{ speaker: "유비", text: "매복이다!" }] }],
+      scriptEvents: [{ id: "pause", name: "Pause", trigger: { kind: "turn", turn: 1, phase }, actions: [{ kind: "message", text: "Ambush" }] }],
+    } };
+    const store = new BattleStore(gatedCtx, SEED, { pauseForDialogue: true });
+    const shown = new Promise<void>(resolve => {
+      const unsubscribe = store.subscribe(() => {
+        if (store.settledState.firedScripts?.includes("pause")) { unsubscribe(); resolve(); }
+      });
+    });
+    store.setAutoBattle(true);
+    await shown;
+    const count = store.actionLog.length;
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(store.actionLog.length).toBe(count);
+    expect(store.committedState.status).toBe("ongoing");
+    store.releaseDialogue();
+    await store.whenIdle();
+    expect(store.committedState).toEqual(pureGreedyEnd(gatedCtx, SEED));
+  });
+
+  it("blocks commands during the opening dialogue and releases a pending auto start", async () => {
+    const store = new BattleStore(ctx, SEED, { pauseForDialogue: true });
+    store.setAutoBattle(true);
+    expect(store.actionLog).toHaveLength(0);
+    store.releaseDialogue();
+    // Release any later dialogue in this fixture as a reader would.
+    const unsubscribe = store.subscribe(() => queueMicrotask(() => store.releaseDialogue()));
+    await store.whenIdle();
+    unsubscribe();
+    expect(store.committedState).toEqual(pureGreedyEnd(ctx, SEED));
+  });
   it("ON이면 양 페이즈가 자동 진행되어 전투가 끝까지 완주한다", async () => {
     const store = new BattleStore(ctx, SEED);
     expect(store.autoBattle).toBe(false);
