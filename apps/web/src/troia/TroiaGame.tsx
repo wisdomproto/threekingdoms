@@ -4,6 +4,7 @@ import { ScenarioSceneSchema } from "@tk/data";
 import BattleScreen from "../battle/BattleScreen";
 import { ScenePlayer } from "../scene/ScenePlayer";
 import { content, context } from "./content";
+import { InstallGameButton } from "../pwa/InstallGameButton";
 import styles from "./TroiaGame.module.css";
 import { playBgm } from "../audio";
 
@@ -23,7 +24,7 @@ export default function TroiaGame() {
   if (phase === "battle") return <BattleScreen key={run} setup={setup} onComplete={setPhase} onExit={() => setPhase("title")} />;
   if (phase !== "title") return <ScenePlayer key={`${phase}:${run}`} scene={scenes[phase]} title="트로이 · 낯선 해안" onComplete={() => setPhase(phase === "intro" ? "battle" : "title")} />;
   return <main className={styles.launcher}>
-    <header><strong>TROIA</strong><span>CHAPTER 01 · 인간들의 전쟁</span></header>
+    <header><strong>TROIA</strong><InstallGameButton /><span>CHAPTER 01 · 인간들의 전쟁</span></header>
     <section>
       <p className={styles.eyebrow}>THE FIRST LANDING</p>
       <h1>낯선 해안</h1>

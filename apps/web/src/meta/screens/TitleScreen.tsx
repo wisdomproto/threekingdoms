@@ -14,6 +14,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { InstallGameButton } from "../../pwa/InstallGameButton";
 import styles from "./TitleScreen.module.css";
 import { earnedInventoryCount, getMeta, reset } from "../metaStore";
 import { adLifecycle } from "../adProviders";
@@ -51,6 +52,7 @@ export function TitleScreen(): React.ReactElement {
     <section className={styles.screen}>
       <div className={styles.topbar}>
         <Link className={styles.studio} href="/">← MOD 목록</Link>
+        <InstallGameButton />
         <Link className={styles.studio} href={`/studio-login?next=${encodeURIComponent(activeGame ? `/studio?project=${activeGame.projectId}` : "/studio")}`}>
           Studio 가기 <span aria-hidden="true">↗</span>
         </Link>
