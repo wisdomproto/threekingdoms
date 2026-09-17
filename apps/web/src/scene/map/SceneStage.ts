@@ -63,8 +63,7 @@ export class SceneStage {
   private lastSnap: ReadonlyMap<string, SceneUnitState> | null = null;
 
   /**
-   * Pixi 부팅 + 맵/유닛 조립. 에셋(바닥·스프라이트·painted)은 fire-and-forget 로드 —
-   * 도착 전엔 단색/색사각 폴백(전투와 동일 규약), 도착하는 대로 교체(무회귀).
+   * Build the stage behind the loading curtain; resolve after all artwork is ready.
    */
   async init(parent: HTMLElement, scene: MapScene, map: BattleMap, walkable: Walkable): Promise<void> {
     if (this.booted) throw new Error("SceneStage: 이미 init됨");
@@ -146,7 +145,7 @@ export class SceneStage {
 
     // ── 에셋 로드(비차단·방어적 — 전투 부트 미러) ──
     // 바닥/오브젝트(getObject — 데코 소품 텍스처 포함) → rebake + 데코 재생성.
-    void textures
+    const tilesBoot = textures
       .loadTiles()
       .then(() => {
         if (!this.booted) return;
@@ -165,12 +164,12 @@ export class SceneStage {
         for (const v of this.views.values()) v.refreshSprite();
       });
     };
-    void textures
+    const spritesBoot = textures
       .loadSprites(() => scheduleRefresh(), new Set(scene.units.map(u => u.sprite)))
       .then(() => scheduleRefresh())
       .catch((e) => console.warn("[SceneStage] loadSprites 예외 (폴백 유지):", e));
     // painted 배경 — /assets/maps/{scene.map}.webp 규약(맵 id 키).
-    void textures
+    const mapBoot = textures
       .loadMapBackground(map.id)
       .then((tex) => {
         if (!tex || !this.booted) return;
@@ -199,6 +198,9 @@ export class SceneStage {
 
     this.booted = { app, tweens, textures, world, resizeObserver, tick };
     this.fit();
+    await Promise.all([tilesBoot, spritesBoot, mapBoot]);
+    if (this.destroyRequested) return;
+    for (const view of this.views.values()) view.refreshSprite();
     // Await scene actors before allowing dialogue to advance: never play their entrance unseen.
     try {
       const response = await fetch(MOTION_URL, { cache: "no-store" });

@@ -97,17 +97,17 @@ export class UnitLayer extends Container {
    * 비동기·방어적: 리그 없으면(null) 베이크 스프라이트 유지(무회귀). 같은 spriteId는 textures가 1회 캐시.
    * BattleRenderer.mount에서 fire-and-forget 호출.
    */
-  applySkeletons(): void {
-    for (const v of this.views.values()) {
+  async applySkeletons(): Promise<void> {
+    await Promise.all([...this.views.values()].map(async v => {
       const sid = v.spriteKey;
-      if (!sid) continue;
-      this.textures
+      if (!sid) return;
+      await this.textures
         .loadSkeleton(sid)
         .then((rig) => {
-          if (rig) v.setSkeleton(rig.skeleton, (img) => rig.textures.get(img) ?? null);
+          if (rig && !v.destroyed) v.setSkeleton(rig.skeleton, (img) => rig.textures.get(img) ?? null);
         })
         .catch((e) => console.warn(`[UnitLayer] 리그 로드 실패 (${sid}) — 베이크 유지`, e));
-    }
+    }));
   }
 
   /** ticker에서 매 프레임 — 전 유닛 idle 호흡 갱신 */

@@ -31,7 +31,13 @@ const STYLE = `@keyframes tkSceneIn { from { opacity: 1 } to { opacity: 0 } }
 .tkComicFlash { animation: tkComicFlash 200ms ease-out both }
 @media (prefers-reduced-motion: reduce) { .tkComicShake,.tkComicFlash { animation: none } .tkComicCam { transition: none !important } }`;
 
-export function ComicScenePlayer({
+import { SceneImageGate } from "../ui/SceneImageGate";
+
+export function ComicScenePlayer(props: Parameters<typeof ComicScenePlayerReady>[0]): React.ReactElement {
+  return <SceneImageGate scene={props.scene}><ComicScenePlayerReady {...props} /></SceneImageGate>;
+}
+
+function ComicScenePlayerReady({
   scene,
   title,
   onComplete,

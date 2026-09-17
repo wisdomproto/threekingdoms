@@ -16,6 +16,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { gameData, type BattleMap, type MapScene, type MapSceneLine } from "../game/data";
 import { moveCostFor } from "@tk/engine";
 import { resolveSceneMap } from "../lab/scene-maps";
+import { SceneImageGate, ImageLoadingScreen } from "../ui/SceneImageGate";
 import { SceneStage } from "./map/SceneStage";
 import { sceneUnitStates, type Cell, type Walkable } from "./map/interpreter";
 import { useDialogueText } from "./useDialogueText";
@@ -57,7 +58,7 @@ export function MapScenePlayer({
     if (!map) onComplete();
   }, [map, onComplete]);
   if (!map) return null;
-  return <MapSceneInner scene={scene} map={map} title={title} onComplete={onComplete} />;
+  return <SceneImageGate scene={scene}><MapSceneInner scene={scene} map={map} title={title} onComplete={onComplete} /></SceneImageGate>;
 }
 
 function MapSceneInner({
@@ -94,24 +95,29 @@ function MapSceneInner({
   const mountRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<SceneStage | null>(null);
   const [ready, setReady] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   useEffect(() => {
     const el = mountRef.current;
     if (!el) return;
+    setLoadError(false);
     const stage = new SceneStage();
     stageRef.current = stage;
     void stage
       .init(el, scene, map, walkable)
-      .catch((err: unknown) => console.error("[MapScenePlayer] SceneStage init 실패", err))
       .then(() => {
-        // 실패해도 진행은 계속(유닛 없는 대사 재생 — 무붕괴). StrictMode 재마운트는 ref 비교로 무시.
+        // Ignore completion from a discarded StrictMode mount.
         if (stageRef.current === stage) setReady(true);
+      }).catch((err: unknown) => {
+        console.error("[MapScenePlayer] SceneStage init failed", err);
+        if (stageRef.current === stage) setLoadError(true);
       });
     return () => {
       if (stageRef.current === stage) stageRef.current = null;
       setReady(false);
       stage.destroy(); // init 진행 중이면 SceneStage 내부 가드가 완료 후 파괴
     };
-  }, [scene, map, walkable]);
+  }, [scene, map, walkable, loadAttempt]);
 
   // ── 줄 진행 상태 ──
   const [idx, setIdx] = useState(0);
@@ -265,7 +271,8 @@ function MapSceneInner({
       }}
     >
       {/* Pixi 무대 (SceneStage 캔버스) */}
-      <div ref={mountRef} style={{ position: "absolute", inset: 0 }} />
+      <div ref={mountRef} style={{ position: "absolute", inset: 0, visibility: ready ? "visible" : "hidden" }} />
+      {!ready && <ImageLoadingScreen failed={loadError} onRetry={() => setLoadAttempt(n => n + 1)} />}
 
       {/* 오프닝 페이드-인 — VN SceneBackground의 tkSceneIn 미러(파트 전환 리마운트 = 장면 전환감) */}
       <div
@@ -275,7 +282,7 @@ function MapSceneInner({
           inset: 0,
           background: "#000",
           pointerEvents: "none",
-          animation: "tkMapSceneIn 420ms ease-out both",
+          animation: ready ? "tkMapSceneIn 420ms ease-out both" : "none",
         }}
       />
       <style>{"@keyframes tkMapSceneIn { from { opacity: 1 } to { opacity: 0 } }"}</style>

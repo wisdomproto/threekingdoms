@@ -1,4 +1,6 @@
 "use client";
+import { preloadImage, sceneImageUrls } from "../ui/preloadImages";
+import { assetUrl as preloadAssetUrl } from "../assetUrl";
 /**
  * BattleScreen (설계 §2.3) — React 셸. canvas mount/unmount + DOM HUD만 담당하고
  * Pixi 객체는 BattleRenderer 내부에 봉인된다 (설계 §2.2 React↔Pixi 경계).
@@ -363,7 +365,7 @@ export default function BattleScreen({ setup, onComplete, onExit }: {
 
   // 전투 부트 게이트 — 에셋(스프라이트·오브젝트·맵배경) 로드 완료까지 로딩 장막을 덮는다.
   // "캐릭터/오브젝트가 뒤늦게 뜨는" 점진 노출 대신 준비 후 시작(2026-07-03 피드백).
-  // After 15 seconds, offer manual entry while assets continue loading.
+  // Slow connections retain the loading curtain until all assets settle.
   // Never reveal placeholder units automatically just because loading is slow.
   const [boot, setBoot] = useState({ pct: 0, ready: false });
   const [bootSlow, setBootSlow] = useState(false);
@@ -409,7 +411,13 @@ export default function BattleScreen({ setup, onComplete, onExit }: {
     renderer.onAssetProgress((pct) => {
       if (!cancelled) setBoot((b) => (b.ready ? b : { pct, ready: false }));
     });
-    void renderer.assetsReady.then(() => {
+    const portraitUrls = new Set([
+      ...sceneImageUrls(ctx.stage.dialogue),
+      ...store.settledState.units.map(u => preloadAssetUrl(`/assets/ui/portraits/${encodeURIComponent(u.id)}.webp`)),
+      ...(ctx.stage.reinforcements ?? []).flatMap(r => r.units.map(u => preloadAssetUrl(`/assets/ui/portraits/${encodeURIComponent(u.commanderId)}.webp`))),
+    ]);
+    const portraitsReady = Promise.allSettled([...portraitUrls].map(preloadImage));
+    void Promise.all([renderer.assetsReady, portraitsReady]).then(() => {
       if (!cancelled) setBoot({ pct: 1, ready: true });
     });
     const bootTimeout = window.setTimeout(() => {
@@ -690,8 +698,8 @@ export default function BattleScreen({ setup, onComplete, onExit }: {
             <p style={{ margin: 0, fontSize: 13 }}>캐릭터와 전장 이미지를 불러오고 있습니다.</p>
             <button
               style={{ padding: "10px 16px", borderRadius: 6, border: `1px solid ${HUD_BRONZE_DIM}`, background: "transparent", color: HUD_PARCHMENT, fontFamily: HUD_FONT, cursor: "pointer" }}
-              onClick={() => setBoot(b => ({ ...b, ready: true }))}
-            >이미지 로딩을 기다리지 않고 입장</button>
+              onClick={() => window.location.reload()}
+            >다시 불러오기</button>
           </>}
         </div>
       )}

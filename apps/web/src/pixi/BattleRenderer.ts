@@ -274,8 +274,8 @@ export class BattleRenderer implements Presenter {
       .then(() => units.refreshSprites())
       .catch((e) => console.warn("[BattleRenderer] loadSprites 예외 (폴백 유지):", e));
     // 자체 컷아웃 리그(§4) — spriteId에 스켈레톤이 있으면 베이크 스프라이트를 리그로 격상.
-    // 비동기·방어적: 리그 없으면 베이크 유지(무회귀). 스프라이트 로드와 독립 진행.
-    units.applySkeletons();
+    // Resolve rigs after sprite keys are known; include them in the loading gate.
+    const rigsBoot = spritesBoot.then(() => units.applySkeletons());
     const objects = new ObjectLayer(this.ctx, textures);
     objects.zIndex = 1.8; // highlights(1)/threat(1.5) 위, units(2) 아래
     // 지형 타일 로드 완료 → TerrainLayer 이미지 텍스처로 교체 + 청크 캐시 재생성
@@ -334,13 +334,6 @@ export class BattleRenderer implements Presenter {
         emitBoot();
       });
 
-    // 부트 게이트 완료 — 3원천 전부 settle되면 resolve(§13: 어떤 실패에도 반드시 열린다).
-    // 원경 산수(loadBackground)는 순수 장식이라 게이트에서 제외.
-    void Promise.allSettled([spritesBoot, tilesBoot, mapBgBoot]).then(() => {
-      this.assetProgressCb?.(1);
-      this.assetsReadyResolve?.();
-    });
-
     // 맵 뒤 배경 (화면 고정 — 카메라 변환 밖). 휑한 가장자리를 원경 산수로 채운다.
     const bg = new Sprite();
     bg.anchor.set(0.5);
@@ -353,7 +346,7 @@ export class BattleRenderer implements Presenter {
       bg.scale.set(Math.max(sw / tex.width, sh / tex.height)); // cover
       bg.position.set(sw / 2, sh / 2);
     };
-    textures
+    const backgroundBoot = textures
       .loadBackground()
       .then((tex) => {
         if (tex) {
@@ -363,6 +356,10 @@ export class BattleRenderer implements Presenter {
         }
       })
       .catch((e) => console.warn("[BattleRenderer] loadBackground 예외:", e));
+    void Promise.allSettled([spritesBoot, tilesBoot, mapBgBoot, rigsBoot, backgroundBoot]).then(() => {
+      this.assetProgressCb?.(1);
+      this.assetsReadyResolve?.();
+    });
     // 분위기 오버레이 (맵 위·스크린FX 아래) — 비네팅 + 따뜻한 글로우
     const atmosphere = new AtmosphereLayer();
     atmosphere.resize(app.screen.width, app.screen.height);

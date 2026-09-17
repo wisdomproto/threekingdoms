@@ -19,7 +19,13 @@ import { SkipBar } from "./parts/SkipBar";
 import { NarrationPanel } from "./parts/NarrationPanel";
 import { DialoguePanel } from "./parts/DialoguePanel";
 
-export function ScenePlayer({
+import { SceneImageGate } from "../ui/SceneImageGate";
+
+export function ScenePlayer(props: Parameters<typeof ScenePlayerReady>[0]): React.ReactElement {
+  return <SceneImageGate scene={props.scene}><ScenePlayerReady {...props} /></SceneImageGate>;
+}
+
+function ScenePlayerReady({
   scene,
   title,
   onComplete,
