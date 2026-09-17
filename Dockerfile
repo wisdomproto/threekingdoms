@@ -10,7 +10,7 @@ ENV NEXT_PUBLIC_HOSTED_STUDIO=1 NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_PUBLIC_ASSET_BASE=$NEXT_PUBLIC_ASSET_BASE
 ENV NEXT_PUBLIC_AD_PROVIDER=$NEXT_PUBLIC_AD_PROVIDER
 ENV NEXT_PUBLIC_GD_GAME_ID=$NEXT_PUBLIC_GD_GAME_ID
-RUN pnpm --filter @tk/web build
+RUN NODE_ENV=production pnpm --filter @tk/web build
 
 # The authoring APIs need tools/editor and packages/data at runtime.
 # Keep the workspace layout; next standalone tracing omits these dynamic files.

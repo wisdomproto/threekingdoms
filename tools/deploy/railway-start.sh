@@ -1,5 +1,7 @@
 #!/bin/sh
 set -eu
+# A dashboard NODE_ENV override must never launch an editor dev server publicly.
+export NODE_ENV=production
 if [ "${TK_STUDIO_ENABLED:-}" = "1" ] && [ -z "${TK_STUDIO_PASSWORD:-}" ]; then
   echo "TK_STUDIO_PASSWORD is required when Studio is enabled." >&2
   exit 1

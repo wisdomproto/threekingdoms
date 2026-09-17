@@ -19,6 +19,7 @@
 ## Railway 설정
 
 1. GitHub 저장소를 연결하고 Dockerfile 빌드를 사용한다. `railway.json`이 헬스 체크 `/api/health`를 지정한다.
+   자동 감지된 패키지 중 `@tk/web`만 서비스로 유지한다. `@tk/import-hero`는 데이터 추출 CLI이므로 제외한다. Root Directory는 `/`, Config File은 `/railway.json`으로 지정한다. Start Command는 설정 파일의 `sh tools/deploy/railway-start.sh`를 사용하고 `pnpm dev`나 `next dev`를 사용하지 않는다. Variables의 `NODE_ENV=development`는 제거한다.
 2. Volume을 만들고 **`/data`** 에 마운트한다. 프로젝트, 게시 게임 버전, 업로드 에셋, 편집 백업이 여기에 저장된다. replica는 1개로 둔다.
 3. 아래 환경변수를 설정한다. 비밀번호는 Railway Variables에만 입력하고 Git에 넣지 않는다.
 
