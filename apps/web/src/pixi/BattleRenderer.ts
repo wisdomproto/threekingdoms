@@ -719,6 +719,7 @@ export class BattleRenderer implements Presenter {
   private bossBgmFired = false;
   /** 직전 strategyCast 카테고리 — 뒤따르는 damageDealt(source=strategy) 임팩트 색을 맞추는 데 씀. */
   private lastStrategyCategory = "special";
+  private lastStrategyTier = 1;
   private lastItemCategory = "special";
   private maybeBossBgm(aId: string, bId: string): void {
     if (this.bossBgmFired) return;
@@ -832,7 +833,7 @@ export class BattleRenderer implements Presenter {
       // (종전엔 책략도 무기 타격과 같은 damageDealt라 캐스터가 칼로 베는 연출이 났다.)
       const cat = e.source === "strategy" ? this.lastStrategyCategory : this.lastItemCategory;
       void s.tweens.delay(60).then(() => {
-        void s.fx.strategyEffect(cat, popupAt);
+        void s.fx.strategyEffect(cat, popupAt, e.source === "strategy" ? this.lastStrategyTier : 1);
         impact();
       });
       await Promise.all([defender.playHitFrom(fromDir, intensity), s.fx.damagePopup(popupAt, e.damage, e.counter, crit, guarded)]);
@@ -880,6 +881,8 @@ export class BattleRenderer implements Presenter {
   async statusApplied(e: Ev<"statusApplied">): Promise<void> {
     const s = this.scene;
     if (!s) return;
+    const buffs: Record<string,string> = {attackUp:"공격력 +20%",defenseUp:"방어력 +20%",spiritUp:"정신력 +20%",moveUp:"이동력 +2"};
+    if (buffs[e.kind]) await s.fx.banner(`${e.unitId} · ${buffs[e.kind]} · ${e.turns}차례`,650);
     if (e.kind === "stun") await s.fx.banner(`${e.unitId} · 기절 ${e.turns}차례`, 650);
     await s.units.view(e.unitId).flash(); // 부여 순간 깜빡임(상태 아이콘 표시는 후속)
   }
@@ -943,11 +946,17 @@ export class BattleRenderer implements Presenter {
   }
 
   // 회복(흡혈·회복책략) — 초록 "+amount" 팝업 + 막대 증가(엔진 정합).
+  async supportResolved(e: Ev<"supportResolved">): Promise<void> {
+    const s=this.scene; if (!s) return;
+    const u=s.units.view(e.unitId);
+    await s.fx.strategyEffect(e.effect === "mp" ? "water" : "heal", gridToWorld({x:u.gridX,y:u.gridY}), 2);
+    await s.fx.banner(`${e.unitId} · ${e.effect === "mp" ? `MP +${e.amount}` : e.effect === "cleanse" ? "상태 해제" : "다시 행동"}`, 450);
+  }
   async troopsHealed(e: Ev<"troopsHealed">): Promise<void> {
     const s = this.scene;
     if (!s) return;
     const u = s.units.view(e.unitId);
-    await s.fx.healPopup(gridToWorld({ x: u.gridX, y: u.gridY }), e.amount);
+    await Promise.all([s.fx.healPopup(gridToWorld({ x: u.gridX, y: u.gridY }), e.amount), s.fx.strategyEffect("heal", gridToWorld({x:u.gridX,y:u.gridY}), e.strategyTier ?? 1)]);
     u.setTroops(u.troops + e.amount);
   }
 
@@ -961,9 +970,10 @@ export class BattleRenderer implements Presenter {
     const strat = this.ctx.data.strategies[e.strategyId];
     const name = strat?.name ?? e.strategyId;
     this.lastStrategyCategory = strat?.category ?? "special";
+    this.lastStrategyTier = strat?.tier ?? 1;
     playSfx(SFX.spell);
     // 카테고리별 대표 VFX(불/물/바람/땅/회복/디버프/특수) — 대상 칸에 펼친다(데미지/회복은 후속 이벤트가 처리).
-    if (strat?.category) void s.fx.strategyEffect(strat.category, targetWorld);
+    if (strat?.category) void s.fx.strategyEffect(strat.support === "mp" ? "water" : strat.category, targetWorld, strat.tier ?? 1);
     await s.fx.banner(name, DUEL_BANNER_MS, true);
   }
 

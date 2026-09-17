@@ -21,7 +21,8 @@ function isConsumable(item: Item): boolean {
   return (item.category === "supplyItem" || item.category === "attackItem") && item.power !== 255;
 }
 
-const STATUS_LABEL: Record<"poison" | "seal" | "immobilize" | "stun", string> = {
+const STATUS_LABEL: Record<string, string> = {
+  attackUp:"공격 강화", defenseUp:"방어 강화", spiritUp:"정신 강화", moveUp:"이동 강화",
   stun: "기절", poison: "중독", seal: "금책", immobilize: "부동",
 };
 

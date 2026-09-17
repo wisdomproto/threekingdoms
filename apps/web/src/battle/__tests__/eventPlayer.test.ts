@@ -266,9 +266,9 @@ describe("회복 책략 투영 (회귀: 드레인 정합 — 회복이 이벤트
       ...base,
       units: base.units.map((u) => (u.id === "유비" ? { ...u, troops: 10 } : u)),
     };
-    // 간옹이 헌책(회복·단일·사거리3)을 부상당한 유비(3,4)에 시전 → 유비 회복
+    // 간옹이 소보급(회복·단일·사거리3)을 부상당한 유비(3,4)에 시전 → 유비 회복
     const r = applyAction(healCtx, wounded, {
-      type: "strategy", unitId: "간옹", strategyId: "헌책", target: { x: 3, y: 4 },
+      type: "strategy", unitId: "간옹", strategyId: "소보급", target: { x: 3, y: 4 },
     });
     // 전제: 엔진 진실에서 유비가 실제로 회복됐다 (회복 경로가 탔다)
     const liubeiCommitted = r.state.units.find((u) => u.id === "유비")!;

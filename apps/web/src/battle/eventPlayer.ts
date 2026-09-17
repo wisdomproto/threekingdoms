@@ -48,6 +48,7 @@ export interface Presenter {
   combo?(e: Ev<"combo">): Promise<void>;
   phaseChanged(e: Ev<"phaseChanged">): Promise<void>;
   /** 상태이상 부여/만료 — 표시 전용(diffSnapshot은 statuses 미비교). 옵셔널. */
+  supportResolved?(e: Ev<"supportResolved">): Promise<void>;
   statusApplied?(e: Ev<"statusApplied">): Promise<void>;
   statusExpired?(e: Ev<"statusExpired">): Promise<void>;
   /** 중독 1틱 피해 — troops 차감 투영 필수(diffSnapshot 정합). */
@@ -187,6 +188,8 @@ export class EventPlayer {
         return p.statusTick?.(e) ?? Promise.resolve();
       case "statusExpired":
         return p.statusExpired?.(e) ?? Promise.resolve();
+      case "supportResolved":
+        return p.supportResolved?.(e) ?? Promise.resolve();
       case "troopsHealed":
         return p.troopsHealed?.(e) ?? Promise.resolve();
       case "levelUp":

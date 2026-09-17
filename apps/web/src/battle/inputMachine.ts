@@ -12,7 +12,7 @@
  */
 import {
   getAttackableTargets, getMovableTiles, getStrategyTargets, unitAt,
-  flankingCount, flankMultiplier, canUltimate, camp,
+  flankingCount, flankMultiplier, canUltimate, camp, strategyAoeCells,
 } from "@tk/engine";
 import type { Action, BattleContext, BattleState, Coord } from "@tk/engine";
 
@@ -145,6 +145,9 @@ export type InputState =
   /** 계략: 선택한 책략의 대상 칸 조준 */
   | {
       kind: "strategyTarget";
+      aim?: Coord;
+      area?: Coord[];
+      affected?: string[];
       unitId: string;
       from: Coord;
       preview: Coord;
@@ -514,7 +517,7 @@ export function reduceInput(
         if (!state.strategies.includes(event.strategyId)) return noop(state);
         const castTiles = getStrategyTargets(ctx, battle, state.unitId, event.strategyId, state.preview);
         if (castTiles.length === 0) return noop(state);
-        return { next: { ...state, kind: "strategyTarget", strategyId: event.strategyId, castTiles }, effects: [] };
+        return { next: { ...state, kind: "strategyTarget", aim: undefined, area: undefined, affected: undefined, strategyId: event.strategyId, castTiles }, effects: [] };
       }
       if (event.type === "cancel" || event.type === "menuCancel") {
         return {
@@ -536,6 +539,13 @@ export function reduceInput(
       }
       if (event.type === "tapTile") {
         if (!state.castTiles.some((t) => sameCoord(t, event.coord))) return noop(state);
+        if (!state.aim || !sameCoord(state.aim, event.coord)) {
+          const strat = ctx.data.strategies[state.strategyId]!;
+          const area = strategyAoeCells(event.coord, strat.aoe).filter(c=>c.x>=0 && c.y>=0 && c.x<ctx.map.width && c.y<ctx.map.height);
+          const caster = battle.units.find(u=>u.id===state.unitId)!;
+          const affected = battle.units.filter(u=>!u.retreated && area.some(c=>sameCoord(c, u.id===caster.id ? state.preview : u)) && (strat.target==="ally" ? camp(u.side)===camp(caster.side) : camp(u.side)!==camp(caster.side))).map(u=>u.id);
+          return {next:{...state,aim:event.coord,area,affected},effects:[]};
+        }
         return {
           next: { kind: "animating" },
           effects: [

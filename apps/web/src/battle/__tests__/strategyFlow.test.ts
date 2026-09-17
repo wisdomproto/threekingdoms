@@ -24,7 +24,7 @@ const stage: Stage = {
 const ctx: BattleContext = { data: gameData, stage, map: testMap };
 
 describe("계략 UI 전체 경로", () => {
-  it("간옹 선택 → 계략 → 업화 → 화웅 조준 → 시전: MP 소비 + 화웅 피해 + acted", async () => {
+  it("간옹 선택 → 계략 → 초열 → 화웅 조준 → 시전: MP 소비 + 화웅 피해 + acted", async () => {
     const store = new BattleStore(ctx, 1);
     const gan0 = store.committedState.units.find((u) => u.id === "간옹")!;
     const hua0 = store.committedState.units.find((u) => u.id === "화웅")!;
@@ -35,19 +35,22 @@ describe("계략 UI 전체 경로", () => {
     expect(store.uiState.kind).toBe("postMoveMenu");
     const pm = store.uiState;
     if (pm.kind !== "postMoveMenu") throw new Error("unreachable");
-    expect(pm.strategies).toContain("업화");                            // 계략 버튼 노출 조건
+    expect(pm.strategies).toContain("초열");                            // 계략 버튼 노출 조건
 
     store.dispatchUi({ type: "menuStrategy" });
     expect(store.uiState.kind).toBe("strategyMenu");
-    store.dispatchUi({ type: "selectStrategy", strategyId: "업화" });
+    store.dispatchUi({ type: "selectStrategy", strategyId: "초열" });
     expect(store.uiState.kind).toBe("strategyTarget");
+    store.dispatchUi({ type: "tapTile", coord: { x: 4, y: 4 } });
+    expect(store.uiState.kind).toBe("strategyTarget");
+    expect(store.actionLog.some(a=>a.type==="strategy")).toBe(false);
     store.dispatchUi({ type: "tapTile", coord: { x: 4, y: 4 } });      // 화웅 조준 → 시전 커밋
 
     await store.whenIdle();
 
     const gan1 = store.committedState.units.find((u) => u.id === "간옹")!;
     const hua1 = store.committedState.units.find((u) => u.id === "화웅")!;
-    expect(gan1.mp).toBe(gan0.mp - gameData.strategies["업화"]!.mp);   // MP 소비
+    expect(gan1.mp).toBe(gan0.mp - gameData.strategies["초열"]!.mp);   // MP 소비
     expect(hua1.troops).toBeLessThan(hua0.troops);                    // 화웅 피해
     expect(store.actionLog.some((a) => a.type === "strategy")).toBe(true);
   });

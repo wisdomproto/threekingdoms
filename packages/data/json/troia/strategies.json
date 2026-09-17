@@ -1,0 +1,192 @@
+{
+  "초열": {
+    "id": "초열",
+    "name": "초열",
+    "category": "fire",
+    "mp": 13,
+    "power": 6,
+    "castRange": 3,
+    "aoe": "cross",
+    "target": "enemy"
+  },
+  "업화": {
+    "id": "업화",
+    "name": "업화",
+    "category": "fire",
+    "mp": 12,
+    "power": 10,
+    "castRange": 3,
+    "aoe": "cross",
+    "target": "enemy"
+  },
+  "화진": {
+    "id": "화진",
+    "name": "화진",
+    "category": "fire",
+    "mp": 13,
+    "power": 12,
+    "castRange": 3,
+    "aoe": "cross",
+    "target": "enemy"
+  },
+  "화룡": {
+    "id": "화룡",
+    "name": "화룡",
+    "category": "fire",
+    "mp": 12,
+    "power": 20,
+    "castRange": 3,
+    "aoe": "single",
+    "target": "enemy"
+  },
+  "폭염": {
+    "id": "폭염",
+    "name": "폭염",
+    "category": "fire",
+    "mp": 5,
+    "power": 24,
+    "castRange": 3,
+    "aoe": "single",
+    "target": "enemy"
+  },
+  "탁류": {
+    "id": "탁류",
+    "name": "탁류",
+    "category": "water",
+    "mp": 13,
+    "power": 6,
+    "castRange": 3,
+    "aoe": "cross",
+    "target": "enemy"
+  },
+  "격류": {
+    "id": "격류",
+    "name": "격류",
+    "category": "water",
+    "mp": 12,
+    "power": 10,
+    "castRange": 3,
+    "aoe": "cross",
+    "target": "enemy"
+  },
+  "수진": {
+    "id": "수진",
+    "name": "수진",
+    "category": "water",
+    "mp": 13,
+    "power": 12,
+    "castRange": 3,
+    "aoe": "cross",
+    "target": "enemy"
+  },
+  "수룡": {
+    "id": "수룡",
+    "name": "수룡",
+    "category": "water",
+    "mp": 12,
+    "power": 20,
+    "castRange": 3,
+    "aoe": "single",
+    "target": "enemy"
+  },
+  "해일": {
+    "id": "해일",
+    "name": "해일",
+    "category": "water",
+    "mp": 6,
+    "power": 20,
+    "castRange": 3,
+    "aoe": "cross",
+    "target": "enemy"
+  },
+  "소보급": {
+    "id": "소보급",
+    "name": "소보급",
+    "category": "heal",
+    "mp": 13,
+    "power": 6,
+    "castRange": 3,
+    "aoe": "cross",
+    "target": "ally"
+  },
+  "대보급": {
+    "id": "대보급",
+    "name": "대보급",
+    "category": "heal",
+    "mp": 12,
+    "power": 10,
+    "castRange": 3,
+    "aoe": "cross",
+    "target": "ally"
+  },
+  "구원대": {
+    "id": "구원대",
+    "name": "구원대",
+    "category": "heal",
+    "mp": 13,
+    "power": 12,
+    "castRange": 3,
+    "aoe": "cross",
+    "target": "ally"
+  },
+  "구원군": {
+    "id": "구원군",
+    "name": "구원군",
+    "category": "heal",
+    "mp": 12,
+    "power": 20,
+    "castRange": 3,
+    "aoe": "single",
+    "target": "ally"
+  },
+  "수송": {
+    "id": "수송",
+    "name": "수송",
+    "category": "heal",
+    "mp": 10,
+    "power": 18,
+    "castRange": 3,
+    "aoe": "cross",
+    "target": "ally"
+  },
+  "조언": {
+    "id": "조언",
+    "name": "조언",
+    "category": "heal",
+    "mp": 12,
+    "power": 24,
+    "castRange": 3,
+    "aoe": "single",
+    "target": "ally"
+  },
+  "헌책": {
+    "id": "헌책",
+    "name": "헌책",
+    "category": "heal",
+    "mp": 6,
+    "power": 48,
+    "castRange": 3,
+    "aoe": "single",
+    "target": "ally"
+  },
+  "분기": {
+    "id": "분기",
+    "name": "분기",
+    "category": "heal",
+    "mp": 13,
+    "power": 6,
+    "castRange": 2,
+    "aoe": "single",
+    "target": "ally"
+  },
+  "기합": {
+    "id": "기합",
+    "name": "기합",
+    "category": "heal",
+    "mp": 11,
+    "power": 3,
+    "castRange": 2,
+    "aoe": "cross",
+    "target": "ally"
+  }
+}

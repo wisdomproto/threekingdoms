@@ -1,6 +1,7 @@
 import { z } from 'zod';
-import { gameData, StageSchema, BattleMapSchema, CommanderSchema, ItemSchema, UnitClassSchema } from '@tk/data';
+import { gameData, StageSchema, BattleMapSchema, CommanderSchema, ItemSchema, UnitClassSchema, StrategySchema } from '@tk/data';
 import { createBattle, type BattleContext } from '@tk/engine';
+import strategySource from '../../../../packages/data/json/troia/strategies.json';
 import source from '../../../../packages/data/json/troia/first-battle.json';
 
 const schema = z.object({
@@ -12,7 +13,7 @@ const schema = z.object({
 });
 export const content = schema.parse(source);
 export const context: BattleContext = {
-  data: { ...gameData, commanders: content.commanders, items:content.items, unitClasses:content.unitClasses, rosters:{}, shops:{}, maps:{[content.map.id]:content.map}, stages:{[content.stage.id]:content.stage} },
+  data: { ...gameData, strategies: z.record(StrategySchema).parse(strategySource), commanders: content.commanders, items:content.items, unitClasses:content.unitClasses, rosters:{}, shops:{}, maps:{[content.map.id]:content.map}, stages:{[content.stage.id]:content.stage} },
   stage:content.stage, map:content.map,
 };
 for (const u of content.stage.units) {

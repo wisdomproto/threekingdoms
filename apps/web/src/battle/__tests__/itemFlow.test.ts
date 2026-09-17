@@ -118,11 +118,12 @@ describe("회복 책략 UI 전체 경로 (아군 타깃)", () => {
     store.dispatchUi({ type: "selectStrategy", strategyId: "소보급" });
     const st = store.uiState;
     if (st.kind !== "strategyTarget") throw new Error("unreachable");
-    // 소보급(aoe=cross, target:ally): 아군(유비 3,5)이 범위 내 → 포함.
-    // cross AoE라 (4,5)을 center로 해도 인접 유비(3,5)가 맞으므로 castTile로 유효(enemy-only 제외는 single AoE에서 보장).
+    // Single-target supply selects only a friendly occupied tile.
+    expect(st.castTiles.some(c=>c.x===4 && c.y===5)).toBe(false);
     expect(st.castTiles.some((c) => c.x === 3 && c.y === 5)).toBe(true);
     // 아군이 전혀 닿지 않는 원거리 빈칸(10,10)은 제외 — ally 분기 보장
     expect(st.castTiles.some((c) => c.x === 10 && c.y === 10)).toBe(false);
+    store.dispatchUi({ type: "tapTile", coord: { x: 3, y: 5 } });
     store.dispatchUi({ type: "tapTile", coord: { x: 3, y: 5 } });   // 유비 조준 → 시전
 
     await store.whenIdle();

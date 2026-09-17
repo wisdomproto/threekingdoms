@@ -142,6 +142,7 @@ class PresenterDelegate implements Presenter {
   battleEnded(e: Ev<"battleEnded">): Promise<void> {
     return this.target?.battleEnded(e) ?? Promise.resolve();
   }
+  supportResolved(e: Ev<"supportResolved">): Promise<void> { return this.target?.supportResolved(e) ?? Promise.resolve(); }
   troopsHealed(e: Ev<"troopsHealed">): Promise<void> {
     return this.target?.troopsHealed(e) ?? Promise.resolve();
   }

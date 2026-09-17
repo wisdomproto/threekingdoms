@@ -52,7 +52,7 @@ export function getMovableTiles(ctx: BattleContext, state: BattleState, unitId: 
       const cost = moveCostFor(terrainAt(ctx, nx, ny), unit.moveClass);
       if (cost >= IMPASSABLE) continue;
       const next = cur.cost + cost;
-      if (next > unit.move) continue;
+      if (next > unit.move + ((unit.statuses ?? []).some(s => s.kind === "moveUp") ? 2 : 0)) continue;
       if (next < (dist.get(key(nx, ny)) ?? Infinity)) {
         dist.set(key(nx, ny), next);
         frontier.push({ x: nx, y: ny, cost: next });

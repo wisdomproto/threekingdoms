@@ -177,6 +177,8 @@ export class HighlightLayer extends Container {
         const moved = ts.preview.x !== ts.from.x || ts.preview.y !== ts.from.y;
         if (moved) this.place(ts.from, ORIGIN_TINT, ORIGIN_ALPHA);
         for (const t of ts.castTiles) this.place(t, STRATEGY_TINT, STRATEGY_ALPHA);
+        for (const t of ts.area ?? []) this.place(t, TARGET_TINT, 0.65);
+        if (ts.aim) this.place(ts.aim, CURSOR_COLOR, 0.35);
         this.placeCursor(ts.preview);
         break;
       }

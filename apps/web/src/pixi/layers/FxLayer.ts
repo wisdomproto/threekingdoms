@@ -25,7 +25,7 @@ const SHARD_GREEN = 0xa7e8b0; // 연두 파편
 
 // ── 통상공격 타격 주스 (§4 절차적, 에셋 무의존 / 순수 표현) ──────────────────
 const SLASH_MS = 200; // 슬래시 호 수명
-const SLASH_LEN = 46; // 호의 호현(chord) 길이 (px, 타일≈48)
+const SLASH_LEN = 36; // 호의 호현(chord) 길이 (px, 타일≈48)
 const SLASH_BOW = 16; // 호의 활 휘는 정도 (px)
 const SLASH_GOLD = 0xfff2c4; // 흰금빛 베기
 const PIERCE_TINT = 0x9fd8ff; // 간접(궁/포) 충격 — 차가운 청백
@@ -87,6 +87,7 @@ export class FxLayer {
     s.blendMode = "add";
     s.position.set(at.x, at.y);
     s.rotation = baseRot;
+    update(0, s); // Normalize before the first rendered frame, including hit-stop.
     this.world.addChild(s);
     return this.tweens.run(ms, (t) => update(t, s)).then(() => {
       this.world.removeChild(s);
@@ -325,7 +326,9 @@ export class FxLayer {
       s.rotation = ang;
       s.blendMode = "add";
       // 생성 시트는 고해상(수백 px) — 월드 화살 길이 ~44px(타일 미만)로 정규화
-      const k = 44 / Math.max(1, tex.width);
+      const k = 34 / Math.max(1, tex.width, tex.height);
+      s.scale.set(k);
+      s.position.set(sx, sy);
       this.world.addChild(s);
       return this.tweens.run(ms, (t) => {
         // 얕은 포물선(아치) — 중간에서 살짝 떠오른다
@@ -339,6 +342,7 @@ export class FxLayer {
     g.moveTo(-9, 0).lineTo(6, 0).stroke({ width: 2, color: 0xd8b46a, alpha: 1 });
     g.poly([9, 0, 4, -2.6, 4, 2.6]).fill({ color: 0xf3ead2 });
     g.rotation = ang;
+    g.position.set(sx, sy);
     this.world.addChild(g);
     return this.tweens.run(ms, (t) => {
       const arc = Math.sin(t * Math.PI) * Math.min(14, dist * 0.12);
@@ -362,7 +366,7 @@ export class FxLayer {
       // Normalize high-resolution art to 44 world pixels before lunge stretching.
       const img = this.playFxSprite(FX.thrust, { x: to.x, y: to.y - 8 }, SLASH_MS, (t, s) => {
         const e = easeOut(t);
-        const k = 44 / Math.max(1, s.texture.width, s.texture.height);
+        const k = 34 / Math.max(1, s.texture.width, s.texture.height);
         s.rotation = ang0;
         s.scale.set(k * (0.7 + e * 0.65), k * 0.9);
         s.alpha = t < 0.4 ? 1 : 1 - (t - 0.4) / 0.6;
@@ -372,7 +376,7 @@ export class FxLayer {
       const img = this.playFxSprite(FX.slash, { x: to.x, y: to.y - 8 }, SLASH_MS, (t, s) => {
         const e = easeOut(t);
         s.rotation = ang0 + (e - 0.5) * 0.9;          // 휘두르는 쓸기
-        s.scale.set((44 / Math.max(1, s.texture.width, s.texture.height)) * (0.8 + e * 0.5));
+        s.scale.set((34 / Math.max(1, s.texture.width, s.texture.height)) * (0.8 + e * 0.5));
         s.alpha = t < 0.35 ? 1 : 1 - (t - 0.35) / 0.65;
         if (indirect) s.tint = 0x9fd8ff;              // 간접=청백(PIERCE_TINT 톤)
       }, ang0);
@@ -436,7 +440,7 @@ export class FxLayer {
    * 묵직한 "맞았다" 신호. 월드 공간, 순수 표현, 배속 존중.
    */
   heroWeaponArc(kind: "dual" | "crescent" | "spear", from: WorldPoint, to: WorldPoint): Promise<void> {
-    return this.heroFrames(kind, { x: to.x, y: to.y - 12 }, kind === "crescent" ? 64 : 54,
+    return this.heroFrames(kind, { x: to.x, y: to.y - 12 }, kind === "crescent" ? 48 : 42,
       Math.atan2(to.y - from.y, to.x - from.x), 200)
       ?? this.slashArc(from, to, kind === "spear" ? "thrust" : "slash");
   }
@@ -480,7 +484,7 @@ export class FxLayer {
   specialImpact(hit: SpecialHit, at: WorldPoint, from: WorldPoint, weapon?: HeroWeapon | null): Promise<void> {
     for (const kind of specialFxCandidates(hit, weapon)) {
       const animation = this.heroFrames(kind, { x: at.x, y: at.y - 12 },
-        hit === "critical" ? 44 : 68,
+        hit === "critical" ? 40 : 60,
         // Both source sheets advance toward screen-right; orient the leading edge toward the target.
         kind === "ultimate-spear" || kind === "ultimate-crescent"
           ? Math.atan2(at.y - from.y, at.x - from.x) : 0,
@@ -498,6 +502,7 @@ export class FxLayer {
     sprite.position.set(at.x, at.y);
     sprite.rotation = rotation;
     sprite.blendMode = "add";
+    sprite.scale.set(size / Math.max(1, sprite.texture.width, sprite.texture.height));
     this.world.addChild(sprite);
     return this.tweens.run(duration, t => {
       sprite.texture = frames[Math.min(3, Math.floor(t * 4))]!;
@@ -537,22 +542,37 @@ export class FxLayer {
    * category(fire/water/wind/earth/heal/debuff/special)별 색·모션으로 차별화 — 미지의 카테고리는 special.
    * 데미지/회복 수치는 후속 damageDealt/troopsHealed가 처리 — 여기선 "주문이 펼쳐졌다" 연출만.
    */
-  strategyEffect(category: string, at: WorldPoint): Promise<void> {
+  strategyEffect(category: string, at: WorldPoint, tier = 1): Promise<void> {
+    tier = Math.max(1, Math.min(4, tier));
+    const size = 36 + tier * 8;
     const frames = Array.from({ length: 8 }, (_, frame) => this.textures?.getFx(`strategy-${category}-${frame}`));
     if (frames.every((frame): frame is Texture => !!frame)) {
       const sprite = new Sprite(frames[0]);
       // Preserve the atlas canvas: trimming each frame makes growing spells jump in size.
       sprite.anchor.set(0.5, category === "special" ? 0.5 : 0.86);
       sprite.position.set(at.x, at.y + (category === "special" ? -8 : 24));
-      sprite.width = 88;
-      sprite.height = 88;
+      sprite.width = size;
+      sprite.height = size;
+      const aura = new Graphics();
+      aura.position.set(at.x, at.y);
+      this.world.addChild(aura);
       this.world.addChild(sprite);
       return this.tweens.run(STRATEGY_MS, (t) => {
         sprite.texture = frames[Math.min(7, Math.floor(t * 8))]!;
+        sprite.width = size; sprite.height = size;
+        aura.clear();
+        const color = category === "fire" ? 0xffa03b : category === "heal" ? 0x8fffb5 : 0x95cfff;
+        if (tier >= 2) aura.ellipse(0, 8, (12 + tier * 3) * Math.sin(t * Math.PI), 5).stroke({color,width:1.5,alpha:1-t});
+        if (tier >= 3) for (let i=0;i<tier;i++) {
+          const angle=i*Math.PI*2/tier+t*3;
+          const x=Math.cos(angle)*15, y=Math.sin(angle)*5;
+          aura.moveTo(x,y+8).lineTo(x,y-24*Math.sin(t*Math.PI)).stroke({color,width:2,alpha:(1-t)*.7});
+        }
         sprite.alpha = Math.min(1, (1 - t) * 8);
       }).then(() => {
         this.world.removeChild(sprite);
         sprite.destroy();
+        aura.destroy();
       });
     }
     const spec = STRATEGY_FX[category] ?? STRATEGY_FX.special!;
@@ -573,7 +593,7 @@ export class FxLayer {
       parts.push({ g, ang: (i / spec.count) * Math.PI * 2 + (i % 2) * 0.5, spd: 26 + (i % 4) * 7 });
     }
 
-    const RING_R = 30;
+    const RING_R = 12 + tier * 3;
     return this.tweens
       .run(STRATEGY_MS, (t) => {
         const e = easeOut(t);

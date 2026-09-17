@@ -137,6 +137,7 @@ export type BattleEvent =
   | { type: "damageDealt"; attackerId: string; defenderId: string; damage: number; counter: boolean; hit: boolean; crit?: boolean; guarded?: boolean;
       /** 비물리 피해 출처(책략/공격아이템) — 생략=무기 타격. 연출 분기용(칼 참격 대신 술법 임팩트). */
       source?: "strategy" | "item" }
+  | { type: "supportResolved"; unitId: string; effect: "mp" | "cleanse" | "refresh"; amount: number }
   | { type: "statusApplied"; unitId: string; kind: StatusKind; turns: number }
   | { type: "statusTick"; unitId: string; kind: StatusKind; damage: number }
   | { type: "statusExpired"; unitId: string; kind: StatusKind }
@@ -144,7 +145,7 @@ export type BattleEvent =
   | { type: "weatherChanged"; weather: Weather; casterId: string }
   // 승급(§7 — 레벨 자동, 전투 중 레벨업으로 임계 돌파 시). 연출: 배너 + 스프라이트 갱신.
   | { type: "unitPromoted"; unitId: string; fromClassId: string; toClassId: string }
-  | { type: "troopsHealed"; unitId: string; amount: number }
+  | { type: "troopsHealed"; unitId: string; amount: number; strategyTier?: number }
   // 협공 발동(결정론) — surround = 대상 포위도(공격자 포함), bonusPercent = 추가피해%. 연출용.
   | { type: "flank"; attackerId: string; defenderId: string; surround: number; bonusPercent: number; participantIds?: string[] }
   // 연속공격(2중공격) 발동 — 이동력 우위로 개시 공격이 2회 타격. 연출용.

@@ -2,6 +2,7 @@ import type { GameData, UnitClass } from "@tk/data";
 import type { BattleContext, BattleState, Coord, UnitState } from "./types";
 import { areFoes } from "./types";
 import { terrainAt, unitAt } from "./movement";
+import { hasStatus } from "./status";
 import { corpsStat } from "./growth";
 
 /**
@@ -15,18 +16,18 @@ const DMG_BASE = 25; // 데미지 상수항 (조조전 + 25)
 
 /** 부대 공격력 = floor(무력/2) + 등급계수 누적성장 (← 무력, grades.atk) */
 export function attackPower(u: UnitState): number {
-  return corpsStat(u.war, u.grades.atk, u.level);
+  return Math.floor(corpsStat(u.war, u.grades.atk, u.level) * (hasStatus(u, "attackUp") ? 1.2 : 1));
 }
 /** 부대 방어력 = floor(통솔/2) + 등급계수 누적성장 (← 통솔, grades.def) */
 export function defensePower(u: UnitState): number {
-  return corpsStat(u.leadership, u.grades.def, u.level);
+  return Math.floor(corpsStat(u.leadership, u.grades.def, u.level) * (hasStatus(u, "defenseUp") ? 1.2 : 1));
 }
 /**
  * 부대 정신력 = (floor(지력/2) + 등급계수 누적성장) × 병법서 보정 (← 지력, grades.spirit).
  * bookBonus = 1 + 최고 book bonusPercent/100 (createBattle에서 산정, 없으면 1.0).
  */
 export function spiritPower(u: UnitState): number {
-  return Math.floor(corpsStat(u.intelligence, u.grades.spirit, u.level) * u.bookBonus);
+  return Math.floor(corpsStat(u.intelligence, u.grades.spirit, u.level) * u.bookBonus * (hasStatus(u, "spiritUp") ? 1.2 : 1));
 }
 /** 부대 순발력 = floor(민첩/2) + 등급계수 누적성장 (← 민첩, grades.agility). 명중/회피 입력. */
 export function agilityPower(u: UnitState): number {
@@ -246,7 +247,7 @@ export function getStrategyTargets(
   if (!u || u.retreated || !strat) return [];
   if (!(u.classId in ctx.data.unitClasses) ||
       !ctx.data.unitClasses[u.classId]!.strategies.includes(strategyId)) return [];
-  if (u.mp < strat.mp) return [];
+  if (u.mp < strat.mp || u.level < (strat.learnLevel ?? 1)) return [];
   const origin = from ?? { x: u.x, y: u.y }; // 프리뷰 이동 후 위치에서 시전 가능 판정
   const W = ctx.map.width, H = ctx.map.height;
   const out: Coord[] = [];
@@ -256,8 +257,10 @@ export function getStrategyTargets(
       const tile = { x: origin.x + dx, y: origin.y + dy };
       if (tile.x < 0 || tile.y < 0 || tile.x >= W || tile.y >= H) continue;
       const hit = strategyAoeCells(tile, strat.aoe).some((c) => {
-        const t = unitAt(state, c.x, c.y);
+        const found = unitAt(state, c.x, c.y);
+        const t = c.x === origin.x && c.y === origin.y ? u : from && found?.id === u.id ? undefined : found;
         if (!t || t.retreated) return false;
+        if (strat.support === "refresh" && (t.id === u.id || !t.acted)) return false;
         // target "enemy" = 적대 진영(camp 다름), "ally" = 같은 진영(우군 포함)
         return strat.target === "enemy" ? areFoes(t.side, u.side) : !areFoes(t.side, u.side);
       });

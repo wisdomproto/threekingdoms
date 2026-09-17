@@ -35,7 +35,9 @@ describe('Troy content on the shared battle engine',()=>{
         for (let frame=0;frame<SPRITE_CLIPS[clip].length;frame++) expect(entry?.poses).toContain(`${view}_${clip}_${frame}`);
       }
     }
-    expect(context.data.strategies).toBe(gameData.strategies);
+    for (const cls of Object.values(context.data.unitClasses)) {
+      for (const id of cls.strategies ?? []) expect(context.data.strategies[id]).toBeDefined();
+    }
     expect(context.data.unitClasses.strategist?.strategies).toContain('초열');
   });
   it('casts through the same strategy menu and BattleStore event stream',async()=>{
@@ -48,9 +50,10 @@ describe('Troy content on the shared battle engine',()=>{
     expect(store.uiState.kind).toBe('strategyMenu');
     store.dispatchUi({type:'selectStrategy',strategyId:'초열'});
     store.dispatchUi({type:'tapTile',coord:{x:11,y:13}});
+    store.dispatchUi({type:'tapTile',coord:{x:11,y:13}});
     await store.whenIdle();
     expect(store.actionLog).toContainEqual({type:'strategy',unitId:'patroclus',strategyId:'초열',target:{x:11,y:13}});
-    expect(store.committedState.units.find(u=>u.id==='patroclus')!.mp).toBe(before.mp-gameData.strategies['초열']!.mp);
+    expect(store.committedState.units.find(u=>u.id==='patroclus')!.mp).toBe(before.mp-context.data.strategies['초열']!.mp);
   });
   it('emits the shared flank and ultimate presentation events',()=>{
     const s=newBattle();

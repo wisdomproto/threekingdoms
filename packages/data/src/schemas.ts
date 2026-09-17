@@ -85,7 +85,7 @@ export const UnitClassSchema = z.object({
 export type UnitClass = z.infer<typeof UnitClassSchema>;
 
 /** 상태이상 종류 (Phase D: 부동·금책·중독. 확장: confuse/debuff 후속). */
-export const StatusKindSchema = z.enum(["poison", "seal", "immobilize", "stun"]);
+export const StatusKindSchema = z.enum(["poison", "seal", "immobilize", "stun", "attackUp", "defenseUp", "spiritUp", "moveUp"]);
 export type StatusKind = z.infer<typeof StatusKindSchema>;
 
 /** 활성 상태이상 1건 (런타임 부여분). turns = 남은 지속 턴. */
@@ -108,6 +108,9 @@ export type StatusEffect = z.infer<typeof StatusEffectSchema>;
  *                          날씨는 화계/수계 책략 위력에 곱보정(combat.weather) — "비 오면 화공 무효" 원작 문법.
  */
 export const StrategySchema = z.object({
+  learnLevel: z.number().int().min(1).max(99).optional(),
+  tier: z.number().int().min(1).max(4).optional(),
+  support: z.enum(["mp", "cleanse", "attackUp", "defenseUp", "spiritUp", "moveUp", "refresh"]).optional(),
   id: z.string(),
   name: z.string(),
   category: z.enum(["fire", "water", "earth", "wind", "heal", "debuff", "special", "weather"]),

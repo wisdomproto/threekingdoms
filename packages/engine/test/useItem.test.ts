@@ -174,8 +174,8 @@ describe("회복 책략 (heal strategy)", () => {
 
   it("화계(fire)는 회복 분기에 영향받지 않고 여전히 피해를 준다", () => {
     const s = createBattle(ctx, 1);
-    // 간옹이 적 화웅(2,5)에게 업화 — heal 분기가 아닌 데미지 분기로 동작
-    const r = applyAction(ctx, s, { type: "strategy", unitId: "간옹", strategyId: "업화", target: { x: 2, y: 5 } });
+    // 간옹이 적 화웅(2,5)에게 초열 — heal 분기가 아닌 데미지 분기로 동작
+    const r = applyAction(ctx, s, { type: "strategy", unitId: "간옹", strategyId: "초열", target: { x: 2, y: 5 } });
     expect(get(r.state, "화웅").troops).toBeLessThan(get(s, "화웅").troops);
     expect(r.events.some((e) => e.type === "damageDealt")).toBe(true);
   });

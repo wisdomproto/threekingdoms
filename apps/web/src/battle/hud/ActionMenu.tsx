@@ -66,6 +66,7 @@ const BUTTON_STYLE: CSSProperties = {
 };
 
 export interface Item {
+  detail?: string;
   key: string;
   label: string;
   accent?: string;
@@ -92,7 +93,7 @@ function Btn({ item, strategy }: { item: Item; strategy?: GameData["strategies"]
       }}
     >
       {strategy && <StrategyIcon name={strategy.name} category={strategy.category} />}
-      <span>{item.label}</span>
+      <span>{item.label}{item.detail && <small style={{display:"block",fontSize:10,opacity:.8}}>{item.detail}</small>}</span>
     </button>
   );
 }
@@ -191,7 +192,8 @@ export function itemsFor(ui: InputState, dispatch: (e: UiEvent) => void, data: G
         const s = data.strategies[id];
         return {
           key: id,
-          label: `${s?.name ?? id}(MP${s?.mp ?? "?"})`,
+          label: `${s?.name ?? id} · MP${s?.mp ?? "?"}`,
+          detail: `${s?.support ? ({mp:"MP 회복",cleanse:"상태 해제",attackUp:"공격 +20%",defenseUp:"방어 +20%",spiritUp:"정신 +20%",moveUp:"이동 +2",refresh:"재행동"}[s.support]) + " · " : ""}${["", "초급", "중급", "상급", "최상급"][s?.tier ?? 1]} Lv${s?.learnLevel ?? 1} · ${s?.aoe === "cross" ? "십자 5칸" : "단일"} · 사거리 ${s?.castRange ?? "?"}`,
           accent: "#b890ff",
           onPress: () => dispatch({ type: "selectStrategy", strategyId: id }),
         };
@@ -219,6 +221,11 @@ export function itemsFor(ui: InputState, dispatch: (e: UiEvent) => void, data: G
   // 입문 공격 확인 — [공격]/[취소]는 AttackForecast VS 카드가 갖는다. 메뉴 숨김.
   if (ui.kind === "confirmAttack") return [];
   // 표적 조준 — 취소만 (맵 칸 탭으로 대상 지정, 무효 칸 탭은 noop이므로 취소 버튼 필수)
+  if (ui.kind === "strategyTarget" && ui.aim) {
+    const aim=ui.aim;
+    return [{key:"cast",label:`시전 · ${(ui.affected ?? []).join(", ") || "대상 없음"}`,onPress:()=>dispatch({type:"tapTile",coord:aim})},
+      {key:"cancel",label:"취소",onPress:()=>dispatch({type:"cancel"})}];
+  }
   if (ui.kind === "targetSelect" || ui.kind === "strategyTarget" || ui.kind === "itemTarget") {
     return [{ key: "cancel", label: "취소", onPress: () => dispatch({ type: "cancel" }) }];
   }

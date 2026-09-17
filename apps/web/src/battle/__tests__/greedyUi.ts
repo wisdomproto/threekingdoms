@@ -54,6 +54,7 @@ export async function playGreedyToEnd(
       store.dispatchUi({ type: "menuStrategy" });
       store.dispatchUi({ type: "selectStrategy", strategyId: final.strategyId });
       store.dispatchUi({ type: "tapTile", coord: final.target });
+      store.dispatchUi({ type: "tapTile", coord: final.target }); // Confirm the area preview.
     } else if (final.type === "wait") {
       store.dispatchUi({ type: "menuWait" });
     } else throw new Error(`Unsupported UI policy action: ${final.type}`);

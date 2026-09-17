@@ -14,7 +14,7 @@ const chapterOneGroups = [...originalGroups,
 
 type SpellCategory = "fire" | "water" | "wind" | "earth" | "heal" | "debuff" | "weather" | "special";
 type Action = `spell:${SpellCategory}` | "burn" | "extinguish" | "weak" | "healthy" | "attack" | "move" | "hit" | "guard" | "flank" | "crit" | "ultimate";
-type Controls = { play(action: Action, back: boolean, generic: boolean): Promise<void>; zoom(value: number): void; speed(value: number): void };
+type Controls = { play(action: Action, back: boolean, generic: boolean, tier: number): Promise<void>; zoom(value: number): void; speed(value: number): void };
 
 /** Read-only art workbench using the actual battle UnitView/FxLayer renderers. */
 export default function BattleMotionPreview() {
@@ -25,6 +25,7 @@ export default function BattleMotionPreview() {
   const [back, setBack] = useState(false);
   const [generic, setGeneric] = useState(false);
   const [group, setGroup] = useState(0);
+  const [spellTier, setSpellTier] = useState(1);
   useEffect(() => {
     let disposed = false;
     setStatus("동작 이미지 불러오는 중…");
@@ -75,7 +76,7 @@ export default function BattleMotionPreview() {
       controls.current = {
         zoom(value) { world.scale.set(value); app.renderer.resize(864 * value, 250 * value + 50); fx.resize(Math.min(864 * value, host.current?.clientWidth ?? 864), 250 * value + 50); },
         speed(value) { speed = value; tweens.setTimeScale(value); },
-        async play(action, rear, generic) {
+        async play(action, rear, generic, tier) {
           if (action === "burn" || action === "extinguish") {
             fires.sync(action === "burn" ? [{cells: entries.flatMap((_,i)=>[{x:2+i*6,y:3},{x:3+i*6,y:3},{x:4+i*6,y:3}]),remaining:3,lastTurn:1,damagePercent:5,spread:false,extinguishInRain:true,flammableOnly:true}] : []);
             return;
@@ -86,7 +87,7 @@ export default function BattleMotionPreview() {
           }
           if (action.startsWith("spell:")) {
             const category = action.slice(6);
-            await Promise.all(units.map((unit,i) => fx.strategyEffect(category, gridToWorld({x:3+i*6,y:3}))));
+            await Promise.all(units.map((unit,i) => fx.strategyEffect(category, gridToWorld({x:3+i*6,y:3}), tier)));
             return;
           }
           if (action === "ultimate") {
@@ -151,7 +152,7 @@ export default function BattleMotionPreview() {
     if (busy || !controls.current) return;
     audio.ensureUnlocked();
     setBusy(true);
-    try { await controls.current.play(action, back, generic); }
+    try { await controls.current.play(action, back, generic, spellTier); }
     finally { setBusy(false); }
   }
   const style = { padding: "10px 16px", border: "1px solid #65735c", borderRadius: 7, background: "#263326", color: "#fff", cursor: "pointer" };
@@ -173,6 +174,7 @@ export default function BattleMotionPreview() {
       {([["attack", "공격 + 이펙트"], ["move", "이동"], ["hit", "피격"], ["guard", "막음"], ["flank", "협공"], ["crit", "치명타"], ["ultimate", "필살기"]] as const).map(([action, label]) => <button style={style} key={action} disabled={busy || !controls.current || (action === "flank" && chapterOneGroups[group]!.length < 3)} onClick={() => void play(action)}>{label}</button>)}
       <label><input type="checkbox" checked={back} disabled={busy} onChange={e => setBack(e.target.checked)}/> 후면 동작</label>
       <label><input type="checkbox" checked={generic} disabled={busy} onChange={e => setGeneric(e.target.checked)}/> 기본 필살기 비교</label>
+      <label>책략 단계 <select value={spellTier} onChange={e=>setSpellTier(Number(e.target.value))}>{[1,2,3,4].map(n=><option key={n} value={n}>{n}단계</option>)}</select></label>
       <label>확대 <select key={`zoom-${group}`} disabled={!controls.current} defaultValue="1" onChange={e => controls.current?.zoom(Number(e.target.value))}><option value="1">1배</option><option value="2">2배</option><option value="3">3배</option></select></label>
       <label>재생 속도 <select key={`speed-${group}`} disabled={!controls.current} defaultValue="1" onChange={e => controls.current?.speed(Number(e.target.value))}><option value="0.25">느리게 · 0.25배</option><option value="1">보통 · 1배</option><option value="2">빠르게 · 2배</option></select></label>
     </div>

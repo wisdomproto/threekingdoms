@@ -674,7 +674,27 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
         if (!isTarget) continue;
         // One cast uses one stat snapshot, even if an earlier AoE target grants a level.
         const caster = unit;
-        if (strat.category === "heal") {
+        if (strat.support) {
+          if (strat.support === "mp") {
+            const current = getUnit(next, t.id);
+            const amount = Math.min(strat.power, current.maxMp - current.mp);
+            next = replaceUnit(next, { ...current, mp: current.mp + amount });
+            events.push({ type: "supportResolved", unitId:t.id, effect:"mp", amount });
+          } else if (strat.support === "cleanse") {
+            const harmful = new Set(["poison", "seal", "immobilize", "stun"]);
+            const current = getUnit(next, t.id);
+            for (const status of current.statuses ?? []) if (harmful.has(status.kind)) events.push({type:"statusExpired",unitId:t.id,kind:status.kind});
+            next = replaceUnit(next, {...current, statuses:(current.statuses ?? []).filter(s=>!harmful.has(s.kind))});
+            events.push({type:"supportResolved",unitId:t.id,effect:"cleanse",amount:0});
+          } else if (strat.support === "refresh") {
+            if (t.id === unit.id || !t.acted) continue;
+            next = replaceUnit(next, {...getUnit(next,t.id),acted:false,moved:false});
+            events.push({type:"supportResolved",unitId:t.id,effect:"refresh",amount:0});
+          } else {
+            next = replaceUnit(next, {...getUnit(next,t.id),statuses:applyStatus(getUnit(next,t.id).statuses,strat.support,3)});
+            events.push({type:"statusApplied",unitId:t.id,kind:strat.support,turns:3});
+          }
+        } else if (strat.category === "heal") {
           // 회복 책략: 회복량 = power + round(시전 정신력 × power / 10), 상한 = maxTroops (결정론).
           // 정신력이 높을수록 회복 효율이 커진다 — 책사/도사 지원 가치. 화계(데미지)는 불변.
           const heal = strat.power + Math.round((spiritPower(caster) * strat.power) / 10);
@@ -682,7 +702,7 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
           next = res.state;
           // 회복도 이벤트로 서술해야 투영(presenter)이 따라온다 — 누락 시 드레인 정합 단언 실패
           // (presented<committed). 흡혈(lifesteal) 경로와 동일 계약. 실제 회복량(클램프 후)만 서술.
-          if (res.healed > 0) events.push({ type: "troopsHealed", unitId: t.id, amount: res.healed });
+          if (res.healed > 0) events.push({ type: "troopsHealed", unitId: t.id, amount: res.healed, strategyTier: strat.tier ?? 1 });
         } else {
           // 날씨 곱보정(원작 재현 — 비=화계 반감·수계 강화). 물리/기타 원소는 무영향.
           const w = ctx.data.combat.weather[next.weather ?? "clear"];

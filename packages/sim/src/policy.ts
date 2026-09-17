@@ -307,7 +307,7 @@ function healPlan(ctx: BattleContext, state: BattleState, unit: UnitState): Acti
   const heals = cls.strategies
     .map((id) => ctx.data.strategies[id])
     .filter((s): s is NonNullable<typeof s> =>
-      s != null && s.category === "heal" && s.target === "ally" && s.mp <= unit.mp,
+      s != null && !s.support && unit.level >= (s.learnLevel ?? 1) && s.category === "heal" && s.target === "ally" && s.mp <= unit.mp,
     )
     // 회복량 = power + round(정신력×power/10) — 엔진 공식과 동일 평가로 최대 회복 우선.
     .sort((a, b) =>

@@ -100,7 +100,7 @@ function ActionBtn({ item, data, mode }: { item: Item; data: GameData; mode: Inp
           <circle cx="16" cy="16" r="13" strokeOpacity=".5" />
           {item.key === "wait" ? <path d="M11 9v14M21 9v14" /> : <path d="m13 10-6 6 6 6M7 16h13q5 0 5 5" />}
         </svg>}
-      <span>{item.label}</span>
+      <span>{item.label}</span>{item.detail && <small style={{fontSize:9,lineHeight:1.2,opacity:.8}}>{item.detail}</small>}
     </button>
   );
 }
