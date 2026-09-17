@@ -24,21 +24,22 @@ const WORLD: Size = { width: 56 * TILE_SIZE, height: 32 * TILE_SIZE }; // 2688×
 const VIEW: Size = { width: 800, height: 600 };
 
 describe("tactical framing", () => {
-  it("shows eleven rows rather than reusing a desktop close-up", () => {
+  it("preserves unit size even in a short mobile viewport", () => {
     const scale = tacticalDefaultZoom(1.5, { width: 800, height: 450 });
-    expect(450 / (scale * TILE_SIZE)).toBeCloseTo(11);
-    expect(tacticalDefaultZoom(0.6, { width: 800, height: 450 })).toBe(0.6);
+    expect(scale).toBe(1.25);
+    expect(tacticalDefaultZoom(1.5, { width: 812, height: 230 })).toBe(scale);
+    expect(tacticalDefaultZoom(0.6, { width: 800, height: 450 })).toBe(1);
   });
-  it("fits movement cells between the HUD strips without zooming in", () => {
+  it("focuses the selected unit without fitting the entire movement range", () => {
     const viewport = { width: 800, height: 450 };
-    const cells = [{ x: 4, y: 4 }, { x: 11, y: 11 }];
+    const cells = [{ x: 4, y: 4 }];
     const target = selectionCameraTarget(cells, viewport, 0.85)!;
     const state = { scale: target.scale, ox: 400 - target.point.x * target.scale, oy: 225 - target.point.y * target.scale };
     expect(worldToScreen(state, { x: 4 * 48, y: 4 * 48 }).y).toBeGreaterThanOrEqual(46 - 1e-9);
-    expect(worldToScreen(state, { x: 12 * 48, y: 12 * 48 }).y).toBeLessThanOrEqual(360 + 1e-9);
-    expect(target.scale).toBeLessThanOrEqual(0.85);
+    expect(worldToScreen(state, { x: 5 * 48, y: 5 * 48 }).y).toBeLessThanOrEqual(360 + 1e-9);
+    expect(target.scale).toBe(0.85);
     expect(selectionCameraTarget([], viewport, 1)).toBeNull();
-    expect(selectionCameraTarget([{ x: 0, y: 0 }, { x: 20, y: 20 }], viewport, 0.85)!.scale).toBe(0.75);
+    expect(selectionCameraTarget([{ x: 0, y: 0 }, { x: 20, y: 20 }], viewport, 0.85)!.scale).toBe(0.85);
   });
 });
 

@@ -34,12 +34,12 @@ export interface Point {
   y: number;
 }
 
-/** Keep at least eleven rows visible in the shared mobile/desktop game frame. */
-export function tacticalDefaultZoom(requested: number, viewport: Size): number {
-  return clampZoom(Math.min(requested, viewport.height / (TILE_SIZE * 11)));
+/** Preserve readable units; a short viewport shows fewer rows instead of smaller units. */
+export function tacticalDefaultZoom(requested: number, _viewport: Size): number {
+  return clampZoom(Math.max(1, Math.min(requested, 1.25)));
 }
 
-/** Frame selectable cells clear of the HUD, without shrinking units below a readable scale. */
+/** Focus the selected unit clear of the HUD while preserving the player's zoom. */
 export function selectionCameraTarget(
   cells: readonly Point[], viewport: Size, currentScale: number,
 ): { point: Point; scale: number } | null {
@@ -48,10 +48,8 @@ export function selectionCameraTarget(
   const top = Math.min(...cells.map(p => p.y)) * TILE_SIZE;
   const width = (Math.max(...cells.map(p => p.x)) + 1) * TILE_SIZE - left;
   const height = (Math.max(...cells.map(p => p.y)) + 1) * TILE_SIZE - top;
-  const topInset = 46, bottomInset = 90, sideInset = 28;
-  const scale = clampZoom(Math.max(Math.min(currentScale, 0.75), Math.min(currentScale,
-    (viewport.width - sideInset * 2) / width,
-    (viewport.height - topInset - bottomInset) / height)));
+  const topInset = 46, bottomInset = 90;
+  const scale = clampZoom(currentScale);
   return { scale, point: {
     x: left + width / 2,
     y: top + height / 2 + (bottomInset - topInset) / (2 * scale),

@@ -1,4 +1,5 @@
 import type { Viewport } from "next";
+import Script from "next/script";
 import { AdHost } from "../src/meta/AdHost";
 import { AudioController } from "../src/audio/AudioController";
 import { GameGate } from "../src/game/GameGate";
@@ -24,6 +25,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
+      <Script src="/install-prompt.js" strategy="beforeInteractive" />
       <body>
         <GameViewport>
         <GameGate>{children}</GameGate>

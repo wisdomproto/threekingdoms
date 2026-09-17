@@ -3,7 +3,7 @@
  * 스테이지 선택 화면 — §5 시나리오 챕터/스테이지 목록.
  *
  * 해금 규칙: 첫 스테이지는 항상 해금, 그 외는 "직전 스테이지 클리어"로 해금.
- * 잠긴 스테이지 → 콤팩트 한 줄(번호+자물쇠). 해금 스테이지 → 풀 카드.
+ * 장별 목록과 모바일 카드. 잠긴 전투도 이름과 해금 조건을 읽을 수 있다.
  * 「이어하기」 배너(스펙 §7): 중단 저장본(tk.battle.suspend.v1)이 이 회차·스테이지와 맞으면 헤더 아래 표시.
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -11,18 +11,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { stages, activeGame } from "../../game/data";
 import { campaignChapters, chapterOf, stageNumber, orderedStageIds } from "../campaign";
-import type { Stage } from "@tk/data";
+import { assetUrl } from "../../assetUrl";
+import styles from "./StageSelect.module.css";
 import { getMeta, startNewGame } from "../metaStore";
 import { writeSortie } from "../sortie";
 import { clearSuspend, isResumable, readSuspend, type SuspendedBattle } from "../../battle/suspend";
-
-const INK = "#17130f";
-const INK_DEEP = "#0c0a07";
-const GOLD = "#cdab6e";
-const GOLD_DIM = "#8a7350";
-const GOLD_GLOW = "rgba(205,171,110,0.18)";
-const PARCHMENT = "#e8dcc0";
-const MUTED = "#5a5142";
 
 const MISSION_TAGS: [RegExp, string][] = [
   [/탈출|철수/, "탈출전"],
@@ -42,6 +35,8 @@ function missionTag(name: string): string {
 
 export function StageSelect(): React.ReactElement {
   const router = useRouter();
+  const [selectedStage, setSelectedStage] = useState<string | null>(null);
+  const [chapter, setChapter] = useState<number | null>(null);
   const [cleared, setCleared] = useState<string[]>([]);
   const [gold, setGold] = useState(0);
   const [playthroughCount, setPlaythroughCount] = useState(0);
@@ -96,374 +91,89 @@ export function StageSelect(): React.ReactElement {
 
   const allCleared = ordered.length > 0 && ordered.every((s) => clearedSet.has(s.id));
 
-  return (
-    <section
-      style={{
-        minHeight: "100svh",
-        background: `radial-gradient(ellipse 160% 80% at 50% -10%, #2a1f0e 0%, ${INK_DEEP} 60%)`,
-        color: PARCHMENT,
-        padding: "0 0 60px",
-        boxSizing: "border-box",
-        fontFamily: '"Noto Serif KR", "Nanum Myeongjo", serif',
-      }}
-    >
-      {/* ── 상단 바 ── */}
-      <header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 12,
-          maxWidth: 720,
-          margin: "0 auto",
-          padding: "14px 16px 12px",
-          borderBottom: "1px solid rgba(205,171,110,0.12)",
-        }}
-      >
-        <Link href="/play/samgukji" style={{ color: GOLD_DIM, fontSize: 13, textDecoration: "none" }}>
-          ◀ 타이틀
-        </Link>
-        <h1 style={{ margin: 0, fontSize: 17, letterSpacing: "0.25em", color: GOLD }}>
-          출진할 전장
-        </h1>
-        <span style={{ display: "flex", alignItems: "center", gap: 14, whiteSpace: "nowrap" }}>
-          {(["기연", "도감", "세이브"] as const).map((label, i) => (
-            <Link
-              key={label}
-              href={["/serendipity", "/codex", "/save"][i]!}
-              style={{ color: GOLD_DIM, fontSize: 13, textDecoration: "none" }}
-            >
-              {label}
-            </Link>
-          ))}
-          <span style={{ fontSize: 13, color: GOLD }}>
-            {gold.toLocaleString()}<span style={{ color: GOLD_DIM }}> 金</span>
-          </span>
-        </span>
+  const next = ordered.find(s => unlocked.get(s.id) && !clearedSet.has(s.id)) ?? ordered.at(-1);
+  const current = grouped.find(ch => ch.chapter === chapter)
+    ?? grouped.find(ch => ch.list.some(s => s.id === next?.id)) ?? grouped[0];
+  const selected = current?.list.find(s=>s.id===selectedStage) ?? current?.list.find(s=>s.id===next?.id) ?? current?.list[0];
+  const selectedOpen = selected ? unlocked.get(selected.id) ?? false : false;
+  const completed = ordered.filter(s => clearedSet.has(s.id)).length;
+
+  return <section className={styles.shell}>
+    <div className={styles.frame}>
+      <img key={current?.chapter} className={styles.backdrop} src={assetUrl(`/assets/scenes/${current?.list[0]?.id ?? "01-zhuojun"}-intro.webp`)} alt="" onError={e=>{e.currentTarget.style.display="none";}} />
+      <header className={styles.header}>
+        <Link className={styles.back} href="/play/samgukji" aria-label="타이틀로 돌아가기">← <span>타이틀</span></Link>
+        <h1>전장 선택</h1>
+        <span className={styles.gold}>자금 <strong>{gold.toLocaleString()}</strong> 금</span>
+        <nav className={styles.utilities} aria-label="게임 메뉴">
+          <Link href="/serendipity">기연</Link><Link href="/codex">도감</Link><Link href="/save">세이브</Link>
+        </nav>
       </header>
-
-      {/* ── 이어하기 배너 — 중단 저장본이 있을 때만 ── */}
-      {suspended && (
-        <div style={{ maxWidth: 720, margin: "0 auto", padding: "14px 12px 0", display: "flex", gap: 8, alignItems: "stretch" }}>
-          <button
-            type="button"
-            data-testid="resume-battle"
-            onClick={() => resume(suspended)}
-            style={{
-              flex: 1, padding: "12px 14px", borderRadius: 8, textAlign: "left",
-              border: `1px solid ${GOLD}99`, background: "rgba(50,38,12,0.7)",
-              color: GOLD, fontSize: 14, fontWeight: 700, letterSpacing: "0.04em",
-              cursor: "pointer", fontFamily: "inherit",
-              boxShadow: `0 2px 18px rgba(205,171,110,0.15)`,
-            }}
-          >
-            이어하기 — {stages[suspended.stageId]?.name ?? suspended.stageId} · {suspended.turn}턴 · {savedAtLabel(suspended.savedAt)}
-          </button>
-          <button
-            type="button"
-            onClick={() => { clearSuspend(); reload(); }}
-            aria-label="저장본 지우기"
-            style={{
-              padding: "0 12px", borderRadius: 8,
-              border: "1px solid #2c2620", background: "rgba(20,18,14,0.5)",
-              color: GOLD_DIM, fontSize: 12, cursor: "pointer", fontFamily: "inherit",
-            }}
-          >
-            지우기
-          </button>
-        </div>
-      )}
-
-      {/* ── 챕터 목록 ── */}
-      <div style={{ maxWidth: 720, margin: "0 auto", padding: "6px 12px 0" }}>
-        {grouped.map((ch) => {
-          const hasAny = ch.list.length > 0;
-          const hasUnlocked = ch.list.some((s) => unlocked.get(s.id));
-          return (
-            <div key={ch.chapter} style={{ marginTop: 20 }}>
-              <ChapterHeading
-                chapter={ch.chapter}
-                title={ch.title}
-                active={hasUnlocked}
-                clearedCount={ch.list.filter((s) => clearedSet.has(s.id)).length}
-                totalCount={ch.list.length}
-              />
-              {!hasAny ? (
-                <p style={{ margin: "6px 0 0 4px", fontSize: 11, color: MUTED }}>준비 중</p>
-              ) : (
-                <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 5 }}>
-                  {ch.list.map((s) => {
-                    const isUnlocked = unlocked.get(s.id) ?? false;
-                    const isCleared = clearedSet.has(s.id);
-                    return isUnlocked ? (
-                      <FullCard key={s.id} stage={s} cleared={isCleared} />
-                    ) : (
-                      <LockedRow key={s.id} stage={s} />
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
-
-        {/* 2회차 */}
-        {allCleared && (
-          <div
-            style={{
-              marginTop: 28,
-              padding: "18px 16px",
-              borderRadius: 8,
-              border: `1px solid ${GOLD}55`,
-              background: "rgba(40,30,12,0.7)",
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-            }}
-          >
-            <div style={{ fontSize: 15, fontWeight: 800, color: GOLD }}>
-              {playthroughCount > 0 ? `${playthroughCount + 1}회차 시작` : "2회차 시작"}
-            </div>
-            <div style={{ fontSize: 12, color: GOLD_DIM, lineHeight: 1.6 }}>
-              보물·자금 일부를 계승하고 적이 강해집니다. 레벨·편성·장비는 초기화됩니다.
-            </div>
-            {confirmNg ? (
-              <div style={{ display: "flex", gap: 10 }}>
-                <button
-                  type="button"
-                  onClick={() => { startNewGame(); reload(); }}
-                  style={{
-                    flex: 1, padding: "10px 0", borderRadius: 6,
-                    border: "1px solid #e06c3a", background: "rgba(80,30,10,0.7)",
-                    color: "#f0b080", fontSize: 14, fontWeight: 700, cursor: "pointer",
-                  }}
-                >확인 — 시작</button>
-                <button
-                  type="button"
-                  onClick={() => setConfirmNg(false)}
-                  style={{
-                    flex: 1, padding: "10px 0", borderRadius: 6,
-                    border: "1px solid #2c2620", background: "rgba(20,18,14,0.5)",
-                    color: GOLD_DIM, fontSize: 14, cursor: "pointer",
-                  }}
-                >취소</button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setConfirmNg(true)}
-                style={{
-                  padding: "10px 0", borderRadius: 6,
-                  border: `1px solid ${GOLD}77`,
-                  background: "rgba(50,38,12,0.7)",
-                  color: GOLD, fontSize: 14, fontWeight: 700, cursor: "pointer",
-                }}
-              >
-                {playthroughCount > 0 ? `${playthroughCount + 1}회차 도전` : "2회차 도전"}
-              </button>
-            )}
+      <div className={styles.body}>
+        <aside className={styles.chapters}>
+          <div className={styles.journey}><span>삼국지 여정</span><strong>{completed}<small> / {ordered.length} 전투</small></strong>
+            <progress aria-label="전체 전투 진행도" value={completed} max={Math.max(1, ordered.length)} />
           </div>
-        )}
+          <nav className={styles.chapterList} aria-label="장 선택">
+            {grouped.map(ch => <button type="button" key={ch.chapter} aria-current={current?.chapter === ch.chapter ? "true" : undefined}
+              onClick={() => setChapter(ch.chapter)} className={styles.chapter}>
+              <span className={styles.chapterNumber}>{String(ch.chapter).padStart(2,"0")}</span>
+              <span><strong>{ch.title}</strong><small>{ch.list.filter(s => clearedSet.has(s.id)).length} / {ch.list.length} 완료</small></span>
+              <span className={styles.chevron} aria-hidden>›</span>
+            </button>)}
+          </nav>
+        </aside>
+        <div className={styles.content}>
+          {suspended && <div className={styles.resume}>
+            <button type="button" data-testid="resume-battle" onClick={() => resume(suspended)}>
+              <strong>중단한 전투 이어하기 →</strong><span>{stages[suspended.stageId]?.name ?? suspended.stageId} · {suspended.turn}턴 · {savedAtLabel(suspended.savedAt)}</span>
+            </button>
+            <button type="button" aria-label="저장본 지우기" onClick={() => {clearSuspend(); reload();}}>지우기</button>
+          </div>}
+          {current && <>
+            <div className={styles.chapterTitle}><div><span className={styles.chapterSeal}>제 {current.chapter} 장 · 연의</span><h2>{current.title}</h2><p>이야기를 따라, 다음 전장으로.</p></div>
+              <span className={styles.chapterProgress}>{current.list.filter(s=>clearedSet.has(s.id)).length} / {current.list.length}<small>전투 완료</small></span></div>
+            <div className={styles.missions}><div className={styles.stageList}>
+              {current.list.map((stage, i) => {
+                const open = unlocked.get(stage.id) ?? false;
+                const done = clearedSet.has(stage.id);
+                const featured = stage.id === next?.id;
+                const inside = <>
+                  <img className={styles.art} src={assetUrl(`/assets/maps/${stage.mapId}.webp`)} alt="" loading="lazy" onError={e=>{e.currentTarget.style.display="none";}} />
+                  <span className={styles.stageNumber}>{String(i+1).padStart(2,"0")}</span>
+                  <span className={styles.stageInfo}><small>{done ? "완료" : open ? "출전 가능" : "미해금"} · {missionTag(stage.name)}</small>
+                    <strong>{stage.name}</strong>
+                    <span>{open ? `승리 보상 ${stage.reward?.gold ?? 0} 금${stage.reward?.treasures.length ? ` · 보물 ${stage.reward.treasures.length}종` : ""}` : "이전 전투를 완료하면 열립니다"}</span>
+                  </span>
+                  <span className={styles.action}>{done ? "완료 ✓" : open ? "선택 ›" : "잠김"}</span>
+                </>;
+                return <button type="button" key={stage.id} aria-pressed={selected?.id===stage.id} onClick={()=>setSelectedStage(stage.id)}
+                  className={`${styles.stage} ${featured ? styles.featured : ""} ${done ? styles.completed : open ? styles.available : styles.locked}`}>{inside}</button>;
+              })}
+            </div>
+            {selected && <section className={styles.missionDetail} aria-label="선택한 전투 정보">
+              <div className={styles.detailArt}><img key={selected.id} src={assetUrl(`/assets/maps/${selected.mapId}.webp`)} alt={`${selected.name} 전장`} onError={e=>{e.currentTarget.style.visibility="hidden";}} /><span>{missionTag(selected.name)}</span></div>
+              <div className={styles.detailBody}><small>{clearedSet.has(selected.id) ? "완료한 전투" : selectedOpen ? "다음 여정" : "아직 열리지 않은 전투"}</small>
+                <h3>{selected.name}</h3><p>{selectedOpen ? "이야기와 함께 전장으로 향합니다. 출전 전 장수와 장비를 준비하세요." : "이전 전투를 완료하면 이 이야기가 열립니다."}</p>
+                <div className={styles.reward}><span>승리 보상</span><strong>{selected.reward?.gold ?? 0}<small> 금</small></strong>{!!selected.reward?.treasures.length && <span>보물 {selected.reward.treasures.length}종</span>}</div>
+                {selectedOpen ? <Link className={styles.enter} href={{pathname:"/scene",query:{stage:selected.id,type:"intro"}}}>{clearedSet.has(selected.id) ? "다시 출전" : "이야기 시작"}<span aria-hidden>→</span></Link> : <button className={styles.enter} disabled>이전 전투 완료 후 입장</button>}
+              </div>
+            </section>}
+            </div>
+            {current.list.length === 0 && <p>이 장의 전투는 준비 중입니다.</p>}
+          </>}
+          {allCleared && <section className={styles.newGame}><h2>{playthroughCount > 0 ? playthroughCount+1 : 2}회차 도전</h2>
+            <p>보물·자금 일부를 계승하고 적이 강해집니다. 레벨·편성·장비는 초기화됩니다.</p>
+            {confirmNg ? <><button onClick={()=>{startNewGame();reload();setChapter(null);}}>확인 — 시작</button><button onClick={()=>setConfirmNg(false)}>취소</button></> : <button onClick={()=>setConfirmNg(true)}>새 회차 시작</button>}
+          </section>}
+          <p className={styles.hint}>전투를 선택하면 이야기를 보고 출전을 준비합니다.</p>
+        </div>
       </div>
-    </section>
-  );
+    </div>
+  </section>;
 }
 
-/** 저장 시각 HH:MM (ISO 파싱 실패 시 빈 문자열). */
 function savedAtLabel(iso: string): string {
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-}
-
-/** 챕터 구분 헤더 — active(해금 스테이지 있는 챕터)는 더 밝게. */
-function ChapterHeading({ chapter, title, active, clearedCount, totalCount }: {
-  chapter: number; title: string; active: boolean;
-  clearedCount: number; totalCount: number;
-}): React.ReactElement {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 0 6px" }}>
-      {/* 좌측 수직 accent 선 */}
-      <div style={{
-        width: 4, height: 44, borderRadius: 2, flexShrink: 0,
-        background: active ? GOLD : "#2c2620",
-        boxShadow: active ? `0 0 10px ${GOLD}88` : "none",
-      }} />
-      {/* 챕터 번호 */}
-      <span style={{
-        fontSize: 10, fontWeight: 700, letterSpacing: "0.15em",
-        color: active ? GOLD : MUTED,
-        border: `1px solid ${active ? GOLD + "55" : "#2c2620"}`,
-        borderRadius: 3, padding: "2px 7px", whiteSpace: "nowrap",
-        background: active ? GOLD_GLOW : "transparent",
-        flexShrink: 0,
-      }}>
-        제 {chapter} 장
-      </span>
-      {/* 챕터 제목 */}
-      <span style={{
-        fontSize: active ? 19 : 14,
-        fontWeight: active ? 700 : 400,
-        color: active ? PARCHMENT : MUTED,
-        letterSpacing: "0.06em",
-        flex: 1,
-      }}>
-        {title}
-      </span>
-      {/* 진행도 */}
-      <span style={{
-        fontSize: 11, color: clearedCount === totalCount ? "#6aaa50" : GOLD_DIM,
-        fontWeight: 600, whiteSpace: "nowrap",
-      }}>
-        {clearedCount}/{totalCount}
-      </span>
-    </div>
-  );
-}
-
-/** 해금된 스테이지 — 풀 히어로 카드. */
-function FullCard({ stage, cleared }: { stage: Stage; cleared: boolean }): React.ReactElement {
-  const num = stageNumber(stage.id);
-  const reward = stage.reward;
-  const tag = missionTag(stage.name);
-
-  const card = (
-    <div style={{
-      position: "relative",
-      display: "flex",
-      alignItems: "center",
-      gap: 16,
-      padding: "18px 18px 18px 0",
-      borderRadius: 8,
-      border: cleared ? `1px solid ${GOLD}30` : `1px solid ${GOLD}80`,
-      background: cleared
-        ? "linear-gradient(135deg, rgba(20,28,14,0.95), rgba(13,18,9,0.95))"
-        : `linear-gradient(100deg, rgba(55,40,10,0.98) 0%, rgba(30,22,6,0.95) 100%)`,
-      boxShadow: cleared
-        ? "none"
-        : `0 2px 24px rgba(205,171,110,0.15), inset 0 1px 0 rgba(205,171,110,0.12)`,
-      cursor: "pointer",
-      overflow: "hidden",
-    }}>
-      {/* 좌측 강조 스트라이프 */}
-      <div style={{
-        width: 5, alignSelf: "stretch", flexShrink: 0,
-        background: cleared
-          ? "linear-gradient(to bottom, #5a9a45, #3a6a28)"
-          : `linear-gradient(to bottom, ${GOLD}, #9a7a3a)`,
-        borderRadius: "8px 0 0 8px",
-        marginLeft: 0,
-      }} />
-
-      {/* 번호 블록 */}
-      <div style={{
-        display: "flex", flexDirection: "column", alignItems: "center",
-        justifyContent: "center", gap: 4, flexShrink: 0, width: 52,
-      }}>
-        <span style={{
-          fontSize: 28, fontWeight: 900, lineHeight: 1, letterSpacing: "-0.03em",
-          color: cleared ? "#6aaa50" : GOLD,
-          textShadow: cleared ? "none" : `0 0 18px ${GOLD}88`,
-        }}>
-          {String(num).padStart(2, "0")}
-        </span>
-        <span style={{
-          fontSize: 9, fontWeight: 700, letterSpacing: "0.08em",
-          color: cleared ? "#4a8a38" : "#8a6a30",
-          border: `1px solid ${cleared ? "#3a6028" : "#6a5020"}`,
-          borderRadius: 3, padding: "1px 5px",
-          background: cleared ? "rgba(40,70,25,0.5)" : "rgba(60,45,10,0.6)",
-        }}>
-          {tag}
-        </span>
-      </div>
-
-      {/* 구분선 */}
-      <span aria-hidden style={{
-        width: 1, alignSelf: "stretch",
-        background: cleared
-          ? "linear-gradient(to bottom, transparent, #2a3820, transparent)"
-          : `linear-gradient(to bottom, transparent, #4a3810, transparent)`,
-        flexShrink: 0,
-      }} />
-
-      {/* 스테이지 정보 */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <span style={{
-            fontSize: 18, fontWeight: 700,
-            color: cleared ? "#a8c898" : PARCHMENT,
-            letterSpacing: "0.04em",
-          }}>
-            {stage.name}
-          </span>
-          {cleared && (
-            <span style={{
-              fontSize: 10, color: "#6aaa50",
-              border: "1px solid #3a5e28", borderRadius: 3,
-              padding: "1px 6px", letterSpacing: "0.1em",
-              background: "rgba(40,70,25,0.4)",
-            }}>✓ 클리어</span>
-          )}
-        </div>
-        {reward && (
-          <div style={{ fontSize: 11, color: cleared ? "#4a6a38" : GOLD_DIM, marginTop: 5 }}>
-            클리어 보상 <strong style={{ color: cleared ? "#5a8045" : GOLD }}>{reward.gold}</strong> 金
-            {reward.treasures.length > 0 && (
-              <span style={{ color: cleared ? "#4a6a38" : "#b09040" }}>
-                {" "}· 보물 {reward.treasures.length}종
-              </span>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* CTA 버튼 */}
-      <div style={{
-        flexShrink: 0,
-        padding: "8px 16px",
-        borderRadius: 6,
-        border: `1px solid ${cleared ? GOLD_DIM + "66" : GOLD + "99"}`,
-        background: cleared ? "rgba(30,25,10,0.6)" : `rgba(80,58,10,0.7)`,
-        fontSize: 13, fontWeight: 700, letterSpacing: "0.08em",
-        color: cleared ? GOLD_DIM : GOLD,
-        textShadow: cleared ? "none" : `0 0 12px ${GOLD}88`,
-      }}>
-        {cleared ? "재도전 ▶" : "출진 ▶"}
-      </div>
-    </div>
-  );
-
-  return (
-    <Link href={{ pathname: "/scene", query: { stage: stage.id, type: "intro" } }}
-      style={{ textDecoration: "none", display: "block" }}>
-      {card}
-    </Link>
-  );
-}
-
-/** 잠긴 스테이지 — 초소형 한 줄. */
-function LockedRow({ stage }: { stage: Stage }): React.ReactElement {
-  const num = stageNumber(stage.id);
-  return (
-    <div aria-disabled style={{
-      display: "flex", alignItems: "center", gap: 10,
-      padding: "5px 14px 5px 10px", borderRadius: 4,
-      border: "1px solid #1a1712",
-      background: "rgba(10,8,6,0.5)",
-      cursor: "not-allowed",
-    }}>
-      <span style={{ fontSize: 11, fontWeight: 700, color: "#2a2218", minWidth: 22, textAlign: "center" }}>
-        {String(num).padStart(2, "0")}
-      </span>
-      <span style={{ fontSize: 10, color: "#2a2218" }}>🔒</span>
-      <span style={{
-        fontSize: 11, color: "#3a3028",
-        filter: "blur(3px)", userSelect: "none",
-        flex: 1, letterSpacing: "0.04em",
-      }}>
-        {stage.name}
-      </span>
-    </div>
-  );
+  return Number.isNaN(d.getTime()) ? "" : `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
 }

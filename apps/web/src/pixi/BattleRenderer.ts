@@ -474,7 +474,8 @@ export class BattleRenderer implements Presenter {
       const ui = store.uiState;
       const selection = ui.kind === "selected" ? ui.unitId : null;
       if (ui.kind === "selected" && selection !== framedSelection) {
-        const target = selectionCameraTarget(ui.movable, app.screen, camera.current.scale);
+        const selectedUnit = store.committedState.units.find(unit => unit.id === ui.unitId);
+        const target = selectionCameraTarget(selectedUnit ? [selectedUnit] : ui.movable, app.screen, camera.current.scale);
         if (target) camera.focusOn(target.point, 260, target.scale);
       }
       framedSelection = selection;

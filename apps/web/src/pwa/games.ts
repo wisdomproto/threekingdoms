@@ -7,7 +7,7 @@ export function gameManifest(game: InstallableGame) {
   const entry = installableGames[game];
   return {
     id: `/play/${game}`, name: entry.name, short_name: entry.shortName,
-    start_url: `/play/${game}`, scope: "/", display: "standalone", lang: "ko",
+    start_url: `/play/${game}`, scope: "/", display: "standalone", orientation: "landscape", lang: "ko",
     background_color: entry.color, theme_color: entry.color,
     icons: [192, 512].map(size => ({ src: `/api/pwa/icon?game=${game}&size=${size}`, sizes: `${size}x${size}`, type: "image/png", purpose: "any maskable" })),
   };

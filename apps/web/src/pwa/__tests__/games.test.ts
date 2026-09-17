@@ -9,6 +9,7 @@ describe("game installation identity", () => {
     for (const m of [a,b]) {
       expect(m.scope).toBe("/");
       expect(m.display).toBe("standalone");
+      expect(m.orientation).toBe("landscape");
       expect(m.icons.map(i=>i.sizes)).toEqual(["192x192","512x512"]);
     }
   });

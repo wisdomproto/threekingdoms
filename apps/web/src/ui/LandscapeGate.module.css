@@ -1,0 +1,8 @@
+.gate { position: fixed; inset: 0; z-index: 2147483000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: max(24px, env(safe-area-inset-top)) 28px; box-sizing: border-box; background: radial-gradient(ellipse at top, #28494a, #0d2024 75%); color: #fff2d3; text-align: center; font-family: sans-serif; }
+.gate h1 { font-size: 24px; margin: 28px 0 12px; }
+.gate p { max-width: 340px; line-height: 1.7; color: #c6d6d1; }
+.gate button { min-height: 52px; padding: 12px 30px; margin-top: 20px; border: 1px solid #f8dc99; border-radius: 12px; background: linear-gradient(#f4db9c, #c99e50); color: #302315; font-size: 18px; font-weight: 700; cursor: pointer; }
+.phone { width: 88px; height: 48px; border: 3px solid #d7b76f; border-radius: 10px; font-size: 40px; line-height: 48px; }
+.fullscreen { position: fixed; z-index: 900; top: max(8px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); min-height: 44px; padding: 8px 16px; border: 1px solid #d7b76f; border-radius: 8px; background: #12282ee8; color: #fff1cf; font: bold 14px sans-serif; }
+.hint { position: fixed; z-index: 901; top: 50px; left: 20%; right: 20%; padding: 12px; background: #12282e; color: #fff; font: 14px/1.5 sans-serif; border-radius: 8px; }
+.hint button { min-width: 44px; min-height: 44px; background: transparent; color: white; border: 0; font-size: 24px; }
