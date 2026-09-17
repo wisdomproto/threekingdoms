@@ -45,11 +45,24 @@ export const SERENDIPITY_COMMON: WeightedReward[] = [
   { weight: 6, reward: { kind: "item", itemId: "화룡서" } }, // 공격 소모품(화공)
 ];
 
-/** rare 풀 — 기연 전용 경미 보물(약한 고정효과). items.json `qiyuan-*`와 1:1. */
-export const SERENDIPITY_RARE: { itemId: string }[] = [
-  { itemId: "qiyuan-charm" }, // 기연의 부적 — 방어 +5%
-  { itemId: "qiyuan-token" }, // 여정의 호패 — 기동 +1
-  { itemId: "qiyuan-relic" }, // 노승의 염주 — 정신 +5%
+/** Treasure pool: four items per grade, weights 40/35/20/5 within the treasure roll. */
+export const SERENDIPITY_RARE: { itemId: string; weight: number }[] = [
+  { itemId: "qiyuan-copper-ring", weight: 40 },
+  { itemId: "qiyuan-cloth-knot", weight: 40 },
+  { itemId: "qiyuan-bamboo-notes", weight: 40 },
+  { itemId: "qiyuan-travel-pouch", weight: 40 },
+  { itemId: "qiyuan-charm", weight: 35 },
+  { itemId: "qiyuan-relic", weight: 35 },
+  { itemId: "qiyuan-blade-knot", weight: 35 },
+  { itemId: "qiyuan-jade-clasp", weight: 35 },
+  { itemId: "qiyuan-token", weight: 20 },
+  { itemId: "qiyuan-war-drum", weight: 20 },
+  { itemId: "qiyuan-iron-mirror", weight: 20 },
+  { itemId: "qiyuan-scholar-seal", weight: 20 },
+  { itemId: "qiyuan-tiger-tally", weight: 5 },
+  { itemId: "qiyuan-phoenix-scroll", weight: 5 },
+  { itemId: "qiyuan-tortoise-jade", weight: 5 },
+  { itemId: "qiyuan-cloud-compass", weight: 5 },
 ];
 
 /**
@@ -112,7 +125,7 @@ export function rollSerendipity(pity: number, rng: () => number): PullOutcome {
   const isRare = forced || rng() < RARE_CHANCE;
   if (isRare) {
     const rare = weightedPick(
-      SERENDIPITY_RARE.map((r) => ({ weight: 1, value: r })),
+      SERENDIPITY_RARE.map((r) => ({ weight: r.weight, value: r })),
       rng(),
     );
     return { reward: { kind: "item", itemId: rare.itemId }, nextPity: 0, wasRare: true };

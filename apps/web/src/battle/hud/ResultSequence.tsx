@@ -818,11 +818,11 @@ export function ResultSequence({
           {/* 기연 포인트 적립(§12) — 막간 기연 뽑기 자원. 자금 줄 아래 한 줄. */}
           {serendipityPts > 0 && (
             <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, marginTop: 2 }}>
-              <span style={{ color: "#b3a78c", fontSize: 13 }}>기연</span>
+              <span style={{ color: "#b3a78c", fontSize: 13 }}>뽑기 포인트</span>
               <span style={{ color: "#b890ff", fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>
                 +{serendipityPts}
               </span>
-              <span style={{ color: "#6f6688", fontSize: 11 }}>奇緣</span>
+              <span style={{ color: "#6f6688", fontSize: 11 }}>P</span>
             </div>
           )}
         </Reveal>

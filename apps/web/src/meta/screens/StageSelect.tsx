@@ -106,7 +106,7 @@ export function StageSelect(): React.ReactElement {
         <h1>전장 선택</h1>
         <span className={styles.gold}>자금 <strong>{gold.toLocaleString()}</strong> 금</span>
         <nav className={styles.utilities} aria-label="게임 메뉴">
-          <Link href="/serendipity">기연</Link><Link href="/codex">도감</Link><Link href="/save">세이브</Link>
+          <Link href="/serendipity">보물 뽑기</Link><Link href="/codex">도감</Link><Link href="/save">세이브</Link>
         </nav>
       </header>
       <div className={styles.body}>

@@ -10,7 +10,7 @@ export let activeGame: GameSnapshot | null = null;
 export function installGame(snapshot: unknown | null): void {
   activeGame = snapshot === null ? null : GameSnapshotSchema.parse(snapshot);
   gameData = activeGame ? { ...baseData, stages: activeGame.stages, maps: activeGame.maps,
-    commanders: activeGame.commanders, rosters: activeGame.rosters, items: activeGame.items } : baseData;
+    commanders: activeGame.commanders, rosters: activeGame.rosters, items: { ...Object.fromEntries(Object.entries(baseData.items).filter(([id]) => id.startsWith("qiyuan-"))), ...activeGame.items } } : baseData;
   installAssetBindings(activeGame?.assetBindings);
   stages = gameData.stages;
 }

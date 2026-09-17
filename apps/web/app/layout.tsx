@@ -25,7 +25,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <Script src="/install-prompt.js" strategy="beforeInteractive" />
+      <head>
+        <Script src="/install-prompt.js" strategy="beforeInteractive" />
+      </head>
       <body>
         <GameViewport>
         <GameGate>{children}</GameGate>

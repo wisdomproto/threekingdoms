@@ -18,6 +18,7 @@ const CATEGORY_FALLBACK: Record<string, { sym: string; color: string }> = {
   book: { sym: "✦", color: "#b890ff" },
   horse: { sym: "♞", color: "#cdab6e" },
 };
+const VECTOR_ITEMS = new Set(["qiyuan-copper-ring", "qiyuan-cloth-knot", "qiyuan-bamboo-notes", "qiyuan-travel-pouch", "qiyuan-blade-knot", "qiyuan-jade-clasp", "qiyuan-war-drum", "qiyuan-iron-mirror", "qiyuan-scholar-seal", "qiyuan-tiger-tally", "qiyuan-phoenix-scroll", "qiyuan-tortoise-jade", "qiyuan-cloud-compass"]);
 const DEFAULT_FALLBACK = { sym: "▪", color: "#cdab6e" };
 
 export function ItemIcon({
@@ -69,7 +70,7 @@ export function ItemIcon({
     <div style={box}>
       <img
         ref={imgRef}
-        src={assetUrl(`/assets/ui/items/${encodeURIComponent(itemId)}.webp`)}
+        src={assetUrl(`/assets/ui/items/${encodeURIComponent(itemId)}.${VECTOR_ITEMS.has(itemId) ? "svg" : "webp"}`)}
         alt=""
         onError={() => setFailed(true)}
         style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}

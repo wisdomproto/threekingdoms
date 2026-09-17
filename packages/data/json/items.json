@@ -1,4 +1,140 @@
 {
+  "qiyuan-copper-ring": {
+    "id": "qiyuan-copper-ring",
+    "name": "동제 가락지",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": {
+      "atkPercent": 3
+    }
+  },
+  "qiyuan-cloth-knot": {
+    "id": "qiyuan-cloth-knot",
+    "name": "평안 매듭",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": {
+      "defensePercent": 3
+    }
+  },
+  "qiyuan-bamboo-notes": {
+    "id": "qiyuan-bamboo-notes",
+    "name": "죽간 필기",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": {
+      "spiritPercent": 3
+    }
+  },
+  "qiyuan-travel-pouch": {
+    "id": "qiyuan-travel-pouch",
+    "name": "행군 향낭",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": {
+      "atkPercent": 2,
+      "defensePercent": 2
+    }
+  },
+  "qiyuan-blade-knot": {
+    "id": "qiyuan-blade-knot",
+    "name": "용기 검수",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": {
+      "atkPercent": 5
+    }
+  },
+  "qiyuan-jade-clasp": {
+    "id": "qiyuan-jade-clasp",
+    "name": "청옥 패식",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": {
+      "atkPercent": 3,
+      "defensePercent": 3
+    }
+  },
+  "qiyuan-war-drum": {
+    "id": "qiyuan-war-drum",
+    "name": "진군 소고",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": {
+      "atkPercent": 10
+    }
+  },
+  "qiyuan-iron-mirror": {
+    "id": "qiyuan-iron-mirror",
+    "name": "호신 철경",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": {
+      "defensePercent": 10
+    }
+  },
+  "qiyuan-scholar-seal": {
+    "id": "qiyuan-scholar-seal",
+    "name": "명사 인장",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": {
+      "spiritPercent": 10
+    }
+  },
+  "qiyuan-tiger-tally": {
+    "id": "qiyuan-tiger-tally",
+    "name": "백호 병부",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": {
+      "atkPercent": 8,
+      "defensePercent": 8
+    }
+  },
+  "qiyuan-phoenix-scroll": {
+    "id": "qiyuan-phoenix-scroll",
+    "name": "봉황 비권",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": {
+      "atkPercent": 8,
+      "spiritPercent": 8
+    }
+  },
+  "qiyuan-tortoise-jade": {
+    "id": "qiyuan-tortoise-jade",
+    "name": "현무 옥패",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": {
+      "defensePercent": 8,
+      "spiritPercent": 8
+    }
+  },
+  "qiyuan-cloud-compass": {
+    "id": "qiyuan-cloud-compass",
+    "name": "운유 나침반",
+    "category": "treasure",
+    "power": 255,
+    "bonusPercent": 0,
+    "effects": {
+      "move": 1,
+      "spiritPercent": 5
+    }
+  },
   "qiyuan-charm": {
     "id": "qiyuan-charm",
     "name": "기연의 부적",

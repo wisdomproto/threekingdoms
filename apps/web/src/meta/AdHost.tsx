@@ -30,7 +30,7 @@ const PARCHMENT = "#e8dcc0";
 const PLACEMENT_LABEL: Record<string, string> = {
   result_double: "결산 보상 2배",
   shop_gold: "골드 충전",
-  qiyuan_extra: "기연 뽑기 +1",
+  qiyuan_extra: "보물 뽑기 +1",
   merchant_restock: "상인 재입고",
   interstitial: "다음 화 예고",
 };

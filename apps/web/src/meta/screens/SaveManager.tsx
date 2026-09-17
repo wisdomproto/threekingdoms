@@ -27,7 +27,7 @@ function SaveSummary(): React.ReactElement {
     { label: "클리어 스테이지", value: `${meta.clearedStages.length} / ${TOTAL_STAGES}` },
     { label: "보유 자금", value: `${meta.gold.toLocaleString()} 金` },
     { label: "보물 수집", value: `${treasureCount}개` },
-    { label: "기연 포인트", value: `${meta.serendipity}` },
+    { label: "뽑기 포인트", value: `${meta.serendipity}` },
     { label: "플레이 회차", value: `${meta.playthroughCount + 1}회차` },
   ];
   if (meta.departedCharacters.length > 0) {

@@ -1,0 +1,58 @@
+.shell { background:radial-gradient(ellipse at 50% 15%,#655035,#151f29 75%); }
+.frame { background:radial-gradient(ellipse at 40% 35%,#53675b,#1b3540 70%); border:3px solid #d1ad64; box-shadow:inset 0 0 0 5px #554331,0 20px 70px #0008; color:#fff0c9; }
+.body { background:repeating-linear-gradient(90deg,transparent 0 150px,#edc67609 151px 152px); }
+.layout { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(260px,.8fr); gap:28px; }
+.encounter { display:flex; flex-direction:column; gap:12px; }
+.balance { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; padding:12px 20px; background:#142933aa; border:1px solid #b19659; border-radius:30px; }.balance strong { color:#ffe097; font-size:21px; padding-left:8px; }
+.stage { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:320px; text-align:center; padding:10px; background:radial-gradient(ellipse,#ffd07622,transparent 70%); }.stage h2 { font:700 25px serif; margin:0; color:#ffe1a0; letter-spacing:.1em; }.stage p { font-size:15px; color:#efe0bf; }.stage strong { color:#ffe1a0; }
+.rewards { padding:18px; border-left:1px solid #bc9b5c66; }.rewards h2 { margin:0; font:700 25px serif; color:#ffe1a0; }.rewards p { font-size:14px; color:#e0d4b9; }.rewards details { font-size:15px; background:#132b35; border:1px solid #9e8550; padding:10px 16px; border-radius:8px; margin:15px 0; }.rewards summary { cursor:pointer; min-height:28px; }.rewards li { margin:10px 0; }
+.treasures { display:flex; flex-direction:column; gap:14px; }.treasures>div { display:grid; grid-template-columns:64px 1fr; gap:4px 14px; padding:16px; border:1px solid #b89959; border-radius:8px; background:linear-gradient(110deg,#39494d,#182d39); box-shadow:inset 0 0 0 3px #d0ad6715; }.treasures>div>:first-child { grid-row:1/5; align-self:center; }.treasures strong { font-size:19px; color:#fff0c8; }.treasures span,.treasures small { grid-column:2; }.treasures small { color:#c9d7cf; font-size:14px; }.grade { font-size:14px; font-weight:700; }
+@media(max-height:500px) and (orientation:landscape) { .layout { gap:14px; grid-template-columns:minmax(0,1.2fr) minmax(240px,1fr); }.stage { min-height:190px; }.stage svg { max-height:190px; }.stage h2 { font-size:20px; }.stage p { margin:6px; }.treasures>div { padding:10px; }.balance { padding:7px 15px; } }
+@media(max-width:600px) and (orientation:portrait) { .layout { grid-template-columns:1fr; }.rewards { border-left:0; border-top:1px solid #bc9b5c66; }.stage { min-height:280px; } }
+
+.gradeFilters { display:flex; gap:6px; margin:14px 0; }.gradeFilters button { flex:1; min-height:44px; border:1px solid #aa925b; border-radius:6px; background:#142b36; color:#ead9b0; font-weight:700; cursor:pointer; }.gradeFilters button[aria-pressed=true] { background:#d3ad61; color:#182c35; }
+
+.frame [data-grade=common] { --tier:#b9c4cd; --tint:#b9c4cd12; }
+.frame [data-grade=fine] { --tier:#81dfa3; --tint:#81dfa31c; }
+.frame [data-grade=rare] { --tier:#c6a0ff; --tint:#aa78ef26; }
+.frame [data-grade=legendary] { --tier:#ffe084; --tint:#eabe4930; }
+.treasures>div[data-grade],.rewardCard[data-grade] { border:2px solid var(--tier); border-left-width:6px; background:linear-gradient(110deg,var(--tint),#142c38 90%); box-shadow:inset 0 0 20px var(--tint),0 0 12px var(--tint); }
+.treasures>div[data-grade=legendary],.rewardCard[data-grade=legendary] { box-shadow:inset 0 0 26px #eabe4930,0 0 18px #eabe4938; }
+.grade { justify-self:start; border:1px solid currentColor; padding:2px 9px; border-radius:4px; letter-spacing:.08em; }
+
+/* Explicit shell scope prevents shared collection styles winning on route changes. */
+.shell.shell { background:radial-gradient(ellipse at 50% 15%,#2b394d,#101722 80%); color:#edf0f5; }
+.shell .frame { background:radial-gradient(ellipse at 30% 35%,#304052,#162231 75%); border:1px solid #8f805e; box-shadow:0 24px 80px #0007; color:#edf0f5; }
+.shell .frame>header { background:#172231; color:#f5ecd8; border-bottom:1px solid #84745670; }
+.shell .frame .body { background:transparent; }
+.frame .balance { background:#182638; border-color:#617087; border-radius:8px; color:#e4eaf3; }
+.frame .balance strong { color:#f3d38e; }
+.frame .stage { background:radial-gradient(ellipse,#dec08412,transparent 65%); }
+.frame .stage h2,.frame .rewards h2 { color:#f2dfb4; }
+.frame .stage p,.frame .rewards p { color:#cbd5e3; }
+.frame .rewards { border-color:#8190a340; }
+.frame .rewards details { background:#172638; border-color:#536279; color:#e1e8f2; }
+.frame .gradeFilters button { background:#253448; color:#e1e8f2; border-color:#536279; }
+.frame .gradeFilters button[aria-pressed=true] { background:#e0bf85; color:#172231; border-color:#e0bf85; }
+.frame .treasures>div { background:linear-gradient(120deg,var(--tint),#172638 80%); }
+.frame .treasures strong { color:#f5f1e8; }
+.frame .treasures small { color:#c3cedd; }
+.frame button:disabled { background:#344254; color:#b7c3d3; border-color:#536279; }
+.frame button:focus-visible { outline:3px solid #a1caff; outline-offset:3px; }
+
+.shell .frame { border-radius:18px; }
+.frame .body { padding:20px 24px; }
+.frame .encounter { gap:8px; }
+.frame .stage { min-height:290px; padding:0; }
+.frame .stage>div { max-width:270px; }
+.frame .stage h2 { font-family:sans-serif; font-size:24px; letter-spacing:-.03em; }
+.frame .stage p { margin:8px 0; }
+.frame .encounter>p { font-size:13px; color:#cbd5e3; margin:4px 0; }
+.frame .encounter>button:not(:disabled) { background:linear-gradient(180deg,#ffe1a0,#cba052); color:#24212b; border-color:#e7c779; box-shadow:0 4px 16px #d9ac4528; }
+.frame .encounter>div>button { background:#253448; border:1px solid #617087; color:#e4eaf3; }
+.frame .rewards { padding:12px 18px; }
+.frame .rewards h2 { font:700 21px sans-serif; }
+.frame .treasures { gap:10px; }
+.frame .treasures>div { padding:12px; }
+@media(pointer:coarse),(max-width:850px){.shell .frame{border-radius:0}.frame .body{padding:12px}}
+@media(max-height:500px) and (orientation:landscape){.frame .stage{min-height:180px}.frame .stage>div{max-width:170px}.frame .stage h2{font-size:18px}.frame .stage p{display:none}.frame .balance{padding:6px 12px}.frame .rewards h2{font-size:18px}.frame .rewards details{margin:8px 0}.frame .treasures>div{padding:8px}}

@@ -1,36 +1,19 @@
 "use client";
-/**
- * 기연(奇緣) 화면 (§12 — "클리어 후 기연 포인트로 뽑기 ... 짧은 텍스트 연출로 이야기처럼 포장. 천장 포함").
- *
- * 클리어로 쌓은 기연 포인트를 소모해 보상(자금/소모품/기연 전용 경미 보물)을 뽑는다.
- * 무작위는 metaStore.pullSerendipity(rng)에 Math.random을 주입 — 전투 밖 메타라 리플레이/
- * 리더보드/밸런스 sim 무관(§14, "랜덤은 재미로" §2-5). 추첨 로직은 serendipity.ts(순수)에 있고
- * 여기선 연출(플레이버 1줄 → 보상 카드 reveal)만 입힌다.
- *
- * 톤/프레임은 StageSelect·Codex(수묵/청동)와 동일. 보물(rare)은 보랏빛 잭팟 톤으로 강조.
- */
-import { useEffect, useState } from "react";
+/** Treasure draw screen. Animation never changes the persisted reward. */
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { gameData } from "../../game/data";
-import type { ItemEffects } from "@tk/data";
+import { itemEffectText as effectSummary } from "../itemEffectText";
 import { getSerendipity, getSerendipityPity, pullSerendipity, pullSerendipityFree } from "../metaStore";
 import { PULL_COST, PITY_CAP, pickFlavor, isSerendipityTreasure } from "../serendipity";
 import type { SerendipityReward } from "../serendipity";
-import { PANEL_FRAME } from "../../battle/hud/frames";
+import styles from "./Collection.module.css";
+import gameStyles from "./Serendipity.module.css";
+import { treasureGrade } from "../treasureGrade";
+import { ItemIcon } from "../../ui/ItemIcon";
+import { Pachinko } from "./Pachinko";
+import { preloadPachinkoAudio, startPachinkoAudio, playPachinkoReward } from "./pachinkoAudio";
 import { RewardedAdButton } from "../RewardedAdButton";
-
-const INK = "#1a1714";
-const INK_DEEP = "#0d0b09";
-const BRONZE_GOLD = "#cdab6e";
-const BRONZE_DIM = "#8a7350";
-const PARCHMENT = "#e8dcc0";
-const RARE_PURPLE = "#b890ff";
-
-const KEYFRAMES = `
-@keyframes tkQiFlavor { 0% { opacity: 0; transform: translateY(6px); } 100% { opacity: 1; transform: translateY(0); } }
-@keyframes tkQiReveal { 0% { opacity: 0; transform: scale(0.6) translateY(8px); } 55% { opacity: 1; transform: scale(1.12); } 100% { transform: scale(1) translateY(0); } }
-@keyframes tkQiGlow { 0%,100% { box-shadow: 0 0 8px ${RARE_PURPLE}55; } 50% { box-shadow: 0 0 18px ${RARE_PURPLE}aa; } }
-`;
 
 /** 보상 → 표시 텍스트. gold=금액, item=아이템명(없으면 id). */
 function rewardLabel(reward: SerendipityReward): string {
@@ -49,17 +32,6 @@ function rewardSub(reward: SerendipityReward): string {
   return "";
 }
 
-function effectSummary(e?: ItemEffects): string {
-  if (!e) return "";
-  const p: string[] = [];
-  if (e.move) p.push(`기동 +${e.move}`);
-  if (e.atkPercent) p.push(`공격 +${e.atkPercent}%`);
-  if (e.spiritPercent) p.push(`정신 +${e.spiritPercent}%`);
-  if (e.defensePercent) p.push(`받는 피해 −${e.defensePercent}%`);
-  if (e.doubleStrike) p.push("연속공격");
-  return p.join(" · ");
-}
-
 interface PullView {
   flavor: string;
   reward: SerendipityReward;
@@ -72,6 +44,27 @@ export function SerendipityScreen(): React.ReactElement {
   const [points, setPoints] = useState(0);
   const [pity, setPity] = useState(0);
   const [view, setView] = useState<PullView | null>(null);
+  const [preview, setPreview] = useState(false);
+  const [gradeFilter, setGradeFilter] = useState("fine");
+  const animationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const animating = useRef(false);
+  const stopAudio = useRef<(() => void) | null>(null);
+  const rewardGrade = useRef<ReturnType<typeof treasureGrade>["grade"] | null>(null);
+  useEffect(() => {
+    void preloadPachinkoAudio().catch(() => {});
+    const chest = new Image(); chest.src = "/ui/serendipity/chest.webp";
+    return () => { if (animationTimer.current) clearTimeout(animationTimer.current); stopAudio.current?.(); };
+  }, []);
+  const reveal = () => {
+    if (animationTimer.current) clearTimeout(animationTimer.current);
+    animationTimer.current = null;
+    animating.current = false;
+    stopAudio.current?.();
+    if (rewardGrade.current !== null) stopAudio.current = playPachinkoReward(rewardGrade.current);
+    rewardGrade.current = null;
+    setPreview(false);
+    setView(v => v ? { ...v, revealed: true } : v);
+  };
   // SSR/하이드레이션 일치 — 마운트 후 1회 로드.
   useEffect(() => {
     setPoints(getSerendipity());
@@ -83,15 +76,18 @@ export function SerendipityScreen(): React.ReactElement {
 
   // 뽑기 결과 → 연출(플레이버 가림 → 보상 공개) + 표시값 갱신. 유료/광고 무료 뽑기 공용.
   const present = (result: { reward: SerendipityReward; wasRare: boolean }) => {
+    animating.current = true;
+    stopAudio.current?.();
+    rewardGrade.current = result.reward.kind === "item" ? treasureGrade(gameData.items[result.reward.itemId]?.effects).grade : "common";
+    stopAudio.current = startPachinkoAudio();
     setPoints(getSerendipity());
     setPity(getSerendipityPity());
     setView({ flavor: pickFlavor(Math.random()), reward: result.reward, rare: result.wasRare, revealed: false });
-    window.setTimeout(() => {
-      setView((v) => (v ? { ...v, revealed: true } : v));
-    }, 650);
+    animationTimer.current = setTimeout(reveal, matchMedia("(prefers-reduced-motion: reduce)").matches ? 100 : 2900);
   };
 
   const onPull = () => {
+    if (animating.current) return;
     const result = pullSerendipity(() => Math.random());
     if (!result) return; // 포인트 부족(버튼 비활성과 이중 가드) — 차감/적립은 이미 영속됨.
     present(result);
@@ -102,133 +98,39 @@ export function SerendipityScreen(): React.ReactElement {
     present(pullSerendipityFree(() => Math.random()));
   };
 
-  return (
-    <main
-      style={{
-        minHeight: "100svh",
-        background: `radial-gradient(120% 80% at 50% 0%, ${INK} 0%, ${INK_DEEP} 80%)`,
-        color: PARCHMENT,
-        padding: "20px 16px 48px",
-        fontFamily: '"Noto Serif KR", "Nanum Myeongjo", "Apple SD Gothic Neo", serif',
-      }}
-    >
-      <style>{KEYFRAMES}</style>
-      <div style={{ maxWidth: 520, margin: "0 auto" }}>
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 4 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: BRONZE_GOLD, letterSpacing: "0.08em" }}>
-            기연 <span style={{ fontSize: 14, color: BRONZE_DIM }}>奇緣</span>
-          </h1>
-          <Link href="/stages" style={{ color: BRONZE_DIM, fontSize: 13, textDecoration: "none" }}>
-            ← 스테이지
-          </Link>
+  const waiting = preview || (!!view && !view.revealed);
+  const previewAnimation = () => {
+    if (animating.current) return;
+    animating.current = true;
+    stopAudio.current?.();
+    rewardGrade.current = gradeFilter as ReturnType<typeof treasureGrade>["grade"];
+    stopAudio.current = startPachinkoAudio();
+    setPreview(true);
+    animationTimer.current = setTimeout(reveal, matchMedia("(prefers-reduced-motion: reduce)").matches ? 100 : 2900);
+  };
+  return <main className={`${styles.shell} ${gameStyles.shell}`}><div className={`${styles.frame} ${gameStyles.frame}`}>
+    <header className={styles.header}><Link href="/stages">← 전장 선택</Link><h1>보물 뽑기</h1><small>전투의 보상, 새로운 발견</small></header>
+    <div className={`${styles.body} ${gameStyles.body}`}><div className={gameStyles.layout}>
+      <section className={gameStyles.encounter} aria-label="보물 뽑기">
+        <div className={gameStyles.balance}><span>뽑기 포인트 <strong>{points}점</strong></span><span>보물 확정까지 <strong>{toPity}회</strong></span></div>
+        <div className={gameStyles.stage} aria-live="polite">
+          {waiting && <Pachinko active onSkip={reveal}/>}
+          {!preview && (view ? <><p>{view.flavor}</p>{view.revealed && <div className={`${styles.reward} ${gameStyles.rewardCard}`} data-grade={view.reward.kind === "item" ? treasureGrade(gameData.items[view.reward.itemId]?.effects).grade : "common"}>
+            {view.reward.kind==='item' ? <ItemIcon itemId={view.reward.itemId} category={gameData.items[view.reward.itemId]?.category} size={80}/> : <span className={styles.symbol} aria-hidden="true">金</span>}
+            {view.rare && <span>뽑기 전용 보물 발견</span>}<strong>{rewardLabel(view.reward)}</strong><span>{rewardSub(view.reward)}</span>{view.reward.kind === "item" && gameData.items[view.reward.itemId]?.category === "treasure" && <><b style={{color:treasureGrade(gameData.items[view.reward.itemId]?.effects).color}}>{treasureGrade(gameData.items[view.reward.itemId]?.effects).label}</b><span>{treasureGrade(gameData.items[view.reward.itemId]?.effects).recommendation}</span></>}
+          </div>}</> : <><Pachinko/><h2>당신의 다음 보물은?</h2><p>당신의 여정에 어떤 보물이 기다릴까요?</p></>)}
         </div>
-        <p style={{ fontSize: 13, color: BRONZE_DIM, margin: "0 0 18px", lineHeight: 1.5 }}>
-          전장에서 쌓은 인연이 뜻밖의 만남으로 이어진다.
-        </p>
-
-        {/* 자원/천장 */}
-        <div
-          style={{
-            ...PANEL_FRAME,
-            background: INK,
-            padding: "14px 18px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: 18,
-          }}
-        >
-          <span style={{ fontSize: 15 }}>
-            보유 기연 <strong style={{ color: RARE_PURPLE, fontSize: 18 }}>{points}</strong>
-          </span>
-          <span style={{ fontSize: 12, color: BRONZE_DIM }}>천장까지 {toPity}회</span>
-        </div>
-
-        {/* 연출 무대 */}
-        <div
-          style={{
-            minHeight: 168,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 14,
-            marginBottom: 20,
-            textAlign: "center",
-          }}
-        >
-          {view ? (
-            <>
-              <div
-                key={view.flavor}
-                style={{ fontSize: 14, color: PARCHMENT, lineHeight: 1.6, maxWidth: 360, animation: "tkQiFlavor 320ms ease-out both" }}
-              >
-                {view.flavor}
-              </div>
-              {view.revealed && (
-                <div
-                  key={rewardLabel(view.reward) + (view.revealed ? "-r" : "")}
-                  style={{
-                    ...PANEL_FRAME,
-                    padding: "14px 22px",
-                    minWidth: 180,
-                    background: view.rare ? "rgba(48, 36, 64, 0.7)" : INK,
-                    color: view.rare ? RARE_PURPLE : BRONZE_GOLD,
-                    animation: view.rare
-                      ? "tkQiReveal 420ms cubic-bezier(0.2,1.3,0.3,1) both, tkQiGlow 1.8s ease-in-out 0.4s infinite"
-                      : "tkQiReveal 380ms cubic-bezier(0.2,1.3,0.3,1) both",
-                  }}
-                >
-                  {view.rare && (
-                    <div style={{ fontSize: 11, color: RARE_PURPLE, letterSpacing: "0.2em", marginBottom: 4 }}>기연 보물</div>
-                  )}
-                  <div style={{ fontSize: 18, fontWeight: 800 }}>{rewardLabel(view.reward)}</div>
-                  {rewardSub(view.reward) && (
-                    <div style={{ fontSize: 12, color: view.rare ? "#cdbdf0" : BRONZE_DIM, marginTop: 4 }}>
-                      {rewardSub(view.reward)}
-                    </div>
-                  )}
-                </div>
-              )}
-            </>
-          ) : (
-            <div style={{ fontSize: 13, color: "#5a5142" }}>
-              {canPull ? "기연을 청해 보자." : "전장에서 기연을 쌓으세요."}
-            </div>
-          )}
-        </div>
-
-        {/* 뽑기 버튼 */}
-        <button
-          type="button"
-          onClick={onPull}
-          disabled={!canPull}
-          style={{
-            width: "100%",
-            minHeight: 56,
-            ...PANEL_FRAME,
-            background: canPull ? "linear-gradient(180deg, rgba(72,56,96,0.9), rgba(40,30,56,0.9))" : "rgba(24,21,17,0.6)",
-            color: canPull ? PARCHMENT : "#5a5142",
-            fontSize: 16,
-            fontWeight: 700,
-            cursor: canPull ? "pointer" : "not-allowed",
-            letterSpacing: "0.05em",
-          }}
-        >
-          기연 청하기 <span style={{ fontSize: 13, color: canPull ? RARE_PURPLE : "#4a4338" }}>({PULL_COST} 기연)</span>
-        </button>
-
-        {/* §13 리워드 광고 — 광고 보고 기연 1회(포인트 무소모). adFree면 버튼 자체가 숨겨짐. */}
-        <div style={{ display: "flex", justifyContent: "center", marginTop: 12 }}>
-          <RewardedAdButton placement="qiyuan_extra" label="광고 보고 기연 +1회" onReward={onAdPull} />
-        </div>
-
-        {!canPull && (
-          <p style={{ fontSize: 12, color: BRONZE_DIM, textAlign: "center", marginTop: 10 }}>
-            스테이지를 클리어하면 등급에 따라 기연이 쌓입니다. 광고로도 기연을 청할 수 있습니다.
-          </p>
-        )}
-      </div>
-    </main>
-  );
+        <button className={styles.primary} onClick={onPull} disabled={!canPull || waiting}>{waiting ? '선물을 확인하는 중…' : `1회 뽑기 · ${PULL_COST}점`}</button>
+        <div className={styles.filters}><button onClick={previewAnimation} disabled={waiting}>연출 미리보기 · 포인트 사용 없음</button></div>
+        {!canPull && <p>뽑기 포인트가 {Math.max(0,PULL_COST-points)}점 더 필요합니다. 전투 완료 보상으로 포인트를 모으세요.</p>}
+        {!waiting && <div className={styles.ad}><RewardedAdButton placement="qiyuan_extra" label="광고 보고 보상 1회 받기" onReward={onAdPull}/></div>}
+      </section>
+      <aside className={gameStyles.rewards}><h2>획득 가능한 보물</h2><p>등급별 보물 · 효과 미리보기</p><details><summary>이용 방법 · 확률 보기</summary>
+        <ul><li>전투 첫 승리: 등급에 따라 1~5점</li><li>완료한 전투 재도전: 1점</li><li>보상 1회: 뽑기 포인트 {PULL_COST}점 사용</li></ul>
+        <h2>보물 확정까지 {toPity}회</h2><p>일반 보상은 자금과 소모품입니다. 보물 확률은 8%이며, 보물 없이 9회 받으면 다음에는 보물이 확정됩니다.</p>
+        <p>보물 안에서 일반 40% · 고급 35% · 희귀 20% · 전설 5%. 보물 확정은 등급을 보장하지 않습니다.</p></details><div className={gameStyles.gradeFilters}>{[["common","일반"],["fine","고급"],["rare","희귀"],["legendary","전설"]].map(([id,label])=><button key={id} aria-pressed={gradeFilter===id} onClick={()=>setGradeFilter(id!)}>{label}</button>)}</div><div className={gameStyles.treasures}>{Object.values(gameData.items).filter(item=>isSerendipityTreasure(item.id) && treasureGrade(item.effects).grade===gradeFilter).map(item=><div key={item.id} data-grade={treasureGrade(item.effects).grade}><ItemIcon itemId={item.id} category={item.category} size={56} style={{border:`2px solid ${treasureGrade(item.effects).color}`,boxShadow:`0 0 12px ${treasureGrade(item.effects).color}33`}}/><span className={gameStyles.grade} style={{color:treasureGrade(item.effects).color}}>{treasureGrade(item.effects).label}</span><strong>{item.name}</strong><span>{effectSummary(item.effects)}</span><small>{treasureGrade(item.effects).recommendation}</small></div>)}</div>
+        <p>선택한 등급의 보상음은 왼쪽 연출 미리보기에서 들을 수 있습니다.</p><p>전투에서 얻는 고유 보물과는 별개의 보상입니다.</p>
+      </aside>
+    </div></div>
+  </div></main>;
 }

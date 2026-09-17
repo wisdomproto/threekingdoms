@@ -1,0 +1,26 @@
+
+.shell.shell { background:radial-gradient(ellipse at top,#29384b,#101723); color:#edf0f5; }
+.shell .frame { background:linear-gradient(135deg,#202c3c,#111b29); border:1px solid #7d735e; box-shadow:0 24px 80px #0006; }
+.frame>header { background:#172231; border-bottom:1px solid #84745670; color:#f3ead6; }
+.frame>div { background:transparent; }
+.frame strong { color:#f2d496; }
+.frame progress { accent-color:#e4bb72; }
+.frame button { background:#263547; border-color:#59697b; color:#e9edf2; }
+.frame button[aria-pressed=true] { background:#e2c18a; color:#182231; border-color:#e2c18a; }
+.frame [data-grade=common] { --tier:#b9c4cd; --glow:#b9c4cd12; }
+.frame [data-grade=fine] { --tier:#81dfa3; --glow:#81dfa319; }
+.frame [data-grade=rare] { --tier:#c6a0ff; --glow:#c6a0ff22; }
+.frame [data-grade=legendary] { --tier:#ffe084; --glow:#ffe08422; }
+.frame .card { position:relative; border:1px solid var(--tier); border-top:3px solid var(--tier); border-radius:10px; padding:16px; background:linear-gradient(160deg,var(--glow),#172332 75%); color:#f3f1e9; box-shadow:0 5px 16px #0003; }
+.card>span { background:#243e38; color:#c2efd6; font-size:12px; }
+.card[data-owned=false]>span { background:#303c4b; color:#d1d9e3; }
+.art { margin:4px 0; padding:12px 32px; background:radial-gradient(ellipse,var(--glow),transparent 70%); }
+.card h2 { margin:5px 0 10px; font:700 20px serif; color:#fff4dc; }
+.grade { color:var(--tier); border:1px solid var(--tier); padding:1px 10px; border-radius:4px; font-size:13px; }
+.card .effect { margin-top:14px; color:#f1f3f6; font-weight:600; }
+.card .source { color:#afbdd0; border-top:1px solid #69778950; padding-top:12px; margin-top:12px; width:100%; font-size:13px; }
+@media(max-height:500px) { .art {padding:0 20px}.card h2{font-size:18px}.frame .card{padding:12px} }
+
+.card[data-owned=false] .art { position:relative; background:radial-gradient(ellipse,#8190a314,transparent 70%); }
+.card[data-owned=false] .art::after { content:"미획득"; position:absolute; bottom:4px; left:50%; transform:translateX(-50%); padding:2px 9px; border:1px solid #7e8c9f; border-radius:3px; background:#1a2634ed; color:#d1d9e3; font-size:11px; white-space:nowrap; }
+.card[data-owned=true] .art { filter:drop-shadow(0 0 10px var(--glow)); }
