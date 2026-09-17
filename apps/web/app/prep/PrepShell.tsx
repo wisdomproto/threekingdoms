@@ -69,7 +69,7 @@ export function PrepShell(): React.ReactElement {
   useEffect(() => {
     const meta = getMeta();
     setTrainingLevel(rosterTrainingLevel(meta));
-    const available = getRoster(chapter);
+    const available = getRoster(chapter).filter(unit => !stage.allowedCommanderIds || stage.allowedCommanderIds.includes(unit.commanderId));
     setRoster(available);
     if (initializedStage.current !== stage.id) {
       setSelected(autoFormation(available, stage));

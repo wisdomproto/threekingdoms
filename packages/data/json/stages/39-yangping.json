@@ -1,0 +1,820 @@
+{
+  "id": "39-yangping",
+  "name": "양평관 확보",
+  "mapId": "yangping",
+  "turnLimit": 30,
+  "levelCap": 47,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "유비",
+    "조운",
+    "장비",
+    "황충",
+    "위연",
+    "마초",
+    "제갈량",
+    "법정"
+  ],
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 39,
+      "troops": 456,
+      "items": [
+        "쌍고검"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 39,
+      "troops": 456,
+      "items": [
+        "용담창"
+      ],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 39,
+      "troops": 456,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "황충",
+      "classId": "archer",
+      "level": 39,
+      "troops": 456,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "위연",
+      "classId": "footman",
+      "level": 39,
+      "troops": 456,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "마초",
+      "classId": "lightCavalry",
+      "level": 39,
+      "troops": 456,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 39,
+      "troops": 347,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "법정",
+      "classId": "strategist",
+      "level": 39,
+      "troops": 347,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "조홍",
+      "classId": "footman",
+      "level": 39,
+      "troops": 427,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "39-yangping-guard-1",
+      "classId": "footman",
+      "level": 37,
+      "troops": 312,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "39-yangping-guard-2",
+      "classId": "archer",
+      "level": 37,
+      "troops": 312,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "39-yangping-guard-3",
+      "classId": "lightCavalry",
+      "level": 37,
+      "troops": 312,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "39-yangping-guard-4",
+      "classId": "footman",
+      "level": 37,
+      "troops": 312,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "39-yangping-guard-5",
+      "classId": "strategist",
+      "level": 37,
+      "troops": 312,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "39-yangping-guard-6",
+      "classId": "archer",
+      "level": 37,
+      "troops": 312,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "39-yangping-guard-7",
+      "classId": "footman",
+      "level": 37,
+      "troops": 312,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "defeatUnit",
+      "unitId": "조홍"
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "유비",
+        "조운",
+        "장비",
+        "황충",
+        "위연",
+        "마초",
+        "제갈량",
+        "법정"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "39-yangping-event",
+      "name": "한중 보급로 연결",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "special",
+          "area": {
+            "x": 3,
+            "y": 5,
+            "width": 5,
+            "height": 9
+          }
+        },
+        {
+          "kind": "heal",
+          "target": {
+            "side": "player"
+          },
+          "amount": 20,
+          "percent": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 4530,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "39-yangping-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "후위대를 격파하고 관문을 확보한다. 퇴각로를 따라 무리하게 북상하지 마라."
+        }
+      ]
+    },
+    {
+      "id": "39-yangping-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "39-yangping-event"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "후방 보급로가 연결되었다. 전열을 회복하고 관문 수비대를 밀어낸다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-council-hall",
+        "label": "양평관 확보 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "위연",
+            "sprite": "sequel-ec9c84ec97b0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "관문을 앞두고 장수들은 한중을 얻은 뒤의 일을 말하기 시작했다. 위연은 지도를 접지 않은 채 그 이야기를 듣고 있었다.",
+            "move": [
+              {
+                "id": "위연",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "얻는 날부터 지키는 싸움이 시작됩니다. 산길마다 같은 수의 병사를 두어서는 안 됩니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그대라면 어느 길을 비워 두겠소?",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "비우는 것이 아니라, 적이 들어오는 것을 보고 모일 수 있게 하겠습니다. 모든 길에 조금씩 있는 군대는 어느 길에서도 강하지 못합니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 답을 재촉하지 않았다. 지도를 자기 쪽으로 돌리지도 않았다. 위연이 끝까지 설명하도록 기다렸다.",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-council-hall",
+        "label": "양평관 확보 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "위연",
+            "sprite": "sequel-ec9c84ec97b0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "마초",
+            "sprite": "sequel-eba788ecb488",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "황충",
+            "sprite": "sequel-ed99a9ecb6a9",
+            "cell": [
+              3,
+              6
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "조조의 군대가 물러가기 시작했다는 보고에도 유비는 곧장 진군을 명하지 않았다. 떠나는 적이 마지막으로 남긴 창끝은 서 있는 적보다 위험할 수 있었다.",
+            "move": [
+              {
+                "id": "위연",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "양평관을 놓아두면 다시 내려올 길을 남기는 셈입니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "맞습니다. 그러나 관문 너머까지 쫓으면 우리의 군량이 이번에는 같은 문제를 겪습니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "어디까지가 승리인지 먼저 정해 놓고 싸우시오. 오늘은 한중의 문을 얻는 것이오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "병사들은 긴 전쟁 끝에 고향으로 돌아갈 길을 이야기했다. 전령들은 그 말보다 먼저 지도 위의 길을 점검했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "서쪽의 길은 제가 보겠습니다. 군사가 도망치는 척하며 돌아서는 것을 경계해야 합니다.",
+            "speaker": "마초",
+            "portraitId": "마초",
+            "pose": [
+              {
+                "id": "마초",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "노장에게 뒤를 맡긴다는 말을 하려면 지금 하시오. 관문 앞에서 바꾸면 듣지 않겠소.",
+            "speaker": "황충",
+            "portraitId": "황충",
+            "pose": [
+              {
+                "id": "마초",
+                "pose": "idle"
+              },
+              {
+                "id": "황충",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "장군은 앞을 맡으시오. 뒤의 책임은 내게도 있소.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "황충",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "진영에서는 한중을 얻은 뒤 누가 지킬지 벌써 말이 돌았다. 유비는 그 이야기를 오늘의 군령에서 떼어 놓았다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "아직 열린 문이 아니오. 돌아온 뒤 함께 의논합시다.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "마초",
+                "pose": "idle"
+              },
+              {
+                "id": "황충",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-sequel-palace",
+        "label": "양평관 확보 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "위연",
+            "sprite": "sequel-ec9c84ec97b0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "양평관의 길이 유비군에게 열리면서 한중의 싸움이 마무리되었다. 유비는 한중왕으로 추대되었고 위연에게 이 땅의 수비를 맡겼다.",
+            "move": [
+              {
+                "id": "위연",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "적이 크게 오면 막고 작게 오면 삼키겠습니다. 맡겨 주신 문을 가벼이 여기지 않겠습니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "크게 말한 것을 탓하지 않겠소. 다만 그 말을 지킬 백성과 군사를 먼저 살피시오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "관우에게도 새 봉작과 한중의 승전보가 전해졌다. 익주에서 울린 북은 형주에서 다른 뜻의 북이 되었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "두 곳의 힘이 함께 움직이면 북쪽은 압박을 받을 것입니다. 강동과의 관계를 놓지 않는 것이 전제입니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "운장에게도 그 말을 분명히 전하시오. 얻은 땅이 넓어질수록 우리 사이의 길도 멀어지는구려.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "형주의 관우는 번성 쪽 군보를 펼쳤다. 오래 기다린 기회가 온 듯했다. 그러나 강동에서 올라오는 편지는 전보다 차가웠다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "한중의 승리가 가장 크게 들리던 때, 형주의 강가에서는 누구도 그 뒤의 겨울을 아직 알지 못했다.",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-sequel-palace",
+        "label": "양평관 확보 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "위연",
+            "sprite": "sequel-ec9c84ec97b0",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "한중의 일을 맡기는 명이 내려지자 위연은 두 손으로 문서를 받았다. 주위의 놀란 시선은 문서보다 무거웠다.",
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "그대가 한 말대로 지켜 보시오. 믿는다는 말은 일을 맡기지 않으면 빈말이오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "관문만 지키지 않겠습니다. 적이 어느 길을 택하든 한중 안에서는 우리 뜻대로 움직이게 하겠습니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "축하하는 사람들 뒤편에서 형주의 서신이 도착했다. 서쪽의 승리가 커지는 동안 동쪽의 강가에서도 새로운 군사가 모이고 있었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "위연",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "양평관 확보의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

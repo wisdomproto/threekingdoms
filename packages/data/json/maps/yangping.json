@@ -1,0 +1,38 @@
+{
+  "id": "yangping",
+  "name": "양평관 확보",
+  "width": 28,
+  "height": 20,
+  "tileLegend": {
+    ".": "plain",
+    "g": "grass",
+    "m": "mountain",
+    "f": "forest",
+    "~": "river",
+    "b": "bridge",
+    "#": "wall",
+    "F": "fort"
+  },
+  "tiles": [
+    "mmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+    "mmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+    "......g.....................",
+    "..........mmmmmm..g.........",
+    ".g........mmmmmm............",
+    ".............g..............",
+    ".........................g..",
+    "........g...................",
+    "..........mmmmmm............",
+    "..........mmmmmm............",
+    "...............g.......F....",
+    "...........................g",
+    "..........mmmmmm............",
+    "..........mmmmmm......g.....",
+    ".....g......................",
+    ".................g..........",
+    "g.........mmmmmm............",
+    "............g...............",
+    "mmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+    "mmmmmmmmmmmmmmmmmmmmmmmmmmmm"
+  ]
+}

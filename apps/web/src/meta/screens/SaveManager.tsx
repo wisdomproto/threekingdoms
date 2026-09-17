@@ -16,9 +16,9 @@ const BRONZE_DIM = "#8a7350";
 const PARCHMENT = "#e8dcc0";
 const DANGER = "#e06c3a";
 
-const TOTAL_STAGES = 27;
 
 function SaveSummary(): React.ReactElement {
+  const TOTAL_STAGES = Object.keys(gameData.stages).length;
   const meta = getMeta();
   const treasureCount = meta.inventory.filter(
     (id) => gameData.items[id]?.category === "treasure",

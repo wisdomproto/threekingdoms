@@ -1,0 +1,82 @@
+[
+  {
+    "id": "city-ground-nanjun",
+    "kind": "city",
+    "name": "nanjun",
+    "prompt": "Create the GROUND LAYER ONLY for an original illustrated Three Kingdoms tactical RPG city battlefield, 남군 공방전, landscape 7:5. Reference 1 is a 28 by 20 tile placement guide, reference 2 gives painterly ground style only. A huge OPEN paved stone city plaza covers rectangle x=10..26, y=2..17, zero-based. Replace ALL grey AND slate guide cells with subtly weathered grey-beige flat flagstone paving. Absolutely NO walls, buildings, roofs, trees, pillars, gatehouses or raised objects: the game renders those separately over this ground. At the western entrance rows8..11 and southern entrance columns17..20 extend broad flat stone approach paths into surrounding tan packed-earth field. At least 85 percent of the city interior should be usable empty grey paving, small irregular stone slabs with quiet texture, NO lawn inside. Blue guide cells are water with soft shorelines at the EXACT guide positions, brown bridge guide cells are water underneath because a separate traversable bridge object will be placed there. Green outside regions only flat moss/grass, no trees. Steep overhead orthographic game map, same scale everywhere, warm daylight, subtle wear and stone seams, clear contrast between city flagstones and exterior ochre dirt, no labels, grids, text or UI. This is the flat background beneath all architecture and characters. Native high resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\sequel-v1\\city-layout-nanjun.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "city-ground-changsha",
+    "kind": "city",
+    "name": "changsha",
+    "prompt": "Create the GROUND LAYER ONLY for an original illustrated Three Kingdoms tactical RPG city battlefield, 장사 공략, landscape 7:5. Reference 1 is a 28 by 20 tile placement guide, reference 2 gives painterly ground style only. A huge OPEN paved stone city plaza covers rectangle x=9..26, y=2..17, zero-based. Replace ALL grey AND slate guide cells with subtly weathered grey-beige flat flagstone paving. Absolutely NO walls, buildings, roofs, trees, pillars, gatehouses or raised objects: the game renders those separately over this ground. At the western entrance rows8..11 and southern entrance columns17..20 extend broad flat stone approach paths into surrounding tan packed-earth field. At least 85 percent of the city interior should be usable empty grey paving, small irregular stone slabs with quiet texture, NO lawn inside. Blue guide cells are water with soft shorelines at the EXACT guide positions, brown bridge guide cells are water underneath because a separate traversable bridge object will be placed there. Green outside regions only flat moss/grass, no trees. Steep overhead orthographic game map, same scale everywhere, warm daylight, subtle wear and stone seams, clear contrast between city flagstones and exterior ochre dirt, no labels, grids, text or UI. This is the flat background beneath all architecture and characters. Native high resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\sequel-v1\\city-layout-changsha.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "city-ground-luocheng",
+    "kind": "city",
+    "name": "luocheng",
+    "prompt": "Create the GROUND LAYER ONLY for an original illustrated Three Kingdoms tactical RPG city battlefield, 낙성 공략, landscape 7:5. Reference 1 is a 28 by 20 tile placement guide, reference 2 gives painterly ground style only. A huge OPEN paved stone city plaza covers rectangle x=9..26, y=2..17, zero-based. Replace ALL grey AND slate guide cells with subtly weathered grey-beige flat flagstone paving. Absolutely NO walls, buildings, roofs, trees, pillars, gatehouses or raised objects: the game renders those separately over this ground. At the western entrance rows8..11 and southern entrance columns17..20 extend broad flat stone approach paths into surrounding tan packed-earth field. At least 85 percent of the city interior should be usable empty grey paving, small irregular stone slabs with quiet texture, NO lawn inside. Blue guide cells are water with soft shorelines at the EXACT guide positions, brown bridge guide cells are water underneath because a separate traversable bridge object will be placed there. Green outside regions only flat moss/grass, no trees. Steep overhead orthographic game map, same scale everywhere, warm daylight, subtle wear and stone seams, clear contrast between city flagstones and exterior ochre dirt, no labels, grids, text or UI. This is the flat background beneath all architecture and characters. Native high resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\sequel-v1\\city-layout-luocheng.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "city-ground-chengdu",
+    "kind": "city",
+    "name": "chengdu",
+    "prompt": "Create the GROUND LAYER ONLY for an original illustrated Three Kingdoms tactical RPG city battlefield, 성도 포위, landscape 7:5. Reference 1 is a 28 by 20 tile placement guide, reference 2 gives painterly ground style only. A huge OPEN paved stone city plaza covers rectangle x=9..26, y=2..17, zero-based. Replace ALL grey AND slate guide cells with subtly weathered grey-beige flat flagstone paving. Absolutely NO walls, buildings, roofs, trees, pillars, gatehouses or raised objects: the game renders those separately over this ground. At the western entrance rows8..11 and southern entrance columns17..20 extend broad flat stone approach paths into surrounding tan packed-earth field. At least 85 percent of the city interior should be usable empty grey paving, small irregular stone slabs with quiet texture, NO lawn inside. Blue guide cells are water with soft shorelines at the EXACT guide positions, brown bridge guide cells are water underneath because a separate traversable bridge object will be placed there. Green outside regions only flat moss/grass, no trees. Steep overhead orthographic game map, same scale everywhere, warm daylight, subtle wear and stone seams, clear contrast between city flagstones and exterior ochre dirt, no labels, grids, text or UI. This is the flat background beneath all architecture and characters. Native high resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\sequel-v1\\city-layout-chengdu.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "city-ground-fancheng",
+    "kind": "city",
+    "name": "fancheng",
+    "prompt": "Create the GROUND LAYER ONLY for an original illustrated Three Kingdoms tactical RPG city battlefield, 번성 수공, landscape 7:5. Reference 1 is a 28 by 20 tile placement guide, reference 2 gives painterly ground style only. A huge OPEN paved stone city plaza covers rectangle x=10..26, y=2..17, zero-based. Replace ALL grey AND slate guide cells with subtly weathered grey-beige flat flagstone paving. Absolutely NO walls, buildings, roofs, trees, pillars, gatehouses or raised objects: the game renders those separately over this ground. At the western entrance rows8..11 and southern entrance columns17..20 extend broad flat stone approach paths into surrounding tan packed-earth field. At least 85 percent of the city interior should be usable empty grey paving, small irregular stone slabs with quiet texture, NO lawn inside. Blue guide cells are water with soft shorelines at the EXACT guide positions, brown bridge guide cells are water underneath because a separate traversable bridge object will be placed there. Green outside regions only flat moss/grass, no trees. Steep overhead orthographic game map, same scale everywhere, warm daylight, subtle wear and stone seams, clear contrast between city flagstones and exterior ochre dirt, no labels, grids, text or UI. This is the flat background beneath all architecture and characters. Native high resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\sequel-v1\\city-layout-fancheng.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "city-ground-tianshui",
+    "kind": "city",
+    "name": "tianshui",
+    "prompt": "Create the GROUND LAYER ONLY for an original illustrated Three Kingdoms tactical RPG city battlefield, 천수 공방, landscape 7:5. Reference 1 is a 28 by 20 tile placement guide, reference 2 gives painterly ground style only. A huge OPEN paved stone city plaza covers rectangle x=9..26, y=2..17, zero-based. Replace ALL grey AND slate guide cells with subtly weathered grey-beige flat flagstone paving. Absolutely NO walls, buildings, roofs, trees, pillars, gatehouses or raised objects: the game renders those separately over this ground. At the western entrance rows8..11 and southern entrance columns17..20 extend broad flat stone approach paths into surrounding tan packed-earth field. At least 85 percent of the city interior should be usable empty grey paving, small irregular stone slabs with quiet texture, NO lawn inside. Blue guide cells are water with soft shorelines at the EXACT guide positions, brown bridge guide cells are water underneath because a separate traversable bridge object will be placed there. Green outside regions only flat moss/grass, no trees. Steep overhead orthographic game map, same scale everywhere, warm daylight, subtle wear and stone seams, clear contrast between city flagstones and exterior ochre dirt, no labels, grids, text or UI. This is the flat background beneath all architecture and characters. Native high resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\sequel-v1\\city-layout-tianshui.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "city-ground-chencang",
+    "kind": "city",
+    "name": "chencang",
+    "prompt": "Create the GROUND LAYER ONLY for an original illustrated Three Kingdoms tactical RPG city battlefield, 진창 공성, landscape 7:5. Reference 1 is a 28 by 20 tile placement guide, reference 2 gives painterly ground style only. A huge OPEN paved stone city plaza covers rectangle x=9..26, y=2..17, zero-based. Replace ALL grey AND slate guide cells with subtly weathered grey-beige flat flagstone paving. Absolutely NO walls, buildings, roofs, trees, pillars, gatehouses or raised objects: the game renders those separately over this ground. At the western entrance rows8..11 and southern entrance columns17..20 extend broad flat stone approach paths into surrounding tan packed-earth field. At least 85 percent of the city interior should be usable empty grey paving, small irregular stone slabs with quiet texture, NO lawn inside. Blue guide cells are water with soft shorelines at the EXACT guide positions, brown bridge guide cells are water underneath because a separate traversable bridge object will be placed there. Green outside regions only flat moss/grass, no trees. Steep overhead orthographic game map, same scale everywhere, warm daylight, subtle wear and stone seams, clear contrast between city flagstones and exterior ochre dirt, no labels, grids, text or UI. This is the flat background beneath all architecture and characters. Native high resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\sequel-v1\\city-layout-chencang.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "city-ground-jianye",
+    "kind": "city",
+    "name": "jianye",
+    "prompt": "Create the GROUND LAYER ONLY for an original illustrated Three Kingdoms tactical RPG city battlefield, 장강 통일전, landscape 7:5. Reference 1 is a 28 by 20 tile placement guide, reference 2 gives painterly ground style only. A huge OPEN paved stone city plaza covers rectangle x=10..26, y=2..17, zero-based. Replace ALL grey AND slate guide cells with subtly weathered grey-beige flat flagstone paving. Absolutely NO walls, buildings, roofs, trees, pillars, gatehouses or raised objects: the game renders those separately over this ground. At the western entrance rows8..11 and southern entrance columns17..20 extend broad flat stone approach paths into surrounding tan packed-earth field. At least 85 percent of the city interior should be usable empty grey paving, small irregular stone slabs with quiet texture, NO lawn inside. Blue guide cells are water with soft shorelines at the EXACT guide positions, brown bridge guide cells are water underneath because a separate traversable bridge object will be placed there. Green outside regions only flat moss/grass, no trees. Steep overhead orthographic game map, same scale everywhere, warm daylight, subtle wear and stone seams, clear contrast between city flagstones and exterior ochre dirt, no labels, grids, text or UI. This is the flat background beneath all architecture and characters. Native high resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\sequel-v1\\city-layout-jianye.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  }
+]

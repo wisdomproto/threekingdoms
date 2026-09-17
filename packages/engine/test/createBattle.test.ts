@@ -1,10 +1,28 @@
 import { describe, it, expect } from "vitest";
 import { gameData } from "@tk/data";
 import { createBattle } from "../src/createBattle";
+import { getAttackableTargets } from "../src/combat";
 import { testCtx, testStage, testMap } from "./fixtures";
 
 describe("createBattle v2 (원작 모델)", () => {
   const state = createBattle(testCtx, 42);
+
+  it("catapults target enemies at two through five tiles, for either side", () => {
+    for (const side of ["player", "enemy"] as const) {
+      const stage = { ...testStage, units: [
+        { ...testStage.units[0]!, classId: "catapult", side, x: 0, y: 4 },
+        { ...testStage.units[2]!, side: side === "player" ? "enemy" as const : "player" as const, x: 5, y: 4 },
+      ] };
+      const ctx = { ...testCtx, stage };
+      const battle = createBattle(ctx, 42);
+      expect(battle.units[0]!.move).toBe(3);
+      for (const distance of [1, 2, 3, 4, 5, 6]) {
+        const positioned = { ...battle, units: battle.units.map((u, i) => i === 1 ? { ...u, x: distance } : u) };
+        expect(getAttackableTargets(ctx, positioned, battle.units[0]!.id))
+          .toEqual(distance >= 2 && distance <= 5 ? [battle.units[1]!.id] : []);
+      }
+    }
+  });
 
   it("병력/사기/레벨이 스테이지 배치대로 해석된다", () => {
     const guanyu = state.units.find((u) => u.id === "관우")!;

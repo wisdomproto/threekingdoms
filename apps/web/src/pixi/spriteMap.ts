@@ -158,6 +158,9 @@ export function spriteCandidates(commanderId: string, classId: string, side: Sid
       out.push(lineTpl);
     }
   }
+  // Existing generic robed artwork keeps newly authored strategists visible until
+  // their own sprites are supplied. Named artwork above always takes precedence.
+  if (["strategist", "sorcerer"].includes(classId)) out.push("sorcerer_enemy");
   return [...new Set(out)].filter(id => !rejectedSprites.has(id));
 }
 

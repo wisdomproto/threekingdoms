@@ -332,7 +332,7 @@ export function healStartItems(
  */
 /** Unique victories train reserves too; replaying a cleared battle cannot farm levels. */
 export function rosterTrainingLevel(s: MetaState): number {
-  return Math.min(30, 1 + new Set(s.clearedStages).size);
+  return Math.min(99, 1 + new Set(s.clearedStages).size);
 }
 
 export function selectRoster(

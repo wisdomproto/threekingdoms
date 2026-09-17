@@ -5,6 +5,11 @@ import type { RosterUnit } from "../metaStore";
 const stage = gameData.stages["05-sishuiguan"]!;
 const unit = (id: string): RosterUnit => ({ commanderId: id, classId: "footman", role: "melee", joinChapter: 1, level: 7, exp: 42, equipped: ["사모"] });
 describe("automatic formation", () => {
+  it("excludes former allies and opposing factions from an era-limited battle", () => {
+    const final = gameData.stages["55-jianye"]!;
+    const result = autoFormation([unit("유비"), unit("관우"), unit("왕준"), unit("두예")], final);
+    expect(result.map(u => u.commanderId)).toEqual(["왕준", "두예"]);
+  });
   it("prioritizes available authored allies and fills the remaining slots without duplicates", () => {
     const allies = stage.units.filter(u => u.side === "player");
     const roster = [unit("reserve"), unit(allies[1]!.commanderId), unit(allies[0]!.commanderId)];

@@ -19,11 +19,16 @@ import { resolveActiveAsset } from "./studio/asset-bindings";
 const ASSET_BASE = (process.env.NEXT_PUBLIC_ASSET_BASE ?? "").replace(/\/+$/, "");
 
 const PROJECT_ASSETS: Record<string, string> = {
+  ...Object.fromEntries(["troy-return-stage", "greek-council-stage", "departure-stage", "ship-briefing-stage"].flatMap(id => ["maps", "scenes"].map(kind => [`/assets/${kind}/troia-${id}.webp`, `/assets/troia/war-bridge/${id}.webp`]))),
+  ...Object.fromEntries(["agamemnon", "menelaus", "hector", "odysseus"].map(id => [`/assets/ui/portraits/troia-${id}.webp`, `/assets/troia/war-bridge/${id}-portrait.webp`])),
+  ...Object.fromEntries(["apple-banquet", "judgment-stage", "sparta-stage"].flatMap(id => ["maps", "scenes"].map(kind => [`/assets/${kind}/troia-${id}.webp`, `/assets/troia/prologue/${id}.webp`]))),
+  ...Object.fromEntries(["paris", "helen", "hera", "athena", "aphrodite"].map(id => [`/assets/ui/portraits/troia-${id}.webp`, `/assets/troia/prologue/${id}-portrait-alpha.webp`])),
+  ...Object.fromEntries(["landing-stage", "camp-stage"].flatMap(id => ["maps", "scenes"].map(kind => [`/assets/${kind}/troia-${id}.webp`, `/assets/troia/story/${id}.webp`]))),
   "/assets/maps/troia-coast.webp": "/assets/maps/troia-coast.webp",
   "/assets/scenes/troia-coast.webp": "/assets/maps/troia-coast.webp",
   "/assets/scenes/troia-opening.webp": "/assets/troia/opening.png",
   ...Object.fromEntries([
-    ["achilles", "아킬레우스", "achilles"],
+    ["achilles", "아킬레우스", "achilles-v2"],
     ["patroclus", "파트로클로스", "patroclus"],
     ["diores", "디오레스", "diores"],
   ].flatMap(([id, name, art]) => [id, name].map(key => [`/assets/ui/portraits/${key}.webp`, `/assets/troia/${art}.png`]))),
@@ -44,7 +49,7 @@ export function assetUrl(path: string): string {
   if (process.env.NODE_ENV === "development" && /^\/assets\/(library|maps|objects|sprites|fx|ui\/(items|portraits)|audio\/voices)(\/|$)/.test(p)) {
     return p.replace(/^\/assets\//, "/api/local-assets/");
   }
-  return ASSET_BASE + p;
+  return (process.env.NEXT_PUBLIC_HOSTED_STUDIO === "1" ? "" : ASSET_BASE) + p;
 }
 
 export { ASSET_BASE };

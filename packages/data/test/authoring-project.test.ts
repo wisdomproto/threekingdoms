@@ -22,10 +22,10 @@ const errors = (draft: unknown) => validateAuthoringProject(draft).map((issue) =
 
 describe("legacy chapter migration", () => {
   it("covers the existing campaign and validates its references", () => {
-    expect(stages.length).toBe(27);
+    expect(stages.length).toBe(55);
     const project = importLegacyChapter({ id: "campaign", name: "삼국지", stages, maps });
     expect(validateAuthoringProject(project)).toEqual([]);
-    expect(project.battles).toHaveLength(27);
+    expect(project.battles).toHaveLength(55);
   });
   for (const [i, name] of filenames.entries()) {
     it(`${name}: preserves every field and key order through save/reopen/export`, () => {

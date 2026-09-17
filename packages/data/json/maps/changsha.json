@@ -1,0 +1,41 @@
+{
+  "id": "changsha",
+  "name": "장사 공략",
+  "width": 28,
+  "height": 20,
+  "tileLegend": {
+    ".": "plain",
+    "g": "grass",
+    "m": "mountain",
+    "f": "forest",
+    "~": "river",
+    "b": "bridge",
+    "#": "wall",
+    "F": "fort",
+    "P": "plain",
+    "G": "gate",
+    "V": "village"
+  },
+  "tiles": [
+    "gggggggggggggggggggggggggggg",
+    "gggggggggggggggggggggggggggg",
+    ".........##################.",
+    ".......g.#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    "..g......#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".........PPPPPPPPPPPPPPPPP#.",
+    ".........PPPPPPPPPPPPPPPPP#.",
+    ".........PPPPPPPPPPPPPPPPP#.",
+    ".........PPPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    "......g..#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".g.......########PPPP######.",
+    "gggggggggggggggggggggggggggg",
+    "gggggggggggggggggggggggggggg"
+  ]
+}

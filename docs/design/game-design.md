@@ -257,3 +257,6 @@ Implemented: authored player levels follow battle order (1–27). Reserve traini
 
 ### Persistent scripted fire (2026-09-14)
 A fire action marks its initial rectangle and persists for 1–20 full turns. Starting with the next turn, spread advances one orthogonal cell and maximum-HP percentage damage is applied once to all occupants, including allies. Overlapping fires use the strongest damage rather than stacking. Fire expires after its configured number of ticks; spread never resets its lifetime. Rain extinguishes fire by default. The default spread restriction allows grass, forest, village, barracks, depot, and bridge terrain; unrestricted spread still excludes river, wall, and cliff. Initial rectangles are explicit author choices and may include other terrain (for authored ship battles). All processing is deterministic and state-serializable.
+# Catapult range adjustment (2026-09-17)
+
+Catapults use a Manhattan attack range of 2–5 tiles (previously 2–3), with movement remaining 3. Adjacent targets remain outside the firing envelope. Both sides use the same class rule; this is a game balance adjustment, not a claim about the original game's range.

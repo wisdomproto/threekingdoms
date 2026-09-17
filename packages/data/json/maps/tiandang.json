@@ -1,0 +1,38 @@
+{
+  "id": "tiandang",
+  "name": "천탕산 기습",
+  "width": 28,
+  "height": 20,
+  "tileLegend": {
+    ".": "plain",
+    "g": "grass",
+    "m": "mountain",
+    "f": "forest",
+    "~": "river",
+    "b": "bridge",
+    "#": "wall",
+    "F": "fort"
+  },
+  "tiles": [
+    "mmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+    "mmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+    ".......................g....",
+    "......g...mmmmmm............",
+    "..........mmmmmm..g.........",
+    ".g..........................",
+    ".............g..............",
+    ".........................g..",
+    "........g.mmmmmm............",
+    "..........mmmmmm............",
+    ".......................F....",
+    "...............g............",
+    "..........mmmmmm...........g",
+    "..........mmmmmm............",
+    "......................g.....",
+    ".....g......................",
+    "..........mmmmmm.g..........",
+    "g...........................",
+    "mmmmmmmmmmmmmmmmmmmmmmmmmmmm",
+    "mmmmmmmmmmmmmmmmmmmmmmmmmmmm"
+  ]
+}

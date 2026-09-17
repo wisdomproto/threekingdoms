@@ -380,7 +380,12 @@ function captureGoalFor(ctx: BattleContext, state: BattleState, unit: UnitState)
 /** 이 유닛이 allRetreated 패배조건(호위 대상)에 포함돼 있으면 true. */
 function isEscort(ctx: BattleContext, unit: UnitState): boolean {
   for (const f of ctx.stage.failConditions ?? []) {
-    if (f.kind === "allRetreated" && f.unitIds.includes(unit.id)) return true;
+    if (f.kind !== "allRetreated" || !f.unitIds.includes(unit.id)) continue;
+    // An entire fighting army losing is not an escort objective. Treating every
+    // soldier as a civilian made the whole army flee even during an assault.
+    const army = ctx.stage.units.filter(u => u.side === "player");
+    if (unit.side === "player" && army.length > 1 && army.every(u => f.unitIds.includes(u.commanderId))) continue;
+    return true;
   }
   return false;
 }

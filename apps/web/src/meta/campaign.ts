@@ -11,6 +11,13 @@ export const CHAPTERS: { chapter: number; title: string; from: number; to: numbe
   { chapter: 3, title: "서주, 여포", from: 10, to: 15 },
   { chapter: 4, title: "관도 ~ 장판파", from: 16, to: 22 },
   { chapter: 5, title: "적벽", from: 23, to: 27 },
+  { chapter: 6, title: "형주의 새 터전", from: 28, to: 30 },
+  { chapter: 7, title: "입촉", from: 31, to: 34 },
+  { chapter: 8, title: "한중 쟁탈", from: 35, to: 39 },
+  { chapter: 9, title: "형제의 마지막 길", from: 40, to: 42 },
+  { chapter: 10, title: "남중과 재건", from: 43, to: 45 },
+  { chapter: 11, title: "출사표와 북벌", from: 46, to: 50 },
+  { chapter: 12, title: "천하가 다시 하나로", from: 51, to: 55 },
 ];
 
 /** id "05-sishuiguan" → 5. 파싱 실패 시 999(맨 뒤). */

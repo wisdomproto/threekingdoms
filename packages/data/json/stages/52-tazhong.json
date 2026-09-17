@@ -1,0 +1,720 @@
+{
+  "id": "52-tazhong",
+  "name": "답중 철수로",
+  "mapId": "tazhong",
+  "turnLimit": 30,
+  "levelCap": 60,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "강유",
+    "요화",
+    "장익",
+    "동궐",
+    "호제",
+    "영수"
+  ],
+  "units": [
+    {
+      "commanderId": "강유",
+      "classId": "lightCavalry",
+      "level": 52,
+      "troops": 508,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "요화",
+      "classId": "footman",
+      "level": 52,
+      "troops": 508,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장익",
+      "classId": "footman",
+      "level": 52,
+      "troops": 508,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "동궐",
+      "classId": "footman",
+      "level": 52,
+      "troops": 508,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "호제",
+      "classId": "footman",
+      "level": 52,
+      "troops": 508,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "영수",
+      "classId": "strategist",
+      "level": 52,
+      "troops": 386,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "등애",
+      "classId": "footman",
+      "level": 52,
+      "troops": 466,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "52-tazhong-guard-1",
+      "classId": "footman",
+      "level": 50,
+      "troops": 351,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "52-tazhong-guard-2",
+      "classId": "archer",
+      "level": 50,
+      "troops": 351,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "52-tazhong-guard-3",
+      "classId": "lightCavalry",
+      "level": 50,
+      "troops": 351,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "52-tazhong-guard-4",
+      "classId": "footman",
+      "level": 50,
+      "troops": 351,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "52-tazhong-guard-5",
+      "classId": "strategist",
+      "level": 50,
+      "troops": 351,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "52-tazhong-guard-6",
+      "classId": "archer",
+      "level": 50,
+      "troops": 351,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "52-tazhong-guard-7",
+      "classId": "footman",
+      "level": 50,
+      "troops": 351,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "surviveTurns",
+      "turns": 7
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "강유",
+        "요화",
+        "장익",
+        "동궐",
+        "호제",
+        "영수"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "52-tazhong-event",
+      "name": "후방 연락 복구",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "special",
+          "area": {
+            "x": 3,
+            "y": 5,
+            "width": 5,
+            "height": 9
+          }
+        },
+        {
+          "kind": "heal",
+          "target": {
+            "side": "player"
+          },
+          "amount": 12,
+          "percent": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 5440,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "52-tazhong-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "강유",
+          "side": "player",
+          "text": "적의 차단을 버티며 군대를 검각 쪽으로 거둔다. 산길에서 분산되지 마라."
+        }
+      ]
+    },
+    {
+      "id": "52-tazhong-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "52-tazhong-event"
+      },
+      "lines": [
+        {
+          "speaker": "강유",
+          "side": "player",
+          "text": "뒤로 통하는 연락로가 열렸다. 병력을 모아 철수 대열을 지킨다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-camp-night",
+        "label": "답중 철수로 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "호제",
+            "sprite": "sequel-ed98b8eca09c",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "강유는 성도에서 온 편지를 접어 두었다. 조정의 소식보다 북쪽 길의 보고가 더 명확해 보이는 날이 많아졌다. 그러나 멀리 있다고 나라 안의 일이 멀어지는 것은 아니었다.",
+            "move": [
+              {
+                "id": "강유",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "밭을 일구고 군량을 모은다. 이번에는 출정할 날짜보다 돌아올 때 남을 것을 먼저 세겠다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "호제는 대답을 하려다 북쪽 전령의 발소리에 돌아섰다. 여러 길에서 동시에 적이 움직인다는 보고였다. 강유는 접어 둔 편지를 다시 펴지 못했다.",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "검각으로 통하는 길부터 확보해야 합니다. 따로 버티면 서로의 소식을 잃습니다.",
+            "speaker": "호제",
+            "portraitId": "호제",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "호제",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "답중 철수로 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "요화",
+            "sprite": "sequel-ec9a94ed9994",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "등애",
+            "sprite": "sequel-eb93b1ec95a0",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "장익",
+            "sprite": "sequel-ec9ea5ec9db5",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "강유의 여러 원정이 지나갔다. 승리도 있었으나 단곡의 패배처럼 오래 남는 손실도 있었다. 군량을 마련하려고 답중에 머무는 동안 성도에서는 황호의 말이 황제 가까이로 들어갔다.",
+            "move": [
+              {
+                "id": "강유",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "적이 큰 군대를 준비하고 있습니다. 한중의 수비를 늦추어서는 안 된다는 보고를 보냈습니다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "답이 늦다고 적도 늦게 오는 것은 아니오.",
+            "speaker": "요화",
+            "portraitId": "요화",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "요화",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "보고는 도착했으나 준비는 충분하지 않았다. 종회가 큰길을 맡고 등애가 강유를 압박하자 촉의 여러 진영은 서로의 소식을 기다릴 시간이 없어졌다.",
+            "pose": [
+              {
+                "id": "요화",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "강유가 돌아갈 길을 먼저 끊는다. 큰 전투보다 빠른 한 걸음이 중요하다.",
+            "speaker": "등애",
+            "portraitId": "등애",
+            "pose": [
+              {
+                "id": "등애",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "검각으로 모여야 합니다. 각 성에 흩어져 있으면 차례로 고립됩니다.",
+            "speaker": "장익",
+            "portraitId": "장익",
+            "pose": [
+              {
+                "id": "등애",
+                "pose": "idle"
+              },
+              {
+                "id": "장익",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "북쪽으로 나가던 길을 이제 남쪽으로 싸우며 돌아가는구나.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "장익",
+                "pose": "idle"
+              },
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "병사들은 버릴 수레와 가져갈 곡식을 나누었다. 값비싼 물건보다 며칠 먹을 자루가 먼저 손에 들렸다.",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "먼저 살아 돌아가야 성도도 지킬 수 있소. 여기서 이름을 세우려 하지 마시오.",
+            "speaker": "요화",
+            "portraitId": "요화",
+            "pose": [
+              {
+                "id": "요화",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "알겠소. 오늘은 진격의 깃발이 아니라 돌아오는 사람을 위한 깃발을 세운다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "요화",
+                "pose": "idle"
+              },
+              {
+                "id": "등애",
+                "pose": "idle"
+              },
+              {
+                "id": "장익",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-camp-night",
+        "label": "답중 철수로 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "장익",
+            "sprite": "sequel-ec9ea5ec9db5",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "요화",
+            "sprite": "sequel-ec9a94ed9994",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "강유의 군대는 차단을 벗어나 검각으로 모였다. 한중의 여러 거점은 이미 무너졌거나 고립되어 있었다. 지켜야 할 나라가 지도 위에서 빠르게 좁아졌다.",
+            "move": [
+              {
+                "id": "장익",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "검각의 길이라면 큰 군대도 한꺼번에 들어오지 못합니다.",
+            "speaker": "장익",
+            "portraitId": "장익",
+            "pose": [
+              {
+                "id": "장익",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "여기서 막는다. 성도가 준비할 시간을 지켜야 한다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "장익",
+                "pose": "idle"
+              },
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "종회는 검각을 정면에서 넘기 어려웠다. 그러나 등애는 촉군이 큰 군대를 보낼 수 없다고 여긴 음평의 험로를 바라보았다.",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "가장 어려운 길이라고 적이 오지 않는 길은 아니오.",
+            "speaker": "요화",
+            "portraitId": "요화",
+            "pose": [
+              {
+                "id": "요화",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "경계할 곳은 많았고 보낼 사람은 적었다. 촉의 군대는 적이 선택할 모든 길을 같은 힘으로 막을 수 없었다.",
+            "pose": [
+              {
+                "id": "요화",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "그래도 오늘 우리 앞의 길을 놓을 수는 없다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "검각의 성벽 아래 북소리가 모였다. 그 소리에 가려 멀리 산을 넘는 작은 부대의 발걸음은 아직 들리지 않았다.",
+            "pose": [
+              {
+                "id": "장익",
+                "pose": "idle"
+              },
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "요화",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "답중 철수로 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "산길을 빠져나온 병사들은 뒤를 돌아볼 힘도 없었다. 강유는 앞서가는 부대에 속도를 늦추라 명했다. 뒤의 부대가 보이지 않는 승리는 필요 없었다.",
+            "move": [
+              {
+                "id": "강유",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "검각에서 모인다. 어느 길로 오든 깃발을 내리지 마라. 서로를 알아볼 표지가 남아 있어야 한다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그는 출정할 때 외우던 지명을 이제 퇴로의 순서로 외웠다. 같은 산과 강이 전혀 다른 뜻을 갖기 시작했다.",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "답중 철수로의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

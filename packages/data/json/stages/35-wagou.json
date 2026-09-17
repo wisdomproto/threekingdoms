@@ -1,0 +1,767 @@
+{
+  "id": "35-wagou",
+  "name": "와구관 방어",
+  "mapId": "wagou",
+  "turnLimit": 30,
+  "levelCap": 43,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "장비",
+    "위연",
+    "황충",
+    "마초",
+    "조운",
+    "제갈량",
+    "법정",
+    "유비"
+  ],
+  "units": [
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 35,
+      "troops": 440,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "위연",
+      "classId": "footman",
+      "level": 35,
+      "troops": 440,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "황충",
+      "classId": "archer",
+      "level": 35,
+      "troops": 440,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "마초",
+      "classId": "lightCavalry",
+      "level": 35,
+      "troops": 440,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 35,
+      "troops": 440,
+      "items": [
+        "용담창"
+      ],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 35,
+      "troops": 335,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "법정",
+      "classId": "strategist",
+      "level": 35,
+      "troops": 335,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 35,
+      "troops": 440,
+      "items": [
+        "쌍고검"
+      ],
+      "side": "player",
+      "x": 5,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장합",
+      "classId": "lightCavalry",
+      "level": 35,
+      "troops": 415,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "35-wagou-guard-1",
+      "classId": "footman",
+      "level": 33,
+      "troops": 300,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "35-wagou-guard-2",
+      "classId": "archer",
+      "level": 33,
+      "troops": 300,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "35-wagou-guard-3",
+      "classId": "lightCavalry",
+      "level": 33,
+      "troops": 300,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "35-wagou-guard-4",
+      "classId": "footman",
+      "level": 33,
+      "troops": 300,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "35-wagou-guard-5",
+      "classId": "strategist",
+      "level": 33,
+      "troops": 300,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "35-wagou-guard-6",
+      "classId": "archer",
+      "level": 33,
+      "troops": 300,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "35-wagou-guard-7",
+      "classId": "footman",
+      "level": 33,
+      "troops": 300,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "defeatUnit",
+      "unitId": "장합"
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "장비",
+        "위연",
+        "황충",
+        "마초",
+        "조운",
+        "제갈량",
+        "법정",
+        "유비"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "35-wagou-event",
+      "name": "산길 측면 타격",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "rock",
+          "area": {
+            "x": 15,
+            "y": 5,
+            "width": 10,
+            "height": 10
+          }
+        },
+        {
+          "kind": "damage",
+          "target": {
+            "side": "enemy",
+            "area": {
+              "x": 15,
+              "y": 5,
+              "width": 10,
+              "height": 10
+            }
+          },
+          "amount": 12,
+          "percent": true,
+          "nonlethal": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 4250,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "35-wagou-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "협곡 입구에서 적을 받는다. 좁은 길을 넘겨주지 말고 측면을 돌아라."
+        }
+      ]
+    },
+    {
+      "id": "35-wagou-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "35-wagou-event"
+      },
+      "lines": [
+        {
+          "speaker": "장비",
+          "side": "player",
+          "text": "적이 정면을 보는 사이 산길의 별동대가 측면을 쳤다. 장합군의 병력이 감소한다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-camp-night",
+        "label": "와구관 방어 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "장비",
+            "sprite": "zhangfei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "장비의 진영에는 빈 술동이가 눈에 띄는 자리에 놓였다. 그러나 막사 안의 잔에는 물이 담겨 있었다. 병사들은 장수가 무엇을 꾸미는지 알면서도 모르는 척해야 했다.",
+            "move": [
+              {
+                "id": "장비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "적이 내 성미를 안다고 믿게 해라. 믿는 것이 깊을수록 확인하는 눈은 게을러진다.",
+            "speaker": "장비",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "전령이 나가자 장비는 소리를 낮추었다. 산을 돌아가는 부대가 길을 잃으면 유인도 헛일이었다. 그는 술동이가 아니라 모래 위에 그린 골짜기를 다시 살폈다.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "북이 늦게 울려도 기다려라. 제때 도착하지 못한 동료를 탓하느라 먼저 몸을 드러내지 마라.",
+            "speaker": "장비",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "와구관 방어 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "장비",
+            "sprite": "zhangfei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "위연",
+            "sprite": "sequel-ec9c84ec97b0",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "황충",
+            "sprite": "sequel-ed99a9ecb6a9",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "조조가 한중에 발을 들이자 익주의 북쪽 산길이 소란해졌다. 장합의 군대는 바위와 숲을 방패로 삼아 내려왔고, 장비는 와구관에서 그를 막았다.",
+            "move": [
+              {
+                "id": "장비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "성도에 앉아 있을 때와 달리 이곳 바람은 말을 많이 하는군. 매일 적이 오는 소식을 싣고 오니.",
+            "speaker": "장비",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "장합은 깊게 들어오지 않습니다. 유리한 곳에 자리를 잡고 우리가 지치기를 기다립니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "장비는 술을 가져오게 했다. 병사들이 수군거렸지만 그의 눈은 술그릇보다 산길의 불빛을 더 오래 좇았다.",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "술에 취한 것처럼 보이게 하려는 것이오?",
+            "speaker": "황충",
+            "portraitId": "황충",
+            "pose": [
+              {
+                "id": "황충",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "참고 앉아 있는 놈도 기다리는 이유가 있겠지. 그 이유를 흔들어 보려는 거요.",
+            "speaker": "장비",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "황충",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "술을 마신다는 소문과 느슨한 경계의 소문이 장합에게 전해졌다. 산속에서 밤마다 들리던 삽질 소리는 점점 가까워졌다.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "익덕은 성미만으로 싸우는 장수가 아닙니다. 다만 돌아 나가는 부대와 시간을 정확히 맞춰야 합니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "앞에서 소리를 지르는 것은 내가 하겠소. 뒤로 가는 사람은 발소리까지 아끼시오.",
+            "speaker": "장비",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그날 밤 진영의 불은 늦게까지 켜져 있었다. 어두운 산길로 떠나는 부대에는 횃불을 나누어 주지 않았다.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "황충",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-camp-night",
+        "label": "와구관 방어 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "위연",
+            "sprite": "sequel-ec9c84ec97b0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "장비",
+            "sprite": "zhangfei-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "법정",
+            "sprite": "sequel-ebb295eca095",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "황충",
+            "sprite": "sequel-ed99a9ecb6a9",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "장합이 물러간 협곡에는 버린 장비가 쌓였다. 장비는 적을 끝없이 쫓지 않고 돌아오는 별동대의 수를 먼저 셌다.",
+            "move": [
+              {
+                "id": "위연",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "장군을 성급한 사람으로만 안 자들이 값을 치렀습니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "내가 늘 성급한 것은 맞소. 그렇다고 적이 원하는 날까지 성급할 필요는 없지.",
+            "speaker": "장비",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "익주의 북문은 지켰으나 한중을 얻은 것은 아니었다. 하후연이 지키는 산과 군량 창고들이 더 북쪽에 이어져 있었다.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "천탕산의 보급을 흔들면 정군산도 가만히 있을 수 없습니다.",
+            "speaker": "법정",
+            "portraitId": "법정",
+            "pose": [
+              {
+                "id": "법정",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "산길이라고 젊은 장수에게만 맡기지 마시오. 활을 쥔 팔은 아직 멀쩡하오.",
+            "speaker": "황충",
+            "portraitId": "황충",
+            "pose": [
+              {
+                "id": "법정",
+                "pose": "idle"
+              },
+              {
+                "id": "황충",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "노장께서 먼저 오른다면 뒤에서 먼지만 먹고 있지는 않겠소.",
+            "speaker": "장비",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "황충",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "승전의 기쁨이 익주로 전해지는 동안 군량 수레는 다시 북쪽 오르막에 들어섰다.",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "법정",
+                "pose": "idle"
+              },
+              {
+                "id": "황충",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "와구관 방어 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "장비",
+            "sprite": "zhangfei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "진흙 묻은 병사들이 돌아오자 장비는 적장의 이름보다 먼저 돌아오지 못한 조의 수를 물었다. 산길에서 길을 잃은 두 조가 마지막으로 도착할 때까지 잔을 들지 않았다.",
+            "move": [
+              {
+                "id": "장비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "이제 마셔도 되겠다. 오늘 술은 적에게 보이려 놓은 것이 아니다.",
+            "speaker": "장비",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "웃음이 터졌지만 누군가는 빈자리 앞에 잔을 놓았다. 장비도 그 잔을 치우지 않았다. 이긴 장수의 요란한 웃음 아래에는, 끝내 돌아오지 못한 이름들이 조용히 남았다.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "와구관 방어의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

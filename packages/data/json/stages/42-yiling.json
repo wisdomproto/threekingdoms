@@ -1,0 +1,851 @@
+{
+  "id": "42-yiling",
+  "name": "이릉 탈출",
+  "mapId": "yiling",
+  "turnLimit": 30,
+  "levelCap": 50,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "유비",
+    "조운",
+    "관흥",
+    "장포",
+    "마량",
+    "사마가"
+  ],
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 42,
+      "troops": 468,
+      "items": [
+        "쌍고검"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 42,
+      "troops": 468,
+      "items": [
+        "용담창"
+      ],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "관흥",
+      "classId": "lightCavalry",
+      "level": 42,
+      "troops": 468,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장포",
+      "classId": "footman",
+      "level": 42,
+      "troops": 468,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "마량",
+      "classId": "strategist",
+      "level": 42,
+      "troops": 356,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "사마가",
+      "classId": "bandit",
+      "level": 42,
+      "troops": 468,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "육손",
+      "classId": "strategist",
+      "level": 42,
+      "troops": 436,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "42-yiling-guard-1",
+      "classId": "footman",
+      "level": 40,
+      "troops": 321,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "42-yiling-guard-2",
+      "classId": "archer",
+      "level": 40,
+      "troops": 321,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "42-yiling-guard-3",
+      "classId": "lightCavalry",
+      "level": 40,
+      "troops": 321,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "42-yiling-guard-4",
+      "classId": "footman",
+      "level": 40,
+      "troops": 321,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "42-yiling-guard-5",
+      "classId": "strategist",
+      "level": 40,
+      "troops": 321,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "42-yiling-guard-6",
+      "classId": "archer",
+      "level": 40,
+      "troops": 321,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "42-yiling-guard-7",
+      "classId": "footman",
+      "level": 40,
+      "troops": 321,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "surviveTurns",
+      "turns": 6
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "유비",
+        "조운",
+        "관흥",
+        "장포",
+        "마량",
+        "사마가"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "42-yiling-event",
+      "name": "육손의 화공",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "fire",
+          "area": {
+            "x": 7,
+            "y": 5,
+            "width": 5,
+            "height": 9
+          }
+        },
+        {
+          "kind": "fire",
+          "area": {
+            "x": 7,
+            "y": 5,
+            "width": 5,
+            "height": 9
+          },
+          "duration": 3,
+          "damagePercent": 8,
+          "spread": false,
+          "flammableOnly": false
+        },
+        {
+          "kind": "damage",
+          "target": {
+            "side": "player"
+          },
+          "amount": 20,
+          "percent": true,
+          "nonlethal": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 4740,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "42-yiling-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "불붙은 진영에서 살아 나간다. 장수를 쫓지 말고 흩어진 아군의 퇴로를 지킨다."
+        }
+      ]
+    },
+    {
+      "id": "42-yiling-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "42-yiling-event"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "연결된 아군 진영에 불이 번졌다. 아군이 화공 피해를 입는다. 불길을 피해 퇴로를 지키며 철수할 시간을 벌어라."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-camp-night",
+        "label": "이릉 탈출 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "동쪽으로 떠나는 군대의 갑옷 끈을 조운이 마지막으로 점검했다. 유비는 그가 전쟁을 말리던 날의 표정을 기억하고 있었다.",
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "그대의 말이 틀렸다고 생각해서 떠나는 것이 아니오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그렇기에 더 어렵습니다. 옳은 줄 아는 말씀을 따르지 않으실 때에는 무엇으로 붙들어야 합니까.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 대답하지 못했다. 분노는 군령으로 적을 수 있었으나 그리움은 그럴 수 없었다. 장비마저 잃었다는 소식 뒤에는 누구의 얼굴도 오래 바라보기 힘들었다.",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "뒤에 남은 이들을 부탁하오. 돌아오는 길이 필요할 것이오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "이릉 탈출 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "관흥",
+            "sprite": "sequel-eab480ed9da5",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "마량",
+            "sprite": "sequel-eba788eb9f89",
+            "cell": [
+              3,
+              6
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "관우의 죽음 뒤 조조도 세상을 떠났고, 조비가 한의 황제로부터 제위를 넘겨받았다. 유비는 한을 잇는다는 이름으로 황제에 올랐다. 그러나 새 칭호가 오래된 슬픔을 지워 주지는 못했다.",
+            "move": [
+              {
+                "id": "제갈량",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "동쪽으로 가는 큰 군대는 북쪽을 비웁니다. 원수를 갚을 마음과 나라가 감당할 수 있는 일은 다릅니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "운장이 없는데 내가 얻은 나라만 헤아려야 하오?",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "백성에게는 내일도 있어야 합니다. 원수가 누구인지보다 먼저 지켜야 할 사람이 누구인지 생각해 주십시오.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 간언을 들었으나 뜻을 꺾지 않았다. 출정을 준비하던 장비마저 부하에게 살해되었다는 소식이 닿았다. 형제의 자리를 채우려던 전쟁은 또 한 자리를 비운 채 시작되었다.",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "아버지의 이름으로 싸우겠습니다.",
+            "speaker": "관흥",
+            "portraitId": "관흥",
+            "pose": [
+              {
+                "id": "관흥",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그 이름 때문에 네 목숨까지 가볍게 쓰지는 않겠다.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "관흥",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "초반의 승리 뒤 전선은 길어졌다. 육손은 싸움을 피했고 더위는 깊어졌다. 촉군은 나무 그늘을 따라 진영을 이어 세웠다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "진영 사이의 길이 너무 깁니다. 한쪽이 흔들리면 소식이 닿기 전에 불안이 번집니다.",
+            "speaker": "마량",
+            "portraitId": "마량",
+            "pose": [
+              {
+                "id": "마량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "어느 밤 적진의 북소리가 갑자기 가까워졌다. 숲 너머 한 줄기 불이 보였을 때 다른 진영에서도 이미 같은 빛이 오르고 있었다.",
+            "pose": [
+              {
+                "id": "마량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "진영을 지키라는 명을 거둔다. 사람을 모아 서쪽 길로 물러나라!",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "관흥",
+                "pose": "idle"
+              },
+              {
+                "id": "마량",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-sequel-sickroom",
+        "label": "이릉 탈출 · 백제성으로",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "퇴로를 지킨 덕에 일부 부대가 불길을 벗어났다. 그러나 살아 돌아온 병사의 숫자는 떠난 병사의 숫자를 대신할 수 없었다. 이릉의 패배는 촉의 국력을 깊게 베었다.",
+            "move": [
+              {
+                "id": "조운",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "추격을 막았습니다. 백제성으로 가셔야 합니다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "돌아갈 때 무엇을 들고 가야 할지 모르겠구나. 나라의 군사를 내 슬픔에 실어 보냈다.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "백제성에서 유비의 병은 깊어졌다. 제갈량이 도착했을 때 두 사람 사이에는 군보보다 긴 침묵이 놓였다.",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "rest"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-sequel-sickroom",
+        "label": "이릉 탈출 · 등불 아래",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "백제성의 밤은 강물 소리로 가득했다. 유비는 잠에서 깰 때마다 불빛이 보이는지 먼저 살폈다. 이미 불길에서 벗어났다는 말을 여러 번 들어도 몸은 믿지 못했다.",
+            "move": [
+              {
+                "id": "제갈량",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "지금은 쉬셔야 합니다. 남은 군사와 고을의 일은 제가 살피겠습니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그대에게 맡긴다는 말을 너무 많이 했소. 이번에는 내가 돌려줄 것이 없구려.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "살아 있는 백성들이 있습니다. 그들을 지키는 일이 아직 남았습니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "rest"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 천천히 고개를 끄덕였다. 한 사람의 한을 끝내려 벌인 싸움 뒤에서, 남은 사람들은 다시 한 나라의 내일을 계산해야 했다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "rest"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-sequel-sickroom",
+        "label": "이릉 탈출 · 마지막 부탁",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              3,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "태자가 도울 만하면 도와주시오. 그렇지 못하다면 군사가 나라를 맡아 주시오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "rest"
+              }
+            ],
+            "move": [
+              {
+                "id": "제갈량",
+                "to": [
+                  7,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "신은 끝까지 아드님을 받들겠습니다. 주공께서 맡기신 사람들을 버리지 않겠습니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "rest"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 형주에서 시작한 길을 더 걸어 보지 못했다. 세 형제의 맹세가 사람의 몸을 잃은 뒤에도 그 이름 아래 사는 백성은 남았다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "제갈량은 성도로 돌아와 황제 유선 앞에 섰다. 이제 맹세를 이어 가는 일은 복수가 아니라 나라를 다시 세우는 일이었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "rest"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "이릉 탈출의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

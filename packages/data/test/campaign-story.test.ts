@@ -5,13 +5,15 @@ import { gameData, MapSceneSchema } from '../src';
 import library from '../../../apps/web/public/assets/scene-motions/library.json';
 
 describe('complete campaign story staging', () => {
-  it('covers all 54 slots and resolves every actor, image and reachable action', () => {
+  it('covers every story slot and resolves every staged actor, image and reachable action', () => {
     let count=0;
     for (const stage of Object.values(gameData.stages)) for (const slot of ['intro','outro'] as const) {
       const parts=stage.scenario?.[slot];
       expect(Array.isArray(parts),stage.id+slot).toBe(true);
       if (!Array.isArray(parts)) continue;
-      expect(parts.some(p=>'map' in p),stage.id+slot).toBe(true); count++;
+      // The original campaign keeps its complete staging. New, unillustrated cast uses VN scenes.
+      if (Number(stage.id.slice(0,2))<=27) expect(parts.some(p=>'map' in p),stage.id+slot).toBe(true);
+      expect(parts.length,stage.id+slot).toBeGreaterThan(0); count++;
       // Chapter one has its own detailed contract and legacy opening.
       if (Number(stage.id.slice(0,2))<5) continue;
       for (const raw of parts) {
@@ -55,6 +57,6 @@ describe('complete campaign story staging', () => {
         }
       }
     }
-    expect(count).toBe(54);
+    expect(count).toBe(Object.keys(gameData.stages).length*2);
   });
 });

@@ -4,5 +4,12 @@ const config: NextConfig = {
   distDir: process.env.TK_NEXT_DIST_DIR || ".next",
   // 워크스페이스 패키지는 TS 소스 그대로 export하므로 Next가 직접 트랜스파일해야 한다
   transpilePackages: ["@tk/data", "@tk/engine"],
+  async rewrites() {
+    return { beforeFiles: [
+      { source: "/_draft/:file", destination: "/api/drafts/:file" },
+      ...(process.env.NEXT_PUBLIC_HOSTED_STUDIO === "1"
+        ? [{ source: "/assets/:path*", destination: "/api/local-assets/:path*" }] : []),
+    ] };
+  },
 };
 export default config;

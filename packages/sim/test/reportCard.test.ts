@@ -35,6 +35,34 @@ const BASELINE_LABELS: Record<string, Label> = {
   "19-xinye": "HEALTHY", "20-changbanpo": "HEALTHY", "21-changbanqiao": "HEALTHY",
   "22-hanjin": "HEALTHY", "23-jiangxia": "HEALTHY", "24-sanjiangkou": "HEALTHY",
   "25-wulin": "HEALTHY", "26-chibi": "HEALTHY", "27-huarongdao": "HEALTHY",
+  "28-nanjun": "HEALTHY",
+  "29-changsha": "HEALTHY",
+  "30-gongan": "HEALTHY",
+  "31-fushui": "HEALTHY",
+  "32-luocheng": "HEALTHY",
+  "33-jiameng": "HEALTHY",
+  "34-chengdu": "HEALTHY",
+  "35-wagou": "HEALTHY",
+  "36-tiandang": "HEALTHY",
+  "37-dingjun": "HEALTHY",
+  "38-hanshui": "HEALTHY",
+  "39-yangping": "HEALTHY",
+  "40-fancheng": "HEALTHY",
+  "41-maicheng": "HEALTHY",
+  "42-yiling": "HEALTHY",
+  "43-lushui": "HEALTHY",
+  "44-nanman": "HEALTHY",
+  "45-tengjia": "HEALTHY",
+  "46-tianshui": "HEALTHY",
+  "47-jieting": "HEALTHY",
+  "48-chencang": "HEALTHY",
+  "49-qishan": "HEALTHY",
+  "50-wuzhangyuan": "HEALTHY",
+  "51-xingshi": "HEALTHY",
+  "52-tazhong": "HEALTHY",
+  "53-jiange": "HEALTHY",
+  "54-mianzhu": "HEALTHY",
+  "55-jianye": "HEALTHY",
 };
 
 const cell = (result: Cell["result"], turns = 5, retreats = 0): Cell => ({ result, turns, retreats });
@@ -142,8 +170,8 @@ describe("runBattle 옵션 (하위호환 + 정책/오프셋)", () => {
   });
 });
 
-describe("회귀 게이트 (§11-A — 전 스테이지 162런)", () => {
-  const rows = buildRows(); // 27 × 6셀
+describe("회귀 게이트 (§11-A — 전 스테이지 330런)", () => {
+  const rows = buildRows(); // 55 × 6 cells
 
   it("모든 스테이지가 BASELINE_LABELS와 일치(드리프트 감지)", () => {
     const got = Object.fromEntries(rows.map((r) => [r.stageId, r.label]));

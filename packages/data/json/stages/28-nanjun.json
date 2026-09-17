@@ -1,0 +1,865 @@
+{
+  "id": "28-nanjun",
+  "name": "남군 공방전",
+  "mapId": "nanjun",
+  "turnLimit": 30,
+  "levelCap": 36,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "유비",
+    "관우",
+    "장비",
+    "조운",
+    "제갈량",
+    "미축",
+    "손건",
+    "유봉"
+  ],
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 28,
+      "troops": 412,
+      "items": [
+        "쌍고검"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 28,
+      "troops": 412,
+      "items": [
+        "청룡언월도"
+      ],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 28,
+      "troops": 412,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 28,
+      "troops": 412,
+      "items": [
+        "용담창"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 28,
+      "troops": 314,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "미축",
+      "classId": "strategist",
+      "level": 28,
+      "troops": 314,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "손건",
+      "classId": "strategist",
+      "level": 28,
+      "troops": 314,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "유봉",
+      "classId": "footman",
+      "level": 28,
+      "troops": 412,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "조인",
+      "classId": "footman",
+      "level": 28,
+      "troops": 394,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "28-nanjun-guard-1",
+      "classId": "footman",
+      "level": 26,
+      "troops": 279,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "28-nanjun-guard-2",
+      "classId": "archer",
+      "level": 26,
+      "troops": 279,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "28-nanjun-guard-3",
+      "classId": "lightCavalry",
+      "level": 26,
+      "troops": 279,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "28-nanjun-guard-4",
+      "classId": "footman",
+      "level": 26,
+      "troops": 279,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "28-nanjun-guard-5",
+      "classId": "strategist",
+      "level": 26,
+      "troops": 279,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "28-nanjun-guard-6",
+      "classId": "archer",
+      "level": 26,
+      "troops": 279,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "28-nanjun-guard-7",
+      "classId": "footman",
+      "level": 26,
+      "troops": 279,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "defeatUnit",
+      "unitId": "조인"
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "유비",
+        "관우",
+        "장비",
+        "조운",
+        "제갈량",
+        "미축",
+        "손건",
+        "유봉"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "28-nanjun-event",
+      "name": "성문 밖 유인",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "rock",
+          "area": {
+            "x": 15,
+            "y": 5,
+            "width": 10,
+            "height": 10
+          }
+        },
+        {
+          "kind": "damage",
+          "target": {
+            "side": "enemy",
+            "area": {
+              "x": 15,
+              "y": 5,
+              "width": 10,
+              "height": 10
+            }
+          },
+          "amount": 12,
+          "percent": true,
+          "nonlethal": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 3760,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "28-nanjun-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "주유의 군대와 뒤엉키지 마라. 성문 밖 적을 밀어내고 강가의 길을 확보한다."
+        }
+      ]
+    },
+    {
+      "id": "28-nanjun-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "28-nanjun-event"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "성문을 나온 수비대의 측면에 복병이 나타났다. 성벽 앞에 몰리지 말고 양쪽 길로 압박하라."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-river-landing",
+        "label": "남군 공방전 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "손건",
+            "sprite": "sunqian-robes",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "장막 밖에서 젖은 신발을 벗는 소리가 났다. 손건이 가져온 호적에는 이름보다 빈칸이 많았다. 강을 건넌 뒤에도 돌아오지 않은 사람들이었다.",
+            "move": [
+              {
+                "id": "손건",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "한 집에서 셋이 나왔는데 둘만 돌아온 경우가 적지 않습니다. 군량 장부와 별도로 찾아야 할 사람의 이름을 적고 있습니다.",
+            "speaker": "손건",
+            "portraitId": "손건",
+            "pose": [
+              {
+                "id": "손건",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "성 하나를 얻었다고 그 빈칸이 채워지지는 않겠지. 그래도 돌아왔을 때 찾아올 문은 있어야 하오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "손건",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그러려면 나루와 창고를 먼저 묶어야 합니다. 병사에게만 길을 내면 백성은 다시 다른 군대를 따라갑니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "손건은 종이가 젖지 않도록 품속에 넣었다. 유비는 한동안 그 손을 바라보다가, 아직 주인이 정해지지 않은 형주의 지도 앞으로 돌아갔다.",
+            "pose": [
+              {
+                "id": "손건",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-river-landing",
+        "label": "남군 공방전 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "장비",
+            "sprite": "zhangfei-leader",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-leader",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              3,
+              6
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "적벽의 불길은 꺼졌지만 강가에는 탄 밧줄과 부러진 노가 오래 남아 있었다. 조조가 돌아간 북쪽보다, 동맹군이 마주 선 남쪽에서 더 많은 전령이 오갔다.",
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "백성들이 돌아갈 고을부터 확보해야 하오. 승전했다고 나루가 저절로 열리지는 않소.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "남군을 조인이 지키고 있습니다. 주유도 그 성을 바라봅니다. 지금 우리에게 필요한 것은 동맹을 깨지 않고 발붙일 자리입니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "같이 싸워 놓고 이제 땅을 두고 눈치를 봐야 한단 말이오?",
+            "speaker": "장비",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "군사도 먹어야 한다. 남의 창고에 기대는 군대는 오래 버티지 못한다.",
+            "speaker": "관우",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 젖은 지도 모서리를 눌렀다. 지도 속 작은 성 하나가 피난민 수천 명의 겨울을 뜻했다. 얻어야 할 것은 명성이 아니라 성문 안의 지붕이었다.",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "주유의 진영에서 성 밖 지원로를 막아 달라는 청이 왔습니다. 조인의 군사는 수시로 나와 나루를 공격합니다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "성벽을 정면으로 들이받을 이유는 없습니다. 나온 군사를 끌어내고, 퇴로와 보급로를 나누어 끊으십시오.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "오군과 먼저 칼을 맞대는 자는 군법으로 다스리겠소. 오늘의 적은 성 안에 있소.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "전령이 떠나자 강 건너 북소리가 번졌다. 승리한 동맹은 아직 같은 방향을 보고 있었으나, 각자의 배에는 다른 내일이 실려 있었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-river-landing",
+        "label": "남군 공방전 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-leader",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "성 밖의 조군이 물러나자 나루에 묶였던 배들이 움직였다. 그러나 남군의 성문이 곧바로 유비에게 열린 것은 아니었다.",
+            "move": [
+              {
+                "id": "조운",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "지원로는 확보했습니다. 다친 병사와 피난민부터 건너게 하겠습니다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "주유는 남군을 계속 압박할 것입니다. 우리는 남쪽 여러 고을로 눈을 돌려야 합니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "누군가는 이긴 자의 깃발보다 돌아온 가족을 먼저 보겠지. 그들을 먼저 살피시오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 점령할 성보다 먼저 수리할 나루와 풀어 줄 곡식의 양을 물었다. 그것은 한 나라의 일이 아니라, 아직 나라를 갖지 못한 군대가 나라를 준비하는 방식이었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "남쪽에서 한현의 군대가 길을 막는다는 소식이 왔소.",
+            "speaker": "관우",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "장사의 노장 황충을 가볍게 보아서는 안 됩니다. 성을 얻더라도 사람을 잃는 싸움은 피해야 합니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "진영의 등불이 하나씩 꺼졌다. 유비의 군대는 강바람을 등지고 형주의 남쪽으로 향할 준비를 했다.",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-river-landing",
+        "label": "남군 공방전 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "미축",
+            "sprite": "mizhu-robes",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "그날 저녁, 나루의 첫 배에는 무기 대신 솥과 이불이 실렸다. 병사 하나가 아이를 안아 배에 올리자 아이는 그의 투구 끈을 놓지 않았다.",
+            "move": [
+              {
+                "id": "미축",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "곡식은 사흘 치를 먼저 풀었습니다. 나머지는 들어오는 집 수를 세어 나누겠습니다.",
+            "speaker": "미축",
+            "portraitId": "미축",
+            "pose": [
+              {
+                "id": "미축",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "다음 고을에서도 같은 일을 하게 될 것이오. 장부에 군대가 먹은 것과 백성에게 준 것을 나누어 적으시오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "미축",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "멀리 주유의 진영에서 북이 울렸다. 유비는 그 소리를 향해 잠깐 고개를 숙였다. 함께 이긴 이들과 앞으로도 같은 길을 갈 수 있을지는, 아직 누구도 말할 수 없었다.",
+            "pose": [
+              {
+                "id": "미축",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "남군 공방전의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

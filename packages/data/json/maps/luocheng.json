@@ -1,0 +1,41 @@
+{
+  "id": "luocheng",
+  "name": "낙성 공략",
+  "width": 28,
+  "height": 20,
+  "tileLegend": {
+    ".": "plain",
+    "g": "grass",
+    "m": "mountain",
+    "f": "forest",
+    "~": "river",
+    "b": "bridge",
+    "#": "wall",
+    "F": "fort",
+    "P": "plain",
+    "G": "gate",
+    "V": "village"
+  },
+  "tiles": [
+    "gggggggggggggggggggggggggggg",
+    "gggggggggggggggggggggggggggg",
+    ".......g.##################.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    "..g......#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".........PPPPPPPPPPPPPPPPP#.",
+    ".........PPPPPPPPPPPPPPPPP#.",
+    ".........PPPPPPPPPPPPPPPPP#.",
+    ".........PPPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    "......g..#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".g.......#PPPPPPPPPPPPPPPP#.",
+    ".........########PPPP######.",
+    "gggggggggggggggggggggggggggg",
+    "gggggggggggggggggggggggggggg"
+  ]
+}

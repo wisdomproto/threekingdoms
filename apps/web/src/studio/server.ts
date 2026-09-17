@@ -1,3 +1,4 @@
+import { hostedStudioEnabled } from "./hosting";
 import { listLibrary, importLibrary } from "./asset-library";
 import { parseAssetBindings } from "./asset-bindings";
 import { objectPreview } from "./object-preview";
@@ -38,7 +39,7 @@ function workspaceRoot() {
   return path;
 }
 export function checkStudioRequest(request: Request, environment: string | undefined) {
-  if (environment !== "development") throw new StoreError(404, "개발 서버에서만 사용할 수 있습니다.");
+  if (environment !== "development" && !hostedStudioEnabled()) throw new StoreError(404, "개발 서버에서만 사용할 수 있습니다.");
   const origin = request.headers.get("origin");
   if (origin && new URL(origin).host !== request.headers.get("host")) throw new StoreError(403, "다른 출처의 요청은 허용하지 않습니다.");
 }
@@ -62,11 +63,12 @@ export async function studioRequest(request: Request): Promise<Response> {
   try {
     checkStudioRequest(request, process.env.NODE_ENV);
     const root = workspaceRoot();
-    const store = createProjectStore(join(root, ".studio", "projects"));
+    const storage = process.env.TK_STUDIO_DATA_DIR || join(root, ".studio");
+    const store = createProjectStore(join(storage, "projects"));
     const dataDir = join(root, "packages", "data", "json");
     const route = new URL(request.url).pathname.replace(/^\/api\/studio\//, "");
     const json = (value: unknown, status = 200) => Response.json(value, { status, headers: { "Cache-Control": "no-store" } });
-    const assetRoot = join(root, 'apps', 'web', 'public', 'assets');
+    const assetRoot = process.env.TK_STUDIO_ASSET_DIR || join(root, 'apps', 'web', 'public', 'assets');
     if (route === 'asset-library') {
       if(request.method === 'GET') return json(await listLibrary(assetRoot));
       if(request.method === 'POST') {
@@ -76,7 +78,7 @@ export async function studioRequest(request: Request): Promise<Response> {
       }
     }
     if (route === "game") {
-      const games = createGameStore(join(root, ".studio", "game"));
+      const games = createGameStore(join(storage, "game"));
       if (request.method === "POST") {
         const input = await body(request);
         const record = await store.read(String(input.projectId));
@@ -112,18 +114,18 @@ export async function studioRequest(request: Request): Promise<Response> {
       const ext=kind==='fx'?'png':'webp';
       const valid=ext==='png'?Buffer.from(bytes.slice(0,8)).equals(Buffer.from([137,80,78,71,13,10,26,10])):Buffer.from(bytes.slice(0,4)).toString()==='RIFF'&&Buffer.from(bytes.slice(8,12)).toString()==='WEBP';
       if(!valid)throw new StoreError(400,'이미지 형식이 맞지 않습니다.');
-      const directory=join(root,'apps','web','public','assets',kind==='items'?'ui/items':kind!);
+      const directory=join(assetRoot,kind==='items'?'ui/items':kind!);
       const file=join(directory,`${id}.${ext}`);
-      if(existsSync(file)){const backup=join(root,'.studio','asset-backups');await mkdir(backup,{recursive:true});await writeFile(join(backup,`${randomUUID()}-${id.replaceAll("/", "_")}.${ext}`),await readFile(file));}
+      if(existsSync(file)){const backup=join(storage,'asset-backups');await mkdir(backup,{recursive:true});await writeFile(join(backup,`${randomUUID()}-${id.replaceAll("/", "_")}.${ext}`),await readFile(file));}
       await mkdir(dirname(file),{recursive:true});await writeFile(file,bytes);
       return json({url:assetUrl(`/assets/${kind==='items'?'ui/items':kind}/${id.split('/').map(encodeURIComponent).join('/')}.${ext}`)});
     }
     if(route==='object-images'&&request.method==='GET') {
-      const directory=join(root,'apps','web','public','assets','objects');
+      const directory=join(assetRoot,'objects');
       const files=await readdir(directory,{recursive:true});
       return json(files.filter(f=>f.endsWith('.webp')).sort().map(f=>({id:f.replaceAll('\\','/').slice(0,-5)})));
     }
-    if(route==='effect-images'&&request.method==='GET')return json((await readdir(join(root,'apps','web','public','assets','fx'))).filter(f=>f.endsWith('.png')).map(f=>({id:f.slice(0,-4),url:assetUrl('/assets/fx/'+f)})));
+    if(route==='effect-images'&&request.method==='GET')return json((await readdir(join(assetRoot,'fx'))).filter(f=>f.endsWith('.png')).map(f=>({id:f.slice(0,-4),url:assetUrl('/assets/fx/'+f)})));
     if (route === "legacy/object-preview" && request.method === "POST") return json(objectPreview(await body(request)));
     const catalogRoute = /^projects\/([^/]+)\/catalogs\/(characters|items)$/.exec(route);
     if (catalogRoute) {
@@ -159,7 +161,7 @@ export async function studioRequest(request: Request): Promise<Response> {
         const snapshot = { kind: "tk-playtest-snapshot", version: 1, draftId, revision: record.revision, seed: 1, savedAt: new Date().toISOString(), returnUrl: `/studio?project=${record.id}`, ...doc, assetBindings: parseAssetBindings(project.assetBindings), catalogs: await projectCatalogs(project, dataDir) };
         const parsed = parsePlaytestSnapshot(snapshot);
         if (!parsed.ok) throw new StoreError(400, parsed.message);
-        const directory = join(root, "apps", "web", "public", "_draft");
+        const directory = process.env.TK_STUDIO_DATA_DIR ? join(storage, "drafts") : join(root, "apps", "web", "public", "_draft");
         await mkdir(directory, { recursive: true });
         await writeFile(join(directory, `${draftId}.json`), JSON.stringify(snapshot), { flag: "wx" });
         const scene = target.kind === "scene" ? "intro" : ["intro", "outro", "outroDefeat"].includes(String(input.scene)) ? String(input.scene) : "";
@@ -192,7 +194,7 @@ export async function studioRequest(request: Request): Promise<Response> {
           return json(spriteCandidates(query.get("commander") ?? "", query.get("class") ?? "", side).map(id => assetUrl(`/assets/sprites/${id.split("/").map(encodeURIComponent).join("/")}/front_idle.webp`)));
         }
         if (file === "comic-files") {
-          const directory = join(root, "apps", "web", "public", "assets", "comics");
+          const directory = join(assetRoot, "comics");
           return json({ files: existsSync(directory) ? (await readdir(directory)).filter(name => name.endsWith(".webp")) : [] });
         }
         const modules = ["asset-library", "map-scene-editor", "map-scene-model", "asset-image-editor", "battle-events", "stage-io", "history", "chapters", "story-model", "validate-story", "story-editor", "publish", "rail", "draft-store", "quick-edit", "studio-bridge", "comic-editor", "editor-mode", "catalog-bridge", "catalog-io"];
@@ -242,7 +244,7 @@ export async function studioRequest(request: Request): Promise<Response> {
       if (request.method === "POST" && route === "exports") {
         const project = loadAuthoringProject(input.project);
         const id = randomUUID();
-        const directory = join(root, ".studio", "exports");
+        const directory = join(storage, "exports");
         const name = `${typeof project.name === "string" ? project.name.replace(/[<>:"/\\|?*\r\n]/g, "_").slice(0, 100) : "project"}.project.json`;
         await mkdir(directory, { recursive: true });
         await writeFile(join(directory, `${id}.json`), JSON.stringify({ name, content: serializeAuthoringProject(project) }), { flag: "wx" });
@@ -277,7 +279,7 @@ export async function studioRequest(request: Request): Promise<Response> {
         if (input.revision !== record.revision) throw new StoreError(409, "프로젝트가 변경됐습니다. 최신 저장본을 열어 주세요.");
         const id = randomUUID();
         const snapshot = createChapterTest(record.project, input.chapterId, await projectCatalogs(record.project, dataDir), id, record.id);
-        const directory = join(root, "apps", "web", "public", "_draft");
+        const directory = process.env.TK_STUDIO_DATA_DIR ? join(storage, "drafts") : join(root, "apps", "web", "public", "_draft");
         await mkdir(directory, { recursive: true });
         await writeFile(join(directory, `${id}.json`), JSON.stringify(snapshot), { flag: "wx" });
         return json({ url: `/studio/play?draft=${id}` }, 201);
@@ -292,7 +294,7 @@ export async function studioRequest(request: Request): Promise<Response> {
         const snapshot = { ...legacySnapshot, assetBindings: parseAssetBindings(loadAuthoringProject(input.project).assetBindings), sceneMaps: projectSceneMaps(input.project, loadAuthoringProject(legacySnapshot.stage)), catalogs: await projectCatalogs(loadAuthoringProject(input.project), dataDir) };
         const parsed = parsePlaytestSnapshot(snapshot);
         if (!parsed.ok) throw new StoreError(400, parsed.message);
-        const directory = join(root, "apps", "web", "public", "_draft");
+        const directory = process.env.TK_STUDIO_DATA_DIR ? join(storage, "drafts") : join(root, "apps", "web", "public", "_draft");
         await mkdir(directory, { recursive: true });
         await writeFile(join(directory, `${draftId}.json`), JSON.stringify(snapshot), { flag: "wx" });
         return json({ url: `/playtest?draft=${draftId}` }, 201);

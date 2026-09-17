@@ -86,6 +86,7 @@ import stage24Json from "../json/stages/24-sanjiangkou.json";
 import stage25Json from "../json/stages/25-wulin.json";
 import stage26Json from "../json/stages/26-chibi.json";
 import stage27Json from "../json/stages/27-huarongdao.json";
+import { sequelMaps, sequelStages } from "./sequel";
 
 export * from "./schemas";
 
@@ -123,6 +124,7 @@ export const gameData: GameData = {
     ch1: loadJson(ShopSchema, shopCh1Json, "shops/ch1.json"),
   },
   maps: {
+    ...Object.fromEntries(sequelMaps.map(map => [map.id, loadJson(BattleMapSchema, map, `maps/${map.id}.json`)])),
     zhuojun: loadJson(BattleMapSchema, zhuojunJson, "maps/zhuojun.json"),
     yingchuan: loadJson(BattleMapSchema, yingchuanJson, "maps/yingchuan.json"),
     guangzong: loadJson(BattleMapSchema, guangzongJson, "maps/guangzong.json"),
@@ -166,6 +168,7 @@ export const gameData: GameData = {
     "scene-camp-night": loadJson(BattleMapSchema, sceneCampNightJson, "maps/scene-camp-night.json"),
   },
   stages: {
+    ...Object.fromEntries(sequelStages.map(stage => [stage.id, loadJson(StageSchema, stage, `stages/${stage.id}.json`)])),
     "01-zhuojun": loadJson(StageSchema, stage01Json, "stages/01-zhuojun.json"),
     "02-yingchuan": loadJson(StageSchema, stage02Json, "stages/02-yingchuan.json"),
     "03-guangzong": loadJson(StageSchema, stage03Json, "stages/03-guangzong.json"),

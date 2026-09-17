@@ -1,0 +1,767 @@
+{
+  "id": "48-chencang",
+  "name": "진창 공성",
+  "mapId": "chencang",
+  "turnLimit": 30,
+  "levelCap": 56,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "제갈량",
+    "위연",
+    "강유",
+    "왕평",
+    "마대",
+    "관흥",
+    "장포",
+    "등지"
+  ],
+  "units": [
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 48,
+      "troops": 374,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "위연",
+      "classId": "footman",
+      "level": 48,
+      "troops": 492,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "강유",
+      "classId": "lightCavalry",
+      "level": 48,
+      "troops": 492,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "왕평",
+      "classId": "footman",
+      "level": 48,
+      "troops": 492,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "마대",
+      "classId": "lightCavalry",
+      "level": 48,
+      "troops": 492,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "관흥",
+      "classId": "lightCavalry",
+      "level": 48,
+      "troops": 492,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장포",
+      "classId": "footman",
+      "level": 48,
+      "troops": 492,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "등지",
+      "classId": "strategist",
+      "level": 48,
+      "troops": 374,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "학소",
+      "classId": "footman",
+      "level": 48,
+      "troops": 454,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "48-chencang-guard-1",
+      "classId": "footman",
+      "level": 46,
+      "troops": 339,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "48-chencang-guard-2",
+      "classId": "archer",
+      "level": 46,
+      "troops": 339,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "48-chencang-guard-3",
+      "classId": "lightCavalry",
+      "level": 46,
+      "troops": 339,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "48-chencang-guard-4",
+      "classId": "footman",
+      "level": 46,
+      "troops": 339,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "48-chencang-guard-5",
+      "classId": "strategist",
+      "level": 46,
+      "troops": 339,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "48-chencang-guard-6",
+      "classId": "archer",
+      "level": 46,
+      "troops": 339,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "48-chencang-guard-7",
+      "classId": "footman",
+      "level": 46,
+      "troops": 339,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "surviveTurns",
+      "turns": 7
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "제갈량",
+        "위연",
+        "강유",
+        "왕평",
+        "마대",
+        "관흥",
+        "장포",
+        "등지"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "48-chencang-event",
+      "name": "공성 부대 재정비",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "special",
+          "area": {
+            "x": 3,
+            "y": 5,
+            "width": 5,
+            "height": 9
+          }
+        },
+        {
+          "kind": "heal",
+          "target": {
+            "side": "player"
+          },
+          "amount": 20,
+          "percent": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 5160,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "48-chencang-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "text": "공성 부대를 보호하고 퇴로를 유지한다. 성을 함락하지 못하더라도 군대를 보전해야 한다."
+        }
+      ]
+    },
+    {
+      "id": "48-chencang-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "48-chencang-event"
+      },
+      "lines": [
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "text": "공성 부대가 장비와 병력을 정비했다. 아군을 회복하며 철수 명령까지 압박을 유지한다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-camp-night",
+        "label": "진창 공성 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "위연",
+            "sprite": "sequel-ec9c84ec97b0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "진창의 성벽은 낮아 보였지만 가까이 갈수록 틈이 없었다. 사다리를 댈 곳, 불을 붙일 곳, 흙을 쌓을 곳마다 수비병이 먼저 손을 써 놓았다.",
+            "move": [
+              {
+                "id": "위연",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "작은 성이라 오래 걸리지 않을 줄 알았습니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "크기는 성의 것이고, 준비는 지키는 사람의 것이네. 학소는 우리가 무엇을 서두르는지 알고 있네.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "제갈량은 남은 군량 날짜를 다시 확인했다. 적의 성벽을 무너뜨리는 것보다 자기 군대의 조급함을 누르는 일이 먼저였다.",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "진창 공성 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "위연",
+            "sprite": "sequel-ec9c84ec97b0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "학소",
+            "sprite": "sequel-ed9599ec868c",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "왕평",
+            "sprite": "sequel-ec9995ed8f89",
+            "cell": [
+              3,
+              6
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "다음 북벌에서 촉군 앞을 막은 것은 큰 군대가 아니라 작은 성의 준비였다. 진창의 학소는 적이 오는 날만 기다린 사람이 아니었다. 그날 오기 전에 성벽을 고친 사람이었다.",
+            "move": [
+              {
+                "id": "위연",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "병력은 많지 않습니다. 사방에서 압박하면 버티기 어려울 것입니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "적은 수로 버틸 준비를 마쳤다는 점이 문제입니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "사다리를 세우면 불이 떨어졌고 성벽 아래로 접근하면 돌이 굴렀다. 새로운 공성법은 새로운 방어와 만났다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "이 방법도 막혔습니다. 다시 시도하면 앞의 부대가 많이 다칩니다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "막혔다는 보고를 늦추지 마시오. 내 계책이 틀렸다는 말을 빨리 듣는 편이 군사를 덜 잃습니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "성 안에는 지킬 사람과 남은 양식이 있다. 적이 많다는 이유로 문을 열지는 않는다.",
+            "speaker": "학소",
+            "portraitId": "학소",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "학소",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "날짜가 지날수록 촉군의 창고가 먼저 가벼워졌다. 성 안의 버티는 힘만큼 성 밖의 멈출 판단도 시험받고 있었다.",
+            "pose": [
+              {
+                "id": "학소",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "군량을 아껴도 돌아갈 몫은 남겨야 합니다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "안다. 오늘의 압박으로 후속 부대를 거둘 시간을 벌고, 때가 되면 미련 없이 물러난다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "학소",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-camp-night",
+        "label": "진창 공성 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "왕평",
+            "sprite": "sequel-ec9995ed8f89",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "진창의 성문은 열리지 않았다. 촉군은 공성 부대를 거두고 물러났다. 군사를 보전한 것은 성을 빼앗았다는 뜻이 아니었고, 성을 못 얻은 것이 모두 헛되었다는 뜻도 아니었다.",
+            "move": [
+              {
+                "id": "강유",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "돌아가면 실패했다는 말을 듣겠지요.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "사실이라면 들어야지. 그 말을 피하려고 사람을 더 잃을 수는 없다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "촉의 손실은 전장 밖에서도 이어졌다. 노장 조운이 세상을 떠났다는 소식이 전해졌다. 유비와 함께 길을 건너던 세대가 또 한 걸음 멀어졌다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "자룡은 돌아오는 사람을 세던 장수였다. 그 습관은 우리가 이어야 한다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "군영의 명부를 다시 정리하겠습니다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "장수들은 새 진군을 논하기 전에 군량을 논했다. 북벌의 길은 창끝이 닿는 거리보다 수레가 왕복하는 거리로 더 자주 정해졌다.",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "제갈량은 기산의 지형을 펼치면서 그 옆에 고을별 곡식 장부를 함께 놓았다.",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "진창 공성 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "철수할 짐을 묶는 소리에 병사들의 표정이 어두워졌다. 제갈량은 일부러 대열 사이를 걸으며 돌아갈 길과 다음 보급소를 설명했다.",
+            "move": [
+              {
+                "id": "제갈량",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "오늘 성을 얻지 못한 것과 그대들을 잃는 것은 다른 일이다. 물러나는 명령도 앞으로 나가는 명령처럼 지켜라.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "진창의 성루에서 불빛이 움직였다. 끝내 서로 얼굴을 가까이 보지 못한 두 장수는, 상대가 얼마나 오래 버텼는지를 누구보다 잘 알고 있었다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "진창 공성의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

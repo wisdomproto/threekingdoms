@@ -1,0 +1,811 @@
+{
+  "id": "45-tengjia",
+  "name": "등갑군 저지",
+  "mapId": "tengjia",
+  "turnLimit": 30,
+  "levelCap": 53,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "제갈량",
+    "조운",
+    "위연",
+    "마대",
+    "왕평",
+    "마속",
+    "장익",
+    "등지"
+  ],
+  "units": [
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 45,
+      "troops": 365,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 45,
+      "troops": 480,
+      "items": [
+        "용담창"
+      ],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "위연",
+      "classId": "footman",
+      "level": 45,
+      "troops": 480,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "마대",
+      "classId": "lightCavalry",
+      "level": 45,
+      "troops": 480,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "왕평",
+      "classId": "footman",
+      "level": 45,
+      "troops": 480,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "마속",
+      "classId": "strategist",
+      "level": 45,
+      "troops": 365,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장익",
+      "classId": "footman",
+      "level": 45,
+      "troops": 480,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "등지",
+      "classId": "strategist",
+      "level": 45,
+      "troops": 365,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "올돌골",
+      "classId": "bandit",
+      "level": 45,
+      "troops": 445,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "45-tengjia-guard-1",
+      "classId": "footman",
+      "level": 43,
+      "troops": 330,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "45-tengjia-guard-2",
+      "classId": "archer",
+      "level": 43,
+      "troops": 330,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "45-tengjia-guard-3",
+      "classId": "lightCavalry",
+      "level": 43,
+      "troops": 330,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "45-tengjia-guard-4",
+      "classId": "footman",
+      "level": 43,
+      "troops": 330,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "45-tengjia-guard-5",
+      "classId": "strategist",
+      "level": 43,
+      "troops": 330,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "45-tengjia-guard-6",
+      "classId": "archer",
+      "level": 43,
+      "troops": 330,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "45-tengjia-guard-7",
+      "classId": "footman",
+      "level": 43,
+      "troops": 330,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "defeatUnit",
+      "unitId": "올돌골"
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "제갈량",
+        "조운",
+        "위연",
+        "마대",
+        "왕평",
+        "마속",
+        "장익",
+        "등지"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "45-tengjia-event",
+      "name": "계곡의 화공",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "fire",
+          "area": {
+            "x": 16,
+            "y": 5,
+            "width": 5,
+            "height": 9
+          }
+        },
+        {
+          "kind": "fire",
+          "area": {
+            "x": 16,
+            "y": 5,
+            "width": 5,
+            "height": 9
+          },
+          "duration": 3,
+          "damagePercent": 8,
+          "spread": false,
+          "flammableOnly": false
+        },
+        {
+          "kind": "damage",
+          "target": {
+            "side": "enemy",
+            "area": {
+              "x": 15,
+              "y": 5,
+              "width": 10,
+              "height": 10
+            }
+          },
+          "amount": 15,
+          "percent": true,
+          "nonlethal": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 4950,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "45-tengjia-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "text": "등갑군의 정면을 피하고 계곡으로 유도한다. 불붙은 구역에 아군이 들어가지 않게 하라."
+        }
+      ]
+    },
+    {
+      "id": "45-tengjia-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "45-tengjia-event"
+      },
+      "lines": [
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "text": "등갑군이 들어온 계곡에 불이 붙었다. 적군이 피해를 입고 계곡의 불길이 잠시 지속된다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-sequel-south-camp",
+        "label": "등갑군 저지 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "위연",
+            "sprite": "sequel-ec9c84ec97b0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "등갑을 시험한 칼이 튕겨 나왔다는 보고가 들어왔다. 제갈량은 갑옷 조각을 불 가까이 가져갔다가 곧 물렸다. 타는 냄새가 막사 안에 잠깐 남았다.",
+            "move": [
+              {
+                "id": "위연",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "불을 쓰면 길이 열립니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "열린 길로 우리만 나가는 것이 아니네. 불길 속에서 적이 빠져나올 틈도 남겨 두게.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그러면 다시 싸울 자가 남습니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "남겨야 할 사람과 놓쳐서는 안 될 적을 분별하는 것이 장수의 일일세. 오늘은 그 일이 특히 어렵겠지.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-sequel-south-camp",
+        "label": "등갑군 저지 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "위연",
+            "sprite": "sequel-ec9c84ec97b0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "마속",
+            "sprite": "sequel-eba788ec868d",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "등갑군이 지나간 길에는 화살이 많이 떨어져 있었다. 맞고도 쓰러지지 않는 적을 본 병사들은 같은 활을 다시 당기며 손에 힘을 주었다.",
+            "move": [
+              {
+                "id": "위연",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "오래 맞붙으면 우리 쪽만 지칩니다. 군사께서 말씀하신 계곡으로 유인하겠습니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "물러날 순서를 먼저 정하시오. 뒤처진 아군이 있는데 불을 놓아서는 안 됩니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "군사들은 마른 풀과 화구를 숨겼다. 평소 군량을 지키던 손이 오늘은 태울 것을 나르고 있었다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "계곡 밖의 길을 맡겠습니다. 싸울 힘을 잃은 자가 나오면 무기를 버리게 하고 받겠습니다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "칠종칠금이라는 말이 돌고 있습니다. 이번에 맹획의 마음도 돌아설까요?",
+            "speaker": "마속",
+            "portraitId": "마속",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "마속",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "숫자를 채우려고 사람을 잡았다 놓는 것이 아닙니다. 그가 납득하지 못하면 일곱 번이라는 말도 허망합니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "마속",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "멀리 등갑이 서로 부딪치는 소리가 났다. 제갈량은 준비한 군령을 다시 읽었다. 불을 놓는 명령은 짧았고 그 뒤에 감당할 일은 길었다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "신호를 기다리겠습니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "밤바람이 계곡을 따라 불었다. 촉군의 유인 부대가 천천히 물러나자 등갑군의 발소리가 그 뒤를 채웠다.",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "마속",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-sequel-south-camp",
+        "label": "등갑군 저지 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "맹획",
+            "sprite": "sequel-eba7b9ed9a8d",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "불이 꺼진 뒤 계곡에는 오래 매캐한 냄새가 남았다. 제갈량은 승전 보고를 듣고도 한동안 말하지 않았다. 연의가 전하는 이 승리에는 그의 눈물도 함께 남았다.",
+            "move": [
+              {
+                "id": "제갈량",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "계책이 옳게 맞았다고 마음까지 가벼워지는 것은 아니구나.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "맹획은 마침내 더 싸우지 않겠다는 뜻을 밝혔다. 촉은 남중의 일을 모두 외지 관리에게 맡기지 않고 현지의 사람을 통해 다스릴 길을 택했다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "오늘 약속을 지키겠다. 너희가 돌아간 뒤에도 우리를 사람으로 대하라.",
+            "speaker": "맹획",
+            "portraitId": "맹획",
+            "pose": [
+              {
+                "id": "맹획",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그 약속을 장부와 법에도 남기겠습니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "맹획",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "군대가 돌아가는 길에 남중의 주민들이 길을 안내했다. 전쟁을 끝내는 행렬은 처음 들어올 때보다 느렸지만, 경계하는 창끝은 조금 낮아졌다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "성도로 돌아가면 쉬실 수 있겠습니까.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "쉬어야 할 사람은 먼저 쉬게 하시오. 북쪽으로 보낼 글은 내가 쓰겠습니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "제갈량은 돌아온 성도에서 출사표를 준비했다. 한 사람에게 맡겼던 유비의 부탁은 이제 나라 전체가 감당할 긴 원정이 되었다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "맹획",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-sequel-south-camp",
+        "label": "등갑군 저지 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "연기가 걷힌 골짜기에서 제갈량은 부채를 접었다. 승전 보고를 읽던 목소리가 멎자 타다 남은 나무가 무너지는 소리가 들렸다.",
+            "move": [
+              {
+                "id": "제갈량",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "살아 있는 사람부터 찾아라. 어느 편 갑옷을 입었는지는 묻지 마라.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "군사들은 물과 들것을 나누어 들었다. 돌아갈 길을 열었다는 기쁨보다, 그 길에 무엇을 남겼는지가 오래 기억될 날이었다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "남중에서 맺은 약속들은 이 골짜기의 기억까지 짊어져야 했다. 제갈량은 귀환을 준비하면서도 현지에 남길 사람을 여러 번 바꾸어 골랐다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "등갑군 저지의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

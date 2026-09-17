@@ -735,6 +735,7 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
       if (!tgt || tgt.retreated) throw new Error(`no valid target at (${tgtCoord.x},${tgtCoord.y})`);
 
       let amount = 0;
+      const itemConsequences: BattleEvent[] = [];
       if (item.category === "supplyItem") {
         // 회복약: 같은 진영(아군·우군) troops를 power만큼 회복 (상한 = maxTroops)
         if (areFoes(tgt.side, unit.side)) throw new Error(`supplyItem target must be friendly`);
@@ -746,7 +747,7 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
         if (!areFoes(tgt.side, unit.side)) throw new Error(`attackItem target must be hostile`);
         const hit = dealDamage(state, unit, tgt, item.power, false, true, false, false, "item");
         next = hit.state;
-        events.push(...hit.events);
+        itemConsequences.push(...hit.events);
         amount = Math.min(item.power, tgt.troops); // 실제 가한 피해(병력이 더 적으면 그만큼)
       }
 
@@ -760,6 +761,8 @@ export function applyAction(ctx: BattleContext, state: BattleState, action: Acti
       events.push({
         type: "itemUsed", unitId: unit.id, itemId: action.itemId, target: action.target, amount,
       });
+      // Announce the tool before its impact/retreat, like strategyCast.
+      events.push(...itemConsequences);
       break;
     }
 

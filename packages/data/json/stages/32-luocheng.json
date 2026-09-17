@@ -1,0 +1,845 @@
+{
+  "id": "32-luocheng",
+  "name": "낙성 공략",
+  "mapId": "luocheng",
+  "turnLimit": 30,
+  "levelCap": 40,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "유비",
+    "황충",
+    "위연",
+    "장비",
+    "조운",
+    "제갈량",
+    "유봉",
+    "손건"
+  ],
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 32,
+      "troops": 428,
+      "items": [
+        "쌍고검"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "황충",
+      "classId": "archer",
+      "level": 32,
+      "troops": 428,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "위연",
+      "classId": "footman",
+      "level": 32,
+      "troops": 428,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 32,
+      "troops": 428,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 32,
+      "troops": 428,
+      "items": [
+        "용담창"
+      ],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 32,
+      "troops": 326,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "유봉",
+      "classId": "footman",
+      "level": 32,
+      "troops": 428,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "손건",
+      "classId": "strategist",
+      "level": 32,
+      "troops": 326,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장임",
+      "classId": "footman",
+      "level": 32,
+      "troops": 406,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "32-luocheng-guard-1",
+      "classId": "footman",
+      "level": 30,
+      "troops": 291,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "32-luocheng-guard-2",
+      "classId": "archer",
+      "level": 30,
+      "troops": 291,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "32-luocheng-guard-3",
+      "classId": "lightCavalry",
+      "level": 30,
+      "troops": 291,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "32-luocheng-guard-4",
+      "classId": "footman",
+      "level": 30,
+      "troops": 291,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "32-luocheng-guard-5",
+      "classId": "strategist",
+      "level": 30,
+      "troops": 291,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "32-luocheng-guard-6",
+      "classId": "archer",
+      "level": 30,
+      "troops": 291,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "32-luocheng-guard-7",
+      "classId": "footman",
+      "level": 30,
+      "troops": 291,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "defeatUnit",
+      "unitId": "장임"
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "유비",
+        "황충",
+        "위연",
+        "장비",
+        "조운",
+        "제갈량",
+        "유봉",
+        "손건"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "32-luocheng-event",
+      "name": "장임의 매복 발견",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "rock",
+          "area": {
+            "x": 15,
+            "y": 5,
+            "width": 10,
+            "height": 10
+          }
+        },
+        {
+          "kind": "damage",
+          "target": {
+            "side": "enemy",
+            "area": {
+              "x": 15,
+              "y": 5,
+              "width": 10,
+              "height": 10
+            }
+          },
+          "amount": 12,
+          "percent": true,
+          "nonlethal": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 4040,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "32-luocheng-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "산길을 경계하라. 성을 얻되 군사를 잃는 무모한 추격은 하지 않는다."
+        }
+      ]
+    },
+    {
+      "id": "32-luocheng-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "32-luocheng-event"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "측면 길에서 매복의 흔적을 찾았다. 바위 뒤 수비대를 흔들어 성문으로 이어지는 길을 연다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-camp-night",
+        "label": "낙성 공략 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "방통",
+            "sprite": "sequel-ebb0a9ed86b5",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "비가 그친 산길에서 방통은 신발에 붙은 진흙을 털었다. 유비의 말이 먼저 멈추자 그는 뒤따르는 수레가 길을 막지 않도록 옆으로 비켜섰다.",
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "오늘은 내 곁에서 가시오. 갈림길마다 군사가 나뉘니 마음이 놓이지 않소.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "곁에만 있으면 보이지 않는 것도 있습니다. 앞길을 살피고 신호를 보내겠습니다.",
+            "speaker": "방통",
+            "portraitId": "방통",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "방통",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "계책을 듣자는 것이 아니라, 무리하지 말라는 말이오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "방통",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "방통은 잠깐 웃었다. 그 대답을 유비는 훗날 여러 번 떠올렸다. 당시에는 그 웃음 뒤에도 수많은 저녁과 회의가 남아 있으리라 여겼다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "방통",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "낙성 공략 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "황충",
+            "sprite": "sequel-ed99a9ecb6a9",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "장비",
+            "sprite": "zhangfei-leader",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              3,
+              6
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "낙봉파에서 돌아온 말에는 주인이 없었다. 진흙이 말의 배까지 튀어 있었고 안장 끈에는 부러진 화살이 걸렸다. 방통이 돌아오지 못했다는 소식은 그 말보다 조금 늦게 왔다.",
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "어제까지 함께 지도를 보았소. 아침에 길을 나눴을 뿐인데.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "장임의 매복이었습니다. 살아 돌아온 군사들을 모으고 있습니다.",
+            "speaker": "황충",
+            "portraitId": "황충",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "황충",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 곧장 복수를 명하지 않았다. 먼저 이름을 적게 했다. 돌아온 자의 이름, 돌아오지 못한 자의 이름, 마지막으로 방통을 본 자의 이름이었다.",
+            "pose": [
+              {
+                "id": "황충",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "익주를 얻는다 해도 그와 함께 의논할 수 없다면, 얻은 것이 모두 같은 무게는 아니겠지.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "형주로 간 급사가 돌아올 때에는 제갈량과 장비, 조운의 군대가 뒤따랐다. 장비는 길에서 얻은 장수 엄안의 충절을 먼저 이야기했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "사원의 자리를 메울 수 있다고 말하지 않겠습니다. 다만 주공께서 멈추지 않도록 곁에 서겠습니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "산길의 군사들이 모였소. 이번에는 뒤를 맡길 사람이 있소.",
+            "speaker": "장비",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "백성들이 성 안으로 피하고 있습니다. 성문을 칠 때 도망칠 길을 남겨 두어야 합니다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 방통이 남긴 지도에 손을 얹었다. 지도 위의 선은 아직 성도까지 이어져 있었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "황충",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-camp-night",
+        "label": "낙성 공략 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "장비",
+            "sprite": "zhangfei-leader",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "낙성이 무너진 뒤에도 장임은 고개를 숙이지 않았다. 유비는 그의 능력을 아꼈지만 장임은 두 주인을 섬기지 않겠다는 뜻을 거두지 않았다.",
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "충성스러운 사람이 적이 되면 이긴 자에게도 쉬운 결말은 없구나.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "죽은 이를 모두 옳다고 할 수도, 살아남은 우리를 모두 옳다고 할 수도 없습니다. 이후의 다스림으로 답해야 합니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "군사들은 방통의 제단에 낙성의 흙을 놓았다. 유비는 승전 보고보다 오래 그 앞에 서 있었다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "가맹관에서 급보가 왔습니다. 서량의 마초가 장로의 군을 이끌고 내려온답니다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "마초라면 내가 맞겠소. 관문이 흔들리면 이 승리도 오래 못 가오.",
+            "speaker": "장비",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "적의 이름만 보고 달려들지 마시오. 그가 왜 여기까지 왔는지도 알아보아야 하오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "한 성이 열린 날 다른 관문의 북이 울렸다. 익주를 얻는 길은 아직 끝나지 않았다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-night",
+        "label": "낙성 공략 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "법정",
+            "sprite": "sequel-ebb295eca095",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "방통이 쓰던 자리는 치우지 못했다. 죽간의 끈이 풀려 있었고, 반쯤 지운 지명 옆에는 다음에 확인하라는 작은 표시가 남아 있었다.",
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "이곳을 지나면 다시 묻겠다고 했는데, 이제 누구에게 물어야 하오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "곁에 선 장수들은 대답하지 못했다. 유비는 죽간을 묶고 나서야 군령을 내렸다. 분노 때문에 항복한 병사를 해치는 일이 없도록 하라는 명령이었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "남겨 둔 계책은 정리하겠습니다. 다만 사공의 이름을 승전 장부 한 줄로 끝내지는 말아 주십시오.",
+            "speaker": "법정",
+            "portraitId": "법정",
+            "pose": [
+              {
+                "id": "법정",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 고개를 끄덕였다. 서쪽으로 나아가는 길에는 이제 영토의 무게만 실린 것이 아니었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "법정",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "낙성 공략의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

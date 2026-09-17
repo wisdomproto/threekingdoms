@@ -7,7 +7,7 @@ export async function GET(_request:Request,{params}:{params:Promise<{asset:strin
   if(!file)return new Response('Not found',{status:404});
   const root=path.basename(process.cwd())==='web'?path.resolve(process.cwd(),'../..'):process.cwd();
   try{
-    const bytes=await readFile(path.join(root,'docs/troia/first-battle/assets',file));
+    const bytes=await readFile(process.env.TK_STUDIO_ASSET_DIR ? path.join(process.env.TK_STUDIO_ASSET_DIR,'troia/legacy',file) : path.join(root,'docs/troia/first-battle/assets',file));
     return new Response(new Uint8Array(bytes),{headers:{'Content-Type':'image/png','Cache-Control':'public, max-age=3600'}});
   }catch{return new Response('Troy artwork is missing from the local workspace.',{status:404});}
 }

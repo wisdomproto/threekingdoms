@@ -1,0 +1,833 @@
+{
+  "id": "31-fushui",
+  "name": "부수관 돌파",
+  "mapId": "fushui",
+  "turnLimit": 30,
+  "levelCap": 39,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "유비",
+    "황충",
+    "위연",
+    "방통",
+    "유봉",
+    "손건",
+    "미축",
+    "간옹"
+  ],
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 31,
+      "troops": 424,
+      "items": [
+        "쌍고검"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "황충",
+      "classId": "archer",
+      "level": 31,
+      "troops": 424,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "위연",
+      "classId": "footman",
+      "level": 31,
+      "troops": 424,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "방통",
+      "classId": "strategist",
+      "level": 31,
+      "troops": 323,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "유봉",
+      "classId": "footman",
+      "level": 31,
+      "troops": 424,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "손건",
+      "classId": "strategist",
+      "level": 31,
+      "troops": 323,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "미축",
+      "classId": "strategist",
+      "level": 31,
+      "troops": 323,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "간옹",
+      "classId": "strategist",
+      "level": 31,
+      "troops": 323,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "양회",
+      "classId": "footman",
+      "level": 31,
+      "troops": 403,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "31-fushui-guard-1",
+      "classId": "footman",
+      "level": 29,
+      "troops": 288,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "31-fushui-guard-2",
+      "classId": "archer",
+      "level": 29,
+      "troops": 288,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "31-fushui-guard-3",
+      "classId": "lightCavalry",
+      "level": 29,
+      "troops": 288,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "31-fushui-guard-4",
+      "classId": "footman",
+      "level": 29,
+      "troops": 288,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "31-fushui-guard-5",
+      "classId": "strategist",
+      "level": 29,
+      "troops": 288,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "31-fushui-guard-6",
+      "classId": "archer",
+      "level": 29,
+      "troops": 288,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "31-fushui-guard-7",
+      "classId": "footman",
+      "level": 29,
+      "troops": 288,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "defeatUnit",
+      "unitId": "양회"
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "유비",
+        "황충",
+        "위연",
+        "방통",
+        "유봉",
+        "손건",
+        "미축",
+        "간옹"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "31-fushui-event",
+      "name": "관문 경계 붕괴",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "rock",
+          "area": {
+            "x": 15,
+            "y": 5,
+            "width": 10,
+            "height": 10
+          }
+        },
+        {
+          "kind": "damage",
+          "target": {
+            "side": "enemy",
+            "area": {
+              "x": 15,
+              "y": 5,
+              "width": 10,
+              "height": 10
+            }
+          },
+          "amount": 12,
+          "percent": true,
+          "nonlethal": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 3970,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "31-fushui-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "협곡 안에서 흩어지지 마라. 관문을 넘은 뒤 후속 부대를 받는다."
+        }
+      ]
+    },
+    {
+      "id": "31-fushui-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "31-fushui-event"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "관문의 신호가 끊겼다. 적 전열이 흔들리는 동안 좁은 길의 출구를 확보한다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-council-hall",
+        "label": "부수관 돌파 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "방통",
+            "sprite": "sequel-ebb0a9ed86b5",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "법정",
+            "sprite": "sequel-ebb295eca095",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "잔치는 끝났으나 유비의 소매에는 술 냄새가 남아 있었다. 유장의 환대가 진심이었다는 것을 알기에, 빈 잔을 내려놓은 손이 더 무거웠다.",
+            "move": [
+              {
+                "id": "방통",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "망설이시는 까닭은 압니다. 그러나 이곳에서 아무 일도 하지 않는다고 아무도 다치지 않는 것은 아닙니다.",
+            "speaker": "방통",
+            "portraitId": "방통",
+            "pose": [
+              {
+                "id": "방통",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그 말을 핑계로 삼을까 두렵소. 남의 성을 갖고 싶은 마음을 백성 걱정이라 부를 수도 있지 않겠소.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "방통",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그래서 약속이 필요합니다. 성을 얻은 뒤 무엇을 하지 않을지부터 정하십시오. 창고를 약탈하지 않고, 항복한 이를 보복하지 않겠다는 약속입니다.",
+            "speaker": "법정",
+            "portraitId": "법정",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "법정",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 곧바로 답하지 않았다. 바깥에서 병사들이 익주의 낯선 지명을 서로 고쳐 읽는 소리가 들렸다. 이제 그들에게 돌아갈 길과 나아갈 길을 말해 주어야 했다.",
+            "pose": [
+              {
+                "id": "방통",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "법정",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-council-hall",
+        "label": "부수관 돌파 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "방통",
+            "sprite": "sequel-ebb0a9ed86b5",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "황충",
+            "sprite": "sequel-ed99a9ecb6a9",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "위연",
+            "sprite": "sequel-ec9c84ec97b0",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "익주로 들어갈 때 유비의 군대는 손님이었다. 성문마다 술과 고기가 나왔고 유장은 먼 길을 온 종친을 반겼다. 그러나 군량의 수량과 병사의 배치를 논할 때마다 웃음은 짧아졌다.",
+            "move": [
+              {
+                "id": "방통",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "주공께서 돌아가시면 익주의 뜻을 맡긴 사람들은 누구를 바라보겠습니까.",
+            "speaker": "방통",
+            "portraitId": "방통",
+            "pose": [
+              {
+                "id": "방통",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "남의 믿음을 밟고 얻은 성으로 백성을 편히 다스릴 수 있겠는가.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "방통",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "망설임도 누군가에게는 칼이 됩니다. 이미 장송의 일이 드러났습니다. 문이 닫히고 있습니다.",
+            "speaker": "방통",
+            "portraitId": "방통",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "방통",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "장송의 죽음과 길목 봉쇄 소식이 잇따랐다. 손님과 주인의 관계가 끝났음을 알리는 데에는 선전포고 한 장도 필요하지 않았다.",
+            "pose": [
+              {
+                "id": "방통",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "돌아가는 길도 순순히 내주지 않을 것입니다. 앞을 택하든 뒤를 택하든 군사를 움직여야 합니다.",
+            "speaker": "황충",
+            "portraitId": "황충",
+            "pose": [
+              {
+                "id": "황충",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "성 안의 원한을 우리 병사에게 풀게 하지는 않겠소. 약탈은 금하오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "황충",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "관문이 좁습니다. 선봉이 막히면 뒤의 군사도 모두 갇힙니다. 제가 먼저 나가겠습니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "정면만 보지 마십시오. 길을 얻는 것이 오늘의 승리입니다. 성 하나의 이름에 매이지 마십시오.",
+            "speaker": "방통",
+            "portraitId": "방통",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "방통",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "부수관으로 가는 산길에 수레바퀴 자국이 길게 이어졌다. 유비는 초청장을 보관한 상자를 닫고 군령을 적을 종이를 펼쳤다.",
+            "pose": [
+              {
+                "id": "방통",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "황충",
+                "pose": "idle"
+              },
+              {
+                "id": "위연",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-council-hall",
+        "label": "부수관 돌파 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "방통",
+            "sprite": "sequel-ebb0a9ed86b5",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "황충",
+            "sprite": "sequel-ed99a9ecb6a9",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "부수관의 길이 열렸다. 병사들은 승전의 북을 쳤지만 유비는 떠나올 때와 같은 마음으로 돌아갈 수 없다는 것을 알았다.",
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "관문을 넘었다고 이 땅의 주인이 된 것은 아니오. 밭을 밟은 값부터 치르시오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "성도로 곧장 갈 수는 없습니다. 낙성의 장임이 우리 앞을 가로막고 있습니다.",
+            "speaker": "방통",
+            "portraitId": "방통",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "방통",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그 장수는 길을 잘 안다고 합니다. 평야에서 이긴 방식으로 산길을 들어가면 안 됩니다.",
+            "speaker": "황충",
+            "portraitId": "황충",
+            "pose": [
+              {
+                "id": "방통",
+                "pose": "idle"
+              },
+              {
+                "id": "황충",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "방통은 지도 위에 두 갈래 길을 그었다. 그는 자신의 선택이 빠른 승리를 가져와 유비의 근심도 끝내기를 바랐다.",
+            "pose": [
+              {
+                "id": "황충",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "서두를수록 서로 소식을 끊지 마시오. 군사께서 내 곁을 멀리 떠나면 마음이 놓이지 않소.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "길을 나누어도 뜻은 나누지 않겠습니다.",
+            "speaker": "방통",
+            "portraitId": "방통",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "방통",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "밤새 비가 지나갔다. 아침에 산안개가 걷혔을 때 두 부대는 서로 다른 길목을 향해 깃발을 들었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "방통",
+                "pose": "idle"
+              },
+              {
+                "id": "황충",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-council-hall",
+        "label": "부수관 돌파 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "방통",
+            "sprite": "sequel-ebb0a9ed86b5",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "첫 성의 문이 열리자 법정은 군사보다 서리를 먼저 들여보냈다. 창고의 봉인을 확인하고, 군대가 가져갈 곡식을 주민들 앞에서 세게 했다.",
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "성 하나를 얻은 것으로 옳았다고 할 수는 없겠지.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "예. 오늘 지킨 약속을 다음 성에서도 지키셔야 합니다. 그때 비로소 사람들이 믿을 것입니다.",
+            "speaker": "방통",
+            "portraitId": "방통",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "방통",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 부수의 성루를 돌아보았다. 처음 들어올 때 자신을 맞던 깃발과 지금 걸린 깃발은 달랐다. 그 아래 사는 사람들까지 낯선 사람이 되게 해서는 안 됐다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "방통",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "부수관 돌파의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

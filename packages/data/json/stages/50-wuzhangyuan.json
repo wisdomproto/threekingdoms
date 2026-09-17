@@ -1,0 +1,719 @@
+{
+  "id": "50-wuzhangyuan",
+  "name": "오장원 후위전",
+  "mapId": "wuzhangyuan",
+  "turnLimit": 30,
+  "levelCap": 58,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "강유",
+    "왕평",
+    "마대",
+    "장익",
+    "장억",
+    "등지"
+  ],
+  "units": [
+    {
+      "commanderId": "강유",
+      "classId": "lightCavalry",
+      "level": 50,
+      "troops": 500,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "왕평",
+      "classId": "footman",
+      "level": 50,
+      "troops": 500,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "마대",
+      "classId": "lightCavalry",
+      "level": 50,
+      "troops": 500,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장익",
+      "classId": "footman",
+      "level": 50,
+      "troops": 500,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장억",
+      "classId": "footman",
+      "level": 50,
+      "troops": 500,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "등지",
+      "classId": "strategist",
+      "level": 50,
+      "troops": 380,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "사마의",
+      "classId": "strategist",
+      "level": 50,
+      "troops": 460,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "50-wuzhangyuan-guard-1",
+      "classId": "footman",
+      "level": 48,
+      "troops": 345,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "50-wuzhangyuan-guard-2",
+      "classId": "archer",
+      "level": 48,
+      "troops": 345,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "50-wuzhangyuan-guard-3",
+      "classId": "lightCavalry",
+      "level": 48,
+      "troops": 345,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "50-wuzhangyuan-guard-4",
+      "classId": "footman",
+      "level": 48,
+      "troops": 345,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "50-wuzhangyuan-guard-5",
+      "classId": "strategist",
+      "level": 48,
+      "troops": 345,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "50-wuzhangyuan-guard-6",
+      "classId": "archer",
+      "level": 48,
+      "troops": 345,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "50-wuzhangyuan-guard-7",
+      "classId": "footman",
+      "level": 48,
+      "troops": 345,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "surviveTurns",
+      "turns": 8
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "강유",
+        "왕평",
+        "마대",
+        "장익",
+        "장억",
+        "등지"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "50-wuzhangyuan-event",
+      "name": "촉군 철수 신호",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "special",
+          "area": {
+            "x": 3,
+            "y": 5,
+            "width": 5,
+            "height": 9
+          }
+        },
+        {
+          "kind": "heal",
+          "target": {
+            "side": "player"
+          },
+          "amount": 12,
+          "percent": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 5300,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "50-wuzhangyuan-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "강유",
+          "side": "player",
+          "text": "본대가 물러날 때까지 후위를 지킨다. 추격자를 멀리 쫓지 마라."
+        }
+      ]
+    },
+    {
+      "id": "50-wuzhangyuan-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "50-wuzhangyuan-event"
+      },
+      "lines": [
+        {
+          "speaker": "강유",
+          "side": "player",
+          "text": "군량과 부상자가 먼저 이동했다. 후위대가 전열을 회복하며 철수할 시간을 번다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-sequel-wuzhang",
+        "label": "오장원 후위전 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "저녁을 물린 뒤에도 제갈량의 등불은 꺼지지 않았다. 강유는 보고를 짧게 하려 했으나 제갈량은 사소한 이름 하나까지 다시 물었다.",
+            "move": [
+              {
+                "id": "강유",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "이런 일은 제게 맡기셔도 됩니다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그래야 한다는 것을 알고 있네. 손에서 놓는 일이 생각보다 어렵구나.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "제갈량은 붓을 내려놓았다. 강유는 명령을 기다렸지만 한동안 아무 말도 없었다. 장막 너머에서 보초를 바꾸는 발소리가 지나갔다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "내가 없어도 군령은 이어져야 하네. 한 사람을 기다리느라 나라가 멈추어서는 안 되네.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "rest"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-sequel-wuzhang",
+        "label": "오장원 후위전 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "왕평",
+            "sprite": "sequel-ec9995ed8f89",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "오장원에서 두 군대는 오래 마주 보았다. 촉군의 밭에는 싹이 났으나 제갈량의 병은 나아지지 않았다. 하루의 끝마다 처리한 문서가 침상 곁에 쌓였다.",
+            "move": [
+              {
+                "id": "강유",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "작은 일까지 모두 보시면 쉬실 틈이 없습니다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "작은 일에서 먼저 굶는 사람이 생길까 두렵구나.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "연의는 그 밤의 기도와 꺼진 등불을 전한다. 그러나 등불 하나보다 오래 닳아 온 것은 나라의 일을 놓지 못한 사람의 몸이었다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "내가 없어도 철수 순서를 지켜라. 군대가 슬픔을 따라 한꺼번에 움직여서는 안 된다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "아직 함께 돌아가실 수 있습니다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "rest"
+              },
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그랬으면 좋겠다. 하지만 군령은 바라는 일만을 위해 쓰는 것이 아니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "제갈량은 유비에게 받은 부탁을 끝까지 놓지 못한 채 세상을 떠났다. 진영은 울음을 뒤로 미루고 철수를 준비했다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "rest"
+              }
+            ]
+          },
+          {
+            "text": "뒤에서 위군이 움직입니다. 승상의 죽음을 짐작한 듯합니다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "남은 사람을 지킨다. 깃발을 정돈하고 북을 맞춰라. 우리의 슬픔을 적에게 대열의 빈틈으로 내주지 마라.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              },
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "군사들은 빈 수레를 바라보지 않으려 애쓰며 창을 들었다. 그 밤의 후위는 한 사람의 마지막 명령을 길 위로 옮기는 일이었다.",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "rest"
+              },
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-sequel-wuzhang",
+        "label": "오장원 후위전 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "왕평",
+            "sprite": "sequel-ec9995ed8f89",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "후위가 버티는 동안 촉군은 질서를 지키며 물러났다. 죽은 제갈량이 살아 있는 사마의를 물리쳤다는 이야기가 퍼졌지만, 길 위에서 짐을 밀고 북을 친 사람들은 살아 있는 병사들이었다.",
+            "move": [
+              {
+                "id": "강유",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "돌아왔습니다. 승상께서 정하신 순서대로 모두를 데려오려 했습니다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "철수 중 위연과 양의의 갈등은 군대 안에 또 다른 상처를 남겼다. 위연은 끝내 마대에게 죽었고, 공명이 떠난 자리는 한 사람의 임명만으로 채워지지 않았다.",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "북쪽에서는 다시 올 것입니다. 이제는 남긴 말을 외우는 것보다 각자 맡은 성을 지켜야 합니다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "성도에서는 장완과 비의가 나라의 살림을 이어 갔다. 강유는 북쪽을 잊지 않았으나 촉의 시간은 예전과 다른 사람들의 손에 놓였다.",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "승상의 뜻을 지킨다고 그분의 이름 뒤에 숨지는 않겠습니다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "해가 바뀌고 아이들이 자랐다. 유비를 직접 본 병사는 줄었지만 그가 세운 나라의 성문은 여전히 매일 열리고 닫혔다.",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "그리고 어느 해, 한중의 성문 밖에 다시 큰 군대가 나타났다.",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-sequel-wuzhang",
+        "label": "오장원 후위전 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "남겨진 부채는 생각보다 가벼웠다. 강유는 그것을 들었다가 원래 있던 자리에 다시 놓았다. 물건 하나를 받는다고 그 사람이 보던 세상까지 이어받는 것은 아니었다.",
+            "move": [
+              {
+                "id": "강유",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "철수 명령은 낮은 목소리로 전달되었다. 울음이 나더라도 수레의 순서를 바꾸지 말고, 불을 밝히더라도 적에게 대열을 보이지 말라는 지시가 덧붙었다."
+          },
+          {
+            "text": "남겨 주신 길을 따르겠습니다. 다만 앞으로 생길 갈림길은 제가 판단해야 한다는 것도 잊지 않겠습니다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "text": "대답은 없었다. 강유는 그 침묵을 처음으로 명령이 아닌 자신의 책임으로 받아들였다.",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "오장원 후위전의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

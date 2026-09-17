@@ -1,0 +1,803 @@
+[
+  {
+    "id": "map-changsha",
+    "kind": "map",
+    "name": "changsha",
+    "prompt": "Create one high-detail painted tactical game ground map for 장사 공략 (changsha), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is siege; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_changsha.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-gongan",
+    "kind": "map",
+    "name": "gongan",
+    "prompt": "Create one high-detail painted tactical game ground map for 공안 귀환로 (gongan), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is river; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_gongan.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-fushui",
+    "kind": "map",
+    "name": "fushui",
+    "prompt": "Create one high-detail painted tactical game ground map for 부수관 돌파 (fushui), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is pass; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_fushui.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-luocheng",
+    "kind": "map",
+    "name": "luocheng",
+    "prompt": "Create one high-detail painted tactical game ground map for 낙성 공략 (luocheng), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is siege; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_luocheng.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-jiameng",
+    "kind": "map",
+    "name": "jiameng",
+    "prompt": "Create one high-detail painted tactical game ground map for 가맹관 대치 (jiameng), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is pass; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_jiameng.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-chengdu",
+    "kind": "map",
+    "name": "chengdu",
+    "prompt": "Create one high-detail painted tactical game ground map for 성도 포위 (chengdu), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is siege; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_chengdu.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-wagou",
+    "kind": "map",
+    "name": "wagou",
+    "prompt": "Create one high-detail painted tactical game ground map for 와구관 방어 (wagou), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is mountain; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_wagou.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-tiandang",
+    "kind": "map",
+    "name": "tiandang",
+    "prompt": "Create one high-detail painted tactical game ground map for 천탕산 기습 (tiandang), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is mountain; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_tiandang.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-dingjun",
+    "kind": "map",
+    "name": "dingjun",
+    "prompt": "Create one high-detail painted tactical game ground map for 정군산 결전 (dingjun), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is mountain; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_dingjun.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-hanshui",
+    "kind": "map",
+    "name": "hanshui",
+    "prompt": "Create one high-detail painted tactical game ground map for 한수 진영 방어 (hanshui), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is river; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_hanshui.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-yangping",
+    "kind": "map",
+    "name": "yangping",
+    "prompt": "Create one high-detail painted tactical game ground map for 양평관 확보 (yangping), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is pass; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_yangping.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-fancheng",
+    "kind": "map",
+    "name": "fancheng",
+    "prompt": "Create one high-detail painted tactical game ground map for 번성 수공 (fancheng), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is riverfort; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_fancheng.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-maicheng",
+    "kind": "map",
+    "name": "maicheng",
+    "prompt": "Create one high-detail painted tactical game ground map for 맥성 철수 엄호 (maicheng), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is forest; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_maicheng.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-yiling",
+    "kind": "map",
+    "name": "yiling",
+    "prompt": "Create one high-detail painted tactical game ground map for 이릉 탈출 (yiling), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is forest; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_yiling.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-lushui",
+    "kind": "map",
+    "name": "lushui",
+    "prompt": "Create one high-detail painted tactical game ground map for 노수 도하 (lushui), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is river; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_lushui.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-nanman",
+    "kind": "map",
+    "name": "nanman",
+    "prompt": "Create one high-detail painted tactical game ground map for 남중 산채 (nanman), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is forest; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_nanman.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-tengjia",
+    "kind": "map",
+    "name": "tengjia",
+    "prompt": "Create one high-detail painted tactical game ground map for 등갑군 저지 (tengjia), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is pass; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_tengjia.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-tianshui",
+    "kind": "map",
+    "name": "tianshui",
+    "prompt": "Create one high-detail painted tactical game ground map for 천수 공방 (tianshui), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is siege; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_tianshui.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-jieting",
+    "kind": "map",
+    "name": "jieting",
+    "prompt": "Create one high-detail painted tactical game ground map for 가정 철수전 (jieting), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is mountain; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_jieting.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-chencang",
+    "kind": "map",
+    "name": "chencang",
+    "prompt": "Create one high-detail painted tactical game ground map for 진창 공성 (chencang), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is siege; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_chencang.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-qishan",
+    "kind": "map",
+    "name": "qishan",
+    "prompt": "Create one high-detail painted tactical game ground map for 기산 보급전 (qishan), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is pass; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_qishan.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-wuzhangyuan",
+    "kind": "map",
+    "name": "wuzhangyuan",
+    "prompt": "Create one high-detail painted tactical game ground map for 오장원 후위전 (wuzhangyuan), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is plain; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_wuzhangyuan.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-xingshi",
+    "kind": "map",
+    "name": "xingshi",
+    "prompt": "Create one high-detail painted tactical game ground map for 흥세산 방어 (xingshi), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is mountain; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_xingshi.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-tazhong",
+    "kind": "map",
+    "name": "tazhong",
+    "prompt": "Create one high-detail painted tactical game ground map for 답중 철수로 (tazhong), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is pass; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_tazhong.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-jiange",
+    "kind": "map",
+    "name": "jiange",
+    "prompt": "Create one high-detail painted tactical game ground map for 검각 수비 (jiange), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is pass; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_jiange.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-mianzhu",
+    "kind": "map",
+    "name": "mianzhu",
+    "prompt": "Create one high-detail painted tactical game ground map for 면죽 최후의 방어 (mianzhu), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is plain; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_mianzhu.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "map-jianye",
+    "kind": "map",
+    "name": "jianye",
+    "prompt": "Create one high-detail painted tactical game ground map for 장강 통일전 (jianye), late Han/Three Kingdoms China. Landscape 7:5. Input1 EXACT tile layout 28x20, input2 art STYLE only. Preserve every terrain region and corridor exactly at supplied coordinates. Tan=walkable ochre earth, pale green=patchy short grass with naturally soft boundaries, dark green=forest floor and low undergrowth (NO tree trunks blocking units), brown mountain=rocky impassable elevated earth, blue=water, grey wall=low stone foundations, brown bridge=flat bare bridge approach (NO wood bridges: game draws them separately), single brown fort cell=flat parade ground with no building. Orthographic overhead terrain ground, no horizon/perspective/isometric diamond. Rich readable painted texture, fine stones/grass, varied hue and local ground detail, cohesive soft daylight. Location terrain is riverfort; evoke geography with ground texture within existing footprint. NO characters, no buildings, no tall trees, no UI/text/grid. Entire image precisely follows blockout, do not invent obstacles on walkable cells. Match cheerful warm green-gold polished SRPG aesthetic of reference2. Maximum native resolution.",
+    "references": [
+      "C:\\projects\\threekingdoms\\docs\\art\\layout_jianye.png",
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\maps\\zhuojun.webp"
+    ]
+  },
+  {
+    "id": "character-강유",
+    "kind": "character",
+    "name": "강유",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Jiang Wei, youthful serious scholar-warrior, clean shaven, emerald teal armor, silver helmet, spear, civilian teal scholar robes. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-관평",
+    "kind": "character",
+    "name": "관평",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Guan Ping, young square-jawed man, green gold armor, green headwrap, polearm, civilian green robes. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-관흥",
+    "kind": "character",
+    "name": "관흥",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Guan Xing, young sharp eyebrows, jade armor, gold-green cap, curved saber, civilian jade robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-당빈",
+    "kind": "character",
+    "name": "당빈",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Tang Bin, middle-aged compact beard, navy silver armor, spear, civilian navy robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-도준",
+    "kind": "character",
+    "name": "도준",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Tao Jun, stern middle-aged Wu commander, copper red armor, sword, civilian muted red robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-동궐",
+    "kind": "character",
+    "name": "동궐",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Dong Jue, mature narrow moustache, jade black armor, sword, civilian dark green official robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-두예",
+    "kind": "character",
+    "name": "두예",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Du Yu, older learned commander, slim moustache, silver blue armor, sword and scroll, civilian blue official robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-등애",
+    "kind": "character",
+    "name": "등애",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Deng Ai, rugged older face, short grey beard, dark blue iron armor, spear, civilian indigo travelling robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-등지",
+    "kind": "character",
+    "name": "등지",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Deng Zhi, mature diplomatic face, neat moustache, pale green light armor, sword, civilian white green scholar robes. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-마대",
+    "kind": "character",
+    "name": "마대",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Ma Dai, young tan face, short moustache, bronze white cavalry armor, spear, civilian sand-colored robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-마량",
+    "kind": "character",
+    "name": "마량",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Ma Liang, distinctive WHITE eyebrows, kind scholarly face, white jade light armor, fan, civilian cream green scholar robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-마속",
+    "kind": "character",
+    "name": "마속",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Ma Su, young confident clean-shaven scholar, green blue light armor, sword, civilian blue-green scholar robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-마초",
+    "kind": "character",
+    "name": "마초",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Ma Chao, handsome young warrior, white silver armor, white helmet with white plume, spear, civilian white robe and blue sash. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-마충",
+    "kind": "character",
+    "name": "마충",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Ma Zhong of Shu, middle-aged tan face, moustache, bronze green armor, spear, civilian olive robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-맹획",
+    "kind": "character",
+    "name": "맹획",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Meng Huo, broad warm dark tan face, big black beard, bronze leather southern tribal armor, heavy mace, civilian woven red ochre southern tunic. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-면죽 별부",
+    "kind": "character",
+    "name": "면죽 별부",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: anonymous Shu captain, ordinary middle-aged man, green leather lamellar armor, spear, civilian brown green tunic. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-반장",
+    "kind": "character",
+    "name": "반장",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Pan Zhang, fierce narrow eyes, stubble, burgundy iron armor, saber, civilian burgundy tunic. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-방덕",
+    "kind": "character",
+    "name": "방덕",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Pang De, weathered sturdy face, thick beard, white bronze helmet and armor, long saber, civilian grey ochre robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-방통",
+    "kind": "character",
+    "name": "방통",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Pang Tong, heavy dark eyebrows, broad nose, scruffy short beard, plum charcoal scholar battle robes, wooden staff, civilian plum scholar robes. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-법정",
+    "kind": "character",
+    "name": "법정",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Fa Zheng, sharp calm face, thin moustache, dark teal light armor over robes, scroll and sword, civilian dark teal robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-사마가",
+    "kind": "character",
+    "name": "사마가",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Shamoke, stocky tan southern chieftain, braided hair, ochre leather armor, iron mace, civilian ochre patterned tunic. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-사마의",
+    "kind": "character",
+    "name": "사마의",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Sima Yi, calculating narrow face, thin black moustache and pointed beard, navy black armored robe, fan, civilian black violet official robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-서황",
+    "kind": "character",
+    "name": "서황",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Xu Huang, sturdy middle-aged face, short black beard, white headcloth, steel grey armor, great axe, civilian grey robe and white headcloth. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-양회",
+    "kind": "character",
+    "name": "양회",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Yang Huai, broad stern moustached face, brown bronze armor, spear, civilian brown robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-영수",
+    "kind": "character",
+    "name": "영수",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Ning Sui, younger clear-eyed officer, blue green armor, sword, civilian pale teal robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-올돌골",
+    "kind": "character",
+    "name": "올돌골",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Wutugu, broad dark tan face, dark hair topknot, layered rattan armor, long club, civilian rattan-trimmed ochre cloth tunic. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-왕보",
+    "kind": "character",
+    "name": "왕보",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Wang Fu, mature thoughtful face, narrow beard, green light armor, sword, civilian moss green scholar robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-왕융",
+    "kind": "character",
+    "name": "왕융",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Wang Rong, composed middle-aged scholar, short moustache, pale blue light armor, fan, civilian pale blue official robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-왕준",
+    "kind": "character",
+    "name": "왕준",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Wang Jun, older confident admiral, grey moustache and short beard, navy gold armor, command sword, civilian navy gold official robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-왕평",
+    "kind": "character",
+    "name": "왕평",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Wang Ping, sturdy mature face, short beard, forest green leather armor, spear, civilian olive military tunic. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-왕혼",
+    "kind": "character",
+    "name": "왕혼",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Wang Hun, middle-aged narrow eyes, black moustache, blue bronze armor, spear, civilian royal blue official robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-요화",
+    "kind": "character",
+    "name": "요화",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Liao Hua, weathered older face, grey-streaked beard, green brown armor, spear, civilian olive brown robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-위연",
+    "kind": "character",
+    "name": "위연",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Wei Yan, fierce reddish face, black beard, maroon green armor, curved long saber, civilian dark red robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-유봉",
+    "kind": "character",
+    "name": "유봉",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Liu Feng, energetic young clean-shaven face, pale green bronze armor, spear, civilian pale green robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-유장",
+    "kind": "character",
+    "name": "유장",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Liu Zhang, gentle round mature face, short beard, purple gold light armor, sword, civilian purple official robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-육손",
+    "kind": "character",
+    "name": "육손",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Lu Xun, refined handsome young scholar, clean-shaven, white red light armor, fan and sword, civilian white robe red sash. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-이구",
+    "kind": "character",
+    "name": "이구",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Li Qiu, middle-aged small moustache, green silver armor, spear, civilian dark green tunic. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-장억",
+    "kind": "character",
+    "name": "장억",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Zhang Ni, tanned rugged older officer, short beard, green ochre armor, spear, civilian ochre green robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-장익",
+    "kind": "character",
+    "name": "장익",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Zhang Yi, mature long moustache, forest-green steel armor, sword, civilian green official robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-장임",
+    "kind": "character",
+    "name": "장임",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Zhang Ren, stern upright mature face, trimmed beard, bronze burgundy armor, spear, civilian burgundy robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-장준",
+    "kind": "character",
+    "name": "장준",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Zhang Zun, young forceful eyebrows, short beard, dark red green armor, spear, civilian dark red robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-장포",
+    "kind": "character",
+    "name": "장포",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Zhang Bao, young broad face and thick eyebrows, short black beard, dark green black armor, snake-headed spear, civilian dark green robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-장합",
+    "kind": "character",
+    "name": "장합",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Zhang He, handsome mature face, neat moustache, violet steel armor, spear, civilian violet robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-제갈상",
+    "kind": "character",
+    "name": "제갈상",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Zhuge Shang, very young clear-eyed scholar-warrior, white jade light armor, spear, civilian white jade robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-제갈첨",
+    "kind": "character",
+    "name": "제갈첨",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Zhuge Zhan, middle-aged thoughtful face, short neat beard, pale jade silver armor, sword, civilian jade scholar robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-조루",
+    "kind": "character",
+    "name": "조루",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Zhao Lei, mature square face, short moustache, dark green bronze armor, spear, civilian brown green robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-조상",
+    "kind": "character",
+    "name": "조상",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Cao Shuang, round middle-aged face, small moustache, rich blue gold armor, sword, civilian blue gold official robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-조인",
+    "kind": "character",
+    "name": "조인",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Cao Ren, stocky mature face, thick beard, dark blue steel armor, shield and saber, civilian indigo robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-조홍",
+    "kind": "character",
+    "name": "조홍",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Cao Hong, mature sharp brows, short black beard, navy bronze armor, saber, civilian slate-blue robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-종회",
+    "kind": "character",
+    "name": "종회",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Zhong Hui, ambitious young pale face, thin moustache, violet silver armor, sword, civilian violet official robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-주창",
+    "kind": "character",
+    "name": "주창",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Zhou Cang, sturdy dark tan face, wild short black beard, green headwrap, dark leather armor, polearm, civilian dark brown tunic green sash. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-주태",
+    "kind": "character",
+    "name": "주태",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Zhou Tai, scarred mature face, short beard, dark red bronze armor, saber, civilian dark red robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-축융",
+    "kind": "character",
+    "name": "축융",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Lady Zhurong, athletic adult woman, tan skin, dark braided hair, copper red southern armor, throwing blade, civilian orange-red patterned long tunic, practical fully clothed. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-하후덕",
+    "kind": "character",
+    "name": "하후덕",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Xiahou De, mature stocky face, trimmed beard, navy bronze armor, axe, civilian slate robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-하후연",
+    "kind": "character",
+    "name": "하후연",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Xiahou Yuan, mature confident face, short beard, blue steel helmet and armor, bow, civilian blue robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-학소",
+    "kind": "character",
+    "name": "학소",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Hao Zhao, severe weathered face, short grey beard, navy iron armor, spear and shield, civilian dark grey robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-호분",
+    "kind": "character",
+    "name": "호분",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Hu Fen, older bold face, grey moustache, blue bronze armor, spear, civilian navy brown robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-호제",
+    "kind": "character",
+    "name": "호제",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Hu Ji, mature gentle moustached face, green silver armor, sword, civilian blue green robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  },
+  {
+    "id": "character-황숭",
+    "kind": "character",
+    "name": "황숭",
+    "prompt": "One production character asset atlas, exactly 4 columns x4 rows, 16 equally sized square cells. Reference is STYLE/body proportions only, not identity. Cute consistent 3-head-tall SD, polished outlined hand-painted 2D tactical RPG artwork, no adult realistic proportions. CHARACTER: Huang Chong, young stern brows, clean shaven, green bronze armor, spear, civilian pale green robe. Battle poses are ON FOOT, no horse. Portrait must match this exact same face. Civilian outfit has NO armor, helmet or weapon, wears a cloth cap. Full body with feet in each cell except portrait. TRUE TRANSPARENT alpha background, no checkerboard, no solid background, no text, labels, grid or borders. Broad empty gutters, nothing crosses cells, keep equal sprite scale. Order left-to-right, top-to-bottom: row1 portrait bust / armored idle three-quarter front facing LEFT / armored idle rear upper-left / armored attacking LEFT using own weapon. Row2 armored attack rear upper-left / armored flinch front LEFT / armored walk front LEFT step / armored walk rear upper-left step. Row3 civilian idle front LEFT / civilian idle rear upper-left / civilian walk front LEFT step1 / civilian walk front LEFT step2. Row4 civilian talking open hand LEFT / civilian hands-clasped salute LEFT / civilian seated cross-legged LEFT / civilian kneeling LEFT. All 16 cells occupied correctly; clear directional silhouette and consistent face. Square high resolution sprite atlas, no scene scenery.",
+    "references": [
+      "C:\\projects\\threekingdoms\\apps\\web\\public\\assets\\sprites\\guanyu\\front_idle.webp"
+    ]
+  }
+]

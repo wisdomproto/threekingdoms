@@ -1,0 +1,750 @@
+{
+  "id": "40-fancheng",
+  "name": "번성 수공",
+  "mapId": "fancheng",
+  "turnLimit": 30,
+  "levelCap": 48,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "관우",
+    "관평",
+    "주창",
+    "요화",
+    "조루",
+    "왕보"
+  ],
+  "units": [
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 40,
+      "troops": 496,
+      "items": [
+        "청룡언월도"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "관평",
+      "classId": "lightCavalry",
+      "level": 40,
+      "troops": 496,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "주창",
+      "classId": "footman",
+      "level": 40,
+      "troops": 496,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "요화",
+      "classId": "footman",
+      "level": 40,
+      "troops": 496,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "조루",
+      "classId": "strategist",
+      "level": 40,
+      "troops": 378,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "왕보",
+      "classId": "archer",
+      "level": 40,
+      "troops": 496,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "방덕",
+      "classId": "lightCavalry",
+      "level": 40,
+      "troops": 430,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "40-fancheng-guard-1",
+      "classId": "footman",
+      "level": 38,
+      "troops": 315,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "40-fancheng-guard-2",
+      "classId": "archer",
+      "level": 38,
+      "troops": 315,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "40-fancheng-guard-3",
+      "classId": "lightCavalry",
+      "level": 38,
+      "troops": 315,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "40-fancheng-guard-4",
+      "classId": "footman",
+      "level": 38,
+      "troops": 315,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "40-fancheng-guard-5",
+      "classId": "strategist",
+      "level": 38,
+      "troops": 315,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "40-fancheng-guard-6",
+      "classId": "archer",
+      "level": 38,
+      "troops": 315,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "40-fancheng-guard-7",
+      "classId": "footman",
+      "level": 38,
+      "troops": 315,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "defeatUnit",
+      "unitId": "방덕"
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "관우",
+        "관평",
+        "주창",
+        "요화",
+        "조루",
+        "왕보"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "40-fancheng-event",
+      "name": "한수 범람",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "weather",
+          "weather": "rain"
+        },
+        {
+          "kind": "effect",
+          "effect": "water",
+          "area": {
+            "x": 15,
+            "y": 5,
+            "width": 10,
+            "height": 10
+          }
+        },
+        {
+          "kind": "damage",
+          "target": {
+            "side": "enemy",
+            "area": {
+              "x": 15,
+              "y": 5,
+              "width": 10,
+              "height": 10
+            }
+          },
+          "amount": 30,
+          "percent": true,
+          "nonlethal": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 4600,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "40-fancheng-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "물이 오를 때 적의 구원군을 격파한다. 번성 성벽 아래에 전군을 몰아넣지 마라."
+        }
+      ]
+    },
+    {
+      "id": "40-fancheng-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "40-fancheng-event"
+      },
+      "lines": [
+        {
+          "speaker": "관우",
+          "side": "player",
+          "text": "한수가 범람했다. 낮은 진지의 적군이 물에 휩쓸려 병력을 잃는다. 비가 내려 화계의 위력도 약해진다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-river-landing",
+        "label": "번성 수공 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "관평",
+            "sprite": "sequel-eab480ed8f89",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "관평은 강가에 박아 둔 말뚝의 눈금을 확인하고 돌아왔다. 어제 물 밖에 있던 표시가 잠겨 있었다. 비는 북쪽 산에서 더 오래 내린다는 보고였다.",
+            "move": [
+              {
+                "id": "관평",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "병사들을 낮은 곳에서 옮기겠습니다. 강을 믿고 세운 진영이 강 때문에 위험해질 수 있습니다.",
+            "speaker": "관평",
+            "portraitId": "관평",
+            "pose": [
+              {
+                "id": "관평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "적을 보는 눈으로 우리 발밑도 보아라. 물이 적군만 알아보고 흐르는 것은 아니다.",
+            "speaker": "관우",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "관평",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "관우는 젖은 서신을 다시 접었다. 뒤쪽 형주의 수비를 묻는 문장이 눈에 남았다. 앞의 성문을 보고 서 있을수록, 보이지 않는 뒤편이 길어졌다.",
+            "pose": [
+              {
+                "id": "관평",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-river-landing",
+        "label": "번성 수공 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "관평",
+            "sprite": "sequel-eab480ed8f89",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "주창",
+            "sprite": "sequel-eca3bcecb0bd",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "한중의 승전보가 형주에 도착한 뒤 관우는 북쪽을 바라보았다. 번성을 압박하면 조조의 남쪽 방어를 흔들 수 있었다. 오래 지켜 온 형주는 마침내 출발점이 되었다.",
+            "move": [
+              {
+                "id": "관평",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "강동의 사신이 다시 다녀갔습니다. 답을 기다린다고 합니다.",
+            "speaker": "관평",
+            "portraitId": "관평",
+            "pose": [
+              {
+                "id": "관평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "뒤의 일도 잊지 않겠다. 그러나 지금 물러서면 모인 군세의 뜻이 꺾인다.",
+            "speaker": "관우",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "관평",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "관우는 단호했으나 형주에 남겨 둘 병력과 가지고 갈 군량을 적은 장부는 쉽게 닫히지 않았다. 뻗는 팔이 길어질수록 뒤를 지키는 손은 가벼워졌다.",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "적의 구원군이 도착했습니다. 우금과 방덕의 깃발입니다.",
+            "speaker": "주창",
+            "portraitId": "주창",
+            "pose": [
+              {
+                "id": "주창",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "성 안과 밖을 따로 보아야 한다. 구원군이 자리를 잡기 전에 강가의 높은 곳을 차지하라.",
+            "speaker": "관우",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "주창",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "비가 여러 날 그치지 않았다. 한수의 물빛이 바뀌었고 물가의 말뚝에는 밤마다 더 높은 흔적이 남았다.",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "물살이 예사롭지 않습니다. 낮은 적진에 배를 돌릴 준비를 하겠습니다.",
+            "speaker": "관평",
+            "portraitId": "관평",
+            "pose": [
+              {
+                "id": "관평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "물 앞에서는 적도 사람이다. 항복하는 자는 건져 올려라. 무기를 놓지 않는 자와만 싸운다.",
+            "speaker": "관우",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "관평",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "북쪽 성벽 위 조인은 불어난 강을 바라보았다. 남쪽에서는 관우의 수군이 어둠 속에 노를 담갔다.",
+            "pose": [
+              {
+                "id": "관평",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "주창",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-river-landing",
+        "label": "번성 수공 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "관우",
+            "sprite": "guanyu-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "관평",
+            "sprite": "sequel-eab480ed8f89",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "주창",
+            "sprite": "sequel-eca3bcecb0bd",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "큰물이 구원군을 삼켰다. 우금은 항복했고 방덕은 끝까지 저항한 뒤 붙잡혔다. 관우의 이름은 번성을 넘어 먼 고을까지 울렸다.",
+            "move": [
+              {
+                "id": "관우",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "승세가 크다 하여 성이 이미 열린 것은 아니다. 군량과 뒤의 소식을 먼저 가져오라.",
+            "speaker": "관우",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그러나 승전보와 함께 돌아와야 할 형주의 편지는 늦었다. 강동에서는 여몽의 군대가 흰옷을 입고 강을 건너고 있었다.",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "뒤쪽 연락이 끊어졌습니다. 남군의 깃발이 바뀌었다는 소문까지 돕니다.",
+            "speaker": "관평",
+            "portraitId": "관평",
+            "pose": [
+              {
+                "id": "관평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "소문만으로 군대를 무너뜨릴 수는 없다. 직접 확인할 사람을 보내라.",
+            "speaker": "관우",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "관평",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "확인하러 간 사람도 돌아오지 않았다. 성 안의 조인과 성 밖의 구원군, 뒤에서 바뀐 형주가 하나의 고리처럼 조여 왔다.",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "군사들이 고향의 가족을 걱정합니다. 밤마다 대열을 떠나는 자가 생깁니다.",
+            "speaker": "주창",
+            "portraitId": "주창",
+            "pose": [
+              {
+                "id": "주창",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "관우는 북쪽 성벽에서 눈을 떼었다. 앞으로 가던 전쟁은 이제 돌아갈 곳을 찾는 전쟁이 되었다.",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "관평",
+                "pose": "idle"
+              },
+              {
+                "id": "주창",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-river-landing",
+        "label": "번성 수공 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "관평",
+            "sprite": "sequel-eab480ed8f89",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "승전 소식을 듣고도 관우는 오래 기뻐하지 않았다. 형주에서 온 전령은 말을 갈아타지 못해 진흙 묻은 채 무릎을 꿇었다.",
+            "move": [
+              {
+                "id": "관평",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "후방의 소식부터 듣겠습니다. 북쪽 추격은 멈추게 하십시오.",
+            "speaker": "관평",
+            "portraitId": "관평",
+            "pose": [
+              {
+                "id": "관평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "내가 직접 듣겠다. 전령에게 물부터 주어라.",
+            "speaker": "관우",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "관평",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "전령이 잔을 든 손을 떨었다. 관우는 그 떨림을 보고서야 자신이 이긴 전장 밖에서 어떤 일이 벌어지고 있는지 짐작했다.",
+            "pose": [
+              {
+                "id": "관평",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "번성 수공의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

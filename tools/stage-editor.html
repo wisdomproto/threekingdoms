@@ -1299,6 +1299,13 @@ function renderMetaTab(b) {
   field(b, '연결 맵 ID', 'map JSON의 id와 일치해야 함', inputText(stage.mapId, v => { stage.mapId = v.trim(); refreshValidation(); }));
   field(b, '제한 턴', '턴 제한 (정수 ≥1)', inputNum(stage.turnLimit, v => { stage.turnLimit = v; refreshValidation(); }, { min: 1 }));
   field(b, '최대 레벨 (선택)', '이 스테이지 레벨캡 1~99. 비우면 미지정', inputNum(stage.levelCap, v => { stage.levelCap = v; refreshValidation(); }, { min: 1, max: 99 }));
+  const castBox=document.createElement('div');castBox.className='field';
+  const castLabel=document.createElement('label');const castCheck=document.createElement('input');castCheck.type='checkbox';castCheck.style.width='auto';castCheck.checked=Array.isArray(stage.allowedCommanderIds);
+  castLabel.append(castCheck,document.createTextNode(' 이 전투의 출전 후보 제한'));castBox.appendChild(castLabel);
+  const usePlacedCast=()=>{stage.allowedCommanderIds=[...new Set(stage.units.filter(u=>u.side==='player').map(u=>u.commanderId))];refreshValidation();renderTab();};
+  castCheck.onchange=()=>{if(castCheck.checked)usePlacedCast();else{stage.allowedCommanderIds=null;refreshValidation();renderTab();}};
+  if(castCheck.checked){const names=document.createElement('p');names.textContent=stage.allowedCommanderIds.join(', ');castBox.appendChild(names);const sync=document.createElement('button');sync.className='btn';sync.textContent='현재 배치된 아군으로 후보 갱신';sync.onclick=usePlacedCast;castBox.appendChild(sync);}
+  const castHint=document.createElement('div');castHint.className='hint';castHint.textContent='합류·생존 시기에 맞는 장수만 편성에 표시합니다. 아군 배치를 바꾼 뒤 후보를 갱신하세요.';castBox.appendChild(castHint);b.appendChild(castBox);
 
   const camHdr = document.createElement('div'); camHdr.className = 'sectlabel'; camHdr.textContent = '카메라 (선택)'; b.appendChild(camHdr);
   const camChk = document.createElement('label'); camChk.style.cssText = 'display:flex;gap:6px;font-size:11.5px;color:var(--dim);margin-bottom:8px';

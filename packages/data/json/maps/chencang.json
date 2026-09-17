@@ -1,0 +1,41 @@
+{
+  "id": "chencang",
+  "name": "진창 공성",
+  "width": 28,
+  "height": 20,
+  "tileLegend": {
+    ".": "plain",
+    "g": "grass",
+    "m": "mountain",
+    "f": "forest",
+    "~": "river",
+    "b": "bridge",
+    "#": "wall",
+    "F": "fort",
+    "P": "plain",
+    "G": "gate",
+    "V": "village"
+  },
+  "tiles": [
+    "gggggggggggggggggggggggggggg",
+    "gggggggggggggggggggggggggggg",
+    ".........##################.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    "........g#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".........PPPPPPPPPPPPPPPPP#g",
+    ".........PPPPPPPPPPPPPPPPP#.",
+    ".........PPPPPPPPPPPPPPPPP#.",
+    ".........PPPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    "g........#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".........#PPPPPPPPPPPPPPPP#.",
+    ".......g.#PPPPPPPPPPPPPPPP#.",
+    ".........########PPPP######.",
+    "gggggggggggggggggggggggggggg",
+    "gggggggggggggggggggggggggggg"
+  ]
+}

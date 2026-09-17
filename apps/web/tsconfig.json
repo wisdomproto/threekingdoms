@@ -19,13 +19,16 @@
     "isolatedModules": true
   },
   "include": [
+    ".next-novel/types/**/*.ts",
+    ".next-portrait-ui/types/**/*.ts",
+    ".next-story/types/**/*.ts",
     ".next-troia-dev/types/**/*.ts",
     ".next/types/**/*.ts",
     "app",
     "next-env.d.ts",
     "src",
     "vitest.config.ts",
-    ".next-story/types/**/*.ts"
+    ".next-railway-check/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

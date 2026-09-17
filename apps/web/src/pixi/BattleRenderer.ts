@@ -12,6 +12,7 @@
 import { Application, ColorMatrixFilter, Container, Graphics, Sprite, Texture } from "pixi.js";
 import type { Side } from "@tk/data";
 import { spriteCandidates } from "./spriteMap";
+import { itemFxCategory } from "./itemPresentation";
 import type { BattleContext, BattleEvent, BattleState, Coord } from "@tk/engine";
 import { camp } from "@tk/engine";
 import type { Presenter, PresentedSnapshot } from "../battle/eventPlayer";
@@ -719,6 +720,7 @@ export class BattleRenderer implements Presenter {
   private bossBgmFired = false;
   /** 직전 strategyCast 카테고리 — 뒤따르는 damageDealt(source=strategy) 임팩트 색을 맞추는 데 씀. */
   private lastStrategyCategory = "special";
+  private lastItemCategory = "special";
   private maybeBossBgm(aId: string, bId: string): void {
     if (this.bossBgmFired) return;
     const boss = bossUnitId(this.ctx.stage);
@@ -829,7 +831,7 @@ export class BattleRenderer implements Presenter {
     if (e.source) {
       // 책략/공격아이템(비물리): 시전자는 돌진·참격 없음 — 대상 칸에 술법 임팩트만.
       // (종전엔 책략도 무기 타격과 같은 damageDealt라 캐스터가 칼로 베는 연출이 났다.)
-      const cat = e.source === "strategy" ? this.lastStrategyCategory : "special";
+      const cat = e.source === "strategy" ? this.lastStrategyCategory : this.lastItemCategory;
       void s.tweens.delay(60).then(() => {
         void s.fx.strategyEffect(cat, popupAt);
         impact();
@@ -983,31 +985,34 @@ export class BattleRenderer implements Presenter {
 
   /**
    * 도구 사용 연출 (W4). supplyItem(회복약)=대상 아군 위 초록 "+amount" 팝업 + 막대 갱신.
-   * attackItem(공격아이템)은 이 이벤트 앞에 damageDealt가 선행해 빨강 팝업·막대 갱신을 이미
-   * 처리했으므로 여기선 도구명 배너만 — 이중 팝업 방지.
+   * Attack tools announce their family before damageDealt plays the impact.
    */
   async itemUsed(e: Ev<"itemUsed">): Promise<void> {
     const s = this.scene;
     if (!s) return;
     const item = this.ctx.data.items[e.itemId];
     const name = item?.name ?? e.itemId;
+    this.lastItemCategory = itemFxCategory(item);
     // target 생략 = 시전자 자신 위치 (useItem 계약). 좌표→대상 유닛은 committed에서 해석.
     const self = this.store?.committedState.units.find((x) => x.id === e.unitId);
     const coord = e.target ?? (self ? { x: self.x, y: self.y } : { x: 0, y: 0 });
     s.units.view(e.unitId).faceToward(coord);
+    this.autoFocus(gridToWorld(coord), FOCUS_MS);
+    playSfx(SFX.spell);
     if (item?.category === "supplyItem") {
       this.autoFocus(gridToWorld(coord), FOCUS_MS);
       const target = this.store?.committedState.units.find(
         (x) => x.x === coord.x && x.y === coord.y && !x.retreated,
       );
       await Promise.all([
+        s.fx.strategyEffect(this.lastItemCategory, gridToWorld(coord)),
         s.fx.healPopup(gridToWorld(coord), e.amount),
         s.fx.banner(`도구 · ${name}`, DUEL_BANNER_MS),
       ]);
       // committed는 이미 회복 반영 — 막대만 그 값으로 갱신(드레인 sync와 일치)
       if (target) s.units.view(target.id).setTroops(target.troops);
     } else {
-      // attackItem: 선행 damageDealt가 빨강 팝업·막대를 처리 — 여기선 도구명 배너만
+      // The following damageDealt owns the elemental impact and damage popup.
       await s.fx.banner(`도구 · ${name}`, DUEL_BANNER_MS);
     }
   }

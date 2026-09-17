@@ -22,7 +22,7 @@ import { BattleStore } from "./store";
 import type { Presenter, PresentedSnapshot } from "./eventPlayer";
 import type { UiEvent } from "./inputMachine";
 import { BattleRenderer } from "../pixi/BattleRenderer";
-import { readSortie, applySortieToStage } from "../meta/sortie";
+import { readSortie, applySortieToStage, resolveBattleEntry } from "../meta/sortie";
 import { readLab, LAB_STAGE_ID } from "../lab/lab";
 import { editorUrlFor } from "../lab/editorLink";
 import { activeUnitId } from "./hud/UnitPanel";
@@ -213,10 +213,10 @@ function makeCtx(): { ctx: BattleContext; sharedItems: string[]; seed?: number; 
       return { ctx: { data: runtimeGameData(lab.catalogs), stage: lab.stage, map: lab.map }, sharedItems: lab.sharedItems, seed: lab.seed, sandbox: true };
     }
   }
-  const sortie = readSortie();
+  const requested = typeof window === "undefined" ? null : new URLSearchParams(window.location.search).get("stage");
+  const { stageId, sortie } = resolveBattleEntry(requested, readSortie());
   // 부대 창고 소모품(원작 창고 §7) — friendly 공유 풀로 주입할 목록. 편성이 없으면 빈 풀.
   const sharedItems = sortie?.sharedItems ?? [];
-  const stageId = sortie?.stageId ?? "05-sishuiguan";
   const baseStage = gameData.stages[stageId] ?? gameData.stages["05-sishuiguan"];
   const map = baseStage ? gameData.maps[baseStage.mapId] : undefined;
   if (!baseStage || !map) throw new Error("스테이지 데이터 누락 — @tk/data 로더 확인");

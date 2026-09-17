@@ -746,6 +746,8 @@ export const StageSchema = z.object({
   // 이 스테이지에서의 레벨캡 (§10 — 스테이지 진행 연동). 미지정 시 엔진 기본 99.
   levelCap: z.number().int().min(1).max(99).optional(),
   units: z.array(StageUnitSchema),
+  /** Optional, explicit cast for this battle (era, allegiance and guest characters). */
+  allowedCommanderIds: z.array(z.string().min(1)).min(1).optional(),
   // ── M3① 신규 목표 시스템 (있으면 victory/defeat보다 우선) ──────────────────
   // objectives: 승리 목표(AND, optional은 보너스). failConditions: 패배 조건(OR).
   // 둘 다 optional — 미지정 스테이지는 기존 victory/defeat로 폴백(하위호환 절).
@@ -802,7 +804,7 @@ export type RosterRole = z.infer<typeof RosterRoleSchema>;
 export const RosterEntrySchema = z.object({
   commanderId: z.string(),
   classId: z.string(),
-  joinChapter: z.number().int().min(1).max(5),
+  joinChapter: z.number().int().min(1).max(99),
   role: RosterRoleSchema,
   uniqueSkillId: z.string().optional(),
   startItems: z.array(z.string()).default([]),  // ★ 시작 장비(Phase F) — selectRoster equipped 기본값
@@ -819,7 +821,7 @@ export type RosterEntry = z.infer<typeof RosterEntrySchema>;
 export const ShopItemSchema = z.object({
   itemId: z.string(),
   price: z.number().int().min(0),
-  unlockChapter: z.number().int().min(1).max(5).default(1),
+  unlockChapter: z.number().int().min(1).max(99).default(1),
 });
 export type ShopItem = z.infer<typeof ShopItemSchema>;
 

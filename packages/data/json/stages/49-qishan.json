@@ -1,0 +1,801 @@
+{
+  "id": "49-qishan",
+  "name": "기산 보급전",
+  "mapId": "qishan",
+  "turnLimit": 30,
+  "levelCap": 57,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "제갈량",
+    "위연",
+    "강유",
+    "왕평",
+    "마대",
+    "관흥",
+    "장포",
+    "등지"
+  ],
+  "units": [
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 49,
+      "troops": 377,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "위연",
+      "classId": "footman",
+      "level": 49,
+      "troops": 496,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "강유",
+      "classId": "lightCavalry",
+      "level": 49,
+      "troops": 496,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "왕평",
+      "classId": "footman",
+      "level": 49,
+      "troops": 496,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "마대",
+      "classId": "lightCavalry",
+      "level": 49,
+      "troops": 496,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "관흥",
+      "classId": "lightCavalry",
+      "level": 49,
+      "troops": 496,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장포",
+      "classId": "footman",
+      "level": 49,
+      "troops": 496,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "등지",
+      "classId": "strategist",
+      "level": 49,
+      "troops": 377,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "사마의",
+      "classId": "strategist",
+      "level": 49,
+      "troops": 457,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "49-qishan-guard-1",
+      "classId": "footman",
+      "level": 47,
+      "troops": 342,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "49-qishan-guard-2",
+      "classId": "archer",
+      "level": 47,
+      "troops": 342,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "49-qishan-guard-3",
+      "classId": "lightCavalry",
+      "level": 47,
+      "troops": 342,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "49-qishan-guard-4",
+      "classId": "footman",
+      "level": 47,
+      "troops": 342,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "49-qishan-guard-5",
+      "classId": "strategist",
+      "level": 47,
+      "troops": 342,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "49-qishan-guard-6",
+      "classId": "archer",
+      "level": 47,
+      "troops": 342,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "49-qishan-guard-7",
+      "classId": "footman",
+      "level": 47,
+      "troops": 342,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "surviveTurns",
+      "turns": 8
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "제갈량",
+        "위연",
+        "강유",
+        "왕평",
+        "마대",
+        "관흥",
+        "장포",
+        "등지"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "49-qishan-event",
+      "name": "군량대 통과",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "special",
+          "area": {
+            "x": 3,
+            "y": 5,
+            "width": 5,
+            "height": 9
+          }
+        },
+        {
+          "kind": "heal",
+          "target": {
+            "side": "player"
+          },
+          "amount": 20,
+          "percent": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 5230,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "49-qishan-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "text": "군량대가 지나갈 길목을 지킨다. 적장에게 전군이 몰려가 보급로를 비우지 마라."
+        }
+      ]
+    },
+    {
+      "id": "49-qishan-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "49-qishan-event"
+      },
+      "lines": [
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "text": "기산 보급로로 군량대가 통과했다. 아군의 병력을 회복한다. 길목을 계속 지켜라."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-council-hall",
+        "label": "기산 보급전 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "강유가 가져온 공격안 옆에 제갈량은 수레와 소의 수를 적은 장부를 놓았다. 젊은 장수의 시선이 두 종이 사이를 오갔다.",
+            "move": [
+              {
+                "id": "강유",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "적의 빈틈이 보여도 군량이 닿지 않으면 가지 말아야 합니까?",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "갈 수는 있네. 다만 돌아오는 병사에게 왜 밥이 없는지 설명할 수 있어야 하네.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "강유는 자신의 글을 지우지 않고 그 아래에 보급로를 덧그렸다. 제갈량은 그제야 다음 계책을 듣겠다는 듯 부채를 내려놓았다.",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-council-hall",
+        "label": "기산 보급전 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "위연",
+            "sprite": "sequel-ec9c84ec97b0",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "사마의",
+            "sprite": "sequel-ec82aceba788ec9d98",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "왕평",
+            "sprite": "sequel-ec9995ed8f89",
+            "cell": [
+              3,
+              6
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "북쪽 원정은 한 번의 큰 결전으로 끝나지 않았다. 성을 얻었다가 물러났고, 들판에서 이겨도 군량이 모자라 돌아와야 했다. 군사들이 외운 것은 적장의 이름만이 아니라 긴 수레길의 굽이였다.",
+            "move": [
+              {
+                "id": "강유",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "이번에는 보급로의 경비를 더 두겠습니다. 앞에서 이겨도 뒤가 끊기면 물러날 수밖에 없습니다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "기회가 왔을 때 더 깊이 들어가야 한다고 생각합니다. 기다리다 놓친 것도 있습니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "장군의 뜻을 안다. 그러나 깊이 들어간 군대가 먹을 곡식도 함께 데려갈 수 있어야 한다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "사마의는 촉군의 도발에 쉽게 움직이지 않았다. 싸우지 않는 선택도 싸움의 일부라는 것을 두 군대가 서로 알고 있었다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "먼 길 온 군대다. 성급히 승부해 그 수고를 덜어 줄 필요가 없다.",
+            "speaker": "사마의",
+            "portraitId": "사마의",
+            "pose": [
+              {
+                "id": "사마의",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "적이 길목의 작은 부대를 노립니다. 오늘은 진영보다 군량대를 향할 것입니다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "사마의",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "군량대와 싸우는 부대를 따로 생각하지 마시오. 창을 든 손과 수레를 미는 손이 같은 전쟁을 하고 있다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "제갈량의 기침이 길어졌다. 가까이 있던 강유는 말을 멈췄지만 제갈량은 지도에서 손을 떼지 않았다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "걱정은 전투가 끝난 뒤에 하자. 지금은 각 길로 보낼 사람을 정하자.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "사마의",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-council-hall",
+        "label": "기산 보급전 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "왕평",
+            "sprite": "sequel-ec9995ed8f89",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "보급로는 지켰으나 북벌 전체의 어려움이 해결된 것은 아니었다. 수레 한 줄을 살려 낸 기쁨 뒤에는 다음 수레를 보낼 고을의 부담이 남았다.",
+            "move": [
+              {
+                "id": "강유",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "싸움만 배워서는 장수가 될 수 없다는 말씀을 이제 조금 알겠습니다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "salute"
+              }
+            ]
+          },
+          {
+            "text": "군사가 살아 돌아가는 길을 함께 배우면 된다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "장합과 싸운 여러 원정, 군량의 지체, 조정과 전선 사이의 보고가 해를 넘겨 쌓였다. 촉의 군대는 다시 북쪽으로 나갈 준비를 했다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "이번에는 둔전을 한다고 들었습니다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "백성의 밭을 빼앗지 않고 군사가 함께 경작할 자리를 정할 것이다. 오래 버틸 방법을 우리 손으로 만들어야 한다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "강유는 제갈량의 손이 전보다 마른 것을 보았다. 원정 준비는 나아지고 있었으나 그것을 이끄는 사람의 몸은 그렇지 못했다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "마지막 봄이 오기 전 누구도 그 봄을 마지막이라고 부르지 않았다.",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-council-hall",
+        "label": "기산 보급전 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "사마의가 움직이지 않는다는 보고가 다시 들어왔다. 강유는 답답한 얼굴로 서 있었고, 제갈량은 편지를 봉하는 손을 멈추지 않았다.",
+            "move": [
+              {
+                "id": "제갈량",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "움직이지 않는 것도 적의 선택일세. 우리가 원하는 싸움을 해 줄 의무는 없지.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그러면 기다림을 견디는 쪽이 이기는 것입니까?",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "무엇을 기다리는지 아는 쪽이겠지. 사람은 목적을 잊으면 기다리는 동안 먼저 무너지네.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "강유",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "기산 보급전의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

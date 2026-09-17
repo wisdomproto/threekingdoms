@@ -38,6 +38,12 @@ export interface SortiePayload {
   sharedItems?: string[];
 }
 
+/** A bookmarked battle must not inherit another battle's stale formation. */
+export function resolveBattleEntry(requested: string | null, payload: SortiePayload | null) {
+  const stageId = requested || payload?.stageId || "05-sishuiguan";
+  return { stageId, sortie: payload?.stageId === stageId ? payload : null };
+}
+
 function hasSession(): boolean {
   return typeof window !== "undefined" && typeof window.sessionStorage !== "undefined";
 }
@@ -86,6 +92,7 @@ export function clearSortie(): void {
  * members가 비었거나 player 슬롯이 없으면 stage.units를 그대로 반환.
  */
 export function applySortieToStage(stage: Stage, members: SortieMember[]): Stage["units"] {
+  if (stage.allowedCommanderIds) members = members.filter(member => stage.allowedCommanderIds!.includes(member.commanderId));
   if (members.length === 0) return stage.units;
   let memberIdx = 0;
   const units: Stage["units"] = [];

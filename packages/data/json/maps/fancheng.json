@@ -1,0 +1,41 @@
+{
+  "id": "fancheng",
+  "name": "번성 수공",
+  "width": 28,
+  "height": 20,
+  "tileLegend": {
+    ".": "plain",
+    "g": "grass",
+    "m": "mountain",
+    "f": "forest",
+    "~": "river",
+    "b": "bridge",
+    "#": "wall",
+    "F": "fort",
+    "P": "plain",
+    "G": "gate",
+    "V": "village"
+  },
+  "tiles": [
+    "ggggggg~~ggg...ggggggggggggg",
+    "ggggggg~~ggg...ggggggggggggg",
+    ".......~~.#################.",
+    ".......~~.#PPPPPPPPPPPPPPP#.",
+    ".....g.~~.#PPPPPPPPPPPPPPP#.",
+    ".......~~.#PPPPPPPPPPPPPPP#.",
+    "g......~~.#PPPPPPPPPPPPPPP#.",
+    ".......bb.#PPPPPPPPPPPPPPP#.",
+    ".......bb.PPPPPPPPPPPPPPPP#.",
+    ".......bb.PPPPPPPPPPPPPPPP#.",
+    ".......bb.PPPPPPPPPPPPPPPP#.",
+    "..g....bb.PPPPPPPPPPPPPPPP#.",
+    ".......~~.#PPPPPPPPPPPPPPP#.",
+    ".......~~.#PPPPPPPPPPPPPPP#.",
+    ".......~~g#PPPPPPPPPPPPPPP#.",
+    ".......~~.#PPPPPPPPPPPPPPP#.",
+    "....g..~~.#PPPPPPPPPPPPPPP#.",
+    ".......~~.#######PPPP######.",
+    "ggggggg~~ggg...ggggggggggggg",
+    "ggggggg~~ggg...ggggggggggggg"
+  ]
+}

@@ -9,10 +9,10 @@ const directory = resolve(process.cwd(), "../../packages/data/json");
 const read = async (path: string) => JSON.parse(await readFile(path, "utf8"));
 
 describe("full campaign migration", () => {
-  it("preserves every raw battle, story map and catalog in five original chapters", async () => {
+  it("preserves every raw battle, story map and catalog in all twelve chapters", async () => {
     const project = await importCampaign(directory, "campaign", "Full campaign");
-    expect(project.battles).toHaveLength(27);
-    expect(project.chapters.map(ch => ch.stages.filter(n => n.kind === "battle").length)).toEqual([4, 5, 6, 7, 5]);
+    expect(project.battles).toHaveLength(55);
+    expect(project.chapters.map(ch => ch.stages.filter(n => n.kind === "battle").length)).toEqual([4, 5, 6, 7, 5, 3, 4, 5, 3, 3, 5, 5]);
     const files = (await readdir(join(directory, "stages"))).filter(file => file.endsWith(".json"));
     for (const file of files) {
       const original = await read(join(directory, "stages", file));

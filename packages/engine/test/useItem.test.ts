@@ -126,6 +126,11 @@ describe("useItem: attackItem (공격아이템)", () => {
     expect(get(r.state, "화웅").retreated).toBe(true);
     expect(r.events.find((e) => e.type === "itemUsed")).toMatchObject({ amount: 30 });
     expect(r.events.some((e) => e.type === "unitRetreated" && e.unitId === "화웅")).toBe(true);
+    const use = r.events.findIndex(e => e.type === "itemUsed");
+    const impact = r.events.findIndex(e => e.type === "damageDealt");
+    const retreat = r.events.findIndex(e => e.type === "unitRetreated");
+    expect(use).toBeLessThan(impact);
+    expect(impact).toBeLessThan(retreat);
   });
 
   it("attackItem을 아군에게 쓰면 에러", () => {

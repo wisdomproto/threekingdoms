@@ -25,11 +25,11 @@ describe("chapterOf", () => {
 });
 
 describe("orderedStageIds", () => {
-  it("번호 오름차순 27개", () => {
+  it("번호 오름차순 55개", () => {
     const ids = orderedStageIds();
-    expect(ids.length).toBe(27);
+    expect(ids.length).toBe(55);
     expect(ids[0]).toBe("01-zhuojun");
-    expect(ids[ids.length - 1]).toBe("27-huarongdao");
+    expect(ids[ids.length - 1]).toBe("55-jianye");
     // 단조 증가
     for (let i = 1; i < ids.length; i++) {
       expect(stageNumber(ids[i]!)).toBeGreaterThan(stageNumber(ids[i - 1]!));
@@ -41,7 +41,8 @@ describe("nextStageId", () => {
   it("다음 스테이지 id, 마지막이면 null", () => {
     expect(nextStageId("01-zhuojun")).toBe("02-yingchuan");
     expect(nextStageId("26-chibi")).toBe("27-huarongdao");
-    expect(nextStageId("27-huarongdao")).toBeNull();
+    expect(nextStageId("27-huarongdao")).toBe("28-nanjun");
+    expect(nextStageId("55-jianye")).toBeNull();
     expect(nextStageId("없는스테이지")).toBeNull();
   });
 });

@@ -1,0 +1,710 @@
+{
+  "id": "51-xingshi",
+  "name": "흥세산 방어",
+  "mapId": "xingshi",
+  "turnLimit": 30,
+  "levelCap": 59,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "왕평",
+    "장익",
+    "장억",
+    "요화",
+    "강유",
+    "마충"
+  ],
+  "units": [
+    {
+      "commanderId": "왕평",
+      "classId": "footman",
+      "level": 51,
+      "troops": 504,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장익",
+      "classId": "footman",
+      "level": 51,
+      "troops": 504,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장억",
+      "classId": "footman",
+      "level": 51,
+      "troops": 504,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "요화",
+      "classId": "footman",
+      "level": 51,
+      "troops": 504,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "강유",
+      "classId": "lightCavalry",
+      "level": 51,
+      "troops": 504,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "마충",
+      "classId": "archer",
+      "level": 51,
+      "troops": 504,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "조상",
+      "classId": "lord",
+      "level": 51,
+      "troops": 463,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "51-xingshi-guard-1",
+      "classId": "footman",
+      "level": 49,
+      "troops": 348,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "51-xingshi-guard-2",
+      "classId": "archer",
+      "level": 49,
+      "troops": 348,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "51-xingshi-guard-3",
+      "classId": "lightCavalry",
+      "level": 49,
+      "troops": 348,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "51-xingshi-guard-4",
+      "classId": "footman",
+      "level": 49,
+      "troops": 348,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "51-xingshi-guard-5",
+      "classId": "strategist",
+      "level": 49,
+      "troops": 348,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "51-xingshi-guard-6",
+      "classId": "archer",
+      "level": 49,
+      "troops": 348,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "51-xingshi-guard-7",
+      "classId": "footman",
+      "level": 49,
+      "troops": 348,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "surviveTurns",
+      "turns": 8
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "왕평",
+        "장익",
+        "장억",
+        "요화",
+        "강유",
+        "마충"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "51-xingshi-event",
+      "name": "산길 보급 차단",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "rock",
+          "area": {
+            "x": 15,
+            "y": 5,
+            "width": 10,
+            "height": 10
+          }
+        },
+        {
+          "kind": "damage",
+          "target": {
+            "side": "enemy",
+            "area": {
+              "x": 15,
+              "y": 5,
+              "width": 10,
+              "height": 10
+            }
+          },
+          "amount": 12,
+          "percent": true,
+          "nonlethal": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 5370,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "51-xingshi-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "왕평",
+          "side": "player",
+          "text": "흥세산의 길목을 지킨다. 적의 수가 많아도 산길을 내어 주지 마라."
+        }
+      ]
+    },
+    {
+      "id": "51-xingshi-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "51-xingshi-event"
+      },
+      "lines": [
+        {
+          "speaker": "왕평",
+          "side": "player",
+          "text": "좁은 산길에서 위군의 보급이 막혔다. 지친 적의 병력이 감소한다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-camp-day",
+        "label": "흥세산 방어 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "왕평",
+            "sprite": "sequel-ec9995ed8f89",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "왕평은 많은 적의 수를 듣고도 관문 앞에 모든 병사를 모으지 않았다. 좁은 길에서는 뒤의 군사가 앞의 군사를 돕지 못한다는 것을 오래전부터 알고 있었다.",
+            "move": [
+              {
+                "id": "왕평",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "적의 숫자보다 오늘 이 길을 통과할 수 있는 숫자를 세어라. 길과 물을 놓치지 않으면 시간을 얻는다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "젊은 장수 하나가 원군을 기다리자고 말했다. 왕평은 고개를 저었다. 기다릴 자리를 지키지 않고 기다린다는 말만 할 수는 없었다.",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "우리가 여기 있는 동안 원군은 올 수 있다. 자리를 내준 뒤에는 와도 만날 곳이 없다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-day",
+        "label": "흥세산 방어 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "왕평",
+            "sprite": "sequel-ec9995ed8f89",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "장익",
+            "sprite": "sequel-ec9ea5ec9db5",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "조상",
+            "sprite": "sequel-eca1b0ec8381",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "요화",
+            "sprite": "sequel-ec9a94ed9994",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "제갈량이 떠난 뒤에도 촉은 곧바로 무너지지 않았다. 한중을 지키는 왕평에게는 싸움을 늦추는 기술보다 싸움이 시작되기 전에 자리를 고르는 기술이 필요했다.",
+            "move": [
+              {
+                "id": "왕평",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "적이 많다는 이유로 성안으로만 들어가면 산길을 모두 내줍니다. 길목부터 지켜야 합니다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "뒤에서 구원군이 오기까지 시간이 걸립니다.",
+            "speaker": "장익",
+            "portraitId": "장익",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              },
+              {
+                "id": "장익",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그러니 앞에서 그 시간을 만들어야 합니다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "장익",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "조상은 큰 군대를 이끌고 왔다. 그러나 길은 군대의 크기에 맞춰 넓어지지 않았다. 사람이 많아질수록 먹일 입도, 짐을 실을 말도 많아졌다.",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "작은 나라의 수비군이다. 산 하나에 원정을 멈출 수는 없다.",
+            "speaker": "조상",
+            "portraitId": "조상",
+            "pose": [
+              {
+                "id": "조상",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "왕평은 가정에서 본 일을 잊지 않았다. 높은 곳만을 자랑하지 않고 물과 길, 서로 연락할 진영의 거리를 함께 살폈다.",
+            "pose": [
+              {
+                "id": "조상",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "병사들에게 퇴로도 알려 두었습니다. 물러나더라도 흩어지지 않을 것입니다.",
+            "speaker": "요화",
+            "portraitId": "요화",
+            "pose": [
+              {
+                "id": "요화",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "좋다. 용감하다는 말보다 제자리에서 서로를 믿는 일이 필요하다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "요화",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "흥세산의 바람이 깃발을 눌렀다. 왕평은 먼 성도의 이름을 외치지 않고 가까운 길목의 이름을 하나씩 불러 맡겼다.",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              },
+              {
+                "id": "장익",
+                "pose": "idle"
+              },
+              {
+                "id": "조상",
+                "pose": "idle"
+              },
+              {
+                "id": "요화",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-camp-day",
+        "label": "흥세산 방어 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "왕평",
+            "sprite": "sequel-ec9995ed8f89",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "요화",
+            "sprite": "sequel-ec9a94ed9994",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "산길을 넘지 못한 위군의 보급은 빠르게 어려워졌다. 구원군이 가까워지자 조상은 물러났다. 촉은 큰 전쟁을 막아 냈지만 적을 깊이 쫓지는 않았다.",
+            "move": [
+              {
+                "id": "왕평",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "지킬 자리를 지켰다. 이것으로 오늘의 일을 마친다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "작은 수비로 큰 군대를 멈췄습니다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              },
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "산이 대신 싸운 것이 아니다. 그 산에 맞게 사람을 놓았을 뿐이다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "시간은 촉만이 아니라 위도 바꾸었다. 낙양에서는 사마씨의 힘이 커졌고 조상의 몰락 뒤 조씨 황제의 자리는 점점 가벼워졌다.",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "강유의 북벌은 그 변화 사이에서 계속되었다. 싸울 기회는 있었지만 작은 나라가 거듭 군대를 내는 부담도 커졌다."
+          },
+          {
+            "text": "전선에서 이기는 일과 나라가 버티는 일을 따로 셀 수는 없소.",
+            "speaker": "요화",
+            "portraitId": "요화",
+            "pose": [
+              {
+                "id": "요화",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "강유는 그 말을 듣고도 북쪽의 지도를 접지 못했다. 누군가에게는 그것이 충성이었고 누군가에게는 두려운 고집이었다.",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              },
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "요화",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-day",
+        "label": "흥세산 방어 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "왕평",
+            "sprite": "sequel-ec9995ed8f89",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "위군이 물러간 뒤 산길에는 부서진 수레가 남았다. 왕평은 그것을 치우게 하기 전에 바퀴 자국과 짐의 무게를 기록하게 했다.",
+            "move": [
+              {
+                "id": "왕평",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "다음에도 같은 실수를 해 주리라 기대하지 마라. 적이 무엇 때문에 돌아갔는지 알아야 우리도 다음에 지킬 수 있다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "늙은 장수의 승전 보고에는 호통이나 자랑이 적었다. 어느 길을 보수하고 어느 창고를 채워야 하는지가 더 길게 적혀 있었다.",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "흥세산 방어의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

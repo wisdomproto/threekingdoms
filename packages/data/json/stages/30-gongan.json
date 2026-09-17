@@ -1,0 +1,790 @@
+{
+  "id": "30-gongan",
+  "name": "공안 귀환로",
+  "mapId": "gongan",
+  "turnLimit": 30,
+  "levelCap": 38,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "유비",
+    "조운",
+    "관우",
+    "장비",
+    "제갈량",
+    "황충",
+    "위연",
+    "손건"
+  ],
+  "units": [
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 30,
+      "troops": 420,
+      "items": [
+        "쌍고검"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 30,
+      "troops": 420,
+      "items": [
+        "용담창"
+      ],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "관우",
+      "classId": "lightCavalry",
+      "level": 30,
+      "troops": 420,
+      "items": [
+        "청룡언월도"
+      ],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 30,
+      "troops": 420,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 30,
+      "troops": 320,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "황충",
+      "classId": "archer",
+      "level": 30,
+      "troops": 420,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "위연",
+      "classId": "footman",
+      "level": 30,
+      "troops": 420,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "손건",
+      "classId": "strategist",
+      "level": 30,
+      "troops": 320,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "주태",
+      "classId": "footman",
+      "level": 30,
+      "troops": 400,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "30-gongan-guard-1",
+      "classId": "footman",
+      "level": 28,
+      "troops": 285,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "30-gongan-guard-2",
+      "classId": "archer",
+      "level": 28,
+      "troops": 285,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "30-gongan-guard-3",
+      "classId": "lightCavalry",
+      "level": 28,
+      "troops": 285,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "30-gongan-guard-4",
+      "classId": "footman",
+      "level": 28,
+      "troops": 285,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "30-gongan-guard-5",
+      "classId": "strategist",
+      "level": 28,
+      "troops": 285,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "30-gongan-guard-6",
+      "classId": "archer",
+      "level": 28,
+      "troops": 285,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "30-gongan-guard-7",
+      "classId": "footman",
+      "level": 28,
+      "troops": 285,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "surviveTurns",
+      "turns": 6
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "유비",
+        "조운",
+        "관우",
+        "장비",
+        "제갈량",
+        "황충",
+        "위연",
+        "손건"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "30-gongan-event",
+      "name": "귀환 나루 개방",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "special",
+          "area": {
+            "x": 3,
+            "y": 5,
+            "width": 5,
+            "height": 9
+          }
+        },
+        {
+          "kind": "heal",
+          "target": {
+            "side": "player"
+          },
+          "amount": 12,
+          "percent": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 3900,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "30-gongan-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "나루의 배가 모두 출발할 때까지 버틴다. 동맹군과의 싸움을 더 키우지 마라."
+        }
+      ]
+    },
+    {
+      "id": "30-gongan-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "30-gongan-event"
+      },
+      "lines": [
+        {
+          "speaker": "유비",
+          "side": "player",
+          "text": "아군 배가 나루에 닿았다. 추격을 막으며 귀환로를 확보한다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-river-landing",
+        "label": "공안 귀환로 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "장비",
+            "sprite": "zhangfei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "공안의 임시 관청에는 아직 문짝도 제대로 달려 있지 않았다. 강바람이 불 때마다 지도 위의 작은 돌들이 굴렀고, 장비는 번번이 그것을 주워 놓았다.",
+            "move": [
+              {
+                "id": "장비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "집을 얻었다더니 문도 없는 집이구려.",
+            "speaker": "장비",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "우리가 처음 군사를 모을 때에는 지붕도 없지 않았느냐.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그때보다 식구가 너무 늘었소. 형님 혼자 비를 맞는 일이라면 몰라도.",
+            "speaker": "장비",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 웃다가 웃음을 거두었다. 장비의 불평에는 늘 뒤따르는 병사들의 얼굴이 있었다. 제갈량은 강 건너에서 온 문서를 펴고 다음 보급선을 짚었다.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-river-landing",
+        "label": "공안 귀환로 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "관우",
+            "sprite": "guanyu-leader",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "형주를 둘러싼 말다툼은 혼인 이야기로 바뀌었다. 강동으로 간 유비는 손권의 누이와 혼인했지만, 잔치가 끝나도 돌아갈 날짜는 쉽게 정해지지 않았다.",
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "오래 머문 손님은 어느 순간 인질이 되기도 하지. 형주의 형제들이 걱정이오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "군사께서 맡기신 계책이 있습니다. 길은 마련할 수 있습니다만 부인께도 뜻을 여쭈어야 합니다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 자신의 귀환만을 의논하던 말을 멈췄다. 손씨 부인에게도 건너야 할 강과 떠나야 할 집이 있었다.",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "나와 함께 가는 일이 그대의 고향을 버리라는 명령이 되어서는 안 되오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "부인은 고향의 군사들 앞에 직접 서겠다는 뜻을 밝혔다. 유비는 그 결단에 기대어 마침내 강가로 향했다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "추격대가 뒤따릅니다. 배는 준비했지만 모두 태우려면 시간이 필요합니다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "강 건너에서 형님의 깃발을 보았소. 여기서부터는 우리가 길을 열겠소.",
+            "speaker": "관우",
+            "portraitId": "관우",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "목숨을 걸고 따라온 사람들을 먼저 보내시오. 쫓는 자들도 어제는 함께 조조와 싸운 군사였소.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "관우",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "나루에는 작별 인사 대신 짧은 명령들이 오갔다. 북소리가 가까워지는 동안 마지막 수레가 진흙길에 바퀴를 박았다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "관우",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-river-landing",
+        "label": "공안 귀환로 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "장비",
+            "sprite": "zhangfei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "마지막 배가 물살을 타자 강가의 추격은 멎었다. 혼인으로 덮으려 했던 형주의 문제는 사라지지 않았지만 유비는 공안으로 돌아왔다.",
+            "move": [
+              {
+                "id": "장비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "형님이 돌아오시니 진영이 이제야 제자리 같소.",
+            "speaker": "장비",
+            "portraitId": "장비",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "돌아온 사람만 반겨서는 안 되오. 나를 따라 고향을 떠난 사람도 있소.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "강동과의 사신 왕래가 다시 시작되었다. 주유의 죽음 뒤에는 노숙이 그 어려운 자리를 맡았다. 서로의 필요를 아는 것과 서로를 믿는 것은 같은 일이 아니었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "형주만으로는 북쪽에 맞설 수 없습니다. 서쪽 익주가 우리의 다음 문제입니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "같은 종친의 땅을 탐한다는 말을 어떻게 피하겠소.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그 무렵 익주에서 장송과 법정의 이름이 들려왔다. 유장이 보낸 초청은 장로를 막아 달라는 것이었으나, 편지 사이에는 익주의 오래된 불안이 배어 있었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "유비는 형주를 관우에게 맡겼다. 강을 따라 서쪽으로 떠나는 배 위에서 그는 받아 든 초청장을 한 번 더 읽었다.",
+            "pose": [
+              {
+                "id": "장비",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-river-landing",
+        "label": "공안 귀환로 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "승전 보고가 끝난 뒤에도 제갈량은 자리를 떠나지 않았다. 서쪽에서 온 법정의 이름이 적힌 서신이 등불 아래 놓여 있었다.",
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "익주의 일을 말하려는 것이오? 같은 유씨가 다스리는 곳이라 더 조심스럽소.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그 망설임을 버리시라는 뜻은 아닙니다. 다만 서쪽에서 사람들이 왜 우리를 찾는지는 들으셔야 합니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 봉한 종이를 오래 만지다가 펼쳤다. 형주의 강물 너머에, 아직 보지 못한 산과 성이 줄지어 기다리고 있었다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "공안 귀환로의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

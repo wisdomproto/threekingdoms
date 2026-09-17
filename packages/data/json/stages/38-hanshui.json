@@ -1,0 +1,778 @@
+{
+  "id": "38-hanshui",
+  "name": "한수 진영 방어",
+  "mapId": "hanshui",
+  "turnLimit": 30,
+  "levelCap": 46,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "조운",
+    "황충",
+    "유비",
+    "장비",
+    "위연",
+    "마초",
+    "법정",
+    "제갈량"
+  ],
+  "units": [
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 38,
+      "troops": 452,
+      "items": [
+        "용담창"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "황충",
+      "classId": "archer",
+      "level": 38,
+      "troops": 452,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "유비",
+      "classId": "lord",
+      "level": 38,
+      "troops": 452,
+      "items": [
+        "쌍고검"
+      ],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장비",
+      "classId": "lightCavalry",
+      "level": 38,
+      "troops": 452,
+      "items": [
+        "사모"
+      ],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "위연",
+      "classId": "footman",
+      "level": 38,
+      "troops": 452,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "마초",
+      "classId": "lightCavalry",
+      "level": 38,
+      "troops": 452,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "법정",
+      "classId": "strategist",
+      "level": 38,
+      "troops": 344,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 38,
+      "troops": 344,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "서황",
+      "classId": "footman",
+      "level": 38,
+      "troops": 424,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "38-hanshui-guard-1",
+      "classId": "footman",
+      "level": 36,
+      "troops": 309,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "38-hanshui-guard-2",
+      "classId": "archer",
+      "level": 36,
+      "troops": 309,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "38-hanshui-guard-3",
+      "classId": "lightCavalry",
+      "level": 36,
+      "troops": 309,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "38-hanshui-guard-4",
+      "classId": "footman",
+      "level": 36,
+      "troops": 309,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "38-hanshui-guard-5",
+      "classId": "strategist",
+      "level": 36,
+      "troops": 309,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "38-hanshui-guard-6",
+      "classId": "archer",
+      "level": 36,
+      "troops": 309,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "38-hanshui-guard-7",
+      "classId": "footman",
+      "level": 36,
+      "troops": 309,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "surviveTurns",
+      "turns": 7
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "조운",
+        "황충",
+        "유비",
+        "장비",
+        "위연",
+        "마초",
+        "법정",
+        "제갈량"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "38-hanshui-event",
+      "name": "빈 진영의 역습",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "rock",
+          "area": {
+            "x": 15,
+            "y": 5,
+            "width": 10,
+            "height": 10
+          }
+        },
+        {
+          "kind": "damage",
+          "target": {
+            "side": "enemy",
+            "area": {
+              "x": 15,
+              "y": 5,
+              "width": 10,
+              "height": 10
+            }
+          },
+          "amount": 12,
+          "percent": true,
+          "nonlethal": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 4460,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "38-hanshui-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "조운",
+          "side": "player",
+          "text": "군량 부대가 돌아올 때까지 진영을 지킨다. 강가에 몰리지 마라."
+        }
+      ]
+    },
+    {
+      "id": "38-hanshui-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "38-hanshui-event"
+      },
+      "lines": [
+        {
+          "speaker": "조운",
+          "side": "player",
+          "text": "열린 진문 앞에서 적이 머뭇거렸다. 북소리와 함께 측면 부대가 반격한다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-river-landing",
+        "label": "한수 진영 방어 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "조운은 군량을 호송하는 수레바퀴 자국을 따라 강가까지 나갔다. 자국이 겹쳐 끊긴 곳에서 전령의 말이 돌아왔다. 안장은 비어 있었다.",
+            "move": [
+              {
+                "id": "조운",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "구원대를 내되 진영의 문을 비우지는 마라. 한 사람을 찾으러 나갔다가 모두의 돌아올 곳을 잃어서는 안 된다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "병사들은 조운이 적을 두려워하는 모습을 본 적이 드물었다. 대신 그는 병사 수를 세고, 되돌아올 길을 확인하고, 다친 말의 고삐를 놓아주는 데 오래 머물렀다.",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "나를 보고 따라오지 말고 깃발을 보고 움직여라. 내가 보이지 않아도 대오는 남아 있어야 한다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-river-landing",
+        "label": "한수 진영 방어 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "황충",
+            "sprite": "sequel-ed99a9ecb6a9",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "서황",
+            "sprite": "sequel-ec849ced99a9",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "한수 부근으로 나간 황충의 부대가 돌아올 시간을 넘겼다. 조운은 진문 밖에 서서 먼지를 보았다. 돌아오는 먼지와 쫓기는 먼지는 모양이 달랐다.",
+            "move": [
+              {
+                "id": "조운",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "구원하러 간다. 진문을 지킬 군사는 남아라.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "강가에서 동료를 구한 조운은 추격군을 달고 돌아왔다. 병사들은 진문을 닫으려 했지만 그는 손을 들어 막았다.",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "깃발을 낮추고 북을 멈춰라. 문은 열어 둔다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "적이 많소. 무엇을 기다리는 것이오?",
+            "speaker": "황충",
+            "portraitId": "황충",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "황충",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "적도 우리가 무엇을 기다리는지 생각하게 해야 합니다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "황충",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "조운의 말이 진영 앞에 홀로 섰다. 뒤편의 병사들은 숨까지 낮추었다. 문 안이 보이지 않는 적에게 침묵은 또 다른 병력이 되었다.",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "함부로 들어가지 마라. 뒤에 무엇이 있는지 살펴라.",
+            "speaker": "서황",
+            "portraitId": "서황",
+            "pose": [
+              {
+                "id": "서황",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "물러서는 말 한 필이 옆의 말을 밀었다. 조운은 그 작은 흐트러짐을 놓치지 않았다.",
+            "pose": [
+              {
+                "id": "서황",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "이제 북을 울려라. 흩어진 군사를 받고 강을 등진 적의 옆을 쳐라.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "황충",
+                "pose": "idle"
+              },
+              {
+                "id": "서황",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-river-landing",
+        "label": "한수 진영 방어 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "법정",
+            "sprite": "sequel-ebb295eca095",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "황충",
+            "sprite": "sequel-ed99a9ecb6a9",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "한수 가의 추격이 끝난 뒤 조운은 처음 나갔던 군량 부대의 이름을 다시 확인했다. 승리의 숫자보다 돌아온 사람의 숫자가 먼저였다.",
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "자룡은 온몸이 담력으로 이루어졌구려.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "문을 열어 둘 수 있었던 것은 뒤의 병사들이 흔들리지 않았기 때문입니다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "조조는 싸움을 거듭할수록 한중의 험한 길과 늘어지는 보급을 헤아려야 했다. 이기는 한 번의 싸움이 모든 산길을 평평하게 만들지는 못했다.",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "조군이 물러설 준비를 하고 있습니다. 양평관의 길을 확보하면 한중의 형세가 정해집니다.",
+            "speaker": "법정",
+            "portraitId": "법정",
+            "pose": [
+              {
+                "id": "법정",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "퇴각하는 적을 보고 우리 군사부터 흐트러져서는 안 되오.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "법정",
+                "pose": "idle"
+              },
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "산을 얻었으니 길도 얻어야지. 그래야 그 위에서 오래 살 수 있소.",
+            "speaker": "황충",
+            "portraitId": "황충",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "황충",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "강가의 말들이 물을 마셨다. 다음 진군의 북은 그들이 고개를 들 때까지 기다렸다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "법정",
+                "pose": "idle"
+              },
+              {
+                "id": "황충",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-river-landing",
+        "label": "한수 진영 방어 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "유비",
+            "sprite": "liubei-leader",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "진영으로 돌아온 병사들은 닫히지 않은 문을 보고서야 숨을 내쉬었다. 조운은 마지막 수레가 들어온 뒤에야 창을 내려놓았다.",
+            "move": [
+              {
+                "id": "유비",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "자룡이 있는 곳은 돌아갈 길이 남는구려.",
+            "speaker": "유비",
+            "portraitId": "유비",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "오늘 돌아오지 못한 이들도 있습니다. 그 말은 찾는 일을 마친 뒤에 듣겠습니다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "유비는 더 칭찬하지 않고 수색에 쓸 횃불을 늘리라 명했다. 강물 위에 흔들리는 불빛이 밤늦도록 이어졌다.",
+            "pose": [
+              {
+                "id": "유비",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "한수 진영 방어의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

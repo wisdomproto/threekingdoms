@@ -3290,5 +3290,2295 @@
     "war": 80,
     "intelligence": 50,
     "faceId": 0
+  },
+  "28-nanjun-guard-1": {
+    "id": "28-nanjun-guard-1",
+    "name": "남군 수비대 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "28-nanjun-guard-2": {
+    "id": "28-nanjun-guard-2",
+    "name": "남군 수비대 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "28-nanjun-guard-3": {
+    "id": "28-nanjun-guard-3",
+    "name": "남군 수비대 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "28-nanjun-guard-4": {
+    "id": "28-nanjun-guard-4",
+    "name": "남군 수비대 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "28-nanjun-guard-5": {
+    "id": "28-nanjun-guard-5",
+    "name": "남군 수비대 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "28-nanjun-guard-6": {
+    "id": "28-nanjun-guard-6",
+    "name": "남군 수비대 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "28-nanjun-guard-7": {
+    "id": "28-nanjun-guard-7",
+    "name": "남군 수비대 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "29-changsha-guard-1": {
+    "id": "29-changsha-guard-1",
+    "name": "장사군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "29-changsha-guard-2": {
+    "id": "29-changsha-guard-2",
+    "name": "장사군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "29-changsha-guard-3": {
+    "id": "29-changsha-guard-3",
+    "name": "장사군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "29-changsha-guard-4": {
+    "id": "29-changsha-guard-4",
+    "name": "장사군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "29-changsha-guard-5": {
+    "id": "29-changsha-guard-5",
+    "name": "장사군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "29-changsha-guard-6": {
+    "id": "29-changsha-guard-6",
+    "name": "장사군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "29-changsha-guard-7": {
+    "id": "29-changsha-guard-7",
+    "name": "장사군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "30-gongan-guard-1": {
+    "id": "30-gongan-guard-1",
+    "name": "강동 추격대 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "30-gongan-guard-2": {
+    "id": "30-gongan-guard-2",
+    "name": "강동 추격대 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "30-gongan-guard-3": {
+    "id": "30-gongan-guard-3",
+    "name": "강동 추격대 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "30-gongan-guard-4": {
+    "id": "30-gongan-guard-4",
+    "name": "강동 추격대 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "30-gongan-guard-5": {
+    "id": "30-gongan-guard-5",
+    "name": "강동 추격대 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "30-gongan-guard-6": {
+    "id": "30-gongan-guard-6",
+    "name": "강동 추격대 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "30-gongan-guard-7": {
+    "id": "30-gongan-guard-7",
+    "name": "강동 추격대 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "31-fushui-guard-1": {
+    "id": "31-fushui-guard-1",
+    "name": "익주 수비대 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "31-fushui-guard-2": {
+    "id": "31-fushui-guard-2",
+    "name": "익주 수비대 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "31-fushui-guard-3": {
+    "id": "31-fushui-guard-3",
+    "name": "익주 수비대 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "31-fushui-guard-4": {
+    "id": "31-fushui-guard-4",
+    "name": "익주 수비대 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "31-fushui-guard-5": {
+    "id": "31-fushui-guard-5",
+    "name": "익주 수비대 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "31-fushui-guard-6": {
+    "id": "31-fushui-guard-6",
+    "name": "익주 수비대 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "31-fushui-guard-7": {
+    "id": "31-fushui-guard-7",
+    "name": "익주 수비대 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "32-luocheng-guard-1": {
+    "id": "32-luocheng-guard-1",
+    "name": "낙성군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "32-luocheng-guard-2": {
+    "id": "32-luocheng-guard-2",
+    "name": "낙성군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "32-luocheng-guard-3": {
+    "id": "32-luocheng-guard-3",
+    "name": "낙성군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "32-luocheng-guard-4": {
+    "id": "32-luocheng-guard-4",
+    "name": "낙성군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "32-luocheng-guard-5": {
+    "id": "32-luocheng-guard-5",
+    "name": "낙성군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "32-luocheng-guard-6": {
+    "id": "32-luocheng-guard-6",
+    "name": "낙성군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "32-luocheng-guard-7": {
+    "id": "32-luocheng-guard-7",
+    "name": "낙성군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "33-jiameng-guard-1": {
+    "id": "33-jiameng-guard-1",
+    "name": "장로군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "33-jiameng-guard-2": {
+    "id": "33-jiameng-guard-2",
+    "name": "장로군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "33-jiameng-guard-3": {
+    "id": "33-jiameng-guard-3",
+    "name": "장로군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "33-jiameng-guard-4": {
+    "id": "33-jiameng-guard-4",
+    "name": "장로군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "33-jiameng-guard-5": {
+    "id": "33-jiameng-guard-5",
+    "name": "장로군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "33-jiameng-guard-6": {
+    "id": "33-jiameng-guard-6",
+    "name": "장로군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "33-jiameng-guard-7": {
+    "id": "33-jiameng-guard-7",
+    "name": "장로군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "34-chengdu-guard-1": {
+    "id": "34-chengdu-guard-1",
+    "name": "성도 수비대 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "34-chengdu-guard-2": {
+    "id": "34-chengdu-guard-2",
+    "name": "성도 수비대 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "34-chengdu-guard-3": {
+    "id": "34-chengdu-guard-3",
+    "name": "성도 수비대 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "34-chengdu-guard-4": {
+    "id": "34-chengdu-guard-4",
+    "name": "성도 수비대 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "34-chengdu-guard-5": {
+    "id": "34-chengdu-guard-5",
+    "name": "성도 수비대 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "34-chengdu-guard-6": {
+    "id": "34-chengdu-guard-6",
+    "name": "성도 수비대 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "34-chengdu-guard-7": {
+    "id": "34-chengdu-guard-7",
+    "name": "성도 수비대 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "35-wagou-guard-1": {
+    "id": "35-wagou-guard-1",
+    "name": "장합군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "35-wagou-guard-2": {
+    "id": "35-wagou-guard-2",
+    "name": "장합군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "35-wagou-guard-3": {
+    "id": "35-wagou-guard-3",
+    "name": "장합군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "35-wagou-guard-4": {
+    "id": "35-wagou-guard-4",
+    "name": "장합군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "35-wagou-guard-5": {
+    "id": "35-wagou-guard-5",
+    "name": "장합군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "35-wagou-guard-6": {
+    "id": "35-wagou-guard-6",
+    "name": "장합군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "35-wagou-guard-7": {
+    "id": "35-wagou-guard-7",
+    "name": "장합군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "36-tiandang-guard-1": {
+    "id": "36-tiandang-guard-1",
+    "name": "천탕산 수비대 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "36-tiandang-guard-2": {
+    "id": "36-tiandang-guard-2",
+    "name": "천탕산 수비대 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "36-tiandang-guard-3": {
+    "id": "36-tiandang-guard-3",
+    "name": "천탕산 수비대 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "36-tiandang-guard-4": {
+    "id": "36-tiandang-guard-4",
+    "name": "천탕산 수비대 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "36-tiandang-guard-5": {
+    "id": "36-tiandang-guard-5",
+    "name": "천탕산 수비대 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "36-tiandang-guard-6": {
+    "id": "36-tiandang-guard-6",
+    "name": "천탕산 수비대 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "36-tiandang-guard-7": {
+    "id": "36-tiandang-guard-7",
+    "name": "천탕산 수비대 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "37-dingjun-guard-1": {
+    "id": "37-dingjun-guard-1",
+    "name": "하후연군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "37-dingjun-guard-2": {
+    "id": "37-dingjun-guard-2",
+    "name": "하후연군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "37-dingjun-guard-3": {
+    "id": "37-dingjun-guard-3",
+    "name": "하후연군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "37-dingjun-guard-4": {
+    "id": "37-dingjun-guard-4",
+    "name": "하후연군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "37-dingjun-guard-5": {
+    "id": "37-dingjun-guard-5",
+    "name": "하후연군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "37-dingjun-guard-6": {
+    "id": "37-dingjun-guard-6",
+    "name": "하후연군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "37-dingjun-guard-7": {
+    "id": "37-dingjun-guard-7",
+    "name": "하후연군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "38-hanshui-guard-1": {
+    "id": "38-hanshui-guard-1",
+    "name": "조조 추격군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "38-hanshui-guard-2": {
+    "id": "38-hanshui-guard-2",
+    "name": "조조 추격군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "38-hanshui-guard-3": {
+    "id": "38-hanshui-guard-3",
+    "name": "조조 추격군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "38-hanshui-guard-4": {
+    "id": "38-hanshui-guard-4",
+    "name": "조조 추격군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "38-hanshui-guard-5": {
+    "id": "38-hanshui-guard-5",
+    "name": "조조 추격군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "38-hanshui-guard-6": {
+    "id": "38-hanshui-guard-6",
+    "name": "조조 추격군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "38-hanshui-guard-7": {
+    "id": "38-hanshui-guard-7",
+    "name": "조조 추격군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "39-yangping-guard-1": {
+    "id": "39-yangping-guard-1",
+    "name": "조군 후위대 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "39-yangping-guard-2": {
+    "id": "39-yangping-guard-2",
+    "name": "조군 후위대 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "39-yangping-guard-3": {
+    "id": "39-yangping-guard-3",
+    "name": "조군 후위대 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "39-yangping-guard-4": {
+    "id": "39-yangping-guard-4",
+    "name": "조군 후위대 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "39-yangping-guard-5": {
+    "id": "39-yangping-guard-5",
+    "name": "조군 후위대 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "39-yangping-guard-6": {
+    "id": "39-yangping-guard-6",
+    "name": "조군 후위대 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "39-yangping-guard-7": {
+    "id": "39-yangping-guard-7",
+    "name": "조군 후위대 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "부사인": {
+    "id": "부사인",
+    "name": "부사인",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "40-fancheng-guard-1": {
+    "id": "40-fancheng-guard-1",
+    "name": "번성 구원군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "40-fancheng-guard-2": {
+    "id": "40-fancheng-guard-2",
+    "name": "번성 구원군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "40-fancheng-guard-3": {
+    "id": "40-fancheng-guard-3",
+    "name": "번성 구원군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "40-fancheng-guard-4": {
+    "id": "40-fancheng-guard-4",
+    "name": "번성 구원군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "40-fancheng-guard-5": {
+    "id": "40-fancheng-guard-5",
+    "name": "번성 구원군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "40-fancheng-guard-6": {
+    "id": "40-fancheng-guard-6",
+    "name": "번성 구원군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "40-fancheng-guard-7": {
+    "id": "40-fancheng-guard-7",
+    "name": "번성 구원군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "41-maicheng-guard-1": {
+    "id": "41-maicheng-guard-1",
+    "name": "강동 포위군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "41-maicheng-guard-2": {
+    "id": "41-maicheng-guard-2",
+    "name": "강동 포위군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "41-maicheng-guard-3": {
+    "id": "41-maicheng-guard-3",
+    "name": "강동 포위군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "41-maicheng-guard-4": {
+    "id": "41-maicheng-guard-4",
+    "name": "강동 포위군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "41-maicheng-guard-5": {
+    "id": "41-maicheng-guard-5",
+    "name": "강동 포위군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "41-maicheng-guard-6": {
+    "id": "41-maicheng-guard-6",
+    "name": "강동 포위군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "41-maicheng-guard-7": {
+    "id": "41-maicheng-guard-7",
+    "name": "강동 포위군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "관흥": {
+    "id": "관흥",
+    "name": "관흥",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "42-yiling-guard-1": {
+    "id": "42-yiling-guard-1",
+    "name": "육손군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "42-yiling-guard-2": {
+    "id": "42-yiling-guard-2",
+    "name": "육손군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "42-yiling-guard-3": {
+    "id": "42-yiling-guard-3",
+    "name": "육손군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "42-yiling-guard-4": {
+    "id": "42-yiling-guard-4",
+    "name": "육손군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "42-yiling-guard-5": {
+    "id": "42-yiling-guard-5",
+    "name": "육손군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "42-yiling-guard-6": {
+    "id": "42-yiling-guard-6",
+    "name": "육손군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "42-yiling-guard-7": {
+    "id": "42-yiling-guard-7",
+    "name": "육손군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "장익": {
+    "id": "장익",
+    "name": "장익",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "등지": {
+    "id": "등지",
+    "name": "등지",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "맹획": {
+    "id": "맹획",
+    "name": "맹획",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "43-lushui-guard-1": {
+    "id": "43-lushui-guard-1",
+    "name": "남중 저항군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "43-lushui-guard-2": {
+    "id": "43-lushui-guard-2",
+    "name": "남중 저항군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "43-lushui-guard-3": {
+    "id": "43-lushui-guard-3",
+    "name": "남중 저항군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "43-lushui-guard-4": {
+    "id": "43-lushui-guard-4",
+    "name": "남중 저항군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "43-lushui-guard-5": {
+    "id": "43-lushui-guard-5",
+    "name": "남중 저항군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "43-lushui-guard-6": {
+    "id": "43-lushui-guard-6",
+    "name": "남중 저항군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "43-lushui-guard-7": {
+    "id": "43-lushui-guard-7",
+    "name": "남중 저항군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "44-nanman-guard-1": {
+    "id": "44-nanman-guard-1",
+    "name": "남중 산채군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "44-nanman-guard-2": {
+    "id": "44-nanman-guard-2",
+    "name": "남중 산채군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "44-nanman-guard-3": {
+    "id": "44-nanman-guard-3",
+    "name": "남중 산채군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "44-nanman-guard-4": {
+    "id": "44-nanman-guard-4",
+    "name": "남중 산채군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "44-nanman-guard-5": {
+    "id": "44-nanman-guard-5",
+    "name": "남중 산채군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "44-nanman-guard-6": {
+    "id": "44-nanman-guard-6",
+    "name": "남중 산채군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "44-nanman-guard-7": {
+    "id": "44-nanman-guard-7",
+    "name": "남중 산채군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "올돌골": {
+    "id": "올돌골",
+    "name": "올돌골",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "45-tengjia-guard-1": {
+    "id": "45-tengjia-guard-1",
+    "name": "등갑군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "45-tengjia-guard-2": {
+    "id": "45-tengjia-guard-2",
+    "name": "등갑군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "45-tengjia-guard-3": {
+    "id": "45-tengjia-guard-3",
+    "name": "등갑군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "45-tengjia-guard-4": {
+    "id": "45-tengjia-guard-4",
+    "name": "등갑군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "45-tengjia-guard-5": {
+    "id": "45-tengjia-guard-5",
+    "name": "등갑군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "45-tengjia-guard-6": {
+    "id": "45-tengjia-guard-6",
+    "name": "등갑군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "45-tengjia-guard-7": {
+    "id": "45-tengjia-guard-7",
+    "name": "등갑군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "46-tianshui-guard-1": {
+    "id": "46-tianshui-guard-1",
+    "name": "천수 수비군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "46-tianshui-guard-2": {
+    "id": "46-tianshui-guard-2",
+    "name": "천수 수비군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "46-tianshui-guard-3": {
+    "id": "46-tianshui-guard-3",
+    "name": "천수 수비군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "46-tianshui-guard-4": {
+    "id": "46-tianshui-guard-4",
+    "name": "천수 수비군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "46-tianshui-guard-5": {
+    "id": "46-tianshui-guard-5",
+    "name": "천수 수비군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "46-tianshui-guard-6": {
+    "id": "46-tianshui-guard-6",
+    "name": "천수 수비군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "46-tianshui-guard-7": {
+    "id": "46-tianshui-guard-7",
+    "name": "천수 수비군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "47-jieting-guard-1": {
+    "id": "47-jieting-guard-1",
+    "name": "장합 추격군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "47-jieting-guard-2": {
+    "id": "47-jieting-guard-2",
+    "name": "장합 추격군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "47-jieting-guard-3": {
+    "id": "47-jieting-guard-3",
+    "name": "장합 추격군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "47-jieting-guard-4": {
+    "id": "47-jieting-guard-4",
+    "name": "장합 추격군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "47-jieting-guard-5": {
+    "id": "47-jieting-guard-5",
+    "name": "장합 추격군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "47-jieting-guard-6": {
+    "id": "47-jieting-guard-6",
+    "name": "장합 추격군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "47-jieting-guard-7": {
+    "id": "47-jieting-guard-7",
+    "name": "장합 추격군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "48-chencang-guard-1": {
+    "id": "48-chencang-guard-1",
+    "name": "진창 수비군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "48-chencang-guard-2": {
+    "id": "48-chencang-guard-2",
+    "name": "진창 수비군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "48-chencang-guard-3": {
+    "id": "48-chencang-guard-3",
+    "name": "진창 수비군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "48-chencang-guard-4": {
+    "id": "48-chencang-guard-4",
+    "name": "진창 수비군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "48-chencang-guard-5": {
+    "id": "48-chencang-guard-5",
+    "name": "진창 수비군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "48-chencang-guard-6": {
+    "id": "48-chencang-guard-6",
+    "name": "진창 수비군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "48-chencang-guard-7": {
+    "id": "48-chencang-guard-7",
+    "name": "진창 수비군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "49-qishan-guard-1": {
+    "id": "49-qishan-guard-1",
+    "name": "위군 차단대 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "49-qishan-guard-2": {
+    "id": "49-qishan-guard-2",
+    "name": "위군 차단대 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "49-qishan-guard-3": {
+    "id": "49-qishan-guard-3",
+    "name": "위군 차단대 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "49-qishan-guard-4": {
+    "id": "49-qishan-guard-4",
+    "name": "위군 차단대 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "49-qishan-guard-5": {
+    "id": "49-qishan-guard-5",
+    "name": "위군 차단대 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "49-qishan-guard-6": {
+    "id": "49-qishan-guard-6",
+    "name": "위군 차단대 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "49-qishan-guard-7": {
+    "id": "49-qishan-guard-7",
+    "name": "위군 차단대 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "장억": {
+    "id": "장억",
+    "name": "장억",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "50-wuzhangyuan-guard-1": {
+    "id": "50-wuzhangyuan-guard-1",
+    "name": "위군 추격대 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "50-wuzhangyuan-guard-2": {
+    "id": "50-wuzhangyuan-guard-2",
+    "name": "위군 추격대 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "50-wuzhangyuan-guard-3": {
+    "id": "50-wuzhangyuan-guard-3",
+    "name": "위군 추격대 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "50-wuzhangyuan-guard-4": {
+    "id": "50-wuzhangyuan-guard-4",
+    "name": "위군 추격대 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "50-wuzhangyuan-guard-5": {
+    "id": "50-wuzhangyuan-guard-5",
+    "name": "위군 추격대 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "50-wuzhangyuan-guard-6": {
+    "id": "50-wuzhangyuan-guard-6",
+    "name": "위군 추격대 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "50-wuzhangyuan-guard-7": {
+    "id": "50-wuzhangyuan-guard-7",
+    "name": "위군 추격대 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "조상": {
+    "id": "조상",
+    "name": "조상",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "51-xingshi-guard-1": {
+    "id": "51-xingshi-guard-1",
+    "name": "조상 원정군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "51-xingshi-guard-2": {
+    "id": "51-xingshi-guard-2",
+    "name": "조상 원정군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "51-xingshi-guard-3": {
+    "id": "51-xingshi-guard-3",
+    "name": "조상 원정군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "51-xingshi-guard-4": {
+    "id": "51-xingshi-guard-4",
+    "name": "조상 원정군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "51-xingshi-guard-5": {
+    "id": "51-xingshi-guard-5",
+    "name": "조상 원정군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "51-xingshi-guard-6": {
+    "id": "51-xingshi-guard-6",
+    "name": "조상 원정군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "51-xingshi-guard-7": {
+    "id": "51-xingshi-guard-7",
+    "name": "조상 원정군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "동궐": {
+    "id": "동궐",
+    "name": "동궐",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "호제": {
+    "id": "호제",
+    "name": "호제",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "영수": {
+    "id": "영수",
+    "name": "영수",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "등애": {
+    "id": "등애",
+    "name": "등애",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "52-taoyang-guard-1": {
+    "id": "52-taoyang-guard-1",
+    "name": "위군 차단대 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "52-taoyang-guard-2": {
+    "id": "52-taoyang-guard-2",
+    "name": "위군 차단대 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "52-taoyang-guard-3": {
+    "id": "52-taoyang-guard-3",
+    "name": "위군 차단대 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "52-taoyang-guard-4": {
+    "id": "52-taoyang-guard-4",
+    "name": "위군 차단대 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "52-taoyang-guard-5": {
+    "id": "52-taoyang-guard-5",
+    "name": "위군 차단대 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "52-taoyang-guard-6": {
+    "id": "52-taoyang-guard-6",
+    "name": "위군 차단대 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "52-taoyang-guard-7": {
+    "id": "52-taoyang-guard-7",
+    "name": "위군 차단대 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "종회": {
+    "id": "종회",
+    "name": "종회",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "53-jiange-guard-1": {
+    "id": "53-jiange-guard-1",
+    "name": "종회군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "53-jiange-guard-2": {
+    "id": "53-jiange-guard-2",
+    "name": "종회군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "53-jiange-guard-3": {
+    "id": "53-jiange-guard-3",
+    "name": "종회군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "53-jiange-guard-4": {
+    "id": "53-jiange-guard-4",
+    "name": "종회군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "53-jiange-guard-5": {
+    "id": "53-jiange-guard-5",
+    "name": "종회군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "53-jiange-guard-6": {
+    "id": "53-jiange-guard-6",
+    "name": "종회군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "53-jiange-guard-7": {
+    "id": "53-jiange-guard-7",
+    "name": "종회군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "제갈첨": {
+    "id": "제갈첨",
+    "name": "제갈첨",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "제갈상": {
+    "id": "제갈상",
+    "name": "제갈상",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "황숭": {
+    "id": "황숭",
+    "name": "황숭",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "이구": {
+    "id": "이구",
+    "name": "이구",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "장준": {
+    "id": "장준",
+    "name": "장준",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "면죽 별부": {
+    "id": "면죽 별부",
+    "name": "면죽 별부",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "54-mianzhu-guard-1": {
+    "id": "54-mianzhu-guard-1",
+    "name": "등애군 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "54-mianzhu-guard-2": {
+    "id": "54-mianzhu-guard-2",
+    "name": "등애군 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "54-mianzhu-guard-3": {
+    "id": "54-mianzhu-guard-3",
+    "name": "등애군 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "54-mianzhu-guard-4": {
+    "id": "54-mianzhu-guard-4",
+    "name": "등애군 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "54-mianzhu-guard-5": {
+    "id": "54-mianzhu-guard-5",
+    "name": "등애군 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "54-mianzhu-guard-6": {
+    "id": "54-mianzhu-guard-6",
+    "name": "등애군 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "54-mianzhu-guard-7": {
+    "id": "54-mianzhu-guard-7",
+    "name": "등애군 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "왕준": {
+    "id": "왕준",
+    "name": "왕준",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "두예": {
+    "id": "두예",
+    "name": "두예",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "왕혼": {
+    "id": "왕혼",
+    "name": "왕혼",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "당빈": {
+    "id": "당빈",
+    "name": "당빈",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "왕융": {
+    "id": "왕융",
+    "name": "왕융",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "호분": {
+    "id": "호분",
+    "name": "호분",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "도준": {
+    "id": "도준",
+    "name": "도준",
+    "war": 78,
+    "leadership": 76,
+    "intelligence": 70,
+    "agility": 70,
+    "luck": 65,
+    "faceId": 0
+  },
+  "55-jianye-guard-1": {
+    "id": "55-jianye-guard-1",
+    "name": "오군 수비대 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "55-jianye-guard-2": {
+    "id": "55-jianye-guard-2",
+    "name": "오군 수비대 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "55-jianye-guard-3": {
+    "id": "55-jianye-guard-3",
+    "name": "오군 수비대 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "55-jianye-guard-4": {
+    "id": "55-jianye-guard-4",
+    "name": "오군 수비대 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "55-jianye-guard-5": {
+    "id": "55-jianye-guard-5",
+    "name": "오군 수비대 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "55-jianye-guard-6": {
+    "id": "55-jianye-guard-6",
+    "name": "오군 수비대 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "55-jianye-guard-7": {
+    "id": "55-jianye-guard-7",
+    "name": "오군 수비대 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "52-tazhong-guard-1": {
+    "id": "52-tazhong-guard-1",
+    "name": "위군 차단대 1",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "52-tazhong-guard-2": {
+    "id": "52-tazhong-guard-2",
+    "name": "위군 차단대 2",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "52-tazhong-guard-3": {
+    "id": "52-tazhong-guard-3",
+    "name": "위군 차단대 3",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "52-tazhong-guard-4": {
+    "id": "52-tazhong-guard-4",
+    "name": "위군 차단대 4",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "52-tazhong-guard-5": {
+    "id": "52-tazhong-guard-5",
+    "name": "위군 차단대 5",
+    "war": 70,
+    "leadership": 66,
+    "intelligence": 76,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "52-tazhong-guard-6": {
+    "id": "52-tazhong-guard-6",
+    "name": "위군 차단대 6",
+    "war": 75,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
+  },
+  "52-tazhong-guard-7": {
+    "id": "52-tazhong-guard-7",
+    "name": "위군 차단대 7",
+    "war": 65,
+    "leadership": 66,
+    "intelligence": 48,
+    "agility": 60,
+    "luck": 50,
+    "faceId": 0
   }
 }

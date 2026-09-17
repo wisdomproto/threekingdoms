@@ -1,0 +1,670 @@
+{
+  "id": "54-mianzhu",
+  "name": "면죽 최후의 방어",
+  "mapId": "mianzhu",
+  "turnLimit": 30,
+  "levelCap": 62,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "제갈첨",
+    "제갈상",
+    "황숭",
+    "이구",
+    "장준",
+    "면죽 별부"
+  ],
+  "units": [
+    {
+      "commanderId": "제갈첨",
+      "classId": "strategist",
+      "level": 54,
+      "troops": 392,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "제갈상",
+      "classId": "lightCavalry",
+      "level": 54,
+      "troops": 516,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "황숭",
+      "classId": "footman",
+      "level": 54,
+      "troops": 516,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "이구",
+      "classId": "footman",
+      "level": 54,
+      "troops": 516,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장준",
+      "classId": "archer",
+      "level": 54,
+      "troops": 516,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "면죽 별부",
+      "classId": "footman",
+      "level": 54,
+      "troops": 516,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "등애",
+      "classId": "footman",
+      "level": 54,
+      "troops": 472,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "54-mianzhu-guard-1",
+      "classId": "footman",
+      "level": 52,
+      "troops": 357,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "54-mianzhu-guard-2",
+      "classId": "archer",
+      "level": 52,
+      "troops": 357,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "54-mianzhu-guard-3",
+      "classId": "lightCavalry",
+      "level": 52,
+      "troops": 357,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "54-mianzhu-guard-4",
+      "classId": "footman",
+      "level": 52,
+      "troops": 357,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "54-mianzhu-guard-5",
+      "classId": "strategist",
+      "level": 52,
+      "troops": 357,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "54-mianzhu-guard-6",
+      "classId": "archer",
+      "level": 52,
+      "troops": 357,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "54-mianzhu-guard-7",
+      "classId": "footman",
+      "level": 52,
+      "troops": 357,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "surviveTurns",
+      "turns": 6
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "제갈첨",
+        "제갈상",
+        "황숭",
+        "이구",
+        "장준",
+        "면죽 별부"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "54-mianzhu-event",
+      "name": "성도 피난로 확보",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "special",
+          "area": {
+            "x": 3,
+            "y": 5,
+            "width": 5,
+            "height": 9
+          }
+        },
+        {
+          "kind": "heal",
+          "target": {
+            "side": "player"
+          },
+          "amount": 12,
+          "percent": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 5580,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "54-mianzhu-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "제갈첨",
+          "side": "player",
+          "text": "피난민과 전령이 빠져나갈 시간을 번다. 면죽의 방어선을 유지하라."
+        }
+      ]
+    },
+    {
+      "id": "54-mianzhu-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "54-mianzhu-event"
+      },
+      "lines": [
+        {
+          "speaker": "제갈첨",
+          "side": "player",
+          "text": "성도로 향하는 피난 행렬이 통과한다. 후위를 세우고 방어 대열을 회복한다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-camp-day",
+        "label": "면죽 최후의 방어 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "황숭",
+            "sprite": "sequel-ed99a9ec88ad",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈첨",
+            "sprite": "sequel-eca09ceab088ecb2a8",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "제갈상",
+            "sprite": "sequel-eca09ceab088ec8381",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "제갈첨은 아버지의 이름으로 자신을 부르는 소리를 들을 때마다 잠깐 늦게 돌아보았다. 오늘만큼은 그 이름이 성문보다 높고 무겁게 느껴졌다.",
+            "move": [
+              {
+                "id": "황숭",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "앞의 험한 길을 먼저 잡았어야 했습니다. 지금이라도 흩어진 병사를 모아 출구를 막아야 합니다.",
+            "speaker": "황숭",
+            "portraitId": "황숭",
+            "pose": [
+              {
+                "id": "황숭",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "망설인 시간은 돌려받을 수 없겠지요. 남은 시간까지 변명하는 데 쓰지는 않겠습니다.",
+            "speaker": "제갈첨",
+            "portraitId": "제갈첨",
+            "pose": [
+              {
+                "id": "황숭",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈첨",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "저도 함께 나가겠습니다.",
+            "speaker": "제갈상",
+            "portraitId": "제갈상",
+            "pose": [
+              {
+                "id": "제갈첨",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈상",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "제갈첨은 아들의 얼굴을 보고 무엇인가 말하려다 그만두었다. 평소라면 아직 이르다고 했을 말이, 그날은 너무 늦은 말이 되어 있었다.",
+            "pose": [
+              {
+                "id": "황숭",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈첨",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈상",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-day",
+        "label": "면죽 최후의 방어 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "황숭",
+            "sprite": "sequel-ed99a9ec88ad",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈첨",
+            "sprite": "sequel-eca09ceab088ecb2a8",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "등애",
+            "sprite": "sequel-eb93b1ec95a0",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈상",
+            "sprite": "sequel-eca09ceab088ec8381",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "등애의 군대가 산을 넘었을 때 성도는 그가 도착할 수 있으리라 생각하지 못했다. 제갈첨은 급히 군대를 모았다. 아버지에게 오래 배울 수 없었던 아들은 아버지의 이름만큼 무거운 기대를 받았다.",
+            "move": [
+              {
+                "id": "황숭",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "험한 길목을 먼저 차지해야 합니다. 적이 평지로 나올 때까지 기다리면 늦습니다.",
+            "speaker": "황숭",
+            "portraitId": "황숭",
+            "pose": [
+              {
+                "id": "황숭",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "병력을 더 모으려 했소. 그 시간이 이제 우리에게 없는 것이구려.",
+            "speaker": "제갈첨",
+            "portraitId": "제갈첨",
+            "pose": [
+              {
+                "id": "황숭",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈첨",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "망설임의 대가는 빠르게 찾아왔다. 면죽 앞에서 맞선 촉군은 뒤로 물러설 땅보다 지켜야 할 사람을 더 많이 안고 있었다.",
+            "pose": [
+              {
+                "id": "제갈첨",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "항복하면 그 집안의 이름을 보전할 수 있다.",
+            "speaker": "등애",
+            "portraitId": "등애",
+            "pose": [
+              {
+                "id": "등애",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "내 집안의 이름을 내 목숨과 바꾸라고 하지 마시오.",
+            "speaker": "제갈첨",
+            "portraitId": "제갈첨",
+            "pose": [
+              {
+                "id": "등애",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈첨",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "아버지와 함께 싸우겠습니다.",
+            "speaker": "제갈상",
+            "portraitId": "제갈상",
+            "pose": [
+              {
+                "id": "제갈첨",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈상",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "네가 내 아들이어서 앞에 서는 것은 원하지 않았다. 그러나 이제 함께 책임질 수밖에 없구나.",
+            "speaker": "제갈첨",
+            "portraitId": "제갈첨",
+            "pose": [
+              {
+                "id": "제갈상",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈첨",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "부자는 서로의 갑옷 끈을 확인했다. 장수들이 마지막으로 확인한 것은 승리의 약속이 아니라 뒤의 사람들이 빠져나갈 길이었다.",
+            "pose": [
+              {
+                "id": "제갈첨",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "북이 멈추더라도 대열을 놓지 마라. 우리가 버티는 동안 누군가는 살아서 간다.",
+            "speaker": "황숭",
+            "portraitId": "황숭",
+            "pose": [
+              {
+                "id": "황숭",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "면죽의 들판에는 더는 물러설 성벽이 없었다. 군사들이 서로의 간격을 좁히며 창을 세웠다.",
+            "pose": [
+              {
+                "id": "황숭",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈첨",
+                "pose": "idle"
+              },
+              {
+                "id": "등애",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈상",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-sequel-palace",
+        "label": "면죽 최후의 방어 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "방어대가 버티는 동안 일부 주민과 전령은 성도로 돌아갔다. 그러나 면죽의 전투에서 제갈첨과 제갈상은 전사했고 방어선은 끝내 무너졌다.",
+            "move": [
+              {
+                "id": "강유",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "유선은 성도에서 항복을 택했다. 더 싸우자는 말과 백성을 살려야 한다는 말이 마지막 조정에 함께 있었다. 촉한은 그렇게 끝났다."
+          },
+          {
+            "text": "검각을 지켰는데 돌아갈 나라가 없어졌구나.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "강유는 뒤에 종회의 야심을 이용해 나라를 되살리려 했으나 계획은 실패했다. 성도의 혼란 속에서 그 또한 죽었다. 한 번 무너진 질서를 의지 하나로 세울 수는 없었다.",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "위에서도 조씨 황제의 시대가 끝났다. 사마염이 진을 세웠고, 세 나라 중 오만 남았다. 유비와 조조가 서로 겨누던 시대는 이미 다른 사람들의 손에 넘어갔다."
+          },
+          {
+            "text": "장강 남쪽에서는 육항과 양호가 국경을 마주 지키던 세월이 흘렀다. 서로의 백성을 함부로 해치지 않는 장수들이 있었으나 그들이 죽은 뒤에도 국경은 남았다."
+          },
+          {
+            "text": "마침내 진은 여러 길로 오를 공격했다. 서쪽 장강에 왕준의 큰 배들이 나타났다."
+          },
+          {
+            "text": "도원에서 시작한 이야기는 이제 그때 태어나지도 않았던 사람들의 마지막 전쟁으로 이어졌다.",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "bg": "scene-sequel-palace",
+        "lines": [
+          {
+            "text": "면죽의 소식은 성도에 있는 사람들에게 서로 다른 속도로 닿았다. 관청은 문서로 알았고, 성문을 지키는 병사는 돌아오지 않는 대열로 알았다."
+          },
+          {
+            "text": "누군가는 제갈량이 살아 있었다면 어땠을지를 말했다. 그러나 그 질문은 오늘 쓰러진 사람들의 이름을 대신해 주지 못했다."
+          },
+          {
+            "text": "제갈첨과 제갈상, 황숭과 장수들의 이름을 적은 장부가 닫혔다. 다음 장에는 승전도 패전도 아닌, 성문을 열 때 지켜야 할 사람들의 수가 적히기 시작했다."
+          },
+          {
+            "text": "한 나라가 끝나는 날에도 밥을 지어야 했고 아이를 찾아야 했다. 역사의 큰 문장 아래에서 사람들의 작은 하루는 멈추지 않았다."
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "면죽 최후의 방어의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

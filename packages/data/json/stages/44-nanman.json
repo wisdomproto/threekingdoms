@@ -1,0 +1,804 @@
+{
+  "id": "44-nanman",
+  "name": "남중 산채",
+  "mapId": "nanman",
+  "turnLimit": 30,
+  "levelCap": 52,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "제갈량",
+    "조운",
+    "위연",
+    "마대",
+    "왕평",
+    "마속",
+    "장익",
+    "등지"
+  ],
+  "units": [
+    {
+      "commanderId": "제갈량",
+      "classId": "strategist",
+      "level": 44,
+      "troops": 362,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "조운",
+      "classId": "lightCavalry",
+      "level": 44,
+      "troops": 476,
+      "items": [
+        "용담창"
+      ],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "위연",
+      "classId": "footman",
+      "level": 44,
+      "troops": 476,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "마대",
+      "classId": "lightCavalry",
+      "level": 44,
+      "troops": 476,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "왕평",
+      "classId": "footman",
+      "level": 44,
+      "troops": 476,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "마속",
+      "classId": "strategist",
+      "level": 44,
+      "troops": 362,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장익",
+      "classId": "footman",
+      "level": 44,
+      "troops": 476,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "등지",
+      "classId": "strategist",
+      "level": 44,
+      "troops": 362,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 11,
+      "facing": "right"
+    },
+    {
+      "commanderId": "축융",
+      "classId": "bandit",
+      "level": 44,
+      "troops": 442,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "44-nanman-guard-1",
+      "classId": "footman",
+      "level": 42,
+      "troops": 327,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "44-nanman-guard-2",
+      "classId": "archer",
+      "level": 42,
+      "troops": 327,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "44-nanman-guard-3",
+      "classId": "lightCavalry",
+      "level": 42,
+      "troops": 327,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "44-nanman-guard-4",
+      "classId": "footman",
+      "level": 42,
+      "troops": 327,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "44-nanman-guard-5",
+      "classId": "strategist",
+      "level": 42,
+      "troops": 327,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "44-nanman-guard-6",
+      "classId": "archer",
+      "level": 42,
+      "troops": 327,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "44-nanman-guard-7",
+      "classId": "footman",
+      "level": 42,
+      "troops": 327,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "defeatUnit",
+      "unitId": "축융"
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "제갈량",
+        "조운",
+        "위연",
+        "마대",
+        "왕평",
+        "마속",
+        "장익",
+        "등지"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "44-nanman-event",
+      "name": "숲길 포위 해제",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "rock",
+          "area": {
+            "x": 15,
+            "y": 5,
+            "width": 10,
+            "height": 10
+          }
+        },
+        {
+          "kind": "damage",
+          "target": {
+            "side": "enemy",
+            "area": {
+              "x": 15,
+              "y": 5,
+              "width": 10,
+              "height": 10
+            }
+          },
+          "amount": 12,
+          "percent": true,
+          "nonlethal": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 4880,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "44-nanman-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "text": "숲 안에서 따로 떨어지지 마라. 산채의 저항을 꺾고 붙잡힌 병사를 구한다."
+        }
+      ]
+    },
+    {
+      "id": "44-nanman-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "44-nanman-event"
+      },
+      "lines": [
+        {
+          "speaker": "제갈량",
+          "side": "player",
+          "text": "측면 길의 매복을 역으로 압박했다. 적의 전열이 흔들리며 산채로 가는 길이 열린다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-sequel-south-camp",
+        "label": "남중 산채 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "축융",
+            "sprite": "sequel-ecb695ec9cb5",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "맹획",
+            "sprite": "sequel-eba7b9ed9a8d",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "맹획은 풀려난 부하들의 얼굴을 차례로 살폈다. 칼을 돌려받은 이도 있었고 상처에 새 천을 감은 이도 있었다. 적의 진영에서 그런 모습으로 돌아온 까닭이 마음에 걸렸다.",
+            "move": [
+              {
+                "id": "축융",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "호의를 보였다고 뜻까지 같아진 것은 아니오. 무엇을 요구하는지 직접 들어야 하오.",
+            "speaker": "축융",
+            "portraitId": "축융",
+            "pose": [
+              {
+                "id": "축융",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "내가 듣기 전에 사람들이 먼저 믿어 버릴까 두렵소.",
+            "speaker": "맹획",
+            "portraitId": "맹획",
+            "pose": [
+              {
+                "id": "축융",
+                "pose": "idle"
+              },
+              {
+                "id": "맹획",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그렇다면 더더욱 피하지 마시오. 우리 사람들의 마음까지 칼로 붙들 수는 없으니까.",
+            "speaker": "축융",
+            "portraitId": "축융",
+            "pose": [
+              {
+                "id": "축융",
+                "pose": "idle"
+              },
+              {
+                "id": "맹획",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-sequel-south-camp",
+        "label": "남중 산채 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "위연",
+            "sprite": "sequel-ec9c84ec97b0",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "축융",
+            "sprite": "sequel-ecb695ec9cb5",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "조운",
+            "sprite": "zhaoyun-robes",
+            "cell": [
+              9,
+              5
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "왕평",
+            "sprite": "sequel-ec9995ed8f89",
+            "cell": [
+              3,
+              6
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "남중의 싸움은 이긴 길을 다시 걷는 일이 많았다. 맹획은 새 군사를 모았고 제갈량은 잡은 사람을 다시 놓아 보냈다. 승리의 보고는 늘었지만 병사들의 피로도 함께 쌓였다.",
+            "move": [
+              {
+                "id": "위연",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "끝낼 수 있을 때 끝내지 않아 같은 산을 몇 번이나 넘고 있습니다.",
+            "speaker": "위연",
+            "portraitId": "위연",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그래서 장군의 불만을 듣습니다. 쉬운 명령이라고 생각했다면 이 자리에 서지 않았을 것입니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "촉군의 앞을 이번에는 축융이 막았다. 그녀는 맹획이 잃은 싸움을 대신 설명하러 온 것이 아니라 자신의 군사를 이끌고 온 장수였다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "너희가 말하는 은혜를 우리 모두가 받아야 할 이유는 없다.",
+            "speaker": "축융",
+            "portraitId": "축융",
+            "pose": [
+              {
+                "id": "축융",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "강요된 은혜는 은혜가 아니겠지요. 그러나 붙잡힌 사람은 서로 돌려보낼 수 있습니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "축융",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "말은 오갔으나 무기는 내려가지 않았다. 숲속 길목에서는 정찰병이 사라졌고 촉군은 산채 안의 포로를 구해야 했다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "길을 나누되 멀리 떨어지지 않겠습니다. 신호가 닿는 거리만큼만 움직이겠습니다.",
+            "speaker": "조운",
+            "portraitId": "조운",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "빽빽한 숲에서는 말 탄 군사보다 보병을 앞에 세우겠습니다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "장수들은 승전보다 먼저 돌아오는 길을 확인했다. 낯선 땅에서 잃어버린 병사 하나를 찾는 데에는 전투보다 긴 시간이 들기도 했다.",
+            "pose": [
+              {
+                "id": "위연",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "축융",
+                "pose": "idle"
+              },
+              {
+                "id": "조운",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-sequel-south-camp",
+        "label": "남중 산채 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "축융",
+            "sprite": "sequel-ecb695ec9cb5",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "마대",
+            "sprite": "sequel-eba788eb8c80",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "축융이 붙잡힌 뒤에도 제갈량은 모욕하는 말을 금했다. 포로 교환이 이루어지자 촉군과 남중의 가족들이 서로 다른 길 끝에서 같은 사람을 기다렸다.",
+            "move": [
+              {
+                "id": "축융",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "한 번 약속을 지켰다고 모두 믿으라 하지는 마라.",
+            "speaker": "축융",
+            "portraitId": "축융",
+            "pose": [
+              {
+                "id": "축융",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그것을 요구하지 않겠습니다. 다음 약속도 지키겠습니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "축융",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "맹획은 다시 돌아왔고 다시 싸움을 준비했다. 이번에는 질긴 등나무 갑옷을 입은 군대가 앞장선다는 소식이 들렸다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "칼과 화살이 잘 들지 않는다고 합니다. 정면으로 붙으면 피해가 큽니다.",
+            "speaker": "마대",
+            "portraitId": "마대",
+            "pose": [
+              {
+                "id": "마대",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "불을 쓰면 막을 수 있습니다. 그러나 그 길의 끝에 무엇이 남을지도 알아야 합니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "마대",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "군막 안의 말이 잠시 끊겼다. 승리할 방법을 안다는 것과 그 방법을 기꺼이 쓴다는 것은 달랐다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "제갈량은 밤늦게까지 출구가 있는 계곡과 없는 계곡을 지도에서 구별했다.",
+            "pose": [
+              {
+                "id": "축융",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "마대",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-sequel-south-camp",
+        "label": "남중 산채 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "맹획",
+            "sprite": "sequel-eba7b9ed9a8d",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "맹획과 제갈량이 마주 앉은 자리에는 통역이 둘 있었다. 같은 말이 다르게 전해지는 것을 막기 위해, 중요한 약속은 한 번씩 되짚었다.",
+            "move": [
+              {
+                "id": "맹획",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "우리 고을의 일을 모두 북쪽 사람에게 맡기지는 마시오.",
+            "speaker": "맹획",
+            "portraitId": "맹획",
+            "pose": [
+              {
+                "id": "맹획",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그대들이 다스리되 약속한 공물과 길은 지켜 주시오. 우리 군대가 다시 내려오지 않아도 되는 길을 만들고 싶소.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "맹획",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "대답은 한 번의 절로 끝나지 않았다. 시장과 세금, 포로와 잃은 가축의 이야기가 저녁까지 이어졌다. 전투보다 더 오래 걸리는 화해였다.",
+            "pose": [
+              {
+                "id": "맹획",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "남중 산채의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

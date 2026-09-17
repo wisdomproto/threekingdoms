@@ -5,6 +5,7 @@ import originalGroups from "../../src/pixi/chapterOnePreview.json";
 import { BattleVoicePlayer, audio } from "../../src/audio";
 
 const chapterOneGroups = [...originalGroups,
+  [{ id: 'troia-agamemnon', name: '아가멤논', classId: 'lord' }, { id: 'troia-menelaus', name: '메넬라오스', classId: 'footman' }],
   [{ id: 'achilles', name: '아킬레우스', classId: 'lord' }, { id: 'patroclus', name: '파트로클로스', classId: 'strategist' }, { id: 'diores', name: '디오레스', classId: 'footman' }],
   [{ id: 'greek-spear', name: '그리스 창병', classId: 'footman' }, { id: 'greek-archer', name: '그리스 궁병', classId: 'archer' }],
   [{ id: 'trojan-spear-1', name: '트로이 창병', classId: 'footman' }, { id: 'trojan-archer-1', name: '트로이 궁병', classId: 'archer' }],

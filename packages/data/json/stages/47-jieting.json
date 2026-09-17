@@ -1,0 +1,754 @@
+{
+  "id": "47-jieting",
+  "name": "가정 철수전",
+  "mapId": "jieting",
+  "turnLimit": 30,
+  "levelCap": 55,
+  "camera": {
+    "zoom": 1.5,
+    "focus": [
+      7,
+      10
+    ]
+  },
+  "allowedCommanderIds": [
+    "왕평",
+    "마속",
+    "위연",
+    "강유",
+    "마대",
+    "관흥"
+  ],
+  "units": [
+    {
+      "commanderId": "왕평",
+      "classId": "footman",
+      "level": 47,
+      "troops": 488,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "마속",
+      "classId": "strategist",
+      "level": 47,
+      "troops": 371,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "위연",
+      "classId": "footman",
+      "level": 47,
+      "troops": 488,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 7,
+      "facing": "right"
+    },
+    {
+      "commanderId": "강유",
+      "classId": "lightCavalry",
+      "level": 47,
+      "troops": 488,
+      "items": [],
+      "side": "player",
+      "x": 4,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "마대",
+      "classId": "lightCavalry",
+      "level": 47,
+      "troops": 488,
+      "items": [],
+      "side": "player",
+      "x": 5,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "관흥",
+      "classId": "lightCavalry",
+      "level": 47,
+      "troops": 488,
+      "items": [],
+      "side": "player",
+      "x": 6,
+      "y": 9,
+      "facing": "right"
+    },
+    {
+      "commanderId": "장합",
+      "classId": "lightCavalry",
+      "level": 47,
+      "troops": 451,
+      "items": [],
+      "side": "enemy",
+      "x": 23,
+      "y": 10,
+      "facing": "left"
+    },
+    {
+      "commanderId": "47-jieting-guard-1",
+      "classId": "footman",
+      "level": 45,
+      "troops": 336,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "47-jieting-guard-2",
+      "classId": "archer",
+      "level": 45,
+      "troops": 336,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "47-jieting-guard-3",
+      "classId": "lightCavalry",
+      "level": 45,
+      "troops": 336,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 6,
+      "facing": "left"
+    },
+    {
+      "commanderId": "47-jieting-guard-4",
+      "classId": "footman",
+      "level": 45,
+      "troops": 336,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "47-jieting-guard-5",
+      "classId": "strategist",
+      "level": 45,
+      "troops": 336,
+      "items": [],
+      "side": "enemy",
+      "x": 19,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "47-jieting-guard-6",
+      "classId": "archer",
+      "level": 45,
+      "troops": 336,
+      "items": [],
+      "side": "enemy",
+      "x": 21,
+      "y": 9,
+      "facing": "left"
+    },
+    {
+      "commanderId": "47-jieting-guard-7",
+      "classId": "footman",
+      "level": 45,
+      "troops": 336,
+      "items": [],
+      "side": "enemy",
+      "x": 17,
+      "y": 12,
+      "facing": "left"
+    }
+  ],
+  "objectives": [
+    {
+      "kind": "surviveTurns",
+      "turns": 6
+    }
+  ],
+  "failConditions": [
+    {
+      "kind": "allRetreated",
+      "unitIds": [
+        "왕평",
+        "마속",
+        "위연",
+        "강유",
+        "마대",
+        "관흥"
+      ]
+    },
+    {
+      "kind": "turnLimitExceeded"
+    }
+  ],
+  "events": [],
+  "scriptEvents": [
+    {
+      "id": "47-jieting-event",
+      "name": "왕평의 후위 신호",
+      "editingMode": "simple",
+      "trigger": {
+        "kind": "turn",
+        "turn": 3,
+        "phase": "player"
+      },
+      "actions": [
+        {
+          "kind": "effect",
+          "effect": "special",
+          "area": {
+            "x": 3,
+            "y": 5,
+            "width": 5,
+            "height": 9
+          }
+        },
+        {
+          "kind": "heal",
+          "target": {
+            "side": "player"
+          },
+          "amount": 12,
+          "percent": true
+        }
+      ]
+    }
+  ],
+  "reward": {
+    "gold": 5090,
+    "exp": 0,
+    "treasures": []
+  },
+  "dialogue": [
+    {
+      "id": "47-jieting-opening",
+      "trigger": {
+        "kind": "battleStart"
+      },
+      "lines": [
+        {
+          "speaker": "왕평",
+          "side": "player",
+          "text": "산 아래 길로 병력을 거둔다. 적을 추격하지 말고 후위가 버틸 시간을 벌어라."
+        }
+      ]
+    },
+    {
+      "id": "47-jieting-event-cue",
+      "trigger": {
+        "kind": "scriptFired",
+        "scriptId": "47-jieting-event"
+      },
+      "lines": [
+        {
+          "speaker": "왕평",
+          "side": "player",
+          "text": "왕평이 흩어진 군사를 모아 후위를 세웠다. 퇴로를 지키며 전열을 회복한다."
+        }
+      ]
+    }
+  ],
+  "scenario": {
+    "intro": [
+      {
+        "map": "scene-camp-day",
+        "label": "가정 철수전 · 길을 나서기 전에",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "왕평",
+            "sprite": "sequel-ec9995ed8f89",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "마속",
+            "sprite": "sequel-eba788ec868d",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "왕평은 산 아래의 우물을 가리켰다. 마속은 높은 능선에서 내려다보는 길을 다시 짚었다. 두 사람의 손은 같은 지도 위에서 끝내 만나지 않았다.",
+            "move": [
+              {
+                "id": "왕평",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "높은 곳을 잡아도 물은 아래에 있습니다. 적이 길을 끊으면 버티는 시간이 짧습니다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "높이에서 내려치는 형세를 얻으면 먼저 무너뜨릴 수 있소.",
+            "speaker": "마속",
+            "portraitId": "마속",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              },
+              {
+                "id": "마속",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "적이 올라오지 않으면 어찌하시겠습니까?",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "마속",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "마속은 잠깐 입을 다물었다가 지도를 접었다. 자신이 옳다는 것을 보여 주려는 마음과 군령을 지켜야 한다는 의무 사이에서, 그는 이미 한쪽으로 기울고 있었다.",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              },
+              {
+                "id": "마속",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-day",
+        "label": "가정 철수전 · 출정",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "마속",
+            "sprite": "sequel-eba788ec868d",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "왕평",
+            "sprite": "sequel-ec9995ed8f89",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "가정에 도착한 마속은 높은 산을 보았다. 왕평은 산 아래의 물과 큰길을 보았다. 같은 장소에서 시작된 두 판단은 진영을 세울 때 갈라졌다.",
+            "move": [
+              {
+                "id": "마속",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "높은 곳을 얻으면 적이 쉽게 오르지 못한다. 아래를 굽어보며 싸우겠다.",
+            "speaker": "마속",
+            "portraitId": "마속",
+            "pose": [
+              {
+                "id": "마속",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "물길을 끊으면 내려와야 합니다. 큰길을 지키라는 승상의 명을 따라야 합니다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "마속",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "마속은 병법의 말을 들었고 왕평은 병사들의 목마름을 떠올렸다. 논쟁은 끝났으나 문제는 끝나지 않았다.",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "작전의 책임은 내가 진다.",
+            "speaker": "마속",
+            "portraitId": "마속",
+            "pose": [
+              {
+                "id": "마속",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그 책임을 병사들이 먼저 목숨으로 갚게 해서는 안 됩니다.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "마속",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "장합은 산을 무리하게 오르지 않았다. 물길과 출구를 막자 산 위의 유리함이 병사들의 불안으로 바뀌었다.",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "내려가서 길을 뚫는다. 대열을 유지하라!",
+            "speaker": "마속",
+            "portraitId": "마속",
+            "pose": [
+              {
+                "id": "마속",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그러나 목마르고 지친 군대는 올라올 때의 군대가 아니었다. 명령이 앞에 닿기 전에 뒤에서 사람이 밀려왔다.",
+            "pose": [
+              {
+                "id": "마속",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "내 북소리를 듣고 모여라. 살 길은 하나다. 흩어져 달아나지 마라.",
+            "speaker": "왕평",
+            "portraitId": "왕평",
+            "pose": [
+              {
+                "id": "왕평",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "왕평의 부대가 산 아래에 서는 동안 패배는 아직 전멸이 되지 않았다. 남은 일은 이 작은 차이를 끝까지 지키는 것이었다.",
+            "pose": [
+              {
+                "id": "마속",
+                "pose": "idle"
+              },
+              {
+                "id": "왕평",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outro": [
+      {
+        "map": "scene-camp-day",
+        "label": "가정 철수전 · 전투 뒤",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "마속",
+            "sprite": "sequel-eba788ec868d",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          },
+          {
+            "id": "강유",
+            "sprite": "sequel-eab095ec9ca0",
+            "cell": [
+              5,
+              5
+            ],
+            "facing": "right"
+          }
+        ],
+        "lines": [
+          {
+            "text": "왕평의 후위가 버텨 일부 병력은 돌아왔다. 그러나 가정을 잃은 첫 북벌은 물러나야 했다. 한 길목의 잘못이 여러 성의 승리를 비웠다.",
+            "move": [
+              {
+                "id": "제갈량",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "돌아온 군사의 수를 적으시오. 잃은 군사의 이름도 빼지 마시오.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "군령을 어겼습니다. 변명하지 않겠습니다.",
+            "speaker": "마속",
+            "portraitId": "마속",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "마속",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "군법을 집행하는 날 제갈량은 눈물을 숨기지 못했다. 아끼는 사람을 벌하는 일과 그를 그 자리에 앉힌 책임은 서로 지워지지 않았다.",
+            "pose": [
+              {
+                "id": "마속",
+                "pose": "idle"
+              }
+            ]
+          },
+          {
+            "text": "내가 사람을 잘못 쓴 죄도 함께 기록하시오.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "이긴 일만 가르치실 줄 알았습니다.",
+            "speaker": "강유",
+            "portraitId": "강유",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "강유",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "진 일을 감추면 다음 사람이 같은 곳에 군사를 묻습니다.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "강유",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "성도로 돌아가는 길은 출정할 때보다 조용했다. 제갈량은 다시 올릴 표문을 준비하며 종이 위에서 먼저 자신의 벼슬을 낮췄다.",
+            "pose": [
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              },
+              {
+                "id": "마속",
+                "pose": "idle"
+              },
+              {
+                "id": "강유",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "map": "scene-camp-day",
+        "label": "가정 철수전 · 남겨진 이야기",
+        "camera": {
+          "zoom": 1.3
+        },
+        "units": [
+          {
+            "id": "마속",
+            "sprite": "sequel-eba788ec868d",
+            "cell": [
+              1,
+              4
+            ],
+            "facing": "right"
+          },
+          {
+            "id": "제갈량",
+            "sprite": "zhugeliang-robes",
+            "cell": [
+              7,
+              4
+            ],
+            "facing": "left"
+          }
+        ],
+        "lines": [
+          {
+            "text": "퇴각한 병사들의 물통은 비어 있었다. 제갈량은 보고서를 읽기 전에 그들에게 물을 나누어 주게 했다. 마속은 그 모습을 보고 더 오래 고개를 들지 못했다.",
+            "move": [
+              {
+                "id": "마속",
+                "to": [
+                  3,
+                  4
+                ]
+              }
+            ]
+          },
+          {
+            "text": "제가 배운 것을 믿었으나, 곁에 있던 사람의 말은 듣지 않았습니다.",
+            "speaker": "마속",
+            "portraitId": "마속",
+            "pose": [
+              {
+                "id": "마속",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "그대를 믿고 맡긴 사람의 잘못도 없지는 않네. 그러나 그 말이 군령을 없애 주지는 못하네.",
+            "speaker": "제갈량",
+            "portraitId": "제갈량",
+            "pose": [
+              {
+                "id": "마속",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "talk"
+              }
+            ]
+          },
+          {
+            "text": "장막 밖에서는 다음 퇴로를 정하는 군령이 이어졌다. 누군가의 잘못을 슬퍼하는 동안에도 살아남은 사람들을 돌려보내야 했다.",
+            "pose": [
+              {
+                "id": "마속",
+                "pose": "idle"
+              },
+              {
+                "id": "제갈량",
+                "pose": "idle"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "outroDefeat": {
+      "bg": "18-bowangpo-outro",
+      "lines": [
+        {
+          "text": "가정 철수전의 작전은 이루어지지 않았다. 흩어진 병력을 모아 진로와 보급을 다시 살펴야 했다."
+        }
+      ]
+    }
+  }
+}

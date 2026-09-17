@@ -58,7 +58,7 @@ function stripNulls(o) {
 }
 
 const KEYS = {
-  stage: ["id", "name", "mapId", "turnLimit", "camera", "reward", "levelCap", "scenario", "dialogue", "decorations", "units", "objectives", "failConditions", "reinforcements", "strategyConditions", "scriptEvents", "victory", "defeat", "events"],
+  stage: ["id", "name", "mapId", "turnLimit", "camera", "reward", "levelCap", "scenario", "dialogue", "decorations", "units", "allowedCommanderIds", "objectives", "failConditions", "reinforcements", "strategyConditions", "scriptEvents", "victory", "defeat", "events"],
   unit: ["commanderId", "facing", "classId", "level", "troops", "items", "side", "x", "y"],
   event: ["id", "type", "trigger", "outcome", "once"],
   reinf: ["id", "side", "trigger", "units", "once"],
