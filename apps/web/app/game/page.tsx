@@ -11,7 +11,7 @@ export default function GameLaunch() {
       const response = await fetch("/api/studio/game", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({projectId}) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error ?? "게임 동기화에 실패했습니다.");
-      if (!cancelled) location.replace("/");
+      if (!cancelled) location.replace("/play/samgukji");
     }
     void launch().catch(e => { if (!cancelled) setError(e.message); });
     return () => { cancelled = true; };

@@ -13,7 +13,7 @@ export default async function StudioLogin({ searchParams }: { searchParams: Prom
         style={{ boxSizing: "border-box", width: "100%", minHeight: 52, padding: "12px 16px", fontSize: 20, background: "#242018", color: "#fff", border: "1px solid #92764a", borderRadius: 8 }} />
       {params.error && <p role="alert" style={{ margin: 0, color: "#ffb4a5" }}>비밀번호가 맞지 않습니다. 다시 입력해 주세요.</p>}
       <button type="submit" style={{ minHeight: 52, fontSize: 17, fontWeight: 700, background: "#d8b978", color: "#251b0f", border: 0, borderRadius: 8, cursor: "pointer" }}>스튜디오 들어가기</button>
-      <Link href="/" style={{ color: "#bcad92", textAlign: "center", padding: 12 }}>게임으로 돌아가기</Link>
+      <Link href="/" style={{ color: "#bcad92", textAlign: "center", padding: 12 }}>메인으로 돌아가기</Link>
     </form>
   </main>;
 }

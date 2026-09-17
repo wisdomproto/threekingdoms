@@ -422,6 +422,11 @@ export function reduceInput(
     }
 
     case "postMoveMenu": {
+      if (event.type === "tapTile") {
+        const target = unitAt(battle, event.coord.x, event.coord.y);
+        if (!target || !state.attackable.includes(target.id)) return noop(state);
+        return attackCommit({ ...state, kind: "targetSelect", ultimate: false }, target.id, confirmAttacks);
+      }
       if (event.type === "menuAttack") {
         if (state.attackable.length === 0) return noop(state); // 대상 없음 — 버튼 비활성과 동일
         return { next: { ...state, kind: "targetSelect", ultimate: false }, effects: [] };
@@ -464,7 +469,7 @@ export function reduceInput(
           effects: [],
         };
       }
-      return noop(state); // tapTile 포함 — 메뉴는 모달
+      return noop(state);
     }
 
     case "targetSelect": {

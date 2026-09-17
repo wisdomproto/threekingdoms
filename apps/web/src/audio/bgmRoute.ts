@@ -8,9 +8,10 @@
 import type { BgmTrackId } from "./bgm";
 
 export function bgmForPath(path: string): BgmTrackId | null {
+  if (path === "/" || path === "/studio-login") return null;
   if (path === "/studio" || path === "/motion-editor" || path === "/battle-motion-preview") return null;
   if (path.startsWith("/battle")) return "battle";
   if (path.startsWith("/scene")) return "scene";
-  if (path === "/") return "title";
+  if (path === "/play/samgukji") return "title";
   return "menu";
 }

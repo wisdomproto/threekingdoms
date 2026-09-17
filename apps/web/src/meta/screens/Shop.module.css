@@ -48,3 +48,28 @@
   .detail dl { clear:both; }
   .wallet strong { font-size:22px; }
 }
+.compact { display:flex; flex-direction:column; height:100%; min-height:0; }
+.compact .header { padding:4px 10px; }
+.compact .header h2 { font-size:16px; }
+.compact .header p { display:none; }
+.compact .wallet span { display:none; }
+.compact .wallet strong { font-size:18px; }
+.compact .layout { flex:1; min-height:0; grid-template-columns:minmax(0,1fr) 230px; }
+.compact .catalog, .compact .detail { overflow-y:auto; padding:8px; }
+.compact .filters { margin-bottom:6px; }
+.compact .filters button { padding:4px 10px; }
+.compact .grid { grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:6px; }
+.compact .card { padding:5px; gap:3px; }
+.compact .card > div { width:48px !important; height:48px !important; }
+.compact .card strong { font-size:13px; }
+.compact .cardBottom { padding-top:4px; }
+.compact .hero { float:right; margin:0 0 4px 6px; padding:0; }
+.compact .hero > div { width:48px !important; height:48px !important; }
+.compact .detail h3 { font-size:17px; margin:3px 0 6px; }
+.compact .detail dl { clear:both; padding-top:4px; margin:4px 0; }
+.compact .detail dl div { margin:4px 0; font-size:12px; }
+.compact .footer { padding:2px 8px; }
+.compact .footer button { font-size:11px !important; padding:0 4px !important; border-width:6px 12px !important; }
+.compact .usage { display:none; }
+.compact .card > .category { display:none; }
+.compact .notice { margin:3px 0 0; min-height:0; }

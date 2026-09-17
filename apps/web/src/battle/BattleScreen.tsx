@@ -528,7 +528,6 @@ export default function BattleScreen({ setup, onComplete, onExit }: {
       {/* 승리조건 배너 = 장막 걷힘 + 개전 나레이션 종료 후 — "나레이션 끝나고 목표가 딱" 시퀀스 */}
       {boot.ready && introDone && <ObjectiveFlashLayer vm={snap.vm} display={display} />}
       <div id="hudLeft" style={mobile ? LEFT_COL_MOBILE : LEFT_COL}>
-        {boot.ready && introDone && !["animating", "enemyTurn", "autoTurn"].includes(snap.ui.kind) && <ObjectiveStrip display={display} />}
         {/* 확인 카드 중엔 정보창을 접는다 — 720p에서 카드 버튼이 컬럼 하단(overflow hidden)에 잘리던 문제 */}
         {!mobile && <AttackForecast ui={snap.ui} ctx={ctx} committed={store.committedState} dispatch={dispatch} />}
       </div>
@@ -562,9 +561,17 @@ export default function BattleScreen({ setup, onComplete, onExit }: {
         }}
       >
         {mobile ? (
+          <>
           <button type="button" data-testid="mobile-menu" aria-label="메뉴 열기" onClick={() => setPaused(true)} style={MOBILE_MENU_BTN}>
             ☰
           </button>
+          <button type="button" aria-label={snap.autoBattle ? "자동전투 중지" : "자동전투 시작"} aria-pressed={snap.autoBattle} disabled={!canAutoFight} title={canAutoFight ? "자동전투" : "클리어한 스테이지에서 사용 가능"} onClick={toggleAuto} style={{ ...MOBILE_MENU_BTN, fontSize: 11, padding: 0, whiteSpace: "nowrap", opacity: canAutoFight ? 1 : 0.45, color: snap.autoBattle ? "#8edf98" : "#e8dcc0" }}>
+            {snap.autoBattle ? "■ 자동" : "▶ 자동"}
+          </button>
+          <button type="button" aria-label={`전투 배속 ${snap.speed}배, 누르면 변경`} onClick={cycleSpeed} style={{ ...MOBILE_MENU_BTN, fontSize: 14 }}>
+            » ×{snap.speed}
+          </button>
+          </>
         ) : (
           <>
             <Minimap map={ctx.map} units={snap.vm.units} selectedId={selectedId} viewport={snap.viewport} />
@@ -689,6 +696,7 @@ export default function BattleScreen({ setup, onComplete, onExit }: {
         </div>
       )}
       <PauseMenu
+        objectives={<ObjectiveStrip display={display} />}
         onExit={onExit}
         open={paused}
         onClose={() => setPaused(false)}

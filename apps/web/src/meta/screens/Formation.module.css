@@ -1,0 +1,16 @@
+.compact { height: 100%; min-height: 0; box-sizing: border-box; padding: 6px !important; gap: 6px !important; grid-template-columns: minmax(0, 1fr) 260px !important; grid-template-rows: minmax(0, 1fr) auto; }
+.compact > div:first-child { overflow-y: auto; }
+.compact > div:first-child > div:first-child { padding: 3px 6px !important; margin-bottom: 3px !important; }
+.compact > div:first-child > p { font-size: 11px !important; margin: 4px 0; }
+.compact > div:nth-child(2) { overflow-y: auto; min-height: 0; }
+.compact > div:nth-child(2) > div > div:first-child { display: none !important; }
+.compact > div:last-child { max-height: 52px; overflow-y: auto; }
+.compact > div:first-child > div:nth-of-type(2) { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)) !important; }
+.compact > div:nth-child(2) > div > div:nth-child(2) > div:first-child { height: 64px !important; }
+.compact > div:nth-child(2) > div > div:nth-child(2) > div:nth-child(2) { padding: 6px !important; gap: 5px !important; }
+.compact > div:nth-child(2) button[title] { max-height: 44px; }
+.compact > div:last-child > div { padding: 3px 8px !important; }
+.compact > div:last-child > div > div:first-child { margin-bottom: 0 !important; }
+.compact article button { padding:4px !important; }
+.compact article button > div:nth-child(2) { height:48px !important; }
+.compact > div:nth-child(2) > div { zoom:0.85; }

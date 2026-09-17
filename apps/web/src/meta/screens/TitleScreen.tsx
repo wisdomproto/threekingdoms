@@ -50,7 +50,7 @@ export function TitleScreen(): React.ReactElement {
   return (
     <section className={styles.screen}>
       <div className={styles.topbar}>
-        <span>THREE KINGDOMS</span>
+        <Link className={styles.studio} href="/">← MOD 목록</Link>
         <Link className={styles.studio} href={`/studio-login?next=${encodeURIComponent(activeGame ? `/studio?project=${activeGame.projectId}` : "/studio")}`}>
           Studio 가기 <span aria-hidden="true">↗</span>
         </Link>

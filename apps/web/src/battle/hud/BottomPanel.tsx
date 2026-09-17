@@ -16,6 +16,9 @@ import type { InputState, UiEvent } from "../inputMachine";
 import type { BattleVM, UnitVM } from "../viewmodel";
 import { itemsFor, type Item } from "./ActionMenu";
 import { AttackForecast } from "./AttackForecast";
+import { StrategyIcon } from "./StrategyIcon";
+import { assetUrl } from "../../assetUrl";
+import type { GameData } from "../../game/data";
 import { HUD_BRONZE_DIM, HUD_FONT, HUD_INK, HUD_PARCHMENT } from "./frames";
 import { canEndTurn } from "./TurnBanner";
 import { PortraitBox, TroopsBar, UnitPanel, activeUnitId, sideColor } from "./UnitPanel";
@@ -34,8 +37,8 @@ const ROOT_STYLE: React.CSSProperties = {
   zIndex: 6, // 대사창(8)·PauseMenu(80)보다 아래
   boxSizing: "border-box",
   paddingBottom: "env(safe-area-inset-bottom)",
-  background: HUD_INK,
-  borderTop: `1px solid ${HUD_BRONZE_DIM}`,
+  background: "linear-gradient(180deg, rgba(17,22,20,.25), rgba(12,17,16,.72))",
+  borderTop: "1px solid rgba(216,190,120,.38)",
   color: HUD_PARCHMENT,
   fontFamily: HUD_FONT,
   pointerEvents: "auto",
@@ -67,21 +70,37 @@ const AUX_BTN_STYLE: React.CSSProperties = {
   flexShrink: 0,
 };
 
-function ActionBtn({ item }: { item: Item }): React.ReactElement {
+function ActionBtn({ item, data, mode }: { item: Item; data: GameData; mode: InputState["kind"] }): React.ReactElement {
   const dim = item.disabled || item.placeholder;
+  const strategy = mode === "strategyMenu" ? data.strategies[item.key] : undefined;
+  const tool = mode === "itemMenu" ? data.items[item.key] : undefined;
+  const art: Record<string, string> = { attack: "쌍고검", strategy: "손자의병법서", item: "한방약", assist: "청룡언월도", ultimate: "방천화극" };
+  const artName = tool?.name ?? art[item.key];
   return (
     <button
       type="button"
       data-testid="bottom-action"
       disabled={dim}
+      aria-label={item.label}
       onClick={dim ? undefined : item.onPress}
       style={{
         ...BTN_STYLE,
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2,
+        minHeight: 62, fontSize: 12, padding: "3px 2px",
+        background: "radial-gradient(ellipse at 50% 32%, rgba(170,133,58,.25), rgba(17,22,20,.15))",
+        borderColor: "rgba(214,185,116,.35)",
+        textShadow: "0 1px 3px #000",
         ...(item.accent && !dim ? { color: item.accent } : {}),
-        ...(dim ? { opacity: 0.4, cursor: "default" } : {}),
+        ...(dim ? { opacity: 0.58, filter: "saturate(.35)", cursor: "default" } : {}),
       }}
     >
-      {item.label}
+      {strategy ? <StrategyIcon name={strategy.name} category={strategy.category} /> : artName ?
+        <img src={assetUrl(`/assets/ui/items/${encodeURIComponent(artName)}.webp`)} alt="" style={{ width: 36, height: 36, objectFit: "contain", filter: "drop-shadow(0 1px 3px #000)" }} /> :
+        <svg viewBox="0 0 32 32" aria-hidden="true" width="36" height="36" fill="none" stroke="#e7cf87" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="16" cy="16" r="13" strokeOpacity=".5" />
+          {item.key === "wait" ? <path d="M11 9v14M21 9v14" /> : <path d="m13 10-6 6 6 6M7 16h13q5 0 5 5" />}
+        </svg>}
+      <span>{item.label}</span>
     </button>
   );
 }
@@ -92,18 +111,14 @@ function UnitRow({ unit, compact, onDetail }: { unit: UnitVM; compact?: boolean;
     <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flex: 1 }}>
       {!compact && <PortraitBox key={unit.name} name={unit.name} compact />}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 6, whiteSpace: "nowrap", overflow: "hidden" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 6, whiteSpace: "nowrap", flexWrap: "wrap" }}>
           <strong style={{ fontSize: compact ? 14 : 16, color: sideColor(unit.side) }}>{unit.name}</strong>
           <span style={{ fontSize: 12, color: "#9aa3ad", overflow: "hidden", textOverflow: "ellipsis" }}>
             {unit.className} · Lv.{unit.level}
             {unit.acted ? " · 행동 완료" : ""}
           </span>
-          {!compact && (
-            <span style={{ marginLeft: "auto", fontSize: 12, color: unit.sp >= unit.maxSp ? "#5ad7ff" : "#9aa3ad" }}>
-              SP {unit.sp}/{unit.maxSp}
-            </span>
-          )}
         </div>
+        {!compact && <div style={{ fontSize: 10, color: unit.sp >= unit.maxSp ? "#5ad7ff" : "#b5c0c3" }}>SP {unit.sp}/{unit.maxSp}</div>}
         <div style={{ marginTop: -4 }}>
           <TroopsBar unit={unit} />
         </div>
@@ -184,7 +199,7 @@ export function BottomPanel({
             ) : items.length > 0 ? (
               <div style={{ display: "grid", flex: 1, minWidth: 0, gridTemplateColumns: ui.kind === "postMoveMenu" ? `repeat(${items.length}, minmax(0, 1fr))` : "repeat(4, minmax(0, 1fr))", gap: 6, maxHeight: 120, overflowY: "auto" }}>
                 {items.map((item) => (
-                  <ActionBtn key={item.key} item={item} />
+                  <ActionBtn key={item.key} item={item} data={ctx.data} mode={ui.kind} />
                 ))}
               </div>
             ) : null}

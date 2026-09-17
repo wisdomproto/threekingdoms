@@ -27,6 +27,7 @@ import { ItemIcon } from "../../ui/ItemIcon";
 const AD_GOLD_REWARD = 100;
 
 export interface ShopProps {
+  compact?: boolean;
   /** 진열 상점(gameData.shops.ch1 등). */
   shop: ShopData;
   /** itemId → Item(이름/효과 표시용). gameData.items. */
@@ -40,6 +41,7 @@ export interface ShopProps {
 }
 
 export function Shop({
+  compact = false,
   shop,
   items,
   gold,
@@ -86,7 +88,7 @@ export function Shop({
   const detail = visibleRows.find((row) => row.itemId === detailId) ?? visibleRows[0];
 
   return (
-    <section className={styles.shop} aria-label="상점">
+    <section className={`${styles.shop} ${compact ? styles.compact : ""}`} aria-label="상점">
       <header className={styles.header}>
         <div><h2>{shop.name}</h2><p>출진에 필요한 장비와 도구를 준비하세요.</p></div>
         <div className={styles.wallet} aria-label="보유 자금"><span>보유 자금</span><strong>{gold.toLocaleString()} <small>금</small></strong></div>

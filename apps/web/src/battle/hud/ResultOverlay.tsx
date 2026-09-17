@@ -58,7 +58,7 @@ export function ResultOverlay({
         <button type="button" style={BUTTON_STYLE} onClick={() => window.location.reload()}>
           다시 도전
         </button>
-        <a href="/" style={BUTTON_STYLE}>
+        <a href="/play/samgukji" style={BUTTON_STYLE}>
           처음으로
         </a>
       </div>

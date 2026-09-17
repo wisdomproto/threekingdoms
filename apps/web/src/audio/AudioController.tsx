@@ -64,6 +64,7 @@ export function AudioController(): React.ReactElement {
     if (track) playBgm(track); else stopBgm();
   }, [pathname]);
 
+  if (pathname === "/" || pathname === "/studio-login" || pathname === "/battle") return <></>;
   return <AudioControl gameplay={pathname === "/battle" || pathname === "/scene"} />;
 }
 

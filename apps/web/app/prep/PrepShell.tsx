@@ -15,6 +15,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import styles from "./PrepShell.module.css";
 import { gameData, stages } from "../../src/game/data";
 import { Formation } from "../../src/meta/screens/Formation";
 import { Shop } from "../../src/meta/screens/Shop";
@@ -143,11 +144,11 @@ export function PrepShell(): React.ReactElement {
   }
 
   return (
-    <main
+    <main className={styles.shell}
       style={{
         display: "flex",
         flexDirection: "column",
-        position: "fixed", inset: 0, overflow: "hidden",
+        position: "absolute", inset: 0, overflow: "hidden",
         // 페이지 캔버스도 먹빛 — 패널 밖 여백이 흰 벌판으로 뜨지 않게(2026-07-03).
         background: "#17140c",
       }}
@@ -226,10 +227,10 @@ export function PrepShell(): React.ReactElement {
         })}
       </div>
 
-      <p style={{ color: "#c5b582", fontSize: 13 }}>부대 훈련 Lv.{trainingLevel} · 뒤처진 장수와 새로 합류한 장수도 이 레벨부터 출전합니다.</p>
+      <p className={styles.training} style={{ color: "#c5b582", fontSize: 13 }}>부대 훈련 Lv.{trainingLevel} · 뒤처진 장수와 새로 합류한 장수도 이 레벨부터 출전합니다.</p>
       {/* 탭 콘텐츠 + 출진 바 = 한 클러스터. 남은 높이에서 세로 중앙(auto 마진 — 내용이 넘치면
           마진이 0으로 접혀 스크롤 안전). 더는 보드를 늘여 양피지 벌판을 만들지 않는다(2026-07-03). */}
-      <div style={{
+      <div className={styles.content} style={{
         flex: 1, minHeight: 0, overflowY: "auto",
         width: "100%", maxWidth: CONTENT_MAX, margin: "0 auto",
         padding: 16, boxSizing: "border-box",
@@ -237,7 +238,7 @@ export function PrepShell(): React.ReactElement {
       }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {activeTab === "formation" ? (
-            <Formation
+            <Formation compact
               key={refreshKey}
               roster={roster}
               maxSlots={maxSlots}
@@ -247,23 +248,22 @@ export function PrepShell(): React.ReactElement {
               focusId={focusId}
               onFocus={setFocusId}
               onEquip={onEquip}
-              actions={sortieActions}
             />
           ) : (
             <>
-            <Shop
+            <Shop compact
               shop={{ ...gameData.shops.ch1!, name: "도구 상점" }}
               items={gameData.items}
               gold={gold}
               chapter={chapter}
               onPurchase={onPurchase}
             />
-            {sortieActions}
             </>
           )}
 
         </div>
       </div>
+      <div className={styles.actions}>{sortieActions}</div>
     </main>
   );
 }

@@ -12,6 +12,8 @@ import {
   screenToWorld,
   worldToScreen,
   zoomAt,
+  tacticalDefaultZoom,
+  selectionCameraTarget,
   type CameraState,
   type Size,
 } from "../camera";
@@ -20,6 +22,25 @@ import { TILE_SIZE } from "../projection";
 // 사수관 56×32 기준 월드 크기
 const WORLD: Size = { width: 56 * TILE_SIZE, height: 32 * TILE_SIZE }; // 2688×1536
 const VIEW: Size = { width: 800, height: 600 };
+
+describe("tactical framing", () => {
+  it("shows eleven rows rather than reusing a desktop close-up", () => {
+    const scale = tacticalDefaultZoom(1.5, { width: 800, height: 450 });
+    expect(450 / (scale * TILE_SIZE)).toBeCloseTo(11);
+    expect(tacticalDefaultZoom(0.6, { width: 800, height: 450 })).toBe(0.6);
+  });
+  it("fits movement cells between the HUD strips without zooming in", () => {
+    const viewport = { width: 800, height: 450 };
+    const cells = [{ x: 4, y: 4 }, { x: 11, y: 11 }];
+    const target = selectionCameraTarget(cells, viewport, 0.85)!;
+    const state = { scale: target.scale, ox: 400 - target.point.x * target.scale, oy: 225 - target.point.y * target.scale };
+    expect(worldToScreen(state, { x: 4 * 48, y: 4 * 48 }).y).toBeGreaterThanOrEqual(46 - 1e-9);
+    expect(worldToScreen(state, { x: 12 * 48, y: 12 * 48 }).y).toBeLessThanOrEqual(360 + 1e-9);
+    expect(target.scale).toBeLessThanOrEqual(0.85);
+    expect(selectionCameraTarget([], viewport, 1)).toBeNull();
+    expect(selectionCameraTarget([{ x: 0, y: 0 }, { x: 20, y: 20 }], viewport, 0.85)!.scale).toBe(0.75);
+  });
+});
 
 describe("clampZoom", () => {
   it("[0.5, 2.0] 범위로 클램프한다", () => {

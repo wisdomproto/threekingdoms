@@ -7,7 +7,7 @@ import { installGame } from "./data";
 /** Keep a running game's data fixed. A full game visit synchronizes saved authoring changes. */
 export function GameGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const editing = pathname === "/studio-login" || /^\/(studio|motion-editor|battle-motion-preview|game|lab|playtest|troia)(\/|$)/.test(pathname);
+  const editing = pathname === "/" || pathname === "/play/troia" || pathname === "/studio-login" || /^\/(studio|motion-editor|battle-motion-preview|game|lab|playtest|troia)(\/|$)/.test(pathname);
   const [ready, setReady] = useState((process.env.NODE_ENV !== "development" && process.env.NEXT_PUBLIC_HOSTED_STUDIO !== "1"));
   const [error, setError] = useState("");
   const [warning, setWarning] = useState("");

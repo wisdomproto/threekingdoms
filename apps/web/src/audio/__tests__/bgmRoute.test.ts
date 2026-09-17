@@ -22,7 +22,9 @@ describe("bgmForPath", () => {
 
   it("씬/타이틀/막간 라우팅", () => {
     expect(bgmForPath("/scene")).toBe("scene");
-    expect(bgmForPath("/")).toBe("title");
+    expect(bgmForPath("/")).toBeNull();
+    expect(bgmForPath("/studio-login")).toBeNull();
+    expect(bgmForPath("/play/samgukji")).toBe("title");
     expect(bgmForPath("/prep")).toBe("menu");
     expect(bgmForPath("/stages")).toBe("menu");
   });

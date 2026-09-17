@@ -27,7 +27,7 @@ export default function ChroniclePage() {
   function go(next: string) { setSelected(next); window.scrollTo({ top: 0, behavior: "instant" }); }
   return <main className={styles.reader} style={{ fontSize: large ? 21 : 18 }}>
     <header className={styles.toolbar}>
-      <Link href="/">← 메인으로</Link><span>유비전 · 이야기 읽기</span>
+      <Link href="/play/samgukji">← 메인으로</Link><span>유비전 · 이야기 읽기</span>
       <button aria-pressed={large} onClick={() => setLarge(!large)}>글자 {large ? "작게" : "크게"}</button>
     </header>
     <div className={styles.book}>

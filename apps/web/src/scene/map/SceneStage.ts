@@ -12,6 +12,7 @@
  * - 진행 상태의 진실은 인터프리터(sceneUnitStates) — skipToState가 언제든 그 상태로 스냅.
  *   걷기는 타일 단위 moveAlong 조각으로 실행해 탭 스킵(actionGen)이 ~1타일 안에 끊는다.
  */
+import { elementRenderDensity, observeRenderSurface } from "../../pixi/renderDensity";
 import { Application, Container, Graphics, Sprite, Text } from "pixi.js";
 import type { BattleMap, MapScene, MapSceneLine } from "@tk/data";
 import { gameData } from "../../game/data";
@@ -38,7 +39,7 @@ interface Booted {
   tweens: TweenRunner;
   textures: TextureResolver;
   world: Container;
-  resizeObserver: ResizeObserver;
+  resizeObserver: { disconnect(): void };
   tick: () => void;
 }
 
@@ -81,7 +82,7 @@ export class SceneStage {
       height: initH,
       background: 0x100e0a, // 씬 여백 = 먹빛(막간 톤)
       antialias: true,
-      resolution: typeof window !== "undefined" ? Math.min(window.devicePixelRatio, 2) : 1,
+      resolution: elementRenderDensity(parent),
       autoDensity: true,
     });
     // StrictMode 가드(BattleRenderer 미러): init 중 destroy 요청 시 완료 후 즉시 파괴.
@@ -191,13 +192,9 @@ export class SceneStage {
     app.ticker.add(tick);
 
     // ── 리사이즈 → 렌더러 전파 → 카메라 재fit (BattleRenderer 미러) ──
-    const resizeObserver = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (!entry) return;
-      const { width, height } = entry.contentRect;
-      if (width > 0 && height > 0) app.renderer.resize(width, height);
+    const resizeObserver = observeRenderSurface(parent, (width, height, resolution) => {
+      app.renderer.resize(width, height, resolution);
     });
-    resizeObserver.observe(parent);
     app.renderer.on("resize", () => this.fit());
 
     this.booted = { app, tweens, textures, world, resizeObserver, tick };

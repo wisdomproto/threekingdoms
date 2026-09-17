@@ -19,6 +19,7 @@ import { sortRoster, type SortKey } from "../rosterSort";
 import { CommanderPortrait } from "../../ui/CommanderPortrait";
 import { CommanderFigure } from "../../ui/CommanderFigure";
 import { CommanderDetail, type StatMax } from "./CommanderDetail";
+import styles from "./Formation.module.css";
 import { ArmyPouch } from "./ArmyPouch";
 import {
   PARCHMENT, PARCHMENT_WARM, INK_PANEL, WOOD, GOLD, GOLD_BRIGHT, GOLD_DIM,
@@ -26,6 +27,7 @@ import {
 } from "./formationUi";
 
 export interface FormationProps {
+  compact?: boolean;
   roster: RosterUnit[];
   maxSlots: number;
   selected: SortieMember[];
@@ -104,9 +106,10 @@ function toMember(u: RosterUnit, items: string[]): SortieMember {
 }
 
 export function Formation({
-  roster, maxSlots, selected, onChange, chapter, focusId, onFocus, onEquip, actions,
+  roster, maxSlots, selected, onChange, chapter, focusId, onFocus, onEquip, actions, compact = false,
 }: FormationProps): React.ReactElement {
-  const narrow = useNarrow();
+  const viewportNarrow = useNarrow();
+  const narrow = !compact && viewportNarrow;
 
   const [inventory, setInventory] = useState<string[]>([]);
   useEffect(() => { setInventory(getMeta().inventory); }, []);
@@ -189,7 +192,7 @@ export function Formation({
   );
 
   return (
-    <section style={{
+    <section className={compact ? styles.compact : undefined} style={{
       background: "#241e10",
       border: "1px solid #806738",
       boxShadow: "none",
@@ -225,7 +228,7 @@ export function Formation({
         </Ribbon>
 
         <p style={{ fontFamily: "system-ui", fontSize: 13, color: "#baaa85", lineHeight: 1.5 }}>장수를 누르면 배치와 상세를 확인합니다. 선택한 장수를 다시 누르면 편성에서 해제합니다.</p>
-        <div style={{ display: "grid", gridTemplateColumns: narrow ? "repeat(3, minmax(0, 1fr))" : "repeat(auto-fill, minmax(92px, 1fr))", gap: 8, alignContent: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(92px, 1fr))", gap: 8, alignContent: "start" }}>
           {sortedRoster.map(u => {
             const index = selected.findIndex(m => m.commanderId === u.commanderId);
             const on = index >= 0;
@@ -239,7 +242,7 @@ export function Formation({
             </article>;
           })}
         </div>
-        <div style={{ marginTop: "auto", paddingTop: 20 }}>{actions}</div>
+        {actions && <div style={{ marginTop: "auto", paddingTop: 20 }}>{actions}</div>}
       </div>
 
       {/* ━━ 우: 선택된 장수 상세 (넓은 화면 — 컬럼은 늘고, 내용만 sticky) ━━ */}

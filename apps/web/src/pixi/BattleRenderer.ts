@@ -9,6 +9,7 @@
  *
  * 결선 순서: renderer 생성 → store 생성(presenter=renderer) → renderer.connect(store) → mount.
  */
+import { elementRenderDensity, observeRenderSurface } from "./renderDensity";
 import { Application, ColorMatrixFilter, Container, Graphics, Sprite, Texture } from "pixi.js";
 import type { Side } from "@tk/data";
 import { spriteCandidates } from "./spriteMap";
@@ -19,7 +20,7 @@ import type { Presenter, PresentedSnapshot } from "../battle/eventPlayer";
 import type { InputState, UiEvent } from "../battle/inputMachine";
 import { findPath } from "../battle/path";
 import { AtmosphereLayer } from "./atmosphere";
-import { CameraController } from "./camera";
+import { CameraController, tacticalDefaultZoom, selectionCameraTarget } from "./camera";
 import { gridToWorld, TILE_SIZE } from "./projection";
 import { TextureResolver } from "./textures";
 import { TweenRunner } from "./tweens";
@@ -121,7 +122,7 @@ interface Scene {
   unsubscribe: () => void;
   onWheel: (e: WheelEvent) => void;
   tick: () => void;
-  resizeObserver: ResizeObserver;
+  resizeObserver: { disconnect(): void };
 }
 
 export class BattleRenderer implements Presenter {
@@ -186,7 +187,7 @@ export class BattleRenderer implements Presenter {
       height: initH,
       background: 0x1b1f24,
       antialias: true,
-      resolution: typeof window !== "undefined" ? Math.min(window.devicePixelRatio, 2) : 1,
+      resolution: elementRenderDensity(parent),
       autoDensity: true,
     });
     this.mounting = false;
@@ -370,7 +371,7 @@ export class BattleRenderer implements Presenter {
     // 스테이지별 카메라 (feel-spec §데이터): zoom/focus를 데이터로 받아 초기 연출에 적용.
     // 미지정이면 기본 줌 + 아군 군주(없으면 맵 중앙)로 폴백. resetCamera()도 이 값으로 복귀.
     const camCfg = this.ctx.stage.camera;
-    this.defaultScale = camCfg?.zoom ?? DEFAULT_ZOOM;
+    this.defaultScale = tacticalDefaultZoom(camCfg?.zoom ?? DEFAULT_ZOOM, app.screen);
     let focusCoord: Coord;
     if (camCfg?.focus) {
       focusCoord = { x: camCfg.focus[0], y: camCfg.focus[1] };
@@ -395,16 +396,9 @@ export class BattleRenderer implements Presenter {
     // ResizeObserver: 컨테이너 크기 변화를 Pixi renderer에 직접 전파.
     // globalThis 'resize' 이벤트(ResizePlugin)와 달리 iframe·CSS 리플로우에도 발화하며,
     // 마운트 해제 시 disconnect()로 정확히 정리된다 (StrictMode 가드).
-    const resizeObserver = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (!entry) return;
-      const { width, height } = entry.contentRect;
-      if (width > 0 && height > 0) {
-        app.renderer.resize(width, height);
-        // app.renderer.on("resize") 핸들러가 camera.resize + fx.resize를 호출한다.
-      }
+    const resizeObserver = observeRenderSurface(parent, (width, height, resolution) => {
+      app.renderer.resize(width, height, resolution);
     });
-    resizeObserver.observe(parent);
 
     const input = new InputAdapter({
       stage: app.stage,
@@ -478,7 +472,15 @@ export class BattleRenderer implements Presenter {
       }
       return null;
     };
+    let framedSelection: string | null = null;
     const unsubscribe = store.subscribe(() => {
+      const ui = store.uiState;
+      const selection = ui.kind === "selected" ? ui.unitId : null;
+      if (ui.kind === "selected" && selection !== framedSelection) {
+        const target = selectionCameraTarget(ui.movable, app.screen, camera.current.scale);
+        if (target) camera.focusOn(target.point, 260, target.scale);
+      }
+      framedSelection = selection;
       highlights.update(store.uiState, store.committedState);
       units.setSelected(getSelectedUnitId(store.uiState));
       this.updateThreat(threat); // 조회 변경/상태 변화 시 위협범위 갱신 (캐시로 재산출 최소화)

@@ -231,10 +231,27 @@ describe("postMoveMenu", () => {
     expect(r.effects).toEqual([]); // 커밋 없음
   });
 
-  it("tapTile은 무시 — 메뉴는 모달", () => {
+  it("빈 칸 탭은 이동 프리뷰를 유지한다", () => {
     expect(reduceInput(menu, { type: "tapTile", coord: { x: 45, y: 15 } }, ctx, nearState).next).toBe(
       menu,
     );
+  });
+  it("이동 후 적 직접 탭은 공격 버튼과 동일하게 이동+공격을 커밋한다", () => {
+    const r = reduceInput(menu, { type: "tapTile", coord: { x: 48, y: 15 } }, ctx, nearState);
+    const targeting = reduceInput(menu, { type: "menuAttack" }, ctx, nearState).next;
+    expect(r).toEqual(reduceInput(targeting, { type: "tapTile", coord: { x: 48, y: 15 } }, ctx, nearState));
+    expect(r.effects).toEqual([{ type: "commit", actions: [
+      { type: "move", unitId: GUANYU, to: preview },
+      { type: "attack", unitId: GUANYU, targetId: HUAXIONG },
+    ] }]);
+  });
+  it("입문 모드의 이동 후 직접 공격은 확인 전까지 이동을 커밋하지 않는다", () => {
+    const r = reduceInput(menu, { type: "tapTile", coord: { x: 48, y: 15 } }, ctx, nearState, false, true);
+    expect(r.next).toMatchObject({ kind: "confirmAttack", targetId: HUAXIONG, prior: { preview } });
+    expect(r.effects).toEqual([]);
+    const confirmed = reduceInput(r.next, { type: "confirmAttack" }, ctx, nearState, false, true);
+    expect(confirmed.next.kind).toBe("animating");
+    expect(confirmed.effects[0]).toMatchObject({ type: "commit", actions: [ { type: "move" }, { type: "attack" } ] });
   });
 });
 

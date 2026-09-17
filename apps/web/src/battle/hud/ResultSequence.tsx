@@ -475,12 +475,12 @@ export function ResultSequence({
   if (!victory || !summary) {
     return (
       <div style={{ ...OVERLAY_STYLE, background: "radial-gradient(120% 90% at 50% 30%, #2a1416 0%, #0d0b09 85%)" }}>
-        <h1 style={{ fontSize: 40, margin: 0, color: "#d9707a", letterSpacing: 4, fontFamily: '"Noto Serif KR", serif' }}>패 배</h1>
+        <h1 style={{ fontSize: 28, margin: 0, color: "#d9707a", letterSpacing: 4, fontFamily: '"Noto Serif KR", serif' }}>패 배</h1>
         <p style={{ margin: 0, color: "#8a7350", fontFamily: '"Noto Serif KR", serif' }}>
           {vm.turn.turn}턴 · {vm.turn.turnLimit}턴 제한
         </p>
         <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
-          <button type="button" style={BUTTON_STYLE} onClick={() => window.location.reload()}>
+          <button type="button" style={{ ...BUTTON_STYLE, minHeight: 42, minWidth: 110, fontSize: 14, padding: "0 16px" }} onClick={() => window.location.reload()}>
             다시 도전
           </button>
           {/* outroDefeat 씬으로(없으면 씬 가드가 전장 선택으로). 샌드박스=leaveSandbox(에디터 탭 또는 /lab). */}
@@ -507,7 +507,7 @@ export function ResultSequence({
   return (
     // 오버레이 전체가 스킵 영역(버튼 클릭은 stopPropagation으로 분리).
     <div
-      style={{ ...OVERLAY_STYLE, cursor: sequenceDone ? "default" : "pointer" }}
+      style={{ ...OVERLAY_STYLE, padding: 12, gap: 8, justifyContent: "flex-start", cursor: sequenceDone ? "default" : "pointer" }}
       onClick={() => {
         if (!sequenceDone) finish();
       }}
@@ -586,11 +586,12 @@ export function ResultSequence({
         />
       )}
 
+      <div data-testid="result-rewards" style={{ position: "relative", flex: "1 1 auto", minHeight: 0, width: "100%", overflowY: "auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
       {/* 표제 — 크게 + 샤인 스윕(금박이 훑고 지나가는 광). overflow 래퍼로 스윕을 가둔다. */}
       <div style={{ position: "relative", overflow: "hidden", padding: "4px 18px" }}>
         <h1
           style={{
-            fontSize: 58,
+            fontSize: 30,
             margin: 0,
             fontWeight: 900,
             color: jackpot ? JACKPOT_GOLD : "#ffd76a",
@@ -629,25 +630,27 @@ export function ResultSequence({
       <div
         style={{
           ...PANEL_FRAME,
+          borderWidth: "16px 18px 12px",
+          flexShrink: 0,
           // 승리판 = 진홍→금 그라디언트(출정 버튼 붉은 판 계열) — 종전 암갈 단색 내부가
           // "거대한 어두운 상자"로 읽히던 우울의 본체(2026-07-04 재지적).
           background: jackpot
             ? "linear-gradient(168deg, rgba(96,32,18,0.94) 0%, rgba(64,40,14,0.94) 55%, rgba(46,28,12,0.95) 100%)"
             : "linear-gradient(168deg, rgba(78,28,16,0.93) 0%, rgba(52,34,14,0.94) 60%, rgba(40,26,12,0.95) 100%)",
           boxShadow: "inset 0 0 40px rgba(255,205,110,0.10)",
-          padding: "18px 28px",
+          padding: "10px 22px",
           minWidth: 300,
           maxWidth: 380,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 14,
+          gap: 8,
           position: "relative",
         }}
       >
         {/* 1. 등급 + 별 (한 칸씩 펀치-인) */}
         <Reveal show={step >= STEP.STARS}>
-          <div style={{ display: "flex", gap: 10, fontSize: 46, lineHeight: 1 }}>
+          <div style={{ display: "flex", gap: 8, fontSize: 28, lineHeight: 1 }}>
             {[0, 1, 2, 3].map((i) => {
               const filled = i < summary.stars;
               const punched = i < starsShown; // 이 별이 "꽂혔는지"
@@ -681,14 +684,14 @@ export function ResultSequence({
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 64,
-                height: 64,
+                width: 42,
+                height: 42,
                 borderRadius: 10,
                 transform: "rotate(-4deg)",
                 background: "linear-gradient(135deg, #9a2f1e, #641c10)",
                 border: "2px solid rgba(0,0,0,0.45)",
                 boxShadow: `0 4px 14px rgba(0,0,0,0.5), 0 0 ${jackpot ? 26 : 14}px ${jackpot ? JACKPOT_GOLD + "66" : "rgba(255,205,110,0.25)"}, inset 0 0 12px rgba(0,0,0,0.4)`,
-                fontSize: 40,
+                fontSize: 28,
                 fontWeight: 900,
                 color: jackpot ? JACKPOT_GOLD : "#ffe2a8",
                 textShadow: "0 2px 6px rgba(0,0,0,0.7)",
@@ -902,18 +905,6 @@ export function ResultSequence({
         </Reveal>
       </div>
 
-      {/* 스킵 힌트 / 버튼: 시퀀스 끝나면 버튼, 아니면 힌트 */}
-      {sequenceDone ? (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 12,
-            marginTop: 4,
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
           {/* 이탈 장수 알림 카드 — markCleared 시 이탈 처리된 장수만 표시 */}
           {departures.map((dep) => (
             <div
@@ -948,6 +939,23 @@ export function ResultSequence({
             </div>
           ))}
 
+      </div>
+
+      {/* 스킵 힌트 / 버튼: 시퀀스 끝나면 버튼, 아니면 힌트 */}
+      {sequenceDone ? (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            alignItems: "center",
+            flexShrink: 0,
+            position: "relative",
+            gap: 8,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* 결산 보상 2배(§12/§13) — 광고 완주 1회만. 누르면 사라짐. adFree면 버튼 자체 미표시. 샌드박스=메타 불가침이라 미표시. */}
           {!doubled && !sandbox && (
             <RewardedAdButton
@@ -957,13 +965,13 @@ export function ResultSequence({
             />
           )}
           <div style={{ display: "flex", gap: 12 }}>
-            <button type="button" style={BUTTON_STYLE} onClick={() => window.location.reload()}>
+            <button type="button" style={{ ...BUTTON_STYLE, minHeight: 42, minWidth: 110, fontSize: 14, padding: "0 16px" }} onClick={() => window.location.reload()}>
               다시 도전
             </button>
             {/* 캠페인 진행: outro 씬 → 다음 스테이지 intro(없으면 전장 선택). 샌드박스=leaveSandbox(에디터 탭 또는 /lab). */}
             <button
               type="button"
-              style={BUTTON_STYLE}
+              style={{ ...BUTTON_STYLE, minHeight: 42, minWidth: 140, fontSize: 15, padding: "0 18px", background: "#845c23", color: "#fff0bf" }}
               onClick={() => onComplete ? onComplete("victory") : (sandbox ? completeSandbox(fadeTo, "victory", undefined, chapterCarry) : fadeTo(stageId ? `/scene?stage=${stageId}&type=outro` : "/stages"))}
             >
               {onComplete ? "이야기 계속 ▶" : sandbox ? sandboxLabel : "다음으로 ▶"}

@@ -89,8 +89,10 @@ export function PauseMenu({
   onToggleConfirmAttacks,
   editorUrl,
   mobileControls,
+  objectives,
 }: {
   onExit?: () => void;
+  objectives?: React.ReactNode;
   open: boolean;
   /** 패널을 닫는다(계속하기/백드롭/ESC). 실제 paused 상태는 BattleScreen이 소유. */
   onClose: () => void;
@@ -184,6 +186,7 @@ export function PauseMenu({
         >
           메 뉴
         </h2>
+        {!confirmExit && objectives && <section aria-label="전투 목표">{objectives}</section>}
 
         {confirmExit ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>

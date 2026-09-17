@@ -120,7 +120,7 @@ export function StageSelect(): React.ReactElement {
           borderBottom: "1px solid rgba(205,171,110,0.12)",
         }}
       >
-        <Link href="/" style={{ color: GOLD_DIM, fontSize: 13, textDecoration: "none" }}>
+        <Link href="/play/samgukji" style={{ color: GOLD_DIM, fontSize: 13, textDecoration: "none" }}>
           ◀ 타이틀
         </Link>
         <h1 style={{ margin: 0, fontSize: 17, letterSpacing: "0.25em", color: GOLD }}>

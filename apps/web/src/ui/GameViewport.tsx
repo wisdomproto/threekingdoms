@@ -6,7 +6,7 @@ import styles from "./GameViewport.module.css";
 
 export function GameViewport({ children }: { children: ReactNode }): React.ReactElement {
   const path = usePathname();
-  const framed = path === "/battle" || path === "/scene";
+  const framed = path === "/battle" || path === "/scene" || path === "/prep";
   return framed ? <Frame>{children}</Frame> : <>{children}</>;
 }
 

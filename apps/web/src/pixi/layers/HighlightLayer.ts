@@ -1,16 +1,15 @@
 /**
  * HighlightLayer (설계 §2.2) — 이동(청)/공격(적)/고스트/커서 하이라이트.
- * InputMachine 상태의 수동적 뷰: update(ui, battle)가 호출될 때마다 풀에서 스프라이트를
- * 꺼내 다시 그린다. 스프라이트 풀 재사용 — 백색 타일 텍스처를 tint+alpha로 변주.
+ * InputMachine 상태의 수동적 뷰. 재사용하는 칸별 도형에 채움과 테두리를 표시한다.
  */
-import { Container, Graphics, Sprite } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 import type { BattleState, Coord } from "@tk/engine";
 import type { InputState } from "../../battle/inputMachine";
 import { TILE_SIZE } from "../projection";
-import { SIDE_COLORS, type TextureResolver } from "../textures";
+import type { TextureResolver } from "../textures";
 
-const MOVE_TINT = 0x3a7bd5;
-const MOVE_ALPHA = 0.35;
+const MOVE_TINT = 0x56aaff;
+const MOVE_ALPHA = 0.18;
 // §10 색 위계: 공격 *가능 범위* = 빨강 / 공격 *대상군*(적이 있는 칸) = 주황.
 // 표적 모드에서 빨강 범위 위에 주황 대상칸을 덧칠해 "어디까지 치나 / 지금 누구를 노리나"를 분리.
 const ATTACK_TINT = 0xd54a3a; // 공격 가능 범위 (빨강)
@@ -26,21 +25,19 @@ const STRATEGY_TINT = 0xb890ff; // 책략 시전 가능 칸 (보라)
 const STRATEGY_ALPHA = 0.4;
 const SUPPLY_TINT = 0x7bd88f; // 회복약 대상 아군 칸 (초록)
 const SUPPLY_ALPHA = 0.45;
-const GHOST_ALPHA = 0.55;
 const ORIGIN_TINT = 0xaaaaaa; // 출발지 마커 — 원작: 유닛이 걸어간 뒤 출발지에 잔상
 const ORIGIN_ALPHA = 0.4;
 
 export class HighlightLayer extends Container {
-  private readonly textures: TextureResolver;
+  private readonly styles = new WeakMap<Graphics, string>();
   private readonly bounds: { width: number; height: number };
-  private readonly pool: Sprite[] = [];
+  private readonly pool: Graphics[] = [];
   private used = 0;
   /** 선택 유닛 커서 — 흰 사각 테두리(§10). 풀과 별개의 단일 Graphics, 항상 맨 위 */
   private readonly selectCursor = new Graphics();
 
-  constructor(textures: TextureResolver, bounds: { width: number; height: number }) {
+  constructor(_textures: TextureResolver, bounds: { width: number; height: number }) {
     super();
-    this.textures = textures;
     this.bounds = bounds;
     this.sortableChildren = true; // 커서(zIndex 1000)를 풀 스프라이트(기본 0) 위로 보장
     // 외곽선 사각형 한 번만 그려두고 position/visible만 토글 (매 update 재드로 회피)
@@ -67,14 +64,23 @@ export class HighlightLayer extends Container {
   private place(coord: Coord, tint: number, alpha: number): void {
     let sprite = this.pool[this.used];
     if (!sprite) {
-      sprite = new Sprite(this.textures.get("white", "tile"));
+      sprite = new Graphics();
       this.pool.push(sprite);
       this.addChild(sprite);
     }
     this.used += 1;
     sprite.visible = true;
-    sprite.tint = tint;
-    sprite.alpha = alpha;
+    // Separate every reachable cell; a continuous fill hides the actual tap targets.
+    const styleKey = `${tint}:${alpha}`;
+    if (this.styles.get(sprite) !== styleKey) {
+      sprite.clear()
+      .roundRect(2, 2, TILE_SIZE - 4, TILE_SIZE - 4, 4)
+      .fill({ color: tint, alpha })
+      .stroke({ color: 0x102537, alpha: 0.65, width: 3 })
+      .roundRect(2, 2, TILE_SIZE - 4, TILE_SIZE - 4, 4)
+      .stroke({ color: tint, alpha: 0.95, width: 1.4 });
+      this.styles.set(sprite, styleKey);
+    }
     sprite.position.set(coord.x * TILE_SIZE, coord.y * TILE_SIZE);
   }
 
@@ -140,6 +146,9 @@ export class HighlightLayer extends Container {
         // preview=from(제자리)인 경우 마커는 불필요 — 유닛이 이동하지 않았으므로.
         const moved = ts.preview.x !== ts.from.x || ts.preview.y !== ts.from.y;
         if (moved) this.place(ts.from, ORIGIN_TINT, ORIGIN_ALPHA);
+        for (const t of this.targetCoords(battle, ts.attackable)) {
+          this.place(t, TARGET_TINT, TARGET_ALPHA);
+        }
         // 흰 커서는 현재(프리뷰) 위치 — 행동 메뉴 중 활성 유닛 위치 명확화
         this.placeCursor(ts.preview);
         break;
