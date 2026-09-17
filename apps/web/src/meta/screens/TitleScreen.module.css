@@ -1,0 +1,50 @@
+:global(body):has(.screen) { margin: 0; background: #0d0b09; }
+.screen {
+  box-sizing: border-box;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  padding: max(12px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  color: #e8dcc0;
+  background: radial-gradient(ellipse at 35% 20%, #393020 0%, #1a1714 45%, #0d0b09 90%);
+  font-family: "Noto Serif KR", "Nanum Myeongjo", "Apple SD Gothic Neo", serif;
+}
+.screen * { box-sizing: border-box; }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; max-width: 1200px; margin: 0 auto; }
+.topbar > span { font: 10px/1.5 sans-serif; letter-spacing: .16em; color: #b59d76; }
+.studio { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 8px 12px; color: #e8dcc0; border: 1px solid #665335; border-radius: 8px; text-decoration: none; font-size: 13px; }
+.content { flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; gap: 32px; width: 100%; max-width: 1000px; margin: 0 auto; padding: 36px 0 24px; }
+.hero { text-align: center; }
+.eyebrow { margin: 0 0 18px; font-size: 12px; color: #c3ac86; letter-spacing: .13em; }
+.hero h1 { margin: 0; font-size: clamp(44px, 12vw, 76px); line-height: 1.18; color: #e2c58a; word-break: keep-all; overflow-wrap: anywhere; text-shadow: 0 4px 24px #0008; }
+.subtitle { margin: 12px 0 0; font-size: 20px; letter-spacing: .45em; text-indent: .45em; }
+.divider { width: 100px; height: 1px; margin: 22px auto; background: linear-gradient(90deg, transparent, #bb985b, transparent); }
+.description { margin: 0; color: #b7a98f; font-size: 14px; line-height: 1.9; }
+.menu { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 380px; margin: 0 auto; }
+.menuHeading { margin: 0 0 4px; color: #b7a98f; font-size: 12px; }
+.menuButton { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; min-height: 56px; padding: 15px 22px; background: #211c15; border: 1px solid #78613c; border-radius: 10px; color: #ead8b2; font-weight: 600; line-height: 1.4; font-family: inherit; font-size: 17px; cursor: pointer; touch-action: manipulation; }
+.primary { background: linear-gradient(135deg, #e5ca8e, #bd9557); color: #251b0f; border-color: #e4c481; font-weight: 700; box-shadow: 0 4px 20px #0003; }
+.menuButton:disabled { color: #8e8270; border-color: #494033; background: #211d17; cursor: default; }
+.menuButton:disabled > span:last-child { visibility: hidden; }
+.menuButton:active:not(:disabled) { transform: translateY(1px); }
+.menuButton:focus-visible, .studio:focus-visible { outline: 3px solid #f5d899; outline-offset: 4px; }
+.hint { min-height: 36px; margin: 2px 0 0; font-size: 12px; line-height: 1.6; color: #b4a58a; text-align: center; word-break: keep-all; }
+.footer { text-align: center; color: #95866f; font-size: 11px; line-height: 1.6; padding-top: 8px; }
+@media (hover: hover) { .menuButton:hover:not(:disabled), .studio:hover { filter: brightness(1.12); } }
+@media (min-width: 768px) {
+  .screen { padding-left: max(40px, env(safe-area-inset-left)); padding-right: max(40px, env(safe-area-inset-right)); }
+  .content { flex-direction: row; align-items: center; gap: 64px; padding: 56px 0; }
+  .hero { flex: 1; min-width: 0; }
+  .menu { flex: 1; padding: 30px; max-width: 400px; border: 1px solid #5d4b303d; border-radius: 16px; background: #15120e99; }
+  .hero h1 { font-size: clamp(56px, 7vw, 88px); }
+}
+@media (orientation: landscape) and (max-height: 540px) {
+  .content { flex-direction: row; align-items: center; gap: 28px; padding: 16px 0; }
+  .hero, .menu { flex: 1; min-width: 0; }
+  .hero h1 { font-size: 44px; }
+  .eyebrow { margin-bottom: 10px; }
+  .description, .divider, .footer, .menuHeading { display: none; }
+  .menu { gap: 8px; padding: 0; border: 0; background: none; }
+  .menuButton { min-height: 48px; padding: 10px 16px; }
+  .hint { min-height: 0; }
+}

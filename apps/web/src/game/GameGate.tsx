@@ -7,7 +7,7 @@ import { installGame } from "./data";
 /** Keep a running game's data fixed. A full game visit synchronizes saved authoring changes. */
 export function GameGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const editing = /^\/(studio|motion-editor|battle-motion-preview|game|lab|playtest|troia)(\/|$)/.test(pathname);
+  const editing = pathname === "/studio-login" || /^\/(studio|motion-editor|battle-motion-preview|game|lab|playtest|troia)(\/|$)/.test(pathname);
   const [ready, setReady] = useState((process.env.NODE_ENV !== "development" && process.env.NEXT_PUBLIC_HOSTED_STUDIO !== "1"));
   const [error, setError] = useState("");
   const [warning, setWarning] = useState("");
@@ -20,7 +20,7 @@ export function GameGate({ children }: { children: React.ReactNode }) {
       if (pathname === "/battle" && query.get("resume") === "1") {
         try { version = JSON.parse(localStorage.getItem("tk.battle.suspend.v1") ?? "null")?.gameVersion ?? ""; } catch {}
       }
-      const response = await fetch(`${process.env.NEXT_PUBLIC_HOSTED_STUDIO === "1" ? "/api/game" : "/api/studio/game"}${version ? `?version=${encodeURIComponent(version)}` : ""}`, { cache:"no-store" });
+      const response = await fetch(`/api/game${version ? `?version=${encodeURIComponent(version)}` : ""}`, { cache:"no-store" });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error ?? "게임 데이터를 불러오지 못했습니다.");
       if (cancelled) return;

@@ -1,15 +1,19 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { isEditorPath, validStudioCredentials } from "./src/studio/hosting-auth";
+import { isEditorPath, validStudioCredentials, validStudioSession, STUDIO_COOKIE } from "./src/studio/hosting-auth";
 import { hostedStudioEnabled } from "./src/studio/hosting";
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  if (process.env.NODE_ENV !== "development" && isEditorPath(path)) {
-    if (!hostedStudioEnabled()) return new NextResponse("Not found", { status: 404 });
-    if (!await validStudioCredentials(request.headers.get("authorization"), process.env.TK_STUDIO_USER || "admin", process.env.TK_STUDIO_PASSWORD || "")) {
-      return new NextResponse("Studio login required", { status: 401, headers: {
-        "WWW-Authenticate": 'Basic realm="Project Studio", charset="UTF-8"', "Cache-Control": "no-store",
-      } });
+  if (isEditorPath(path) && (process.env.NODE_ENV !== "development" || process.env.TK_STUDIO_PASSWORD)) {
+    if (process.env.NODE_ENV !== "development" && !hostedStudioEnabled()) return new NextResponse("Not found", { status: 404 });
+    const password = process.env.TK_STUDIO_PASSWORD || "";
+    const authenticated = await validStudioSession(request.cookies.get(STUDIO_COOKIE)?.value, password)
+      || await validStudioCredentials(request.headers.get("authorization"), process.env.TK_STUDIO_USER || "admin", password);
+    if (!authenticated) {
+      if (path.startsWith("/api/") || path.startsWith("/_draft/")) return NextResponse.json({ error: "Studio login required" }, { status: 401, headers: { "Cache-Control": "no-store" } });
+      const login = new URL("/studio-login", request.url);
+      login.searchParams.set("next", path + request.nextUrl.search);
+      return NextResponse.redirect(login);
     }
   }
   // Separate services can have readable project domains without exposing IDs.

@@ -155,11 +155,15 @@ export function PauseMenu({
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: "min(340px, 90vw)",
+          width: 380,
+          maxWidth: "100%",
+          maxHeight: "100%",
+          overflowY: "auto",
+          boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
           gap: 16,
-          padding: "26px 24px",
+          padding: "18px 24px",
           borderRadius: 14,
           background: `linear-gradient(160deg, ${INK} 0%, ${INK_DEEP} 100%)`,
           border: `1px solid ${BRONZE_DIM}66`,

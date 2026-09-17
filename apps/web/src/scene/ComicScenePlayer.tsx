@@ -52,7 +52,7 @@ export function ComicScenePlayer({
     const el = rootRef.current;
     if (!el) return;
     const set = (w: number, h: number): void => { if (w > 0 && h > 0) setView({ w, h }); };
-    set(window.innerWidth, window.innerHeight); // 첫 프레임 즉시(백그라운드 문서는 RO 콜백이 렌더링 재개까지 미뤄진다)
+    set(el.clientWidth, el.clientHeight); // 첫 프레임 즉시(백그라운드 문서는 RO 콜백이 렌더링 재개까지 미뤄진다)
     const ro = new ResizeObserver(([entry]) => set(entry!.contentRect.width, entry!.contentRect.height));
     ro.observe(el);
     return () => ro.disconnect();

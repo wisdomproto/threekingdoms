@@ -64,7 +64,7 @@ export function AudioController(): React.ReactElement {
     if (track) playBgm(track); else stopBgm();
   }, [pathname]);
 
-  return <AudioControl />;
+  return <AudioControl gameplay={pathname === "/battle" || pathname === "/scene"} />;
 }
 
 // ── 떠 있는 뮤트/음량 컨트롤 ──────────────────────────────────────────────────
@@ -135,7 +135,7 @@ function Slider({
 }
 
 /** 음량/뮤트 팝오버 토글. 엔진 설정을 구독해 외부 변경도 반영. */
-function AudioControl(): React.ReactElement {
+function AudioControl({ gameplay = false }: { gameplay?: boolean }): React.ReactElement {
   const [, force] = useState(0);
   const [open, setOpen] = useState(false);
   useEffect(() => audio.subscribe(() => force((n) => n + 1)), []);
@@ -143,7 +143,7 @@ function AudioControl(): React.ReactElement {
   const muted = s.muted;
 
   return (
-    <div style={WRAP_STYLE}>
+    <div style={gameplay ? { ...WRAP_STYLE, left: "auto", right: 12, top: 100, bottom: "auto", alignItems: "flex-end", flexDirection: "column-reverse" } : WRAP_STYLE}>
       {open && (
         <div style={PANEL_STYLE} onClick={(e) => e.stopPropagation()}>
           <Slider label="전체" value={s.master} onChange={(v) => audio.setSettings({ master: v })} />

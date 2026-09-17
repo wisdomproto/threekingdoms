@@ -13,17 +13,11 @@
  */
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BUTTON_FRAME } from "../../battle/hud/frames";
+import Link from "next/link";
+import styles from "./TitleScreen.module.css";
 import { earnedInventoryCount, getMeta, reset } from "../metaStore";
 import { adLifecycle } from "../adProviders";
 import { activeGame } from "../../game/data";
-
-/** 수묵·청동 공유 팔레트 (frames.ts 청동기 톤 + 먹빛 배경). */
-const INK = "#1a1714";
-const INK_DEEP = "#0d0b09";
-const BRONZE_GOLD = "#cdab6e";
-const BRONZE_DIM = "#8a7350";
-const PARCHMENT = "#e8dcc0";
 
 export function TitleScreen(): React.ReactElement {
   const router = useRouter();
@@ -54,143 +48,46 @@ export function TitleScreen(): React.ReactElement {
   }
 
   return (
-    <section
-      style={{
-        minHeight: "100svh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 32,
-        padding: "48px 20px",
-        boxSizing: "border-box",
-        background: `radial-gradient(120% 90% at 50% 18%, ${INK} 0%, ${INK_DEEP} 78%)`,
-        color: PARCHMENT,
-        textAlign: "center",
-        fontFamily:
-          '"Noto Serif KR", "Nanum Myeongjo", "Apple SD Gothic Neo", serif',
-      }}
-    >
-      {/* 로고 블록 */}
-      {activeGame && <div style={{fontSize:14,color:PARCHMENT}}>
-        <p>{activeGame.name} · 동기화된 버전 {activeGame.revision}</p>
-        <a href={`/studio?project=${activeGame.projectId}`} style={{color:BRONZE_GOLD}}>스튜디오로 돌아가기</a>
-        <p style={{fontSize:12,color:BRONZE_DIM}}>저장한 편집 내용은 게임을 다시 열 때 반영됩니다.</p>
-      </div>}
-      <header style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <p
-          style={{
-            margin: 0,
-            letterSpacing: "0.5em",
-            fontSize: 13,
-            color: BRONZE_DIM,
-            textIndent: "0.5em",
-          }}
-        >
-          1998년의 게임성 · 2026년의 연출
-        </p>
-        <h1
-          style={{
-            margin: 0,
-            fontSize: "clamp(40px, 11vw, 76px)",
-            lineHeight: 1.05,
-            color: BRONZE_GOLD,
-            textShadow: `0 2px 18px ${INK_DEEP}, 0 0 1px ${BRONZE_DIM}`,
-            fontWeight: 700,
-          }}
-        >
-          삼국지
-        </h1>
-        <h2
-          style={{
-            margin: 0,
-            fontSize: "clamp(16px, 4.5vw, 24px)",
-            letterSpacing: "0.35em",
-            color: PARCHMENT,
-            textIndent: "0.35em",
-            fontWeight: 400,
-          }}
-        >
-          유 비 전
-        </h2>
-        <div
-          aria-hidden
-          style={{
-            width: 96,
-            height: 2,
-            margin: "8px auto 0",
-            background: `linear-gradient(90deg, transparent, ${BRONZE_DIM}, transparent)`,
-          }}
-        />
-      </header>
-
-      {/* 메뉴 */}
-      <nav
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 16,
-          width: "min(320px, 86vw)",
-        }}
-      >
-        <MenuButton
-          label="이어하기"
-          onClick={onContinue}
-          disabled={!hasProgress}
-          primary={hasProgress}
-        />
-        <MenuButton
-          label="새 게임"
-          onClick={onNewGame}
-          primary={!hasProgress}
-        />
-        <MenuButton label="이야기 읽기" onClick={() => router.push("/chronicle")} />
-        {hasProgress && (
-          <p style={{ margin: 0, fontSize: 12, color: BRONZE_DIM }}>
-            새 게임은 현재 진행을 모두 초기화합니다.
+    <section className={styles.screen}>
+      <div className={styles.topbar}>
+        <span>THREE KINGDOMS</span>
+        <Link className={styles.studio} href={`/studio-login?next=${encodeURIComponent(activeGame ? `/studio?project=${activeGame.projectId}` : "/studio")}`}>
+          Studio 가기 <span aria-hidden="true">↗</span>
+        </Link>
+      </div>
+      <div className={styles.content}>
+        <header className={styles.hero}>
+          <p className={styles.eyebrow}>삼국의 시대, 나의 이야기</p>
+          <h1>삼국지</h1>
+          <p className={styles.subtitle}>유비전</p>
+          <div className={styles.divider} aria-hidden="true" />
+          <p className={styles.description}>뜻을 함께할 장수들과<br />난세를 헤쳐 나가세요.</p>
+        </header>
+        <nav className={styles.menu} aria-label="게임 시작 메뉴">
+          <p className={styles.menuHeading}>여정을 시작하세요</p>
+          <MenuButton label="이어하기" onClick={onContinue} disabled={!hasProgress} primary={hasProgress} />
+          <MenuButton label="새 게임" onClick={onNewGame} primary={!hasProgress} />
+          <MenuButton label="이야기 읽기" onClick={() => router.push("/chronicle")} />
+          <p className={styles.hint}>
+            {hasProgress ? "새 게임을 시작하면 현재 진행이 초기화됩니다." : "진행한 내용은 이 기기에 자동으로 저장됩니다."}
           </p>
-        )}
-      </nav>
+        </nav>
+      </div>
+      <footer className={styles.footer}>한 수의 선택으로 이어지는 영웅들의 이야기</footer>
     </section>
   );
 }
 
-function MenuButton({
-  label,
-  onClick,
-  disabled = false,
-  primary = false,
-  tone = "default",
-}: {
+function MenuButton({ label, onClick, disabled = false, primary = false }: {
   label: string;
   onClick: () => void;
   disabled?: boolean;
   primary?: boolean;
-  tone?: "default" | "warn";
 }): React.ReactElement {
-  const color =
-    tone === "warn" ? "#e7c34a" : primary ? "#f3e7c8" : "#cdab6e";
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        ...BUTTON_FRAME,
-        background: "transparent",
-        color: disabled ? "#5a5142" : color,
-        fontSize: 18,
-        letterSpacing: "0.25em",
-        textIndent: "0.25em",
-        padding: "10px 8px",
-        cursor: disabled ? "default" : "pointer",
-        opacity: disabled ? 0.45 : 1,
-        fontFamily: "inherit",
-        fontWeight: primary ? 700 : 400,
-        transition: "color 120ms, opacity 120ms",
-      }}
-    >
-      {label}
+    <button type="button" onClick={onClick} disabled={disabled}
+      className={`${styles.menuButton} ${primary ? styles.primary : ""}`}>
+      <span>{label}</span><span aria-hidden="true">→</span>
     </button>
   );
 }

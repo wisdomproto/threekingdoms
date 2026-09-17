@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <main style={{ background: "#0d0b09" }}>
       <TitleScreen />
-      <details style={{ padding: "16px 24px 32px", color: "#9aa3ad", fontSize: 13, background: "#0d0b09", borderTop: "1px solid #2c2620" }}>
+      {process.env.NODE_ENV === "development" && <details style={{ padding: "16px 24px 32px", color: "#9aa3ad", fontSize: 13, background: "#0d0b09", borderTop: "1px solid #2c2620" }}>
         <summary style={{ cursor: "pointer", color: "#8a7350" }}>개발 링크 (임시)</summary>
         <p>첫 스테이지: {stage.name} ({map.width}×{map.height})</p>
         <p>등록 장수: {Object.keys(gameData.commanders).length}명</p>
@@ -21,7 +21,7 @@ export default function Home() {
           <li><Link href="/stages">스테이지 선택</Link></li>
           <li><Link href={{ pathname: "/prep", query: { stage: stage.id } }}>출진 준비</Link></li>
         </ul>
-      </details>
+      </details>}
     </main>
   );
 }

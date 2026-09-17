@@ -90,7 +90,7 @@ function ActionBtn({ item }: { item: Item }): React.ReactElement {
 function UnitRow({ unit, compact, onDetail }: { unit: UnitVM; compact?: boolean; onDetail: () => void }): React.ReactElement {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0, flex: 1 }}>
-      {!compact && <PortraitBox key={unit.name} name={unit.name} />}
+      {!compact && <PortraitBox key={unit.name} name={unit.name} compact />}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 6, whiteSpace: "nowrap", overflow: "hidden" }}>
           <strong style={{ fontSize: compact ? 14 : 16, color: sideColor(unit.side) }}>{unit.name}</strong>
@@ -156,11 +156,11 @@ export function BottomPanel({
 
   if (hidden) return null;
   const unit = id ? (vm.units.find((u) => u.id === id) ?? null) : null;
-  const items = state === "expanded" && !previewWalking ? itemsFor(ui, dispatch, ctx.data) : [];
+  const items = state === "expanded" && !previewWalking ? itemsFor(ui, dispatch, ctx.data).filter(item => !item.placeholder) : [];
 
   return (
     <>
-      <div id="hudBottom" ref={rootRef} style={ROOT_STYLE}>
+      <div id="hudBottom" ref={rootRef} style={state === "collapsed" && !unit ? { ...ROOT_STYLE, background: "transparent", borderTop: "none", pointerEvents: "none" } : ROOT_STYLE}>
         {state === "collapsed" ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8, minHeight: AUX_H, padding: "4px 8px" }}>
             {unit ? <UnitRow unit={unit} compact onDetail={() => setSheet(true)} /> : <div style={{ flex: 1 }} />}
@@ -169,20 +169,20 @@ export function BottomPanel({
                 type="button"
                 data-testid="bottom-end-turn"
                 onClick={() => dispatch({ type: "endTurnPressed" })}
-                style={{ ...BTN_STYLE, minWidth: 96, padding: "0 16px", flexShrink: 0 }}
+                style={{ ...BTN_STYLE, pointerEvents: "auto", minWidth: 96, padding: "0 16px", flexShrink: 0 }}
               >
                 턴 종료
               </button>
             )}
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 6, padding: "6px 8px" }}>
-            {unit && <UnitRow unit={unit} onDetail={() => setSheet(true)} />}
-            <AttackForecast ui={ui} ctx={ctx} committed={committed} dispatch={dispatch} />
+          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 12, padding: "6px 12px" }}>
+            {unit && <div style={{ width: 240, flexShrink: 0 }}><UnitRow unit={unit} onDetail={() => setSheet(true)} /></div>}
+            {<div style={{ position: "absolute", right: 12, bottom: "100%", maxHeight: 300, overflowY: "auto" }}><AttackForecast ui={ui} ctx={ctx} committed={committed} dispatch={dispatch} /></div>}
             {ui.kind === "selected" ? (
               <div style={{ textAlign: "center", fontSize: 14, color: "#9aa3ad", padding: "8px 0" }}>이동할 칸이나 적을 탭</div>
             ) : items.length > 0 ? (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6, maxHeight: "50vh", overflowY: "auto" }}>
+              <div style={{ display: "grid", flex: 1, minWidth: 0, gridTemplateColumns: ui.kind === "postMoveMenu" ? `repeat(${items.length}, minmax(0, 1fr))` : "repeat(4, minmax(0, 1fr))", gap: 6, maxHeight: 120, overflowY: "auto" }}>
                 {items.map((item) => (
                   <ActionBtn key={item.key} item={item} />
                 ))}
@@ -197,7 +197,7 @@ export function BottomPanel({
           style={{
             ...ROOT_STYLE,
             zIndex: 7,
-            maxHeight: "70vh",
+            maxHeight: "80%",
             overflowY: "auto",
             padding: "6px 8px calc(8px + env(safe-area-inset-bottom))",
           }}

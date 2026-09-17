@@ -46,7 +46,7 @@ import { BottomPanel } from "./hud/BottomPanel";
 import { ActionMenu } from "./hud/ActionMenu";
 import { adLifecycle } from "../meta/adProviders";
 import { HUD_FONT, HUD_BRONZE, HUD_BRONZE_DIM, HUD_INK, HUD_PARCHMENT } from "./hud/frames";
-import { hudMode } from "./hudLayout";
+
 import { loadControls, saveControls } from "./controlSettings";
 import { canSuspend, clearSuspend, isResumable, readSuspend, writeSuspend } from "./suspend";
 import { firedDialogues, toDialogueSnapshot } from "./dialogue/director";
@@ -509,15 +509,8 @@ export default function BattleScreen({ setup, onComplete, onExit }: {
   }, [store, delegate]);
   const selectedId = activeUnitId(snap.ui);
   // 모바일 HUD(스펙 2026-09-12): <768px면 하단 패널이 부유 메뉴·정보창·턴종료를 대신한다. 데스크톱 JSX는 불변.
-  const [touchControls, setTouchControls] = useState(false);
-  useEffect(() => {
-    const query = window.matchMedia("(pointer: coarse)");
-    const update = () => setTouchControls(query.matches);
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, []);
-  const mobile = touchControls || hudMode(viewport.width) === "mobile";
+  // One touch-first layout for the shared 16:9 gameplay viewport.
+  const mobile = true;
   // Desktop information stays below; commands follow the selected unit.
   // 목표 텍스트(승리/패배/제한턴)는 stage 불변이라 1회 — 칩·강조 배너가 같은 display를 받는다.
   const display = useMemo(

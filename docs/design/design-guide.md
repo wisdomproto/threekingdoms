@@ -609,3 +609,8 @@ Archetype, Package, License를 표시한다.
 -   [ ] Basic Creator는 rig를 몰라도 제작 가능
 -   [ ] Advanced Creator는 세부 제어 가능
 -   [ ] Presentation 편집도 Undo/Redo 지원
+
+
+## Mobile-first gameplay viewport (2026-09-17)
+
+Scenario and battle use one 800 × 450 logical canvas (16:9). Fit this canvas inside the device safe area without cropping; desktop uses the same layout and proportions, with letterboxing. Portrait phones remain usable with a rotate suggestion. Studio and authoring previews keep their independent workspace. Battle commands share one compact touch dock on all devices, with unit information beside actions, not a second desktop layout. Dialogue is readable as complete sentences with scrollable long passages and 44–52 logical pixel controls.

@@ -18,7 +18,7 @@ export function NarrationPanel({
   total: number;
 }): React.ReactElement {
   return (
-    <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "0 12px calc(40px + env(safe-area-inset-bottom))" }}>
+    <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "0 12px calc(14px + env(safe-area-inset-bottom))" }}>
       <div
         style={{
           maxWidth: 620,
@@ -30,7 +30,7 @@ export function NarrationPanel({
           backdropFilter: "blur(2px)",
         }}
       >
-        <div style={{ color: PARCHMENT, fontSize: 15.5, lineHeight: 1.85, textAlign: "center", letterSpacing: "0.02em" }}>
+        <div style={{ color: PARCHMENT, fontSize: 18, lineHeight: 1.65, wordBreak: "keep-all", overflowWrap: "anywhere", maxHeight: 150, overflowY: "auto", textAlign: "center", letterSpacing: "0.02em" }}>
           {shown}
           {!done && <span style={{ color: BRONZE_GOLD, opacity: 0.7 }}>▍</span>}
         </div>

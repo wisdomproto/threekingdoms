@@ -92,9 +92,9 @@ function SceneRoute(): React.ReactElement | null {
         <ScenePlayer key={playerKey} scene={part} title={stage?.name} onComplete={next} />
       )}
       <button type="button" onClick={() => { setPi(0); setReplay(n => n + 1); }}
-        style={{ position: "fixed", top: "calc(12px + env(safe-area-inset-top))", right: 132, zIndex: 20,
+        style={{ position: "fixed", top: "calc(12px + env(safe-area-inset-top))", right: 150, zIndex: 20,
           background: "rgba(20,17,14,0.8)", color: "#d8ba7b", border: "1px solid #6f5a34",
-          borderRadius: 4, padding: "4px 12px", fontSize: 12, cursor: "pointer" }}>
+          borderRadius: 4, minHeight: 44, padding: "8px 12px", fontSize: 14, cursor: "pointer" }}>
         처음부터 ↺
       </button>
       {overlay}

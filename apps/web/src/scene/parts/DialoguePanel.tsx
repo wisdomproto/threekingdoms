@@ -28,7 +28,7 @@ export function DialoguePanel({
   const portraitSrc = line.portraitId ? assetUrl(`/assets/ui/portraits/${line.portraitId}.webp`) : undefined;
 
   return (
-    <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "0 12px calc(20px + env(safe-area-inset-bottom))" }}>
+    <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "0 12px calc(10px + env(safe-area-inset-bottom))" }}>
       <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", alignItems: "flex-end", gap: 12 }}>
         {/* 화자 초상 */}
         {portraitSrc && <div style={{ width: 96, height: 116, flexShrink: 0 }}>
@@ -49,7 +49,7 @@ export function DialoguePanel({
           <div style={{ color: nameColor, fontWeight: 700, fontSize: 16, marginBottom: 6, letterSpacing: "0.04em" }}>
             {line.speaker}
           </div>
-          <div style={{ color: PARCHMENT, fontSize: 16, lineHeight: 1.65, minHeight: 52 }}>
+          <div style={{ color: PARCHMENT, fontSize: 18, lineHeight: 1.55, minHeight: 52, wordBreak: "keep-all", overflowWrap: "anywhere", maxHeight: 112, overflowY: "auto" }}>
             {shown}
             {!done && <span style={{ color: BRONZE_GOLD, opacity: 0.7 }}>▍</span>}
           </div>
