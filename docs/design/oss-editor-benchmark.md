@@ -482,6 +482,23 @@ GPL은 유료 판매를 허용하지만, 적용되는 코드를 수정·결합·
 
 > **한 프로젝트에서 장수·장비·전장·이야기를 편집하고, 방금 바꾼 그대로 실제 삼국지 전투를 실행한 뒤, 잃어버린 작업 없이 돌아오는 제작 환경을 만드는 것.**
 
+
+## 18. 추가 조사 — 자동 밸런스 시뮬레이션 유무 (2026-09-18)
+
+본문 §3~§8의 "테스트"는 **전부 수동 플레이테스트**(현재 챕터를 F5로 실행)다. 스테이지를 자동으로 여러 번 돌려 난이도를 판정하는 **시뮬레이션**은 아니다. 이 구분을 확인하려고 범위를 넓혀 추가 조사했다.
+
+| 계층 | 자동 시뮬레이션 | 사례 |
+|---|---|---|
+| 창작자 저작도구 | **없음** | SRPG Studio, LT-Maker, RPGAtlas, LDtk, RPG Maker SRPG 플러그인 |
+| 자사 게임 스튜디오 | 있음 (내부 전용) | Prismata(Lunarch Studios), AI 플레이테스트 외주 서비스 |
+| 학계 | 활발 | RaidEnv, Dungeons & Replicants II, Metagame Autobalancing |
+
+- **SRPG Studio**(SapphireSoft, 이 장르 최대 상용 도구): 공식 매뉴얼의 "Balance/Enemy Balance"는 **성장률로 적 스탯을 자동 산출하는 계산기**이고 시뮬레이션이 아니다. 테스트는 Test Play / Map Test(수동). 매뉴얼은 적 AI가 Stat Boosting·Class Change·Custom 아이템 효과를 쓰지 못한다고 명시한다 — 자동 플레이테스트를 감당할 AI가 아니다. [S38]
+- **LT-Maker**: 헤드리스 실행·밸런스 판정 기능 문서화 없음(본문 §4와 일치). [S39]
+- **Prismata**(Lunarch Studios): 초당 수백만 수를 두는 C++ 엔진으로 자동 QA·AI 튜닝·**밸런스 테스트** 수행, 신규 유닛 공정성을 플레이어 피드백 없이 판정. AIIDE 스타크래프트 AI 대회 우승자(Dave Churchill) 주도. AI 강도를 사람 랭크 매칭에 몰래 넣어 검증. 엔진은 오픈소스(도입 전 라이선스 확인 필요). [S40][S41]
+
+**결론**: 자동 밸런스 시뮬레이션은 **스튜디오가 자기 게임에 쓰는 것**과 **논문**에만 있고, **창작자에게 주는 도구에는 없다.** 우리 해석·전략은 `docs/superpowers/specs/2026-09-17-simulation-authoring-strategy.md` §12. 한계: 일본어 SRPG Studio 커뮤니티(플러그인)는 미조사, "문서화 없음" ≠ "기능 없음" 100% 증명은 아님.
+
 ---
 
 # 출처 목록
@@ -617,3 +634,17 @@ GPL은 유료 판매를 허용하지만, 적용되는 코드를 수정·결합·
 
 **[S37] SRPGCK MapExporter** — Unity 에디터 내 맵 직렬화 사례.
 `https://raw.githubusercontent.com/JoeOsborn/SRPGCK/master/Assets/Editor/SRPGKit/MapExporter.cs`
+
+### 추가 조사 (2026-09-18)
+
+**[S38] SRPG Studio 공식 매뉴얼 — Database** — Enemy Balance·Test Play·Map Test, 적 AI 아이템 사용 제한.
+`http://www.srpgstudio.com/english/help/data.html`
+
+**[S39] lt-maker documentation**
+`https://lt-maker.readthedocs.io/en/latest/source/home.html`
+
+**[S40] The Prismata AI: How I learned to stop worrying and love the bots** (Game Developer)
+`https://www.gamedeveloper.com/design/the-prismata-ai-how-i-learned-to-stop-worrying-and-love-the-bots`
+
+**[S41] davechurchill/PrismataAI** — C++ AI 엔진 (오픈소스).
+`https://github.com/davechurchill/PrismataAI`
